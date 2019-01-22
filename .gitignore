@@ -59,3 +59,16 @@ typings/
 
 # next.js build output
 .next
+
+# IDEA
+.idea
+.vscode
+
+# temp
+package-lock.json
+build
+dist
+log
+
+# setting
+setting.ts
