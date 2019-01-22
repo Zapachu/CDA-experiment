@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+message CreateParams {
+}
+
+message GameState {
+}
+
+message PlayerState {
+}
+
+message MoveParams {
+    string imageName = 1;
+}
+
+message PushParams {
+}

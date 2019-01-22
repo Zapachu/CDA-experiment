@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+message CreateParams {
+    string nextPhaseKey = 1;
+    float exchangeRate = 2;
+    int32 timeLimit = 3;
+}
+
+message GameState {
+    int32 gameStage = 1;
+    int32 time = 2;
+}
+
+message PlayerState {
+    message Anwser {
+        int32 emotion = 1;
+        int32 gender = 2;
+        int32 time = 3;
+    }
+    message Result {
+        int32 genderNum = 1;
+        int32 emotionNum = 2;
+        float point = 3;
+    }
+    int32 seatNumber = 1;
+    repeated Anwser anwsers = 2;
+    Result result = 3;
+}
+
+message MoveParams {
+    message NewAnwser {
+        int32 index = 1;
+        int32 gender = 2;
+        int32 emotion = 3;
+    }
+    int32 seatNumber = 1;
+    NewAnwser newanwser = 2;
+}
+message PushParams {
+}

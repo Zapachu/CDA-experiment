@@ -1,0 +1,2 @@
+{"script":"lib/core/server/server.ts","name":"bespoke","env":{"NODE_ENV":"production","PORT":3009},"log_date_format" :
+"YYYY-MM-DD HH:mm Z"}

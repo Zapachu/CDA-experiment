@@ -1,0 +1,27 @@
+/**
+ * Description : 非敏感配置信息
+ */
+import {LogLevel, Language} from './baseEnum'
+
+export const config = {
+    rootName: 'bespoke',
+    apiPrefix: 'api',
+    socketPath: '/bespoke/socket.io',
+    memoryCacheLifetime: 3 * 60 * 1000,
+    minMoveInterval: 500,
+    historyGamesListSize: 12,
+    shareCodeLifeTime:3 * 24 * 60 * 60,
+    vcodeLifetime:60,
+    logLevel: LogLevel.log,
+    defaultLanguage: Language.en,
+    deployIndependently: true,
+    cookieKey:{
+        csrf:'_csrf'
+    },
+    buildManifest:{
+        coreFile:'bespokeCore.json',
+        gameFile:'bespokeGame.json',
+        clientVendorLib:'clientVendor',
+        clientCoreLib:'clientCore'
+    }
+}

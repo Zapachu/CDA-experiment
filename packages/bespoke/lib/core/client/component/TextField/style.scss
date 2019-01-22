@@ -1,0 +1,25 @@
+@import "public";
+
+.textField {
+  .textFieldLabel {
+    color: rgba($color-black, .6);
+    margin: .5rem;
+  }
+  input {
+    text-align: center;
+    font-size: $fontSize-middle;
+    color: rgba($color-black, .8);
+    padding: 2px .5rem;
+    margin: 2px .5rem;
+    border: {
+      width: 1px;
+      style: solid;
+      color: transparent transparent rgba($color-black, .2);
+    }
+    outline: none;
+    transition: $transition-normal;
+    &:hover, &:focus {
+      border-bottom-color: rgba($color-black, .5);
+    }
+  }
+}
