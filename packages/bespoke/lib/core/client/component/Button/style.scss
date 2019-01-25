@@ -1,0 +1,16 @@
+@import "public";
+
+.button {
+  margin: .2rem;
+  display: flex;
+  justify-content: center;
+  background-color: white;
+  border-radius: .2rem;
+  outline: none;
+  box-shadow: $shadow-normal;
+  cursor: pointer;
+  user-select: none;
+  label{
+    cursor: pointer;
+  }
+}

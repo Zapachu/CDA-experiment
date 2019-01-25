@@ -1,0 +1,64 @@
+@import "public";
+
+.create {
+  margin: 1.5rem;
+  display: flex;
+  flex-direction: column;
+
+  .baseFields {
+
+  }
+
+  .privatePriceTable {
+    margin-top: 1rem;
+    color: $color-black;
+    text-align: center;
+
+    td {
+      border: $borderLine;
+      width: 5rem;
+      height: 3rem;
+
+      a {
+        color: $color-blue;
+        transition: $transition-normal;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+      input {
+        width: 4rem;
+      }
+    }
+  }
+
+  .btnSwitch {
+    margin-top: 1rem;
+    text-align: center;
+    transition: $transition-normal;
+    color: rgba($color-blue, .6);
+
+    &:hover {
+      color: $color-blue;
+      text-decoration: underline;
+    }
+  }
+}
+
+.result {
+  width: 24rem;
+  margin: 2rem auto;
+
+  .resultTable {
+    margin: 1rem;
+
+    td {
+      width: 4rem;
+      height: 3rem;
+      text-align: center;
+      border: $borderLine;
+    }
+  }
+}

@@ -1,0 +1,48 @@
+@import "public";
+
+.btnGroup {
+  display: flex;
+  align-items: center;
+  margin: .5rem;
+  label {
+    color: rgba($color-black, .8);
+    margin: .5rem;
+  }
+  .btns {
+    display: flex;
+    border: $borderLine;
+    border-radius: .5rem;
+    font-size: $fontSize-middle;
+    overflow: hidden;
+    background: white;
+    list-style: none;
+    padding: 0;
+    li {
+      color: rgba($color-black, .8);
+      padding: .5rem 1rem;
+      border-left: 1px solid rgba($color-black, .1);
+      transition: $transition-normal;
+      position: relative;
+      left: -1px;
+      cursor: pointer;
+      user-select: none;
+      &:hover, &.active {
+        color: $color-blue;
+      }
+    }
+  }
+
+  &.small {
+    margin: .2rem;
+    label {
+      font-size: .8rem;
+    }
+    .btns {
+      border-radius: .2rem;
+      font-size: $fontSize-small;
+      li {
+        padding: .2rem .8rem;
+      }
+    }
+  }
+}

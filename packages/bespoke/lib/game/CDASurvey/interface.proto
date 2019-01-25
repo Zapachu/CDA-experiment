@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+message CreateParams {
+}
+
+message GameState {
+    int32 gameStage = 1;
+}
+
+message PlayerState {
+    int32 seatNumber = 1;
+    int32 surveyStage = 2;
+    repeated string surveyBasic = 3;
+    repeated string surveyFeedback = 4;
+    repeated string surveyTest = 5;
+}
+
+message MoveParams {
+    int32 seatNumber = 1;
+    repeated string inputs = 2;
+    int32 stage = 3;
+}
+
+message PushParams {
+}

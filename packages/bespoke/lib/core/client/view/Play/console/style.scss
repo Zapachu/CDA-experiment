@@ -1,0 +1,85 @@
+@import "public";
+
+.blankMsg {
+  @include blankMsg;
+}
+
+@mixin layoutWrapper {
+  width: calc(50% - .5rem);
+  margin: .5rem 0;
+  @media (max-width: $layout-mediaWidth) {
+    width: calc(100% - .5rem);
+  }
+}
+
+.gameControl {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  background: white;
+  margin: auto;
+  box-shadow: $shadow-normal;
+  display: flex;
+  align-items: start;
+  .simulatePlayer {
+    flex-basis: 60%;
+    margin: 1rem;
+    user-select: none;
+    .header {
+      display: flex;
+      justify-content: center;
+      .addWrapper {
+        margin-left: 2rem;
+        input {
+          width: 5rem;
+          border: none;
+          border-bottom: 1px solid rgba($color-blue, .7);
+          outline: none;
+          text-align: center;
+        }
+        span {
+          color: $color-blue;
+          &:hover {
+            cursor: pointer;
+          }
+        }
+      }
+    }
+    .players {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      margin: .5rem 0 1rem;
+      a {
+        min-width: 5rem;
+        font-size: $fontSize-middle;
+        color: $color-black;
+        text-align: center;
+        transition: $transition-normal;
+        &:hover {
+          color: $color-blue;
+          text-decoration: underline;
+        }
+        &.startAll {
+          color: $color-blue;
+          font-size: $fontSize-small;
+        }
+      }
+    }
+  }
+  .statusSwitcher {
+    flex-basis: 40%;
+    border-right: 1px solid rgba($color-black, .1);
+    height: 100%;
+    .btnGroup {
+      display: flex;
+      justify-content: flex-end;
+    }
+    .switcherWrapper {
+      margin-top: 2rem;
+      display: flex;
+      justify-content: center;
+    }
+  }
+}

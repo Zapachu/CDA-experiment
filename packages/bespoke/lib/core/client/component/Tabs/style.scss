@@ -1,0 +1,24 @@
+@import "public";
+
+.tabs{
+  user-select: none;
+  .tabsHeader{
+    display: flex;
+    border-bottom: 1px solid $color-blue;
+    li{
+      padding: .5rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      background: $color-background;
+      color: rgba($color-black,.8);
+      transition: all .2s linear;
+      &:hover{
+        color: $color-blue;
+      }
+      &.active{
+        background: $color-blue;
+        color: #fff;
+      }
+    }
+  }
+}

@@ -1,0 +1,187 @@
+@import "public";
+
+@mixin cutLine {
+  content: '';
+  border-top: 1px solid #d9d9d9;
+  transform: scaleY(.5);
+  width: 100%;
+  display: block;
+  position: absolute;
+}
+
+@mixin inputSection {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: .8rem;
+  &:before {
+    @include cutLine
+  }
+}
+
+.Login {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .title {
+    margin: 2rem 0;
+    color: white;
+    font-size: $fontSize-large;
+    user-select: none;
+  }
+  .inputPanel {
+    margin-top: 2rem;
+    max-width: 32rem;
+    padding: 2rem 2.5rem;
+    border-radius: .8rem;
+    box-shadow: $shadow-normal;
+    background-color: #fff;
+    overflow: hidden;
+    input {
+      flex: 1;
+      font-size: $fontSize-middle;
+      border: 0;
+      outline: 0;
+      background-color: transparent;
+      padding: .5rem;
+      width: 100%;
+      cursor: pointer;
+    }
+    .label {
+      margin-bottom: 4px;
+      color: #999;
+      font-size: .8rem;
+    }
+
+    .mobileNumberWrapper {
+      @include inputSection;
+    }
+    .verifyCodeWrapper {
+      @include inputSection;
+      .verifyCode {
+        width: 6rem;
+      }
+      .verifyCodeBtn {
+        min-width: 6rem;
+        padding: 0 .6em 0 .7em;
+        border-left: 1px solid #e5e5e5;
+        font-size: 17px;
+        color: #3cc51f;
+        background-color: transparent;
+        border-top: 0;
+        border-right: 0;
+        border-bottom: 0;
+        cursor: pointer;
+        outline: none;
+        &.disabled {
+          color: rgba($color-black, .8);
+          cursor: auto;
+        }
+      }
+      &:after {
+        @include cutLine;
+        bottom: 0;
+      }
+    }
+    .loginBtnWrapper {
+      @include inputSection;
+      margin-top: 1rem;
+      .loginBtn {
+        position: relative;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 14px;
+        padding-right: 14px;
+        box-sizing: border-box;
+        font-size: 18px;
+        text-align: center;
+        text-decoration: none;
+        color: #fff;
+        line-height: 2.55555556;
+        border-radius: 5px;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        overflow: hidden;
+        width: 100%;
+        border-width: 0;
+        outline: 0;
+        -webkit-appearance: none;
+        background-color: #1aad19;
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.mobileNumberInput {
+  display: flex;
+  justify-content: space-between;
+  background: white;
+  flex-wrap: wrap;
+  align-items: center;
+  position: relative;
+  top: 1px;
+  .nationCode {
+    width: 5rem;
+    position: relative;
+    cursor: pointer;
+    &:before {
+      content: " ";
+      display: inline-block;
+      height: 6px;
+      width: 6px;
+      border-width: 2px 2px 0 0;
+      border-color: #c8c8cd;
+      border-style: solid;
+      -webkit-transform: matrix(.71, .71, -.71, .71, 0, 0);
+      transform: matrix(.71, .71, -.71, .71, 0, 0);
+      position: absolute;
+      top: 50%;
+      right: 15px;
+      margin-top: -4px;
+    }
+    &:after {
+      content: " ";
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 1px;
+      bottom: 0;
+      border-right: 1px solid #d9d9d9;
+      color: #d9d9d9;
+      -webkit-transform-origin: 100% 0;
+      transform-origin: 100% 0;
+      -webkit-transform: scaleX(.5);
+      transform: scaleX(.5);
+    }
+  }
+  .mobileNumber {
+    flex-grow: 1;
+  }
+  .nationCodeSelector {
+    position: absolute;
+    flex-basis: 100%;
+    max-height: 10rem;
+    overflow: auto;
+    user-select: none;
+    top: 2.5rem;
+    z-index: 1;
+    background: white;
+    border: 1px solid #d9d9d9;
+    border-radius: $border-radius;
+    li{
+      display: flex;
+      justify-content: space-between;
+      padding: .5rem 1rem;
+      cursor: pointer;
+      transition: $transition-normal;
+      span:last-child{
+        color: rgba($color-black, .5);
+      }
+      &:hover{
+        background: $color-background;
+      }
+    }
+  }
+}

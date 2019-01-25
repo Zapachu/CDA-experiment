@@ -1,0 +1,14 @@
+@import "public";
+
+.rangeInput{
+  input{
+    height: 1rem;
+    cursor: pointer;
+  }
+  span{
+    display: inline-block;
+    width: 4rem;
+    font-size: $fontSize-middle;
+    color: rgba($color-black,.6);
+  }
+}

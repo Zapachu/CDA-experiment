@@ -1,0 +1,133 @@
+.NumberInputComp {
+  display: flex;
+  align-items: center;
+  border: 1px solid #5588ee;
+  border-radius: 3px;
+  padding: .2rem 0 .2rem .6rem;
+  &.invalid {
+    border-color: #c30d23;
+    animation-name: shake;
+    animation-duration: 100ms;
+    animation-iteration-count: 3;
+    animation-timing-function: ease-in-out;
+    animation-delay: 0s;
+    animation-play-state: running;
+  }
+  input {
+    height: 2rem;
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 1.1rem;
+  }
+  .counter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #5588ee;
+    width: 24px;
+    height: 18px;
+    border-radius: 10px;
+    margin-right: .6rem;
+    color: #5588ee;
+    cursor: pointer;
+    &.disabled {
+      border-color: #9b9b9b;
+      color: #9b9b9b;
+      pointer-events: none;
+    }
+  }
+
+  @keyframes shake {
+    0% {
+      transform: translate(0px, 0px) rotate(0deg);
+    }
+    20% {
+      transform: translate(0px, 0px) rotate(-0.5deg);
+    }
+    40% {
+      transform: translate(-1px, -1px) rotate(-0.5deg);
+    }
+    60% {
+      transform: translate(-1px, -1px) rotate(-0.5deg);
+    }
+    80% {
+      transform: translate(-1px, 0px) rotate(-0.5deg);
+    }
+    98% {
+      transform: translate(0px, 0px) rotate(-0.5deg);
+    }
+  }
+}
+
+.RangeInputComp {
+  input[type=range] {
+    -webkit-appearance: none;
+    background: transparent;
+    width: 100%;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+  }
+  input[type=range]:focus {
+    outline: none;
+  }
+  input[type=range]::-ms-track {
+    width: 100%;
+    cursor: pointer;
+    background: transparent; 
+    border-color: transparent;
+    color: transparent;
+  }
+  input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 4px;
+    cursor: pointer;
+    background: #8caae5;
+    border-radius: .5px;
+  }
+  input[type=range]:focus::-webkit-slider-runnable-track {
+    background: #8caae5;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    border: 1px solid #5588ee;
+    height: 16px;
+    width: 16px;
+    border-radius: 8px;
+    background: #ffffff;
+    cursor: pointer;
+    margin-top: -6px;
+  }
+  
+
+  &.invalid {
+    animation-name: shake;
+    animation-duration: 100ms;
+    animation-iteration-count: 3;
+    animation-timing-function: ease-in-out;
+    animation-delay: 0s;
+    animation-play-state: running;
+  }
+
+  @keyframes shake {
+    0% {
+      transform: translate(0px, 0px) rotate(0deg);
+    }
+    20% {
+      transform: translate(0px, 0px) rotate(-0.5deg);
+    }
+    40% {
+      transform: translate(-1px, -1px) rotate(-0.5deg);
+    }
+    60% {
+      transform: translate(-1px, -1px) rotate(-0.5deg);
+    }
+    80% {
+      transform: translate(-1px, 0px) rotate(-0.5deg);
+    }
+    98% {
+      transform: translate(0px, 0px) rotate(-0.5deg);
+    }
+  }
+}
