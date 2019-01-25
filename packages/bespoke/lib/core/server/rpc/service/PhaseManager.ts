@@ -24,5 +24,4 @@ const phaseService = {
 
 export {PhaseService, phaseService}
 
-const gameService = new GameService(setting.elfGameServiceUri, credentials.createInsecure()) as CGameService
-export {gameService}
+export const gameService = new GameService(setting.elfGameServiceUri, credentials.createInsecure()) as CGameService

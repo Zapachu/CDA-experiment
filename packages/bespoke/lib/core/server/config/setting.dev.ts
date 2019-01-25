@@ -11,6 +11,7 @@ export default {
     sessionSecret: process.env.SESSION_SECRET || 'sessionsecret',
     //region rpc
     academusServiceUri:'127.0.0.1:53008',
+    proxyServiceUri:'127.0.0.1:58888',
     pythonRobotUri: '127.0.0.1:50051',
     elfGameServiceUri: '127.0.0.1:54000',
     localServiceUri: '127.0.0.1:53009',

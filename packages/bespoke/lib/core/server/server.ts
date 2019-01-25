@@ -24,7 +24,7 @@ import {Log, redisClient, WebpackHmr, setting} from '@server-util'
 import {config} from '@common'
 import {EventDispatcher} from './controller/eventDispatcher'
 import requestRouter from './controller/requestRouter'
-import {serve as serveRPC} from './rpc'
+import {serve as serveRPC, proxyService} from './rpc'
 import {AddressInfo} from 'net'
 
 const RedisStore = connectRedis(expressSession)
@@ -63,7 +63,7 @@ express.use(errorHandler())
 express.use(`/${config.rootName}/static`, Express.static(path.join(__dirname, '../../../dist/'), {maxAge: '10d'}))
 express.use(`/${config.rootName}`, requestRouter)
 
-export function startServer(port: number = 0): Express.Express {
+export function startServer({namespace, host = '127.0.0.1', port = 0}: { namespace: string, host?: string, port?: number }): Express.Express {
     const server = express.listen(port)
         .on('error', (error: NodeJS.ErrnoException) => {
             if (error.syscall !== 'listen') {
@@ -84,8 +84,15 @@ export function startServer(port: number = 0): Express.Express {
             }
         })
         .on('listening', () => {
-            const address = server.address()
-            Log.i(`Listening on ${typeof address === 'string' ? `pipe ${address}` : `port ${(<AddressInfo>address).port}`}`)
+            const {port} = server.address() as AddressInfo
+            Log.i(`Listening on port ${port}`)
+            const registerReq = {namespace, host, port: port.toString()}
+            const heartBeat2Proxy = () => {
+                proxyService.registerGame(registerReq,
+                    err => err ? Log.w(`注册至代理失败，${config.gameRegisterInterval}秒后重试`) : null)
+                setTimeout(() => heartBeat2Proxy(), config.gameRegisterInterval)
+            }
+            heartBeat2Proxy()
         })
     EventDispatcher.startGameSocket(server)
     if (!config.deployIndependently) {

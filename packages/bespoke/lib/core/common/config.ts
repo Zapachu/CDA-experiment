@@ -12,6 +12,7 @@ export const config = {
     historyGamesListSize: 12,
     shareCodeLifeTime:3 * 24 * 60 * 60,
     vcodeLifetime:60,
+    gameRegisterInterval:30000,
     logLevel: LogLevel.log,
     defaultLanguage: Language.en,
     deployIndependently: true,

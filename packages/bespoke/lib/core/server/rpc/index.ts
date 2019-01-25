@@ -10,6 +10,11 @@ export * from './proto/phaseManager'
 export {gameService}
 //endregion
 
+//region proxy
+export * from './proto/BespokeProxy'
+export {proxyService} from './service/BespokeProxy'
+//endregion
+
 import {Server, ServerCredentials} from 'grpc'
 import {gameService, PhaseService, phaseService} from './service/PhaseManager'
 import {config} from '@common'
@@ -23,11 +28,12 @@ export function serve() {
     server.addService(PhaseService.service, phaseService)
     server.bind(setting.localServiceUri, ServerCredentials.createInsecure())
     server.start()
-    setInterval(() => registerPhases(), 30000)
+    setInterval(() => registerPhases(), config.gameRegisterInterval)
+
 }
 
 function registerPhases() {
-    const {[`${config.buildManifest.clientVendorLib}.js`]:vendorPath} = JSON.parse(
+    const {[`${config.buildManifest.clientVendorLib}.js`]: vendorPath} = JSON.parse(
         readFileSync(resolve(__dirname, `../../../../dist/${config.buildManifest.coreFile}`)).toString()
     )
     const phases = Object.entries(
