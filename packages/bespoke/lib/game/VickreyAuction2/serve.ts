@@ -1,5 +1,5 @@
-import {startServer} from '../../core/server/server'
+import {Server} from '../../core/server/server'
 import {namespace} from './config'
 import Controller from './Controller'
 
-startServer(namespace, {Controller})
+Server.start(namespace, {Controller})

@@ -1,43 +1,39 @@
 import {Router} from 'express'
 import {GameCtrl, UserCtrl} from './requestHandler'
 
-//region /api/user
 const userApiRouter = Router()
-userApiRouter.get('/verifyCode', UserCtrl.getVerifyCode)
-userApiRouter.post('/login', UserCtrl.handleLogin)
-userApiRouter.get('/', UserCtrl.getUser)
-userApiRouter.post('/logout', UserCtrl.handleLogout)
-//endregion
+    .get('/verifyCode', UserCtrl.getVerifyCode)
+    .post('/login', UserCtrl.handleLogin)
+    .get('/', UserCtrl.getUser)
+    .post('/logout', UserCtrl.handleLogout)
 
-//region /api/game
 const gameApiRouter = Router()
-gameApiRouter.get('/accessibleTemplates', GameCtrl.getAccessibleTemplates)
-gameApiRouter.get('/gameTemplateUrl', GameCtrl.getGameTemplateUrl)
-gameApiRouter.get('/historyThumb', GameCtrl.getHistoryGameThumbs)
-gameApiRouter.post('/new', GameCtrl.newGame)
-gameApiRouter.get('/:gameId', GameCtrl.getGame)
-gameApiRouter.get('/share/:gameId', GameCtrl.shareGame)
-gameApiRouter.post('/joinWithShareCode', GameCtrl.joinWithShareCode)
-gameApiRouter.get('/simulatePlayer/:gameId', GameCtrl.getSimulatePlayers)
-gameApiRouter.post('/simulatePlayer/:gameId', GameCtrl.newSimulatePlayer)
-gameApiRouter.get('/actor/:gameId', GameCtrl.getActor)
-gameApiRouter.get('/moveLogs/:gameId', GameCtrl.getMoveLogs)
-gameApiRouter.all('/pass2Game/:gameId', GameCtrl.passThrough)
-    .all('/pass2Namespace', GameCtrl.passThrough)
-//endregion
-
-//region /api
+    .get('/accessibleTemplates', GameCtrl.getAccessibleTemplates)
+    .get('/gameTemplateUrl', GameCtrl.getGameTemplateUrl)
+    .get('/historyThumb', GameCtrl.getHistoryGameThumbs)
+    .post('/new', GameCtrl.newGame)
+    .get('/namespace/:gameId', GameCtrl.getNamespace)
+    .get('/share/:gameId', GameCtrl.shareGame)
+    .post('/joinWithShareCode', GameCtrl.joinWithShareCode)
+    .get('/simulatePlayer/:gameId', GameCtrl.getSimulatePlayers)
+    .post('/simulatePlayer/:gameId', GameCtrl.newSimulatePlayer)
+    .get('/actor/:gameId', GameCtrl.getActor)
+    .get('/moveLogs/:gameId', GameCtrl.getMoveLogs)
 const apiRouter = Router()
-apiRouter.use('/user', userApiRouter)
-apiRouter.use('/game', gameApiRouter)
-//endregion
+    .use('/user', userApiRouter)
+    .use('/game', gameApiRouter)
 
-//region /
-const router = Router()
-router.use('/api', apiRouter)
-router.get('/dashboard', UserCtrl.isTeacher, UserCtrl.renderApp)
-router.get('/create/:namespace', UserCtrl.isTeacher, UserCtrl.renderApp)
-router.get('/*', UserCtrl.renderApp)
-//endregion
+const rootRouter = Router()
+    .use('/api', apiRouter)
+    .get('/dashboard', UserCtrl.isTeacher, UserCtrl.renderApp)
+    .get('/create/:namespace', UserCtrl.isTeacher, UserCtrl.renderApp)
+    .get('/*', UserCtrl.renderApp)
 
-export default router
+const namespaceApiRouter = Router()
+    .get('/game/:gameId', GameCtrl.getGame)
+    .all('/pass2Game/:gameId', GameCtrl.passThrough)
+    .all('/pass2Namespace', GameCtrl.passThrough)
+const namespaceRouter = Router()
+    .use(`/api`, namespaceApiRouter)
+
+export {rootRouter, namespaceRouter}

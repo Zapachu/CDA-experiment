@@ -12,7 +12,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin'),
     ManifestPlugin = require('webpack-manifest-plugin'),
     QiniuPlugin = require('qiniu-webpack-plugin')
 
-function buildProtoDts(namespace:string, watch:boolean=false) {
+function buildProtoDts(namespace: string, watch: boolean = false) {
     const gamePath = path.resolve(__dirname, `../../lib/game/${namespace}`)
 
     function build() {
@@ -24,7 +24,7 @@ function buildProtoDts(namespace:string, watch:boolean=false) {
     }
 
     build()
-    if(watch){
+    if (watch) {
         chokidar.watch(`${gamePath}/interface.proto`).on('change', build)
     }
 }
@@ -44,7 +44,7 @@ export = () => {
     }
     buildProtoDts(namespace, buildMode === 'dev')
     return {
-        devtool: buildMode === 'dev' ? 'eval' : '',
+        devtool: buildMode === 'dev' ? 'cheap-module-eval-source-map' : '',
         mode: buildMode === 'dev' ? 'development' : 'production',
         watch: buildMode === 'dev',
         watchOptions: {
@@ -58,7 +58,7 @@ export = () => {
             filename: '[name].[hash:4].js',
             library: '[name]',
             libraryTarget: 'umd',
-            publicPath: buildMode === 'publish' ? `${qiNiu.download.jsDomain}/${qiNiu.upload.path}/` : `/${config.rootName}/static/`
+            publicPath: buildMode === 'publish' ? `${qiNiu.download.jsDomain}/${qiNiu.upload.path}/` : `/${config.rootName}/${namespace}/static/`
         },
         resolve: {
             extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
@@ -102,7 +102,7 @@ export = () => {
                         loader: 'file-loader',
                         options: {
                             name: `[path]/[name].[ext]`,
-                            context:'lib/game'
+                            context: `lib/game/${namespace}`
                         }
                     }
                 }
@@ -131,7 +131,6 @@ export = () => {
             })
         ].concat(buildMode === 'publish' ? [
             new QiniuPlugin(qiNiu.upload)
-        ] : buildMode === 'dist' ? [
-        ] : [])
+        ] : buildMode === 'dist' ? [] : [])
     }
 }

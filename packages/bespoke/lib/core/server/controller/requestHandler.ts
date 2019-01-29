@@ -194,6 +194,14 @@ export class GameCtrl {
         }
     }
 
+    static async getNamespace(req, res) {
+        const {namespace} = await GameDAO.getGame(req.params.gameId)
+        res.json({
+            code: baseEnum.ResponseCode.success,
+            namespace
+        })
+    }
+
     static async shareGame(req, res) {
         const {gameId} = req.params
         let shareCode = await redisClient.get(RedisKey.share_GameCode(gameId))

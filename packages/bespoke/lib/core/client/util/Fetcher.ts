@@ -6,15 +6,15 @@ export class Fetcher<FetchType> {
     }
 
     buildGetUrl(type: FetchType, params = {}): string {
-        return buildUrl('/game/pass2Game/:gameId', {gameId: this.gameId}, {type, ...params})
+        return buildUrl('/game/pass2Game/:gameId', {gameId: this.gameId}, {type, ...params}, this.namespace)
     }
 
     getFromGame(type: FetchType, params = {}) {
-        return Api.getFromeGame(this.gameId, type.toString(), params)
+        return Api.getFromGame(this.namespace, this.gameId, type.toString(), params)
     }
 
     postToGame(type: FetchType, params = {}) {
-        return Api.postToGame(this.gameId, type.toString(), params)
+        return Api.postToGame(this.namespace, this.gameId, type.toString(), params)
     }
 
     getFromNamespace(type: FetchType, params = {}) {

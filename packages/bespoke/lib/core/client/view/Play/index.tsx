@@ -51,7 +51,7 @@ export class Play extends React.Component<TRootCtx & RouteComponentProps<{ gameI
         }
         await this.props.switchGameTemplate(game.namespace)
         const socketClient = connect('/', {
-            path: config.socketPath,
+            path: config.socketPath(game.namespace),
             query: `gameId=${gameId}&token=${actor.token}&type=${actor.type}`
         })
         this.registerStateReducer(socketClient)
@@ -121,15 +121,15 @@ export class Play extends React.Component<TRootCtx & RouteComponentProps<{ gameI
                 {
                     gameState.status === baseEnum.GameStatus.over ?
                         <GameResult {...{game, fetcher, Result4Owner}}/> :
-                        gameState.status === baseEnum.GameStatus.notStarted?
-                        <MaskLoading label={lang.Mask_WaitForGameToStart}/>:
-                        <Play4Owner {...{
-                            game,
-                            fetcher,
-                            frameEmitter,
-                            gameState,
-                            playerStates
-                        }}/>
+                        gameState.status === baseEnum.GameStatus.notStarted ?
+                            <MaskLoading label={lang.Mask_WaitForGameToStart}/> :
+                            <Play4Owner {...{
+                                game,
+                                fetcher,
+                                frameEmitter,
+                                gameState,
+                                playerStates
+                            }}/>
                 }
             </div>
         }
