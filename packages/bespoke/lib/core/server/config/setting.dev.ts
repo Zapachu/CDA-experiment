@@ -2,6 +2,8 @@ import * as dateFormat from 'dateformat'
 import {config} from '../../common'
 
 export default {
+    namespace:'',
+    host:'127.0.0.1',
     port: 3009,
     mongoUri: process.env.MONGODB || 'mongodb://127.0.0.1:27017/academyDev',
     mongoUser: '',

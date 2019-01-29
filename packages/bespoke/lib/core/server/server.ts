@@ -20,10 +20,11 @@ registerTsConfigPath({
     paths
 })
 
-import {Log, redisClient, WebpackHmr, setting} from '@server-util'
+import {Log, redisClient, WebpackHmr, setting, TServerOption} from '@server-util'
 import {config} from '@common'
 import {EventDispatcher} from './controller/eventDispatcher'
 import requestRouter from './controller/requestRouter'
+import {GameLogic, ILogicTemplate} from './manager/logicManager'
 import {serve as serveRPC, proxyService} from './rpc'
 import {AddressInfo} from 'net'
 
@@ -63,7 +64,10 @@ express.use(errorHandler())
 express.use(`/${config.rootName}/static`, Express.static(path.join(__dirname, '../../../dist/'), {maxAge: '10d'}))
 express.use(`/${config.rootName}`, requestRouter)
 
-export function startServer({namespace, host = '127.0.0.1', port = 0}: { namespace: string, host?: string, port?: number }): Express.Express {
+export function startServer(namespace: string, logicTemplate: ILogicTemplate, serverOption: TServerOption = {}): Express.Express {
+    Object.assign(setting, serverOption, {namespace})
+    GameLogic.initInstance(logicTemplate)
+    const {host, port} = setting
     const server = express.listen(port)
         .on('error', (error: NodeJS.ErrnoException) => {
             if (error.syscall !== 'listen') {
@@ -92,11 +96,11 @@ export function startServer({namespace, host = '127.0.0.1', port = 0}: { namespa
                     err => err ? Log.w(`注册至代理失败，${config.gameRegisterInterval}秒后重试`) : null)
                 setTimeout(() => heartBeat2Proxy(), config.gameRegisterInterval)
             }
-            heartBeat2Proxy()
+            if (!config.deployIndependently) {
+                serveRPC()
+                heartBeat2Proxy()
+            }
         })
     EventDispatcher.startGameSocket(server)
-    if (!config.deployIndependently) {
-        serveRPC()
-    }
     return express
 }

@@ -12,7 +12,7 @@ userApiRouter.post('/logout', UserCtrl.handleLogout)
 //region /api/game
 const gameApiRouter = Router()
 gameApiRouter.get('/accessibleTemplates', GameCtrl.getAccessibleTemplates)
-gameApiRouter.get('/gameTemplateUrl/:namespace', GameCtrl.getGameTemplateUrl)
+gameApiRouter.get('/gameTemplateUrl', GameCtrl.getGameTemplateUrl)
 gameApiRouter.get('/historyThumb', GameCtrl.getHistoryGameThumbs)
 gameApiRouter.post('/new', GameCtrl.newGame)
 gameApiRouter.get('/:gameId', GameCtrl.getGame)
@@ -23,7 +23,7 @@ gameApiRouter.post('/simulatePlayer/:gameId', GameCtrl.newSimulatePlayer)
 gameApiRouter.get('/actor/:gameId', GameCtrl.getActor)
 gameApiRouter.get('/moveLogs/:gameId', GameCtrl.getMoveLogs)
 gameApiRouter.all('/pass2Game/:gameId', GameCtrl.passThrough)
-    .all('/pass2Namespace/:namespace', GameCtrl.passThrough)
+    .all('/pass2Namespace', GameCtrl.passThrough)
 //endregion
 
 //region /api

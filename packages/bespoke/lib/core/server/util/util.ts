@@ -48,3 +48,5 @@ export const setting = ((): typeof devSetting => {
             return devSetting
     }
 })()
+
+export type TServerOption = Partial<typeof devSetting>

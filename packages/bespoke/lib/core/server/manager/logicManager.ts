@@ -1,4 +1,4 @@
-import {elfPhaseId2PlayUrl, EventIO, Hash, Log, readManifest} from '@server-util'
+import {elfPhaseId2PlayUrl, EventIO, Hash, Log, readManifest, setting} from '@server-util'
 import {
     baseEnum,
     config,
@@ -20,23 +20,32 @@ export type AnyController = BaseController<any, any, any, any, any, any, any, an
 type AnyRobotScheduler = RobotScheduler<any, any, any, any, any, any, any>
 type AnyRobot = BaseRobot<any, any, any, any, any, any, any>
 
-interface ILogicTemplate {
-    namespace?: string,
+export interface ILogicTemplate {
     Controller: new(...args) => AnyController,
     Robot?: new(...args) => AnyRobot
 }
 
-class GameLogic {
+export class GameLogic {
     private readonly namespaceController: AnyController
     private gameControllers = new Map<string, AnyController>()
     private robotSchedulers = new Map<string, AnyRobotScheduler>()
 
-    constructor(private gameLogicTemplate: ILogicTemplate) {
+    private static _gameLogic: GameLogic
+
+    static initInstance(template: ILogicTemplate) {
+        this._gameLogic = new GameLogic(template)
+    }
+
+    static get instance(): GameLogic {
+        return this._gameLogic
+    }
+
+    private constructor(private gameLogicTemplate: ILogicTemplate) {
         this.namespaceController = new gameLogicTemplate.Controller()
     }
 
     getBespokeClientPath() {
-        return readManifest(`../../../../dist/${config.buildManifest.gameFile}`)[`${this.gameLogicTemplate.namespace}.js`]
+        return readManifest(`../../../../dist/${config.buildManifest.gameFile}`)[`${setting.namespace}.js`]
     }
 
     getNamespaceController() {
@@ -60,18 +69,6 @@ class GameLogic {
         const robotProxy = await (pythonRobot ? new PythonSchedulerProxy(game, actor) : new NodeRobotsScheduler(game, actor, this.gameLogicTemplate.Robot)).init()
         this.robotSchedulers.set(robotProxy.id, robotProxy)
     }
-}
-
-const gameLogics: { [namespace: string]: GameLogic } = {}
-
-export function registerGameLogic(namespace: string, template: ILogicTemplate) {
-    template.namespace = namespace
-    gameLogics[template.namespace] = new GameLogic(template)
-    Log.i(`${namespace.padEnd(32)} ${template.Controller?'Controller':''} ${template.Robot?'Robot':''}`)
-}
-
-export function getGameLogic(namespace: string): GameLogic {
-    return gameLogics[namespace]
 }
 
 export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
@@ -137,7 +134,7 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
     }
 
     async startNewRobotScheduler(key, pythonRobot: boolean) {
-        await getGameLogic(this.game.namespace).startNewRobotScheduler(this.game.id, key, pythonRobot)
+        await GameLogic.instance.startNewRobotScheduler(this.game.id, key, pythonRobot)
     }
 
     async handleFetch(req: Request, res: Response) {

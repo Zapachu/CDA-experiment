@@ -25,8 +25,7 @@ export class Root extends React.Component<{}, TRootCtx> {
 
     act = {
         switchGameTemplate: async (namespace: string): Promise<void> => {
-            document.cookie = `namespace=${namespace}; path=/`
-            const {code, jsUrl} = await Api.getGameTemplateUrl(namespace)
+            const {code, jsUrl} = await Api.getGameTemplateUrl()
             if (code !== baseEnum.ResponseCode.success) {
                 return
             }
