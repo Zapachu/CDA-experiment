@@ -30,12 +30,12 @@ func (router *Router) GetRandomRoute() Route {
 	return route
 }
 
-func (router *Router) GetRoute(namespace string) Route {
-	route := router.routeTable[namespace]
-	if &route == nil {
+func (router *Router) GetRoute(namespace string) (Route, bool) {
+	route, ok := router.routeTable[namespace]
+	if !ok {
 		log.Printf("未找到指定GameServer:%v", namespace)
 	}
-	return route
+	return route, ok
 }
 
 var router *Router

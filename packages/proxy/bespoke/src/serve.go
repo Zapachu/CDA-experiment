@@ -13,11 +13,16 @@ type Proxy struct{}
 
 func (proxy *Proxy) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	router := game.GetRouter()
-	route := router.GetRandomRoute()
+	var route game.Route
 	for _, cookie := range req.Cookies() {
 		if cookie.Name == "namespace" {
-			route = router.GetRoute(cookie.Value)
+			if r, ok := router.GetRoute(cookie.Value); ok {
+				route = r
+			}
 		}
+	}
+	if route.Host == "" {
+		route = router.GetRandomRoute()
 	}
 	remoteUrl, _ := url.Parse("http://" + route.Host + ":" + route.Port)
 	httputil.NewSingleHostReverseProxy(remoteUrl).ServeHTTP(res, req)
@@ -31,6 +36,7 @@ func startServer() {
 }
 
 func main() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	go rpc.Serve()
 	startServer()
 }
