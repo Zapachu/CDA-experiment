@@ -1,4 +1,4 @@
-import {geneClientBuilder} from '../../../core/client/script/game'
+import {geneClientBuilder} from '../../../core/client/script/webpack.game'
 import {namespace} from '../config'
 import {resolve} from 'path'
 

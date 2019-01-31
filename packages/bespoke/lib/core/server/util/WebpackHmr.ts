@@ -2,10 +2,10 @@ import {config} from '@common'
 import * as path from 'path'
 import * as webpack from 'webpack'
 import {Express, Response, NextFunction} from 'express'
-import {webpackHmr} from '@server-util'
+import {setting, webpackHmr} from '@server-util'
 import * as webpackDevMiddleware from 'webpack-dev-middleware'
 import * as  webpackHotMiddleware from 'webpack-hot-middleware'
-import coreWebpackCfg = require('../../../../bin/script/core')
+import coreWebpackCfg = require('../../client/script/webpack.core')
 
 export class WebpackHmr {
     static compiler = webpack(coreWebpackCfg({webpackHmr}) as any) as any
@@ -24,7 +24,7 @@ export class WebpackHmr {
 
     static sendIndexHtml(res: Response, next: NextFunction) {
         if (!webpackHmr) {
-            return res.sendFile(path.resolve(__dirname, '../../../../dist/index.html'))
+            return res.sendFile(path.resolve(setting.staticPath, 'index.html'))
         }
         WebpackHmr.compiler.outputFileSystem.readFile(path.join(WebpackHmr.compiler.outputPath, 'index.html'), (err, result) => {
             if (err) {

@@ -3,12 +3,11 @@ import * as fs from 'fs'
 import * as chokidar from 'chokidar'
 import * as pbjs from 'protobufjs/cli/pbjs'
 import * as pbts from 'protobufjs/cli/pbts'
+import * as HtmlWebpackPlugin from 'html-webpack-plugin'
+import * as QiniuPlugin from 'qiniu-webpack-plugin'
+import * as CleanWebpackPlugin from 'clean-webpack-plugin'
 import {TsconfigPathsPlugin} from 'tsconfig-paths-webpack-plugin'
 import {config, IQiniuConfig} from '../../common'
-
-const CleanWebpackPlugin = require('clean-webpack-plugin'),
-    ManifestPlugin = require('webpack-manifest-plugin'),
-    QiniuPlugin = require('qiniu-webpack-plugin')
 
 function buildProtoDts(namespace: string, namespacePath: string, watch: boolean = false) {
     function build() {
@@ -107,8 +106,9 @@ export function geneClientBuilder(namespace: string, {
             'client-vendor': config.buildManifest.clientVendorLib
         },
         plugins: [
-            new ManifestPlugin({
-                fileName: `${namespace}.json`
+            new HtmlWebpackPlugin({
+                filename: 'index.html',
+                template: path.resolve(__dirname, '../dist/index.html')
             }),
             new CleanWebpackPlugin('*', {
                 root: outputPath,

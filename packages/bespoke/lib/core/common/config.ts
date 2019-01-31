@@ -20,7 +20,6 @@ export const config = {
         csrf: '_csrf'
     },
     buildManifest: {
-        coreFile: 'bespokeCore.json',
         clientVendorLib: 'clientVendor',
         clientCoreLib: 'clientCore'
     }
