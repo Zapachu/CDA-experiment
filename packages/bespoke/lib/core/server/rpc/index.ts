@@ -19,8 +19,6 @@ import {Server, ServerCredentials} from 'grpc'
 import {gameService, PhaseService, phaseService} from './service/PhaseManager'
 import {config} from '@common'
 import {Log, setting} from '@server-util'
-import {readFileSync} from 'fs'
-import {resolve} from 'path'
 
 export function serve() {
     const server = new Server()
@@ -29,21 +27,13 @@ export function serve() {
     server.bind(setting.localServiceUri, ServerCredentials.createInsecure())
     server.start()
     setInterval(() => registerPhases(), config.gameRegisterInterval)
-
 }
 
 function registerPhases() {
-    const {[`${config.buildManifest.clientVendorLib}.js`]: vendorPath} = JSON.parse(
-        readFileSync(resolve(__dirname, `../../../../dist/${config.buildManifest.coreFile}`)).toString()
-    )
-    const phases = Object.entries(
-        JSON.parse(
-            readFileSync(resolve(__dirname, `../../../../dist/${config.buildManifest.gameFile}`)).toString()
-        )
-    ).map(([nsp, path]) => ({
-        namespace: nsp.replace('.js', ''),
-        jsUrl: `${setting.localRootUrl}${vendorPath};${setting.localRootUrl}${path}`,
+    const phases = [{
+        namespace: setting.namespace,
+        jsUrl: `https://${setting.host}:${setting.port}/${setting.getClientPath()}`,
         rpcUri: setting.localServiceUri
-    }))
+    }]
     gameService.registerPhases({phases}, err => err && Log.e(err))
 }

@@ -48,7 +48,7 @@ export default class UserService {
     }
 
     static getGameTemplateNamespaces(mobile: string): Array<string> {
-        const targetEntry = Object.entries(setting.adminMobileNumbers).find(([m]) => m.includes(mobile))
-        return targetEntry ? targetEntry[1] : null
+        //TODO 由GO Proxy处理
+        return []
     }
 }

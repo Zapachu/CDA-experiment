@@ -95,3 +95,24 @@ export interface IConnection extends EventEmitter {
 export interface IEventHandler {
     (connection: IConnection, ...args: any[]): void
 }
+
+export interface IQCloudSMS {
+    appId: string
+    appKey: string
+    smsSign: string
+    templateId: {
+        verifyCode: string
+    }
+}
+
+export interface IQiniuConfig {
+    upload: {
+        ACCESS_KEY: string
+        SECRET_KEY: string
+        bucket: string
+        path: string
+    },
+    download: {
+        jsDomain: string
+    }
+}

@@ -21,7 +21,6 @@ export const config = {
     },
     buildManifest: {
         coreFile: 'bespokeCore.json',
-        gameFile: 'bespokeGame.json',
         clientVendorLib: 'clientVendor',
         clientCoreLib: 'clientCore'
     }

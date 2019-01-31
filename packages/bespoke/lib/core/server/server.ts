@@ -3,7 +3,7 @@
 import * as path from 'path'
 import {connect as connectMongo} from 'mongoose'
 import * as connectRedis from 'connect-redis'
-// import {csrf} from 'lusca'
+import {csrf} from 'lusca'
 import * as Express from 'express'
 import * as expressSession from 'express-session'
 import * as passport from 'passport'
@@ -20,7 +20,7 @@ registerTsConfigPath({
     paths
 })
 
-import {Log, redisClient, WebpackHmr, setting, TServerOption} from '@server-util'
+import {Log, redisClient, WebpackHmr, setting, initSetting, ISetting} from '@server-util'
 import {baseEnum, config} from '@common'
 import {EventDispatcher} from './controller/eventDispatcher'
 import {rootRouter, namespaceRouter} from './controller/requestRouter'
@@ -58,7 +58,7 @@ export class Server {
                 client: redisClient as any
             })
         }))
-// express.use((req, res, next) => csrf({cookie: config.cookieKey.csrf})(req, res, next))
+        express.use((req, res, next) => csrf({cookie: config.cookieKey.csrf})(req, res, next))
         express.use(passport.initialize())
         express.use(passport.session())
         express.use((req, res, next) => {
@@ -66,8 +66,8 @@ export class Server {
             next()
         })
         express.use(errorHandler())
+        express.use(`/${config.rootName}/${namespace}/static`, Express.static(setting.staticPath, {maxAge: '10d'}))
         express.use(`/${config.rootName}/static`, Express.static(path.join(__dirname, '../../../dist/'), {maxAge: '10d'}))
-        express.use(`/${config.rootName}/${namespace}/static`, Express.static(path.join(__dirname, `../../../dist/${namespace}/`), {maxAge: '10d'}))
         express.use(`/${config.rootName}`, rootRouter.use(`/${namespace}`, namespaceRouter))
         return express
     }
@@ -123,15 +123,15 @@ export class Server {
             })
     }
 
-    static start(namespace: string, logicTemplate: ILogicTemplate, serverOption: TServerOption = {}): Express.Express {
-        Object.assign(setting, serverOption, {namespace})
+    static start(gameSetting: ISetting, logicTemplate: ILogicTemplate): Express.Express {
+        initSetting(gameSetting)
         this.initMongo()
         this.initPassPort()
         GameLogic.initInstance(logicTemplate)
         const {host, port} = setting,
             express = this.initExpress()
         this.bindServerListener(EventDispatcher.startGameSocket(express.listen(port)), port, () => {
-            const registerReq = {namespace, host, port: port.toString()}
+            const registerReq = {namespace: setting.namespace, host, port: port.toString()}
             const heartBeat2Proxy = () => {
                 proxyService.registerGame(registerReq,
                     err => err ? Log.w(`注册至代理失败，${config.gameRegisterInterval}秒后重试`) : null)

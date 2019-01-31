@@ -1,7 +1,6 @@
-import {elfPhaseId2PlayUrl, EventIO, Hash, Log, readManifest, setting} from '@server-util'
+import {elfPhaseId2PlayUrl, EventIO, Hash, Log} from '@server-util'
 import {
     baseEnum,
-    config,
     FrameEmitter,
     IActor,
     IConnection,
@@ -42,10 +41,6 @@ export class GameLogic {
 
     private constructor(private gameLogicTemplate: ILogicTemplate) {
         this.namespaceController = new gameLogicTemplate.Controller()
-    }
-
-    getBespokeClientPath() {
-        return readManifest(`../../../../dist/${config.buildManifest.gameFile}`)[`${setting.namespace}.js`]
     }
 
     getNamespaceController() {
@@ -167,7 +162,7 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
             return Log.w('Bespoke单独部署，game未关联至Elf group')
         }
         gameService.sendBackPlayer({
-            playUrl: elfPhaseId2PlayUrl(this.game.id),
+            playUrl: elfPhaseId2PlayUrl(this.game.namespace, this.game.id),
             playerToken,
             nextPhaseKey,
             groupId: this.game.groupId
