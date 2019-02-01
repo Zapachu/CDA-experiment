@@ -1,4 +1,4 @@
-import {registerOnFramework} from '../../index'
+import {registerOnFramework} from 'client-vendor'
 import {Play} from './Play'
 import {Create} from './Create'
 import {Play4Owner} from './Play4Owner'

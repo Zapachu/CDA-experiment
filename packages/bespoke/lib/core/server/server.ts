@@ -68,7 +68,8 @@ export class Server {
         express.use(errorHandler())
         express.use(`/${config.rootName}/${namespace}/static`, Express.static(setting.staticPath, {maxAge: '10d'}))
         express.use(`/${config.rootName}/static`, Express.static(path.join(__dirname, '../client/dist/'), {maxAge: '10d'}))
-        express.use(`/${config.rootName}`, rootRouter.use(`/${namespace}`, namespaceRouter))
+        express.use(`/${config.rootName}/${namespace}`, namespaceRouter)
+        express.use(`/${config.rootName}`, rootRouter)
         return express
     }
 

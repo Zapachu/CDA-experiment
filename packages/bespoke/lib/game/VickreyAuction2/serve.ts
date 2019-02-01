@@ -5,6 +5,7 @@ import * as path from 'path'
 
 Server.start({
     namespace,
+    port:3009,
     getClientPath: () => require(`./dist/${namespace}.json`)[`${namespace}.js`],
     staticPath: path.resolve(__dirname, 'dist'),
     qCloudSMS: {

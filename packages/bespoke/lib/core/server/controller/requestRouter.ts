@@ -23,7 +23,7 @@ const apiRouter = Router()
     .use('/user', userApiRouter)
     .use('/game', gameApiRouter)
 
-const rootRouter = Router()
+export const rootRouter = Router()
     .use('/api', apiRouter)
     .get('/dashboard', UserCtrl.isTeacher, UserCtrl.renderApp)
     .get('/create/:namespace', UserCtrl.isTeacher, UserCtrl.renderApp)
@@ -33,7 +33,5 @@ const namespaceApiRouter = Router()
     .get('/game/:gameId', GameCtrl.getGame)
     .all('/pass2Game/:gameId', GameCtrl.passThrough)
     .all('/pass2Namespace', GameCtrl.passThrough)
-const namespaceRouter = Router()
+export const namespaceRouter = Router()
     .use(`/api`, namespaceApiRouter)
-
-export {rootRouter, namespaceRouter}

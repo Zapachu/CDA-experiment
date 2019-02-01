@@ -4,7 +4,7 @@ import {LanguageSwitcher, Api, loadScript} from 'client-vendor'
 import {BrowserRouter, Switch, Route} from 'react-router-dom'
 import {config, baseEnum} from '@common'
 import {rootContext, TRootCtx} from '../context'
-import {IGameTemplate} from 'client-vendor'
+import {IGameTemplate, TRegisterGame} from 'client-vendor'
 import {Login} from './Login'
 import {Dashboard} from './Dashboard'
 import {Create} from './Create'
@@ -58,5 +58,18 @@ export class Root extends React.Component<{}, TRootCtx> {
                 </Switch>
             </BrowserRouter>
         </rootContext.Provider>
+    }
+}
+
+export const registerGame: TRegisterGame = (namespace: string, gameTemplate: IGameTemplate) => {
+    const Empty = () => null
+    gameTemplates[namespace] = {
+        namespace,
+        Create: Empty,
+        Info: Empty,
+        Play4Owner: Empty,
+        Result: Empty,
+        Result4Owner: Empty,
+        ...gameTemplate
     }
 }

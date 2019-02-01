@@ -5,15 +5,9 @@
   "repository": " ",
   "license": "ISC",
   "scripts": {
-    "buildRpcProto": "ts-node ./bin/script/buildRpcProto.ts",
-    "core:build": "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./bin/script/core.ts",
+    "core:build": "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./lib/core/client/script/webpack.core.ts",
     "core:dist": "npm run core:build --buildMode=dist",
-    "core:publish": "npm run core:build --buildMode=publish",
-    "game:build": "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./bin/script/game.ts",
-    "game:dist": "npm run game:build --buildMode=dist",
-    "game:publish": "npm run game:build --buildMode=publish",
-    "server:serve": "ts-node ./bin/script/buildServer.ts && node ./build/core/server/server.js",
-    "server:ts-serve": "ts-node ./lib/core/server/server.ts"
+    "core:publish": "npm run core:build --buildMode=publish"
   },
   "dependencies": {
     "@grpc/proto-loader": "^0.3.0",

@@ -8,7 +8,7 @@ interface IHttpRes {
 }
 
 export function buildUrl(pathFragment: string, params = {}, query = {}, namespace = ''): string {
-    let path = `/${config.rootName}/${namespace}/${config.apiPrefix}${pathFragment}`
+    let path = `/${config.rootName}/${namespace ? `${namespace}/` : ''}${config.apiPrefix}${pathFragment}`
     if (params) {
         path = path.replace(/:([\w\d]+)/, (matchedParam, paramName) => params[paramName])
     }

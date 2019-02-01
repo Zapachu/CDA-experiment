@@ -15,6 +15,8 @@ export interface IGameTemplate {
     Result4Owner?: Core.Result4OwnerClass
 }
 
+export type TRegisterGame = (namespace: string, gameTemplate: IGameTemplate) => void
+
 export namespace Core {
 
     interface ICreateProps<ICreateParams, FetchType> {
