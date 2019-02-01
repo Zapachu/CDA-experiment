@@ -9,7 +9,6 @@ const userApiRouter = Router()
 
 const gameApiRouter = Router()
     .get('/accessibleTemplates', GameCtrl.getAccessibleTemplates)
-    .get('/gameTemplateUrl', GameCtrl.getGameTemplateUrl)
     .get('/historyThumb', GameCtrl.getHistoryGameThumbs)
     .post('/new', GameCtrl.newGame)
     .get('/namespace/:gameId', GameCtrl.getNamespace)

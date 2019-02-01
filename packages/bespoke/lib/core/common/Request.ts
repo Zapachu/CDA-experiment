@@ -53,10 +53,6 @@ export class Request {
         return await this.get('/game/accessibleTemplates')
     }
 
-    async getGameTemplateUrl(): Promise<IHttpRes & { jsUrl: string }> {
-        return await this.get('/game/gameTemplateUrl')
-    }
-
     async getHistoryGames(namespace?: string): Promise<IHttpRes & { historyGameThumbs: Array<IGameThumb> }> {
         return await this.get('/game/historyThumb', null, {namespace})
     }

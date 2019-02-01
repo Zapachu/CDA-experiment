@@ -1,7 +1,7 @@
 import {config, baseEnum, IGameThumb} from '@common'
 import {Request, Response, NextFunction} from 'express'
 import * as passport from 'passport'
-import {Log, RedisKey, redisClient, Hash, WebpackHmr, inProductEnv, setting} from '@server-util'
+import {Log, RedisKey, redisClient, Hash, WebpackHmr, inProductEnv} from '@server-util'
 import {GameModel, UserModel, UserDoc, MoveLogModel, SimulatePlayerModel} from '@server-model'
 import {AnyController, GameLogic} from '../manager/logicManager'
 import GameDAO from '../service/GameDAO'
@@ -162,20 +162,6 @@ export class GameCtrl {
         } : {
             code: baseEnum.ResponseCode.notFound
         })
-    }
-
-    static async getGameTemplateUrl(req, res: Response) {
-        try {
-            res.json({
-                code: baseEnum.ResponseCode.success,
-                jsUrl: setting.getClientPath()
-            })
-        } catch (e) {
-            Log.e(e)
-            res.json({
-                code: baseEnum.ResponseCode.serverError
-            })
-        }
     }
 
     static async newGame(req, res) {

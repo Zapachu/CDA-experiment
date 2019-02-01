@@ -49,7 +49,6 @@ export class Play extends React.Component<TRootCtx & RouteComponentProps<{ gameI
         if (!token) {
             history.push(`${history.location.pathname}?${queryString.stringify({token: actor.token})}`)
         }
-        await this.props.switchGameTemplate(game.namespace)
         const socketClient = connect('/', {
             path: config.socketPath(game.namespace),
             query: `gameId=${gameId}&token=${actor.token}&type=${actor.type}`
