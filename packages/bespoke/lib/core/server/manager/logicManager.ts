@@ -13,7 +13,7 @@ import GameDAO from '../service/GameDAO'
 import {NodeRobotsScheduler, PythonSchedulerProxy, RobotScheduler} from './robotSchedulerManager'
 import {MoveQueue, StateManager} from '../service/StateManager'
 import {Request, Response} from 'express'
-import {gameService, ISendBackPlayerRes} from '../rpc'
+import {getGameService, ISendBackPlayerRes} from '../rpc'
 
 export type AnyController = BaseController<any, any, any, any, any, any, any, any>
 type AnyRobotScheduler = RobotScheduler<any, any, any, any, any, any, any>
@@ -161,7 +161,7 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
         if (!this.game.groupId) {
             return Log.w('Bespoke单独部署，game未关联至Elf group')
         }
-        gameService.sendBackPlayer({
+        getGameService().sendBackPlayer({
             playUrl: elfPhaseId2PlayUrl(this.game.namespace, this.game.id),
             playerToken,
             nextPhaseKey,
@@ -178,7 +178,7 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
 }
 
 export class BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
-    constructor(private robotSchdulerManager: NodeRobotsScheduler<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {
+    constructor(private nodeRobotsScheduler: NodeRobotsScheduler<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {
     }
 
     async init(): Promise<BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>> {
@@ -186,19 +186,19 @@ export class BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushTy
     }
 
     get game(): IGameWithId<ICreateParams> {
-        return this.robotSchdulerManager.game
+        return this.nodeRobotsScheduler.game
     }
 
     get gameState(): TGameState<IGameState> {
-        return this.robotSchdulerManager.gameState
+        return this.nodeRobotsScheduler.gameState
     }
 
     get playerState(): TPlayerState<IPlayerState> {
-        return this.robotSchdulerManager.playerState
+        return this.nodeRobotsScheduler.playerState
     }
 
     get frameEmitter(): FrameEmitter<MoveType, PushType, IMoveParams, IPushParams> {
-        return this.robotSchdulerManager.frameEmitter
+        return this.nodeRobotsScheduler.frameEmitter
     }
 
     receiveGameState(): void {

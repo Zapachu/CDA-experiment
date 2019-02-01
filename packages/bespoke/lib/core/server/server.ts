@@ -20,12 +20,12 @@ registerTsConfigPath({
     paths
 })
 
-import {Log, redisClient, WebpackHmr, setting, initSetting, ISetting} from '@server-util'
+import {Log, redisClient, WebpackHmr, setting, initSetting, ISetting, QCloudSMS} from '@server-util'
 import {baseEnum, config} from '@common'
 import {EventDispatcher} from './controller/eventDispatcher'
 import {rootRouter, namespaceRouter} from './controller/requestRouter'
 import {GameLogic, ILogicTemplate} from './manager/logicManager'
-import {serve as serveRPC, proxyService} from './rpc'
+import {serve as serveRPC, getProxyService} from './rpc'
 import {AddressInfo} from 'net'
 import {UserDoc, UserModel} from '@server-model'
 import {Strategy} from 'passport-local'
@@ -67,7 +67,7 @@ export class Server {
         })
         express.use(errorHandler())
         express.use(`/${config.rootName}/${namespace}/static`, Express.static(setting.staticPath, {maxAge: '10d'}))
-        express.use(`/${config.rootName}/static`, Express.static(path.join(__dirname, '../../../dist/'), {maxAge: '10d'}))
+        express.use(`/${config.rootName}/static`, Express.static(path.join(__dirname, '../client/dist/'), {maxAge: '10d'}))
         express.use(`/${config.rootName}`, rootRouter.use(`/${namespace}`, namespaceRouter))
         return express
     }
@@ -127,12 +127,17 @@ export class Server {
         initSetting(gameSetting)
         this.initMongo()
         this.initPassPort()
+        QCloudSMS.init()
         GameLogic.initInstance(logicTemplate)
         const {host, port} = setting,
             express = this.initExpress()
         this.bindServerListener(EventDispatcher.startGameSocket(express.listen(port)), port, () => {
             const registerReq = {namespace: setting.namespace, host, port: port.toString()}
             const heartBeat2Proxy = () => {
+                const proxyService = getProxyService()
+                if (!proxyService) {
+                    return
+                }
                 proxyService.registerGame(registerReq,
                     err => err ? Log.w(`注册至代理失败，${config.gameRegisterInterval}秒后重试`) : null)
                 setTimeout(() => heartBeat2Proxy(), config.gameRegisterInterval)

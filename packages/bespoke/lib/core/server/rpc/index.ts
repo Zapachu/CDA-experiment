@@ -1,22 +1,22 @@
 //region AcademusBespoke
 import {AcademusBespoke, academusBespoke} from './service/AcademusBespoke'
 
-export {AcademusBespokeConsumer} from './service/AcademusBespoke'
+export {getAcademusService} from './service/AcademusBespoke'
 //endregion
 
 //region elf
 export * from './proto/phaseManager'
 
-export {gameService}
+export {getGameService}
 //endregion
 
 //region proxy
 export * from './proto/BespokeProxy'
-export {proxyService} from './service/BespokeProxy'
+export {getProxyService} from './service/BespokeProxy'
 //endregion
 
 import {Server, ServerCredentials} from 'grpc'
-import {gameService, PhaseService, phaseService} from './service/PhaseManager'
+import {getGameService, PhaseService, phaseService} from './service/PhaseManager'
 import {config} from '@common'
 import {Log, setting} from '@server-util'
 
@@ -35,5 +35,5 @@ function registerPhases() {
         jsUrl: `https://${setting.host}:${setting.port}/${setting.getClientPath()}`,
         rpcUri: setting.localServiceUri
     }]
-    gameService.registerPhases({phases}, err => err && Log.e(err))
+    getGameService().registerPhases({phases}, err => err && Log.e(err))
 }

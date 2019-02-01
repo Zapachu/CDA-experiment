@@ -5,6 +5,7 @@ import * as pbjs from 'protobufjs/cli/pbjs'
 import * as pbts from 'protobufjs/cli/pbts'
 import * as HtmlWebpackPlugin from 'html-webpack-plugin'
 import * as QiniuPlugin from 'qiniu-webpack-plugin'
+import * as ManifestPlugin from 'webpack-manifest-plugin'
 import * as CleanWebpackPlugin from 'clean-webpack-plugin'
 import {TsconfigPathsPlugin} from 'tsconfig-paths-webpack-plugin'
 import {config, IQiniuConfig} from '../../common'
@@ -106,6 +107,9 @@ export function geneClientBuilder(namespace: string, {
             'client-vendor': config.buildManifest.clientVendorLib
         },
         plugins: [
+            new ManifestPlugin({
+                fileName: `${namespace}.json`
+            }),
             new HtmlWebpackPlugin({
                 filename: 'index.html',
                 template: path.resolve(__dirname, '../dist/index.html')

@@ -24,4 +24,11 @@ const phaseService = {
 
 export {PhaseService, phaseService}
 
-export const gameService = new GameService(setting.elfGameServiceUri, credentials.createInsecure()) as CGameService
+let gameService: CGameService
+
+export function getGameService() {
+    if (!gameService) {
+        gameService = new GameService(setting.elfGameServiceUri, credentials.createInsecure()) as CGameService
+    }
+    return gameService
+}
