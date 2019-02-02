@@ -93,8 +93,7 @@ $root.proto = (function() {
          * @memberof proto
          * @interface IregisterGameReq
          * @property {string|null} [namespace] registerGameReq namespace
-         * @property {string|null} [host] registerGameReq host
-         * @property {string|null} [port] registerGameReq port
+         * @property {string|null} [rpcPort] registerGameReq rpcPort
          */
 
         /**
@@ -121,20 +120,12 @@ $root.proto = (function() {
         registerGameReq.prototype.namespace = "";
 
         /**
-         * registerGameReq host.
-         * @member {string} host
+         * registerGameReq rpcPort.
+         * @member {string} rpcPort
          * @memberof proto.registerGameReq
          * @instance
          */
-        registerGameReq.prototype.host = "";
-
-        /**
-         * registerGameReq port.
-         * @member {string} port
-         * @memberof proto.registerGameReq
-         * @instance
-         */
-        registerGameReq.prototype.port = "";
+        registerGameReq.prototype.rpcPort = "";
 
         /**
          * Creates a new registerGameReq instance using the specified properties.
@@ -162,10 +153,8 @@ $root.proto = (function() {
                 writer = $Writer.create();
             if (message.namespace != null && message.hasOwnProperty("namespace"))
                 writer.uint32(/* id 1, wireType 2 =*/10).string(message.namespace);
-            if (message.host != null && message.hasOwnProperty("host"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.host);
-            if (message.port != null && message.hasOwnProperty("port"))
-                writer.uint32(/* id 3, wireType 2 =*/26).string(message.port);
+            if (message.rpcPort != null && message.hasOwnProperty("rpcPort"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.rpcPort);
             return writer;
         };
 
@@ -204,10 +193,7 @@ $root.proto = (function() {
                     message.namespace = reader.string();
                     break;
                 case 2:
-                    message.host = reader.string();
-                    break;
-                case 3:
-                    message.port = reader.string();
+                    message.rpcPort = reader.string();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -247,12 +233,9 @@ $root.proto = (function() {
             if (message.namespace != null && message.hasOwnProperty("namespace"))
                 if (!$util.isString(message.namespace))
                     return "namespace: string expected";
-            if (message.host != null && message.hasOwnProperty("host"))
-                if (!$util.isString(message.host))
-                    return "host: string expected";
-            if (message.port != null && message.hasOwnProperty("port"))
-                if (!$util.isString(message.port))
-                    return "port: string expected";
+            if (message.rpcPort != null && message.hasOwnProperty("rpcPort"))
+                if (!$util.isString(message.rpcPort))
+                    return "rpcPort: string expected";
             return null;
         };
 
@@ -270,10 +253,8 @@ $root.proto = (function() {
             var message = new $root.proto.registerGameReq();
             if (object.namespace != null)
                 message.namespace = String(object.namespace);
-            if (object.host != null)
-                message.host = String(object.host);
-            if (object.port != null)
-                message.port = String(object.port);
+            if (object.rpcPort != null)
+                message.rpcPort = String(object.rpcPort);
             return message;
         };
 
@@ -292,15 +273,12 @@ $root.proto = (function() {
             var object = {};
             if (options.defaults) {
                 object.namespace = "";
-                object.host = "";
-                object.port = "";
+                object.rpcPort = "";
             }
             if (message.namespace != null && message.hasOwnProperty("namespace"))
                 object.namespace = message.namespace;
-            if (message.host != null && message.hasOwnProperty("host"))
-                object.host = message.host;
-            if (message.port != null && message.hasOwnProperty("port"))
-                object.port = message.port;
+            if (message.rpcPort != null && message.hasOwnProperty("rpcPort"))
+                object.rpcPort = message.rpcPort;
             return object;
         };
 

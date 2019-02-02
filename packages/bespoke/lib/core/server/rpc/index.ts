@@ -24,16 +24,17 @@ export function serve() {
     const server = new Server()
     server.addService(AcademusBespoke.service, academusBespoke)
     server.addService(PhaseService.service, phaseService)
-    server.bind(setting.localServiceUri, ServerCredentials.createInsecure())
+    server.bind(`0.0.0.0:${setting.rpcPort}`, ServerCredentials.createInsecure())
     server.start()
     setInterval(() => registerPhases(), config.gameRegisterInterval)
 }
 
 function registerPhases() {
+    const {proxyService: {host, port}} = setting
     const phases = [{
         namespace: setting.namespace,
-        jsUrl: `https://${setting.host}:${setting.port}/${setting.getClientPath()}`,
+        jsUrl: `https://${host}:${port}/${setting.getClientPath()}`,
         rpcUri: setting.localServiceUri
-    }]
+      }]
     getGameService().registerPhases({phases}, err => err && Log.e(err))
 }

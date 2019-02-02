@@ -5,8 +5,9 @@ import (
 )
 
 type Route struct {
-	Host string
-	Port string
+	Host    string
+	Port    string
+	RpcPort string
 }
 
 type Router struct {

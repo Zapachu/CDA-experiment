@@ -15,7 +15,6 @@ export const config = {
     gameRegisterInterval: 30000,
     logLevel: LogLevel.log,
     defaultLanguage: Language.en,
-    deployIndependently: true,
     cookieKey: {
         csrf: '_csrf'
     },

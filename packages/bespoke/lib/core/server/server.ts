@@ -130,24 +130,27 @@ export class Server {
         this.initPassPort()
         QCloudSMS.init()
         GameLogic.initInstance(logicTemplate)
-        const {host, port} = setting,
+        const {port} = setting,
             express = this.initExpress()
         this.bindServerListener(EventDispatcher.startGameSocket(express.listen(port)), port, () => {
-            const registerReq = {namespace: setting.namespace, host, port: port.toString()}
+            if (!setting.proxyService) {
+                return
+            }
+            if (setting.elfGameServiceUri) {
+                serveRPC()
+            }
             const heartBeat2Proxy = () => {
                 const proxyService = getProxyService()
                 if (!proxyService) {
                     return
                 }
-                proxyService.registerGame(registerReq,
+                const {namespace, rpcPort} = setting
+                proxyService.registerGame({namespace, rpcPort: rpcPort.toString()},
                     err => err ? Log.w(`注册至代理失败，${config.gameRegisterInterval}秒后重试`) : null)
                 setTimeout(() => heartBeat2Proxy(), config.gameRegisterInterval)
             }
             heartBeat2Proxy()
         })
-        if (!config.deployIndependently) {
-            serveRPC()
-        }
         return express
     }
 }

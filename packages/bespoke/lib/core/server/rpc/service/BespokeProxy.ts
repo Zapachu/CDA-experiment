@@ -11,7 +11,8 @@ let proxyService: proto.ProxyService
 export function getProxyService(): proto.ProxyService {
     if (!proxyService) {
         try {
-            proxyService = new ProxyService(setting.proxyServiceUri, credentials.createInsecure()) as proto.ProxyService
+            const {host, port} = setting.proxyService
+            proxyService = new ProxyService(`${host}:${port}`, credentials.createInsecure()) as proto.ProxyService
         } catch (e) {
             Log.e('Failed to build RPC channel')
         }
