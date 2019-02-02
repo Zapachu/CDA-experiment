@@ -1,3 +1,4 @@
+//TODO rpcProto文件改为静态编译
 syntax = "proto3";
 
 service AcademusBespoke{

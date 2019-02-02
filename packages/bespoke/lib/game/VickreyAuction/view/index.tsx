@@ -1,4 +1,4 @@
-import {registerOnFramework} from '../../index'
+import {registerOnFramework} from 'client-vendor'
 import {namespace} from '../config'
 import {Create} from './Create'
 import {Play} from './Egret'

@@ -11,17 +11,24 @@ const {GameService, PhaseService} = loadPackageDefinition(loadSync(resolve(__dir
 const phaseService = {
     async newPhase({request: {groupId, owner, namespace, param}}: { request: INewPhaseReq }, callback) {
         const {id} = await new GameModel(<IGame<any>>{
-            title:'',
-            desc:'',
+            title: '',
+            desc: '',
             owner,
             groupId,
             namespace,
             params: JSON.parse(param)
         }).save()
-        callback(null, {playUrl: elfPhaseId2PlayUrl(id)})
+        callback(null, {playUrl: elfPhaseId2PlayUrl(namespace, id)})
     }
 }
 
 export {PhaseService, phaseService}
 
-export const gameService = new GameService(setting.elfGameServiceUri, credentials.createInsecure()) as CGameService
+let gameService: CGameService
+
+export function getGameService() {
+    if (!gameService) {
+        gameService = new GameService(setting.elfGameServiceUri, credentials.createInsecure()) as CGameService
+    }
+    return gameService
+}

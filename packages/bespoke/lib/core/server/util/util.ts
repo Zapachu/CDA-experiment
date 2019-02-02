@@ -2,9 +2,9 @@ import {config, baseEnum} from '@common'
 import {colorConsole, dailyfile} from 'tracer'
 import {resolve} from 'path'
 import * as objHash from 'object-hash'
-import devSetting from '../config/setting.dev'
-import * as fs from 'fs'
-import * as path from 'path'
+import {setting} from './Setting'
+
+export * from './Setting'
 
 export const inProductEnv = process.env.NODE_ENV === baseEnum.Env.production
 export const webpackHmr = process.env.HMR === 'true'
@@ -30,21 +30,6 @@ export class Hash {
     }
 }
 
-export function elfPhaseId2PlayUrl(phaseId: string): string {
-    return `${setting.localRootUrl}/${config.rootName}/play/${phaseId}`
+export function elfPhaseId2PlayUrl(namespace: string, phaseId: string): string {
+    return `http://${setting.host}/${config.rootName}/${namespace}/play/${phaseId}`
 }
-
-export function readManifest(relativePath: string) {
-    return JSON.parse(fs.readFileSync(path.resolve(__dirname, relativePath)).toString())
-}
-
-export const setting = ((): typeof devSetting => {
-    switch (process.env.NODE_ENV) {
-        case baseEnum.Env.production:
-            return require('../config/setting').default
-        case baseEnum.Env.testing:
-            return require('../config/setting.test').default
-        default:
-            return devSetting
-    }
-})()

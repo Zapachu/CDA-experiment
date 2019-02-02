@@ -1,7 +1,6 @@
-import {elfPhaseId2PlayUrl, EventIO, Hash, Log, readManifest} from '@server-util'
+import {elfPhaseId2PlayUrl, EventIO, Hash, Log} from '@server-util'
 import {
     baseEnum,
-    config,
     FrameEmitter,
     IActor,
     IConnection,
@@ -14,29 +13,34 @@ import GameDAO from '../service/GameDAO'
 import {NodeRobotsScheduler, PythonSchedulerProxy, RobotScheduler} from './robotSchedulerManager'
 import {MoveQueue, StateManager} from '../service/StateManager'
 import {Request, Response} from 'express'
-import {gameService, ISendBackPlayerRes} from '../rpc'
+import {getGameService, ISendBackPlayerRes} from '../rpc'
 
 export type AnyController = BaseController<any, any, any, any, any, any, any, any>
 type AnyRobotScheduler = RobotScheduler<any, any, any, any, any, any, any>
 type AnyRobot = BaseRobot<any, any, any, any, any, any, any>
 
-interface ILogicTemplate {
-    namespace?: string,
+export interface ILogicTemplate {
     Controller: new(...args) => AnyController,
     Robot?: new(...args) => AnyRobot
 }
 
-class GameLogic {
+export class GameLogic {
     private readonly namespaceController: AnyController
     private gameControllers = new Map<string, AnyController>()
     private robotSchedulers = new Map<string, AnyRobotScheduler>()
 
-    constructor(private gameLogicTemplate: ILogicTemplate) {
-        this.namespaceController = new gameLogicTemplate.Controller()
+    private static _gameLogic: GameLogic
+
+    static initInstance(template: ILogicTemplate) {
+        this._gameLogic = new GameLogic(template)
     }
 
-    getBespokeClientPath() {
-        return readManifest(`../../../../dist/${config.buildManifest.gameFile}`)[`${this.gameLogicTemplate.namespace}.js`]
+    static get instance(): GameLogic {
+        return this._gameLogic
+    }
+
+    private constructor(private gameLogicTemplate: ILogicTemplate) {
+        this.namespaceController = new gameLogicTemplate.Controller()
     }
 
     getNamespaceController() {
@@ -60,18 +64,6 @@ class GameLogic {
         const robotProxy = await (pythonRobot ? new PythonSchedulerProxy(game, actor) : new NodeRobotsScheduler(game, actor, this.gameLogicTemplate.Robot)).init()
         this.robotSchedulers.set(robotProxy.id, robotProxy)
     }
-}
-
-const gameLogics: { [namespace: string]: GameLogic } = {}
-
-export function registerGameLogic(namespace: string, template: ILogicTemplate) {
-    template.namespace = namespace
-    gameLogics[template.namespace] = new GameLogic(template)
-    Log.i(`${namespace.padEnd(32)} ${template.Controller?'Controller':''} ${template.Robot?'Robot':''}`)
-}
-
-export function getGameLogic(namespace: string): GameLogic {
-    return gameLogics[namespace]
 }
 
 export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
@@ -137,7 +129,7 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
     }
 
     async startNewRobotScheduler(key, pythonRobot: boolean) {
-        await getGameLogic(this.game.namespace).startNewRobotScheduler(this.game.id, key, pythonRobot)
+        await GameLogic.instance.startNewRobotScheduler(this.game.id, key, pythonRobot)
     }
 
     async handleFetch(req: Request, res: Response) {
@@ -169,8 +161,8 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
         if (!this.game.groupId) {
             return Log.w('Bespoke单独部署，game未关联至Elf group')
         }
-        gameService.sendBackPlayer({
-            playUrl: elfPhaseId2PlayUrl(this.game.id),
+        getGameService().sendBackPlayer({
+            playUrl: elfPhaseId2PlayUrl(this.game.namespace, this.game.id),
             playerToken,
             nextPhaseKey,
             groupId: this.game.groupId
@@ -186,7 +178,7 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
 }
 
 export class BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
-    constructor(private robotSchdulerManager: NodeRobotsScheduler<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {
+    constructor(private nodeRobotsScheduler: NodeRobotsScheduler<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {
     }
 
     async init(): Promise<BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>> {
@@ -194,19 +186,19 @@ export class BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushTy
     }
 
     get game(): IGameWithId<ICreateParams> {
-        return this.robotSchdulerManager.game
+        return this.nodeRobotsScheduler.game
     }
 
     get gameState(): TGameState<IGameState> {
-        return this.robotSchdulerManager.gameState
+        return this.nodeRobotsScheduler.gameState
     }
 
     get playerState(): TPlayerState<IPlayerState> {
-        return this.robotSchdulerManager.playerState
+        return this.nodeRobotsScheduler.playerState
     }
 
     get frameEmitter(): FrameEmitter<MoveType, PushType, IMoveParams, IPushParams> {
-        return this.robotSchdulerManager.frameEmitter
+        return this.nodeRobotsScheduler.frameEmitter
     }
 
     receiveGameState(): void {

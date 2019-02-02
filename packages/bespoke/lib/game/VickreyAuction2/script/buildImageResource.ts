@@ -1,9 +1,9 @@
 import {resolve} from 'path'
 import {readdirSync, writeFileSync} from 'fs'
 
-const fileNames = readdirSync(resolve(__dirname, '../../resource/img'))
+const fileNames = readdirSync(resolve(__dirname, '../resource/img'))
 
-writeFileSync('./imgGroup.ts',
+writeFileSync('../src/view/util/imgGroup.ts',
     `function loadImg(src: string) {
     return new Promise<HTMLImageElement>(resolve => {
         const img = new Image()
@@ -15,7 +15,7 @@ writeFileSync('./imgGroup.ts',
 export async function loadImgGroup() {
     return {
         ${fileNames
-        .map(fileName => `${fileName.split('.')[0]} : await loadImg(require('../../resource/img/${fileName}'))`)
+        .map(fileName => `${fileName.split('.')[0]} : await loadImg(require('../../../resource/img/${fileName}'))`)
         .join(',\n\t\t')}
     }
 }

@@ -17,7 +17,6 @@ export const connCtx = <C extends {}>(Context: React.Context<C>) =>
 //region root
 export type TRootCtx = Partial<{
     gameTemplate: IGameTemplate
-    switchGameTemplate: (namespace: string) => Promise<void>
 }>
 export const rootContext = createContext<TRootCtx>({})
 //endregion

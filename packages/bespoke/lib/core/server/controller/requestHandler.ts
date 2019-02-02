@@ -3,7 +3,7 @@ import {Request, Response, NextFunction} from 'express'
 import * as passport from 'passport'
 import {Log, RedisKey, redisClient, Hash, WebpackHmr, inProductEnv} from '@server-util'
 import {GameModel, UserModel, UserDoc, MoveLogModel, SimulatePlayerModel} from '@server-model'
-import {getGameLogic, AnyController} from '../manager/logicManager'
+import {AnyController, GameLogic} from '../manager/logicManager'
 import GameDAO from '../service/GameDAO'
 import UserService from '../service/UserService'
 
@@ -108,7 +108,7 @@ export class GameCtrl {
         try {
             let game = await GameDAO.getGame(gameId)
             if (!user || user._id.toString() !== game.owner) {
-                game = (await getGameLogic(game.namespace).getGameController(gameId)).getGame4Player()
+                game = (await GameLogic.instance.getGameController(gameId)).getGame4Player()
             }
             res.json({
                 code: baseEnum.ResponseCode.success,
@@ -164,22 +164,6 @@ export class GameCtrl {
         })
     }
 
-    static async getGameTemplateUrl(req, res: Response) {
-        const {params: {namespace}} = req
-        try {
-            const jsUrl = getGameLogic(namespace).getBespokeClientPath()
-            res.json({
-                code: baseEnum.ResponseCode.success,
-                jsUrl
-            })
-        } catch (e) {
-            Log.e(e)
-            res.json({
-                code: baseEnum.ResponseCode.serverError
-            })
-        }
-    }
-
     static async newGame(req, res) {
         const {namespace, game} = req.body, owner = req.user
         try {
@@ -193,6 +177,14 @@ export class GameCtrl {
                 code: baseEnum.ResponseCode.serverError
             })
         }
+    }
+
+    static async getNamespace(req, res) {
+        const {namespace} = await GameDAO.getGame(req.params.gameId)
+        res.json({
+            code: baseEnum.ResponseCode.success,
+            namespace
+        })
     }
 
     static async shareGame(req, res) {
@@ -294,12 +286,12 @@ export class GameCtrl {
 
     static async passThrough(req, res) {
         let controller: AnyController
-        const {params: {namespace, gameId}} = req
+        const {params: {gameId}} = req
         if (gameId) {
             const game = await GameDAO.getGame(gameId)
-            controller = await getGameLogic(game.namespace).getGameController(game.id)
+            controller = await GameLogic.instance.getGameController(game.id)
         } else {
-            controller = getGameLogic(namespace).getNamespaceController()
+            controller = GameLogic.instance.getNamespaceController()
         }
         await controller.handleFetch(req, res)
     }

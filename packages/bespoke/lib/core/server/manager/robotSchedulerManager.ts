@@ -151,7 +151,7 @@ export class PythonSchedulerProxy<ICreateParams, IGameState, IPlayerState, MoveT
                 playerState: this.playerState
             })))
         } catch (e) {
-            console.log(e)
+            Log.e(e)
         }
     }
 }

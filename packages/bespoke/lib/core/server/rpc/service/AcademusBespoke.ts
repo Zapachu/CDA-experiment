@@ -1,15 +1,23 @@
 import * as path from 'path'
 import {loadPackageDefinition, credentials} from 'grpc'
 import {loadSync} from '@grpc/proto-loader'
-import {RedisKey, redisClient, setting} from "@server-util";
+import {RedisKey, redisClient, setting} from '@server-util'
 
 export const {AcademusBespoke} = loadPackageDefinition(loadSync(path.resolve(__dirname, '../proto/AcademusBespoke.proto'))) as any
 export const academusBespoke = {
     checkShareCode: (req, callback) => {
-        const {code} = req.request;
+        const {code} = req.request
         redisClient.get(RedisKey.share_CodeGame(code)).then(gameId => {
             callback(null, {gameId})
         })
     }
 }
-export const AcademusBespokeConsumer = new AcademusBespoke(setting.academusServiceUri, credentials.createInsecure())
+
+let academusService
+
+export function getAcademusService() {
+    if (!academusService) {
+        academusService = new AcademusBespoke(setting.academusServiceUri, credentials.createInsecure())
+    }
+    return academusService
+}

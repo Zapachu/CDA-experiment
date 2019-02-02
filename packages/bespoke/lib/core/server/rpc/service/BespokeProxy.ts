@@ -1,8 +1,21 @@
 import * as path from 'path'
 import {loadPackageDefinition, credentials} from 'grpc'
 import {loadSync} from '@grpc/proto-loader'
-import {setting} from '@server-util'
+import {setting, Log} from '@server-util'
 import {proto} from '..'
 
 export const {proto: {ProxyService}} = loadPackageDefinition(loadSync(path.resolve(__dirname, '../proto/BespokeProxy.proto'))) as any
-export const proxyService = new ProxyService(setting.proxyServiceUri, credentials.createInsecure()) as proto.ProxyService
+
+let proxyService: proto.ProxyService
+
+export function getProxyService(): proto.ProxyService {
+    if (!proxyService) {
+        try {
+            const {host, port} = setting.proxyService
+            proxyService = new ProxyService(`${host}:${port}`, credentials.createInsecure()) as proto.ProxyService
+        } catch (e) {
+            Log.e('Failed to build RPC channel')
+        }
+    }
+    return proxyService
+}

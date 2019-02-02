@@ -1,10 +1,10 @@
 import {baseEnum, IEventHandler, IConnection, IMoveCallback} from '@common'
-import {getGameLogic} from '../manager/logicManager'
+import {GameLogic} from '../manager/logicManager'
 
 export const EventHandler = {
     [baseEnum.SocketEvent.online]: async (connection: IConnection) => {
         const {game, actor} = connection,
-            controller = await getGameLogic(game.namespace).getGameController(game.id)
+            controller = await GameLogic.instance.getGameController(game.id)
         connection.join(game.id)
         controller.connections.set(actor.token, connection)
         if (actor.type === baseEnum.Actor.owner) {
@@ -19,7 +19,7 @@ export const EventHandler = {
     },
 
     [baseEnum.SocketEvent.disconnect]: async ({game, actor}: IConnection) => {
-        const {stateManager} = await getGameLogic(game.namespace).getGameController(game.id)
+        const {stateManager} = await GameLogic.instance.getGameController(game.id)
         if (actor.type === baseEnum.Actor.owner) {
             const gameState = await stateManager.getGameState()
             gameState.connectionId = ''
@@ -31,7 +31,7 @@ export const EventHandler = {
     },
 
     [baseEnum.SocketEvent.move]: async ({actor, game}: IConnection, type: string, params: {}, cb?: IMoveCallback) => {
-        const controller = await getGameLogic(game.namespace).getGameController(game.id)
+        const controller = await GameLogic.instance.getGameController(game.id)
         await controller.moveReducer(actor, type, params, cb || (() => null))
     }
 } as { [s: string]: IEventHandler }

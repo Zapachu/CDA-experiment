@@ -1,4 +1,4 @@
-import {registerOnFramework} from '../../index'
+import {registerOnFramework} from 'client-vendor'
 import {Create} from './Create'
 import {CreateOnElf} from './CreateOnElf'
 import {Info} from './Info'

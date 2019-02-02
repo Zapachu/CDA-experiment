@@ -1,4 +1,4 @@
-import {registerOnFramework} from '../../index'
+import {registerOnFramework} from 'client-vendor'
 import {Play} from './Play'
 
 registerOnFramework('FaceRecognition', {

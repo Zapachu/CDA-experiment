@@ -33,11 +33,6 @@ export class Create extends React.Component<RouteComponentProps<{ namespace: str
         submitable: true
     }
 
-    async componentDidMount() {
-        const {switchGameTemplate, match: {params: {namespace}}} = this.props
-        await switchGameTemplate(namespace)
-    }
-
     setSubmitable(submitable: boolean) {
         this.setState({submitable})
     }

@@ -23,7 +23,6 @@ export class Configuration extends React.Component<TRootCtx & RouteComponentProp
     async componentDidMount() {
         const {props: {match: {params: {gameId}}}} = this
         const {game} = await Api.getGame(gameId)
-        await this.props.switchGameTemplate(game.namespace)
         this.setState({
             loading: false,
             game
@@ -44,9 +43,9 @@ export class Configuration extends React.Component<TRootCtx & RouteComponentProp
                 <Info {...{game}}/>
                 <li style={{margin: '2rem auto 0'}}>
                     <Button width={Button.Width.medium}
-                          color={Button.Color.blue}
-                          label={lang.playRoom}
-                          onClick={() => history.push(`/play/${gameId}`)}
+                            color={Button.Color.blue}
+                            label={lang.playRoom}
+                            onClick={() => history.push(`/play/${gameId}`)}
                     />
                 </li>
             </ul>

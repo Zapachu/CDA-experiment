@@ -7,8 +7,8 @@ interface IHttpRes {
     code: baseEnum.ResponseCode
 }
 
-export function buildUrl(pathFragment: string, params = {}, query = {}): string {
-    let path = `/${config.rootName}/${config.apiPrefix}${pathFragment}`
+export function buildUrl(pathFragment: string, params = {}, query = {}, namespace = ''): string {
+    let path = `/${config.rootName}/${namespace ? `${namespace}/` : ''}${config.apiPrefix}${pathFragment}`
     if (params) {
         path = path.replace(/:([\w\d]+)/, (matchedParam, paramName) => params[paramName])
     }
@@ -18,13 +18,18 @@ export function buildUrl(pathFragment: string, params = {}, query = {}): string 
 export class Request {
     private readonly get: (path: string, params?: {}, query?: {}) => Promise<any>
     private readonly post: (path: string, params?: {}, query?: {}, data?: {}) => Promise<any>
+    private readonly get_nsp: (namespace: string, path: string, params?: {}, query?: {}) => Promise<any>
+    private readonly post_nsp: (namespace: string, path: string, params?: {}, query?: {}, data?: {}) => Promise<any>
 
     constructor(get: (url: string) => Promise<any>,
                 post: (url: string, data?: {}) => Promise<any>) {
-        this.get = async (path: string, params?: {}, query?: {}) => await get(buildUrl(path, params, query))
-        this.post = async (path: string, params?: {}, query?: {}, data?: {}) => await post(buildUrl(path, params, query), data)
+        this.get = async (path, params, query) => await get(buildUrl(path, params, query))
+        this.post = async (path, params, query, data) => await post(buildUrl(path, params, query), data)
+        this.get_nsp = async (namespace, path, params, query) => await get(buildUrl(path, params, query, namespace))
+        this.post_nsp = async (namespace, path, params, query, data) => await post(buildUrl(path, params, query, namespace), data)
     }
 
+    //region /
     //region user
     async getVerifyCode(nationCode: baseEnum.NationCode, mobile: string): Promise<IHttpRes & { msg: string }> {
         return await this.get('/user/verifyCode', null, {nationCode, mobile})
@@ -48,10 +53,6 @@ export class Request {
         return await this.get('/game/accessibleTemplates')
     }
 
-    async getGameTemplateUrl(namespace: string): Promise<IHttpRes & { jsUrl: string }> {
-        return await this.get('/game/gameTemplateUrl/:namespace', {namespace})
-    }
-
     async getHistoryGames(namespace?: string): Promise<IHttpRes & { historyGameThumbs: Array<IGameThumb> }> {
         return await this.get('/game/historyThumb', null, {namespace})
     }
@@ -60,8 +61,8 @@ export class Request {
         return await this.post('/game/new', null, null, {game, namespace})
     }
 
-    async getGame(gameId: string): Promise<IHttpRes & { game: IGameWithId<any> }> {
-        return await this.get('/game/:gameId', {gameId})
+    async getNamespace(gameId: string): Promise<IHttpRes & { namespace: string }> {
+        return await this.get('/game/namespace/:gameId', {gameId})
     }
 
     async shareGame(gameId: string): Promise<IHttpRes & { shareCode: string, title: string }> {
@@ -88,23 +89,29 @@ export class Request {
         return this.get('/game/moveLogs/:gameId', {gameId})
     }
 
-    //region passthrough
+    //endregion
+    //endregion
+    //region /namespace
+    async getGame(gameId: string): Promise<IHttpRes & { game: IGameWithId<any> }> {
+        const {namespace} = await this.getNamespace(gameId)
+        return await this.get_nsp(namespace, '/game/:gameId', {gameId})
+    }
+
     async getFromNamespace(namespace: string, type: string, params: {}) {
-        return await this.get('/game/pass2Namespace/:namespace', {namespace}, {type, ...params})
+        return await this.get_nsp(namespace, `/game/pass2Namespace`, null, {type, ...params})
     }
 
     async postToNamespace(namespace: string, type: string, params: {}) {
-        return await this.post('/game/pass2Namespace/:namespace', {namespace}, {type, ...params})
+        return await this.post_nsp(namespace, `/game/pass2Namespace`, null, {type, ...params})
     }
 
-    async getFromeGame(gameId: string, type: string, params: {}) {
-        return await this.get('/game/pass2Game/:gameId', {gameId}, {type, ...params})
+    async getFromGame(namespace: string, gameId: string, type: string, params: {}) {
+        return await this.get_nsp(namespace, `/game/pass2Game/:gameId`, {gameId}, {type, ...params})
     }
 
-    async postToGame(gameId: string, type: string, params: {}) {
-        return await this.post('/game/pass2Game/:gameId', {gameId}, {type, ...params})
+    async postToGame(namespace: string, gameId: string, type: string, params: {}) {
+        return await this.post_nsp(namespace, `/game/pass2Game/:gameId`, {gameId}, {type, ...params})
     }
 
-    //endregion
     //endregion
 }
