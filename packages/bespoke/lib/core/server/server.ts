@@ -11,15 +11,6 @@ import * as errorHandler from 'errorhandler'
 import * as bodyParser from 'body-parser'
 import * as compression from 'compression'
 import * as morgan from 'morgan'
-
-const {compilerOptions: {paths}} = require(path.join(__dirname, '../../../tsconfig.json'))
-import {register as registerTsConfigPath} from 'tsconfig-paths'
-
-registerTsConfigPath({
-    baseUrl: path.resolve(__dirname, '../../'),
-    paths
-})
-
 import {Log, redisClient, WebpackHmr, setting, initSetting, ISetting, QCloudSMS} from '@server-util'
 import {baseEnum, config} from '@common'
 import {EventDispatcher} from './controller/eventDispatcher'

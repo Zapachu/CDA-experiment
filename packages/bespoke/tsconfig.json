@@ -36,6 +36,6 @@
   "include": [
     "bin",
     "lib",
-    "test"
+    "."
   ]
 }

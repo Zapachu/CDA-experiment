@@ -1,12 +1,14 @@
-import {Server} from '../../../core/server/server'
+require('../../../../registerTsconfig')
+import {Server} from 'server-vendor'
 import {namespace} from './config'
 import Controller from './Controller'
 import * as path from 'path'
+import {setting} from './setting'
 
 Server.start({
     namespace,
-    port: 3009,
-    rpcPort: 53009,
+    port: +process.env.PORT || setting.port,
+    rpcPort: +process.env.RPC_PORT || setting.rpcPort,
     getClientPath: () => require(`../dist/${namespace}.json`)[`${namespace}.js`],
     staticPath: path.resolve(__dirname, '../dist'),
     qCloudSMS: {
@@ -19,6 +21,6 @@ Server.start({
     },
     proxyService: {
         host: '127.0.0.1',
-        port: 58888,
+        port: 58888
     }
 }, {Controller})
