@@ -1,10 +1,7 @@
-import {config, baseEnum} from '@common'
+import {config, baseEnum, IQCloudSMS, IQiniuConfig} from '@common'
 import {colorConsole, dailyfile} from 'tracer'
 import {resolve} from 'path'
 import * as objHash from 'object-hash'
-import {setting} from './Setting'
-
-export * from './Setting'
 
 export const inProductEnv = process.env.NODE_ENV === baseEnum.Env.production
 export const webpackHmr = process.env.HMR === 'true'
@@ -33,3 +30,56 @@ export class Hash {
 export function elfPhaseId2PlayUrl(namespace: string, phaseId: string): string {
     return `http://${setting.host}/${config.rootName}/${namespace}/play/${phaseId}`
 }
+
+//region setting
+export interface ISetting {
+    namespace: string
+    host?: string
+    port?: number
+    rpcPort?: number
+    independent?: boolean
+    mongoUri?: string
+    mongoUser?: string
+    mongoPass?: string
+    redisHost?: string
+    redisPort?: number
+    sessionSecret?: string
+    //region RPC
+    proxyService?: {
+        host: string
+        port: number
+    }
+    academusServiceUri?: string
+    pythonRobotUri?: string
+    elfGameServiceUri?: string
+    localServiceUri?: string
+    //endregion
+    qCloudSMS: IQCloudSMS
+    qiNiu?: IQiniuConfig
+    mail?: {
+        smtpHost: string
+        smtpUsername: string
+        smtpPassword: string
+    }
+    adminMobileNumbers?: Array<string>
+    getClientPath: () => string
+    staticPath: string
+}
+
+export const setting: Readonly<(Partial<ISetting>)> = {
+    host: '127.0.0.1',
+    port: 0,
+    mongoUri: 'mongodb://127.0.0.1:27017/academy',
+    mongoUser: '',
+    mongoPass: '',
+    redisHost: '127.0.0.1',
+    redisPort: 6379,
+    sessionSecret: 'sessionsecret',
+    adminMobileNumbers: ['13000000000']
+}
+
+export function initSetting(gameSetting: ISetting) {
+    Object.assign(setting, gameSetting)
+}
+
+//endregion
