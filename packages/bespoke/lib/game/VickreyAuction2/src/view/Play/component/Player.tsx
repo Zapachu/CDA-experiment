@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {Keyframes, SpringProps} from 'react-spring'
+import {Keyframes, SpringProps} from 'react-spring/renderprops'
 import {gameData} from '../gameData'
 import {PlayerStatus} from '../../../config'
 

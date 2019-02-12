@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {PlayerStatus} from '../../../config'
 import {gameData} from '../gameData'
-import {Spring} from 'react-spring'
+import {Spring} from 'react-spring/renderprops'
 
 interface SpringState {
     x: number

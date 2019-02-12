@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {IElfCreateProps} from 'elf-game'
 import {FrameEmitter, IGame, TGameState, TPlayerState} from '@common'
-import {Fetcher} from '../util'
+import {Fetcher} from '.'
 
 export interface IGameTemplate {
     namespace?: string

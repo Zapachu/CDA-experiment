@@ -20,7 +20,7 @@
         "core/common"
       ],
       "client-vendor": [
-        "core/client/vendor"
+        "core/client"
       ],
       "server-vendor": [
         "core/server"

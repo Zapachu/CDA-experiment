@@ -34,7 +34,7 @@ const Root: React.FunctionComponent<TRootCtx> = props =>
         </BrowserRouter>
     </rootContext.Provider>
 
-export const start: TRegisterGame = (namespace: string, gameTemplate: IGameTemplate) => {
+export const registerGame: TRegisterGame = (namespace: string, gameTemplate: IGameTemplate) => {
     const Empty = () => null
     const template = {
         namespace,

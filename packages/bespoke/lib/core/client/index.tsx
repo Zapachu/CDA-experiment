@@ -1,1 +1,0 @@
-export {start as registerGame} from './view'

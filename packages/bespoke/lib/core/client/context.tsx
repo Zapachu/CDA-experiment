@@ -1,6 +1,6 @@
 import {createContext} from 'react'
 import * as React from 'react'
-import {IGameTemplate} from 'client-vendor'
+import {IGameTemplate} from './util/interface'
 
 export const connCtx = <C extends {}>(Context: React.Context<C>) =>
     <P, S>(ComponentClass: React.ComponentClass<P & C, S>) => {

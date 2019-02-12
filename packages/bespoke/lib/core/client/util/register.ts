@@ -1,4 +1,4 @@
-import {IGameTemplate, TRegisterGame} from 'client-vendor'
+import {IGameTemplate, TRegisterGame} from './interface'
 import {TregisterPhaseCreate} from 'elf-game'
 
 export function registerOnFramework(namespace: string, gameTemplate: IGameTemplate) {
