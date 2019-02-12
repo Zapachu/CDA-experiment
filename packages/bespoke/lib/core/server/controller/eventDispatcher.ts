@@ -1,6 +1,6 @@
 import {Server} from 'http'
 import {EventHandler} from './eventHandler'
-import {EventIO, Log} from '@server-util'
+import {EventIO, Log} from '../util'
 import {IConnection, IEventHandler} from '@common'
 
 export class EventDispatcher {

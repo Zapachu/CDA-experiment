@@ -1,5 +1,5 @@
 import {baseEnum, config} from '@common'
-import {redisClient, RedisKey, QCloudSMS, Log, inProductEnv, setting} from '@server-util'
+import {redisClient, RedisKey, QCloudSMS, Log, inProductEnv, setting} from '../util'
 
 const SEND_TIMES_PER_DAY = 3
 

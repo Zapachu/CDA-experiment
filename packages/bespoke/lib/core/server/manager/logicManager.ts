@@ -1,4 +1,4 @@
-import {elfPhaseId2PlayUrl, EventIO, Hash, Log} from '@server-util'
+import {elfPhaseId2PlayUrl, EventIO, Hash, Log} from '../util'
 import {
     baseEnum,
     FrameEmitter,

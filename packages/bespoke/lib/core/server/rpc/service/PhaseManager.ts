@@ -2,8 +2,8 @@ import {resolve} from 'path'
 import {loadPackageDefinition, credentials} from 'grpc'
 import {loadSync} from '@grpc/proto-loader'
 import {INewPhaseReq, GameService as CGameService} from '..'
-import {elfPhaseId2PlayUrl, setting} from '@server-util'
-import {GameModel} from '@server-model'
+import {elfPhaseId2PlayUrl, setting} from '../../util'
+import {GameModel} from '../../model'
 import {IGame} from '@common'
 
 const {GameService, PhaseService} = loadPackageDefinition(loadSync(resolve(__dirname, '../proto/phaseManager.proto'))) as any

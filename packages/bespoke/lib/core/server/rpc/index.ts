@@ -18,7 +18,7 @@ export {getProxyService} from './service/BespokeProxy'
 import {Server, ServerCredentials} from 'grpc'
 import {getGameService, PhaseService, phaseService} from './service/PhaseManager'
 import {config} from '@common'
-import {Log, setting} from '@server-util'
+import {Log, setting} from '../util'
 
 export function serve() {
     const server = new Server()
@@ -35,6 +35,6 @@ function registerPhases() {
         namespace: setting.namespace,
         jsUrl: `https://${host}:${port}/${setting.getClientPath()}`,
         rpcUri: setting.localServiceUri
-      }]
+    }]
     getGameService().registerPhases({phases}, err => err && Log.e(err))
 }

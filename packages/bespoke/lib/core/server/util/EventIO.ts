@@ -3,7 +3,7 @@ import {Server} from 'http'
 import {EventEmitter} from 'events'
 import * as socketIO from 'socket.io'
 import GameDAO from '../service/GameDAO'
-import {setting} from '@server-util'
+import {setting} from './util'
 
 export class EventIO {
     private static socketIOServer: socketIO.Server

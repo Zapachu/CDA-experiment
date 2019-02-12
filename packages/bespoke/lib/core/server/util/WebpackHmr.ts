@@ -2,7 +2,7 @@ import {config} from '@common'
 import * as path from 'path'
 import * as webpack from 'webpack'
 import {Express, Response, NextFunction} from 'express'
-import {setting, webpackHmr} from '@server-util'
+import {setting, webpackHmr} from './util'
 import * as webpackDevMiddleware from 'webpack-dev-middleware'
 import * as  webpackHotMiddleware from 'webpack-hot-middleware'
 import coreWebpackCfg = require('../../client/script/webpack.core')

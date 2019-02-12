@@ -1,4 +1,4 @@
-import {Log, EventIO, RobotConnection, cacheResultSync} from '@server-util'
+import {Log, EventIO, RobotConnection, cacheResultSync, setting} from '../util'
 import * as path from 'path'
 import {credentials, load as grpcLoad, loadPackageDefinition} from 'grpc'
 import {loadSync} from '@grpc/proto-loader'
@@ -12,7 +12,6 @@ import {
     TPlayerState,
     FrameEmitter
 } from '@common'
-import {setting} from '@server-util'
 import {BaseRobot} from '../index'
 
 export abstract class RobotScheduler<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {

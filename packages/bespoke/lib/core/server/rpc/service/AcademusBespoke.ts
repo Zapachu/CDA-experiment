@@ -1,7 +1,7 @@
 import * as path from 'path'
 import {loadPackageDefinition, credentials} from 'grpc'
 import {loadSync} from '@grpc/proto-loader'
-import {RedisKey, redisClient, setting} from '@server-util'
+import {RedisKey, redisClient, setting} from '../../util'
 
 export const {AcademusBespoke} = loadPackageDefinition(loadSync(path.resolve(__dirname, '../proto/AcademusBespoke.proto'))) as any
 export const academusBespoke = {

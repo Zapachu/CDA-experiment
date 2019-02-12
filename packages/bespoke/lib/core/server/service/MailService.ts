@@ -1,5 +1,5 @@
 import {createTransport} from 'nodemailer'
-import {setting} from '@server-util'
+import {setting} from '../util'
 
 const transporter = createTransport({
     host: setting.mail.smtpHost,
@@ -9,26 +9,26 @@ const transporter = createTransport({
         user: setting.mail.smtpUsername,
         pass: setting.mail.smtpPassword
     }
-});
+})
 
 interface attachmentProps {
-    filename:string,
-    path:string
+    filename: string,
+    path: string
 }
 
 interface sendMailProps {
-    to:string,
-    from?:string,
-    subject:string,
-    text:string,
-    attachments?:Array<attachmentProps>
+    to: string,
+    from?: string,
+    subject: string,
+    text: string,
+    attachments?: Array<attachmentProps>
 }
 
 export default class MailService {
-    static async sendMail(config:sendMailProps) {
+    static async sendMail(config: sendMailProps) {
         return new Promise((resolve, reject) => {
             transporter.sendMail(config, (err, info) => {
-                if(err) return reject(err)
+                if (err) return reject(err)
                 resolve(info)
             })
         })

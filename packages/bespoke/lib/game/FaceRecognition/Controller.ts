@@ -1,10 +1,9 @@
 import * as request from 'request'
 import * as qiniu from 'qiniu'
-import {BaseController, IActor, IMoveCallback} from 'server-vendor'
+import {BaseController, IActor, IMoveCallback, Log} from 'server-vendor'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
 import {FetchType, MoveType, PushType, qiniuTokenLifetime} from './config'
 import setting from './config/setting'
-import {Log} from '@server-util'
 
 export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
     _qiniuUploadToken: string

@@ -1,5 +1,5 @@
 import {baseEnum} from '@common'
-import {setting} from '@server-util'
+import {setting} from './util'
 import * as QCloudSms from 'qcloudsms_js'
 
 export class QCloudSMS {

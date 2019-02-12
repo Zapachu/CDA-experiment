@@ -19,12 +19,6 @@
       "@common": [
         "core/common"
       ],
-      "@server-util": [
-        "core/server/util"
-      ],
-      "@server-model": [
-        "core/server/model"
-      ],
       "client-vendor": [
         "core/client/vendor"
       ],
