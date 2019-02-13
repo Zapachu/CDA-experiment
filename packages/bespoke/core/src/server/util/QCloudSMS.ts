@@ -1,5 +1,5 @@
 import {baseEnum} from '@dev/common'
-import {setting} from './util'
+import {Log, setting} from './util'
 import * as QCloudSms from 'qcloudsms_js'
 
 export class QCloudSMS {
@@ -7,8 +7,12 @@ export class QCloudSMS {
     private static singleSender
 
     static init() {
-        this.qCloudSMS = QCloudSms(setting.qCloudSMS.appId, setting.qCloudSMS.appKey)
-        this.singleSender = QCloudSMS.qCloudSMS.SmsSingleSender()
+        try {
+            this.qCloudSMS = QCloudSms(setting.qCloudSMS.appId, setting.qCloudSMS.appKey)
+            this.singleSender = QCloudSMS.qCloudSMS.SmsSingleSender()
+        }catch (e) {
+            Log.e('QCloudSMS初始化失败')
+        }
     }
 
     static singleSenderWithParam(

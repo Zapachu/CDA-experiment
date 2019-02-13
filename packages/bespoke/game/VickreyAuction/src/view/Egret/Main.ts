@@ -9,7 +9,7 @@ export class Main extends egret.DisplayObjectContainer {
     constructor() {
         super()
         this.addEventListener(egret.Event.ADDED_TO_STAGE, async () => {
-            await RES.loadConfig(resMeta.name, `${location.origin}/${config.rootName}/static/${namespace}/resource`)
+            await RES.loadConfig(resMeta.name, `${location.origin}/${config.rootName}/${namespace}/static`)
             await RES.loadGroup(resMeta.preload.name)
             this.addChild(new Market())
             this.addChild(new OperateBar())

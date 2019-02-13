@@ -54,7 +54,7 @@ export interface ISetting {
     elfGameServiceUri?: string
     localServiceUri?: string
     //endregion
-    qCloudSMS: IQCloudSMS
+    qCloudSMS?: IQCloudSMS
     qiNiu?: IQiniuConfig
     mail?: {
         smtpHost: string

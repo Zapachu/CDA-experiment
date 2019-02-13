@@ -1,4 +1,4 @@
-import {FrameEmitter, IGame} from '@dev/common'
+import {FrameEmitter, IGame} from '../../../../../core/src/common'
 import {MoveType, PushType} from '../../config'
 import {ICreateParams, IMoveParams, IPushParams} from '../../interface'
 
