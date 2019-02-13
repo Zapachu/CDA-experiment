@@ -1,10 +1,9 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang, Button, MaskLoading} from '@dev/client'
+import {Core, Lang, Button, MaskLoading, baseEnum} from '@dev/client'
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import {FetchType, MoveType, phaseNames, PlayerStatus, PushType, ROLE} from '../config'
 import {TradeChart} from './phase/mainGame'
-import {GameStatus} from '../../../core/common/baseEnum'
 
 interface IPlay4OwnerState {
     timer?: number
@@ -72,7 +71,7 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
 
     renderAssignPosition() {
         const {lang, props: {frameEmitter, gameState, playerStates, game}} = this
-        const totalPlayer = game.params.phases.find(ph => ph.templateName===phaseNames.assignPosition).params.positions.length
+        const totalPlayer = game.params.phases.find(ph => ph.templateName === phaseNames.assignPosition).params.positions.length
         return <section className={style.assignPosition}>
             {
                 this.renderPlayerStatusTable()
@@ -128,7 +127,7 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
                             <label>{lang.readingInfo}<em>{time2ReadInfo - timer}</em>s</label> :
                             timer < ((+time2ReadInfo) + (+durationOfEachPeriod)) ?
                                 <label>{lang.trading}<em>{+durationOfEachPeriod + +time2ReadInfo - timer}</em>s</label> :
-                                <label>{lang.showResult}<em>{+durationOfEachPeriod + 2 *time2ReadInfo - timer}</em>s</label> : null
+                                <label>{lang.showResult}<em>{+durationOfEachPeriod + 2 * time2ReadInfo - timer}</em>s</label> : null
                     }
                 </div>
             </div>
@@ -158,7 +157,7 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
 
     render() {
         const {lang, props: {gameState}} = this
-        if (gameState.status === GameStatus.notStarted) {
+        if (gameState.status === baseEnum.GameStatus.notStarted) {
             return <MaskLoading label={lang.gameHasNotStarted}/>
         }
         return <section className={style.player4Owner}>

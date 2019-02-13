@@ -1,8 +1,7 @@
 import nodeXlsx from 'node-xlsx'
-import {BaseController, IActor, IMoveCallback, TGameState, FreeStyleModel} from '@dev/server'
+import {BaseController, IActor, IMoveCallback, TGameState, FreeStyleModel, baseEnum} from '@dev/server'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
 import {FetchType, MoveType, GameStage, PushType, GENDER, SheetType, IAnwserLog, IResult, EYES} from './config'
-import {GameStatus} from '../../core/common/baseEnum'
 
 const RIGHT_ANSWER = [
     {emotion: 0, gender: GENDER.male},
@@ -152,7 +151,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             case MoveType.startMainTest: {
                 gameState.gameStage = GameStage.mainTest
                 this.timer = global.setInterval(async () => {
-                    if (gameState.status !== GameStatus.started) {
+                    if (gameState.status !== baseEnum.GameStatus.started) {
                         return
                     }
                     if (gameState.time++ >= timeLimit * 60) {

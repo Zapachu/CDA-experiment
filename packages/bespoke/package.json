@@ -5,7 +5,7 @@
   "repository": " ",
   "license": "ISC",
   "scripts": {
-    "core:build": "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./lib/core/client/script/webpack.core.ts",
+    "core:build": "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./core/src/client/script/webpack.core.ts",
     "core:dist": "npm run core:build --buildMode=dist",
     "core:publish": "npm run core:build --buildMode=publish"
   },

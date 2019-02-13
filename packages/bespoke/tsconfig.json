@@ -14,18 +14,20 @@
     "noUnusedLocals": true,
     "resolveJsonModule": true,
     "jsx": "react",
-    "baseUrl": "lib",
+    "baseUrl": "core",
     "paths": {
       "@dev/*": [
-        "core/*"
+        "src/*"
       ]
     }
   },
   "include": [
-    "lib",
+    "core",
+    "game",
     "."
   ],
   "exclude": [
-    "**/script"
+    "**/script",
+    "**/setting*"
   ]
 }

@@ -6,7 +6,7 @@ import {
     IMoveCallback,
     TGameState,
     TPlayerState,
-    Log
+    Log,
 } from '@dev/server'
 import nodeXlsx from 'node-xlsx'
 import {
@@ -29,7 +29,6 @@ import {
     TRADE_TYPE
 } from './config'
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
-import {GameStatus} from '../../core/common/baseEnum'
 import * as dateFormat from 'dateformat'
 import cloneDeep = require('lodash/cloneDeep')
 import {getEnumKeys} from './util'
@@ -126,7 +125,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         let periodCountDown = 0
         this.broadcast(PushType.periodCountDown, {periodCountDown})
         const timer = global.setInterval(async () => {
-            if (gameState.status !== GameStatus.started) {
+            if (gameState.status !== baseEnum.GameStatus.started) {
                 return
             }
             const {durationOfEachPeriod, time2ReadInfo} = this.game.params.phases[gameState.gamePhaseIndex].params

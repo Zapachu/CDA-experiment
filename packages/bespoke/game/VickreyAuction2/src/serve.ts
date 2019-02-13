@@ -1,4 +1,4 @@
-require('../../../../registerTsconfig')
+require('../../../registerTsconfig')
 import {Server} from '@dev/server'
 import {namespace} from './config'
 import Controller from './Controller'

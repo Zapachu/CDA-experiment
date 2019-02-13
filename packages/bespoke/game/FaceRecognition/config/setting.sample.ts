@@ -1,4 +1,4 @@
-import {qiNiu} from '../../../core/client/script/setting'
+import {qiNiu} from '../../../core/src/client/script/setting'
 
 export default {
     qiNiu,
