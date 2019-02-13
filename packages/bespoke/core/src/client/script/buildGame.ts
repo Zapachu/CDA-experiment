@@ -3,6 +3,7 @@ import * as fs from 'fs'
 import * as chokidar from 'chokidar'
 import * as pbjs from 'protobufjs/cli/pbjs'
 import * as pbts from 'protobufjs/cli/pbts'
+import * as webpack from 'webpack'
 import * as HtmlWebpackPlugin from 'html-webpack-plugin'
 import * as QiniuPlugin from 'qiniu-webpack-plugin'
 import * as ManifestPlugin from 'webpack-manifest-plugin'
@@ -49,21 +50,26 @@ function buildProtoDts(protoPath: string, watch: boolean = false) {
     }
 }
 
-export function geneClientBuilder(namespace: string, {
-    buildMode = 'dev',
-    basePath,
-    paths,
-    qiNiu
-}: {
+interface IBuildOption {
+    namespace: string
     buildMode?: 'dev' | 'dist' | 'publish'
     basePath: string
     paths?: IPaths
     qiNiu?: IQiniuConfig
-}) {
+}
+
+export function geneClientBuilder(
+    {
+        namespace,
+        buildMode = 'dev',
+        basePath,
+        paths,
+        qiNiu
+    }: IBuildOption): webpack.Configuration {
     const {resource, proto, entry, output} = resolvePaths(basePath, paths)
     buildProtoDts(proto, buildMode === 'dev')
     return {
-        devtool: buildMode === 'dev' ? 'cheap-module-eval-source-map' : '',
+        devtool: buildMode === 'dev' ? 'cheap-module-eval-source-map' : false,
         mode: buildMode === 'dev' ? 'development' : 'production',
         watch: buildMode === 'dev',
         watchOptions: {poll: true},
@@ -146,3 +152,8 @@ export function geneClientBuilder(namespace: string, {
         ] : buildMode === 'dist' ? [] : [])
     }
 }
+
+export function buildClient(option: IBuildOption) {
+    webpack(geneClientBuilder(option), err => err ? console.error(err) : null)
+}
+

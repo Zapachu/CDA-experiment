@@ -25,9 +25,5 @@
     "core",
     "game",
     "."
-  ],
-  "exclude": [
-    "**/script",
-    "**/setting*"
   ]
 }
