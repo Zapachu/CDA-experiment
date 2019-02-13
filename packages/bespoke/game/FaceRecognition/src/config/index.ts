@@ -1,6 +1,5 @@
 export const namespace = 'FaceRecognition'
 
-
 export enum MoveType {
     getQiniuConfig = 'getQiniuConfig',
     recognize = 'recognize'

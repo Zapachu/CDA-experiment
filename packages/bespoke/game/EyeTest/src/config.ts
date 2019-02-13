@@ -1,3 +1,5 @@
+export const namespace = 'EyeTest'
+
 export enum MoveType {
     //player
     submitSeatNumber = 'submitSeatNumber',
