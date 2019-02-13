@@ -1,3 +1,5 @@
+export const namespace = 'CardGame'
+
 export enum GameType {
     LeftRight,
     Card
