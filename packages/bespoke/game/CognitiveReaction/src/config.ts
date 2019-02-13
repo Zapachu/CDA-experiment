@@ -1,3 +1,5 @@
+export const namespace = 'CognitiveReaction'
+
 export enum MoveType {
     //player
     submitSeatNumber = 'submitSeatNumber',
