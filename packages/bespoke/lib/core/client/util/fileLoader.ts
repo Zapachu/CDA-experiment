@@ -1,4 +1,4 @@
-import {baseEnum} from '@common'
+import {baseEnum} from '@dev/common'
 
 export function loadScript(list: Array<string>, callback = () => null) {
     let loaded = 0

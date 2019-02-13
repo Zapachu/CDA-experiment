@@ -1,4 +1,4 @@
-import {baseEnum} from '@common'
+import {baseEnum} from '@dev/common'
 import {setting} from './util'
 import * as QCloudSms from 'qcloudsms_js'
 

@@ -1,4 +1,4 @@
-import {baseEnum, IEventHandler, IConnection, IMoveCallback} from '@common'
+import {baseEnum, IEventHandler, IConnection, IMoveCallback} from '@dev/common'
 import {GameLogic} from '../manager/logicManager'
 
 export const EventHandler = {

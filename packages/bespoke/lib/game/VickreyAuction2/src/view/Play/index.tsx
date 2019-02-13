@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang, MaskLoading, Toast} from 'client-vendor'
+import {Core, Lang, MaskLoading, Toast} from '@dev/client'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
 import {FetchType, MoveType, NEW_ROUND_TIMER, PlayerStatus, PushType} from '../../config'
 import {gameData} from './gameData'

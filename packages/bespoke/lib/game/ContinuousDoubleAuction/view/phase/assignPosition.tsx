@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Lang, Label, Input, Button, MaskLoading, BtnGroup, Toast} from 'client-vendor'
+import {Lang, Label, Input, Button, MaskLoading, BtnGroup, Toast} from '@dev/client'
 import {IDENTITY, MoveType, ROLE, RobotStartMode, PlayerStatus} from '../../config'
 import {BasePhase} from './BasePhase'
 import {getEnumKeys} from '../../util'

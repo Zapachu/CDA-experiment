@@ -1,7 +1,7 @@
 import {Server} from 'http'
 import {EventHandler} from './eventHandler'
 import {EventIO, Log} from '../util'
-import {IConnection, IEventHandler} from '@common'
+import {IConnection, IEventHandler} from '@dev/common'
 
 export class EventDispatcher {
     private static subscribeOnConnection(clientConn: IConnection) {

@@ -3,7 +3,7 @@ import cloneDeep = require('lodash/cloneDeep')
 import isEqual = require('lodash/isEqual')
 import {diff} from 'deep-diff'
 import {EventIO} from '../util'
-import {baseEnum, TGameState, TPlayerState, IGameWithId, IMoveLog, IActor} from '@common'
+import {baseEnum, TGameState, TPlayerState, IGameWithId, IMoveLog, IActor} from '@dev/common'
 import GameDAO from './GameDAO'
 import {BaseController} from '../'
 import {MoveLogModel} from '../model'

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {Core} from 'client-vendor'
+import {Core} from '@dev/client'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import {FetchType, MoveType, PushType} from '../config'
 import {phaseTemplates} from './phase'

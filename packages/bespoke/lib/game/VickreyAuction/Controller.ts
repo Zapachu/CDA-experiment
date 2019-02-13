@@ -1,4 +1,4 @@
-import {BaseController, IActor, IGameWithId, IMoveCallback, redisClient, TGameState, TPlayerState} from 'server-vendor'
+import {BaseController, IActor, IGameWithId, IMoveCallback, redisClient, TGameState, TPlayerState} from '@dev/server'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
 import {FetchType, MoveType, PushType, RedisKey} from './config'
 import cloneDeep = require('lodash/cloneDeep')

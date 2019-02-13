@@ -16,20 +16,16 @@
     "jsx": "react",
     "baseUrl": "lib",
     "paths": {
-      "@common": [
-        "core/common"
-      ],
-      "client-vendor": [
-        "core/client"
-      ],
-      "server-vendor": [
-        "core/server"
+      "@dev/*": [
+        "core/*"
       ]
     }
   },
   "include": [
-    "bin",
     "lib",
     "."
+  ],
+  "exclude": [
+    "**/script"
   ]
 }

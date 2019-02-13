@@ -1,5 +1,5 @@
 import nodeXlsx from 'node-xlsx'
-import {BaseController, IActor, IMoveCallback, TGameState, FreeStyleModel, baseEnum, TPlayerState} from 'server-vendor'
+import {BaseController, IActor, IMoveCallback, TGameState, FreeStyleModel, baseEnum, TPlayerState} from '@dev/server'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
 import {FetchType, MoveType, GameStage, PushType, SheetType, IResult, QUESTIONS, PlayerStage} from './config'
 

@@ -9,8 +9,8 @@ import {
     FrameEmitter,
     IActor,
     IGameWithId
-} from '@common'
-import {MaskLoading, Lang, Api, Fetcher} from 'client-vendor'
+} from '@dev/common'
+import {MaskLoading, Lang, Api, Fetcher} from '@dev/client'
 import {connCtx, rootContext, TRootCtx} from '../../context'
 import {connect} from 'socket.io-client'
 import {applyChange, Diff} from 'deep-diff'

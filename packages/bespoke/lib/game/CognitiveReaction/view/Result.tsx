@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang} from 'client-vendor'
+import {Core, Lang} from '@dev/client'
 import {ICreateParams, IMoveParams, IPlayerState} from '../interface'
 import {FetchType, SheetType, QUESTIONS} from '../config'
 import GameResult from './components/GameResult'

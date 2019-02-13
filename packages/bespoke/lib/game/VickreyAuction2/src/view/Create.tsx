@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Input, Label, Lang, RangeInput, Toast, MaskLoading, Button} from 'client-vendor'
+import {Core, Input, Label, Lang, RangeInput, Toast, MaskLoading, Button} from '@dev/client'
 import {FetchType} from '../config'
 import {ICreateParams} from '../interface'
 

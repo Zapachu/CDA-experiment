@@ -1,4 +1,4 @@
-import {buildUrl} from '@common'
+import {buildUrl} from '@dev/common'
 import {Api} from './request'
 
 export class Fetcher<FetchType> {

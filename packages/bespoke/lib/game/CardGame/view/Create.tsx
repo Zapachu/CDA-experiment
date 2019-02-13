@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang, baseEnum, Label, Switch, BtnGroup} from 'client-vendor'
+import {Core, Lang, baseEnum, Label, Switch, BtnGroup} from '@dev/client'
 import {FetchType, GameType} from '../config'
 import {ICreateParams} from '../interface'
 

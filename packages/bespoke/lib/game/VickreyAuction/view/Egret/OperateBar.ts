@@ -1,6 +1,6 @@
 import {gameData} from './gameData'
 import {MoveType, PushType} from '../../config'
-import {Lang, Toast} from 'client-vendor'
+import {Lang, Toast} from '@dev/client'
 import {Button, Input} from './component'
 
 export class OperateBar extends egret.DisplayObjectContainer {

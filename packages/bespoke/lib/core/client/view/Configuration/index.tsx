@@ -1,8 +1,8 @@
 import * as React from 'react'
 import * as style from './style.scss'
 
-import {IGameWithId} from '@common'
-import {Api, Lang, MaskLoading, Button} from 'client-vendor'
+import {IGameWithId} from '@dev/common'
+import {Api, Lang, MaskLoading, Button} from '@dev/client'
 import {connCtx, rootContext, TRootCtx} from '../../context'
 import {RouteComponentProps} from 'react-router'
 

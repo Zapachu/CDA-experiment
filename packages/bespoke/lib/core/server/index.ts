@@ -1,4 +1,4 @@
-export * from '@common'
+export * from '@dev/common'
 export {redisClient, Log} from './util'
 export {FreeStyleModel} from './model'
 export {BaseController, BaseRobot} from './manager/logicManager'

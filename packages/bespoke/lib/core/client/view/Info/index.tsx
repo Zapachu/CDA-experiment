@@ -1,8 +1,8 @@
 import * as React from 'react'
 import * as style from './style.scss'
 
-import {IActor, IGameWithId, baseEnum} from '@common'
-import {Api, Lang, Markdown, MaskLoading} from 'client-vendor'
+import {IActor, IGameWithId, baseEnum} from '@dev/common'
+import {Api, Lang, Markdown, MaskLoading} from '@dev/client'
 import {RouteComponentProps} from 'react-router'
 import * as queryString from 'query-string'
 

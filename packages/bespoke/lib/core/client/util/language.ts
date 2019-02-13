@@ -1,4 +1,4 @@
-import {baseEnum, config} from "@common"
+import {baseEnum, config} from "@dev/common"
 
 export const languages = [baseEnum.Language.zh, baseEnum.Language.en]
 

@@ -1,4 +1,4 @@
-import {config, baseEnum, IGameThumb} from '@common'
+import {config, baseEnum, IGameThumb} from '@dev/common'
 import {Request, Response, NextFunction} from 'express'
 import * as passport from 'passport'
 import {Log, RedisKey, redisClient, Hash, WebpackHmr, inProductEnv} from '../util'

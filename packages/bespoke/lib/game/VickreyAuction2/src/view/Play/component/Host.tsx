@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {Lang} from 'client-vendor'
+import {Lang} from '@dev/client'
 import {Keyframes, config} from 'react-spring/renderprops'
 import {gameData} from '../gameData'
 import {DEAL_TIMER} from '../../../config'

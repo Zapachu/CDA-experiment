@@ -1,6 +1,6 @@
 import * as IORedis from 'ioredis'
 import {setting} from './util'
-import {baseEnum} from '@common'
+import {baseEnum} from '@dev/common'
 
 export const redisClient = new IORedis(setting.redisPort, setting.redisHost)
     .on('error', (err) => {

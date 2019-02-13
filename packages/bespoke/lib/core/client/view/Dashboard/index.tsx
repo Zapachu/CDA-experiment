@@ -1,8 +1,8 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {IGameThumb} from '@common'
+import {IGameThumb} from '@dev/common'
 import {RouteComponentProps} from 'react-router-dom'
-import {Api, Lang} from 'client-vendor'
+import {Api, Lang} from '@dev/client'
 import * as dateFormat from 'dateformat'
 
 declare interface IDashboardState {

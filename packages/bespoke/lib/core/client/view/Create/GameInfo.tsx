@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Label, Input, Markdown, Lang} from 'client-vendor'
-import {IGameConfig} from '@common'
+import {Label, Input, Markdown, Lang} from '@dev/client'
+import {IGameConfig} from '@dev/common'
 
 declare interface IGameInfoProps {
     title: string,

@@ -94,7 +94,7 @@ export = ({webpackHmr}: { webpackHmr: boolean }) => {
             'react': 'React',
             'react-dom': 'ReactDOM',
             'elf-game': 'elfCore',
-            'client-vendor': config.buildManifest.clientVendorLib
+            '@dev/client': config.buildManifest.clientVendorLib
         },
         plugins: [
             new HtmlWebpackPlugin({

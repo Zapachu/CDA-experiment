@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang, Label} from 'client-vendor'
+import {Core, Lang, Label} from '@dev/client'
 import {ICreateParams, IMoveParams, IPlayerState} from '../interface'
 import {FetchType} from '../config'
 

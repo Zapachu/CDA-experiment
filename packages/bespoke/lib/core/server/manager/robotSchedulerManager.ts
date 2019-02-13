@@ -11,7 +11,7 @@ import {
     IGameWithId,
     TPlayerState,
     FrameEmitter
-} from '@common'
+} from '@dev/common'
 import {BaseRobot} from '../index'
 
 export abstract class RobotScheduler<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {

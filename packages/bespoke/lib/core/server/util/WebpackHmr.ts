@@ -1,4 +1,4 @@
-import {config} from '@common'
+import {config} from '@dev/common'
 import * as path from 'path'
 import * as webpack from 'webpack'
 import {Express, Response, NextFunction} from 'express'

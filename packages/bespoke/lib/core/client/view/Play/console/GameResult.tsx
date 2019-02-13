@@ -1,6 +1,6 @@
 import * as React from 'react'
-import {baseEnum, IGameWithId} from '@common'
-import {Core, Api, Fetcher, MaskLoading} from 'client-vendor'
+import {baseEnum, IGameWithId} from '@dev/common'
+import {Core, Api, Fetcher, MaskLoading} from '@dev/client'
 import cloneDeep = require('lodash/cloneDeep')
 import {applyChange} from 'deep-diff'
 

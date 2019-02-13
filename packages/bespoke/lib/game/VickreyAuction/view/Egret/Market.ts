@@ -1,4 +1,4 @@
-import {Lang} from 'client-vendor'
+import {Lang} from '@dev/client'
 import {Players} from './Players'
 import {resMeta} from '../util/resMeta'
 import {gameData} from './gameData'

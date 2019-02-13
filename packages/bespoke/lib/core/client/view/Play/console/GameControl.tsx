@@ -1,9 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {baseEnum, FrameEmitter, IGameWithId, ISimulatePlayer, TGameState} from '@common'
-
-import {Api, Lang, Button} from 'client-vendor'
-import {GameStatus} from '../../../../common/baseEnum'
+import {baseEnum, FrameEmitter, IGameWithId, ISimulatePlayer, TGameState} from '@dev/common'
+import {Api, Lang, Button} from '@dev/client'
 
 const {notStarted, started, paused, over} = baseEnum.GameStatus
 
@@ -89,7 +87,7 @@ export class GameControl extends React.Component<IGameControlProps> {
                             )
                     }
                     {
-                        gameState.status === GameStatus.over ?
+                        gameState.status === baseEnum.GameStatus.over ?
                             <div className={style.blankMsg}>{this.lang.GameOver}</div> : null
                     }
                 </div>

@@ -9,7 +9,7 @@ import {
     IPlayerState,
     IPushParams
 } from '../../interface'
-import {MaskLoading, Fetcher, FrameEmitter, IGame} from 'client-vendor'
+import {MaskLoading, Fetcher, FrameEmitter, IGame} from '@dev/client'
 
 export namespace BasePhase {
 

@@ -1,5 +1,5 @@
 import {Schema, Document, Model, model} from 'mongoose'
-import {IMoveLog} from '@common'
+import {IMoveLog} from '@dev/common'
 
 const {Types: {String, Number}} = Schema
 

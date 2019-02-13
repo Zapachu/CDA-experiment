@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {baseEnum} from '@common'
+import {baseEnum} from '@dev/common'
 import {Lang, languages} from '../../util'
 import Language = baseEnum.Language
 

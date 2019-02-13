@@ -1,5 +1,5 @@
 import {Schema, Document, Model, model} from 'mongoose'
-import {IUser} from '@common'
+import {IUser} from '@dev/common'
 
 const {Types: {String, Number}} = Schema
 

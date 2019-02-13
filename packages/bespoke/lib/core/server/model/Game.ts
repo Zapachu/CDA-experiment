@@ -1,4 +1,4 @@
-import {IGame, ISimulatePlayer} from '@common'
+import {IGame, ISimulatePlayer} from '@dev/common'
 import {Schema, Document, Model, model} from 'mongoose'
 
 const {Types: {ObjectId, String}} = Schema

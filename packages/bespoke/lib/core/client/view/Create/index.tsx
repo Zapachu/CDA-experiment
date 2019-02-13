@@ -4,9 +4,9 @@ import * as style from './style.scss'
 import {connCtx, rootContext, TRootCtx} from '../../context'
 import {GameInfo} from './GameInfo'
 import {HistoryGame} from './HistoryGame'
-import {Button, Toast, Api, Fetcher, Lang} from 'client-vendor'
+import {Button, Toast, Api, Fetcher, Lang} from '@dev/client'
 import * as baseEnum from '../../../common/baseEnum'
-import {IGameConfig} from '@common'
+import {IGameConfig} from '@dev/common'
 
 const SubmitBarHeight = '5rem'
 

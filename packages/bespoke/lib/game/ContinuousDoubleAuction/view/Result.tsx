@@ -1,4 +1,4 @@
-import {Core} from 'client-vendor'
+import {Core} from '@dev/client'
 import {ICreateParams, IPlayerState} from '../interface'
 import {FetchType} from '../config'
 

@@ -8,7 +8,7 @@ import {
     IMoveCallback,
     TGameState,
     TPlayerState
-} from '@common'
+} from '@dev/common'
 import GameDAO from '../service/GameDAO'
 import {NodeRobotsScheduler, PythonSchedulerProxy, RobotScheduler} from './robotSchedulerManager'
 import {MoveQueue, StateManager} from '../service/StateManager'

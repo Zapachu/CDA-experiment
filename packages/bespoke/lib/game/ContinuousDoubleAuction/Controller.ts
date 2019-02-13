@@ -7,7 +7,7 @@ import {
     TGameState,
     TPlayerState,
     Log
-} from 'server-vendor'
+} from '@dev/server'
 import nodeXlsx from 'node-xlsx'
 import {
     DBKey,

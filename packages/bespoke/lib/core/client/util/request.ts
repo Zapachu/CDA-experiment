@@ -1,4 +1,4 @@
-import {config, baseEnum, Request} from '@common'
+import {config, baseEnum, Request} from '@dev/common'
 
 const baseFetchOption = {
     credentials: 'include',

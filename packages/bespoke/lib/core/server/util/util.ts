@@ -1,4 +1,4 @@
-import {config, baseEnum, IQCloudSMS, IQiniuConfig} from '@common'
+import {config, baseEnum, IQCloudSMS, IQiniuConfig} from '@dev/common'
 import {colorConsole, dailyfile} from 'tracer'
 import {resolve} from 'path'
 import * as objHash from 'object-hash'

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, Core, Lang, MaskLoading, Toast, RadioGroup, Input} from 'client-vendor'
+import {Button, Core, Lang, MaskLoading, Toast, RadioGroup, Input} from '@dev/client'
 import {FetchType, GameStage, MoveType, PushType, PlayerStage, QUESTIONS} from '../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import GameResult from './components/GameResult'

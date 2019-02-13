@@ -1,6 +1,6 @@
 import * as request from 'request'
 import * as qiniu from 'qiniu'
-import {BaseController, IActor, IMoveCallback, Log} from 'server-vendor'
+import {BaseController, IActor, IMoveCallback, Log} from '@dev/server'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
 import {FetchType, MoveType, PushType, qiniuTokenLifetime} from './config'
 import setting from './config/setting'

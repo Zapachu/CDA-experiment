@@ -1,8 +1,8 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {baseEnum} from '@common'
+import {baseEnum} from '@dev/common'
 import {RouteComponentProps} from 'react-router-dom'
-import {CodePanel, Toast, Api, Lang} from 'client-vendor'
+import {CodePanel, Toast, Api, Lang} from '@dev/client'
 
 export class Join extends React.Component<RouteComponentProps<{}>> {
     lang = Lang.extractLang({

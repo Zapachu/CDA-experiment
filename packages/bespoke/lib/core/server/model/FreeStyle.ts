@@ -1,5 +1,5 @@
 import {Schema, Document, Model, model} from 'mongoose'
-import {IFreeStyle} from '@common'
+import {IFreeStyle} from '@dev/common'
 
 const {Types:{ObjectId, String}} = Schema
 

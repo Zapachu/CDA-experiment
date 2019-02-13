@@ -1,4 +1,4 @@
-import {baseEnum, config, IConnection, IConnectionNamespace, IGameWithId, IActor} from '@common'
+import {baseEnum, config, IConnection, IConnectionNamespace, IGameWithId, IActor} from '@dev/common'
 import {Server} from 'http'
 import {EventEmitter} from 'events'
 import * as socketIO from 'socket.io'

@@ -2,7 +2,7 @@ import {
     TGameState,
     IGameWithId,
     TPlayerState
-} from '@common'
+} from '@dev/common'
 import {cacheResult, Log, inProductEnv, redisClient, RedisKey} from '../util'
 import {GameModel, GameDoc} from '../model'
 

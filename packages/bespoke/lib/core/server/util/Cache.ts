@@ -1,4 +1,4 @@
-import {config} from '@common'
+import {config} from '@dev/common'
 
 export interface CacheData{
     timestamp:number

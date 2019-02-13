@@ -1,8 +1,8 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import * as dateFormat from 'dateformat'
-import {baseEnum, IGameConfig, IGameThumb} from '@common'
-import {Api, Lang} from 'client-vendor'
+import {baseEnum, IGameConfig, IGameThumb} from '@dev/common'
+import {Api, Lang} from '@dev/client'
 
 declare interface IHistoryGameProps {
     namespace: string,

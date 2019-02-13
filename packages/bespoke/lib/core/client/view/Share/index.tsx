@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {RouteComponentProps} from 'react-router-dom'
-import {baseEnum, config} from '@common'
-import {Toast, Api, Lang} from 'client-vendor'
+import {baseEnum, config} from '@dev/common'
+import {Toast, Api, Lang} from '@dev/client'
 import * as QrCode from 'qrcode.react'
 import * as style from './style.scss'
 

@@ -17,7 +17,7 @@ export {getProxyService} from './service/BespokeProxy'
 
 import {Server, ServerCredentials} from 'grpc'
 import {getGameService, PhaseService, phaseService} from './service/PhaseManager'
-import {config} from '@common'
+import {config} from '@dev/common'
 import {Log, setting} from '../util'
 
 export function serve() {
