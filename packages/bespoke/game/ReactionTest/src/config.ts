@@ -1,3 +1,5 @@
+export const namespace = 'ReactionTest'
+
 export enum MoveType {
   //player
   submitSeatNumber = 'submitSeatNumber',
