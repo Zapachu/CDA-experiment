@@ -1,3 +1,5 @@
+export const namespace = 'CDASurvey'
+
 export enum MoveType {
   //player
   submitSeatNumber = 'submitSeatNumber',
