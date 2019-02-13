@@ -3,7 +3,7 @@ import * as style from './style.scss'
 import {RouteComponentProps} from 'react-router'
 import {baseEnum, config} from '@dev/common'
 import {Toast, Api, Lang} from '@dev/client'
-import {connCtx, rootContext, TRootCtx} from '../../context'
+import {connCtx, rootContext, TRootCtx} from '../context'
 
 declare interface ILoginState {
     nationCode: baseEnum.NationCode

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {RouteComponentProps} from 'react-router'
 import * as style from './style.scss'
-import {connCtx, rootContext, TRootCtx} from '../../context'
+import {connCtx, rootContext, TRootCtx} from '../context'
 import {GameInfo} from './GameInfo'
 import {HistoryGame} from './HistoryGame'
 import {Button, Toast, Api, Fetcher, Lang} from '@dev/client'

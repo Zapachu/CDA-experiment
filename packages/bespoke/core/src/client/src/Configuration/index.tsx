@@ -3,7 +3,7 @@ import * as style from './style.scss'
 
 import {IGameWithId} from '@dev/common'
 import {Api, Lang, MaskLoading, Button} from '@dev/client'
-import {connCtx, rootContext, TRootCtx} from '../../context'
+import {connCtx, rootContext, TRootCtx} from '../context'
 import {RouteComponentProps} from 'react-router'
 
 declare type IConfigurationState = {

@@ -19,7 +19,7 @@ export = ({webpackHmr}: { webpackHmr: boolean }) => {
         },
         entry: {
             [config.buildManifest.clientVendorLib]: [...webpackHotDevEntry, path.resolve(__dirname, '../index.ts')],
-            [config.buildManifest.clientCoreLib]: [...webpackHotDevEntry, path.resolve(__dirname, '../view/index.tsx')]
+            [config.buildManifest.clientCoreLib]: [...webpackHotDevEntry, path.resolve(__dirname, '../src/index.tsx')]
         },
         output: {
             path: path.resolve(__dirname, '../dist'),
