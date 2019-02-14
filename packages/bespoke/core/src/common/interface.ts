@@ -116,3 +116,39 @@ export interface IQiniuConfig {
         jsDomain: string
     }
 }
+
+export interface ICoreSetting {
+    host: string
+    mongoUri: string
+    mongoUser: string
+    mongoPass: string
+    redisHost: string
+    redisPort: number
+    sessionSecret: string
+    //region RPC
+    proxyService: {
+        host: string
+        port: number
+    }
+    academusServiceUri: string
+    pythonRobotUri: string
+    elfGameServiceUri: string
+    //endregion
+    qCloudSMS: IQCloudSMS
+    qiNiu: IQiniuConfig
+    mail: {
+        smtpHost: string
+        smtpUsername: string
+        smtpPassword: string
+    }
+    adminMobileNumbers: Array<string>
+}
+
+export interface ISetting extends Partial<ICoreSetting> {
+    namespace: string
+    getClientPath: () => string
+    staticPath: string
+    independent?: boolean
+    port?: number
+    rpcPort?: number
+}

@@ -1,12 +1,14 @@
+require('../../../../registerTsconfig')
 import * as path from 'path'
 import * as webpack from 'webpack'
 import * as CleanWebpackPlugin from 'clean-webpack-plugin'
 import {TsconfigPathsPlugin} from 'tsconfig-paths-webpack-plugin'
 import * as HtmlWebpackPlugin from 'html-webpack-plugin'
 import * as QiniuPlugin from 'qiniu-webpack-plugin'
-import {config} from '../../common'
-import {qiNiu} from './setting'
+import {config} from '@dev/common'
+import {coreSetting} from '@dev/server/config/setting.sample'
 
+const {qiNiu} = coreSetting
 export = ({webpackHmr}: { webpackHmr: boolean }) => {
     const buildMode = process.env.npm_config_buildMode || 'dev'
     const webpackHotDevEntry = webpackHmr ? [`webpack-hot-middleware/client?path=/${config.rootName}/__webpack_hmr&reload=true`] : []

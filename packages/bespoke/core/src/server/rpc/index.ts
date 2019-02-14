@@ -34,7 +34,7 @@ function registerPhases() {
     const phases = [{
         namespace: setting.namespace,
         jsUrl: `https://${host}:${port}/${setting.getClientPath()}`,
-        rpcUri: setting.localServiceUri
+        rpcUri: ''//TODO rpcUri=>rpcPort
     }]
     getGameService().registerPhases({phases}, err => err && Log.e(err))
 }

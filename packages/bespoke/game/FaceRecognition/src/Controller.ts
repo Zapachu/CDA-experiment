@@ -1,9 +1,11 @@
 import * as request from 'request'
 import * as qiniu from 'qiniu'
-import {BaseController, IActor, IMoveCallback, Log} from '@dev/server'
+import {BaseController, IActor, IMoveCallback, Log, setting as coreSetting} from '@dev/server'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
 import {FetchType, MoveType, PushType, qiniuTokenLifetime} from './config'
 import setting from './config/setting'
+
+const {qiNiu} = coreSetting
 
 export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
     _qiniuUploadToken: string
@@ -11,9 +13,9 @@ export default class Controller extends BaseController<ICreateParams, IGameState
     get qiniuUploadToken(): string {
         if (!this._qiniuUploadToken) {
             this._qiniuUploadToken = new qiniu.rs.PutPolicy({
-                scope: setting.qiNiu.upload.bucket,
+                scope: qiNiu.upload.bucket,
                 expires: qiniuTokenLifetime
-            }).uploadToken(new qiniu.auth.digest.Mac(setting.qiNiu.upload.ACCESS_KEY, setting.qiNiu.upload.SECRET_KEY))
+            }).uploadToken(new qiniu.auth.digest.Mac(qiNiu.upload.ACCESS_KEY, qiNiu.upload.SECRET_KEY))
             setTimeout(() => this._qiniuUploadToken = null, (qiniuTokenLifetime - 3) * 1000)//在七牛token失效前弃用,下次请求生成新token
         }
         return this._qiniuUploadToken
@@ -35,7 +37,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         returnFaceAttributes: 'age,gender,emotion'
                     },
                     body: JSON.stringify({
-                        url: `${setting.qiNiu.download.jsDomain}/${params.imageName}`
+                        url: `${qiNiu.download.jsDomain}/${params.imageName}`
                     }),
                     headers: {
                         'Content-Type': 'application/json',

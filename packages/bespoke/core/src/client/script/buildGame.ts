@@ -79,11 +79,11 @@ export function geneClientBuilder(
             filename: '[name].[hash:4].js',
             library: '[name]',
             libraryTarget: 'umd',
-            publicPath: buildMode === 'publish' ? `${qiNiu.download.jsDomain}/${qiNiu.upload.path}/` : `/${config.rootName}/${namespace}/static/`
+            publicPath: buildMode === 'publish' ? `${qiNiu.download.jsDomain}/${qiNiu.upload.path}/${namespace}` : `/${config.rootName}/${namespace}/static/`
         },
         resolve: {
             extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
-            plugins: [new TsconfigPathsPlugin({//TODO core提取为package后移除此插件
+            plugins: [new TsconfigPathsPlugin({
                 configFile: resolve(__dirname, `../../../../tsconfig.json`)
             })]
         },

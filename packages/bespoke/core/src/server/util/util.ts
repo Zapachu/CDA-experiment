@@ -1,4 +1,5 @@
-import {config, baseEnum, IQCloudSMS, IQiniuConfig} from '@dev/common'
+import {config, baseEnum, ISetting} from '@dev/common'
+import {coreSetting} from '../config/setting.sample'
 import {colorConsole, dailyfile} from 'tracer'
 import {resolve} from 'path'
 import * as objHash from 'object-hash'
@@ -32,54 +33,13 @@ export function elfPhaseId2PlayUrl(namespace: string, phaseId: string): string {
 }
 
 //region setting
-export interface ISetting {
-    namespace: string
-    host?: string
-    port?: number
-    rpcPort?: number
-    independent?: boolean
-    mongoUri?: string
-    mongoUser?: string
-    mongoPass?: string
-    redisHost?: string
-    redisPort?: number
-    sessionSecret?: string
-    //region RPC
-    proxyService?: {
-        host: string
-        port: number
-    }
-    academusServiceUri?: string
-    pythonRobotUri?: string
-    elfGameServiceUri?: string
-    localServiceUri?: string
-    //endregion
-    qCloudSMS?: IQCloudSMS
-    qiNiu?: IQiniuConfig
-    mail?: {
-        smtpHost: string
-        smtpUsername: string
-        smtpPassword: string
-    }
-    adminMobileNumbers?: Array<string>
-    getClientPath: () => string
-    staticPath: string
-}
 
-export const setting: Readonly<(Partial<ISetting>)> = {
-    host: '127.0.0.1',
-    port: 0,
-    mongoUri: 'mongodb://127.0.0.1:27017/academy',
-    mongoUser: '',
-    mongoPass: '',
-    redisHost: '127.0.0.1',
-    redisPort: 6379,
-    sessionSecret: 'sessionsecret',
-    adminMobileNumbers: ['13000000000']
-}
+export const setting: Readonly<(Partial<ISetting>)> = coreSetting
 
 export function initSetting(gameSetting: ISetting) {
+    gameSetting.port = gameSetting.port || 0
     Object.assign(setting, gameSetting)
+    setting.qiNiu.upload.path += `/${gameSetting.namespace}`
 }
 
 //endregion
