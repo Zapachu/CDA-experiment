@@ -6,7 +6,6 @@ const dtsGenerator = (_dtsGenerator as any).default as typeof _dtsGenerator
 
 const {
     compilerOptions: {
-        baseUrl,
         paths
     }
 } = JSON.parse(readFileSync(resolve(__dirname, '../../tsconfig.json')).toString())

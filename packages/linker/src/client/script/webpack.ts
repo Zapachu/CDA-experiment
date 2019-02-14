@@ -5,7 +5,7 @@ import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
 import * as HtmlWebpackPlugin from 'html-webpack-plugin'
 import tsImportPluginFactory = require( 'ts-import-plugin')
 import * as webpack from 'webpack'
-import {config} from '../../lib/game/common'
+import {config} from '../../common'
 
 export = ({webpackHmr}: { webpackHmr: boolean }) => {
     const buildMode = process.env.npm_config_buildMode || 'dev'
@@ -18,11 +18,11 @@ export = ({webpackHmr}: { webpackHmr: boolean }) => {
             poll: true
         },
         entry: {
-            'coreCommon': [...webpackHotDevEntry, path.resolve(__dirname, '../../lib/game/common/index.ts')],
-            'elfCore': [...webpackHotDevEntry, path.resolve(__dirname, '../../lib/game/client/index.tsx')]
+            'coreCommon': [...webpackHotDevEntry, path.resolve(__dirname, '../../common/index.ts')],
+            'elfCore': [...webpackHotDevEntry, path.resolve(__dirname, '../../client/index.tsx')]
         },
         output: {
-            path: path.resolve(__dirname, '../../dist'),
+            path: path.resolve(__dirname, '../../../dist'),
             filename: '[name].[hash:4].js',
             library: '[name]',
             libraryTarget: 'umd',
@@ -34,7 +34,7 @@ export = ({webpackHmr}: { webpackHmr: boolean }) => {
                 // '@ant-design/icons/lib/dist$': path.resolve(__dirname, '../../lib/game/client/component/AntDesignIcon.ts')
             },
             plugins: [new TsconfigPathsPlugin({
-                configFile: path.resolve(__dirname, `../../tsconfig.json`)
+                configFile: path.resolve(__dirname, `../../../tsconfig.json`)
             })]
         },
         module: {
@@ -62,7 +62,7 @@ export = ({webpackHmr}: { webpackHmr: boolean }) => {
                         {
                             loader: 'sass-loader',
                             options: {
-                                includePaths: [path.resolve(__dirname, '../../lib/game/common/resource')]
+                                includePaths: [path.resolve(__dirname, '../../common/resource')]
                             }
                         }
                     ]
@@ -87,12 +87,12 @@ export = ({webpackHmr}: { webpackHmr: boolean }) => {
         },
         plugins: [
             new CleanWebpackPlugin(['core*.js'], {
-                root: path.resolve(__dirname, `../../dist`),
+                root: path.resolve(__dirname, `../../../dist`),
                 watch: true
             }),
             new HtmlWebpackPlugin({
                 filename: 'index.html',
-                template: path.resolve(__dirname, '../../lib/game/server/view/index.html')
+                template: path.resolve(__dirname, './index.html')
             })
         ].concat(buildMode === 'dist' ? [
             new BundleAnalyzerPlugin()
