@@ -45,7 +45,7 @@ export class Create extends React.Component<RouteComponentProps<{ namespace: str
         const {code, gameId} = await Api.newGame(game, namespace)
         if (code === baseEnum.ResponseCode.success) {
             Toast.success(lang.CreateSuccess)
-            setTimeout(() => this.props.history.push(`/play/${gameId}`), 1000)
+            setTimeout(() => this.props.history.push(`/${namespace}/play/${gameId}`), 1000)
         } else {
             Toast.error(lang.CreateFailed)
         }

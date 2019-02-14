@@ -43,6 +43,7 @@ export interface IGameWithId<ICreateParams>extends IGame<ICreateParams> {
 
 export interface IGameThumb {
     id: string
+    namespace:string
     title: string
     createAt: number
 }

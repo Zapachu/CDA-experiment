@@ -38,7 +38,7 @@ export class Dashboard extends React.Component<RouteComponentProps<{}>, IDashboa
                 {
                     namespaces.map(namespace =>
                         <li key={namespace}
-                            onClick={() => history.push(`/create/${namespace}`)}
+                            onClick={() => history.push(`/${namespace}/create`)}
                         >{namespace}</li>
                     )
                 }
@@ -46,9 +46,9 @@ export class Dashboard extends React.Component<RouteComponentProps<{}>, IDashboa
             <label className={style.title}>{lang.historyExperiment}</label>
             <ul className={style.historyGames}>
                 {
-                    historyGameThumbs.map(({id, title, createAt}) =>
+                    historyGameThumbs.map(({id, namespace, title, createAt}) =>
                         <li key={id}
-                            onClick={()=>history.push(`/play/${id}`)}
+                            onClick={()=>history.push(`/${namespace}/play/${id}`)}
                         >
                             {title}
                             <span className={style.timestamp}>{dateFormat(createAt, 'yyyy-mm-dd')}</span>

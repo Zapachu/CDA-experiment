@@ -45,7 +45,7 @@ export class Info extends React.Component<RouteComponentProps<{ gameId: string }
                     style: {
                         backgroundColor: '#ff888e'
                     },
-                    onClick: () => history.push(`/play/${gameId}${search}`)
+                    onClick: () => history.push(`/${game.namespace}/play/${gameId}${search}`)
                 }}>{actor.type === baseEnum.Actor.player ? lang.joinGame : lang.enterRoom}</li>
             </ul>
         </div>

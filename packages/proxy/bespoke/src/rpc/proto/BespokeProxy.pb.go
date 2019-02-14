@@ -4,8 +4,10 @@
 package proto
 
 import (
+	context "context"
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
+	grpc "google.golang.org/grpc"
 	math "math"
 )
 
@@ -126,4 +128,76 @@ var fileDescriptor_5c68d2351f2d193a = []byte{
 	0x2e, 0x1e, 0x64, 0xad, 0x42, 0x62, 0x10, 0x47, 0xea, 0xa1, 0x39, 0x4d, 0x0a, 0xbb, 0x78, 0xb1,
 	0x12, 0x43, 0x12, 0x1b, 0x58, 0xc2, 0x18, 0x10, 0x00, 0x00, 0xff, 0xff, 0xb4, 0xe8, 0x3a, 0xde,
 	0xeb, 0x00, 0x00, 0x00,
+}
+
+// Reference imports to suppress errors if they are not otherwise used.
+var _ context.Context
+var _ grpc.ClientConn
+
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the grpc package it is being compiled against.
+const _ = grpc.SupportPackageIsVersion4
+
+// ProxyServiceClient is the client API for ProxyService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+type ProxyServiceClient interface {
+	RegisterGame(ctx context.Context, in *RegisterGameReq, opts ...grpc.CallOption) (*RegisterGameRes, error)
+}
+
+type proxyServiceClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewProxyServiceClient(cc *grpc.ClientConn) ProxyServiceClient {
+	return &proxyServiceClient{cc}
+}
+
+func (c *proxyServiceClient) RegisterGame(ctx context.Context, in *RegisterGameReq, opts ...grpc.CallOption) (*RegisterGameRes, error) {
+	out := new(RegisterGameRes)
+	err := c.cc.Invoke(ctx, "/proto.ProxyService/registerGame", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ProxyServiceServer is the server API for ProxyService service.
+type ProxyServiceServer interface {
+	RegisterGame(context.Context, *RegisterGameReq) (*RegisterGameRes, error)
+}
+
+func RegisterProxyServiceServer(s *grpc.Server, srv ProxyServiceServer) {
+	s.RegisterService(&_ProxyService_serviceDesc, srv)
+}
+
+func _ProxyService_RegisterGame_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterGameReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProxyServiceServer).RegisterGame(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.ProxyService/RegisterGame",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProxyServiceServer).RegisterGame(ctx, req.(*RegisterGameReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _ProxyService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "proto.ProxyService",
+	HandlerType: (*ProxyServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "registerGame",
+			Handler:    _ProxyService_RegisterGame_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "BespokeProxy.proto",
 }

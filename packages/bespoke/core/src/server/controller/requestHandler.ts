@@ -272,7 +272,7 @@ export class GameCtrl {
         try {
             const historyGameThumbs: Array<IGameThumb> = (await GameModel.find({owner: user.id, ...namespace ? {namespace} : {}})
                 .limit(historyGamesListSize)
-                .sort({createAt: -1})).map(({id, title, createAt}) => ({id, title, createAt}))
+                .sort({createAt: -1})).map(({id, namespace, title, createAt}) => ({id, namespace, title, createAt}))
             res.json({
                 code: baseEnum.ResponseCode.success,
                 historyGameThumbs

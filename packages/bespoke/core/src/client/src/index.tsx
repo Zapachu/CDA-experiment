@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './initial.scss'
 import {Lang, LanguageSwitcher} from '@dev/client'
-import {BrowserRouter, Switch, Route} from 'react-router-dom'
+import {BrowserRouter, Switch, Route, RouteComponentProps} from 'react-router-dom'
 import {config} from '@dev/common'
 import {rootContext, TRootCtx} from './context'
 import {IGameTemplate, TRegisterGame} from '@dev/client'
@@ -22,17 +22,22 @@ const Root: React.FunctionComponent<TRootCtx> = props =>
         </div>
         <BrowserRouter basename={config.rootName}>
             <Switch>
+                <Route path={`/${props.gameTemplate.namespace}`} component={NamespaceRoute}/>
                 <Route path='/login' component={Login}/>
                 <Route path='/dashboard' component={Dashboard}/>
-                <Route path='/create/:namespace' component={Create}/>
                 <Route path='/info/:gameId' component={Info}/>
                 <Route path='/share/:gameId' component={Share}/>
                 <Route path='/join' component={Join}/>
-                <Route path='/play/:gameId' component={Play}/>
-                <Route path='/configuration/:gameId' component={Configuration}/>
             </Switch>
         </BrowserRouter>
     </rootContext.Provider>
+
+const NamespaceRoute: React.FunctionComponent<RouteComponentProps> = ({match}) =>
+    <Switch>
+        <Route path={`${match.url}/create`} component={Create}/>
+        <Route path={`${match.url}/play/:gameId`} component={Play}/>
+        <Route path={`${match.url}/configuration/:gameId`} component={Configuration}/>
+    </Switch>
 
 export const registerGame: TRegisterGame = (namespace: string, gameTemplate: IGameTemplate) => {
     const Empty = () => null

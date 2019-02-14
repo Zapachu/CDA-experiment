@@ -45,7 +45,7 @@ export class Configuration extends React.Component<TRootCtx & RouteComponentProp
                     <Button width={Button.Width.medium}
                             color={Button.Color.blue}
                             label={lang.playRoom}
-                            onClick={() => history.push(`/play/${gameId}`)}
+                            onClick={() => history.push(`/${game.namespace}/play/${gameId}`)}
                     />
                 </li>
             </ul>

@@ -70,7 +70,7 @@ export class GameControl extends React.Component<IGameControlProps> {
                 <div className={style.btnGroup}>
                     <Button {...btnProps} icon={Button.Icon.home} onClick={() => historyPush(`/dashboard`)}/>
                     <Button {...btnProps} icon={Button.Icon.parameter}
-                            onClick={() => historyPush(`/configuration/${game.id}`)}/>
+                            onClick={() => historyPush(`/${game.namespace}/configuration/${game.id}`)}/>
                     <Button {...btnProps} icon={Button.Icon.share} onClick={() => historyPush(`/share/${game.id}`)}/>
                 </div>
                 <div className={style.switcherWrapper}>
