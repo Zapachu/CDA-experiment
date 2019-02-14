@@ -1,0 +1,12 @@
+.startPhase {
+  &.create {
+    .firstPhaseWrapper{
+      margin-top: 1rem;
+      display: flex;
+      justify-content: center;
+      .firstPhase{
+        flex-basis: 50%;
+      }
+    }
+  }
+}

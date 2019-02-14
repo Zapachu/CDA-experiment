@@ -1,0 +1,16 @@
+@import "public";
+.Join{
+  .title{
+    color: rgba($color-black, .6);
+    font-weight: bold;
+    font-size: $fontSize-middle;
+    margin: 1rem;
+  }
+  .tips{
+    font-size: $fontSize-small;
+    text-align: center;
+    margin: 1rem;
+    color: rgba($color-blue, .6);
+    user-select: none;
+  }
+}

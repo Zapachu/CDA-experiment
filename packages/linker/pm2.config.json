@@ -1,0 +1,9 @@
+{
+  "script": "lib/game/server/server.ts",
+  "name": "elf",
+  "env": {
+    "NODE_ENV": "production",
+    "PORT": 4000
+  },
+  "log_date_format": "YYYY-MM-DD HH:mm Z"
+}
