@@ -10,7 +10,7 @@ import {phaseTemplates} from '../../../index'
 import {message, Row, Col, Button, Input, Icon, Card, Modal, Select, Tabs, Tag} from '@antd-component'
 import {Loading, Title} from '@client-component'
 import {Link} from 'react-router-dom'
-import * as cloneDeep from 'lodash/cloneDeep'
+import {cloneDeep} from 'lodash'
 
 declare interface ICreateState {
     loading: boolean
@@ -424,7 +424,7 @@ class AddPhase extends React.Component<AddPhaseProps, AddPhaseState> {
                         allowClear
                         style={{width:'70%'}}
                         value={searchTerm}
-                        onChange={val => this.handleChange(val)}
+                        onChange={val => this.handleChange(val.toString())}
                         onSearch={val => this.handleSearch(val)}
                         showArrow={false}
                         placeholder={lang.searchPhase}

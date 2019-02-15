@@ -1,5 +1,5 @@
 {
-  "name": "experiment-link-framework",
+  "name": "elf-linker",
   "version": "0.0.0",
   "author": "GuoKan",
   "repository": " ",
@@ -14,6 +14,7 @@
     "antd": "^3.10.8",
     "big-integer": "^1.6.36",
     "connect-redis": "^3.3.3",
+    "elf-proto": "^1.0.0",
     "express": "^4.16.3",
     "express-session": "^1.15.6",
     "grpc": "^1.14.1",

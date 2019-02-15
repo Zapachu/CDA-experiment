@@ -323,7 +323,7 @@ $root.RegisterPhasesReq = (function() {
          * @interface IphaseRegInfo
          * @property {string|null} [namespace] phaseRegInfo namespace
          * @property {string|null} [jsUrl] phaseRegInfo jsUrl
-         * @property {string|null} [rpcUri] phaseRegInfo rpcUri
+         * @property {number|null} [rpcPort] phaseRegInfo rpcPort
          */
 
         /**
@@ -358,12 +358,12 @@ $root.RegisterPhasesReq = (function() {
         phaseRegInfo.prototype.jsUrl = "";
 
         /**
-         * phaseRegInfo rpcUri.
-         * @member {string} rpcUri
+         * phaseRegInfo rpcPort.
+         * @member {number} rpcPort
          * @memberof RegisterPhasesReq.phaseRegInfo
          * @instance
          */
-        phaseRegInfo.prototype.rpcUri = "";
+        phaseRegInfo.prototype.rpcPort = 0;
 
         /**
          * Creates a new phaseRegInfo instance using the specified properties.
@@ -393,8 +393,8 @@ $root.RegisterPhasesReq = (function() {
                 writer.uint32(/* id 1, wireType 2 =*/10).string(message.namespace);
             if (message.jsUrl != null && message.hasOwnProperty("jsUrl"))
                 writer.uint32(/* id 2, wireType 2 =*/18).string(message.jsUrl);
-            if (message.rpcUri != null && message.hasOwnProperty("rpcUri"))
-                writer.uint32(/* id 3, wireType 2 =*/26).string(message.rpcUri);
+            if (message.rpcPort != null && message.hasOwnProperty("rpcPort"))
+                writer.uint32(/* id 3, wireType 0 =*/24).int32(message.rpcPort);
             return writer;
         };
 
@@ -436,7 +436,7 @@ $root.RegisterPhasesReq = (function() {
                     message.jsUrl = reader.string();
                     break;
                 case 3:
-                    message.rpcUri = reader.string();
+                    message.rpcPort = reader.int32();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -479,9 +479,9 @@ $root.RegisterPhasesReq = (function() {
             if (message.jsUrl != null && message.hasOwnProperty("jsUrl"))
                 if (!$util.isString(message.jsUrl))
                     return "jsUrl: string expected";
-            if (message.rpcUri != null && message.hasOwnProperty("rpcUri"))
-                if (!$util.isString(message.rpcUri))
-                    return "rpcUri: string expected";
+            if (message.rpcPort != null && message.hasOwnProperty("rpcPort"))
+                if (!$util.isInteger(message.rpcPort))
+                    return "rpcPort: integer expected";
             return null;
         };
 
@@ -501,8 +501,8 @@ $root.RegisterPhasesReq = (function() {
                 message.namespace = String(object.namespace);
             if (object.jsUrl != null)
                 message.jsUrl = String(object.jsUrl);
-            if (object.rpcUri != null)
-                message.rpcUri = String(object.rpcUri);
+            if (object.rpcPort != null)
+                message.rpcPort = object.rpcPort | 0;
             return message;
         };
 
@@ -522,14 +522,14 @@ $root.RegisterPhasesReq = (function() {
             if (options.defaults) {
                 object.namespace = "";
                 object.jsUrl = "";
-                object.rpcUri = "";
+                object.rpcPort = 0;
             }
             if (message.namespace != null && message.hasOwnProperty("namespace"))
                 object.namespace = message.namespace;
             if (message.jsUrl != null && message.hasOwnProperty("jsUrl"))
                 object.jsUrl = message.jsUrl;
-            if (message.rpcUri != null && message.hasOwnProperty("rpcUri"))
-                object.rpcUri = message.rpcUri;
+            if (message.rpcPort != null && message.hasOwnProperty("rpcPort"))
+                object.rpcPort = message.rpcPort;
             return object;
         };
 

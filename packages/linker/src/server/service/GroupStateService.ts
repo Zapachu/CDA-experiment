@@ -1,5 +1,5 @@
 import {baseEnum, CorePhaseNamespace, IGroupState, IGameWithId, IPhaseConfig, IPhaseState, NFrame} from '@common'
-import {getPhaseService, RegisterPhasesReq} from '../rpc'
+import {getPhaseService} from '../rpc'
 import {GameService} from './GameService'
 import {EventDispatcher} from '../controller/eventDispatcher'
 import {Log, RedisKey, redisClient} from '@server-util'
@@ -38,7 +38,7 @@ export class GroupStateService {
             })
         }
         const regInfo = await redisClient.get(RedisKey.phaseRegInfo(phaseCfg.namespace)),
-            {rpcUri} = JSON.parse(regInfo) as RegisterPhasesReq.IphaseRegInfo
+            {rpcUri} = JSON.parse(regInfo)
         return new Promise<IPhaseState>((resolve, reject) => {
             getPhaseService(rpcUri).newPhase({
                 owner: this.group.owner,

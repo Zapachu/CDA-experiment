@@ -1,23 +1,13 @@
-import * as path from 'path'
-import {loadPackageDefinition, credentials} from 'grpc'
-import {loadSync} from '@grpc/proto-loader'
-import {RedisKey, redisClient, setting} from '../../util'
+import {Server} from 'grpc'
+import {AcademusBespoke as A} from 'elf-proto'
+import {RedisKey, redisClient} from '../../util'
 
-export const {AcademusBespoke} = loadPackageDefinition(loadSync(path.resolve(__dirname, '../proto/AcademusBespoke.proto'))) as any
-export const academusBespoke = {
-    checkShareCode: (req, callback) => {
-        const {code} = req.request
+export function setBespokeService(server: Server) {
+    function checkShareCode({request: {code}}: { request: A.TCheckShareCodeReq }, callback: A.TCheckShareCodeCallback): void {
         redisClient.get(RedisKey.share_CodeGame(code)).then(gameId => {
             callback(null, {gameId})
         })
     }
-}
 
-let academusService
-
-export function getAcademusService() {
-    if (!academusService) {
-        academusService = new AcademusBespoke(setting.academusServiceUri, credentials.createInsecure())
-    }
-    return academusService
+    A.setBespokeService(server, {checkShareCode})
 }

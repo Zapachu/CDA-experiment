@@ -13,7 +13,7 @@ import GameDAO from '../service/GameDAO'
 import {NodeRobotsScheduler, PythonSchedulerProxy, RobotScheduler} from './robotSchedulerManager'
 import {MoveQueue, StateManager} from '../service/StateManager'
 import {Request, Response} from 'express'
-import {getGameService, ISendBackPlayerRes} from '../rpc'
+import {getGameService} from '../rpc'
 
 export type AnyController = BaseController<any, any, any, any, any, any, any, any>
 type AnyRobotScheduler = RobotScheduler<any, any, any, any, any, any, any>
@@ -166,7 +166,7 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
             playerToken,
             nextPhaseKey,
             groupId: this.game.groupId
-        }, (err, res: ISendBackPlayerRes) => {
+        }, (err, res) => {
             if (err) {
                 return Log.e(err)
             }

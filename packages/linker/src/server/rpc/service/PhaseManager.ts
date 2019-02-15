@@ -1,15 +1,12 @@
-import {resolve} from 'path'
-import {loadPackageDefinition, credentials} from 'grpc'
+import {Server} from 'grpc'
 import {config} from '@common'
-import {loadSync} from '@grpc/proto-loader'
 import {Log, redisClient, RedisKey, RedisLifetime, buildPlayUrl} from '@server-util'
-import {IRegisterPhasesReq, ISendBackPlayerReq, PhaseService as CPhaseService} from '..'
 import {GroupStateService} from '@server-service'
+import {PhaseManager as P} from 'elf-proto'
 
-const {GameService, PhaseService} = loadPackageDefinition(loadSync(resolve(__dirname, '../proto/phaseManager.proto'))) as any
+export function setGameService(server: Server) {
 
-const gameService = {
-    registerPhases: (req: { request: IRegisterPhasesReq }, callback) => {
+    function registerPhases(req: { request: P.TRegisterPhasesReq }, callback: P.TRegisterPhasesCallBack) {
         Log.d('registerPhases:', JSON.stringify(req.request))
         new Promise(async resolve => {
             req.request.phases.forEach(async phase => {
@@ -21,8 +18,9 @@ const gameService = {
             success: true,
             waitURL: `/${config.rootName}/waiting`
         }))
-    },
-    sendBackPlayer: (req: { request: ISendBackPlayerReq }, callback) => {
+    }
+
+    function sendBackPlayer(req: { request: P.TSendBackPlayerReq }, callback: P.TSendBackPlayerCallback) {
         Log.d('sendBackPlayer:', JSON.stringify(req.request))
         const {groupId, playUrl, playerToken, nextPhaseKey} = req.request
         GroupStateService.getService(groupId).then(async (groupService) => {
@@ -30,14 +28,15 @@ const gameService = {
             callback(null, {sendBackUrl: buildPlayUrl(groupId, playerToken)})
         })
     }
+
+    P.setGameService(server, {registerPhases, sendBackPlayer})
 }
-export {GameService, gameService}
 
-const phaseServices: { [k: string]: CPhaseService } = {}
+const phaseServices: { [k: string]: P.TPhaseServiceConsumer } = {}
 
-export function getPhaseService(phaseServiceUri: string): CPhaseService {
+export function getPhaseService(phaseServiceUri: string) {
     if (!phaseServices[phaseServiceUri]) {
-        phaseServices[phaseServiceUri] = new PhaseService(phaseServiceUri, credentials.createInsecure())
+        phaseServices[phaseServiceUri] = P.getPhaseService(phaseServiceUri)
     }
     return phaseServices[phaseServiceUri]
 }
