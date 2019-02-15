@@ -147,8 +147,8 @@ export interface ICoreSetting {
 
 export interface ISetting extends Partial<ICoreSetting> {
     namespace: string
-    getClientPath: () => string
     staticPath: string
+    getClientPath?: () => string
     independent?: boolean
     port?: number
     rpcPort?: number

@@ -1,8 +1,9 @@
 import {config} from '@dev/common'
+import * as fs from 'fs'
 import * as path from 'path'
 import * as webpack from 'webpack'
 import {Express, Response, NextFunction} from 'express'
-import {setting, webpackHmr} from './util'
+import {webpackHmr, setting} from './util'
 import * as webpackDevMiddleware from 'webpack-dev-middleware'
 import * as  webpackHotMiddleware from 'webpack-hot-middleware'
 import coreWebpackCfg = require('../../client/script/webpack.core')
@@ -23,16 +24,18 @@ export class WebpackHmr {
     }
 
     static sendIndexHtml(res: Response, next: NextFunction) {
-        if (!webpackHmr) {
-            return res.sendFile(path.resolve(setting.staticPath, 'index.html'))
+        if (webpackHmr) {
+            WebpackHmr.compiler.outputFileSystem.readFile(path.join(WebpackHmr.compiler.outputPath, 'index.html'), (err, result) =>
+                err ? next(err) : this.decorateHtml(res, result)
+            )
+        } else {
+            const result = fs.readFileSync(path.resolve(__dirname, `../../client/dist/index.html`)).toString()
+            this.decorateHtml(res, result)
         }
-        WebpackHmr.compiler.outputFileSystem.readFile(path.join(WebpackHmr.compiler.outputPath, 'index.html'), (err, result) => {
-            if (err) {
-                return next(err)
-            }
-            res.set('content-type', 'text/html')
-            res.send(result)
-            res.end()
-        })
+    }
+
+    private static decorateHtml(res: Response, body: string) {
+        res.set('content-type', 'text/html')
+        res.end(body + `<script type="text/javascript" src="${setting.getClientPath()}"></script>`)
     }
 }

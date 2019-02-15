@@ -4,7 +4,6 @@ import * as chokidar from 'chokidar'
 import * as pbjs from 'protobufjs/cli/pbjs'
 import * as pbts from 'protobufjs/cli/pbts'
 import * as webpack from 'webpack'
-import * as HtmlWebpackPlugin from 'html-webpack-plugin'
 import * as QiniuPlugin from 'qiniu-webpack-plugin'
 import * as ManifestPlugin from 'webpack-manifest-plugin'
 import * as CleanWebpackPlugin from 'clean-webpack-plugin'
@@ -77,8 +76,6 @@ export function geneClientBuilder(
         output: {
             path: output,
             filename: '[name].[hash:4].js',
-            library: '[name]',
-            libraryTarget: 'umd',
             publicPath: buildMode === 'publish' ? `${qiNiu.download.jsDomain}/${qiNiu.upload.path}/${namespace}` : `/${config.rootName}/${namespace}/static/`
         },
         resolve: {
@@ -138,10 +135,6 @@ export function geneClientBuilder(
         plugins: [
             new ManifestPlugin({
                 fileName: `${namespace}.json`
-            }),
-            new HtmlWebpackPlugin({
-                filename: 'index.html',
-                template: resolve(__dirname, '../dist/index.html')
             }),
             new CleanWebpackPlugin('*', {
                 root: output,

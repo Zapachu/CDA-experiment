@@ -2,6 +2,7 @@ import {config, baseEnum, ISetting} from '@dev/common'
 import {coreSetting} from '../config/setting.sample'
 import {colorConsole, dailyfile} from 'tracer'
 import {resolve} from 'path'
+import {readFileSync} from 'fs'
 import * as objHash from 'object-hash'
 
 export const inProductEnv = process.env.NODE_ENV === baseEnum.Env.production
@@ -37,9 +38,14 @@ export function elfPhaseId2PlayUrl(namespace: string, phaseId: string): string {
 export const setting: Readonly<(Partial<ISetting>)> = coreSetting
 
 export function initSetting(gameSetting: ISetting) {
+    const {namespace, staticPath} = gameSetting
     gameSetting.port = gameSetting.port || 0
+    gameSetting.getClientPath = gameSetting.getClientPath || ((): string => {
+        const {[`${namespace}.js`]: clientPath} = JSON.parse(readFileSync(resolve(staticPath, `${namespace}.json`)).toString())
+        return clientPath
+    })
     Object.assign(setting, gameSetting)
-    setting.qiNiu.upload.path += `/${gameSetting.namespace}`
+    setting.qiNiu.upload.path += `/${namespace}`
 }
 
 //endregion
