@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {CorePhaseNamespace, IGroupWithId} from '@common'
+import {CorePhaseNamespace, IGameWithId} from '@common'
 import {Api, Lang, loadScript} from '@client-util'
 import {RouteComponentProps} from 'react-router'
 import {Card, Modal} from '@antd-component'
@@ -10,11 +10,11 @@ import {phaseTemplates} from '../../../index'
 
 declare interface IInfoState {
     loading: boolean
-    group?: IGroupWithId
+    game?: IGameWithId
     activePhaseKey?: string
 }
 
-export class Configuration extends React.Component<RouteComponentProps<{ groupId: string }>, IInfoState> {
+export class Configuration extends React.Component<RouteComponentProps<{ gameId: string }>, IInfoState> {
 
     lang = Lang.extractLang({
         back2Game: ['返回实验', 'Back to game'],
@@ -30,31 +30,31 @@ export class Configuration extends React.Component<RouteComponentProps<{ groupId
     }
 
     async componentDidMount() {
-        const {props: {match: {params: {groupId}}}} = this
-        const {group} = await Api.getGroup(groupId)
+        const {props: {match: {params: {gameId}}}} = this
+        const {game} = await Api.getGame(gameId)
         const {templates} = await Api.getPhaseTemplates()
         loadScript(templates.reduce((prev, {jsUrl}) => [...prev, ...jsUrl.split(';')], []), () => {
-            this.setState({loading: false, group})
+            this.setState({loading: false, game})
         })
     }
 
     render(): React.ReactNode {
-        const {lang, props: {history}, state: {loading, group}} = this
+        const {lang, props: {history}, state: {loading, game}} = this
         if (loading) {
             return <Loading/>
         }
         return <section className={style.groupConfiguration}>
             <Breadcrumb history={history} links={[
-                {to: `/game/info/${group.gameId}`, label: lang.back2Game},
-                {to: `/group/play/${group.id}`, label: lang.console},
+                {to: `/game/info/${game.id}`, label: lang.back2Game},
+                {to: `/group/play/${game.id}`, label: lang.console},
             ]}/>
             <div>
                 <Title label={lang.groupInfo}/>
-                <Card title={group.title}>
-                    {group.desc}
+                <Card title={game.title}>
+                    {game.desc}
                 </Card>
             </div>
-            <PhaseFlowChart phaseConfigs={group.phaseConfigs}
+            <PhaseFlowChart phaseConfigs={game.phaseConfigs}
                             onClickPhase={key => this.setState({activePhaseKey: key})}/>
             {
                 this.renderActivePhaseModal()
@@ -63,7 +63,7 @@ export class Configuration extends React.Component<RouteComponentProps<{ groupId
     }
 
     renderActivePhaseModal() {
-        const {state: {group: {phaseConfigs}, activePhaseKey}} = this
+        const {state: {game: {phaseConfigs}, activePhaseKey}} = this
         const curPhase = phaseConfigs.find(({key}) => key === activePhaseKey)
         if (!curPhase || [CorePhaseNamespace.start, CorePhaseNamespace.end].includes(curPhase.namespace as any)) {
             return null

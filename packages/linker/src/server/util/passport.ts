@@ -13,4 +13,8 @@ export function usePassport(express:Express) {
     })
     express.use(passport.initialize())
     express.use(passport.session())
+    express.use((req, res, next) => {
+        res.locals.user = req.user
+        next()
+    })
 }

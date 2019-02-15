@@ -19,6 +19,8 @@ export interface IPhaseTemplate {
     namespace?: string
     localeNames: Array<string>
     Create?: typeof BaseCreate
+    type: string
+    otreeName?: string
 }
 
 export const phaseTemplates: {
@@ -28,7 +30,11 @@ export const phaseTemplates: {
 export function registerPhaseCreate(namespace: string, phaseTemplate: IPhaseTemplate) {
     phaseTemplate.namespace = namespace
     phaseTemplate.Create = phaseTemplate.Create || BaseCreate
-    phaseTemplates[namespace] = phaseTemplate
+    if(phaseTemplate.type === 'otree') {
+        phaseTemplates[`otree_${phaseTemplate.otreeName}`] = phaseTemplate
+    } else {
+        phaseTemplates[namespace] = phaseTemplate
+    }
 }
 
 const rootContainer = document.body.appendChild(document.createElement('div'))

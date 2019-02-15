@@ -19,11 +19,11 @@ export class Play4Player extends React.Component<TRootContext & TPlayContext> {
     }
 
     render(): React.ReactNode {
-        const {curPhaseState, props: {actor, group}} = this
+        const {curPhaseState, props: {actor, game}} = this
         if (!curPhaseState) {
             return <Loading/>
         }
-        const curPhaseCfg = group.phaseConfigs.find(({key}) => key === curPhaseState.key)
+        const curPhaseCfg = game.phaseConfigs.find(({key}) => key === curPhaseState.key)
         if (curPhaseCfg.namespace === CorePhaseNamespace.end) {
             return <h2>GAME OVER</h2>
         }

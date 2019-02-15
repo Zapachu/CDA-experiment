@@ -12,7 +12,7 @@ declare interface IShareState {
     title: string
 }
 
-export class Share extends React.Component<RouteComponentProps<{ groupId: string }>, IShareState> {
+export class Share extends React.Component<RouteComponentProps<{ gameId: string }>, IShareState> {
     state: IShareState = {
         title: '',
         shareCode: ''
@@ -26,7 +26,7 @@ export class Share extends React.Component<RouteComponentProps<{ groupId: string
     })
 
     async componentDidMount() {
-        const {code, shareCode, title} = await Api.shareGroup(this.props.match.params.groupId)
+        const {code, shareCode, title} = await Api.shareGame(this.props.match.params.gameId)
         if (code === baseEnum.ResponseCode.success) {
             this.setState({shareCode, title})
         } else {
@@ -35,16 +35,16 @@ export class Share extends React.Component<RouteComponentProps<{ groupId: string
     }
 
     render(): React.ReactNode {
-        const {lang, props: {history, match: {params: {groupId}}}, state} = this
+        const {lang, props: {history, match: {params: {gameId}}}, state} = this
         return <section className={style.share}>
             <Breadcrumb history={history} links={[
-                {label: lang.groupInfo, to: `/group/info/${groupId}`},
-                {label: lang.console, to: `/group/play/${groupId}`}
+                {label: lang.groupInfo, to: `/group/info/${gameId}`},
+                {label: lang.console, to: `/group/play/${gameId}`}
             ]}/>
             <div className={style.shareContent}>
                 <h2>{state.title}</h2>
-                <div className={style.qrCodeWrapper} onClick={() => history.push(`/group/info/${groupId}`)}>
-                    <QrCode size={256} value={`/${config.rootName}/${config.apiPrefix}/group/info/${groupId}`}/>
+                <div className={style.qrCodeWrapper} onClick={() => history.push(`/group/info/${gameId}`)}>
+                    <QrCode size={256} value={`/${config.rootName}/${config.apiPrefix}/group/info/${gameId}`}/>
                 </div>
                 <div className={style.shareCode}>
                     <label>{lang.shareCode}</label>

@@ -38,41 +38,39 @@ export interface IPhaseState {
     }
 }
 
-export interface IBaseGroup {
-    gameId: string
+export interface IBaseGame {
     title: string
     desc: string
     owner?: string
+    published?: boolean
+    mode: string
 }
 
-export interface IBaseGroupWithId extends IBaseGroup {
+export interface IBaseGameWithId extends IBaseGame {
     id: string
 }
 
-export interface IGroup extends IBaseGroup {
+export interface IGame extends IBaseGame {
     phaseConfigs: Array<IPhaseConfig<{}>>,
 }
 
-export interface IGroupWithId extends IGroup {
+export interface IGameWithId extends IGame {
     id: string
 }
 
-export interface IGame {
-    owner?: string
-    title: string
-    desc: string
+export interface IGameToUpdate {
+    // title?: string
+    // desc?: string
+    phaseConfigs?: Array<IPhaseConfig<{}>>
+    published?: boolean
 }
 
 export interface IPlayer {
-    groupId: string
+    gameId: string
     userId: string
 }
 
 export interface IPlayerWithId {
-    id: string
-}
-
-export interface IGameWithId extends IGame {
     id: string
 }
 

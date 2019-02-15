@@ -1,8 +1,8 @@
-import {baseEnum, IPhaseConfig, config} from '@common'
+import {baseEnum, config} from '@common'
 import {UserDoc} from '@server-model'
 import {Hash, redisClient, RedisKey} from '@server-util'
 import {Request, Response, NextFunction} from 'express'
-import {GameService, GroupService, PhaseService} from '@server-service'
+import {GameService, PhaseService} from '@server-service'
 import {WebpackHmr} from '../util/WebpackHmr'
 import {PlayerService} from '../service/PlayerService'
 
@@ -21,23 +21,23 @@ export class UserCtrl {
         req.user.role === baseEnum.AcademusRole.teacher ? next() : res.redirect(config.academusLoginRoute)
     }
 
-    static async isGroupAccessible(req, res: Response, next: NextFunction) {
-        const {user: {_id}, params: {groupId}} = req,
+    static async isGameAccessible(req, res: Response, next: NextFunction) {
+        const {user: {_id}, params: {gameId}} = req,
             userId = _id.toString()
-        const {owner} = await GroupService.getGroup(groupId)
+        const {owner} = await GameService.getGame(gameId)
         if (owner === userId) {
             return next()
         }
-        const player = await PlayerService.findPlayerId(groupId, userId)
+        const player = await PlayerService.findPlayerId(gameId, userId)
         if (player) {
             return next()
         }
-        res.redirect(`/${config.rootName}/${config.appPrefix}/group/info/${groupId}`)
+        res.redirect(`/${config.rootName}/${config.appPrefix}/group/info/${gameId}`)
     }
 
     static getUser(req, res: Response) {
         if (!req.isAuthenticated()) {
-            return res.json({
+            res.json({
                 code: baseEnum.ResponseCode.notFound
             })
         }
@@ -50,35 +50,6 @@ export class UserCtrl {
 }
 
 export class GameCtrl {
-    static async getGame(req: Request, res) {
-        const {params: {gameId}} = req
-        const game = await GameService.getGame(gameId)
-        res.json({
-            code: baseEnum.ResponseCode.success,
-            game
-        })
-    }
-
-    static async getGameList(req, res) {
-        const {user: {_id}} = req
-        const gameList = await GameService.getGameList(_id.toString())
-        res.json({
-            code: baseEnum.ResponseCode.success,
-            gameList
-        })
-    }
-
-    static async saveNewGame(req, res) {
-        const {body: {title, desc}, user: {_id}} = req
-        const gameId = await GameService.saveGame(_id.toString(), title, desc)
-        res.json({
-            code: baseEnum.ResponseCode.success,
-            gameId
-        })
-    }
-}
-
-export class GroupCtrl {
     static async getPhaseTemplates(req, res) {
         const user = req.user as UserDoc
         const templates = await PhaseService.getPhaseTemplates(user)
@@ -88,54 +59,60 @@ export class GroupCtrl {
         })
     }
 
-    static async saveNewGroup(req: Request, res: Response) {
-        const {params: {gameId}, body: {title, desc, phaseConfigs}, user: {id: owner}} = req
-        const groupId = await GroupService.saveGroup({
+    static async saveNewGame(req: Request, res: Response) {
+        const {body: {title, desc, mode}, user: {id: owner}} = req
+        const gameId = await GameService.saveGame({
             owner,
-            gameId,
             title,
             desc,
-            phaseConfigs: phaseConfigs.map(({key, namespace, title, param = {}, suffixPhaseKeys = []}: IPhaseConfig) => ({
-                key, namespace, title, param, suffixPhaseKeys
-            }))
+            mode,
         })
         res.json({
             code: baseEnum.ResponseCode.success,
-            groupId
+            gameId
         })
     }
 
-    static async getGroupList(req: Request, res: Response) {
-        const {params: {gameId}} = req
-        const groupList = await GameService.getGroupList(gameId)
+    static async updateGame(req: Request, res: Response) {
+        const {params: {gameId}, body: {toUpdate}} = req
+        const game = await GameService.updateGame(gameId, toUpdate)
         res.json({
             code: baseEnum.ResponseCode.success,
-            groupList
+            game
         })
     }
 
-    static async getBaseGroup(req: Request, res: Response) {
-        const {groupId} = req.params
-        const {phaseConfigs, ...group} = await GroupService.getGroup(groupId)
+    static async getGameList(req: Request, res: Response) {
+        const {user:{_id}} = req
+        const gameList = await GameService.getGameList(_id)
         res.json({
             code: baseEnum.ResponseCode.success,
-            group
+            gameList
         })
     }
 
-    static async getGroup(req: Request, res: Response) {
-        const {groupId} = req.params
-        const group = await GroupService.getGroup(groupId)
+    static async getBaseGame(req: Request, res: Response) {
+        const {gameId} = req.params
+        const {phaseConfigs, ...game} = await GameService.getGame(gameId)
         res.json({
             code: baseEnum.ResponseCode.success,
-            group
+            game
         })
     }
 
-    static async shareGroup(req, res) {
-        const {groupId} = req.params
-        let shareCode = await redisClient.get(RedisKey.share_GroupCode(groupId))
-        const {title} = await GroupService.getGroup(groupId)
+    static async getGame(req: Request, res: Response) {
+        const {gameId} = req.params
+        const game = await GameService.getGame(gameId)
+        res.json({
+            code: baseEnum.ResponseCode.success,
+            game
+        })
+    }
+
+    static async shareGame(req, res) {
+        const {gameId} = req.params
+        let shareCode = await redisClient.get(RedisKey.share_GroupCode(gameId))
+        const {title} = await GameService.getGame(gameId)
         if (shareCode) {
             return res.json({
                 code: baseEnum.ResponseCode.success,
@@ -145,8 +122,8 @@ export class GroupCtrl {
         }
         shareCode = Math.random().toString().substr(2, 6)
         try {
-            await redisClient.setex(RedisKey.share_GroupCode(groupId), SECONDS_PER_DAY, shareCode)
-            await redisClient.setex(RedisKey.share_CodeGroup(shareCode), SECONDS_PER_DAY, groupId)
+            await redisClient.setex(RedisKey.share_GroupCode(gameId), SECONDS_PER_DAY, shareCode)
+            await redisClient.setex(RedisKey.share_CodeGroup(shareCode), SECONDS_PER_DAY, gameId)
             res.json({
                 code: baseEnum.ResponseCode.success,
                 title,
@@ -161,21 +138,21 @@ export class GroupCtrl {
 
     static async joinWithShareCode(req, res) {
         const {body: {code}} = req
-        const groupId = await redisClient.get(RedisKey.share_CodeGroup(code))
-        res.json(groupId ? {
+        const gameId = await redisClient.get(RedisKey.share_CodeGroup(code))
+        res.json(gameId ? {
             code: baseEnum.ResponseCode.success,
-            groupId
+            gameId
         } : {
             code: baseEnum.ResponseCode.notFound
         })
     }
 
-    static async joinGroup(req, res) {
-        const {user: {_id}, params: {groupId}} = req, userId = _id.toString()
+    static async joinGame(req, res) {
+        const {user: {_id}, params: {gameId}} = req, userId = _id.toString()
         try {
-            const playerId = await PlayerService.findPlayerId(groupId, userId)
+            const playerId = await PlayerService.findPlayerId(gameId, userId)
             if (!playerId) {
-                await PlayerService.savePlayer(groupId, userId)
+                await PlayerService.savePlayer(gameId, userId)
             }
         } catch (e) {
             return res.json({
@@ -188,9 +165,9 @@ export class GroupCtrl {
     }
 
     static async getPlayers(req:Request, res:Response){
-        const {params:{groupId}} = req
+        const {params:{gameId}} = req
         try{
-            const players = await PlayerService.getPlayers(groupId)
+            const players = await PlayerService.getPlayers(gameId)
             res.json({
                 code:baseEnum.ResponseCode.success,
                 players
@@ -200,17 +177,19 @@ export class GroupCtrl {
                 code:baseEnum.ResponseCode.notFound
             })
         }
-    } 
+    }
 
     static async getActor(req, res) {
         const {ResponseCode, Actor} = baseEnum
-        let {user, params: {groupId}, query: {token: queryToken}} = req, userId = user._id.toString()
-        const group = await GroupService.getGroup(groupId), playerId = await PlayerService.findPlayerId(groupId, userId)
-        let token = Hash.isHash(queryToken) ? queryToken : userId === group.owner ? Hash.hashObj(userId) : Hash.hashObj(playerId)
-        let type = token === Hash.hashObj(userId) ? Actor.owner : userId === group.owner ? Actor.clientRobot : Actor.player
+        let {user, params: {gameId}, query: {token: queryToken}} = req, userId = user._id.toString()
+        const game = await GameService.getGame(gameId), playerId = await PlayerService.findPlayerId(gameId, userId)
+        let token = Hash.isHash(queryToken) ? queryToken : userId === game.owner ? Hash.hashObj(userId) : Hash.hashObj(playerId)
+        let type = token === Hash.hashObj(userId) ? Actor.owner : userId === game.owner ? Actor.clientRobot : Actor.player
+        req.session.token = token
+        req.session.playerId = playerId
         res.json({
             code: ResponseCode.success,
-            group,
+            game,
             actor: {token, type}
         })
     }

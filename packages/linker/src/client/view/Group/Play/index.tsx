@@ -1,6 +1,6 @@
 import * as React from "react";
 import {RouteComponentProps} from "react-router";
-import {config, baseEnum, IGroupState, IGroupWithId, TSocket, NFrame, IActor} from "@common";
+import {config, baseEnum, IGroupState, IGameWithId, TSocket, NFrame, IActor} from "@common";
 import {Api, connCtx} from "@client-util";
 import {connect} from "socket.io-client"
 import {rootContext, TRootContext, playContext} from "@client-context";
@@ -10,31 +10,31 @@ import * as queryString from 'query-string'
 import {Loading} from '@client-component'
 
 declare interface IPlayState {
-    group?: IGroupWithId,
+    game?: IGameWithId,
     actor?: IActor,
     socketClient?: TSocket,
     groupState?: IGroupState
 }
 
 @connCtx(rootContext)
-export class Play extends React.Component<TRootContext & RouteComponentProps<{ groupId: string }>, IPlayState> {
+export class Play extends React.Component<TRootContext & RouteComponentProps<{ gameId: string }>, IPlayState> {
     state: IPlayState = {}
 
     async componentDidMount() {
-        const {props: {match: {params: {groupId}}, location: {search}}} = this,
+        const {props: {match: {params: {gameId}}, location: {search}}} = this,
             {token = ''} = queryString.parse(search)
-        const {group} = await Api.getGroup(groupId),
-            {actor} = await Api.getActor(groupId, token as string)
+        const {game} = await Api.getGame(gameId),
+            {actor} = await Api.getActor(gameId, token as string)
         if (!actor) {
             this.props.history.push('/join')
         }
         const socketClient = connect('/', {
             path: config.socketPath,
-            query: `groupId=${groupId}&token=${actor.token}&type=${actor.type}`
+            query: `groupId=${gameId}&token=${actor.token}&type=${actor.type}`
         })
         this.registerStateReducer(socketClient)
         this.setState({
-            group,
+            game,
             actor,
             socketClient
         }, () => socketClient.emit(baseEnum.SocketEvent.upFrame, NFrame.UpFrame.joinRoom))
@@ -53,11 +53,11 @@ export class Play extends React.Component<TRootContext & RouteComponentProps<{ g
     }
 
     render(): React.ReactNode {
-        const {props:{history}, state: {group, actor, socketClient, groupState}} = this
+        const {props:{history}, state: {game, actor, socketClient, groupState}} = this
         if (!groupState) {
             return <Loading/>
         }
-        return <playContext.Provider value={{groupState, socketClient, group, actor}}>
+        return <playContext.Provider value={{groupState, socketClient, game, actor}}>
             {
                 actor.type === baseEnum.Actor.owner ?
                     <Play4Owner history={history}/> :

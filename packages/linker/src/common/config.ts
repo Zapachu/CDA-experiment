@@ -1,10 +1,10 @@
 import {LogLevel} from './baseEnum'
 
 export const config = {
-    rootName: 'elfGame',
+    rootName: 'elf',
     apiPrefix: 'api',
     appPrefix: 'app',
-    socketPath: '/elfGame/socket.io',
+    socketPath: '/elf/socket.io',
     logLevel: LogLevel.log,
     academusLoginRoute: '/login',
     cookieKey:{

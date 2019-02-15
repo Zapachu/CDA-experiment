@@ -27,19 +27,19 @@ export class Play4Owner extends React.Component<TRootContext & TPlayContext & { 
     })
 
     render(): React.ReactNode {
-        const {props: {group, groupState, history}, lang} = this
+        const {props: {game, groupState, history}, lang} = this
         console.log(groupState)
         return <section className={style.console}>
             <Breadcrumb history={history} links={[
-                {label: lang.groupConfiguration, to: `/group/configuration/${group.id}`},
-                {label: lang.playerList, to: `/group/player/${group.id}`},
-                {label: lang.share, to: `/group/share/${group.id}`},
+                {label: lang.groupConfiguration, to: `/group/configuration/${game.id}`},
+                {label: lang.playerList, to: `/group/player/${game.id}`},
+                {label: lang.share, to: `/group/share/${game.id}`},
             ]}/>
             <Title label={lang.phaseStatus}/>
             {
                 groupState.phaseStates.map((phaseState, i) =>
                     <Card key={i}
-                          title={group.phaseConfigs.find(({key}) => key === phaseState.key).title}
+                          title={game.phaseConfigs.find(({key}) => key === phaseState.key).title}
                           extra={lang[PhaseStatus[phaseState.status]]}
                           actions={[<a onClick={() => window.open(phaseState.playUrl, '_blank')}>{lang.console}</a>]}
                     >

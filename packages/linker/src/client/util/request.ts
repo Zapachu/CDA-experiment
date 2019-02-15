@@ -1,4 +1,4 @@
-import {config, baseEnum, IPhaseConfig, IGroupWithId, IActor, IGameWithId, IBaseGroupWithId, IUserWithId, TApiGroupPlayers} from '@common'
+import {config, baseEnum, IGameWithId, IActor, IBaseGameWithId, IUserWithId, TApiGroupPlayers, IGameToUpdate} from '@common'
 import {getCookie} from '@client-util'
 import * as queryString from 'query-string'
 
@@ -53,70 +53,62 @@ export class Request {
         return await GET('/user')
     }
 
-    static async postNewGame(title: string, desc: string): Promise<IHttpRes & {
-        gameId: string
+    static async getBaseGame(gameId: string): Promise<IHttpRes & {
+        game: IBaseGameWithId
     }> {
-        return await POST('/game/create', null, null, {
-            title, desc
-        })
+        return await GET('/game/baseInfo/:gameId', {gameId})
     }
 
-    static async getGame(gameId: string): Promise<IHttpRes & { game: IGameWithId }> {
+    static async getGame(gameId: string): Promise<IHttpRes & {
+        game: IGameWithId
+    }> {
         return await GET('/game/:gameId', {gameId})
+    }
+
+    static async joinGameWithCode(code: string): Promise<IHttpRes & { gameId?: string }> {
+        return await POST('/game/joinWithShareCode', null, null, {code})
+    }
+
+    static async joinGame(gameId: string):Promise<IHttpRes>{
+        return await POST('/game/join/:gameId',{gameId})
+    }
+
+    static async getPlayers(gameId: string):Promise<IHttpRes & {players:TApiGroupPlayers}>{
+        return await GET('/game/getPlayers/:gameId',{gameId})
     }
 
     static async getGameList(): Promise<IHttpRes & { gameList: Array<IGameWithId> }> {
         return await GET('/game/list')
     }
 
-    static async getBaseGroup(groupId: string): Promise<IHttpRes & {
-        group: IBaseGroupWithId
-    }> {
-        return await GET('/group/baseInfo/:groupId', {groupId})
-    }
-
-    static async getGroup(groupId: string): Promise<IHttpRes & {
-        group: IGroupWithId
-    }> {
-        return await GET('/group/:groupId', {groupId})
-    }
-
-    static async joinGameWithCode(code: string): Promise<IHttpRes & { groupId?: string }> {
-        return await POST('/group/joinWithShareCode', null, null, {code})
-    }
-
-    static async joinGroup(groupId: string):Promise<IHttpRes>{
-        return await POST('/group/join/:groupId',{groupId})
-    }
-
-    static async getPlayers(groupId: string):Promise<IHttpRes & {players:TApiGroupPlayers}>{
-        return await GET('/group/getPlayers/:groupId',{groupId})
-    }
-
-    static async getGroupList(gameId: string): Promise<IHttpRes & { groupList: Array<IGroupWithId> }> {
-        return await GET('/group/list/:gameId', {gameId})
-    }
-
     static async getPhaseTemplates(): Promise<IHttpRes & {
         templates: Array<{ namespace: string, jsUrl: string }>
     }> {
-        return await GET('/group/phaseTemplates')
+        return await GET('/game/phaseTemplates')
     }
 
-    static async postNewGroup(gameId: string, title: string, desc: string, phaseConfigs: Array<IPhaseConfig<{}>>): Promise<IHttpRes & {
-        groupId: string
+    static async postNewGame(title: string, desc: string, mode: string): Promise<IHttpRes & {
+        gameId: string
     }> {
-        return await POST('/group/create/:gameId', {gameId}, null, {
-            title, desc, phaseConfigs
+        return await POST('/game/create', null, null, {
+            title, desc, mode
         })
     }
 
-    static async shareGroup(groupId: string): Promise<IHttpRes & { shareCode: string, title: string }> {
-        return await GET('/group/share/:groupId', {groupId})
+    static async postEditGame(gameId: string, toUpdate: IGameToUpdate): Promise<IHttpRes & {
+        game: IGameWithId
+    }> {
+        return await POST('/game/edit/:gameId', {gameId}, null, {
+            toUpdate
+        })
     }
 
-    static async getActor(groupId: string, token: string = ''): Promise<IHttpRes & { actor: IActor }> {
-        return await GET('/group/actor/:groupId', {groupId}, {token})
+    static async shareGame(gameId: string): Promise<IHttpRes & { shareCode: string, title: string }> {
+        return await GET('/game/share/:gameId', {gameId})
+    }
+
+    static async getActor(gameId: string, token: string = ''): Promise<IHttpRes & { actor: IActor }> {
+        return await GET('/game/actor/:gameId', {gameId}, {token})
     }
 
 }

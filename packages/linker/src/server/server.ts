@@ -8,11 +8,11 @@ import * as connectRedis from 'connect-redis'
 import * as expressSession from 'express-session'
 import * as morgan from 'morgan'
 
-const {compilerOptions: {paths}} = require(path.join(__dirname, '../../tsconfig.json'))
+const {compilerOptions: {paths}} = require(path.join(__dirname, '../../../tsconfig.json'))
 import {register as registerTsConfigPath} from 'tsconfig-paths'
 
 registerTsConfigPath({
-    baseUrl: path.resolve(__dirname, '../'),
+    baseUrl: path.resolve(__dirname, '../../'),
     paths
 })
 
@@ -41,7 +41,7 @@ express.use(morgan('dev'))
 express.use(bodyParser.json())
 express.use(bodyParser.urlencoded({extended: true, limit: '30mb', parameterLimit: 30000}))
 express.use(`/${config.rootName}/static`, Express.static(
-    path.join(__dirname, '../../dist/'),
+    path.join(__dirname, '../../../dist/'),
     {maxAge: '10d'}
 ))
 const RedisStore = connectRedis(expressSession)
@@ -51,8 +51,14 @@ express.use(expressSession({
     saveUninitialized: true,
     secret: settings.sessionSecret,
     store: new RedisStore({
+        ttl: 60 * 60 * 24 * 7,
         client: redisClient as any
-    })
+    }),
+    cookie: {
+        path: '/',
+        domain: 'ancademy.org',
+        maxAge: 1000 * 60 * 60 * 24 * 7
+    }
 }))
 express.use(csrf(
     {

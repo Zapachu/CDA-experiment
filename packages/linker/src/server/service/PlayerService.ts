@@ -2,13 +2,13 @@ import {PlayerModel} from '@server-model'
 import {TApiGroupPlayers} from '@common'
 
 export class PlayerService {
-    static async savePlayer(groupId: string, userId: string): Promise<string> {
-        const player = await new PlayerModel({groupId, userId}).save()
+    static async savePlayer(gameId: string, userId: string): Promise<string> {
+        const player = await new PlayerModel({gameId, userId}).save()
         return player.id
     }
 
-    static async findPlayerId(groupId: string, userId: string): Promise<string> {
-        const player = await PlayerModel.findOne({groupId, userId})
+    static async findPlayerId(gameId: string, userId: string): Promise<string> {
+        const player = await PlayerModel.findOne({gameId, userId})
         return player ? player.id : null
     }
 

@@ -1,40 +1,49 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {RouteComponentProps} from 'react-router'
-import {baseEnum, IPhaseConfig, CorePhaseNamespace} from '@common'
+import {baseEnum, IPhaseConfig, CorePhaseNamespace, GameMode} from '@common'
+import {IPhaseTemplate} from '../../../index'
 import * as dagre from 'dagre'
 import {Api, connCtx, genePhaseKey, loadScript, Lang} from '@client-util'
 import {rootContext, TRootContext} from '@client-context'
 import {phaseTemplates} from '../../../index'
-import {message, Row, Col, Button, Input, Icon, Card, Modal} from '@antd-component'
-import {Breadcrumb, Label, Loading, Title} from '@client-component'
-
-const {Group: ButtonGroup} = Button, {TextArea} = Input
+import {message, Row, Col, Button, Input, Icon, Card, Modal, Select, Tabs, Tag} from '@antd-component'
+import {Loading, Title} from '@client-component'
+import {Link} from 'react-router-dom'
+import * as cloneDeep from 'lodash/cloneDeep'
 
 declare interface ICreateState {
     loading: boolean
-    title: string
-    desc: string
-    phaseConfigs: Array<IPhaseConfig<{}>>
-    activePhaseKey: string,
+    activePhaseKey: string
     highlightPhaseKeys?: Array<string>
     showSvgModal: boolean
+    showAddPhaseModal: boolean
+    phaseConfigs: Array<IPhaseConfig<{[key:string]: string}>>
+    published: boolean
+    mode: string
 }
 
 @connCtx(rootContext)
 export class Create extends React.Component<TRootContext & RouteComponentProps<{ gameId: string }>, ICreateState> {
+    private mode: GameMode
+
     get defaultState() {
         return {
-            title: '',
-            desc: '',
-            phaseConfigs: [],
             activePhaseKey: '',
             highlightPhaseKeys: [],
-            showSvgModal: false
+            showSvgModal: false,
+            showAddPhaseModal: false,
+            phaseConfigs: [],
+            published: false,
+            mode: this.mode || GameMode.easy
         }
     }
 
     lang = Lang.extractLang({
+        addPhase: ['添加环节', 'Add Phase'],
+        startPhase: ['开始环节', 'Starting Phase'],
+        start: ['开始', 'Start'],
+        end: ['结束', 'End'],
         goBack: ['返回', 'go back'],
         cancel: ['取消', 'Cancel'],
         submit: ['提交', 'Submit'],
@@ -47,7 +56,13 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
         desc: ['描述', 'Description'],
         groupInfo: ['实验组信息', 'Game Info'],
         phasePointedByAnotherOne: ['尚有其它环节指向此环节,无法移除', 'This phase cannot be removed since there is another one pointing to it'],
-        createSuccess: ['创建成功，即将进入实验房间', 'Create success, enter to play room now']
+        createSuccess: ['创建成功', 'Created successfully'],
+        view: ['查看', 'VIEW'],
+        console: ['控制台', 'CONSOLE'],
+        newGroup: ['新建组', 'New Group'],
+        goPublish: ['去发布', 'Go Publish'],
+        lackPhaseConfigs: ['实验环节缺失', 'Please complete phase configs'],
+        lackStartPhase: ['开始环节缺失', 'Please set starting phase']
     })
 
     state: ICreateState = {
@@ -55,28 +70,46 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
         ...this.defaultState
     }
 
-    async componentDidMount() {
+    componentDidMount() {
+        Promise.all([this.fetchGame(), this.fetchPhaseTemplates()]).then(() => {
+            this.setState({loading: false})
+        })
+    }
+
+    fetchPhaseTemplates = (): Promise<null> => new Promise(async resolve => {
         const {code, templates} = await Api.getPhaseTemplates()
         if (code === baseEnum.ResponseCode.success) {
             loadScript(templates.reduce((prev, {jsUrl}) => [...prev, ...jsUrl.split(';')], []), () => {
-                this.setState({loading: false})
+                resolve()
             })
         }
-    }
+    })
 
-    handleNewPhase(namespace: string) {
-        const key = genePhaseKey(),
-            seq = this.state.phaseConfigs.filter(phaseCfg => phaseCfg.namespace === namespace).length,
-            title = Lang.extractLang({title: phaseTemplates[namespace].localeNames}).title + (seq ? seq + 1 : '')
-        this.setState(({phaseConfigs}) => ({
-            phaseConfigs: phaseConfigs.concat({
-                key,
-                title,
-                namespace,
-                param: {},
-                suffixPhaseKeys: []
-            })
-        }))
+    fetchGame = (): Promise<null> => new Promise(async resolve => {
+        const {match:{params:{gameId}}} = this.props;
+        const {game:{published, mode, phaseConfigs=[]}} = await Api.getGame(gameId)
+        this.mode = mode as GameMode
+        this.setState({
+            published,
+            mode,
+            phaseConfigs
+        })
+        resolve()
+    })
+
+    handleNewPhase = (newPhase: IPhaseConfig) => {
+        const {mode} = this.state
+        this.setState(({phaseConfigs}) => {
+            return mode === GameMode.extended
+                ? {
+                    phaseConfigs: phaseConfigs.concat(newPhase),
+                    showAddPhaseModal: false
+                }
+                : {
+                    phaseConfigs: [newPhase],
+                    showAddPhaseModal: false
+                }
+        })
     }
 
     handleUpdatePhase(i: number, newConfig: Partial<IPhaseConfig<{}>>) {
@@ -109,86 +142,119 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
         }))
     }
 
-    async handleSubmit() {
-        const {lang, props: {history, match}, state: {title, desc, phaseConfigs}} = this
-        const {code, groupId} = await Api.postNewGroup(match.params.gameId, title, desc, phaseConfigs)
-        if (code === baseEnum.ResponseCode.success) {
-            await message.success(lang.createSuccess)
-            history.push(`/group/info/${groupId}`)
+    handleStartPhase(key: string) {
+        const {lang} = this
+        const phaseConfigs = [...this.state.phaseConfigs]
+        const startPhase = phaseConfigs.find(pc => pc.namespace===CorePhaseNamespace.start)
+        if(startPhase) {
+            startPhase.suffixPhaseKeys = [key]
+            startPhase.param.firstPhaseKey = key
+            this.setState({phaseConfigs})
+        } else {
+            this.setState(({phaseConfigs}) => ({
+                phaseConfigs: phaseConfigs.concat({
+                    key: CorePhaseNamespace.start,
+                    title: lang.start,
+                    namespace: CorePhaseNamespace.start,
+                    param: {firstPhaseKey: key},
+                    suffixPhaseKeys: [key]
+                })
+            }))
         }
     }
 
-    render(): React.ReactNode {
-        const {lang, props: {history, match: {params: {gameId}}}} = this
-        return this.state.loading ? <Loading/> :
-            <section className={style.createGroup}>
-                <Breadcrumb history={history} links={[
-                    {label: lang.goBack, to: `/game/info/${gameId}`}
-                ]}/>
-                {
-                    this.renderGroupInfo()
-                }
-                {
-                    this.renderPhases()
-                }
+    async handleSubmit() {
+        const {lang, props: {history, match}, state: {phaseConfigs, mode}} = this
+        if(!phaseConfigs.length) {
+            return message.info(lang.lackPhaseConfigs)
+        }
+        const phaseConfigsToUpdate = cloneDeep(phaseConfigs)
+        if(mode === GameMode.easy) {
+            const startPhase = {
+                key: CorePhaseNamespace.start,
+                title: lang.start,
+                namespace: CorePhaseNamespace.start,
+                param: {firstPhaseKey: phaseConfigs[0].key},
+                suffixPhaseKeys: [phaseConfigs[0].key]
+            }
+            phaseConfigsToUpdate.push(startPhase)
+        }
+        if(!phaseConfigsToUpdate.some(pc => pc.namespace === CorePhaseNamespace.start)) {
+            return message.info(lang.lackStartPhase)
+        }
+        const endPhase = {
+            key: CorePhaseNamespace.end,
+            title: lang.end,
+            namespace: CorePhaseNamespace.end,
+            param: {},
+            suffixPhaseKeys: []
+        }
+        phaseConfigsToUpdate.forEach(pc => {
+            if(!pc.suffixPhaseKeys.length) {
+                pc.suffixPhaseKeys = [endPhase.key]
+            }
+        })
+        phaseConfigsToUpdate.push(endPhase)
+        const {code} = await Api.postEditGame(match.params.gameId, {phaseConfigs: phaseConfigsToUpdate, published: true})
+        if (code === baseEnum.ResponseCode.success) {
+            message.success(lang.createSuccess)
+            history.push(`/game`)
+        }
+    }
+
+    renderButtons = () => {
+        const {lang, state: {published}, props: {match:{params:{gameId}}}} = this
+        if(!published) {
+            return (
                 <div className={style.submitBtnGroup}>
                     <Button className={style.btn}
                             onClick={() => this.setState(this.defaultState)}>{lang.cancel}</Button>
                     <Button className={style.btn} type={'primary'}
                             onClick={() => this.handleSubmit()}>{lang.submit}</Button>
                 </div>
+            )
+        }
+        return (
+            <div className={style.submitBtnGroup}>
+                <Link style={{marginRight:'50px'}} to={`/group/info/${gameId}`}>{lang.view}</Link>
+                <Link to={`/group/play/${gameId}`}>{lang.console}</Link>
+            </div>
+        )
+    }
+
+    render(): React.ReactNode {
+        const {lang, state:{showAddPhaseModal, mode}} = this
+        return this.state.loading ? <Loading/> :
+            <section className={style.createGroup}>
+                <div className={style.addPhaseBtn}>
+                    <Button onClick={() => this.setState({showAddPhaseModal: true})}>{lang.addPhase}</Button>
+                </div>
+                {mode === GameMode.extended
+                    ? this.renderPhases()
+                    : this.renderPhaseEditor(0)
+                }
+                {this.renderButtons()}
+                <Modal visible={showAddPhaseModal}
+                    footer={null}
+                    bodyStyle={{minHeight:'200px'}}
+                    width={700}
+                    title={lang.addPhase}
+                    onCancel={() => this.setState(({showAddPhaseModal}) => ({showAddPhaseModal: !showAddPhaseModal}))}>
+                    <AddPhase onTagClick={this.handleNewPhase}/>
+                </Modal>
             </section>
     }
 
-    renderGroupInfo() {
-        const {lang, state: {title, desc}} = this
-        return <React.Fragment>
-            <Title label={lang.groupInfo}/>
-            <Input value={title}
-                   placeholder={lang.title}
-                   maxLength={20}
-                   onChange={({target: {value: title}}) => this.setState({title})}/>
-            <br/><br/>
-            <TextArea value={desc}
-                      maxLength={500}
-                      autosize={{minRows: 5, maxRows: 10}}
-                      placeholder={lang.desc}
-                      onChange={({target: {value: desc}}) => this.setState({desc})}/>
-        </React.Fragment>
-    }
-
     renderPhases() {
-        const {lang, state: {phaseConfigs, activePhaseKey, highlightPhaseKeys, showSvgModal}} = this
+        const {lang, state: {published, phaseConfigs, activePhaseKey, highlightPhaseKeys, showSvgModal}} = this
         const flowChart = <PhaseFlowChart {...{
             phaseConfigs,
             highlightPhaseKeys: [activePhaseKey, ...highlightPhaseKeys],
-            onClickPhase: key => this.setState({activePhaseKey: key})
+            onClickPhase: published ? ()=>{} : key => this.setState({activePhaseKey: key})
         }}/>
+        const curPhaseIndex = phaseConfigs.findIndex(({key}) => key === activePhaseKey)
         return <section className={style.phasesSection}>
             <Title label={lang.groupPhases}/>
-            <Row>
-                <Col span={2}>
-                    <Label label={lang.add}/>
-                </Col>
-                <Col span={8}>
-                    <ButtonGroup>
-                        {
-                            Object.entries(phaseTemplates)
-                                .map(([namespace, phaseTemplate]) => {
-                                        return <Button key={namespace}
-                                                       {...CorePhaseNamespace[namespace] &&
-                                                       phaseConfigs.find(phaseCfg => phaseCfg.namespace == namespace) ? {
-                                                           disabled: true
-                                                       } : {
-                                                           onClick: () => this.handleNewPhase(namespace)
-                                                       }
-                                                       }>{Lang.extractLang({name: phaseTemplate.localeNames}).name}</Button>
-                                    }
-                                )
-                        }
-                    </ButtonGroup>
-                </Col>
-            </Row>
             <Row>
                 <Col span={7}>
                     {
@@ -201,7 +267,7 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
                 </Col>
                 <Col span={16}>
                     {
-                        this.renderPhaseEditor()
+                        this.renderPhaseEditor(curPhaseIndex)
                     }
                 </Col>
             </Row>
@@ -214,15 +280,17 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
         </section>
     }
 
-    renderPhaseEditor() {
-        const {lang, state: {phaseConfigs, activePhaseKey}} = this
-        const curPhaseIndex = phaseConfigs.findIndex(({key}) => key === activePhaseKey),
-            curPhase = phaseConfigs[curPhaseIndex]
+    renderPhaseEditor(curPhaseIndex: number) {
+        const {lang, state: {phaseConfigs, activePhaseKey, mode}} = this
+        // const curPhaseIndex = phaseConfigs.findIndex(({key}) => key === activePhaseKey),
+        const curPhase = phaseConfigs[curPhaseIndex]
         if (!curPhase) {
             return null
         }
-        const {Create} = phaseTemplates[curPhase.namespace]
-        return <Card className={style.phaseCard} actions={[
+        const {Create} = phaseTemplates[curPhase.namespace==='otree' ? `otree_${curPhase.param.otreeName}` : curPhase.namespace]
+        return <Card className={style.phaseCard} actions={mode===GameMode.easy?[]:[
+            <Icon type={'play-circle'}
+                  onClick={() => this.handleStartPhase(curPhase.key)}>{lang.startPhase}</Icon>,
             <Icon type={'delete'}
                   onClick={() => this.handleRemovePhase(curPhaseIndex)}>{lang.remove}</Icon>
         ].concat(CorePhaseNamespace[curPhase.namespace] ? [] :
@@ -236,7 +304,9 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
             <div className={style.createWrapper}>
                 <Create {...{
                     key: activePhaseKey,
-                    phases: phaseConfigs.map(({namespace, title, key}) => ({
+                    phases: phaseConfigs
+                                .filter(({namespace, key}) => namespace!==CorePhaseNamespace.start && key!==curPhase.key)
+                                .map(({namespace, title, key}) => ({
                         label: title,
                         key,
                         namespace
@@ -252,6 +322,143 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
                 }}/>
             </div>
         </Card>
+    }
+}
+
+
+interface AddPhaseState {
+    phaseType: string
+    phases: Array<{
+        type: string,
+        nodes: Array<{name: string, namespace: string}>
+    }>
+    options: Array<string>
+    searchTerm: string
+}
+
+interface AddPhaseProps {
+    onTagClick: (newPhase: IPhaseConfig) => void
+}
+
+class AddPhase extends React.Component<AddPhaseProps, AddPhaseState> {
+    constructor(props) {
+        super(props)
+        this.state = {
+            phaseType: '',
+            phases: this.formatPhases(phaseTemplates),
+            options: [],
+            searchTerm: ''
+        }
+    }
+
+    lang = Lang.extractLang({
+        otree: ['oTree', 'oTree'],
+        bespoke: ['定制实验', 'Bespoke'],
+        survey: ['问卷', 'Survey'],
+        searchPhase: ['搜索环节', 'Search Phase']
+    })
+
+    formatPhases = (phaseTemplates: {[phase: string]: IPhaseTemplate}) => {
+        const phases: {[type:string]: Array<{name: string, namespace: string, otreeName?: string}>} = {}
+        Object.values(phaseTemplates).forEach(tpl => {
+            if(phases[tpl.type]) {
+                phases[tpl.type].push(tpl.otreeName ? {
+                    name: Lang.extractLang({name: tpl.localeNames}).name,
+                    namespace: tpl.namespace,
+                    otreeName: tpl.otreeName
+                } : {
+                    name: Lang.extractLang({name: tpl.localeNames}).name,
+                    namespace: tpl.namespace
+                })
+            } else {
+                phases[tpl.type] = [tpl.otreeName ? {
+                    name: Lang.extractLang({name: tpl.localeNames}).name,
+                    namespace: tpl.namespace,
+                    otreeName: tpl.otreeName
+                } : {
+                    name: Lang.extractLang({name: tpl.localeNames}).name,
+                    namespace: tpl.namespace
+                }]
+            }
+        })
+        return Object.entries(phases).map(([type, nodes]) =>({type, nodes}))
+    }
+
+    handleSearch = (term: string) => {
+        if(!term) return;
+        const options: AddPhaseState['options'] = []
+        Object.values(phaseTemplates).forEach(tpl => {
+            const name = Lang.extractLang({name: tpl.localeNames}).name
+            if(name.includes(term)) {
+                options.push(name)
+            }
+        })
+        this.setState({options})
+    }
+
+    handleChange = (name: string) => {
+        const {options, phases, phaseType} = this.state
+        if(!name) {
+            this.setState({phases: this.formatPhases(phaseTemplates), options: [], searchTerm: ''})
+        }
+        else if(options.length) {
+            const newPhases = phases
+                                .filter(phase => {
+                                    return phase.nodes.some(node => node.name === name)
+                                })
+                                .map(({type, nodes}) => ({
+                                    type,
+                                    nodes: nodes.filter(node => node.name === name)
+                                }))
+            this.setState({phases: newPhases, phaseType: newPhases[0]?newPhases[0].type:phaseType, searchTerm: name})
+        }
+    }
+
+    render() {
+        const {lang, state:{phaseType, phases, options, searchTerm}} = this
+        return (
+            <section className={style.addPhase}>
+                <div className={style.searchBar}>
+                    <Select
+                        showSearch
+                        allowClear
+                        style={{width:'70%'}}
+                        value={searchTerm}
+                        onChange={val => this.handleChange(val)}
+                        onSearch={val => this.handleSearch(val)}
+                        showArrow={false}
+                        placeholder={lang.searchPhase}
+                    >
+                        {options.map(option => <Select.Option key={option}>{option}</Select.Option>)}
+                    </Select>
+                </div>
+                <Tabs activeKey={phaseType}
+                    onChange={this.onTabChange}>
+                    {phases.map(({nodes, type}) =>
+                        <Tabs.TabPane
+                            tab={lang[type]}
+                            key={type}>
+                            {nodes.map((node, i) => <Tag key={`${node.namespace}-${i}`} onClick={() => this.onTagClick(node)}>{node.name}</Tag>)}
+                        </Tabs.TabPane>
+                    )}
+                </Tabs>
+            </section>
+        )
+    }
+
+    onTagClick = (node:{name: string, namespace: string, otreeName?: string}) => {
+        const {lang, state:{phaseType}, props:{onTagClick}} = this
+        onTagClick({
+            key: genePhaseKey(),
+            title: `${lang[phaseType]}-${node.name}`,
+            namespace: node.namespace,
+            param: node.namespace==='otree' ? {otreeName: node.otreeName} : {},
+            suffixPhaseKeys: []
+        })
+    }
+
+    onTabChange = (key: string) => {
+        this.setState({phaseType: key})
     }
 }
 
@@ -342,7 +549,10 @@ export const PhaseFlowChart: React.SFC<{
                                 width: width + 2 * fontSize,
                                 height,
                                 fill: 'transparent',
-                                onClick: () => [BASE_NODE.start, BASE_NODE.end].includes(key) ? null : onClickPhase(key)
+                                onClick: () => {
+                                    console.log('key on phase: ', key);
+                                    [BASE_NODE.start, BASE_NODE.end].includes(key) ? null : onClickPhase(key)
+                                }
                             }}/>
                         </React.Fragment>
                     }

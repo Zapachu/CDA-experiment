@@ -2,7 +2,7 @@ import * as React from 'react'
 import {BrowserRouter, Route, Switch} from 'react-router-dom'
 import {config} from '@common'
 import {TRootContext, rootContext} from '@client-context'
-import {Group, registerCorePhases} from './Group'
+import {Group} from './Group'
 import {Game} from './Game'
 import {Api} from '@client-util'
 import {LanguageSwitcher} from '@client-component'
@@ -13,7 +13,7 @@ declare interface IRootState extends TRootContext {
 
 export class Root extends React.Component<{}, IRootState> {
     componentWillMount(): void {
-        registerCorePhases()
+        // registerCorePhases()
     }
 
     state: IRootState = {}

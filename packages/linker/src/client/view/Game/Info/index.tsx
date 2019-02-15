@@ -1,71 +1,86 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {RouteComponentProps} from 'react-router'
-import {IGameWithId, IGroupWithId} from '@common'
+import {baseEnum, GameMode} from '@common'
 import {Api, Lang} from '@client-util'
-import {Card, List, Button} from '@antd-component'
-import {Breadcrumb, Loading, Title} from '@client-component'
-import {Link} from 'react-router-dom'
+import {Button, Input, message, Switch} from '@antd-component'
 
 interface IInfoState {
     loading: boolean,
-    groupList?: Array<IGroupWithId>,
-    game?: IGameWithId
+    title: string,
+    desc: string,
+    created: boolean,
+    mode: string
 }
-
-const {Item: ListItem} = List, {Meta: ListItemMeta} = ListItem
-
 
 export class Info extends React.Component<RouteComponentProps<{ gameId: string }>, IInfoState> {
     lang = Lang.extractLang({
-        gameList: ['实验列表', 'GameList'],
-        create: ['创建', 'CREATE'],
-        view: ['查看', 'VIEW'],
-        console: ['控制台', 'CONSOLE'],
-        gameInfo: ['实验信息', 'Game Info'],
-        groups: ['实验组', 'Groups']
+        title: ['标题', 'Title'],
+        desc: ['详情', 'Description'],
+        save: ['保存', 'Save'],
+        lackInfo: ['实验描述缺失', 'Please complete game info'],
+        extendedMode: ['扩展模式', 'Extended Mode']
     })
     state: IInfoState = {
-        loading: true
+        loading: false,
+        title: '',
+        desc: '',
+        created: false, //已创建
+        mode: GameMode.easy
     }
 
     async componentDidMount() {
         const {props: {match: {params: {gameId}}}} = this
-        const {game} = await Api.getGame(gameId)
-        const {groupList} = await Api.getGroupList(gameId)
-        this.setState({loading: false, game, groupList})
+        if(gameId) {
+            const {game} = await Api.getGame(gameId)
+            this.setState({created: true, title: game.title, desc: game.desc, mode: game.mode})
+        }
+    }
+
+    async submitGame() {
+        const {lang} = this
+        const {title, desc, mode} = this.state
+        if(!title || !desc) {
+            return message.info(lang.lackInfo)
+        }
+        const {history} = this.props
+        this.setState({loading: true})
+        const {code, gameId} = await Api.postNewGame(title, desc, mode)
+        if (code === baseEnum.ResponseCode.success) {
+            history.push(`/group/create/${gameId}`)
+        } else {
+            this.setState({loading: false})
+        }
     }
 
     render(): React.ReactNode {
-        const {lang, props: {history}, state: {loading, game, groupList}} = this
-        if (!loading) {
-            return <section className={style.gameInfo}>
-                <Breadcrumb history={history} links={[
-                    {to: '/game', label: lang.gameList}
-                ]}/>
-                <div>
-                    <Title label={lang.gameInfo}/>
-                    <Card title={game.title}>
-                        {game.desc}
-                    </Card>
-                </div>
-                <div>
-                    <Title label={lang.groups}/>
-                    <List dataSource={groupList} renderItem={group =>
-                        <ListItem actions={[
-                            <Link to={`/group/info/${group.id}`}>{lang.view}</Link>,
-                            <Link to={`/group/play/${group.id}`}>{lang.console}</Link>
-                        ]}>
-                            <ListItemMeta title={group.title} description={group.desc}/>
-                        </ListItem>}/>
-                    <div className={style.createBtnWrapper}>
-                        <Button type={'primary'}
-                                onClick={() => history.push(`/group/create/${game.id}`)}>{lang.create}</Button>
-                    </div>
-                </div>
-            </section>
-        } else {
-            return <Loading/>
-        }
+        const {lang, state: {title, desc, loading, created, mode}} = this
+        return <section className={style.gameInfo}>
+            <Input value={title}
+                disabled={created}
+                placeholder={lang.title}
+                maxLength={20}
+                onChange={({target: {value: title}}) => this.setState({title})}/>
+            <br/><br/>
+            <Input.TextArea value={desc}
+                disabled={created}
+                maxLength={500}
+                autosize={{minRows: 5, maxRows: 10}}
+                placeholder={lang.desc}
+                onChange={({target: {value: desc}}) => this.setState({desc})}/>
+            <br/><br/>
+            <div className={style.switchContainer}>
+                <Switch checked={mode===GameMode.extended}
+                    disabled={created}
+                    onChange={checked => this.setState({mode: checked?GameMode.extended:GameMode.easy})} />
+                <span>{lang.extendedMode}</span>
+            </div>
+            <br/><br/>
+            <Button type={'primary'}
+                disabled={created}
+                loading={loading}
+                onClick={() => this.submitGame()}>{lang.save}
+            </Button>
+        </section>
     }
 }

@@ -8,9 +8,11 @@ $submitBarHeight: 5rem;
   @media (max-width: $layout-mediaWidth) {
     width: 100%;
   }
-  height: 100vh;
   display: flex;
   flex-direction: column;
+  .addPhaseBtn {
+    margin-bottom: 1rem;
+  }
   .phasesSection {
     flex-grow: 1;
     padding-bottom: $submitBarHeight;
@@ -42,4 +44,11 @@ $submitBarHeight: 5rem;
 .flowChart {
   min-height: 24rem;
   margin: auto;
+}
+
+.addPhase {
+  .searchBar {
+    display: flex;
+    justify-content: center;
+  }
 }

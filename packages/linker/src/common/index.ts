@@ -8,3 +8,8 @@ export enum CorePhaseNamespace {
     start = 'start',
     end = 'end'
 }
+
+export enum GameMode {
+    easy = 'easy',
+    extended = 'extended'
+}

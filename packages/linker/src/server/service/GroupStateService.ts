@@ -1,6 +1,6 @@
-import {baseEnum, CorePhaseNamespace, IGroupState, IGroupWithId, IPhaseConfig, IPhaseState, NFrame} from '@common'
+import {baseEnum, CorePhaseNamespace, IGroupState, IGameWithId, IPhaseConfig, IPhaseState, NFrame} from '@common'
 import {getPhaseService, RegisterPhasesReq} from '../rpc'
-import {GroupService} from './GroupService'
+import {GameService} from './GameService'
 import {EventDispatcher} from '../controller/eventDispatcher'
 import {Log, RedisKey, redisClient} from '@server-util'
 
@@ -9,7 +9,7 @@ const groupStateServices: { [groupId: string]: GroupStateService } = {}
 export class GroupStateService {
     static async getService(groupId: string) {
         if (!groupStateServices[groupId]) {
-            const group = await GroupService.getGroup(groupId)
+            const group = await GameService.getGame(groupId)
             groupStateServices[groupId] = await (new GroupStateService(group)).init()
         }
         return groupStateServices[groupId]
@@ -17,7 +17,7 @@ export class GroupStateService {
 
     groupState: IGroupState
 
-    constructor(public group: IGroupWithId) {
+    constructor(public group: IGameWithId) {
         this.groupState = {
             groupId: group.id,
             phaseStates: []

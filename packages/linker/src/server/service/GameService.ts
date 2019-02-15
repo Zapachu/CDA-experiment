@@ -1,24 +1,34 @@
-import {GameModel, GroupModel} from '@server-model'
-import {IGameWithId} from '@common'
+import {IBaseGame, IGameWithId, IGameToUpdate} from '@common'
+import {GameModel} from '@server-model'
 
 export class GameService {
-    static async getGame(gameId:string):Promise<IGameWithId>{
-        const {id, owner, title, desc} = await GameModel.findById(gameId)
-        return {id, owner, title, desc}
-    }
-
     static async getGameList(owner: string): Promise<Array<IGameWithId>> {
         const gameList = await GameModel.find({owner})
-        return gameList.map(({id, title, desc}) => ({id, title, desc}))
+        return gameList.map(({id, title, desc, published, phaseConfigs, mode}) => ({id, title, desc, published, phaseConfigs, mode}))
     }
 
-    static async saveGame(owner: string, title: string, desc: string): Promise<string> {
-        const game = await new GameModel({owner, title, desc}).save()
-        return game.id
+    static async saveGame(game: IBaseGame): Promise<string> {
+        const {id} = await new GameModel(game).save()
+        return id
     }
 
-    static async getGroupList(gameId: string): Promise<Array<IGameWithId>> {
-        const groupList = await GroupModel.find({gameId})
-        return groupList.map(({id, title, desc}) => ({id, title, desc}))
+    static async getGame(gameId: string): Promise<IGameWithId> {
+        const {id, title, desc, phaseConfigs, owner, published, mode} = await GameModel.findById(gameId)
+        return {id, title, desc, phaseConfigs, owner, published, mode}
+    }
+
+    static async updateGame(gameId: string, toUpdate: IGameToUpdate): Promise<IGameWithId> {
+        const game = await GameModel.findById(gameId)
+        Object.entries(toUpdate).forEach(([key, val]) => game[key] = val)
+        const updatedGame = await game.save()
+        return {
+            id: updatedGame.id,
+            owner: updatedGame.owner,
+            title: updatedGame.title,
+            desc: updatedGame.desc,
+            phaseConfigs: updatedGame.phaseConfigs,
+            published: updatedGame.published,
+            mode: updatedGame.mode
+        }
     }
 }

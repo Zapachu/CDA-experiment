@@ -1,35 +1,31 @@
 import {Router, Response} from 'express'
 import {config} from '@common'
 
-import {UserCtrl, GameCtrl, GroupCtrl} from './requestHandler'
+import {UserCtrl, GameCtrl} from './requestHandler'
 
 const apiRouter = Router()
     .use('/user', Router()
         .get('/', UserCtrl.getUser)
     )
     .use('/game', Router()
-        .get('/list', GameCtrl.getGameList)
+        .get('/phaseTemplates', GameCtrl.getPhaseTemplates)
         .post('/create', GameCtrl.saveNewGame)
+        .post('/edit/:gameId', GameCtrl.updateGame)
+        .get('/list', GameCtrl.getGameList)
+        .get('/actor/:gameId', GameCtrl.getActor)
+        .get('/share/:gameId', GameCtrl.shareGame)
+        .post('/joinWithShareCode', GameCtrl.joinWithShareCode)
+        .post('/join/:gameId', GameCtrl.joinGame)
+        .get('/baseInfo/:gameId', GameCtrl.getBaseGame)
+        .get('/getPlayers/:gameId', GameCtrl.getPlayers)
         .get('/:gameId', GameCtrl.getGame)
-    )
-    .use('/group', Router()
-        .get('/phaseTemplates', GroupCtrl.getPhaseTemplates)
-        .post('/create/:gameId', GroupCtrl.saveNewGroup)
-        .get('/list/:gameId', GroupCtrl.getGroupList)
-        .get('/actor/:groupId', GroupCtrl.getActor)
-        .get('/share/:groupId', GroupCtrl.shareGroup)
-        .post('/joinWithShareCode', GroupCtrl.joinWithShareCode)
-        .post('/join/:groupId', GroupCtrl.joinGroup)
-        .get('/baseInfo/:groupId', GroupCtrl.getBaseGroup)
-        .get('/getPlayers/:groupId', GroupCtrl.getPlayers)
-        .get('/:groupId', GroupCtrl.getGroup)
     )
 
 const appRouter = Router()
     .get('/login', UserCtrl.renderApp)
     .get('/game/create', UserCtrl.loggedIn, UserCtrl.isTeacher, UserCtrl.renderApp)
     .get('/group/create', UserCtrl.loggedIn, UserCtrl.isTeacher, UserCtrl.renderApp)
-    .get('/group/play/:groupId', UserCtrl.loggedIn, UserCtrl.isGroupAccessible, UserCtrl.renderApp)
+    .get('/group/play/:gameId', UserCtrl.loggedIn, UserCtrl.isGameAccessible, UserCtrl.renderApp)
     .get('/*', UserCtrl.loggedIn, UserCtrl.renderApp)
 
 export default Router()

@@ -5,5 +5,11 @@
     margin: 1rem;
     display: flex;
     justify-content: center;
+    ul {
+      li {
+        margin-bottom: 1rem;
+        width: 100px;
+      }
+    }
   }
 }
