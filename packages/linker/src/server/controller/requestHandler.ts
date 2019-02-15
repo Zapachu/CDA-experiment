@@ -37,7 +37,7 @@ export class UserCtrl {
 
     static getUser(req, res: Response) {
         if (!req.isAuthenticated()) {
-            res.json({
+            return res.json({
                 code: baseEnum.ResponseCode.notFound
             })
         }

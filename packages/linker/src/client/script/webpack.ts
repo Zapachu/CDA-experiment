@@ -1,7 +1,7 @@
 import * as path from 'path'
 import * as CleanWebpackPlugin from 'clean-webpack-plugin'
 import {TsconfigPathsPlugin} from 'tsconfig-paths-webpack-plugin'
-import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
+// import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
 import * as HtmlWebpackPlugin from 'html-webpack-plugin'
 import tsImportPluginFactory = require( 'ts-import-plugin')
 import * as webpack from 'webpack'
@@ -95,7 +95,7 @@ export = ({webpackHmr}: { webpackHmr: boolean }) => {
                 template: path.resolve(__dirname, './index.html')
             })
         ].concat(buildMode === 'dist' ? [
-            new BundleAnalyzerPlugin()
+            // new BundleAnalyzerPlugin()
         ] : webpackHmr ? [
             new webpack.HotModuleReplacementPlugin()
         ] : [])
