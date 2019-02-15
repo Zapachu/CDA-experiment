@@ -3,6 +3,7 @@ import {getPhaseService} from '../rpc'
 import {GameService} from './GameService'
 import {EventDispatcher} from '../controller/eventDispatcher'
 import {Log, RedisKey, redisClient} from '@server-util'
+import {PhaseManager} from 'elf-proto'
 
 const groupStateServices: { [groupId: string]: GroupStateService } = {}
 
@@ -38,7 +39,8 @@ export class GroupStateService {
             })
         }
         const regInfo = await redisClient.get(RedisKey.phaseRegInfo(phaseCfg.namespace)),
-            {rpcUri} = JSON.parse(regInfo)
+            {rpcPort} = JSON.parse(regInfo) as PhaseManager.IPhaseRegInfo
+        const rpcUri = `127.0.0.1:${rpcPort}`//TODO (rpcPort)=>rpcUri
         return new Promise<IPhaseState>((resolve, reject) => {
             getPhaseService(rpcUri).newPhase({
                 owner: this.group.owner,
