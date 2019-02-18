@@ -1,0 +1,15 @@
+.groupInfo {
+  max-width: 48rem;
+  margin: 0 auto;
+  .buttonWrapper{
+    margin: 1rem;
+    display: flex;
+    justify-content: center;
+    ul {
+      li {
+        margin-bottom: 1rem;
+        width: 100px;
+      }
+    }
+  }
+}

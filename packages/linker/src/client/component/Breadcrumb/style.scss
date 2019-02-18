@@ -1,0 +1,16 @@
+@import "public";
+
+.breadcrumbs {
+  margin: .5rem 0;
+  a {
+    color: rgba($color-black, .8);
+    user-select: none;
+    &:hover {
+      color: rgba($color-blue, .8);
+    }
+  }
+  .separator {
+    color: rgba($color-black, .8);
+    margin: 0 .5rem;
+  }
+}
