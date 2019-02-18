@@ -3,10 +3,12 @@ package main
 import (
 	"./game"
 	"./rpc"
+	"fmt"
 	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strings"
 )
 
 type Proxy struct{}
@@ -14,14 +16,11 @@ type Proxy struct{}
 func (proxy *Proxy) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	router := game.GetRouter()
 	var route game.Route
-	for _, cookie := range req.Cookies() {
-		if cookie.Name == "namespace" {
-			if r, ok := router.GetRoute(cookie.Value); ok {
-				route = r
-			}
-		}
-	}
-	if route.Host == "" {
+	namespace := strings.Split(req.URL.Path+"//", "/")[2]
+	if r, ok := router.GetRoute(namespace); ok {
+		fmt.Printf("%s %s \n", namespace, req.URL.Path)
+		route = r
+	} else {
 		route = router.GetRandomRoute()
 	}
 	remoteUrl, _ := url.Parse("http://" + route.Host + ":" + route.Port)

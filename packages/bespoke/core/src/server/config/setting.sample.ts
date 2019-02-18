@@ -16,7 +16,7 @@ export const coreSetting: ICoreSetting = {
     },
     academusServiceUri: '127.0.0.1:53008',
     pythonRobotUri: '127.0.0.1:54001',
-    elfGameServiceUri: '127.0.0.1:54002',
+    elfGameServiceUri: '127.0.0.1:54000',
     adminMobileNumbers: ['13000000000'],
     qiNiu: {
         upload: {

@@ -131,16 +131,12 @@ export class Server {
                 serveRPC()
             }
             const heartBeat2Proxy = () => {
-                const proxyService = getProxyService()
-                if (!proxyService) {
-                    return
-                }
                 const {namespace, rpcPort} = setting
-                proxyService.registerGame({namespace, port: port.toString(), rpcPort: rpcPort.toString()},
+                getProxyService().registerGame({namespace, port: port.toString(), rpcPort: rpcPort.toString()},
                     err => err ? Log.w(`注册至代理失败，${config.gameRegisterInterval}秒后重试`) : null)
                 setTimeout(() => heartBeat2Proxy(), config.gameRegisterInterval)
             }
-            setTimeout(() => () => heartBeat2Proxy(), Math.random() * config.gameRegisterInterval)
+            setTimeout( () => heartBeat2Proxy(), .5 * config.gameRegisterInterval)
         })
         return express
     }

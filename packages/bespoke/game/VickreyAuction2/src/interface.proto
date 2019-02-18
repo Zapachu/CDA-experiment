@@ -5,6 +5,7 @@ message CreateParams {
     int32 groupSize = 2;
     int32 startingPrice = 3;
     repeated string privatePrice = 4;
+    string nextPhaseKey = 5;
 }
 
 message MoveParams {

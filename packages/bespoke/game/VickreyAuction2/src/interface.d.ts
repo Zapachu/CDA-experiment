@@ -13,6 +13,9 @@ export interface ICreateParams {
 
     /** CreateParams privatePrice */
     privatePrice?: (string[]|null);
+
+    /** CreateParams nextPhaseKey */
+    nextPhaseKey?: (string|null);
 }
 
 /** Represents a CreateParams. */
@@ -35,6 +38,9 @@ export class CreateParams implements ICreateParams {
 
     /** CreateParams privatePrice. */
     public privatePrice: string[];
+
+    /** CreateParams nextPhaseKey. */
+    public nextPhaseKey: string;
 
     /**
      * Creates a new CreateParams instance using the specified properties.
