@@ -38,9 +38,8 @@ export class GroupStateService {
                 playerStatus: {}
             })
         }
-        const regInfo = await redisClient.get(RedisKey.phaseRegInfo(phaseCfg.namespace)),
-            {rpcPort} = JSON.parse(regInfo) as PhaseManager.IPhaseRegInfo
-        const rpcUri = `127.0.0.1:${rpcPort}`//TODO (rpcPort)=>rpcUri
+        const regInfo = await redisClient.get(RedisKey.phaseRegInfo(phaseCfg.namespace))
+        const {rpcUri} = JSON.parse(regInfo) as PhaseManager.IPhaseRegInfo
         return new Promise<IPhaseState>((resolve, reject) => {
             getPhaseService(rpcUri).newPhase({
                 owner: this.group.owner,

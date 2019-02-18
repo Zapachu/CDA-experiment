@@ -53,6 +53,9 @@ export namespace proto {
         /** registerGameReq namespace */
         namespace?: (string|null);
 
+        /** registerGameReq port */
+        port?: (string|null);
+
         /** registerGameReq rpcPort */
         rpcPort?: (string|null);
     }
@@ -68,6 +71,9 @@ export namespace proto {
 
         /** registerGameReq namespace. */
         public namespace: string;
+
+        /** registerGameReq port. */
+        public port: string;
 
         /** registerGameReq rpcPort. */
         public rpcPort: string;

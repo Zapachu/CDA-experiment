@@ -1,4 +1,3 @@
-
 syntax = "proto3";
 package proto;
 
@@ -9,7 +8,8 @@ service ProxyService {
 
 message registerGameReq {
     string namespace = 1;
-    string rpcPort = 2;
+    string port = 2;
+    string rpcPort = 3;
 }
 message registerGameRes {
     bool result = 1;

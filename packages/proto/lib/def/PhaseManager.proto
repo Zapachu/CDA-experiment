@@ -11,7 +11,7 @@ message RegisterPhasesReq {
     message phaseRegInfo {
         string namespace = 1;
         string jsUrl = 2;
-        int32 rpcPort = 3;
+        string rpcUri = 3;
     }
     repeated phaseRegInfo phases = 1;
 }

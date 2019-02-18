@@ -4,6 +4,7 @@ import * as webpack from 'webpack'
 import * as CleanWebpackPlugin from 'clean-webpack-plugin'
 import {TsconfigPathsPlugin} from 'tsconfig-paths-webpack-plugin'
 import * as HtmlWebpackPlugin from 'html-webpack-plugin'
+import * as ManifestPlugin from 'webpack-manifest-plugin'
 import * as QiniuPlugin from 'qiniu-webpack-plugin'
 import {config} from '@dev/common'
 import {coreSetting} from '@dev/server/config/setting.sample'
@@ -102,6 +103,9 @@ export = ({webpackHmr}: { webpackHmr: boolean }) => {
             new HtmlWebpackPlugin({
                 filename: 'index.html',
                 template: path.resolve(__dirname, './index.html')
+            }),
+            new ManifestPlugin({
+                fileName: `${config.buildManifest.clientCoreLib}.json`
             }),
             new CleanWebpackPlugin('*', {
                 root: path.resolve(__dirname, `../dist`),

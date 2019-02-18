@@ -9,5 +9,6 @@ Server.start({
     namespace,
     port: +process.env.PORT || setting.port,
     rpcPort: +process.env.RPC_PORT || setting.rpcPort,
-    staticPath: path.resolve(__dirname, '../dist')
+    staticPath: path.resolve(__dirname, '../dist'),
+    elfGameServiceUri:'127.0.0.1:54000',
 }, {Controller})
