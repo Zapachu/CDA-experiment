@@ -130,6 +130,7 @@ export interface ICoreSetting {
     proxyService: {
         host: string
         port: number
+        rpcPort:number
     }
     academusServiceUri: string
     pythonRobotUri: string

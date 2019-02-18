@@ -2,5 +2,6 @@ import {setting} from '../../util'
 import {BespokeProxy} from 'elf-proto'
 
 export function getProxyService() {
-    return BespokeProxy.getProxyService(setting.proxyService)
+    const {proxyService: {host, rpcPort}} = setting
+    return BespokeProxy.getProxyService(`${host}:${rpcPort}`)
 }

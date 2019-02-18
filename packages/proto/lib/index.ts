@@ -33,14 +33,11 @@ export namespace AcademusBespoke {
 export namespace BespokeProxy {
     let proxyServiceConsumer: proto.ProxyService
 
-    export function getProxyService({host, port}: {
-        host: string,
-        port: number
-    }): proto.ProxyService {
+    export function getProxyService(serviceURI: string): proto.ProxyService {
         if (!proxyServiceConsumer) {
             try {
-                const {proto: {ProxyService}} = loadPackageDefinition(loadSync(resolve(__dirname, './BespokeProxy.proto'))) as any
-                proxyServiceConsumer = new ProxyService(`${host}:${port}`, credentials.createInsecure()) as proto.ProxyService
+                const {proto: {ProxyService}} = loadPackageDefinition(loadSync(resolve(__dirname, './def/BespokeProxy.proto'))) as any
+                proxyServiceConsumer = new ProxyService(serviceURI, credentials.createInsecure()) as proto.ProxyService
             } catch (e) {
                 console.error(e)
             }
@@ -50,7 +47,7 @@ export namespace BespokeProxy {
 }
 
 export namespace PhaseManager {
-    let protoDef = loadPackageDefinition(loadSync(resolve(__dirname, './def/BespokeProxy.proto'))) as any
+    let protoDef = loadPackageDefinition(loadSync(resolve(__dirname, './def/PhaseManager.proto'))) as any
 
     let gameService: GameService
 
@@ -100,6 +97,6 @@ export namespace PhaseManager {
     }
 
     export function setGameService(server: Server, gameService: TGameService) {
-        server.addService(protoDef.GameService, gameService)
+        server.addService(protoDef.GameService.service, gameService)
     }
 }

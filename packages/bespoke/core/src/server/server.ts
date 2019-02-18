@@ -138,7 +138,7 @@ export class Server {
                 const {namespace, rpcPort} = setting
                 proxyService.registerGame({namespace, rpcPort: rpcPort.toString()},
                     err => err ? Log.w(`注册至代理失败，${config.gameRegisterInterval}秒后重试`) : null)
-                setTimeout(() => heartBeat2Proxy(), config.gameRegisterInterval)
+                // setTimeout(() => heartBeat2Proxy(), config.gameRegisterInterval)
             }
             heartBeat2Proxy()
         })

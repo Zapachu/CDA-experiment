@@ -10,7 +10,7 @@ export function serve() {
     setBespokeService(server)
     server.bind(`0.0.0.0:${setting.rpcPort}`, ServerCredentials.createInsecure())
     server.start()
-    setInterval(() => registerPhases(), config.gameRegisterInterval)
+    registerPhases()
 }
 
 function registerPhases() {
@@ -22,6 +22,7 @@ function registerPhases() {
             rpcPort
         }]
     }, err => err && Log.e(err))
+    setTimeout(() => registerPhases(), config.gameRegisterInterval)
 }
 
 export {getGameService} from './service/PhaseManager'

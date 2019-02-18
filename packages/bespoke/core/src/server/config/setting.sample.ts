@@ -11,7 +11,8 @@ export const coreSetting: ICoreSetting = {
     sessionSecret: 'sessionsecret',
     proxyService: {
         host: '127.0.0.1',
-        port: 58888
+        port: 8888,
+        rpcPort:58888
     },
     academusServiceUri: '127.0.0.1:53008',
     pythonRobotUri: '127.0.0.1:54001',
