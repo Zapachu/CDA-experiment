@@ -140,7 +140,7 @@ export class Server {
                     err => err ? Log.w(`注册至代理失败，${config.gameRegisterInterval}秒后重试`) : null)
                 setTimeout(() => heartBeat2Proxy(), config.gameRegisterInterval)
             }
-            heartBeat2Proxy()
+            setTimeout(() => () => heartBeat2Proxy(), Math.random() * config.gameRegisterInterval)
         })
         return express
     }

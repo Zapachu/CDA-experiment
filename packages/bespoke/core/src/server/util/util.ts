@@ -1,5 +1,5 @@
 import {config, baseEnum, ISetting} from '@dev/common'
-import {coreSetting} from '../config/setting.sample'
+import {coreSetting} from '../config/setting'
 import {colorConsole, dailyfile} from 'tracer'
 import {resolve} from 'path'
 import {readFileSync} from 'fs'

@@ -7,7 +7,7 @@ import * as HtmlWebpackPlugin from 'html-webpack-plugin'
 import * as ManifestPlugin from 'webpack-manifest-plugin'
 import * as QiniuPlugin from 'qiniu-webpack-plugin'
 import {config} from '@dev/common'
-import {coreSetting} from '@dev/server/config/setting.sample'
+import {coreSetting} from '@dev/server/config/setting'
 
 const {qiNiu} = coreSetting
 export = ({webpackHmr}: { webpackHmr: boolean }) => {
