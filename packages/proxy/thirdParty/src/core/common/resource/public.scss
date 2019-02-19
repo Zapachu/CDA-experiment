@@ -1,0 +1,45 @@
+/*************** variables ******************/
+$color-bg-1:#f0f0f0;
+$color-bg-2:#f5f5f5;
+$color-blue:#4285f4;
+$color-red:#E27B6A;
+$color-gray:#b5b5b5;
+$color-black:#555;
+$color-primary:#303f9f;
+//fontSize
+$fontSize-small:1rem;
+$fontSize-middle:1.2rem;
+$fontSize-large:1.3rem;
+//border
+$border-radius:3px;
+@mixin cardEdge{
+  box-shadow: 0 1px 1px 0 rgba(0,0,0,0.14);
+  border-radius: $border-radius;
+}
+//shadow
+$shadow-normal: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+$shadow-light: 0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);
+//layout宽度
+$layout-mediaWidth: 962px;
+$layout-mainContentWidth: 80%;
+//transition
+$transition-normal:all .2s linear;
+
+/*************** mixin ******************/
+@function calcSlotWidth($power:0){
+  $result: 1px;
+  @for $i from 0 through $power {
+    $result: $result * 2;
+  }
+  @return $result
+}
+
+/*************** function ******************/
+@mixin blankMsg {
+  margin: 1rem auto;
+  text-align: center;
+  font-size: $fontSize-large;
+  color: rgba($color-black,.3);
+  cursor:default;
+  user-select: none;
+}
