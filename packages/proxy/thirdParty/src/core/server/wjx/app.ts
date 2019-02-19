@@ -5,20 +5,20 @@ import * as bodyParser from 'body-parser'
 import * as errorhandler from 'errorhandler'
 import * as expressSession from 'express-session'
 import * as httpProxy from 'http-proxy-middleware'
-import { Response, Request, NextFunction } from 'express'
-import { connect as mongodConnect, connection as mongodConnection } from 'mongoose'
+import {Response, Request, NextFunction} from 'express'
+import {connect as mongodConnect, connection as mongodConnection} from 'mongoose'
 
 import './passport'
-import { serve as RPC } from './rpc'
+import {serve as RPC} from './rpcService'
 import settings from '../config/settings'
-import { gameService } from './rpc/service/WjxManager'
-import { ThirdPartPhase } from '../models'
+import {getGameService} from '../util/rpcService'
+import {ThirdPartPhase} from '../models'
 
 /**
  * Mongoose settings
  */
 mongodConnect(settings.mongoUri, {
-    ...settings.mongoUser ? { user: settings.mongoUser, pass: settings.mongoPass } : {},
+    ...settings.mongoUser ? {user: settings.mongoUser, pass: settings.mongoPass} : {},
     useNewUrlParser: true
 })
 mongodConnection.on('error', () => console.log('Mongodb Connection Error'))
@@ -35,7 +35,7 @@ const redisClient = redis.createClient(settings.redisPort, settings.redisHost)
 
 // session config
 const sessionSet = {
-    name: "academy.sid",
+    name: 'academy.sid',
     resave: true,
     saveUninitialized: true,
     secret: settings.sessionSecret,
@@ -53,10 +53,10 @@ const app = Express()
 app.set('views', path.join(__dirname, './view'))
 app.set('view engine', 'pug')
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true, limit: '30mb', parameterLimit: 30000 }))
+app.use(bodyParser.urlencoded({extended: true, limit: '30mb', parameterLimit: 30000}))
 app.use(`/${settings.WjxRootName}/static`, Express.static(
     path.join(__dirname, '../../../../dist'),
-    { maxAge: '10d' }
+    {maxAge: '10d'}
 ))
 
 // use session
@@ -72,7 +72,7 @@ const getNextPhaseUrl = async (wjxHash) => {
     console.log('log > wjx hash ', wjxHash)
     const wjxPhase: any = await ThirdPartPhase.findOne({
         namespace: 'wjx',
-        playHashs: { $elemMatch: { hash: wjxHash } }
+        playHashs: {$elemMatch: {hash: wjxHash}}
     })
     console.log('log > qualtrics phase', wjxPhase)
     const paramsJson = JSON.parse(wjxPhase.param)
@@ -80,11 +80,11 @@ const getNextPhaseUrl = async (wjxHash) => {
         groupId: wjxPhase.groupId,
         nextPhaseKey: paramsJson.nextPhaseKey || -1,
         playerToken: paramsJson.palyerCode || wjxPhase.playHashs[0].player,
-        playUrl: `${settings.WjxPhaseServerPrefix}/init/jq/${wjxPhase._id.toString()}`,
+        playUrl: `${settings.WjxPhaseServerPrefix}/init/jq/${wjxPhase._id.toString()}`
     }
 
     return await new Promise((resolve, reject) => {
-        gameService.sendBackPlayer(request, (err: {}, service_res: { sendBackUrl: string }) => {
+        getGameService().sendBackPlayer(request, (err: {}, service_res: { sendBackUrl: string }) => {
             if (err) {
                 console.log(err)
             }
@@ -133,7 +133,7 @@ app.use(async (req: IRequest, res: Response, next: NextFunction) => {
             console.log('log > find phase object...')
             console.log(currentPhase)
 
-            const { playHashs } = currentPhase
+            const {playHashs} = currentPhase
 
             let redirectTo = null
 
@@ -148,7 +148,7 @@ app.use(async (req: IRequest, res: Response, next: NextFunction) => {
             }
 
             // 新加入成员
-            playHashs.push({ hash: currentPhaseWjxHash, player: currentUserElfGameHash })
+            playHashs.push({hash: currentPhaseWjxHash, player: currentUserElfGameHash})
             currentPhase.playHashs = playHashs
             currentPhase.markModified('playHashs')
             await currentPhase.save()
@@ -165,7 +165,7 @@ app.use(async (req: IRequest, res: Response, next: NextFunction) => {
 
     if (req.path.indexOf('complete') !== -1 && req.method === 'GET') {
         const wjxHash = req.query.q
-        const nextPhaseUrl:any = getNextPhaseUrl(wjxHash)
+        const nextPhaseUrl: any = getNextPhaseUrl(wjxHash)
         return res.redirect(nextPhaseUrl)
     }
 

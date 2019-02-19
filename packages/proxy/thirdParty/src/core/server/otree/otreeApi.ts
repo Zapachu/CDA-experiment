@@ -1,5 +1,5 @@
-import settings from '../../../../config/settings'
-import { ThirdPartPhase } from '../../../../models'
+import settings from '../config/settings'
+import {ThirdPartPhase} from '../models'
 
 const otreePlayUrl = settings.otreeServerRootUrl
 const otreeDemoUrlPrefix = `${otreePlayUrl}/demo/`
@@ -19,7 +19,7 @@ declare interface IgetUrlByNamespace {
  *      3. 保存 控制台 url、prefix、玩家 otree hash
  *      4. 返回 otreePhase._id
  */
-const getUrlByNamespace = async (groupId: string, namespace: string, param: string): Promise<IgetUrlByNamespace> => {
+export const getUrlByNamespace = async (groupId: string, namespace: string, param: string): Promise<IgetUrlByNamespace> => {
 
     const request = require('request')
     const rp = require('request-promise')
@@ -30,7 +30,7 @@ const getUrlByNamespace = async (groupId: string, namespace: string, param: stri
         const otreeDemoClickUrl = `${otreeDemoUrlPrefix}${paramJson.otreeName}`
         request(otreeDemoClickUrl, async (error, response, body) => {
             if (error) {
-                reject({ err: 1, msg: 'err: make sure the otree server is starting' })
+                reject({err: 1, msg: 'err: make sure the otree server is starting'})
             }
 
             setTimeout(async () => {
@@ -46,7 +46,9 @@ const getUrlByNamespace = async (groupId: string, namespace: string, param: stri
                 const playHashsConf: { hash: string, player: string }[] = []
 
                 // 预设玩家 hash， 皆为未分配
-                playHashs.map(hash => { playHashsConf.push({ hash: hash, player: 'wait' }) })
+                playHashs.map(hash => {
+                    playHashsConf.push({hash: hash, player: 'wait'})
+                })
 
                 const adminUrl = response.request.uri.path
                 const newOtreePhase = await new ThirdPartPhase({
@@ -73,5 +75,3 @@ const getUrlByNamespace = async (groupId: string, namespace: string, param: stri
 
 // 测试用
 // getUrlByNamespace('2', 'otree', JSON.stringify({otreeName: 'public_goods',nextPhaseKey: 4}))
-
-export { getUrlByNamespace }

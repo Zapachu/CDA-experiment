@@ -2,25 +2,26 @@ import * as path from 'path'
 import * as Express from 'express'
 import * as passport from 'passport'
 import * as bodyParser from 'body-parser'
-import * as errorhandler from 'errorhandler'
+import * as errorHandler from 'errorhandler'
 import * as expressSession from 'express-session'
 import * as httpProxy from 'http-proxy-middleware'
-import { Response, Request, NextFunction } from 'express'
-import { connect as mongodConnect, connection as mongodConnection } from 'mongoose'
+import {Response, Request, NextFunction} from 'express'
+import {connect as mongodConnect, connection as mongodConnection} from 'mongoose'
 
-import './passport'
-import { serve as RPC } from './rpc'
+import '../util/passport'
+import {serve as RPC} from './rpcService'
 import settings from '../config/settings'
-import { gameService } from './rpc/service/qqwjManager'
-import { ThirdPartPhase } from '../models'
+import {getGameService} from '../util/rpcService'
+import {ThirdPartPhase} from '../models'
 import * as zlib from 'zlib'
+
 const {Gzip} = require('zlib')
 
 /**
  * Mongoose settings
  */
 mongodConnect(settings.mongoUri, {
-    ...settings.mongoUser ? { user: settings.mongoUser, pass: settings.mongoPass } : {},
+    ...settings.mongoUser ? {user: settings.mongoUser, pass: settings.mongoPass} : {},
     useNewUrlParser: true
 })
 mongodConnection.on('error', () => console.log('Mongodb Connection Error'))
@@ -37,7 +38,7 @@ const redisClient = redis.createClient(settings.redisPort, settings.redisHost)
 
 // session config
 const sessionSet = {
-    name: "academy.sid",
+    name: 'academy.sid',
     resave: true,
     saveUninitialized: true,
     secret: settings.sessionSecret,
@@ -55,10 +56,10 @@ const app = Express()
 app.set('views', path.join(__dirname, './view'))
 app.set('view engine', 'pug')
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true, limit: '30mb', parameterLimit: 30000 }))
+app.use(bodyParser.urlencoded({extended: true, limit: '30mb', parameterLimit: 30000}))
 app.use(`/${settings.qqwjRootName}/static`, Express.static(
     path.join(__dirname, '../../../../dist'),
-    { maxAge: '10d' }
+    {maxAge: '10d'}
 ))
 
 // use session
@@ -74,7 +75,7 @@ const getNextPhaseUrl = async (qqwjHash) => {
     console.log('log > qqwj hash ', qqwjHash)
     const qqwjPhase: any = await ThirdPartPhase.findOne({
         namespace: 'qqwj',
-        playHashs: { $elemMatch: { hash: qqwjHash } }
+        playHashs: {$elemMatch: {hash: qqwjHash}}
     })
     console.log('log > qqwj phase', qqwjPhase)
     const paramsJson = JSON.parse(qqwjPhase.param)
@@ -82,11 +83,11 @@ const getNextPhaseUrl = async (qqwjHash) => {
         groupId: qqwjPhase.groupId,
         nextPhaseKey: paramsJson.nextPhaseKey || -1,
         playerToken: paramsJson.palyerCode || qqwjPhase.playHashs[0].player,
-        playUrl: `${settings.qqwjPhaseServerPrefix}/init/qqwj/${qqwjPhase._id.toString()}`,
+        playUrl: `${settings.qqwjPhaseServerPrefix}/init/qqwj/${qqwjPhase._id.toString()}`
     }
 
     return await new Promise((resolve, reject) => {
-        gameService.sendBackPlayer(request, (err: {}, service_res: { sendBackUrl: string }) => {
+        getGameService().sendBackPlayer(request, (err: {}, service_res: { sendBackUrl: string }) => {
             if (err) {
                 console.log(err)
             }
@@ -160,9 +161,9 @@ const proxy = httpProxy({
                 return true
             }
             res.end = () => {
-                console.log("log > got end")
+                console.log('log > got end')
                 let fullChunk = Buffer.concat(buffers)
-                zlib.unzip(fullChunk, { finishFlush: zlib.constants.Z_SYNC_FLUSH }, (err, buffer) => {
+                zlib.unzip(fullChunk, {finishFlush: zlib.constants.Z_SYNC_FLUSH}, (err, buffer) => {
                     if (!err) {
                         gzipStream.on('data', chunk => {
                             console.log('log > write gziped buffer')
@@ -221,7 +222,7 @@ app.use(async (req: IRequest, res: Response, next: NextFunction) => {
             console.log('log > find phase object...')
             console.log(currentPhase)
 
-            const { playHashs } = currentPhase
+            const {playHashs} = currentPhase
 
             let redirectTo = null
 
@@ -236,7 +237,7 @@ app.use(async (req: IRequest, res: Response, next: NextFunction) => {
             }
 
             // 新加入成员
-            playHashs.push({ hash: currentPhaseqqwjHash, player: currentUserElfGameHash })
+            playHashs.push({hash: currentPhaseqqwjHash, player: currentUserElfGameHash})
             currentPhase.playHashs = playHashs
             currentPhase.markModified('playHashs')
             await currentPhase.save()
@@ -269,7 +270,7 @@ app.use(async (req: IRequest, res: Response, next: NextFunction) => {
 /**
  * 部署于 二级域名 或仅使用代理  eg:   https://qqwj.ancademy.org/...
  */
-app.use(errorhandler())
+app.use(errorHandler())
 const server: any = app.listen(3073, () => {
     console.log('listening at ', server.address().port)
 })
