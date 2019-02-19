@@ -3,8 +3,6 @@
   "version": "1.0.0",
   "repository": " ",
   "scripts": {
-    "client:build": "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./script/webpack.ts",
-    "client:dist": "npm run client:build --buildMode=dist",
     "otree:build": "npm run client:build --phase=otree",
     "otree:dist": "npm run client:build --phase=otree --buildMode=dist",
     "otree:proxy": "ts-node ./lib/core/server/otree/app.ts",
@@ -28,6 +26,7 @@
     "body": "^5.1.0",
     "chalk": "^2.4.1",
     "connect-redis": "^3.3.3",
+    "elf-proto": "^1.0.0",
     "errorhandler": "^1.5.0",
     "express": "^4.16.3",
     "express-session": "^1.15.6",

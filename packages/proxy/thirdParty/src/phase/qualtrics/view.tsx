@@ -1,9 +1,6 @@
 import * as React from 'react'
-import { BaseCreate, BasePlay, Lang } from '@core/client'
+import {BaseCreate, Lang, registerOnFramework} from '@core/client'
 import * as style from './style.scss'
-
-import { PushType, MoveType } from './config'
-import {registerOnFramework} from '../index'
 
 export class Create extends BaseCreate<any> {
 
@@ -14,25 +11,25 @@ export class Create extends BaseCreate<any> {
 
     /**
      * 新建 phase
-     * @param namespace 
+     * @param namespace
      */
     createPhase(namespace: string) {
         console.log(namespace)
-        const { props: { updatePhase } } = this
-        updatePhase([], { namespace })
+        const {props: {updatePhase}} = this
+        updatePhase([], {namespace})
     }
 
     // 输入qualtircs 地址
     handleInputQualtricsUrl = (event) => {
-        this.setState({ qualtricsUrl: event.target.value })
+        this.setState({qualtricsUrl: event.target.value})
     }
 
     // 提交新建的qualtrics 问卷url
     hanldeSubmitQualtricsUrl = () => {
         console.log(this.state.qualtricsUrl)
-        const { props: { updatePhase } } = this
+        const {props: {updatePhase}} = this
         this.setState({isEdit: false})
-        updatePhase([], { qualtricsUrl: this.state.qualtricsUrl })
+        updatePhase([], {qualtricsUrl: this.state.qualtricsUrl})
     }
 
     calcSuffixPhaseKeys(newParam) {
@@ -56,8 +53,8 @@ export class Create extends BaseCreate<any> {
          * highlightPhase: 高亮phase
          * nextPhaseKey: 下一个phase
          */
-        const { props: { phases, updatePhase, highlightPhases, curPhase } } = this
-        const nextPhase = phases[phases.findIndex(({ key }) => key === curPhase.key) + 1]
+        const {props: {phases, updatePhase, highlightPhases, curPhase}} = this
+        const nextPhase = phases[phases.findIndex(({key}) => key === curPhase.key) + 1]
         console.log(curPhase)
         console.log(phases)
 
@@ -78,8 +75,8 @@ export class Create extends BaseCreate<any> {
                 <div className={style.inputTip}>输入qualtrics匿名链接</div>
                 {
                     this.state.isEdit ?
-                    <input onChange={this.handleInputQualtricsUrl} /> :
-                    <a onClick={this.toEdit}>{this.state.qualtricsUrl}</a>
+                        <input onChange={this.handleInputQualtricsUrl}/> :
+                        <a onClick={this.toEdit}>{this.state.qualtricsUrl}</a>
                 }
                 <button onClick={this.hanldeSubmitQualtricsUrl}>提交</button>
             </div>
@@ -88,15 +85,15 @@ export class Create extends BaseCreate<any> {
                 <label>{lang.name}</label>
                 <ul className={style.suffixPhases}>
                     {
-                        phases.map(({ key, label }) => <li key={key}
-                            className={`${key === curPhase.param.nextPhaseKey ? style.active : ''}`}
-                            onMouseEnter={() => highlightPhases([key])}
-                            onMouseOut={() => highlightPhases([])}
-                            onClick={() => updatePhase(this.calcSuffixPhaseKeys({
-                                ...curPhase.param, nextPhaseKey: key
-                            }), { nextPhaseKey: key })}>
-                            {label || key}
-                        </li>
+                        phases.map(({key, label}) => <li key={key}
+                                                         className={`${key === curPhase.param.nextPhaseKey ? style.active : ''}`}
+                                                         onMouseEnter={() => highlightPhases([key])}
+                                                         onMouseOut={() => highlightPhases([])}
+                                                         onClick={() => updatePhase(this.calcSuffixPhaseKeys({
+                                                             ...curPhase.param, nextPhaseKey: key
+                                                         }), {nextPhaseKey: key})}>
+                                {label || key}
+                            </li>
                         )
                     }
                 </ul>
@@ -105,16 +102,7 @@ export class Create extends BaseCreate<any> {
     }
 }
 
-export class Play extends BasePlay<MoveType, PushType> {
-
-    render(): React.ReactNode {
-        return <section></section>
-    }
-}
-
-registerOnFramework('qualtrics',{
-    localeNames:['Qualtrics 环节', 'Qualtrics Phase'],
-    Create,
-    Play
+registerOnFramework('qualtrics', {
+    localeNames: ['Qualtrics 环节', 'Qualtrics Phase'],
+    Create
 })
-

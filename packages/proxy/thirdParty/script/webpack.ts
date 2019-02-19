@@ -2,8 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const CleanWebpackPlugin = require('clean-webpack-plugin'),
     ManifestPlugin = require('webpack-manifest-plugin'),
-    TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin'),
-    HtmlWebpackPlugin = require('html-webpack-plugin')
+    TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin')
 
 module.exports = () => {
     const {npm_config_buildMode: buildMode = 'dev', npm_config_phase: phase = ''} = process.env
@@ -48,42 +47,6 @@ module.exports = () => {
                 }
             ]
         },
-        ...(phase ? cfg4Phase(phase) : cfg4Core())
-    }
-}
-
-function cfg4Core() {
-    return {
-        entry: {
-            'coreCommon': path.resolve(__dirname, '../src/core/common/index.ts'),
-            'coreClient': path.resolve(__dirname, '../src/core/client/index.tsx')
-        },
-        output: {
-            path: path.resolve(__dirname, '../dist/core'),
-            filename: '[name].[hash:4].js',
-            library: '[name]',
-            libraryTarget: 'umd',
-            publicPath: '/elfPhase/static/core/'
-        },
-        externals: {
-            'react': 'React',
-            'react-dom': 'ReactDOM'
-        },
-        plugins: [
-            new CleanWebpackPlugin(['core/*.js'], {
-                root: path.resolve(__dirname, `../dist`),
-                watch: true
-            }),
-            new HtmlWebpackPlugin({
-                filename: 'index.html',
-                template: path.resolve(__dirname, '../src/core/server/view/index.html')
-            })
-        ]
-    }
-}
-
-function cfg4Phase(phase) {
-    return {
         entry: {
             [phase]: path.resolve(__dirname, `../src/phase/${phase}/view`)
         },

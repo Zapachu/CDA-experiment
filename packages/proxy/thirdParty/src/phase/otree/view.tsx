@@ -1,9 +1,7 @@
 import * as React from 'react'
-import {BaseCreate, BasePlay, Lang} from '@core/client'
+import {BaseCreate, Lang, registerOnFramework} from '@core/client'
 import * as style from './style.scss'
-
-import {ICreateParam, PushType, MoveType} from './config'
-import {registerOnFramework} from '../index'
+import {ICreateParam} from './config'
 
 class Create extends BaseCreate<any> {
 
@@ -119,15 +117,7 @@ class Create extends BaseCreate<any> {
     }
 }
 
-class Play extends BasePlay<MoveType, PushType> {
-
-    render(): React.ReactNode {
-        return <section></section>
-    }
-}
-
 registerOnFramework('otree', {
     localeNames: ['Otree 环节', 'Otree Phase'],
-    Create,
-    Play
+    Create
 })

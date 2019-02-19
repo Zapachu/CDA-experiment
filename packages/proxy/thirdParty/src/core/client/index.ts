@@ -1,5 +1,4 @@
 import * as React from 'react'
-import {FrameEmitter} from './util'
 import {IElfCreateProps} from 'elf-game'
 
 export {Lang} from './util'
@@ -9,26 +8,17 @@ export interface IPhaseTemplate {
     namespace?: string
     localeNames: Array<string>
     Create?: typeof BaseCreate
-    Play?: typeof BasePlay
 }
 
 export const phaseTemplates: {
     [phase: string]: IPhaseTemplate
 } = {}
 
-export type TregisterPhasePlay = typeof registerPhasePlay
-
-export function registerPhasePlay(namespace: string, phaseTemplate: IPhaseTemplate) {
-    phaseTemplate.namespace = namespace
-    phaseTemplate.Play = phaseTemplate.Play || BasePlay
-    phaseTemplates[namespace] = phaseTemplate
-}
-
 export class BaseCreate<ICreateParams> extends React.Component<IElfCreateProps<ICreateParams>> {
 
 }
 
-export abstract class BasePlay<UpFrame extends number, DownFrame extends number, State = {}> extends React.Component<{
-    frameEmitter: FrameEmitter<UpFrame, DownFrame>
-}, State> {
+export function registerOnFramework(namespace: string, phaseTemplate: IPhaseTemplate) {
+    phaseTemplate.namespace = namespace
+    window['elfCore'].registerPhaseCreate(namespace, phaseTemplate)
 }

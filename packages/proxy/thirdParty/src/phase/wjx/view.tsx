@@ -1,11 +1,8 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Lang, BaseCreate, BasePlay} from '@core/client'
-import {registerOnFramework} from '../index'
+import {Lang, BaseCreate, registerOnFramework} from '@core/client'
 
-import {PushType, MoveType} from './config'
-
-export class Create extends BaseCreate<any> {
+class Create extends BaseCreate<any> {
 
     state = {
         wjxUrl: '',
@@ -105,15 +102,7 @@ export class Create extends BaseCreate<any> {
     }
 }
 
-export class Play extends BasePlay<MoveType, PushType> {
-
-    render(): React.ReactNode {
-        return <section></section>
-    }
-}
-
 registerOnFramework('wjx', {
     localeNames: ['问卷星', 'WJX Phase'],
-    Create,
-    Play
+    Create
 })
