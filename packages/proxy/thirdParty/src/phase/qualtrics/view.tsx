@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { BaseCreate, BasePlay, Lang } from '@client-vendor'
+import { BaseCreate, BasePlay, Lang } from '@core/client'
 import * as style from './style.scss'
 
 import { PushType, MoveType } from './config'

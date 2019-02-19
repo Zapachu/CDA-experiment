@@ -1,8 +1,9 @@
 import * as React from 'react'
 import {BrowserRouter, Route, Switch} from 'react-router-dom'
-import {config, baseEnum} from '@common'
-import {TRootContext, rootContext} from '@client-context'
+import {config, baseEnum} from '@core/common'
+import {TRootContext, rootContext} from '../context'
 import * as Phase from './Phase'
+import {render} from 'react-dom'
 
 const LANGUAGE_KEY = 'language'
 
@@ -29,3 +30,5 @@ export class Root extends React.Component<{}, IRootState> {
         </rootContext.Provider>
     }
 }
+
+render(<Root/>, document.body.appendChild(document.createElement('div')))

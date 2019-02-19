@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Lang, BaseCreate, BasePlay} from '@client-vendor'
+import {Lang, BaseCreate, BasePlay} from '@core/client'
 import {registerOnFramework} from '../index'
 
 import {PushType, MoveType} from './config'

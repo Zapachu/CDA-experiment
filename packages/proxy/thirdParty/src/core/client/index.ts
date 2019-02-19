@@ -1,9 +1,9 @@
 import * as React from 'react'
-import {FrameEmitter} from '@client-lib'
+import {FrameEmitter} from './util'
 import {IElfCreateProps} from 'elf-game'
 
-export {Lang} from '@client-lib'
-export {CorePhaseNamespace} from '@common'
+export {Lang} from './util'
+export {CorePhaseNamespace} from '@core/common'
 
 export interface IPhaseTemplate {
     namespace?: string
@@ -24,7 +24,7 @@ export function registerPhasePlay(namespace: string, phaseTemplate: IPhaseTempla
     phaseTemplates[namespace] = phaseTemplate
 }
 
-export class BaseCreate<ICreateParams> extends React.Component<IElfCreateProps<ICreateParams>>{
+export class BaseCreate<ICreateParams> extends React.Component<IElfCreateProps<ICreateParams>> {
 
 }
 

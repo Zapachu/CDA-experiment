@@ -95,7 +95,7 @@ function cfg4Phase(phase) {
         externals: {
             'react': 'React',
             'react-dom': 'ReactDOM',
-            '@common': 'coreCommon',
+            '@core/common': 'coreCommon',
             '@client': 'coreClient',
             'elf-game': 'elfCore'
         },

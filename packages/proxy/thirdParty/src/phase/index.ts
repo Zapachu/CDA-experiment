@@ -1,4 +1,4 @@
-import {IPhaseTemplate} from '@client-vendor'
+import {IPhaseTemplate} from '@core/client'
 
 export function registerOnFramework(namespace: string, phaseTemplate: IPhaseTemplate) {
     phaseTemplate.namespace = namespace

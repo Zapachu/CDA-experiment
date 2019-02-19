@@ -1,10 +1,10 @@
 import * as React from 'react'
 import {RouteComponentProps} from 'react-router-dom'
 import {connect as socketConnect} from 'socket.io-client'
-import {baseEnum, config, NSocket, TSocket} from '@common'
-import {loadScript, connCtx, FrameEmitter} from '@client-lib'
-import {rootContext, TRootContext} from '@client-context'
-import {IPhaseTemplate, phaseTemplates} from '@client-vendor'
+import {baseEnum, config, NSocket, TSocket} from '@core/common'
+import {loadScript, connCtx, FrameEmitter} from '../util'
+import {rootContext, TRootContext} from '../context'
+import {IPhaseTemplate, phaseTemplates} from '@core/client'
 
 declare interface IPlayState {
     groupId?: string

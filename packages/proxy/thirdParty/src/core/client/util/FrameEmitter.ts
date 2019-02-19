@@ -1,4 +1,4 @@
-import {TSocket, baseEnum} from "@common";
+import {TSocket, baseEnum} from "@core/common";
 
 export class FrameEmitter<UpFrame, DownFrame> {
     private listeners = new Map<DownFrame, (...args: any[]) => void>()

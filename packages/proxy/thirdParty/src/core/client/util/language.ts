@@ -1,4 +1,4 @@
-import {baseEnum} from "@common"
+import {baseEnum} from "@core/common"
 import Language = baseEnum.Language
 
 export const languageNames = [Language.chinese, Language.english]
