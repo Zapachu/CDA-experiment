@@ -31,7 +31,14 @@ module.exports = () => {
                     exclude: /node_modules/,
                     use: [
                         'style-loader',
-                        'css-loader?modules&importLoaders=1&localIdentName=[local]_[hash:base64:4]',
+                        {
+                            loader: 'css-loader',
+                            options: {
+                                modules: true,
+                                importLoaders: 1,
+                                localIdentName: '[local]_[hash:base64:4]'
+                            }
+                        },
                         {
                             loader: 'sass-loader',
                             options: {
@@ -58,9 +65,7 @@ module.exports = () => {
         externals: {
             'react': 'React',
             'react-dom': 'ReactDOM',
-            '@core/common': 'coreCommon',
-            '@client': 'coreClient',
-            'elf-game': 'elfCore'
+            'elf-linker': 'elfCore'
         },
         plugins: [
             new ManifestPlugin({

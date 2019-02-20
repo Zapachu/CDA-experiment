@@ -129,7 +129,6 @@ export function geneClientBuilder(
         externals: {
             'react': 'React',
             'react-dom': 'ReactDOM',
-            'elf-game': 'elfCore',
             '@dev/client': config.buildManifest.clientVendorLib
         },
         plugins: [

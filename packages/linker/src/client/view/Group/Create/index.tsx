@@ -120,11 +120,12 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
         })
     }
 
-    handleRemovePhase(i: number) {
+    handleRemovePhase(i: number):void {
         const phaseConfigs = this.state.phaseConfigs.slice()
         const prePhaseConfig = phaseConfigs.find(({suffixPhaseKeys}) => suffixPhaseKeys.includes(phaseConfigs[i].key))
         if (prePhaseConfig) {
-            return message.error(this.lang.phasePointedByAnotherOne)
+            message.error(this.lang.phasePointedByAnotherOne)
+            return
         }
         phaseConfigs.splice(i, 1)
         this.setState({

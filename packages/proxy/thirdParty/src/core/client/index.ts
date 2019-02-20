@@ -1,18 +1,8 @@
 import * as React from 'react'
-import {IElfCreateProps} from 'elf-game'
+import {IElfCreateProps, IPhaseTemplate, registerPhaseCreate} from 'elf-linker'
 
 export {Lang} from './util'
 export {CorePhaseNamespace} from '@core/common'
-
-export interface IPhaseTemplate {
-    namespace?: string
-    localeNames: Array<string>
-    Create?: typeof BaseCreate
-}
-
-export const phaseTemplates: {
-    [phase: string]: IPhaseTemplate
-} = {}
 
 export class BaseCreate<ICreateParams> extends React.Component<IElfCreateProps<ICreateParams>> {
 
@@ -20,5 +10,6 @@ export class BaseCreate<ICreateParams> extends React.Component<IElfCreateProps<I
 
 export function registerOnFramework(namespace: string, phaseTemplate: IPhaseTemplate) {
     phaseTemplate.namespace = namespace
-    window['elfCore'].registerPhaseCreate(namespace, phaseTemplate)
+    phaseTemplate.type = 'otree'
+    registerPhaseCreate(namespace, phaseTemplate)
 }

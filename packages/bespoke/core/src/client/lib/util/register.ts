@@ -1,5 +1,5 @@
 import {IGameTemplate, TRegisterGame} from './interface'
-import {TregisterPhaseCreate} from 'elf-game'
+import {IPhaseTemplate} from 'elf-linker'
 
 export function registerOnFramework(namespace: string, gameTemplate: IGameTemplate) {
     gameTemplate.namespace = namespace
@@ -8,10 +8,11 @@ export function registerOnFramework(namespace: string, gameTemplate: IGameTempla
         _registerGame(namespace, gameTemplate)
     }
     if (window['elfCore']) {
-        const {localeNames, CreateOnElf} = gameTemplate
-        const _registerPhaseCreate = window['elfCore'].registerPhaseCreate as TregisterPhaseCreate
-        _registerPhaseCreate(namespace, {
-            localeNames, Create: CreateOnElf, type: 'bespoke'
-        })
+        const phaseTemplate: IPhaseTemplate = {
+            type: 'bespoke',
+            localeNames: gameTemplate.localeNames,
+            Create: gameTemplate.CreateOnElf
+        }
+        window['elfCore'].registerPhaseCreate(namespace, phaseTemplate)
     }
 }

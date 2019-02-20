@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {IElfCreateProps} from 'elf-game'
+import {IElfCreateProps} from 'elf-linker'
 import {FrameEmitter, IGame, TGameState, TPlayerState} from '@dev/common'
 import {Fetcher} from '.'
 

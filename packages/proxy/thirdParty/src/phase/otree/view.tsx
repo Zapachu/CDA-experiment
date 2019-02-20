@@ -119,5 +119,6 @@ class Create extends BaseCreate<any> {
 
 registerOnFramework('otree', {
     localeNames: ['Otree 环节', 'Otree Phase'],
-    Create
+    Create,
+    type: 'otree'
 })

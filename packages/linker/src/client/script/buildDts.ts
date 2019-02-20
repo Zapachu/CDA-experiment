@@ -8,24 +8,25 @@ const {
     compilerOptions: {
         paths
     }
-} = JSON.parse(readFileSync(resolve(__dirname, '../../tsconfig.json')).toString())
+} = JSON.parse(readFileSync(resolve(__dirname, '../../../tsconfig.json')).toString())
 
-const MODULE_NAME = 'elf-game'
+const MODULE_NAME = 'elf-linker'
 
 dtsGenerator({
+    baseDir:resolve(__dirname, '../../../'),
     name: MODULE_NAME,
-    project: resolve(__dirname, '../../'),
-    out: resolve(__dirname, '../../build/elf-game.d.ts'),
-    main: `${MODULE_NAME}/lib/game/client/vendor`,
-    exclude: ['node_modules/**/*.d.ts',
-        './lib/game/server/**/*.ts',
-        './lib/game/client/component/MaterialUI.tsx',
-        './lib/game/client/global.d.ts'
+    project: resolve(__dirname, '../../../'),
+    out: resolve(__dirname, '../../../build/elf-linker.d.ts'),
+    main: `${MODULE_NAME}/client/vendor`,
+    exclude: ['node_modules/**/*',
+        'src/server/**/*.ts',
+        'src/client/component/**.*',
+        'src/client/global.d.ts'
     ],
     resolveModuleId: ({currentModuleId}) => `${MODULE_NAME}/${currentModuleId.replace(/\/index$/, '')}`,
     resolveModuleImport: ({importedModuleId, currentModuleId}) => {
         if (paths[importedModuleId]) {
-            return `${MODULE_NAME}/lib/${paths[importedModuleId]}`
+            return `${MODULE_NAME}/${paths[importedModuleId]}`
         }
         if (importedModuleId.startsWith('./') && importedModuleId.endsWith('index')) {
             const curDir = `${MODULE_NAME}/${currentModuleId.substring(0,currentModuleId.lastIndexOf('/'))}`
