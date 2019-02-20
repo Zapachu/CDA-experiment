@@ -1,7 +1,6 @@
 import {Server, ServerCredentials} from 'grpc'
 import {PhaseManager as P} from 'elf-proto'
-import {registerPhases} from '../util/rpcService'
-import setting from '../config/settings'
+import {registerPhases, setting} from '@core/server'
 import {getUrlByNamespace} from './otreeApi'
 
 export function serve() {

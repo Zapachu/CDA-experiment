@@ -1,79 +1,18 @@
-import * as path from 'path'
-import * as Express from 'express'
-import * as bodyParser from 'body-parser'
-import * as passport from 'passport'
-import * as errorHandler from 'errorhandler'
-import * as expressSession from 'express-session'
 import * as httpProxy from 'http-proxy-middleware'
-
 import {Response, Request, NextFunction} from 'express'
-import {connect as mongodConnect, connection as mongodConnection} from 'mongoose'
+import {settings, ThirdPartPhase, GameUserPermissionModel, Server, getGameService} from '@core/server'
+import {serve as serveRPC} from './rpcService'
 
-import '../util/passport'
-import settings from '../config/settings'
+const express = Server.start(3070, settings.otreeRootName)
 
-import {ThirdPartPhase, GameUserPermissionModel} from '../models'
-
-import {serve as otreeRPC} from './rpcService'
-import {getGameService} from '../util/rpcService'
-
-// Otree Sign
-const otreePlayUrl = settings.otreeServerRootUrl
-const otreeParticipantUrl = 'InitializeParticipant/'
-const otreeEndSign = 'OutOfRangeNotification'
-
-// Mongoose settings
-mongodConnect(settings.mongoUri, {
-    ...settings.mongoUser ? {user: settings.mongoUser, pass: settings.mongoPass} : {},
-    useNewUrlParser: true
-})
-mongodConnection.on('error', () => console.log('Mongodb Connection Error'))
-
-// Redis settings
-const redis = require('redis')
-const RedisStore = require('connect-redis')(expressSession)
-const redisClient = redis.createClient(settings.redisPort, settings.redisHost)
-
-// session config
-const sessionSet = {
-    name: 'academy.sid',
-    resave: true,
-    saveUninitialized: true,
-    secret: settings.sessionSecret,
-    store: new RedisStore({client: redisClient, auto_reconnect: true})
+const OTREE = {
+    PLAY_URL: settings.otreeServerRootUrl,
+    PARTICIPANT_URL: 'InitializeParticipant/',
+    END_SIGN: 'OutOfRangeNotification'
 }
-
-const app = Express()
-
-// 静态文件
-app.set('views', path.join(__dirname, './view'))
-app.set('view engine', 'pug')
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended: true, limit: '30mb', parameterLimit: 30000}))
-app.use(`/${settings.otreeRootName}/static`, Express.static(
-    path.join(__dirname, '../../../../dist'),
-    {maxAge: '10d'}
-))
-
-// use session
-app.use(expressSession(sessionSet))
-app.use(passport.initialize())
-app.use(passport.session())
-app.use((req: IRequest, res: Response, next: NextFunction) => {
-    res.locals.user = req.user
-    next()
-})
-
-const proxy = httpProxy({
-    target: otreePlayUrl,
-    ws: true
-})
-
-interface IRequest extends Request {
+express.use(async (req: Request & {
     user: { _id: string }
-}
-
-app.use(async (req: IRequest, res: Response, next: NextFunction) => {
+}, res: Response, next: NextFunction) => {
 
     console.log(`${req.method}  ${req.url}`)
 
@@ -112,7 +51,7 @@ app.use(async (req: IRequest, res: Response, next: NextFunction) => {
      *      4. 通过 otree phase 获得下一阶段所需参数
      *      5. 通过 player code、nextPhaseKey 获得 下一阶段 url
      */
-    if (req.path.indexOf(otreeEndSign) != -1) {
+    if (req.path.indexOf(OTREE.END_SIGN) != -1) {
 
         let playerGameHash: string
         const playerOtreeHash: string = req.headers.referer.split('/p/')[1].split('/')[0]
@@ -130,7 +69,7 @@ app.use(async (req: IRequest, res: Response, next: NextFunction) => {
 
             const params: { nextPhaseKey: string } = JSON.parse(otreePhase.param)
             const groupId: string = otreePhase.groupId
-            const playUrl: string = otreePhase.prefixUrl + otreeParticipantUrl + playerOtreeHash
+            const playUrl: string = otreePhase.prefixUrl + OTREE.PARTICIPANT_URL + playerOtreeHash
             const playerToken: string = playerGameHash
             const nextPhaseKey: string = params.nextPhaseKey
 
@@ -176,8 +115,8 @@ app.use(async (req: IRequest, res: Response, next: NextFunction) => {
             //  已加入过
             if (findExistOne.length > 0) {
                 console.log('????')
-                console.log(`${otreePlayUrl}/${otreeParticipantUrl}${findExistOne[0].hash}`)
-                return res.redirect(`${otreePlayUrl}/${otreeParticipantUrl}${findExistOne[0].hash}`)
+                console.log(`${OTREE.PLAY_URL}/${OTREE.PARTICIPANT_URL}${findExistOne[0].hash}`)
+                return res.redirect(`${OTREE.PLAY_URL}/${OTREE.PARTICIPANT_URL}${findExistOne[0].hash}`)
             } else {
                 for (let i = 0; i < otreePhase.playHashs.length; i++) {
                     console.log(otreePhase.playHashs[i].player)
@@ -195,7 +134,7 @@ app.use(async (req: IRequest, res: Response, next: NextFunction) => {
                 // 新加入的
                 otreePhase.markModified('playHashs')
                 await otreePhase.save()
-                return res.redirect(`${otreePlayUrl}/${otreeParticipantUrl}${findHash}`)
+                return res.redirect(`${OTREE.PLAY_URL}/${OTREE.PARTICIPANT_URL}${findHash}`)
             }
         } catch (err) {
             if (err) {
@@ -207,18 +146,9 @@ app.use(async (req: IRequest, res: Response, next: NextFunction) => {
     next()
 })
 
+express.use(httpProxy({
+    target: OTREE.PLAY_URL,
+    ws: true
+}))
 
-/**
- * 部署于 二级域名  eg:   https://otree.ancademy.org/...
- */
-app.use(errorHandler())
-const server: any = app.listen(3070, () => {
-    console.log('listening at ', server.address().port)
-})
-
-app.use(proxy)
-
-/**
- * Otree phase RPC 服务
- */
-otreeRPC()
+serveRPC()

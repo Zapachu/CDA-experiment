@@ -1,10 +1,9 @@
-import settings from '../config/settings'
-import {ThirdPartPhase} from '../models'
+import {ThirdPartPhase, setting} from '@core/server'
 
-const otreePlayUrl = settings.otreeServerRootUrl
+const otreePlayUrl = setting.otreeServerRootUrl
 const otreeDemoUrlPrefix = `${otreePlayUrl}/demo/`
 const otreeParticipantUrl = 'InitializeParticipant/'
-const otreePhaseServerPrefix = settings.otreePhaseServerPrefix
+const otreePhaseServerPrefix = setting.otreePhaseServerPrefix
 
 declare interface IgetUrlByNamespace {
     err: number,

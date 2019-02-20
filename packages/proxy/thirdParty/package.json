@@ -43,11 +43,15 @@
     "socket.io": "^2.1.1",
     "tracer": "^0.9.1",
     "tsconfig-paths": "^3.5.0",
-    "typescript": "^3.0.1"
+    "typescript": "^3.0.1",
+    "compression": "latest",
+    "ioredis": "latest"
   },
   "devDependencies": {
+    "@types/compression": "0.0.36",
     "@types/connect-redis": "0.0.7",
     "@types/events": "^1.2.0",
+    "@types/ioredis": "^4.0.7",
     "@types/mongoose": "^5.2.3",
     "@types/node": "^10.1.2",
     "@types/react": "^16.3.14",

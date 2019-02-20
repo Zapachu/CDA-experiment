@@ -1,75 +1,13 @@
-import * as path from 'path'
-import * as Express from 'express'
-import * as passport from 'passport'
-import * as bodyParser from 'body-parser'
 import * as errorHandler from 'errorhandler'
-import * as expressSession from 'express-session'
 import * as httpProxy from 'http-proxy-middleware'
 import {Response, Request, NextFunction} from 'express'
-import {connect as mongodConnect, connection as mongodConnection} from 'mongoose'
-
-import '../util/passport'
-import {serve as RPC} from './rpcService'
-import settings from '../config/settings'
-import {getGameService} from '../util/rpcService'
-import {ThirdPartPhase} from '../models'
+import {serve as serveRPC} from './rpcService'
+import {settings, getGameService, ThirdPartPhase, Server} from '@core/server'
 import * as zlib from 'zlib'
 
 const {Gzip} = require('zlib')
 
-/**
- * Mongoose settings
- */
-mongodConnect(settings.mongoUri, {
-    ...settings.mongoUser ? {user: settings.mongoUser, pass: settings.mongoPass} : {},
-    useNewUrlParser: true
-})
-mongodConnection.on('error', () => console.log('Mongodb Connection Error'))
-
-/**
- * Redis settings
- */
-const redis = require('redis')
-const RedisStore = require('connect-redis')(expressSession)
-const redisClient = redis.createClient(settings.redisPort, settings.redisHost)
-/**
- * Redis settings end
- */
-
-// session config
-const sessionSet = {
-    name: 'academy.sid',
-    resave: true,
-    saveUninitialized: true,
-    secret: settings.sessionSecret,
-    store: new RedisStore({
-        client: redisClient,
-        auto_reconnect: true
-    })
-}
-
-const app = Express()
-
-/**
- * 静态文件
- */
-app.set('views', path.join(__dirname, './view'))
-app.set('view engine', 'pug')
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended: true, limit: '30mb', parameterLimit: 30000}))
-app.use(`/${settings.qqwjRootName}/static`, Express.static(
-    path.join(__dirname, '../../../../dist'),
-    {maxAge: '10d'}
-))
-
-// use session
-app.use(expressSession(sessionSet))
-app.use(passport.initialize())
-app.use(passport.session())
-app.use((req: IRequest, res: Response, next: NextFunction) => {
-    res.locals.user = req.user
-    next()
-})
+const express = Server.start(3073, settings.qqwjRootName)
 
 const getNextPhaseUrl = async (qqwjHash) => {
     console.log('log > qqwj hash ', qqwjHash)
@@ -191,13 +129,7 @@ const proxy = httpProxy({
     }
 })
 
-interface IRequest extends Request {
-    user: {
-        _id: string
-    }
-}
-
-app.use(async (req: IRequest, res: Response, next: NextFunction) => {
+express.use(async (req: Request, res: Response, next: NextFunction) => {
 
     console.log(`${req.method}  ${req.url}`)
 
@@ -266,15 +198,11 @@ app.use(async (req: IRequest, res: Response, next: NextFunction) => {
     next()
 })
 
-
-/**
- * 部署于 二级域名 或仅使用代理  eg:   https://qqwj.ancademy.org/...
- */
-app.use(errorHandler())
-const server: any = app.listen(3073, () => {
+express.use(errorHandler())
+const server: any = express.listen(3073, () => {
     console.log('listening at ', server.address().port)
 })
 
-app.use(proxy)
+express.use(proxy)
 
-RPC()
+serveRPC()
