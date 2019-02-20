@@ -1,3 +1,4 @@
+import '../../../../registerTsconfig'
 import * as httpProxy from 'http-proxy-middleware'
 import {Response, Request, NextFunction} from 'express'
 import {settings, ThirdPartPhase, GameUserPermissionModel, Server, getGameService} from '@core/server'
