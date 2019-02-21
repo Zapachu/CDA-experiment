@@ -1,0 +1,38 @@
+import { Server, ServerCredentials } from 'grpc'
+import { gameService, PhaseService, phaseService } from './service/WjxManager'
+import { resolve } from 'path'
+import { readFileSync } from 'fs'
+import setting from '../../../config/settings'
+export * from '../../common/rpc/proto/phaseManager'
+
+export { gameService }
+
+export function serve() {
+    const server = new Server()
+    server.addService(PhaseService.service, phaseService)
+    server.bind(`0.0.0.0:5${setting.wjxPort}`, ServerCredentials.createInsecure())
+    server.start()
+    setInterval(() => registerPhases(), 10000)
+}
+
+function getJsUrls(): Array<{ namespace: string, jsUrl: string }> {
+    const phases = []
+    Object.entries(JSON.parse(readFileSync(resolve(__dirname, '../../../../dist/manifest.json')).toString())).map(([k, v]) => {
+        if (k.replace('.js', '') === 'wjx') {
+            phases.push({
+                namespace: k.replace('.js', ''),
+                jsUrl: `${setting.localWjxRootUrl}${v}`,
+                rpcUri: setting.localWjxServiceUri
+            })
+        }
+    })
+    return phases
+}
+
+function registerPhases() {
+    gameService.registerPhases({ phases: getJsUrls() }, (err) => {
+        if (err) {
+            console.log(err)
+        }
+    })
+}
