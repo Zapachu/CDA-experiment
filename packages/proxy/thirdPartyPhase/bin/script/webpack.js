@@ -90,7 +90,7 @@ function cfg4Phase(phase) {
             'react-dom': 'ReactDOM',
             '@common': 'coreCommon',
             '@client': 'coreClient',
-            'elf-game':'elfCore',
+            'elf-linker':'elfCore',
         },
         plugins: [
             new ManifestPlugin({

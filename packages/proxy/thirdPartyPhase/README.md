@@ -96,10 +96,10 @@ v2.0-third-part-phase
 - otree common phase 组件加载到 elf-core，同时 fetch otree server（3070端口）的可使用otree phase列表
 - otree server （3070） 返回给组件可用的（用户被允许新建的）otree phase 列表
 - 点击列表中的某个 otree phase，即完成 phase新建
-- 提交后，在初始化 group时，elf-game core 获取 elf-otree phase 的 newPhase服务
-- 此时newPhase 服务完成 play路由、admin路由、elf-game player hash <=> otree-game player hash 映射的记录（数据库），同时保存phase 参数到数据库，此时 elf-game player hash 皆为空，等待玩家的到来
-- 玩家获得play 地址，play地址后添加 elf-game 提供的hash，此时玩家访问 otree server（包含代理）
+- 提交后，在初始化 group时，elf-linker core 获取 elf-otree phase 的 newPhase服务
+- 此时newPhase 服务完成 play路由、admin路由、elf-linker player hash <=> otree-game player hash 映射的记录（数据库），同时保存phase 参数到数据库，此时 elf-linker player hash 皆为空，等待玩家的到来
+- 玩家获得play 地址，play地址后添加 elf-linker 提供的hash，此时玩家访问 otree server（包含代理）
 - 代理解析获得真实otree play路由，此时将数据库中 两个app hash映射关系保存，然后从定向到 otree play 路由
 - 玩家进入 play 页面
-- 监听结束标志，结束时，使用sendbackPlayer 告之 elf-game core 已完成phase
-- elf-game core转向下一个phase
+- 监听结束标志，结束时，使用sendbackPlayer 告之 elf-linker core 已完成phase
+- elf-linker core转向下一个phase

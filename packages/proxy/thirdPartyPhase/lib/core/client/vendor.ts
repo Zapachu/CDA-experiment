@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {FrameEmitter} from '@client-lib'
-import {IElfCreateProps} from 'elf-game'
+import {IElfCreateProps} from 'elf-linker'
 
 export {Lang} from '@client-lib'
 export {CorePhaseNamespace} from '@common'
