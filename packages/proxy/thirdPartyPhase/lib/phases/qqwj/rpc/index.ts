@@ -1,16 +1,14 @@
 import { Server, ServerCredentials } from 'grpc'
-import { gameService, PhaseService, phaseService } from './service/qqwjManager'
+import {phaseService } from './service/qqwjManager'
+import {PhaseManager} from 'elf-proto'
 import setting from '../../../config/settings'
+import {gameService} from '../../common/utils'
 import { resolve } from 'path'
 import { readFileSync } from 'fs'
 
-export * from '../../common/rpc/proto/phaseManager'
-
-export { gameService }
-
 export function serve() {
     const server = new Server()
-    server.addService(PhaseService.service, phaseService)
+    PhaseManager.setPhaseService(server, phaseService)
     server.bind(`0.0.0.0:5${setting.qqwjPort}`, ServerCredentials.createInsecure())
     server.start()
     setInterval(() => registerPhases(), 10000)

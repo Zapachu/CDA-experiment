@@ -1,17 +1,8 @@
-import {ConDB} from './conDB'
-import {ErrorPage} from './errorPage'
-import {gen32Token} from './gen32Token'
-import {SessionTokenCheck} from "./sessionTokenCheck"
-import {SessionSetMiddleware} from './sessionSetMiddleware'
-import {PassportMiddleware} from './passportMiddleware'
-import {StaticPathMiddleware} from './staticPathMiddleware'
-
-export {
-    ConDB,
-    ErrorPage,
-    gen32Token,
-    PassportMiddleware,
-    SessionTokenCheck,
-    SessionSetMiddleware,
-    StaticPathMiddleware,
-}
+export {ConDB} from './conDB'
+export {ErrorPage} from './errorPage'
+export {gen32Token} from './gen32Token'
+export {SessionTokenCheck} from "./sessionTokenCheck"
+export {SessionSetMiddleware} from './sessionSetMiddleware'
+export {PassportMiddleware} from './passportMiddleware'
+export {StaticPathMiddleware} from './staticPathMiddleware'
+export {gameService} from './gameService'

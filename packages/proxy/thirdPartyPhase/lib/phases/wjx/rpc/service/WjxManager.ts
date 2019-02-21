@@ -1,11 +1,6 @@
-import { resolve } from 'path'
-import { loadPackageDefinition, credentials } from 'grpc'
-import { loadSync } from '@grpc/proto-loader'
-import { INewPhaseReq } from '../../../common/rpc/proto/phaseManager'
 import { ThirdPartPhase } from '../../../../core/server/models'
-const { GameService, PhaseService } = loadPackageDefinition(loadSync(resolve(__dirname, '../../../common/rpc/proto/phaseManager.proto'))) as any
-
 import settings from '../../../../config/settings'
+import {PhaseManager} from 'elf-proto'
 
 const {localWjxRootUrl} = settings
 
@@ -39,13 +34,8 @@ const getUrlByNamespace = async (groupId, namespace, param) => {
     }
 }
 
-const phaseService = {
-    async newPhase({ request: { groupId, namespace, param } }: { request: INewPhaseReq }, callback) {
+export const phaseService = {
+    async newPhase({ request: { groupId, namespace, param } }: { request: PhaseManager.TNewPhaseReq }, callback:PhaseManager.TNewPhaseCallback) {
         callback(null, { playUrl: await getUrlByNamespace(groupId, namespace, param) })
     }
 }
-
-export { PhaseService, phaseService }
-
-const gameService = new GameService(settings.elfGameServiceUri, credentials.createInsecure())
-export { gameService }

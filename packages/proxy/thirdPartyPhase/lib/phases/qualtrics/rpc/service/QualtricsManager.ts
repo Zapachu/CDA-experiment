@@ -1,11 +1,7 @@
-import {resolve} from 'path'
-import {loadSync} from '@grpc/proto-loader'
 import setting from '../../../../config/settings'
-import {INewPhaseReq} from '../../../common/rpc/proto/phaseManager'
 import {ThirdPartPhase} from '../../../../core/server/models'
-import {loadPackageDefinition, credentials} from 'grpc'
+import {PhaseManager} from 'elf-proto'
 
-const {GameService, PhaseService} = loadPackageDefinition(loadSync(resolve(__dirname, '../../../common/rpc/proto/phaseManager.proto'))) as any
 const {localQualtricsRootUrl} = setting
 
 const getUrlByNamespace = async (groupId, namespace, param) => {
@@ -31,13 +27,8 @@ const getUrlByNamespace = async (groupId, namespace, param) => {
     }
 }
 
-const phaseService = {
-    async newPhase({request: {groupId, namespace, param}}: { request: INewPhaseReq }, callback) {
+export const phaseService = {
+    async newPhase({request: {groupId, namespace, param}}: { request: PhaseManager.TNewPhaseReq }, callback:PhaseManager.TNewPhaseCallback) {
         callback(null, {playUrl: await getUrlByNamespace(groupId, namespace, param)})
     }
 }
-
-export {PhaseService, phaseService}
-
-const gameService = new GameService(setting.elfGameServiceUri, credentials.createInsecure())
-export {gameService}

@@ -1,8 +1,7 @@
 import * as React from 'react'
-import {BaseCreate, BasePlay, Lang} from '@client-vendor'
+import {BaseCreate, Lang} from '@client-vendor'
 import * as style from './style.scss'
 
-import {PushType, MoveType} from './config'
 import {registerOnFramework} from '../../index'
 
 export class Create extends BaseCreate<any> {
@@ -82,17 +81,9 @@ export class Create extends BaseCreate<any> {
     }
 }
 
-export class Play extends BasePlay<MoveType, PushType> {
-
-    render(): React.ReactNode {
-        return <section></section>
-    }
-}
-
 registerOnFramework('qualtrics', {
     localeNames: ['Qualtrics 环节', 'Qualtrics Phase'],
     Create,
-    Play,
     type: 'survey'
 })
 

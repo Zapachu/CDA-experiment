@@ -1,8 +1,7 @@
 import * as React from 'react'
-import {BaseCreate, BasePlay, Lang} from '@client-vendor'
+import {BaseCreate, Lang} from '@client-vendor'
 import * as style from './style.scss'
 
-import {ICreateParam, PushType, MoveType} from './config'
 import {registerOnFramework} from '../../index'
 import {fetchData} from '../../common/utils/fetchData'
 
@@ -34,13 +33,6 @@ class Create extends BaseCreate<any> {
   }
 }
 
-class Play extends BasePlay<MoveType, PushType> {
-
-    render(): React.ReactNode {
-        return <section></section>
-    }
-}
-
 const fetchUrl = '/phases/list'
 fetchData(fetchUrl)
   .then(res => {
@@ -49,7 +41,6 @@ fetchData(fetchUrl)
           registerOnFramework('otree', {
               localeNames: [name, name],
               Create,
-              Play,
               type: 'otree',
               otreeName: name
           })

@@ -2,7 +2,7 @@
 
 import {ThirdPartPhase} from "../../../../core/server/models"
 import settings from "../../../../config/settings"
-import {gameService} from "../../rpc"
+import {gameService} from "../../../common/utils"
 
 const {localWjxRootUrl} = settings
 

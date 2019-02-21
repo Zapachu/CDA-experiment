@@ -1,6 +1,6 @@
 import {ThirdPartPhase} from "../../../../core/server/models"
 import settings from "../../../../config/settings"
-import {gameService} from "../../rpc"
+import {gameService} from '../../../common/utils'
 
 const getNextPhaseUrl = async (req) => {
     const qqwjHash = req.url.split('/s/')[1]

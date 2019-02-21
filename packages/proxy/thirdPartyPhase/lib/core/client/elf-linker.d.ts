@@ -705,7 +705,7 @@ declare module 'elf-linker/client' {
 	    namespace?: string;
 	    localeNames: Array<string>;
 	    Create?: typeof BaseCreate;
-	    type: 'bespoke' | 'otree' | 'qualtrics' | 'qqwj' | 'wjx';
+	    type: 'bespoke' | 'otree' | 'qualtrics' | 'survey';
 	    otreeName?: string;
 	}
 	export const phaseTemplates: {

@@ -1,9 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Lang, BaseCreate, BasePlay} from '@client-vendor'
+import {Lang, BaseCreate} from '@client-vendor'
 import {registerOnFramework} from '../../index'
-
-import {PushType, MoveType} from './config'
 
 export class Create extends BaseCreate<any> {
 
@@ -101,16 +99,8 @@ export class Create extends BaseCreate<any> {
     }
 }
 
-export class Play extends BasePlay<MoveType, PushType> {
-
-    render(): React.ReactNode {
-        return <section></section>
-    }
-}
-
 registerOnFramework('wjx', {
     localeNames: ['问卷星', 'WJX Phase'],
     Create,
-    Play,
     type: 'survey'
 })

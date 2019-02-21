@@ -1,7 +1,7 @@
 'use strict'
 
 import {ThirdPartPhase} from "../../../../core/server/models"
-import {gameService} from "../../rpc"
+import {gameService} from "../../../common/utils"
 import settings from "../../../../config/settings"
 
 const {localQualtricsRootUrl} = settings
