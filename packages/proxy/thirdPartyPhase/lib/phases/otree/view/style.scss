@@ -1,0 +1,23 @@
+@import "public";
+
+.create {
+  padding: 1rem;
+  .case {
+    display: flex;
+    align-items: center;
+    > label {
+      color: rgba($color-black, .8);
+      margin-right: 10px;
+    }
+    .suffixPhases {
+      list-style: circle;
+      li {
+        cursor: pointer;
+        transition: $transition-normal;
+        &.active, &:hover {
+          color: $color-blue;
+        }
+      }
+    }
+  }
+}

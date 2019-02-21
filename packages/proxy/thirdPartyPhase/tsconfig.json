@@ -1,0 +1,45 @@
+{
+  "compilerOptions": {
+    "outDir": "./build",
+    "module": "commonjs",
+    "target": "es5",
+    "lib": [
+      "esnext",
+      "dom"
+    ],
+    "declaration": false,
+    "sourceMap": true,
+    "experimentalDecorators": true,
+    "jsx": "react",
+    "baseUrl": "lib",
+    "paths": {
+      "@common": [
+        "core/common"
+      ],
+      "@client-vendor": [
+        "core/client/vendor"
+      ],
+      "@client-lib": [
+        "core/client/lib"
+      ],
+      "@client-context": [
+        "core/client/context"
+      ],
+      "@server": [
+        "core/server"
+      ],
+      "@server-lib": [
+        "core/server/lib"
+      ],
+      "@server-service": [
+        "core/server/service"
+      ],
+      "@server-model": [
+        "core/server/model"
+      ]
+    }
+  },
+  "include": [
+    "lib"
+  ]
+}

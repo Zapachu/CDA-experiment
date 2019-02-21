@@ -19,7 +19,7 @@ export interface IPhaseTemplate {
     namespace?: string
     localeNames: Array<string>
     Create?: typeof BaseCreate
-    type: string
+    type: 'bespoke' | 'otree' | 'qualtrics' | 'survey'
     otreeName?: string
 }
 
@@ -30,7 +30,7 @@ export const phaseTemplates: {
 export function registerPhaseCreate(namespace: string, phaseTemplate: IPhaseTemplate) {
     phaseTemplate.namespace = namespace
     phaseTemplate.Create = phaseTemplate.Create || BaseCreate
-    if(phaseTemplate.type === 'otree') {
+    if (phaseTemplate.type === 'otree') {
         phaseTemplates[`otree_${phaseTemplate.otreeName}`] = phaseTemplate
     } else {
         phaseTemplates[namespace] = phaseTemplate
