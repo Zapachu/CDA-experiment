@@ -124,6 +124,7 @@ export class Server {
         const {port} = setting,
             express = this.initExpress()
         this.bindServerListener(EventDispatcher.startGameSocket(express.listen(port)), port, () => {
+            Log.i(`CreateGame：http://127.0.0.1:${port}/${config.rootName}/${setting.namespace}/create`)
             if (!setting.proxyService) {
                 return
             }
