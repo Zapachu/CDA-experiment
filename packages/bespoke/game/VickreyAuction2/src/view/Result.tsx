@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang, MaskLoading} from '@dev/client'
+import {Core, Lang, MaskLoading} from 'bespoke-client'
 import {ICreateParams, IPlayerState} from '../interface'
 import {FetchType} from '../config'
 import {loadImgGroup, TImgGroup} from './util/imgGroup'

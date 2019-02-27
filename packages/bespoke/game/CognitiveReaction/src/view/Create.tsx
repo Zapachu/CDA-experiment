@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {ICreateParams} from '../interface'
-import {Core, Lang, Label, Input} from '@dev/client'
+import {Core, Lang, Label, Input} from 'bespoke-client'
 import {PushType} from '../config'
 
 interface ICreateState {

@@ -1,4 +1,4 @@
-import {registerOnFramework} from '@dev/client'
+import {registerOnFramework} from 'bespoke-client'
 import {namespace} from '../config'
 import {Create} from './Create'
 import {Play} from './Egret'

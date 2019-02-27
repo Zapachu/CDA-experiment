@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Dice} from '@dev/client'
+import {Dice} from 'bespoke-client'
 import {Role} from '../../config'
 
 interface IMatrixProps {

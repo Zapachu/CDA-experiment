@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, Core, Lang, MaskLoading, Toast, RadioGroup, Input} from '@dev/client'
+import {Button, Core, Lang, MaskLoading, Toast, RadioGroup, Input} from 'bespoke-client'
 import {FetchType, GameStage, MoveType, PushType, SURVEY_STAGE, SURVEY_BASIC, SURVEY_FEEDBACK, SURVEY_TEST} from '../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 

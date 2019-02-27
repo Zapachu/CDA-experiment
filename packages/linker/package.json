@@ -4,6 +4,8 @@
   "author": "GuoKan",
   "repository": " ",
   "license": "ISC",
+  "main": "src/client/vendor.ts",
+  "types": "src/client/vendor.d.ts",
   "scripts": {
     "buildDts": "ts-node ./src/client/script/buildDts.ts",
     "client:build": "webpack  --env.TS_NODE_PROJECT=\"tsconfig.json\"  --config ./src/client/script/webpack.ts",

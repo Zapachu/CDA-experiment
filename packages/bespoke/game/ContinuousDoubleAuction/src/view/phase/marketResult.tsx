@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Lang, Button, FrameEmitter, IGame} from '@dev/client'
+import {Lang, Button, FrameEmitter, IGame} from 'bespoke-client'
 import {BasePhase} from './BasePhase'
 import {MoveType, PushType} from '../../config'
 import {ICreateParams, IMoveParams, IPushParams} from '../../interface'

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core} from '@dev/client'
+import {Core} from 'bespoke-client'
 import {ICreateParams, IPlayerState} from '../interface'
 import {FetchType} from '../config'
 import GameResult from './components/GameResult'

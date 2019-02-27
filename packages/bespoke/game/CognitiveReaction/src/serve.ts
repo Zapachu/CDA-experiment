@@ -1,5 +1,5 @@
 require('../../../registerTsconfig')
-import {Server} from '@dev/server'
+import {Server} from 'bespoke-server'
 import {namespace} from './config'
 import Controller from './Controller'
 import * as path from 'path'

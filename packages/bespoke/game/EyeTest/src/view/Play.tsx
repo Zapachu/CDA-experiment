@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, Core, Lang, MaskLoading, RadioGroup, Toast} from '@dev/client'
+import {Button, Core, Lang, MaskLoading, RadioGroup, Toast} from 'bespoke-client'
 import {EYE_EXAMPLE, EYES, FetchType, GameStage, GENDER, MoveType, PushType} from '../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import {getEnumKeys} from '../util'

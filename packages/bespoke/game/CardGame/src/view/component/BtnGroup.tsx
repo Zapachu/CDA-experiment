@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button} from '@dev/client'
+import {Button} from 'bespoke-client'
 
 export function BtnGroup({options, activeIndex, onChange, onConfirm}) {
     return <section className={style.subBtnGroup}>

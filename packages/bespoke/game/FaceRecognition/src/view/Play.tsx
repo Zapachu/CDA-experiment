@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import * as qiniu from 'qiniu-js'
-import {Core, Lang, Button} from '@dev/client'
+import {Core, Lang, Button} from 'bespoke-client'
 import {FetchType, MoveType, PushType, TResultItem, Point, recognizeInterval} from '../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 
