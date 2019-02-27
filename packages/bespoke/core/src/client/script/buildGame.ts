@@ -135,7 +135,7 @@ export function geneClientBuilder(
             new ManifestPlugin({
                 fileName: `${namespace}.json`
             }),
-            new CleanWebpackPlugin('*', {
+            new CleanWebpackPlugin(`${namespace}.*`, {
                 root: output,
                 watch: true
             })
