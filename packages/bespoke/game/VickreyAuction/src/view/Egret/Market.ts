@@ -1,4 +1,4 @@
-import {Lang} from 'bespoke-client'
+import {Lang} from 'bespoke-client-util'
 import {Players} from './Players'
 import {resMeta} from '../util/resMeta'
 import {gameData} from './gameData'

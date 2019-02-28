@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {baseEnum, Core, loadThirdPartyLib, MaskLoading} from 'bespoke-client'
+import {baseEnum, Core, loadThirdPartyLib, MaskLoading} from 'bespoke-client-util'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
 import {FetchType, MoveType, PushType} from '../../config'
 import {gameData} from './gameData'

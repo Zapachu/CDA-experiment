@@ -1,4 +1,4 @@
-import {FrameEmitter, IGame} from 'bespoke-client'
+import {FrameEmitter, IGame} from 'bespoke-client-util'
 import {MoveType, PushType} from '../../config'
 import {ICreateParams, IMoveParams, IPushParams} from '../../interface'
 

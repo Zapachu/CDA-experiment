@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Label, Input, Markdown, Lang} from 'bespoke-client'
+import {Label, Input, Markdown, Lang} from 'bespoke-client-util'
 import {IGameConfig} from 'bespoke-common'
 
 declare interface IGameInfoProps {

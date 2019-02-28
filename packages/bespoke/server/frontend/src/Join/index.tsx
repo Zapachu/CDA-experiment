@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {baseEnum} from 'bespoke-common'
 import {RouteComponentProps} from 'react-router-dom'
-import {CodePanel, Toast, Api, Lang} from 'bespoke-client'
+import {CodePanel, Toast, Api, Lang} from 'bespoke-client-util'
 
 export class Join extends React.Component<RouteComponentProps<{}>> {
     lang = Lang.extractLang({

@@ -1,4 +1,4 @@
-import {registerOnFramework} from 'bespoke-client'
+import {registerOnFramework} from 'bespoke-client-util'
 import {Play} from './Play'
 
 registerOnFramework('FaceRecognition', {

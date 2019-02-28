@@ -2,5 +2,7 @@
   "name": "@types/elf-linker",
   "version": "1.0.0",
   "types": "index",
-  "dependencies": {}
+  "dependencies": {
+    "elf-setting": "^1.0.0"
+  }
 }

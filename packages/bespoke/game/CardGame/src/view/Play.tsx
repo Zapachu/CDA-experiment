@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, Core, Lang, MaskLoading, Dice} from 'bespoke-client'
+import {Button, Core, Lang, MaskLoading, Dice} from 'bespoke-client-util'
 import {FetchType, GameType, MoveType, PushType, Role, cardGame, LRGame, PlayerStatus} from '../config'
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import {Header, HistoryTable, Matrix, BtnGroup} from './component'

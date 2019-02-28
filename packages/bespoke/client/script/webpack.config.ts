@@ -2,7 +2,7 @@ import * as path from 'path'
 import * as CleanWebpackPlugin from 'clean-webpack-plugin'
 import * as QiniuPlugin from 'qiniu-webpack-plugin'
 import {config} from 'bespoke-common'
-import {qiNiu} from './setting'
+import {qiNiu} from 'elf-setting'
 
 const buildMode = process.env.npm_config_buildMode || 'dev'
 

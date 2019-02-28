@@ -1,6 +1,6 @@
 import {createContext} from 'react'
 import * as React from 'react'
-import {IGameTemplate} from 'bespoke-client'
+import {IGameTemplate} from 'bespoke-client-util'
 
 export const connCtx = <C extends {}>(Context: React.Context<C>) =>
     <P, S>(ComponentClass: React.ComponentClass<any, S>) => {

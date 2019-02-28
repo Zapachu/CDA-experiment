@@ -1,4 +1,4 @@
-import {Core} from 'bespoke-client'
+import {Core} from 'bespoke-client-util'
 import {ICreateParams, IPlayerState} from '../interface'
 import {FetchType} from '../config'
 

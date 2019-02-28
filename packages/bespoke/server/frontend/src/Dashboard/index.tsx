@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {IGameThumb} from 'bespoke-common'
 import {RouteComponentProps} from 'react-router-dom'
-import {Api, Lang} from 'bespoke-client'
+import {Api, Lang} from 'bespoke-client-util'
 import * as dateFormat from 'dateformat'
 
 declare interface IDashboardState {

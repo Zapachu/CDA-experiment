@@ -129,7 +129,7 @@ export function geneClientBuilder(
         externals: {
             'react': 'React',
             'react-dom': 'ReactDOM',
-            'bespoke-client': config.buildManifest.clientVendorLib
+            'bespoke-client-util': config.buildManifest.clientVendorLib
         },
         plugins: [
             new ManifestPlugin({

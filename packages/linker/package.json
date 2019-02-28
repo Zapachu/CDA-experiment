@@ -16,6 +16,7 @@
     "big-integer": "^1.6.42",
     "connect-redis": "^3.4.0",
     "elf-proto": "^1.0.0",
+    "elf-setting": "^1.0.0",
     "express": "^4.16.4",
     "express-session": "^1.15.6",
     "grpc": "^1.18.0",

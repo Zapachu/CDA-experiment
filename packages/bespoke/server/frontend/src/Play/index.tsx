@@ -10,7 +10,7 @@ import {
     IActor,
     IGameWithId
 } from 'bespoke-common'
-import {MaskLoading, Lang, Api, Fetcher} from 'bespoke-client'
+import {MaskLoading, Lang, Api, Fetcher} from 'bespoke-client-util'
 import {connCtx, rootContext, TRootCtx} from '../context'
 import {connect} from 'socket.io-client'
 import {applyChange, Diff} from 'deep-diff'

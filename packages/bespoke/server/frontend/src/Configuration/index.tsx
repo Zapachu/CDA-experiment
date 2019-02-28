@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as style from './style.scss'
 
 import {IGameWithId} from 'bespoke-common'
-import {Api, Lang, MaskLoading, Button} from 'bespoke-client'
+import {Api, Lang, MaskLoading, Button} from 'bespoke-client-util'
 import {connCtx, rootContext, TRootCtx} from '../context'
 import {RouteComponentProps} from 'react-router'
 

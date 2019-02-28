@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as style from './style.scss'
 
 import {IActor, IGameWithId, baseEnum} from 'bespoke-common'
-import {Api, Lang, Markdown, MaskLoading} from 'bespoke-client'
+import {Api, Lang, Markdown, MaskLoading} from 'bespoke-client-util'
 import {RouteComponentProps} from 'react-router'
 import * as queryString from 'query-string'
 

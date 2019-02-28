@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {baseEnum, FrameEmitter, IGameWithId, ISimulatePlayer, TGameState} from 'bespoke-common'
-import {Api, Lang, Button} from 'bespoke-client'
+import {Api, Lang, Button} from 'bespoke-client-util'
 
 const {notStarted, started, paused, over} = baseEnum.GameStatus
 

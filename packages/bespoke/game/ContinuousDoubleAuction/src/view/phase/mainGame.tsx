@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, Label, Lang, MaskLoading, RangeInput, Toast, Input, Switch} from 'bespoke-client'
+import {Button, Label, Lang, MaskLoading, RangeInput, Toast, Input, Switch} from 'bespoke-client-util'
 import {BasePhase} from './BasePhase'
 import {CreateParams, GameState} from '../../interface'
 

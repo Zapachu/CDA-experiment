@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core} from 'bespoke-client'
+import {Core} from 'bespoke-client-util'
 import {ICreateParams} from '../interface'
 import {phaseTemplates} from './phase'
 

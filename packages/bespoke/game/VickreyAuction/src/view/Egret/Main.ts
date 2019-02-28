@@ -1,5 +1,5 @@
 import {resMeta} from '../util/resMeta'
-import {config} from 'bespoke-client'
+import {config} from 'bespoke-client-util'
 import {namespace} from '../../config'
 import {OperateBar} from './OperateBar'
 import {Market} from './Market'
