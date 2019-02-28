@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, Label, Lang, MaskLoading, RangeInput, Toast, Input, Switch} from 'bespoke-client-util'
+import {Button, ButtonProps, Label, Lang, MaskLoading, RangeInput, Toast, Input, Switch} from 'bespoke-client-util'
 import {BasePhase} from './BasePhase'
 import {CreateParams, GameState} from '../../interface'
 
@@ -417,8 +417,8 @@ class Play extends BasePhase.Play<IPlayState> {
                                                 <div className={style.submitBtnWrapper}>
                                                     <Button {...{
                                                         label: lang.shout,
-                                                        type: Button.Type.primary,
-                                                        width: Button.Width.medium,
+                                                        type: ButtonProps.Type.primary,
+                                                        width: ButtonProps.Width.medium,
                                                         onClick: () => this.submitOrder()
                                                     }}/>
                                                 </div>

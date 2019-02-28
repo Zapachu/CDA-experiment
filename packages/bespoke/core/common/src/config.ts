@@ -17,9 +17,5 @@ export const config = {
     defaultLanguage: Language.en,
     cookieKey: {
         csrf: '_csrf'
-    },
-    buildManifest: {
-        clientVendorLib: 'clientVendor',
-        clientCoreLib: 'clientCore'
     }
 }

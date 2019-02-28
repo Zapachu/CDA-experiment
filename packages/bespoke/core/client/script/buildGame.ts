@@ -7,8 +7,8 @@ import * as webpack from 'webpack'
 import * as QiniuPlugin from 'qiniu-webpack-plugin'
 import * as ManifestPlugin from 'webpack-manifest-plugin'
 import * as CleanWebpackPlugin from 'clean-webpack-plugin'
-import {TsconfigPathsPlugin} from 'tsconfig-paths-webpack-plugin'
-import {config, IQiniuConfig} from '../../common'
+import {config} from 'bespoke-common'
+import {IQiniuConfig} from 'elf-setting'
 
 interface IPaths {
     resource?: string
@@ -66,6 +66,7 @@ export function geneClientBuilder(
         qiNiu
     }: IBuildOption): webpack.Configuration {
     const {resource, proto, entry, output} = resolvePaths(basePath, paths)
+    console.log(entry)
     buildProtoDts(proto, buildMode === 'dev')
     return {
         devtool: buildMode === 'dev' ? 'cheap-module-eval-source-map' : false,
@@ -79,10 +80,7 @@ export function geneClientBuilder(
             publicPath: buildMode === 'publish' ? `${qiNiu.download.jsDomain}/${qiNiu.upload.path}/${namespace}` : `/${config.rootName}/${namespace}/static/`
         },
         resolve: {
-            extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
-            plugins: [new TsconfigPathsPlugin({
-                configFile: resolve(__dirname, `../../../../tsconfig.json`)
-            })]
+            extensions: ['.ts', '.tsx', '.js', '.jsx', '.json']
         },
         module: {
             rules: [
@@ -129,7 +127,7 @@ export function geneClientBuilder(
         externals: {
             'react': 'React',
             'react-dom': 'ReactDOM',
-            'bespoke-client-util': config.buildManifest.clientVendorLib
+            'bespoke-client-util': 'BespokeClientUtil'
         },
         plugins: [
             new ManifestPlugin({

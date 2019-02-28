@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button} from 'bespoke-client-util'
+import {Button, ButtonProps} from 'bespoke-client-util'
 
 export function BtnGroup({options, activeIndex, onChange, onConfirm}) {
     return <section className={style.subBtnGroup}>
@@ -15,7 +15,7 @@ export function BtnGroup({options, activeIndex, onChange, onConfirm}) {
         </ul>
         <div className={style.operateTips}>Your move : <em>{options[activeIndex]}</em></div>
         <div>
-            <Button label='Confirm' width={Button.Width.small} onClick={() => onConfirm()}/>
+            <Button label='Confirm' width={ButtonProps.Width.small} onClick={() => onConfirm()}/>
         </div>
     </section>
 }

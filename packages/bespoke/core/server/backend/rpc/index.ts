@@ -1,6 +1,4 @@
 import {Server, ServerCredentials} from 'grpc'
-import {resolve} from 'path'
-import {readFileSync} from 'fs'
 import {setBespokeService} from './service/AcademusBespoke'
 import {getGameService, setPhaseService} from './service/PhaseManager'
 import {config} from 'bespoke-common'
@@ -16,9 +14,7 @@ export function serve() {
 }
 
 function registerPhases() {
-    const {[`${config.buildManifest.clientVendorLib}.js`]: vendorPath} = JSON.parse(
-        readFileSync(resolve(__dirname, `../../client/dist/${config.buildManifest.clientCoreLib}.json`)).toString()
-    )
+    const vendorPath = ''//TODO 提供bespoke-client-util的访问
     const {proxyService: p, host, rpcPort, getClientPath} = setting
     getGameService().registerPhases({
         phases: [{

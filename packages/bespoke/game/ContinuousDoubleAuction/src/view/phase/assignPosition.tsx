@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Lang, Label, Input, Button, MaskLoading, BtnGroup, Toast} from 'bespoke-client-util'
+import {Lang, Label, Input, Button, ButtonProps, MaskLoading, BtnGroup, Toast} from 'bespoke-client-util'
 import {IDENTITY, MoveType, ROLE, RobotStartMode, PlayerStatus} from '../../config'
 import {BasePhase} from './BasePhase'
 import {getEnumKeys} from '../../util'
@@ -257,7 +257,7 @@ class Play extends BasePhase.Play<IPlayState> {
             <input type='number'
                    value={seatNumber || ''}
                    onChange={({target: {value: seatNumber}}) => this.setState({seatNumber: seatNumber.substr(0, 4)} as any)}/>
-            <Button width={Button.Width.medium} label={lang.enterMarket} onClick={() => {
+            <Button width={ButtonProps.Width.medium} label={lang.enterMarket} onClick={() => {
                 if (isNaN(Number(seatNumber))) {
                     return Toast.warn(lang.invalidSeatNumber)
                 }

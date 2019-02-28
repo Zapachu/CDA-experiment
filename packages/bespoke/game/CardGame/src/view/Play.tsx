@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, Core, Lang, MaskLoading, Dice} from 'bespoke-client-util'
+import {Button, ButtonProps, Core, Lang, MaskLoading, Dice} from 'bespoke-client-util'
 import {FetchType, GameType, MoveType, PushType, Role, cardGame, LRGame, PlayerStatus} from '../config'
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import {Header, HistoryTable, Matrix, BtnGroup} from './component'
@@ -91,7 +91,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                         playerStatus === PlayerStatus.result ? <React.Fragment>
                                 <div className={style.proceedBtnWrapper}>
                                     <Button label='Proceed'
-                                            width={Button.Width.small}
+                                            width={ButtonProps.Width.small}
                                             onClick={() => frameEmitter.emit(MoveType.proceed)}/>
                                 </div>
                                 ,
@@ -180,7 +180,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                                 <Dice number={theLastPeriod.dieRoll} showAnimation={true}/>
                             </div>
                             <Button label='Proceed'
-                                    width={Button.Width.small}
+                                    width={ButtonProps.Width.small}
                                     onClick={() => frameEmitter.emit(MoveType.proceed)}/>
                         </div>,
                         <section key='roundDetailWrapper' className={style.roundDetailWrapper}>
