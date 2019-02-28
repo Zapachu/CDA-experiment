@@ -2,8 +2,5 @@
   "name": "elf-setting",
   "version": "1.0.0",
   "main": "src/setting",
-  "types": "src/setting.sample",
-  "dependencies": {
-    "dateformat": "^3.0.3"
-  }
+  "types": "src/setting.sample"
 }

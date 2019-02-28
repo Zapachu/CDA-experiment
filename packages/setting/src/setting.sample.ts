@@ -1,6 +1,7 @@
-import * as dateFormat from 'dateformat'
 import {ICoreSetting} from './interface'
 
+const d = new Date(),
+    timestamp = `${d.getFullYear()}${d.getMonth()}${d.getDate()}${d.getHours()}${d.getMinutes()}`
 const elfSetting = <ICoreSetting>{
     host: '127.0.0.1',
     mongoUri: 'mongodb://127.0.0.1:27017/academy',
@@ -23,7 +24,7 @@ const elfSetting = <ICoreSetting>{
             ACCESS_KEY: 'Cgc7------------------------------------',
             SECRET_KEY: 'QGyn------------------------------------',
             bucket: 'notes',
-            path: `${dateFormat(Date.now(), 'yyyymmddHHMM')}`
+            path: timestamp
         },
         download: {
             jsDomain: 'http://--------.bkt.clouddn.com'
