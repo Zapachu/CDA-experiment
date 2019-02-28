@@ -1,6 +1,9 @@
 {
   "name": "elf-setting",
   "version": "1.0.0",
-  "main": "src/setting",
-  "types": "src/setting.sample"
+  "main": "build/index",
+  "types": "build/index",
+  "scripts": {
+    "install": "tsc"
+  }
 }

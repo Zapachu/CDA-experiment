@@ -2,8 +2,9 @@ import * as path from 'path'
 import * as CleanWebpackPlugin from 'clean-webpack-plugin'
 import * as QiniuPlugin from 'qiniu-webpack-plugin'
 import {config} from 'bespoke-common'
-import {qiNiu} from 'elf-setting'
+import {elfSetting} from 'elf-setting'
 
+const {qiNiu} = elfSetting
 const buildMode = process.env.npm_config_buildMode || 'dev'
 
 export = {
@@ -13,13 +14,11 @@ export = {
     watchOptions: {
         poll: true
     },
-    entry: {
-        [config.buildManifest.clientVendorLib]: path.resolve(__dirname, '../lib/index.ts'),
-    },
+    entry: path.resolve(__dirname, '../lib/index.ts'),
     output: {
         path: path.resolve(__dirname, '../dist'),
-        filename: `[name]${buildMode==='dev'?'':'.min'}.js`,
-        library: '[name]',
+        filename: `bespoke-client-util${buildMode==='dev'?'':'.min'}.js`,
+        library: 'BespokeClientUtil',
         libraryTarget: 'umd',
         publicPath: buildMode === 'publish' ? `${qiNiu.download.jsDomain}/${qiNiu.upload.path}/` : `/${config.rootName}/static/`
     },

@@ -1,8 +1,11 @@
 {
   "name": "bespoke-server",
   "version": "1.0.0",
-  "main": "backend/index.ts",
-  "types": "backend/index.ts",
+  "main": "build/backend/index",
+  "types": "build/backend/index.d.ts",
+  "scripts": {
+    "install": "tsc"
+  },
   "devDependencies": {
     "@types/body-parser": "^1.17.0",
     "@types/connect-redis": "0.0.8",

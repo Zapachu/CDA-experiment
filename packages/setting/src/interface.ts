@@ -46,12 +46,3 @@ export interface ICoreSetting {
     }
     adminMobileNumbers: Array<string>
 }
-
-export interface ISetting extends Partial<ICoreSetting> {
-    namespace: string
-    staticPath: string
-    getClientPath?: () => string
-    independent?: boolean
-    port?: number
-    rpcPort?: number
-}

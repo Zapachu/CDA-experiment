@@ -2,7 +2,7 @@ import {ICoreSetting} from './interface'
 
 const d = new Date(),
     timestamp = `${d.getFullYear()}${d.getMonth()}${d.getDate()}${d.getHours()}${d.getMinutes()}`
-const elfSetting = <ICoreSetting>{
+export const elfSetting = <ICoreSetting>{
     host: '127.0.0.1',
     mongoUri: 'mongodb://127.0.0.1:27017/academy',
     mongoUser: '',
@@ -44,5 +44,3 @@ const elfSetting = <ICoreSetting>{
         smtpPassword: ''
     }
 }
-
-export = elfSetting

@@ -1,4 +1,5 @@
 import {AcademusRole, Actor, GameStatus} from './baseEnum'
+import {ICoreSetting} from 'elf-setting'
 import {EventEmitter} from 'events'
 import {Socket} from 'socket.io-client'
 import {Diff} from 'deep-diff'
@@ -95,4 +96,13 @@ export interface IConnection extends EventEmitter {
 
 export interface IEventHandler {
     (connection: IConnection, ...args: any[]): void
+}
+
+export interface ISetting extends Partial<ICoreSetting> {
+    namespace: string
+    staticPath: string
+    getClientPath?: () => string
+    independent?: boolean
+    port?: number
+    rpcPort?: number
 }

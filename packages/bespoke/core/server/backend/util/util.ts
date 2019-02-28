@@ -1,5 +1,5 @@
 import {config, baseEnum, ISetting} from 'bespoke-common'
-import {coreSetting} from '../config/setting'
+import {elfSetting} from 'elf-setting'
 import {colorConsole, dailyfile} from 'tracer'
 import {resolve} from 'path'
 import {readFileSync} from 'fs'
@@ -36,7 +36,7 @@ export function elfPhaseId2PlayUrl(namespace: string, phaseId: string): string {
 
 //region setting
 
-export const setting: Readonly<(Partial<ISetting>)> = coreSetting
+export const setting: Readonly<(Partial<ISetting>)> = elfSetting
 
 export function initSetting(gameSetting: ISetting) {
     const {namespace, staticPath} = gameSetting
