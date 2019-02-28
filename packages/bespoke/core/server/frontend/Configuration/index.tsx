@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as style from './style.scss'
 
 import {IGameWithId} from 'bespoke-common'
-import {Api, Lang, MaskLoading, Button} from 'bespoke-client-util'
+import {Api, Lang, MaskLoading, Button, ButtonProps} from 'bespoke-client-util'
 import {connCtx, rootContext, TRootCtx} from '../context'
 import {RouteComponentProps} from 'react-router'
 
@@ -42,8 +42,8 @@ export class Configuration extends React.Component<TRootCtx & RouteComponentProp
             <ul className={style.phaseList}>
                 <Info {...{game}}/>
                 <li style={{margin: '2rem auto 0'}}>
-                    <Button width={Button.Width.medium}
-                            color={Button.Color.blue}
+                    <Button width={ButtonProps.Width.medium}
+                            color={ButtonProps.Color.blue}
                             label={lang.playRoom}
                             onClick={() => history.push(`/${game.namespace}/play/${gameId}`)}
                     />

@@ -4,7 +4,7 @@ import * as style from './style.scss'
 import {connCtx, rootContext, TRootCtx} from '../context'
 import {GameInfo} from './GameInfo'
 import {HistoryGame} from './HistoryGame'
-import {Button, Toast, Api, Fetcher, Lang} from 'bespoke-client-util'
+import {Button, ButtonProps, Toast, Api, Fetcher, Lang} from 'bespoke-client-util'
 import {IGameConfig, baseEnum} from 'bespoke-common'
 
 const SubmitBarHeight = '5rem'
@@ -79,7 +79,7 @@ export class Create extends React.Component<RouteComponentProps<{ namespace: str
             </div>
             <div className={style.submitBtnWrapper} style={{height: SubmitBarHeight}}>
                 {
-                    submitable ? <Button width={Button.Width.medium}
+                    submitable ? <Button width={ButtonProps.Width.medium}
                                          label={lang.Submit}
                                          onClick={() => this.submit()}
                     /> : null

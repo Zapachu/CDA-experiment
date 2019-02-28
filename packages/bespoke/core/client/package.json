@@ -1,8 +1,8 @@
 {
   "name": "bespoke-client-util",
   "version": "1.0.0",
-  "main": "dist/bespoke-client-util.min",
-  "types": "build/lib/index",
+  "main": "build/index",
+  "types": "build/index",
   "scripts": {
     "install": "tsc & npm run dist",
     "build": "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./script/webpack.config.ts",
@@ -25,7 +25,6 @@
     "dateformat": "^3.0.3",
     "elf-linker": "^0.0.0",
     "file-loader": "^3.0.1",
-    "html-webpack-plugin": "latest",
     "marked": "^0.6.0",
     "mocha": "^5.2.0",
     "node-sass": "^4.11.0",

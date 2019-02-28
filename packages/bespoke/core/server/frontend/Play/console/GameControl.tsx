@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {baseEnum, FrameEmitter, IGameWithId, ISimulatePlayer, TGameState} from 'bespoke-common'
-import {Api, Lang, Button} from 'bespoke-client-util'
+import {Api, Lang, Button, ButtonProps} from 'bespoke-client-util'
 
 const {notStarted, started, paused, over} = baseEnum.GameStatus
 
@@ -33,8 +33,8 @@ export class GameControl extends React.Component<IGameControlProps> {
             {
                 status: over,
                 label: this.lang.SwitchGameStatus_over,
-                color: Button.Color.red,
-                width: Button.Width.small
+                color: ButtonProps.Color.red,
+                width: ButtonProps.Width.small
             },
             {
                 status: paused,
@@ -45,8 +45,8 @@ export class GameControl extends React.Component<IGameControlProps> {
             {
                 status: over,
                 label: this.lang.SwitchGameStatus_over,
-                color: Button.Color.red,
-                width: Button.Width.small
+                color: ButtonProps.Color.red,
+                width: ButtonProps.Width.small
             },
             {
                 status: started,
@@ -61,22 +61,22 @@ export class GameControl extends React.Component<IGameControlProps> {
             return null
         }
         const btnProps = {
-            type: Button.Type.flat,
-            color: Button.Color.blue,
-            width: Button.Width.tiny
+            type: ButtonProps.Type.flat,
+            color: ButtonProps.Color.blue,
+            width: ButtonProps.Width.tiny
         }
         return <section className={style.gameControl} style={{height: GameControlHeight}}>
             <div className={style.statusSwitcher}>
                 <div className={style.btnGroup}>
-                    <Button {...btnProps} icon={Button.Icon.home} onClick={() => historyPush(`/dashboard`)}/>
-                    <Button {...btnProps} icon={Button.Icon.parameter}
+                    <Button {...btnProps} icon={ButtonProps.Icon.home} onClick={() => historyPush(`/dashboard`)}/>
+                    <Button {...btnProps} icon={ButtonProps.Icon.parameter}
                             onClick={() => historyPush(`/${game.namespace}/configuration/${game.id}`)}/>
-                    <Button {...btnProps} icon={Button.Icon.share} onClick={() => historyPush(`/share/${game.id}`)}/>
+                    <Button {...btnProps} icon={ButtonProps.Icon.share} onClick={() => historyPush(`/share/${game.id}`)}/>
                 </div>
                 <div className={style.switcherWrapper}>
                     {
                         (this.gameStatusMachine[gameState.status] || [])
-                            .map(({status, label, type = Button.Type.primary, color = Button.Color.blue, width = Button.Width.medium}) =>
+                            .map(({status, label, type = ButtonProps.Type.primary, color = ButtonProps.Color.blue, width = ButtonProps.Width.medium}) =>
                                 <Button key={label} {...{
                                     label,
                                     color,
