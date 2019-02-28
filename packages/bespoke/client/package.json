@@ -46,9 +46,8 @@
     "webpack-bundle-analyzer": "latest",
     "webpack-cli": "^3.2.3",
     "webpack-dev-server": "^3.1.14",
-    "webpack-manifest-plugin": "^2.0.4"
-  },
-  "dependencies": {
+    "webpack-manifest-plugin": "^2.0.4",
+    "@types/elf-linker": "^1.0.0",
     "elf-linker": "^0.0.0"
   }
 }

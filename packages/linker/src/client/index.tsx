@@ -4,10 +4,21 @@ require('./initial.scss')
 import * as React from 'react'
 import {render} from 'react-dom'
 import {Root} from './view'
-import {IElfCreateProps} from './vendor'
+import {IPhaseConfig} from '@common'
 
 export {Lang} from '@client-util'
 export {IPhaseConfig, CorePhaseNamespace} from '@common'
+
+export interface IElfCreateProps<ICreateParam> {
+    phases: Array<{
+        label: string
+        key: string
+        namespace: string
+    }>
+    curPhase: IPhaseConfig<ICreateParam>
+    updatePhase: (suffixPhaseKeys: Array<string>, param: Partial<ICreateParam>) => void
+    highlightPhases: (phaseKeys: Array<string>) => void
+}
 
 export class BaseCreate<ICreateParam, State = ICreateParam> extends React.Component<IElfCreateProps<ICreateParam>, State> {
     render() {

@@ -7,12 +7,12 @@ export function registerOnFramework(namespace: string, gameTemplate: IGameTempla
         const _registerGame = window['clientCore'].registerGame as TRegisterGame
         _registerGame(namespace, gameTemplate)
     }
-    if (window['elfCore']) {
+    if (window['ElfLinker']) {
         const phaseTemplate: IPhaseTemplate = {
             type: 'bespoke',
             localeNames: gameTemplate.localeNames,
             Create: gameTemplate.CreateOnElf
         }
-        window['elfCore'].registerPhaseCreate(namespace, phaseTemplate)
+        window['ElfLinker'].registerPhaseCreate(namespace, phaseTemplate)
     }
 }

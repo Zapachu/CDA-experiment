@@ -1,5 +1,12 @@
 import {Component} from 'react'
-import {IPhaseConfig} from '../common'
+
+interface IPhaseConfig<ICreateParam = {}> {
+    namespace: string
+    key: string
+    title: string
+    param: ICreateParam
+    suffixPhaseKeys: Array<string>
+}
 
 declare class BaseCreate<ICreateParam, State = ICreateParam> extends Component<IElfCreateProps<ICreateParam>, State> {
 }

@@ -85,7 +85,7 @@ export = {
     externals: {
         'react': 'React',
         'react-dom': 'ReactDOM',
-        'elf-linker': 'elfCore'
+        'elf-linker': 'ElfLinker'
     },
     plugins: [
         new CleanWebpackPlugin('*', {
