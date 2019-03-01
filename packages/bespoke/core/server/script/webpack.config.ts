@@ -1,18 +1,9 @@
 import * as path from 'path'
-import * as fs from 'fs'
 import * as CleanWebpackPlugin from 'clean-webpack-plugin'
 import * as HtmlWebpackPlugin from 'html-webpack-plugin'
 import * as QiniuPlugin from 'qiniu-webpack-plugin'
 import {config} from 'bespoke-common'
 import {elfSetting} from 'elf-setting'
-
-//region bespoke-client-util
-const clientUtilBundleName = 'bespoke-client-util.min.js'
-fs.copyFileSync(
-    path.resolve(__dirname, `../node_modules/bespoke-client-util/dist/${clientUtilBundleName}`),
-    path.resolve(__dirname, `../dist/${clientUtilBundleName}`)
-)
-//endregion
 
 const {qiNiu} = elfSetting
 const buildMode = process.env.npm_config_buildMode || 'dev'
@@ -75,7 +66,7 @@ export = {
     plugins: [
         new HtmlWebpackPlugin({
             filename: 'index.html',
-            clientUtilBundlePath: `/${config.rootName}/static/${clientUtilBundleName}`,
+            clientUtilBundlePath: `/${config.rootName}/static/bespoke-client-util.min.js`,
             template: path.resolve(__dirname, './index.html')
         }),
         new CleanWebpackPlugin('main*.js', {
