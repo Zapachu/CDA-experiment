@@ -19,7 +19,7 @@ export interface IQiniuConfig {
     }
 }
 
-export interface ICoreSetting {
+export interface IElfSetting {
     host: string
     mongoUri: string
     mongoUser: string

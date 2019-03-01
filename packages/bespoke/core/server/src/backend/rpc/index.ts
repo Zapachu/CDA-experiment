@@ -14,12 +14,11 @@ export function serve() {
 }
 
 function registerPhases() {
-    const vendorPath = ''//TODO 提供bespoke-client-util的访问
     const {proxyService: p, host, rpcPort, getClientPath} = setting
     getGameService().registerPhases({
         phases: [{
             namespace: setting.namespace,
-            jsUrl: `http://${p.host}:${p.port}${vendorPath};http://${p.host}:${p.port}${getClientPath()}`,
+            jsUrl: `http://${p.host}:${p.port}/${config.rootName}/static/bespoke-client-util.min.js;http://${p.host}:${p.port}${getClientPath()}`,
             rpcUri: `${host}:${rpcPort}`
         }]
     }, err => err && Log.e(err))

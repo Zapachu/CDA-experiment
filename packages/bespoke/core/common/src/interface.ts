@@ -1,5 +1,5 @@
 import {AcademusRole, Actor, GameStatus} from './baseEnum'
-import {ICoreSetting} from 'elf-setting'
+import {IElfSetting} from 'elf-setting'
 import {EventEmitter} from 'events'
 import {Socket} from 'socket.io-client'
 import {Diff} from 'deep-diff'
@@ -98,7 +98,7 @@ export interface IEventHandler {
     (connection: IConnection, ...args: any[]): void
 }
 
-export interface ISetting extends Partial<ICoreSetting> {
+export interface ISetting extends Partial<IElfSetting> {
     namespace: string
     staticPath: string
     getClientPath?: () => string
