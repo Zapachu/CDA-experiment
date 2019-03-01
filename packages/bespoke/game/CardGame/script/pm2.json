@@ -1,6 +1,6 @@
 {
   "script": "../src/serve.ts",
-  "name": "VickreyAuction",
+  "name": "CardGame",
   "env": {
     "NODE_ENV": "production",
     "PORT": 3009,

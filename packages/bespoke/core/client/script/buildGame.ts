@@ -142,8 +142,3 @@ export function geneClientBuilder(
         ] : buildMode === 'dist' ? [] : [])
     }
 }
-
-export function buildClient(option: IBuildOption) {
-    webpack(geneClientBuilder(option), err => err ? console.error(err) : null)
-}
-

@@ -1,6 +1,6 @@
 {
   "script": "../src/serve.ts",
-  "name": "VickreyAuction",
+  "name": "CDASurvey",
   "env": {
     "NODE_ENV": "production",
     "PORT": 3009,
