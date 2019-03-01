@@ -11,7 +11,7 @@ import * as errorHandler from 'errorhandler'
 import * as bodyParser from 'body-parser'
 import * as compression from 'compression'
 import * as morgan from 'morgan'
-import {Log, redisClient, WebpackHmr, setting, initSetting, QCloudSMS} from './util'
+import {Log, redisClient, setting, initSetting, QCloudSMS} from './util'
 import {baseEnum, config, ISetting} from 'bespoke-common'
 import {EventDispatcher} from './controller/eventDispatcher'
 import {rootRouter, namespaceRouter} from './controller/requestRouter'
@@ -34,7 +34,6 @@ export class Server {
     private static initExpress(): Express.Express {
         const {namespace} = setting
         const express = Express()
-        WebpackHmr.applyHotDevMiddleware(express)
         express.use(compression())
         express.use(morgan('dev'))
         express.use(bodyParser.json())
@@ -58,7 +57,7 @@ export class Server {
         })
         express.use(errorHandler())
         express.use(`/${config.rootName}/${namespace}/static`, Express.static(setting.staticPath, {maxAge: '10d'}))
-        express.use(`/${config.rootName}/static`, Express.static(path.join(__dirname, '../client/dist/'), {maxAge: '10d'}))
+        express.use(`/${config.rootName}/static`, Express.static(path.join(__dirname, '../../dist/'), {maxAge: '10d'}))
         express.use(`/${config.rootName}/${namespace}`, namespaceRouter)
         express.use(`/${config.rootName}`, rootRouter)
         return express

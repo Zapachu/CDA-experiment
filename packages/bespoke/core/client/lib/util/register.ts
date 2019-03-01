@@ -3,8 +3,8 @@ import {IPhaseTemplate} from 'elf-linker'
 
 export function registerOnFramework(namespace: string, gameTemplate: IGameTemplate) {
     gameTemplate.namespace = namespace
-    if (window['clientCore']) {
-        const _registerGame = window['clientCore'].registerGame as TRegisterGame
+    if (window['BespokeServer']) {
+        const _registerGame = window['BespokeServer'].registerGame as TRegisterGame
         _registerGame(namespace, gameTemplate)
     }
     if (window['ElfLinker']) {

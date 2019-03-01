@@ -1,17 +1,21 @@
 import {config, baseEnum, IGameThumb} from 'bespoke-common'
-import {Request, Response, NextFunction} from 'express'
+import {Request, Response} from 'express'
 import * as passport from 'passport'
-import {Log, RedisKey, redisClient, Hash, WebpackHmr, inProductEnv} from '../util'
+import {Log, RedisKey, redisClient, Hash, inProductEnv, setting} from '../util'
 import {GameModel, UserModel, UserDoc, MoveLogModel, SimulatePlayerModel} from '../model'
 import {AnyController, GameLogic} from '../manager/logicManager'
 import GameDAO from '../service/GameDAO'
 import UserService from '../service/UserService'
+import * as fs from 'fs'
+import * as path from 'path'
 
 const {historyGamesListSize} = config
 
 export class UserCtrl {
-    static async renderApp(req, res: Response, next: NextFunction) {
-        WebpackHmr.sendIndexHtml(res, next)
+    static async renderApp(req, res: Response) {
+        const chunk = fs.readFileSync(path.resolve(__dirname, `../../../dist/index.html`)).toString()
+        res.set('content-type', 'text/html')
+        res.end(chunk + `<script type="text/javascript" src="${setting.getClientPath()}"></script>`)
     }
 
     static isTeacher(req, res: Response, next) {
