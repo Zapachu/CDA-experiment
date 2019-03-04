@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+service ElfService {
+    rpc getActivePhases (GetActivePhaseReq) returns (GetActivePhaseRes) {
+    }
+}
+
+message GetActivePhaseReq {
+
+}
+message GetActivePhaseRes {
+    message Phase {
+        string namespace = 1;
+        string type = 2;
+    }
+    repeated Phase phases = 1;
+}
+
+service V5Service {
+    rpc reward (RewardReq) returns (RewardRes) {
+    }
+}
+
+message RewardReq {
+}
+message RewardRes {
+}
