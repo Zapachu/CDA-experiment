@@ -2,7 +2,7 @@ import { Server, ServerCredentials } from 'grpc'
 import { phaseService } from './service/WjxManager'
 import { resolve } from 'path'
 import { readFileSync } from 'fs'
-import {PhaseManager} from 'elf-proto'
+import {PhaseManager} from 'elf-protocol'
 import setting from '../../../config/settings'
 import {gameService} from '../../common/utils'
 

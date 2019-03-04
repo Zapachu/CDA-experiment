@@ -1,6 +1,6 @@
 import { ThirdPartPhase } from '../../../../core/server/models'
 import settings from '../../../../config/settings'
-import {PhaseManager} from 'elf-proto'
+import {PhaseManager} from 'elf-protocol'
 
 const {localWjxRootUrl} = settings
 

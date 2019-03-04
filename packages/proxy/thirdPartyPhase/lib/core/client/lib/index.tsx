@@ -4,7 +4,7 @@ export {FrameEmitter} from './FrameEmitter'
 export {Lang} from './language'
 
 export const connCtx = <C extends {}>(Context: React.Context<C>) =>
-    <P, S>(ComponentClass: React.ComponentClass<P & C, S>) => {
+    <P, S>(ComponentClass: React.ComponentClass<any, S>) => {
         const ConsumerWrapper: React.SFC = (props: P) =>
             <Context.Consumer>
                 {

@@ -2,7 +2,7 @@ import {Server} from 'grpc'
 import {config} from '@common'
 import {Log, redisClient, RedisKey, RedisLifetime, buildPlayUrl} from '@server-util'
 import {GroupStateService} from '@server-service'
-import {PhaseManager as P} from 'elf-proto'
+import {PhaseManager as P} from 'elf-protocol'
 
 export function setGameService(server: Server) {
 

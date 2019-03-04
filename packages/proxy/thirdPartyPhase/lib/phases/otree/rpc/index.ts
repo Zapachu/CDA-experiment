@@ -1,6 +1,6 @@
 import { Server, ServerCredentials } from 'grpc'
 import {phaseService } from './service/OtreeManager'
-import {PhaseManager} from 'elf-proto'
+import {PhaseManager} from 'elf-protocol'
 import {gameService} from '../../common/utils'
 import setting from '../../../config/settings'
 import { resolve } from 'path'

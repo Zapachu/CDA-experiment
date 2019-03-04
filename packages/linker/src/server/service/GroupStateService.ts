@@ -3,7 +3,7 @@ import {getPhaseService} from '../rpc'
 import {GameService} from './GameService'
 import {EventDispatcher} from '../controller/eventDispatcher'
 import {Log, RedisKey, redisClient} from '@server-util'
-import {PhaseManager} from 'elf-proto'
+import {PhaseManager} from 'elf-protocol'
 
 const groupStateServices: { [groupId: string]: GroupStateService } = {}
 

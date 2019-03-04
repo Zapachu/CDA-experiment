@@ -2,8 +2,8 @@ import {loadPackageDefinition, credentials, Server} from 'grpc'
 import {loadSync} from '@grpc/proto-loader'
 import {resolve} from 'path'
 
-import {ICheckShareCodeReq, ICheckShareCodeRes} from './def/AcademusBespoke'
-import {proto} from './def/BespokeProxy'
+import {ICheckShareCodeReq, ICheckShareCodeRes} from './proto/AcademusBespoke'
+import {proto} from './proto/BespokeProxy'
 import {
     GameService,
     PhaseService,
@@ -14,10 +14,14 @@ import {
     IRegisterPhasesRes,
     ISendBackPlayerReq,
     ISendBackPlayerRes
-} from './def/phaseManager'
+} from './proto/phaseManager'
+
+import * as Model from './model'
+
+export {Model}
 
 export namespace AcademusBespoke {
-    let protoDef = loadPackageDefinition(loadSync(resolve(__dirname, './def/AcademusBespoke.proto'))) as any
+    let protoDef = loadPackageDefinition(loadSync(resolve(__dirname, './proto/AcademusBespoke.proto'))) as any
 
     export type TCheckShareCodeReq = ICheckShareCodeReq
     export type TCheckShareCodeCallback = (error?: Error, response?: ICheckShareCodeRes) => void
@@ -36,7 +40,7 @@ export namespace BespokeProxy {
     export function getProxyService(serviceURI: string): proto.ProxyService {
         if (!proxyServiceConsumer) {
             try {
-                const {proto: {ProxyService}} = loadPackageDefinition(loadSync(resolve(__dirname, './def/BespokeProxy.proto'))) as any
+                const {proto: {ProxyService}} = loadPackageDefinition(loadSync(resolve(__dirname, './proto/BespokeProxy.proto'))) as any
                 proxyServiceConsumer = new ProxyService(serviceURI, credentials.createInsecure()) as proto.ProxyService
             } catch (e) {
                 console.error(e)
@@ -47,7 +51,7 @@ export namespace BespokeProxy {
 }
 
 export namespace PhaseManager {
-    let protoDef = loadPackageDefinition(loadSync(resolve(__dirname, './def/PhaseManager.proto'))) as any
+    let protoDef = loadPackageDefinition(loadSync(resolve(__dirname, './proto/PhaseManager.proto'))) as any
 
     let gameService: GameService
 

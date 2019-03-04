@@ -12,8 +12,8 @@ export const elfSetting = <IElfSetting>{
     sessionSecret: 'sessionsecret',
     proxyService: {
         host: '127.0.0.1',
-        port: 8888,
-        rpcPort: 58888
+        port: 4001,
+        rpcPort: 54001
     },
     academusServiceUri: '127.0.0.1:53008',
     pythonRobotUri: '127.0.0.1:54001',

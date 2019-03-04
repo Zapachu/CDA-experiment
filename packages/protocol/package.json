@@ -1,5 +1,5 @@
 {
-  "name": "elf-proto",
+  "name": "elf-protocol",
   "version": "1.0.0",
   "main": "lib/index.ts",
   "types": "lib/index.ts",
@@ -7,5 +7,9 @@
     "@grpc/proto-loader": "^0.4.0",
     "elf-setting": "^1.0.0",
     "grpc": "^1.18.0"
+  },
+  "devDependencies": {
+    "@types/mongoose": "^5.3.20",
+    "mongoose": "^5.4.17"
   }
 }

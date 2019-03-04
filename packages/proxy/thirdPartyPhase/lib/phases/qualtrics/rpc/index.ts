@@ -1,7 +1,7 @@
 import { resolve } from 'path'
 import { readFileSync } from 'fs'
 import { Server, ServerCredentials } from 'grpc'
-import {PhaseManager} from 'elf-proto'
+import {PhaseManager} from 'elf-protocol'
 import {gameService} from '../../common/utils'
 import {phaseService } from './service/QualtricsManager'
 import setting from '../../../config/settings'

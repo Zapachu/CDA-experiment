@@ -1,7 +1,8 @@
 'use strict'
 
 import {ErrorPage} from '../../../common/utils/errorPage'
-import {GameUserPermissionModel, ThirdPartPhase} from '../../../../core/server/models'
+import {Model} from 'elf-protocol'
+import {ThirdPartPhase} from '../../../../core/server/models'
 import settings from '../../../../config/settings'
 import {list as otreeDemoList} from './otreeList'
 
@@ -34,7 +35,7 @@ const InitWork = (app) => {
         if (isGetOtreeList) {
             let permittedList = ['quiz']
             try {
-                const userGamePermissions: any = await GameUserPermissionModel.find({userId: req.user._id.toString()}).populate('gameTemplateId')
+                const userGamePermissions: any = await Model.GameUserPermissionModel.find({userId: req.user._id.toString()}).populate('gameTemplateId')
                 console.log(userGamePermissions)
                 userGamePermissions.forEach(rec => {
                     if (rec.gameTemplateId.namespace === 'otree_demo') {

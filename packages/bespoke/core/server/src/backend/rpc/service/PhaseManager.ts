@@ -2,7 +2,7 @@ import {elfPhaseId2PlayUrl, setting} from '../../util'
 import {GameModel} from '../../model'
 import {IGame} from 'bespoke-common'
 import {Server} from 'grpc'
-import {PhaseManager as P} from 'elf-proto'
+import {PhaseManager as P} from 'elf-protocol'
 
 export function setPhaseService(server: Server) {
     function newPhase({request: {groupId, owner, namespace, param}}: { request: P.TNewPhaseReq }, callback: P.TNewPhaseCallback): void {

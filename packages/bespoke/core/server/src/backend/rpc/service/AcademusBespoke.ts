@@ -1,5 +1,5 @@
 import {Server} from 'grpc'
-import {AcademusBespoke as A} from 'elf-proto'
+import {AcademusBespoke as A} from 'elf-protocol'
 import {RedisKey, redisClient} from '../../util'
 
 export function setBespokeService(server: Server) {

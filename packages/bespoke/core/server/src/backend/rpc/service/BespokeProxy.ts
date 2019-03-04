@@ -1,5 +1,5 @@
 import {setting} from '../../util'
-import {BespokeProxy} from 'elf-proto'
+import {BespokeProxy} from 'elf-protocol'
 
 export function getProxyService() {
     const {proxyService: {host, rpcPort}} = setting

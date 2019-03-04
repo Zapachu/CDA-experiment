@@ -1,6 +1,6 @@
 import { Server, ServerCredentials } from 'grpc'
 import {phaseService } from './service/qqwjManager'
-import {PhaseManager} from 'elf-proto'
+import {PhaseManager} from 'elf-protocol'
 import setting from '../../../config/settings'
 import {gameService} from '../../common/utils'
 import { resolve } from 'path'

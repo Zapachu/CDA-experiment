@@ -1,6 +1,6 @@
 import {IUser} from '@common'
 import {redisClient, RedisKey} from '@server-util'
-import {PhaseManager} from 'elf-proto'
+import {PhaseManager} from 'elf-protocol'
 
 export class PhaseService {
     static async getPhaseTemplates(user: IUser): Promise<Array<PhaseManager.IPhaseRegInfo>> {
