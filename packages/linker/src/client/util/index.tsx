@@ -1,5 +1,4 @@
 import * as React from "react"
-import classNames from 'classnames'
 
 export {Request as Api} from './request'
 export {loadScript} from './fileLoader'
@@ -22,8 +21,8 @@ export function genePhaseKey(): string {
 }
 
 export const connCtx = <C extends {}>(Context: React.Context<C>) =>
-    <P, S>(ComponentClass: React.ComponentClass<P & C, S>) => {
-        const ConsumerWrapper: React.SFC = (props: P) =>
+    <P, S>(ComponentClass: React.ComponentClass<any, S>) => {
+        const ConsumerWrapper: React.FunctionComponent = (props: P) =>
             <Context.Consumer>
                 {
                     (context: C) =>
@@ -32,7 +31,3 @@ export const connCtx = <C extends {}>(Context: React.Context<C>) =>
             </Context.Consumer>
         return ConsumerWrapper as any
     }
-
-export function clsNames(...classes: Array<string>): string {
-    return classNames(classes)
-}

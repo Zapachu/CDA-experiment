@@ -35,7 +35,8 @@ export class GroupStateService {
             return Promise.resolve({
                 key: phaseCfg.key,
                 status: baseEnum.PhaseStatus.playing,
-                playerStatus: {}
+                playerStatus: {},
+                playerPoint: {}
             })
         }
         const regInfo = await redisClient.get(RedisKey.phaseRegInfo(phaseCfg.namespace))
@@ -54,7 +55,8 @@ export class GroupStateService {
                     key: phaseCfg.key,
                     status: baseEnum.PhaseStatus.playing,
                     playUrl,
-                    playerStatus: {}
+                    playerStatus: {},
+                    playerPoint: {}
                 })
             })
         })
@@ -74,7 +76,7 @@ export class GroupStateService {
         }
     }
 
-    async sendBackPlayer(playUrl: string, playerToken: string, nextPhaseKey: string): Promise<void> {
+    async sendBackPlayer(playUrl: string, playerToken: string, nextPhaseKey: string, point: number): Promise<void> {
         const {group: {phaseConfigs}, groupState: {phaseStates}} = this
 
         let nextPhaseState
@@ -82,10 +84,10 @@ export class GroupStateService {
             nextPhaseState = await this.newPhase(phaseCfg)
             phaseStates.push(nextPhaseState)
         }
-        Log.d(phaseStates, playUrl)
         const currentPhaseState = phaseStates.find(phaseState => phaseState.playUrl === playUrl),
             currentPhaseCfgIndex = phaseConfigs.findIndex(phaseCfg => phaseCfg.key === currentPhaseState.key)
         currentPhaseState.playerStatus[playerToken] = baseEnum.PlayerStatus.left
+        currentPhaseState.playerPoint[playerToken] = point
         let phaseCfg = phaseConfigs.find(phaseCfg => phaseCfg.key === nextPhaseKey)
         if (!phaseCfg) {
             if (currentPhaseCfgIndex === phaseConfigs.length - 1) {

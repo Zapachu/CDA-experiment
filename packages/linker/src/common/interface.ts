@@ -34,7 +34,10 @@ export interface IPhaseState {
     status: PhaseStatus
     playUrl?: string
     playerStatus: {
-        [code: string]: PlayerStatus
+        [playerToken: string]: PlayerStatus
+    },
+    playerPoint:{
+        [playerToken:string]:number
     }
 }
 

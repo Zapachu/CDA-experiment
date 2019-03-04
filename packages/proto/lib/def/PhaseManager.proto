@@ -24,6 +24,7 @@ message SendBackPlayerReq {
     string playUrl = 2;
     string playerToken = 3;
     string nextPhaseKey = 4;
+    int32 point = 5;
 }
 message SendBackPlayerRes {
     string sendBackUrl = 1;

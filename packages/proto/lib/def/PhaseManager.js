@@ -770,6 +770,7 @@ $root.SendBackPlayerReq = (function() {
      * @property {string|null} [playUrl] SendBackPlayerReq playUrl
      * @property {string|null} [playerToken] SendBackPlayerReq playerToken
      * @property {string|null} [nextPhaseKey] SendBackPlayerReq nextPhaseKey
+     * @property {number|null} [point] SendBackPlayerReq point
      */
 
     /**
@@ -820,6 +821,14 @@ $root.SendBackPlayerReq = (function() {
     SendBackPlayerReq.prototype.nextPhaseKey = "";
 
     /**
+     * SendBackPlayerReq point.
+     * @member {number} point
+     * @memberof SendBackPlayerReq
+     * @instance
+     */
+    SendBackPlayerReq.prototype.point = 0;
+
+    /**
      * Creates a new SendBackPlayerReq instance using the specified properties.
      * @function create
      * @memberof SendBackPlayerReq
@@ -851,6 +860,8 @@ $root.SendBackPlayerReq = (function() {
             writer.uint32(/* id 3, wireType 2 =*/26).string(message.playerToken);
         if (message.nextPhaseKey != null && message.hasOwnProperty("nextPhaseKey"))
             writer.uint32(/* id 4, wireType 2 =*/34).string(message.nextPhaseKey);
+        if (message.point != null && message.hasOwnProperty("point"))
+            writer.uint32(/* id 5, wireType 0 =*/40).int32(message.point);
         return writer;
     };
 
@@ -896,6 +907,9 @@ $root.SendBackPlayerReq = (function() {
                 break;
             case 4:
                 message.nextPhaseKey = reader.string();
+                break;
+            case 5:
+                message.point = reader.int32();
                 break;
             default:
                 reader.skipType(tag & 7);
@@ -944,6 +958,9 @@ $root.SendBackPlayerReq = (function() {
         if (message.nextPhaseKey != null && message.hasOwnProperty("nextPhaseKey"))
             if (!$util.isString(message.nextPhaseKey))
                 return "nextPhaseKey: string expected";
+        if (message.point != null && message.hasOwnProperty("point"))
+            if (!$util.isInteger(message.point))
+                return "point: integer expected";
         return null;
     };
 
@@ -967,6 +984,8 @@ $root.SendBackPlayerReq = (function() {
             message.playerToken = String(object.playerToken);
         if (object.nextPhaseKey != null)
             message.nextPhaseKey = String(object.nextPhaseKey);
+        if (object.point != null)
+            message.point = object.point | 0;
         return message;
     };
 
@@ -988,6 +1007,7 @@ $root.SendBackPlayerReq = (function() {
             object.playUrl = "";
             object.playerToken = "";
             object.nextPhaseKey = "";
+            object.point = 0;
         }
         if (message.groupId != null && message.hasOwnProperty("groupId"))
             object.groupId = message.groupId;
@@ -997,6 +1017,8 @@ $root.SendBackPlayerReq = (function() {
             object.playerToken = message.playerToken;
         if (message.nextPhaseKey != null && message.hasOwnProperty("nextPhaseKey"))
             object.nextPhaseKey = message.nextPhaseKey;
+        if (message.point != null && message.hasOwnProperty("point"))
+            object.point = message.point;
         return object;
     };
 
