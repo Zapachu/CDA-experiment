@@ -5,7 +5,6 @@
   "repository": " ",
   "license": "ISC",
   "scripts": {
-    "buildDts": "ts-node ./src/client/script/buildDts.ts",
     "client:build": "webpack  --env.TS_NODE_PROJECT=\"tsconfig.json\"  --config ./src/client/script/webpack.ts",
     "client:dist": "npm run client:build --buildMode=dist",
     "server:ts-serve": "ts-node ./src/server/server.ts"

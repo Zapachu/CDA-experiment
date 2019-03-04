@@ -14,7 +14,7 @@
 
 
 ## 首次运行
- - `npx lerna init`
+ - `npx lerna bootstrap`
  - `cd linker`
    - `npm run client:dist`
    - `npm run server:ts-serve`
@@ -26,8 +26,9 @@
    - `npm run otree`
    - `npm run wjx:dist`
    - ...
- - `cd bespoke`
-   - `npm run core:dist`
-   - `cd VickreyAuction2`
-   - `ts-node ./script/buildClient.ts`
-   - `ts-node ./src/serve.ts`
+ - `cd bespoke\game`
+   - `npm run help`
+   - --- OR ---
+   - `cd VickreyAuction2/scrpit`
+   - `webpack --env.TS_NODE_PROJECT="../../tsconfig.json" --config ./webpack.config.ts`
+   - `pm2 start ./pm2.json`
