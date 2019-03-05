@@ -5,6 +5,7 @@ import {EventHandler} from './eventHandler'
 import {Log} from "@server-util"
 import {EventEmitter} from "events"
 import {GameService} from '@server-service'
+import {UserModel} from '@server-model'
 
 export interface IConnection extends EventEmitter {
     id: string
@@ -39,9 +40,10 @@ export class EventDispatcher {
     static startGroupSocket(server: Server): Server {
         this.socket = socketIO(server, {path: config.socketPath})
         this.socket.on(baseEnum.SocketEvent.connection, async (connection: socketIO.Socket) => {
-            const {token, type, groupId} = connection.handshake.query
+            const {token, type, groupId, userId} = connection.handshake.query
             const group = await GameService.getGame(groupId)
-            this.subscribeOnConnection(Object.assign(connection, {actor: {token, type}, group}) as any)
+            const {name} = await UserModel.findById(userId)
+            this.subscribeOnConnection(Object.assign(connection, {actor: {token, type, userId, userName:name}, group}) as any)
         })
         return server
     }

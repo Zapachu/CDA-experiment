@@ -24,7 +24,7 @@ async function request(url, method: baseEnum.RequestMethod = baseEnum.RequestMet
         method,
         ...(data ? {body: JSON.stringify(data)} : {})
     } as RequestInit
-    const res = await fetch(`/${config.rootName}${url}`, option)
+    const res = await fetch(url.startsWith('/v5') ? url : `/${config.rootName}${url}`, option)
     if (res.ok) {
         return res.json()
     }
@@ -120,4 +120,14 @@ export class Request {
         return await GET('/game/actor/:gameId', {gameId}, {token})
     }
 
+    /**** V5 ****/
+    static async reward(orgCode:string, gameId: string, data: {
+        money:number,
+        subject: number,
+        task: string,
+        tasker: string,
+        payeeId: string
+    }): Promise<{ err: number }> {
+        return await request(`/v5/apiv5/${orgCode}/researcher/trans/reward`, baseEnum.RequestMethod.post, data)
+    }
 }

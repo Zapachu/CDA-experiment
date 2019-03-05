@@ -4,6 +4,7 @@ import {config} from '@common'
 import {TRootContext, rootContext} from '@client-context'
 import {Group} from './Group'
 import {Game} from './Game'
+import {Loading} from '@client-component'
 import {Api} from '@client-util'
 import * as style from './initial.scss'
 
@@ -26,16 +27,18 @@ export class Root extends React.Component<{}, IRootState> {
 
     render(): React.ReactNode {
         const {state: {user}} = this
-        return <rootContext.Provider value={{user}}>
-            <div className={style.languageSwitcherWrapper}>
-                {/*<LanguageSwitcher/>*/}
-            </div>
-            <BrowserRouter basename={`${config.rootName}/${config.appPrefix}`}>
-                <Switch>
-                    <Route path="/game" component={Game}/>
-                    <Route path="/group" component={Group}/>
-                </Switch>
-            </BrowserRouter>
-        </rootContext.Provider>
+        return user ? <section className={style.rootView}>
+            <rootContext.Provider value={{user}}>
+                <div className={style.languageSwitcherWrapper}>
+                    {/*<LanguageSwitcher/>*/}
+                </div>
+                <BrowserRouter basename={`${config.rootName}/${config.appPrefix}`}>
+                    <Switch>
+                        <Route path="/game" component={Game}/>
+                        <Route path="/group" component={Group}/>
+                    </Switch>
+                </BrowserRouter>
+            </rootContext.Provider>
+        </section> : <Loading/>
     }
 }

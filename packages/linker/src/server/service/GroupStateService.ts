@@ -1,4 +1,13 @@
-import {baseEnum, CorePhaseNamespace, IGroupState, IGameWithId, IPhaseConfig, IPhaseState, NFrame} from '@common'
+import {
+    baseEnum,
+    CorePhaseNamespace,
+    IGroupState,
+    IGameWithId,
+    IPhaseConfig,
+    IPhaseState,
+    NFrame,
+    IActor
+} from '@common'
 import {getPhaseService} from '../rpc'
 import {GameService} from './GameService'
 import {EventDispatcher} from '../controller/eventDispatcher'
@@ -35,8 +44,7 @@ export class GroupStateService {
             return Promise.resolve({
                 key: phaseCfg.key,
                 status: baseEnum.PhaseStatus.playing,
-                playerStatus: {},
-                playerPoint: {}
+                playerState: {}
             })
         }
         const regInfo = await redisClient.get(RedisKey.phaseRegInfo(phaseCfg.namespace))
@@ -55,8 +63,7 @@ export class GroupStateService {
                     key: phaseCfg.key,
                     status: baseEnum.PhaseStatus.playing,
                     playUrl,
-                    playerStatus: {},
-                    playerPoint: {}
+                    playerState: {}
                 })
             })
         })
@@ -69,10 +76,15 @@ export class GroupStateService {
         return this
     }
 
-    async joinGroupRoom(token: string): Promise<void> {
+    async joinGroupRoom(actor: IActor): Promise<void> {
         const {groupState: {phaseStates}} = this
-        if (phaseStates.length === 1 && phaseStates[0].playerStatus[token] === undefined) {
-            phaseStates[0].playerStatus[token] = baseEnum.PlayerStatus.playing
+        if (phaseStates.length === 1 && phaseStates[0].playerState[actor.token] === undefined) {
+            phaseStates[0].playerState[actor.token] = {
+                status: baseEnum.PlayerStatus.playing,
+                userName: actor.userName,
+                userId: actor.userId,
+                point: 0
+            }
         }
     }
 
@@ -86,8 +98,8 @@ export class GroupStateService {
         }
         const currentPhaseState = phaseStates.find(phaseState => phaseState.playUrl === playUrl),
             currentPhaseCfgIndex = phaseConfigs.findIndex(phaseCfg => phaseCfg.key === currentPhaseState.key)
-        currentPhaseState.playerStatus[playerToken] = baseEnum.PlayerStatus.left
-        currentPhaseState.playerPoint[playerToken] = point
+        currentPhaseState.playerState[playerToken].status = baseEnum.PlayerStatus.left
+        currentPhaseState.playerState[playerToken].point = point
         let phaseCfg = phaseConfigs.find(phaseCfg => phaseCfg.key === nextPhaseKey)
         if (!phaseCfg) {
             if (currentPhaseCfgIndex === phaseConfigs.length - 1) {

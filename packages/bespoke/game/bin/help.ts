@@ -39,7 +39,7 @@ prompt([
                 }
             ]).then(({port, rpcPort}) => {
                 env.PORT = port
-                env.RPCPORT = rpcPort
+                env.RPC_PORT = rpcPort
                 exec(`ts-node ./${namespace}/src/serve.ts`)
             })
     }

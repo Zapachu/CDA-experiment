@@ -21,7 +21,7 @@ export class Play extends React.Component<TRootContext & RouteComponentProps<{ g
     state: IPlayState = {}
 
     async componentDidMount() {
-        const {props: {match: {params: {gameId}}, location: {search}}} = this,
+        const {props: {match: {params: {gameId}}, location: {search}, user}} = this,
             {token = ''} = queryString.parse(search)
         const {game} = await Api.getGame(gameId),
             {actor} = await Api.getActor(gameId, token as string)
@@ -30,7 +30,7 @@ export class Play extends React.Component<TRootContext & RouteComponentProps<{ g
         }
         const socketClient = connect('/', {
             path: config.socketPath,
-            query: `groupId=${gameId}&token=${actor.token}&type=${actor.type}`
+            query: `groupId=${gameId}&token=${actor.token}&type=${actor.type}&userId=${user.id}`
         })
         this.registerStateReducer(socketClient)
         this.setState({
