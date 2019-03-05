@@ -22,6 +22,7 @@ function getJsUrls(): Array<{ namespace: string, jsUrl: string }> {
     Object.entries(JSON.parse(readFileSync(resolve(__dirname, '../../../../dist/manifest.json')).toString())).map(([k, v]) => {
         if (k.replace('.js', '') === 'otree') {
             otreePhase.push({
+                type:PhaseManager.PhaseType.otree,
                 namespace: k.replace('.js', ''),
                 jsUrl: `${setting.localOtreeRootUrl}${v}`,
                 rpcUri: setting.localOtreePhaseServiceUri

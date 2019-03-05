@@ -1,4 +1,13 @@
-import {config, baseEnum, IGameWithId, IActor, IBaseGameWithId, IUserWithId, TApiGroupPlayers, IGameToUpdate} from '@common'
+import {
+    config,
+    baseEnum,
+    IGameWithId,
+    IActor,
+    IBaseGameWithId,
+    IUserWithId,
+    TApiGroupPlayers,
+    IGameToUpdate
+} from '@common'
 import {getCookie} from '@client-util'
 import * as queryString from 'query-string'
 
@@ -69,12 +78,12 @@ export class Request {
         return await POST('/game/joinWithShareCode', null, null, {code})
     }
 
-    static async joinGame(gameId: string):Promise<IHttpRes>{
-        return await POST('/game/join/:gameId',{gameId})
+    static async joinGame(gameId: string): Promise<IHttpRes> {
+        return await POST('/game/join/:gameId', {gameId})
     }
 
-    static async getPlayers(gameId: string):Promise<IHttpRes & {players:TApiGroupPlayers}>{
-        return await GET('/game/getPlayers/:gameId',{gameId})
+    static async getPlayers(gameId: string): Promise<IHttpRes & { players: TApiGroupPlayers }> {
+        return await GET('/game/getPlayers/:gameId', {gameId})
     }
 
     static async getGameList(): Promise<IHttpRes & { gameList: Array<IGameWithId> }> {
@@ -82,7 +91,7 @@ export class Request {
     }
 
     static async getPhaseTemplates(): Promise<IHttpRes & {
-        templates: Array<{ namespace: string, jsUrl: string }>
+        templates: Array<{ namespace: string, jsUrl: string, type: string }>
     }> {
         return await GET('/game/phaseTemplates')
     }

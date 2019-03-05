@@ -5,7 +5,6 @@ import {TRootContext, rootContext} from '@client-context'
 import {Group} from './Group'
 import {Game} from './Game'
 import {Api} from '@client-util'
-import {LanguageSwitcher} from '@client-component'
 import * as style from './initial.scss'
 
 declare interface IRootState extends TRootContext {
@@ -29,7 +28,7 @@ export class Root extends React.Component<{}, IRootState> {
         const {state: {user}} = this
         return <rootContext.Provider value={{user}}>
             <div className={style.languageSwitcherWrapper}>
-                <LanguageSwitcher/>
+                {/*<LanguageSwitcher/>*/}
             </div>
             <BrowserRouter basename={`${config.rootName}/${config.appPrefix}`}>
                 <Switch>

@@ -324,6 +324,7 @@ $root.RegisterPhasesReq = (function() {
          * @property {string|null} [namespace] phaseRegInfo namespace
          * @property {string|null} [jsUrl] phaseRegInfo jsUrl
          * @property {string|null} [rpcUri] phaseRegInfo rpcUri
+         * @property {string|null} [type] phaseRegInfo type
          */
 
         /**
@@ -366,6 +367,14 @@ $root.RegisterPhasesReq = (function() {
         phaseRegInfo.prototype.rpcUri = "";
 
         /**
+         * phaseRegInfo type.
+         * @member {string} type
+         * @memberof RegisterPhasesReq.phaseRegInfo
+         * @instance
+         */
+        phaseRegInfo.prototype.type = "";
+
+        /**
          * Creates a new phaseRegInfo instance using the specified properties.
          * @function create
          * @memberof RegisterPhasesReq.phaseRegInfo
@@ -395,6 +404,8 @@ $root.RegisterPhasesReq = (function() {
                 writer.uint32(/* id 2, wireType 2 =*/18).string(message.jsUrl);
             if (message.rpcUri != null && message.hasOwnProperty("rpcUri"))
                 writer.uint32(/* id 3, wireType 2 =*/26).string(message.rpcUri);
+            if (message.type != null && message.hasOwnProperty("type"))
+                writer.uint32(/* id 4, wireType 2 =*/34).string(message.type);
             return writer;
         };
 
@@ -437,6 +448,9 @@ $root.RegisterPhasesReq = (function() {
                     break;
                 case 3:
                     message.rpcUri = reader.string();
+                    break;
+                case 4:
+                    message.type = reader.string();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -482,6 +496,9 @@ $root.RegisterPhasesReq = (function() {
             if (message.rpcUri != null && message.hasOwnProperty("rpcUri"))
                 if (!$util.isString(message.rpcUri))
                     return "rpcUri: string expected";
+            if (message.type != null && message.hasOwnProperty("type"))
+                if (!$util.isString(message.type))
+                    return "type: string expected";
             return null;
         };
 
@@ -503,6 +520,8 @@ $root.RegisterPhasesReq = (function() {
                 message.jsUrl = String(object.jsUrl);
             if (object.rpcUri != null)
                 message.rpcUri = String(object.rpcUri);
+            if (object.type != null)
+                message.type = String(object.type);
             return message;
         };
 
@@ -523,6 +542,7 @@ $root.RegisterPhasesReq = (function() {
                 object.namespace = "";
                 object.jsUrl = "";
                 object.rpcUri = "";
+                object.type = "";
             }
             if (message.namespace != null && message.hasOwnProperty("namespace"))
                 object.namespace = message.namespace;
@@ -530,6 +550,8 @@ $root.RegisterPhasesReq = (function() {
                 object.jsUrl = message.jsUrl;
             if (message.rpcUri != null && message.hasOwnProperty("rpcUri"))
                 object.rpcUri = message.rpcUri;
+            if (message.type != null && message.hasOwnProperty("type"))
+                object.type = message.type;
             return object;
         };
 

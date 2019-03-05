@@ -12,6 +12,7 @@ message RegisterPhasesReq {
         string namespace = 1;
         string jsUrl = 2;
         string rpcUri = 3;
+        string type = 4;
     }
     repeated phaseRegInfo phases = 1;
 }
