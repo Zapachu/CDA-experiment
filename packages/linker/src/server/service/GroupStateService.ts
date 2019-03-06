@@ -87,7 +87,7 @@ export class GroupStateService {
         }
     }
 
-    async sendBackPlayer(playUrl: string, playerToken: string, nextPhaseKey: string, phasePlayerId:string, detailIframeUrl:string): Promise<void> {
+    async sendBackPlayer(playUrl: string, playerToken: string, nextPhaseKey: string, phasePlayer:PhaseManager.TPhasePlayer): Promise<void> {
         const {group: {phaseConfigs}, groupState: {phaseStates}} = this
 
         let nextPhaseState
@@ -98,8 +98,7 @@ export class GroupStateService {
         const currentPhaseState = phaseStates.find(phaseState => phaseState.playUrl === playUrl),
             currentPhaseCfgIndex = phaseConfigs.findIndex(phaseCfg => phaseCfg.key === currentPhaseState.key)
         currentPhaseState.playerState[playerToken].status = baseEnum.PlayerStatus.left
-        currentPhaseState.playerState[playerToken].phasePlayerId = phasePlayerId
-        currentPhaseState.playerState[playerToken].detailIframeUrl = detailIframeUrl
+        currentPhaseState.playerState[playerToken].phasePlayer = phasePlayer
         let phaseCfg = phaseConfigs.find(phaseCfg => phaseCfg.key === nextPhaseKey)
         if (!phaseCfg) {
             if (currentPhaseCfgIndex === phaseConfigs.length - 1) {

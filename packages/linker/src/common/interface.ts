@@ -1,5 +1,6 @@
 import {PhaseStatus, PlayerStatus, Actor, AcademusRole} from './baseEnum'
 import {Socket} from 'socket.io-client'
+import {PhaseManager} from 'elf-protocol'
 
 export type TSocket = typeof Socket
 
@@ -40,8 +41,7 @@ export interface IPhaseState {
             userId: string
             userName: string
             status: PlayerStatus
-            phasePlayerId?: string
-            detailIframeUrl?: string
+            phasePlayer?: PhaseManager.TPhasePlayer
         }
     }
 }

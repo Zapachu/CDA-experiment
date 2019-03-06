@@ -50,7 +50,9 @@ export class Play4Owner extends React.Component<TRootContext & TPlayContext & { 
                                     <List.Item>
                                         <List.Item.Meta title={`Token : ${playerToken}`}
                                                         description={
-                                                            `${playerState.userName}:${lang[PlayerStatus[playerState.status]]}`
+                                                            `${playerState.userName}:${lang[PlayerStatus[playerState.status]]}
+                                                               ${JSON.stringify(playerState.phasePlayer||'')}
+                                                            `
                                                         }/>
                                         <RewardPanel {...{
                                             orgCode: user.orgCode,
