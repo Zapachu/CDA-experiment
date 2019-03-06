@@ -25,7 +25,8 @@ message SendBackPlayerReq {
     string playUrl = 2;
     string playerToken = 3;
     string nextPhaseKey = 4;
-    int32 point = 5;
+    string phasePlayerId = 5;
+    string detailIframeUrl = 6;
 }
 message SendBackPlayerRes {
     string sendBackUrl = 1;

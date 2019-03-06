@@ -40,7 +40,8 @@ export interface IPhaseState {
             userId: string
             userName: string
             status: PlayerStatus
-            point: number
+            phasePlayerId?: string
+            detailIframeUrl?: string
         }
     }
 }

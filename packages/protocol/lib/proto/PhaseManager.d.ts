@@ -377,8 +377,11 @@ export interface ISendBackPlayerReq {
     /** SendBackPlayerReq nextPhaseKey */
     nextPhaseKey?: (string|null);
 
-    /** SendBackPlayerReq point */
-    point?: (number|null);
+    /** SendBackPlayerReq phasePlayerId */
+    phasePlayerId?: (string|null);
+
+    /** SendBackPlayerReq detailIframeUrl */
+    detailIframeUrl?: (string|null);
 }
 
 /** Represents a SendBackPlayerReq. */
@@ -402,8 +405,11 @@ export class SendBackPlayerReq implements ISendBackPlayerReq {
     /** SendBackPlayerReq nextPhaseKey. */
     public nextPhaseKey: string;
 
-    /** SendBackPlayerReq point. */
-    public point: number;
+    /** SendBackPlayerReq phasePlayerId. */
+    public phasePlayerId: string;
+
+    /** SendBackPlayerReq detailIframeUrl. */
+    public detailIframeUrl: string;
 
     /**
      * Creates a new SendBackPlayerReq instance using the specified properties.
