@@ -30,7 +30,7 @@ async function getJsUrls() {
         jsUrl: `${setting.localOtreeRootUrl}${manifest['otree.js']}`,
         rpcUri: setting.localOtreePhaseServiceUri
     }
-    await getDemoList()
+    await getDemoList(regPhase.namespace)
     return [regPhase]
 }
 
