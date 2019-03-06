@@ -1,10 +1,10 @@
-import { Server, ServerCredentials } from 'grpc'
-import {phaseService } from './service/OtreeManager'
+import {Server, ServerCredentials} from 'grpc'
+import {phaseService} from './service/OtreeManager'
 import {PhaseManager} from 'elf-protocol'
 import {gameService} from '../../common/utils'
 import setting from '../../../config/settings'
-import { resolve } from 'path'
-import { readFileSync } from 'fs'
+import {resolve} from 'path'
+import {readFileSync} from 'fs'
 
 export function serve() {
     const server = new Server()
@@ -21,24 +21,21 @@ export function serve() {
  * namespace: oTree + hash
  * data: {namespace, list}
  */
-function getJsUrls(): Array<{ namespace: string, jsUrl: string }> {
-    const otreePhase = []
-    Object.entries(JSON.parse(readFileSync(resolve(__dirname, '../../../../dist/manifest.json')).toString())).map(([k, v]) => {
-        if (k.replace('.js', '') === 'otree') {
-            otreePhase.push({
-                type:PhaseManager.PhaseType.otree,
-                namespace: k.replace('.js', ''),
-                jsUrl: `${setting.localOtreeRootUrl}${v}`,
-                rpcUri: setting.localOtreePhaseServiceUri
-            })
-        }
-    })
-    return otreePhase
+function getJsUrls() {
+    const manifest = JSON.parse(readFileSync(resolve(__dirname, '../../../../dist/manifest.json')).toString())
+    const regPhase = {
+        type: PhaseManager.PhaseType.otree,
+        namespace: `oTree-${Date.now()}`,
+        jsUrl: `${setting.localOtreeRootUrl}${manifest['otree.js']}`,
+        rpcUri: setting.localOtreePhaseServiceUri
+    }
+
+    return [regPhase]
 }
 
 // 注册 Otree Phase
 function registerPhases() {
-    gameService.registerPhases({ phases: getJsUrls() }, (err) => {
+    gameService.registerPhases({phases: getJsUrls()}, (err) => {
         if (err) {
             console.log(err)
         }
