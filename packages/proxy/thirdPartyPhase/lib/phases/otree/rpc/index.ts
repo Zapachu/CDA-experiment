@@ -14,8 +14,12 @@ export function serve() {
     setInterval(() => registerPhases(), 10000)
 }
 
+
 /**
- * 注册 phase 提供的信息
+ * Init: list
+ * GET oTree List Functions / oTree List Cache
+ * namespace: oTree + hash
+ * data: {namespace, list}
  */
 function getJsUrls(): Array<{ namespace: string, jsUrl: string }> {
     const otreePhase = []
