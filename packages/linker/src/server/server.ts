@@ -46,7 +46,7 @@ express.use(`/${config.rootName}/static`, Express.static(
 ))
 const RedisStore = connectRedis(expressSession)
 express.use(expressSession({
-    name: "academy.sid",
+    name: 'academy.sid',
     resave: true,
     saveUninitialized: true,
     secret: settings.sessionSecret,
@@ -60,11 +60,17 @@ express.use(expressSession({
         maxAge: 1000 * 60 * 60 * 24 * 7
     }
 }))
-express.use(csrf(
-    {
-        cookie: config.cookieKey.csrf
+const csrfWhitelist = [`/${config.rootName}/${config.apiPrefix}/game/phaseTemplates`]
+express.use((req: Express.Request, res: Express.Response, next: Express.NextFunction) => {
+    if (csrfWhitelist.includes(req.path)) {
+        return next()
     }
-))
+    csrf(
+        {
+            cookie: config.cookieKey.csrf
+        }
+    )(req, res, next)
+})
 usePassport(express)
 express.use(`/${config.rootName}`, requestRouter)
 express.set('port', settings.port)

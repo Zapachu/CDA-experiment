@@ -5,6 +5,7 @@ import {gen32Token} from './gen32Token'
 
 const SessionTokenCheck = (app) => {
     app.use((req, res, next) => {
+        console.log(req.url)
 
         const excludes = [
             'static',

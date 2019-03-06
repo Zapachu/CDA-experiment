@@ -2,14 +2,14 @@
 
 import '../auth/passport'
 import * as passport from 'passport'
-import {UserModel} from '../../../core/server/models'
+import {Model} from 'elf-protocol'
 
 passport.serializeUser(function (user, done) {
     // @ts-ignore
     done(null, user._id);
 });
 passport.deserializeUser(function (id, done) {
-    UserModel.findById(id, function (err, user) {
+    Model.UserModel.findById(id, function (err, user) {
         done(err, user);
     });
 });

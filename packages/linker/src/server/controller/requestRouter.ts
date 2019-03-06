@@ -18,6 +18,7 @@ const apiRouter = Router()
         .post('/join/:gameId', GameCtrl.joinGame)
         .get('/baseInfo/:gameId', GameCtrl.getBaseGame)
         .get('/getPlayers/:gameId', GameCtrl.getPlayers)
+        .get('/rewarded', GameCtrl.getRewardedMoney)
         .get('/:gameId', GameCtrl.getGame)
     )
 

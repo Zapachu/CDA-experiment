@@ -1,9 +1,18 @@
-import {baseEnum, CorePhaseNamespace, IGroupState, IGameWithId, IPhaseConfig, IPhaseState, NFrame} from '@common'
+import {
+    baseEnum,
+    CorePhaseNamespace,
+    IGroupState,
+    IGameWithId,
+    IPhaseConfig,
+    IPhaseState,
+    NFrame,
+    IActor
+} from '@common'
 import {getPhaseService} from '../rpc'
 import {GameService} from './GameService'
 import {EventDispatcher} from '../controller/eventDispatcher'
 import {Log, RedisKey, redisClient} from '@server-util'
-import {PhaseManager} from 'elf-proto'
+import {PhaseManager} from 'elf-protocol'
 
 const groupStateServices: { [groupId: string]: GroupStateService } = {}
 
@@ -35,7 +44,7 @@ export class GroupStateService {
             return Promise.resolve({
                 key: phaseCfg.key,
                 status: baseEnum.PhaseStatus.playing,
-                playerStatus: {}
+                playerState: {}
             })
         }
         const regInfo = await redisClient.get(RedisKey.phaseRegInfo(phaseCfg.namespace))
@@ -46,15 +55,15 @@ export class GroupStateService {
                 groupId: this.group.id,
                 namespace: phaseCfg.namespace,
                 param: JSON.stringify(phaseCfg.param)
-            }, (err, {playUrl}) => {
+            }, (err, res) => {
                 if (err) {
                     return reject(err)
                 }
                 resolve({
                     key: phaseCfg.key,
                     status: baseEnum.PhaseStatus.playing,
-                    playUrl,
-                    playerStatus: {}
+                    playUrl:res.playUrl,
+                    playerState: {}
                 })
             })
         })
@@ -67,14 +76,17 @@ export class GroupStateService {
         return this
     }
 
-    async joinGroupRoom(token: string): Promise<void> {
+    async joinGroupRoom(actor: IActor): Promise<void> {
         const {groupState: {phaseStates}} = this
-        if (phaseStates.length === 1 && phaseStates[0].playerStatus[token] === undefined) {
-            phaseStates[0].playerStatus[token] = baseEnum.PlayerStatus.playing
+        if (phaseStates.length === 1 && phaseStates[0].playerState[actor.token] === undefined) {
+            phaseStates[0].playerState[actor.token] = {
+                actor,
+                status: baseEnum.PlayerStatus.playing
+            }
         }
     }
 
-    async sendBackPlayer(playUrl: string, playerToken: string, nextPhaseKey: string): Promise<void> {
+    async sendBackPlayer(playUrl: string, playerToken: string, nextPhaseKey: string, phasePlayer:PhaseManager.TPhasePlayer): Promise<void> {
         const {group: {phaseConfigs}, groupState: {phaseStates}} = this
 
         let nextPhaseState
@@ -82,10 +94,10 @@ export class GroupStateService {
             nextPhaseState = await this.newPhase(phaseCfg)
             phaseStates.push(nextPhaseState)
         }
-        Log.d(phaseStates, playUrl)
         const currentPhaseState = phaseStates.find(phaseState => phaseState.playUrl === playUrl),
             currentPhaseCfgIndex = phaseConfigs.findIndex(phaseCfg => phaseCfg.key === currentPhaseState.key)
-        currentPhaseState.playerStatus[playerToken] = baseEnum.PlayerStatus.left
+        currentPhaseState.playerState[playerToken].status = baseEnum.PlayerStatus.left
+        currentPhaseState.playerState[playerToken].phasePlayer = phasePlayer
         let phaseCfg = phaseConfigs.find(phaseCfg => phaseCfg.key === nextPhaseKey)
         if (!phaseCfg) {
             if (currentPhaseCfgIndex === phaseConfigs.length - 1) {

@@ -2,7 +2,7 @@ import { Server, ServerCredentials } from 'grpc'
 import { phaseService } from './service/WjxManager'
 import { resolve } from 'path'
 import { readFileSync } from 'fs'
-import {PhaseManager} from 'elf-proto'
+import {PhaseManager} from 'elf-protocol'
 import setting from '../../../config/settings'
 import {gameService} from '../../common/utils'
 
@@ -19,6 +19,7 @@ function getJsUrls(): Array<{ namespace: string, jsUrl: string }> {
     Object.entries(JSON.parse(readFileSync(resolve(__dirname, '../../../../dist/manifest.json')).toString())).map(([k, v]) => {
         if (k.replace('.js', '') === 'wjx') {
             phases.push({
+                type:PhaseManager.PhaseType.wjx,
                 namespace: k.replace('.js', ''),
                 jsUrl: `${setting.localWjxRootUrl}${v}`,
                 rpcUri: setting.localWjxServiceUri

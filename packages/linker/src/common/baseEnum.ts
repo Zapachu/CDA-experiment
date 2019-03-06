@@ -9,6 +9,11 @@ export enum AcademusRole {
     teacher = 1
 }
 
+export enum AcademusResCode {
+    success = 0,
+    err = 1
+}
+
 export enum Role {
     owner,
     player

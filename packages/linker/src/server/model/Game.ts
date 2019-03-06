@@ -13,6 +13,8 @@ const GameSchema = new Schema({
     phaseConfigs: Object,
     published: {type: Boolean, default: false},
     mode: String,
+    createAt: { type: Date, default: Date.now },
+    updateAt: { type: Date, default: Date.now },
 }, {minimize: false})
 
 export const GameModel = model<GameDoc>('ElfGame', GameSchema)

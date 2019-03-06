@@ -1,14 +1,15 @@
 'use strict'
 
 import {ErrorPage} from '../../../common/utils/errorPage'
-import {GameUserPermissionModel, ThirdPartPhase} from '../../../../core/server/models'
+import ListMap from '../utils/ListMap'
+import {ThirdPartPhase} from '../../../../core/server/models'
 import settings from '../../../../config/settings'
-import {list as otreeDemoList} from './otreeList'
 
 const {localOtreeRootUrl} = settings
 
 const InitWork = (app) => {
     app.use(async (req, res, next) => {
+        console.log(req.url)
         const originWrite = res.write
         const originEnd = res.end
 
@@ -19,34 +20,23 @@ const InitWork = (app) => {
         }
 
         const noRes = () => {
-            res.write = () => {}
-            res.end = () => {}
+            res.write = () => {
+            }
+            res.end = () => {
+            }
         }
 
         noRes()
         console.log(`${req.method}  ${req.url}`)
-        console.log(req.user)
-        if (!req.user) return ErrorPage(okRes(), 'Not Login')
+        // console.log(req.user)
+        // if (!req.user) return ErrorPage(okRes(), 'Not Login')
         const isInit = req.url.includes('/init')                  // 初始化的标志
         const isGetOtreeList = req.url.includes('/phases/list')   // 获取许可列表
         const otreeParticipantUrl = 'InitializeParticipant/'      // 初始化的标志
 
         if (isGetOtreeList) {
-            let permittedList = ['quiz']
-            try {
-                const userGamePermissions: any = await GameUserPermissionModel.find({userId: req.user._id.toString()}).populate('gameTemplateId')
-                console.log(userGamePermissions)
-                userGamePermissions.forEach(rec => {
-                    if (rec.gameTemplateId.namespace === 'otree_demo') {
-                        permittedList = otreeDemoList
-                    }
-                })
-                return okRes().json({err: 0, list: permittedList})
-            } catch (err) {
-                if (err) {
-                    return okRes().json({err: 1, msg: err})
-                }
-            }
+            const list = ListMap.getList(settings.otreeUser1)
+            return okRes().json({err: 0, list})
         }
 
         if (isInit) {
@@ -55,7 +45,7 @@ const InitWork = (app) => {
             const phaseId = req.path.split('InitializeParticipant/')[1]
 
             try {
-                const Phase:any = await ThirdPartPhase.findById(phaseId).exec()
+                const Phase: any = await ThirdPartPhase.findById(phaseId).exec()
 
                 if (!Phase) {
                     return ErrorPage(okRes(), 'phase not found')

@@ -12,9 +12,9 @@ const {otreeRootName: namespace, otreePort: port} = settings
 const app = Express()
 
 ConDB()
-SessionSetMiddleware(app)
-PassportMiddleware(app)
 StaticPathMiddleware(app, namespace)
+SessionSetMiddleware(app)
+// PassportMiddleware(app)
 
 SessionTokenCheck(app)
 InitWork(app)

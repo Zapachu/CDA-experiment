@@ -1,4 +1,4 @@
-import {BaseRobot, FreeStyleModel, redisClient} from '@dev/server'
+import {BaseRobot, FreeStyleModel, redisClient} from 'bespoke-server'
 import * as dateFormat from 'dateformat'
 import {
     AdjustDirection,

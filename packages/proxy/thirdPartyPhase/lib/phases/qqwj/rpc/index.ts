@@ -1,6 +1,6 @@
 import { Server, ServerCredentials } from 'grpc'
 import {phaseService } from './service/qqwjManager'
-import {PhaseManager} from 'elf-proto'
+import {PhaseManager} from 'elf-protocol'
 import setting from '../../../config/settings'
 import {gameService} from '../../common/utils'
 import { resolve } from 'path'
@@ -19,6 +19,7 @@ function getJsUrls(): Array<{ namespace: string, jsUrl: string }> {
     Object.entries(JSON.parse(readFileSync(resolve(__dirname, '../../../../dist/manifest.json')).toString())).map(([k, v]) => {
         if (k.replace('.js', '') === 'qqwj') {
             phases.push({
+                type:PhaseManager.PhaseType.qqwj,
                 namespace: k.replace('.js', ''),
                 jsUrl: `${setting.localqqwjRootUrl}${v}`,
                 rpcUri: setting.localqqwjServiceUri

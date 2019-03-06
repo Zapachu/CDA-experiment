@@ -1,5 +1,6 @@
 import {PhaseStatus, PlayerStatus, Actor, AcademusRole} from './baseEnum'
 import {Socket} from 'socket.io-client'
+import {PhaseManager} from 'elf-protocol'
 
 export type TSocket = typeof Socket
 
@@ -16,8 +17,11 @@ export interface IUserWithId extends IUser {
 }
 
 export interface IActor {
+    userId: string
+    userName: string
     token: string
     type: Actor
+    playerId: string
 }
 
 
@@ -29,12 +33,18 @@ export interface IPhaseConfig<ICreateParam = {}> {
     suffixPhaseKeys: Array<string>
 }
 
+export interface IPlayerState {
+    actor: IActor
+    status: PlayerStatus
+    phasePlayer?: PhaseManager.TPhasePlayer
+}
+
 export interface IPhaseState {
     key: string
     status: PhaseStatus
     playUrl?: string
-    playerStatus: {
-        [code: string]: PlayerStatus
+    playerState: {
+        [playerToken: string]: IPlayerState
     }
 }
 
@@ -68,6 +78,7 @@ export interface IGameToUpdate {
 export interface IPlayer {
     gameId: string
     userId: string
+    reward: string
 }
 
 export interface IPlayerWithId {
@@ -107,8 +118,8 @@ export namespace NFrame {
 
 //region Api
 export type TApiGroupPlayers = Array<{
-    playerId:string,
-    userId:string,
-    name:string
+    playerId: string,
+    userId: string,
+    name: string
 }>
 //endregion

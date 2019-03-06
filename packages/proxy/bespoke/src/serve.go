@@ -28,7 +28,7 @@ func (proxy *Proxy) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 }
 
 func startServer() {
-	err := http.ListenAndServe(":8888", &Proxy{})
+	err := http.ListenAndServe(":4001", &Proxy{})
 	if err != nil {
 		log.Fatalln("ListenAndServe: ", err)
 	}

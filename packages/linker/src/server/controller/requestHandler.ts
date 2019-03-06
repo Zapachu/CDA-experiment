@@ -1,5 +1,5 @@
 import {baseEnum, config} from '@common'
-import {UserDoc} from '@server-model'
+import {UserDoc, PlayerModel} from '@server-model'
 import {Hash, redisClient, RedisKey} from '@server-util'
 import {Request, Response, NextFunction} from 'express'
 import {GameService, PhaseService} from '@server-service'
@@ -55,7 +55,7 @@ export class GameCtrl {
         const templates = await PhaseService.getPhaseTemplates(user)
         res.json({
             code: baseEnum.ResponseCode.success,
-            templates: templates.map(({namespace, jsUrl}) => ({namespace, jsUrl}))
+            templates: templates.map(({namespace, type, jsUrl}) => ({namespace, type, jsUrl}))
         })
     }
 
@@ -65,7 +65,7 @@ export class GameCtrl {
             owner,
             title,
             desc,
-            mode,
+            mode
         })
         res.json({
             code: baseEnum.ResponseCode.success,
@@ -83,7 +83,7 @@ export class GameCtrl {
     }
 
     static async getGameList(req: Request, res: Response) {
-        const {user:{_id}} = req
+        const {user: {_id}} = req
         const gameList = await GameService.getGameList(_id)
         res.json({
             code: baseEnum.ResponseCode.success,
@@ -164,17 +164,32 @@ export class GameCtrl {
         })
     }
 
-    static async getPlayers(req:Request, res:Response){
-        const {params:{gameId}} = req
-        try{
+    static async getPlayers(req: Request, res: Response) {
+        const {params: {gameId}} = req
+        try {
             const players = await PlayerService.getPlayers(gameId)
             res.json({
-                code:baseEnum.ResponseCode.success,
+                code: baseEnum.ResponseCode.success,
                 players
+            })
+        } catch (e) {
+            res.json({
+                code: baseEnum.ResponseCode.notFound
+            })
+        }
+    }
+
+    static async getRewardedMoney(req: Request, res: Response){
+        const {query:{playerId}} = req
+        try{
+            const {reward} = await PlayerModel.findById(playerId)
+            res.json({
+                code: baseEnum.ResponseCode.success,
+                reward
             })
         }catch (e) {
             res.json({
-                code:baseEnum.ResponseCode.notFound
+                code: baseEnum.ResponseCode.notFound
             })
         }
     }
@@ -190,7 +205,7 @@ export class GameCtrl {
         res.json({
             code: ResponseCode.success,
             game,
-            actor: {token, type}
+            actor: {token, type, playerId}
         })
     }
 }

@@ -1,6 +1,6 @@
 import setting from '../../../../config/settings'
 import {ThirdPartPhase} from '../../../../core/server/models'
-import {PhaseManager} from 'elf-proto'
+import {PhaseManager} from 'elf-protocol'
 
 const {localQualtricsRootUrl} = setting
 

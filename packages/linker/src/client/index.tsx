@@ -4,10 +4,21 @@ require('./initial.scss')
 import * as React from 'react'
 import {render} from 'react-dom'
 import {Root} from './view'
-import {IElfCreateProps} from './vendor'
+import {IPhaseConfig} from '@common'
 
 export {Lang} from '@client-util'
 export {IPhaseConfig, CorePhaseNamespace} from '@common'
+
+export interface IElfCreateProps<ICreateParam> {
+    phases: Array<{
+        label: string
+        key: string
+        namespace: string
+    }>
+    curPhase: IPhaseConfig<ICreateParam>
+    updatePhase: (suffixPhaseKeys: Array<string>, param: Partial<ICreateParam>) => void
+    highlightPhases: (phaseKeys: Array<string>) => void
+}
 
 export class BaseCreate<ICreateParam, State = ICreateParam> extends React.Component<IElfCreateProps<ICreateParam>, State> {
     render() {
@@ -20,7 +31,6 @@ export interface IPhaseTemplate {
     localeNames: Array<string>
     Create?: typeof BaseCreate
     type: 'bespoke' | 'otree' | 'qualtrics' | 'survey'
-    otreeName?: string
 }
 
 export const phaseTemplates: {
@@ -30,11 +40,7 @@ export const phaseTemplates: {
 export function registerPhaseCreate(namespace: string, phaseTemplate: IPhaseTemplate) {
     phaseTemplate.namespace = namespace
     phaseTemplate.Create = phaseTemplate.Create || BaseCreate
-    if (phaseTemplate.type === 'otree') {
-        phaseTemplates[`otree_${phaseTemplate.otreeName}`] = phaseTemplate
-    } else {
-        phaseTemplates[namespace] = phaseTemplate
-    }
+    phaseTemplates[namespace] = phaseTemplate
 }
 
 const rootContainer = document.body.appendChild(document.createElement('div'))

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, Core, Lang, MaskLoading, Toast, RadioGroup, Input} from '@dev/client'
+import {Button, ButtonProps, Core, Lang, MaskLoading, Toast, RadioGroup, Input} from 'bespoke-client-util'
 import {FetchType, GameStage, MoveType, PushType, SURVEY_STAGE, SURVEY_BASIC, SURVEY_FEEDBACK, SURVEY_TEST} from '../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 
@@ -50,7 +50,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             <input type='number'
                    value={seatNumber||''}
                    onChange={({target: {value: seatNumber}}) => this.setState({seatNumber: seatNumber.substr(0, 4)} as any)}/>
-            <Button width={Button.Width.medium} label={lang.submit} onClick={() => {
+            <Button width={ButtonProps.Width.medium} label={lang.submit} onClick={() => {
                 if (isNaN(Number(seatNumber))) {
                     return Toast.warn(lang.invalidSeatNumber)
                 }

@@ -40,10 +40,10 @@ const rewriteResBuffers = async (proxyRes, req, res) => {
             const playUrl: string = `${localOtreeRootUrl}/init/${otreeParticipantUrl}${otreePhase._id}`
             const playerToken: string = playerGameHash
             const nextPhaseKey: string = params.nextPhaseKey
-            const request: { groupId: string, playUrl: string, playerToken: string, nextPhaseKey: string } = {
-                groupId, playUrl, playerToken, nextPhaseKey
-            }
-            gameService.sendBackPlayer(request, (err: {}, service_res: { sendBackUrl: string }) => {
+            gameService.sendBackPlayer({
+                groupId, playUrl, playerToken, nextPhaseKey,
+                phasePlayer:{uniKey:playerOtreeHash}
+            }, (err: {}, service_res: { sendBackUrl: string }) => {
                 if (err) {
                     console.log(err)
                     return okRes().send('Get Next Phase Error From Core')

@@ -1,4 +1,4 @@
-import {registerOnFramework} from '@dev/client'
+import {registerOnFramework} from 'bespoke-client-util'
 import {Create} from './Create'
 import {CreateOnElf} from './CreateOnElf'
 import {Info} from './Info'

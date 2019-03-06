@@ -17,14 +17,11 @@ export = ({webpackHmr}: { webpackHmr: boolean }) => {
         watchOptions: {
             poll: true
         },
-        entry: {
-            'coreCommon': [...webpackHotDevEntry, path.resolve(__dirname, '../../common/index.ts')],
-            'elfCore': [...webpackHotDevEntry, path.resolve(__dirname, '../../client/index.tsx')]
-        },
+        entry: [...webpackHotDevEntry, path.resolve(__dirname, '../../client/index.tsx')],
         output: {
             path: path.resolve(__dirname, '../../../dist'),
-            filename: '[name].[hash:4].js',
-            library: '[name]',
+            filename: 'elf-linker.js',
+            library: 'ElfLinker',
             libraryTarget: 'umd',
             publicPath: `/${config.rootName}/static/`
         },
@@ -58,7 +55,14 @@ export = ({webpackHmr}: { webpackHmr: boolean }) => {
                     exclude: /node_modules/,
                     use: [
                         'style-loader',
-                        'css-loader?modules&importLoaders=1&localIdentName=[local]_[hash:base64:4]',
+                        {
+                            loader: 'css-loader',
+                            options: {
+                                modules: true,
+                                importLoaders: 1,
+                                localIdentName: '[local]_[hash:base64:4]'
+                            }
+                        },
                         {
                             loader: 'sass-loader',
                             options: {
@@ -71,7 +75,7 @@ export = ({webpackHmr}: { webpackHmr: boolean }) => {
                     test: /\.css$/,
                     use: [
                         'style-loader',
-                        'css-loader?importLoaders=1'
+                        'css-loader'
                     ]
                 },
                 {
@@ -86,7 +90,7 @@ export = ({webpackHmr}: { webpackHmr: boolean }) => {
             'react-dom': 'ReactDOM'
         },
         plugins: [
-            new CleanWebpackPlugin(['core*.js'], {
+            new CleanWebpackPlugin(['*'], {
                 root: path.resolve(__dirname, `../../../dist`),
                 watch: true
             }),

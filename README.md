@@ -4,7 +4,7 @@
   - 仓库由多个pkg组成，用lerna维护其版本与相互间依赖
   - 为方便pkg间联调debug，暂均直接通过ts-node运行ts源码
   - - linker ：调度管理模块，各phaseProxy启动后定时向其发送心跳(更新注册信息)
-    - proto ：系统间rpc接口声明，并提供接口函数的封装
+    - protocol ：系统间数据交换协议(RPC接口封装,Model定义等)
     - bespoke
         - core : 定制实验框架
         - game ：单个定制实验，可在各自目录内生成前端打包文件，启动独立进程,仅在内网暴露端口，由proxy对外提供访问
@@ -14,7 +14,7 @@
 
 
 ## 首次运行
- - `npx lerna init`
+ - `npx lerna bootstrap`
  - `cd linker`
    - `npm run client:dist`
    - `npm run server:ts-serve`
@@ -26,8 +26,9 @@
    - `npm run otree`
    - `npm run wjx:dist`
    - ...
- - `cd bespoke`
-   - `npm run core:dist`
-   - `cd VickreyAuction2`
-   - `ts-node ./script/buildClient.ts`
-   - `ts-node ./src/serve.ts`
+ - `cd bespoke\game`
+   - `npm run help`
+   - --- OR ---
+   - `cd VickreyAuction2/scrpit`
+   - `webpack --env.TS_NODE_PROJECT="../../tsconfig.json" --config ./webpack.config.ts`
+   - `pm2 start ./pm2.json`

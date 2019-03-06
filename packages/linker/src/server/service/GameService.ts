@@ -3,7 +3,7 @@ import {GameModel} from '@server-model'
 
 export class GameService {
     static async getGameList(owner: string): Promise<Array<IGameWithId>> {
-        const gameList = await GameModel.find({owner})
+        const gameList = await GameModel.find({owner}).sort('-createAt').limit(12)
         return gameList.map(({id, title, desc, published, phaseConfigs, mode}) => ({id, title, desc, published, phaseConfigs, mode}))
     }
 

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang, BtnGroup} from '@dev/client'
+import {Core, Lang, BtnGroup} from 'bespoke-client-util'
 import {Create} from './Create'
 import {ICreateParams} from '../interface'
 

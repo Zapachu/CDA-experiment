@@ -1,5 +1,0 @@
-export * from '@dev/common'
-export {redisClient, setting, Log} from './util'
-export {FreeStyleModel} from './model'
-export {BaseController, BaseRobot} from './manager/logicManager'
-export {Server} from './server'

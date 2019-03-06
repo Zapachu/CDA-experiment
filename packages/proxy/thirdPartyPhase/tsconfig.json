@@ -7,7 +7,7 @@
       "esnext",
       "dom"
     ],
-    "declaration": false,
+    "declaration": true,
     "sourceMap": true,
     "experimentalDecorators": true,
     "jsx": "react",

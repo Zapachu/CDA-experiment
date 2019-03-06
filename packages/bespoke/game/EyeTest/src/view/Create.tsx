@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Input, Label, Lang} from '@dev/client'
+import {Core, Input, Label, Lang} from 'bespoke-client-util'
 import {FetchType} from '../config'
 import {ICreateParams} from '../interface'
 

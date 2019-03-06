@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, Core, Lang, MaskLoading, RadioGroup, Toast} from '@dev/client'
+import {Button, ButtonProps, Core, Lang, MaskLoading, RadioGroup, Toast} from 'bespoke-client-util'
 import {EYE_EXAMPLE, EYES, FetchType, GameStage, GENDER, MoveType, PushType} from '../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import {getEnumKeys} from '../util'
@@ -80,7 +80,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             <input type='number'
                    value={seatNumber || ''}
                    onChange={({target: {value: seatNumber}}) => this.setState({seatNumber: seatNumber.substr(0, 4)} as any)}/>
-            <Button width={Button.Width.medium} label={lang.submit} onClick={() => {
+            <Button width={ButtonProps.Width.medium} label={lang.submit} onClick={() => {
                 if (isNaN(Number(seatNumber))) {
                     return Toast.warn(lang.invalidSeatNumber)
                 }
@@ -125,7 +125,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                         onChange={v => this.setState({emotion: emotionOptions.findIndex(o => o === v)})}
             />
             <div className={style.btnWrapper}>
-                <Button width={Button.Width.medium} label={lang.submit} onClick={() => {
+                <Button width={ButtonProps.Width.medium} label={lang.submit} onClick={() => {
                     frameEmitter.emit(MoveType.anwser, {
                         newanwser: {
                             emotion,
