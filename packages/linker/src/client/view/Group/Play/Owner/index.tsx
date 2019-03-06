@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {connCtx, Lang, Api} from '@client-util'
-import {baseEnum} from '@common'
+import {baseEnum, IPlayerState} from '@common'
 import {playContext, rootContext, TPlayContext, TRootContext} from '@client-context'
 import {Card, List, message} from '@antd-component'
 import {Breadcrumb, Title} from '@client-component'
@@ -29,6 +29,7 @@ export class Play4Owner extends React.Component<TRootContext & TPlayContext & { 
 
     render(): React.ReactNode {
         const {props: {user, game, groupState, history}, lang} = this
+        console.log(groupState)
         return <section className={style.console}>
             <Breadcrumb history={history} links={[
                 {label: lang.groupConfiguration, to: `/group/configuration/${game.id}`},
@@ -46,19 +47,19 @@ export class Play4Owner extends React.Component<TRootContext & TPlayContext & { 
                         <List
                             dataSource={Object.entries(phaseState.playerState)}
                             renderItem={
-                                ([playerToken, playerState]) =>
+                                ([playerToken, {actor, status, phasePlayer}]: [string, IPlayerState]) =>
                                     <List.Item>
                                         <List.Item.Meta title={`Token : ${playerToken}`}
                                                         description={
-                                                            `${playerState.userName}:${lang[PlayerStatus[playerState.status]]}
-                                                               ${JSON.stringify(playerState.phasePlayer||'')}
+                                                            `${actor.userName}:${lang[PlayerStatus[status]]}
+                                                               ${JSON.stringify(phasePlayer || '')}
                                                             `
                                                         }/>
                                         <RewardPanel {...{
                                             orgCode: user.orgCode,
                                             gameId: game.id,
-                                            playerId: playerToken,
-                                            userId: playerState.userId
+                                            playerId: actor.playerId,
+                                            userId: actor.userId
                                         }}/>
                                     </List.Item>
                             }>
@@ -87,9 +88,23 @@ class RewardPanel extends React.Component<TRewardPanelProps, TRewardPanelState> 
         InvalidAwardAmount: ['奖励金额有误', 'InvalidAwardAmount'],
         RewardFailed: ['奖励失败', 'RewardFailed'],
         RewardSuccess: ['奖励成功', 'RewardSuccess'],
+        Rewarded: ['已奖励', 'Rewarded'],
         Reward: ['奖励', 'Reward'],
         Submit: ['提交', 'Submit']
     })
+
+    async componentDidMount() {
+        const {props: {playerId}} = this
+        if (!playerId) {
+            return
+        }
+        const {code, reward} = await Api.getRewarded(playerId)
+        if (code == baseEnum.ResponseCode.success) {
+            this.setState({
+                reward: +reward
+            })
+        }
+    }
 
     state = {
         money: '',
@@ -104,6 +119,10 @@ class RewardPanel extends React.Component<TRewardPanelProps, TRewardPanelState> 
             state: {money, rewarding, reward}
         } = this
         return <section className={style.rewardPanel}>
+            <div className={style.rewardedMoney}>
+                <label>{lang.Rewarded}</label>
+                <em>{reward}</em>
+            </div>
             <div className={style.rewardInputSpan}>
                 <input {...{
                     className: `${style.rewardInput} ${rewarding ? style.active : ''}`,
@@ -121,7 +140,7 @@ class RewardPanel extends React.Component<TRewardPanelProps, TRewardPanelState> 
                             }
                             Api.reward(orgCode, gameId, {
                                 money: _money,
-                                subject: 10,
+                                subject: 11,
                                 task: gameId,
                                 tasker: playerId,
                                 payeeId: userId

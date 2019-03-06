@@ -120,6 +120,10 @@ export class Request {
         return await GET('/game/actor/:gameId', {gameId}, {token})
     }
 
+    static async getRewarded(playerId: string): Promise<IHttpRes & { reward: string }> {
+        return await GET('/game/rewarded', null,{playerId})
+    }
+
     /**** V5 ****/
     static async reward(orgCode: string, gameId: string, data: {
         money: number,

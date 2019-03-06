@@ -1,5 +1,5 @@
 import {baseEnum, config} from '@common'
-import {UserDoc} from '@server-model'
+import {UserDoc, PlayerModel} from '@server-model'
 import {Hash, redisClient, RedisKey} from '@server-util'
 import {Request, Response, NextFunction} from 'express'
 import {GameService, PhaseService} from '@server-service'
@@ -179,6 +179,21 @@ export class GameCtrl {
         }
     }
 
+    static async getRewardedMoney(req: Request, res: Response){
+        const {query:{playerId}} = req
+        try{
+            const {reward} = await PlayerModel.findById(playerId)
+            res.json({
+                code: baseEnum.ResponseCode.success,
+                reward
+            })
+        }catch (e) {
+            res.json({
+                code: baseEnum.ResponseCode.notFound
+            })
+        }
+    }
+
     static async getActor(req, res) {
         const {ResponseCode, Actor} = baseEnum
         let {user, params: {gameId}, query: {token: queryToken}} = req, userId = user._id.toString()
@@ -190,7 +205,7 @@ export class GameCtrl {
         res.json({
             code: ResponseCode.success,
             game,
-            actor: {token, type}
+            actor: {token, type, playerId}
         })
     }
 }

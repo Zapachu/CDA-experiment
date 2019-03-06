@@ -21,6 +21,7 @@ export interface IActor {
     userName: string
     token: string
     type: Actor
+    playerId: string
 }
 
 
@@ -32,17 +33,18 @@ export interface IPhaseConfig<ICreateParam = {}> {
     suffixPhaseKeys: Array<string>
 }
 
+export interface IPlayerState {
+    actor: IActor
+    status: PlayerStatus
+    phasePlayer?: PhaseManager.TPhasePlayer
+}
+
 export interface IPhaseState {
     key: string
     status: PhaseStatus
     playUrl?: string
     playerState: {
-        [playerToken: string]: {
-            userId: string
-            userName: string
-            status: PlayerStatus
-            phasePlayer?: PhaseManager.TPhasePlayer
-        }
+        [playerToken: string]: IPlayerState
     }
 }
 
@@ -76,6 +78,7 @@ export interface IGameToUpdate {
 export interface IPlayer {
     gameId: string
     userId: string
+    reward: string
 }
 
 export interface IPlayerWithId {

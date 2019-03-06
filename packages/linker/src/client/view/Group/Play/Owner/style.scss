@@ -17,15 +17,6 @@
       margin: 0 .5rem;
       color: $color-red;
     }
-    .withdrawBtn{
-      margin-left: .5rem;
-      color: rgba($color-blue,.8);
-      transition: $transition-normal;
-      &:hover{
-        color: $color-blue;
-        text-decoration: underline;
-      }
-    }
   }
   .rewardInputSpan{
     display: flex;

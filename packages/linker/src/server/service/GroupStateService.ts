@@ -80,9 +80,8 @@ export class GroupStateService {
         const {groupState: {phaseStates}} = this
         if (phaseStates.length === 1 && phaseStates[0].playerState[actor.token] === undefined) {
             phaseStates[0].playerState[actor.token] = {
-                status: baseEnum.PlayerStatus.playing,
-                userName: actor.userName,
-                userId: actor.userId
+                actor,
+                status: baseEnum.PlayerStatus.playing
             }
         }
     }

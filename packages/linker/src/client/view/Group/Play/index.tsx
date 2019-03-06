@@ -30,7 +30,7 @@ export class Play extends React.Component<TRootContext & RouteComponentProps<{ g
         }
         const socketClient = connect('/', {
             path: config.socketPath,
-            query: `groupId=${gameId}&token=${actor.token}&type=${actor.type}&userId=${user.id}`
+            query: `groupId=${gameId}&userId=${user.id}&token=${actor.token}&type=${actor.type}&playerId=${actor.playerId}`
         })
         this.registerStateReducer(socketClient)
         this.setState({
