@@ -792,8 +792,7 @@ $root.SendBackPlayerReq = (function() {
      * @property {string|null} [playUrl] SendBackPlayerReq playUrl
      * @property {string|null} [playerToken] SendBackPlayerReq playerToken
      * @property {string|null} [nextPhaseKey] SendBackPlayerReq nextPhaseKey
-     * @property {string|null} [phasePlayerId] SendBackPlayerReq phasePlayerId
-     * @property {string|null} [detailIframeUrl] SendBackPlayerReq detailIframeUrl
+     * @property {SendBackPlayerReq.IPhasePlayer|null} [phasePlayer] SendBackPlayerReq phasePlayer
      */
 
     /**
@@ -844,20 +843,12 @@ $root.SendBackPlayerReq = (function() {
     SendBackPlayerReq.prototype.nextPhaseKey = "";
 
     /**
-     * SendBackPlayerReq phasePlayerId.
-     * @member {string} phasePlayerId
+     * SendBackPlayerReq phasePlayer.
+     * @member {SendBackPlayerReq.IPhasePlayer|null|undefined} phasePlayer
      * @memberof SendBackPlayerReq
      * @instance
      */
-    SendBackPlayerReq.prototype.phasePlayerId = "";
-
-    /**
-     * SendBackPlayerReq detailIframeUrl.
-     * @member {string} detailIframeUrl
-     * @memberof SendBackPlayerReq
-     * @instance
-     */
-    SendBackPlayerReq.prototype.detailIframeUrl = "";
+    SendBackPlayerReq.prototype.phasePlayer = null;
 
     /**
      * Creates a new SendBackPlayerReq instance using the specified properties.
@@ -891,10 +882,8 @@ $root.SendBackPlayerReq = (function() {
             writer.uint32(/* id 3, wireType 2 =*/26).string(message.playerToken);
         if (message.nextPhaseKey != null && message.hasOwnProperty("nextPhaseKey"))
             writer.uint32(/* id 4, wireType 2 =*/34).string(message.nextPhaseKey);
-        if (message.phasePlayerId != null && message.hasOwnProperty("phasePlayerId"))
-            writer.uint32(/* id 5, wireType 2 =*/42).string(message.phasePlayerId);
-        if (message.detailIframeUrl != null && message.hasOwnProperty("detailIframeUrl"))
-            writer.uint32(/* id 6, wireType 2 =*/50).string(message.detailIframeUrl);
+        if (message.phasePlayer != null && message.hasOwnProperty("phasePlayer"))
+            $root.SendBackPlayerReq.PhasePlayer.encode(message.phasePlayer, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
         return writer;
     };
 
@@ -942,10 +931,7 @@ $root.SendBackPlayerReq = (function() {
                 message.nextPhaseKey = reader.string();
                 break;
             case 5:
-                message.phasePlayerId = reader.string();
-                break;
-            case 6:
-                message.detailIframeUrl = reader.string();
+                message.phasePlayer = $root.SendBackPlayerReq.PhasePlayer.decode(reader, reader.uint32());
                 break;
             default:
                 reader.skipType(tag & 7);
@@ -994,12 +980,11 @@ $root.SendBackPlayerReq = (function() {
         if (message.nextPhaseKey != null && message.hasOwnProperty("nextPhaseKey"))
             if (!$util.isString(message.nextPhaseKey))
                 return "nextPhaseKey: string expected";
-        if (message.phasePlayerId != null && message.hasOwnProperty("phasePlayerId"))
-            if (!$util.isString(message.phasePlayerId))
-                return "phasePlayerId: string expected";
-        if (message.detailIframeUrl != null && message.hasOwnProperty("detailIframeUrl"))
-            if (!$util.isString(message.detailIframeUrl))
-                return "detailIframeUrl: string expected";
+        if (message.phasePlayer != null && message.hasOwnProperty("phasePlayer")) {
+            var error = $root.SendBackPlayerReq.PhasePlayer.verify(message.phasePlayer);
+            if (error)
+                return "phasePlayer." + error;
+        }
         return null;
     };
 
@@ -1023,10 +1008,11 @@ $root.SendBackPlayerReq = (function() {
             message.playerToken = String(object.playerToken);
         if (object.nextPhaseKey != null)
             message.nextPhaseKey = String(object.nextPhaseKey);
-        if (object.phasePlayerId != null)
-            message.phasePlayerId = String(object.phasePlayerId);
-        if (object.detailIframeUrl != null)
-            message.detailIframeUrl = String(object.detailIframeUrl);
+        if (object.phasePlayer != null) {
+            if (typeof object.phasePlayer !== "object")
+                throw TypeError(".SendBackPlayerReq.phasePlayer: object expected");
+            message.phasePlayer = $root.SendBackPlayerReq.PhasePlayer.fromObject(object.phasePlayer);
+        }
         return message;
     };
 
@@ -1048,8 +1034,7 @@ $root.SendBackPlayerReq = (function() {
             object.playUrl = "";
             object.playerToken = "";
             object.nextPhaseKey = "";
-            object.phasePlayerId = "";
-            object.detailIframeUrl = "";
+            object.phasePlayer = null;
         }
         if (message.groupId != null && message.hasOwnProperty("groupId"))
             object.groupId = message.groupId;
@@ -1059,10 +1044,8 @@ $root.SendBackPlayerReq = (function() {
             object.playerToken = message.playerToken;
         if (message.nextPhaseKey != null && message.hasOwnProperty("nextPhaseKey"))
             object.nextPhaseKey = message.nextPhaseKey;
-        if (message.phasePlayerId != null && message.hasOwnProperty("phasePlayerId"))
-            object.phasePlayerId = message.phasePlayerId;
-        if (message.detailIframeUrl != null && message.hasOwnProperty("detailIframeUrl"))
-            object.detailIframeUrl = message.detailIframeUrl;
+        if (message.phasePlayer != null && message.hasOwnProperty("phasePlayer"))
+            object.phasePlayer = $root.SendBackPlayerReq.PhasePlayer.toObject(message.phasePlayer, options);
         return object;
     };
 
@@ -1076,6 +1059,238 @@ $root.SendBackPlayerReq = (function() {
     SendBackPlayerReq.prototype.toJSON = function toJSON() {
         return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
     };
+
+    SendBackPlayerReq.PhasePlayer = (function() {
+
+        /**
+         * Properties of a PhasePlayer.
+         * @memberof SendBackPlayerReq
+         * @interface IPhasePlayer
+         * @property {string|null} [uniKey] PhasePlayer uniKey
+         * @property {string|null} [point] PhasePlayer point
+         * @property {string|null} [detailIframeUrl] PhasePlayer detailIframeUrl
+         */
+
+        /**
+         * Constructs a new PhasePlayer.
+         * @memberof SendBackPlayerReq
+         * @classdesc Represents a PhasePlayer.
+         * @implements IPhasePlayer
+         * @constructor
+         * @param {SendBackPlayerReq.IPhasePlayer=} [properties] Properties to set
+         */
+        function PhasePlayer(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * PhasePlayer uniKey.
+         * @member {string} uniKey
+         * @memberof SendBackPlayerReq.PhasePlayer
+         * @instance
+         */
+        PhasePlayer.prototype.uniKey = "";
+
+        /**
+         * PhasePlayer point.
+         * @member {string} point
+         * @memberof SendBackPlayerReq.PhasePlayer
+         * @instance
+         */
+        PhasePlayer.prototype.point = "";
+
+        /**
+         * PhasePlayer detailIframeUrl.
+         * @member {string} detailIframeUrl
+         * @memberof SendBackPlayerReq.PhasePlayer
+         * @instance
+         */
+        PhasePlayer.prototype.detailIframeUrl = "";
+
+        /**
+         * Creates a new PhasePlayer instance using the specified properties.
+         * @function create
+         * @memberof SendBackPlayerReq.PhasePlayer
+         * @static
+         * @param {SendBackPlayerReq.IPhasePlayer=} [properties] Properties to set
+         * @returns {SendBackPlayerReq.PhasePlayer} PhasePlayer instance
+         */
+        PhasePlayer.create = function create(properties) {
+            return new PhasePlayer(properties);
+        };
+
+        /**
+         * Encodes the specified PhasePlayer message. Does not implicitly {@link SendBackPlayerReq.PhasePlayer.verify|verify} messages.
+         * @function encode
+         * @memberof SendBackPlayerReq.PhasePlayer
+         * @static
+         * @param {SendBackPlayerReq.IPhasePlayer} message PhasePlayer message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        PhasePlayer.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.uniKey != null && message.hasOwnProperty("uniKey"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.uniKey);
+            if (message.point != null && message.hasOwnProperty("point"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.point);
+            if (message.detailIframeUrl != null && message.hasOwnProperty("detailIframeUrl"))
+                writer.uint32(/* id 3, wireType 2 =*/26).string(message.detailIframeUrl);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified PhasePlayer message, length delimited. Does not implicitly {@link SendBackPlayerReq.PhasePlayer.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof SendBackPlayerReq.PhasePlayer
+         * @static
+         * @param {SendBackPlayerReq.IPhasePlayer} message PhasePlayer message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        PhasePlayer.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a PhasePlayer message from the specified reader or buffer.
+         * @function decode
+         * @memberof SendBackPlayerReq.PhasePlayer
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {SendBackPlayerReq.PhasePlayer} PhasePlayer
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        PhasePlayer.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.SendBackPlayerReq.PhasePlayer();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1:
+                    message.uniKey = reader.string();
+                    break;
+                case 2:
+                    message.point = reader.string();
+                    break;
+                case 3:
+                    message.detailIframeUrl = reader.string();
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a PhasePlayer message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof SendBackPlayerReq.PhasePlayer
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {SendBackPlayerReq.PhasePlayer} PhasePlayer
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        PhasePlayer.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a PhasePlayer message.
+         * @function verify
+         * @memberof SendBackPlayerReq.PhasePlayer
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        PhasePlayer.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.uniKey != null && message.hasOwnProperty("uniKey"))
+                if (!$util.isString(message.uniKey))
+                    return "uniKey: string expected";
+            if (message.point != null && message.hasOwnProperty("point"))
+                if (!$util.isString(message.point))
+                    return "point: string expected";
+            if (message.detailIframeUrl != null && message.hasOwnProperty("detailIframeUrl"))
+                if (!$util.isString(message.detailIframeUrl))
+                    return "detailIframeUrl: string expected";
+            return null;
+        };
+
+        /**
+         * Creates a PhasePlayer message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof SendBackPlayerReq.PhasePlayer
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {SendBackPlayerReq.PhasePlayer} PhasePlayer
+         */
+        PhasePlayer.fromObject = function fromObject(object) {
+            if (object instanceof $root.SendBackPlayerReq.PhasePlayer)
+                return object;
+            var message = new $root.SendBackPlayerReq.PhasePlayer();
+            if (object.uniKey != null)
+                message.uniKey = String(object.uniKey);
+            if (object.point != null)
+                message.point = String(object.point);
+            if (object.detailIframeUrl != null)
+                message.detailIframeUrl = String(object.detailIframeUrl);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a PhasePlayer message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof SendBackPlayerReq.PhasePlayer
+         * @static
+         * @param {SendBackPlayerReq.PhasePlayer} message PhasePlayer
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        PhasePlayer.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.uniKey = "";
+                object.point = "";
+                object.detailIframeUrl = "";
+            }
+            if (message.uniKey != null && message.hasOwnProperty("uniKey"))
+                object.uniKey = message.uniKey;
+            if (message.point != null && message.hasOwnProperty("point"))
+                object.point = message.point;
+            if (message.detailIframeUrl != null && message.hasOwnProperty("detailIframeUrl"))
+                object.detailIframeUrl = message.detailIframeUrl;
+            return object;
+        };
+
+        /**
+         * Converts this PhasePlayer to JSON.
+         * @function toJSON
+         * @memberof SendBackPlayerReq.PhasePlayer
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        PhasePlayer.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        return PhasePlayer;
+    })();
 
     return SendBackPlayerReq;
 })();

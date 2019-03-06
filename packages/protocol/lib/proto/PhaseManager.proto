@@ -21,12 +21,16 @@ message RegisterPhasesRes {
     string waitURL = 2;
 }
 message SendBackPlayerReq {
+    message PhasePlayer {
+        string uniKey = 1;
+        string point = 2;
+        string detailIframeUrl = 3;
+    }
     string groupId = 1;
     string playUrl = 2;
     string playerToken = 3;
     string nextPhaseKey = 4;
-    string phasePlayerId = 5;
-    string detailIframeUrl = 6;
+    PhasePlayer phasePlayer = 5;
 }
 message SendBackPlayerRes {
     string sendBackUrl = 1;
