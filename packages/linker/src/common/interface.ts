@@ -16,6 +16,8 @@ export interface IUserWithId extends IUser {
 }
 
 export interface IActor {
+    userId: string
+    userName: string
     token: string
     type: Actor
 }
@@ -33,11 +35,13 @@ export interface IPhaseState {
     key: string
     status: PhaseStatus
     playUrl?: string
-    playerStatus: {
-        [playerToken: string]: PlayerStatus
-    },
-    playerPoint:{
-        [playerToken:string]:number
+    playerState: {
+        [playerToken: string]: {
+            userId: string
+            userName: string
+            status: PlayerStatus
+            point: number
+        }
     }
 }
 
@@ -110,8 +114,8 @@ export namespace NFrame {
 
 //region Api
 export type TApiGroupPlayers = Array<{
-    playerId:string,
-    userId:string,
-    name:string
+    playerId: string,
+    userId: string,
+    name: string
 }>
 //endregion

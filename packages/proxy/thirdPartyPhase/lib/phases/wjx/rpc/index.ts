@@ -19,6 +19,7 @@ function getJsUrls(): Array<{ namespace: string, jsUrl: string }> {
     Object.entries(JSON.parse(readFileSync(resolve(__dirname, '../../../../dist/manifest.json')).toString())).map(([k, v]) => {
         if (k.replace('.js', '') === 'wjx') {
             phases.push({
+                type:PhaseManager.PhaseType.wjx,
                 namespace: k.replace('.js', ''),
                 jsUrl: `${setting.localWjxRootUrl}${v}`,
                 rpcUri: setting.localWjxServiceUri

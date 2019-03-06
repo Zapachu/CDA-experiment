@@ -1,9 +1,9 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {connCtx, Lang} from '@client-util'
+import {connCtx, Lang, Api} from '@client-util'
 import {baseEnum} from '@common'
 import {playContext, rootContext, TPlayContext, TRootContext} from '@client-context'
-import {Card, List} from '@antd-component'
+import {Card, List, message} from '@antd-component'
 import {Breadcrumb, Title} from '@client-component'
 import {History} from 'history'
 
@@ -23,17 +23,17 @@ export class Play4Owner extends React.Component<TRootContext & TPlayContext & { 
         [PhaseStatus[PhaseStatus.closed]]: ['已关闭', 'Closed'],
         playerStatus: ['玩家状态', 'Player Status'],
         [PhaseStatus[PlayerStatus.playing]]: ['进行中', 'Playing'],
-        [PhaseStatus[PlayerStatus.left]]: ['已离开', 'Left']
+        [PhaseStatus[PlayerStatus.left]]: ['已离开', 'Left'],
+        reward: ['奖励', 'Reward']
     })
 
     render(): React.ReactNode {
-        const {props: {game, groupState, history}, lang} = this
-        console.log(groupState)
+        const {props: {user, game, groupState, history}, lang} = this
         return <section className={style.console}>
             <Breadcrumb history={history} links={[
                 {label: lang.groupConfiguration, to: `/group/configuration/${game.id}`},
                 {label: lang.playerList, to: `/group/player/${game.id}`},
-                {label: lang.share, to: `/group/share/${game.id}`},
+                {label: lang.share, to: `/group/share/${game.id}`}
             ]}/>
             <Title label={lang.phaseStatus}/>
             {
@@ -44,18 +44,105 @@ export class Play4Owner extends React.Component<TRootContext & TPlayContext & { 
                           actions={[<a onClick={() => window.open(phaseState.playUrl, '_blank')}>{lang.console}</a>]}
                     >
                         <List
-                            dataSource={Object.entries(phaseState.playerStatus)}
+                            dataSource={Object.entries(phaseState.playerState)}
                             renderItem={
-                                ([playerToken, playerStatus]) =>
+                                ([playerToken, playerState]) =>
                                     <List.Item>
-                                        <List.Item.Meta title={playerToken}
-                                                        description={lang[PlayerStatus[playerStatus]]}/>
+                                        <List.Item.Meta title={`Token : ${playerToken}`}
+                                                        description={
+                                                            `${playerState.userName}:${lang[PlayerStatus[playerState.status]]}`
+                                                        }/>
+                                        <RewardPanel {...{
+                                            orgCode: user.orgCode,
+                                            gameId: game.id,
+                                            playerId: playerToken,
+                                            userId: playerState.userId
+                                        }}/>
                                     </List.Item>
                             }>
                         </List>
                     </Card>)
             }
         </section>
-        return JSON.stringify(groupState.phaseStates)
+    }
+}
+
+declare type TRewardPanelProps = {
+    orgCode: string
+    gameId: string
+    playerId: string
+    userId: string
+}
+
+declare type TRewardPanelState = {
+    money: number | string
+    rewarding: boolean
+    reward: number
+}
+
+class RewardPanel extends React.Component<TRewardPanelProps, TRewardPanelState> {
+    lang = Lang.extractLang({
+        InvalidAwardAmount: ['奖励金额有误', 'InvalidAwardAmount'],
+        RewardFailed: ['奖励失败', 'RewardFailed'],
+        RewardSuccess: ['奖励成功', 'RewardSuccess'],
+        Reward: ['奖励', 'Reward'],
+        Submit: ['提交', 'Submit']
+    })
+
+    state = {
+        money: '',
+        rewarding: false,
+        reward: 0
+    }
+
+    render() {
+        const {
+            lang,
+            props: {orgCode, gameId, playerId, userId},
+            state: {money, rewarding, reward}
+        } = this
+        return <section className={style.rewardPanel}>
+            <div className={style.rewardInputSpan}>
+                <input {...{
+                    className: `${style.rewardInput} ${rewarding ? style.active : ''}`,
+                    type: 'number',
+                    value: money,
+                    onChange: (({target: {value: money}}) => this.setState({money}))
+                }}/>
+                <a {...{
+                    className: style.rewardBtn,
+                    onClick: () => {
+                        if (rewarding) {
+                            const _money = Number(money)
+                            if (isNaN(_money) || _money <= 0) {
+                                return message.warn(lang.InvalidAwardAmount)
+                            }
+                            Api.reward(orgCode, gameId, {
+                                money: _money,
+                                subject: 10,
+                                task: gameId,
+                                tasker: playerId,
+                                payeeId: userId
+                            }).then(({err}) => {
+                                if (err !== baseEnum.AcademusResCode.success) {
+                                    message.error(lang.RewardFailed)
+                                } else {
+                                    message.success(lang.RewardSuccess)
+                                    this.setState({
+                                        money: '',
+                                        rewarding: false,
+                                        reward: reward + _money
+                                    })
+                                }
+                            })
+                        } else {
+                            this.setState({
+                                rewarding: true
+                            })
+                        }
+                    }
+                }}>{rewarding ? lang.Submit : lang.Reward}</a>
+            </div>
+        </section>
     }
 }

@@ -11,7 +11,7 @@ export const EventHandler = {
             case NFrame.UpFrame.joinRoom: {
                 connection.join(group.id)
                 if(actor.type !== Actor.owner){
-                    await groupService.joinGroupRoom(actor.token)
+                    await groupService.joinGroupRoom(actor)
                 }
                 break
             }

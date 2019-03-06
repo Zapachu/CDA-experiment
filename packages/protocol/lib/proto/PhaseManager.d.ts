@@ -168,6 +168,9 @@ export namespace RegisterPhasesReq {
 
         /** phaseRegInfo rpcUri */
         rpcUri?: (string|null);
+
+        /** phaseRegInfo type */
+        type?: (string|null);
     }
 
     /** Represents a phaseRegInfo. */
@@ -187,6 +190,9 @@ export namespace RegisterPhasesReq {
 
         /** phaseRegInfo rpcUri. */
         public rpcUri: string;
+
+        /** phaseRegInfo type. */
+        public type: string;
 
         /**
          * Creates a new phaseRegInfo instance using the specified properties.

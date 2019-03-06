@@ -199,7 +199,7 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
         const {code} = await Api.postEditGame(match.params.gameId, {phaseConfigs: phaseConfigsToUpdate, published: true})
         if (code === baseEnum.ResponseCode.success) {
             message.success(lang.createSuccess)
-            history.push(`/game`)
+            history.push(`/group/info/${match.params.gameId}`)
         }
     }
 

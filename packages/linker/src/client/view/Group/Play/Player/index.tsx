@@ -11,7 +11,7 @@ export class Play4Player extends React.Component<TRootContext & TPlayContext> {
         const {actor, groupState} = this.props
         let curPhaseState: IPhaseState = null
         groupState.phaseStates.forEach(phaseState => {
-            if (phaseState.playerStatus[actor.token] !== undefined) {
+            if (phaseState.playerState[actor.token] !== undefined) {
                 curPhaseState = phaseState
             }
         })
@@ -27,7 +27,7 @@ export class Play4Player extends React.Component<TRootContext & TPlayContext> {
         if (curPhaseCfg.namespace === CorePhaseNamespace.end) {
             return <h2>GAME OVER</h2>
         }
-        switch (curPhaseState.playerStatus[actor.token]) {
+        switch (curPhaseState.playerState[actor.token].status) {
             case baseEnum.PlayerStatus.playing: {
                 window.location.href = `${curPhaseState.playUrl}?token=${actor.token}`
                 return null

@@ -19,6 +19,7 @@ function getJsUrls(): Array<{ namespace: string, jsUrl: string }> {
     Object.entries(JSON.parse(readFileSync(resolve(__dirname, '../../../../dist/manifest.json')).toString())).map(([k, v]) => {
         if (k.replace('.js', '') === 'qualtrics') {
             phases.push({
+                type:PhaseManager.PhaseType.quatrics,
                 namespace: k.replace('.js', ''),
                 jsUrl: `${setting.localQualtricsRootUrl}${v}`,
                 rpcUri: setting.localQualtricsServiceUri
