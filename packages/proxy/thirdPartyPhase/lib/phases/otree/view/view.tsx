@@ -32,7 +32,7 @@ class Create extends BaseCreate<any> {
         const listView = []
         this.state.list.map((li, key) => {
             listView.push(
-                <React.Fragment key={`otree-phase-list-${key}`}>
+                <React.Fragment key={`oTree-phase-list-${key}`}>
                     <li style={{
                         cursor: 'pointer',
                         listStyle: 'circle',
@@ -81,13 +81,13 @@ class Create extends BaseCreate<any> {
                             </li>
                         )
                     }
-                </ul>
+                </ul> 
             </div>
         </section>
     }
 }
 
-registerOnFramework('user001', {
+registerOnFramework('oTree-user001', {
     localeNames: ['OTree', 'OTree'],
     Create,
     type: 'temp',
