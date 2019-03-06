@@ -10,7 +10,7 @@ ListMap.clean = () => {
     })
 }
 
-ListMap.getList = async (namespace) => {
+ListMap.getList = (namespace) => {
     let list = {data: [], lastTime: 0}
     if (ListMap.has(namespace)) {
         list = ListMap.get(namespace)

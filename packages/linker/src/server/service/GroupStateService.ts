@@ -55,14 +55,14 @@ export class GroupStateService {
                 groupId: this.group.id,
                 namespace: phaseCfg.namespace,
                 param: JSON.stringify(phaseCfg.param)
-            }, (err, {playUrl}) => {
+            }, (err, res) => {
                 if (err) {
                     return reject(err)
                 }
                 resolve({
                     key: phaseCfg.key,
                     status: baseEnum.PhaseStatus.playing,
-                    playUrl,
+                    playUrl:res.playUrl,
                     playerState: {}
                 })
             })

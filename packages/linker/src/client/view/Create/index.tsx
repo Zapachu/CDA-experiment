@@ -352,6 +352,7 @@ class AddPhase extends React.Component<AddPhaseProps, AddPhaseState> {
     }
 
     lang = Lang.extractLang({
+        otree:['OTree','OTree'],
         bespoke: ['定制实验', 'Bespoke'],
         survey: ['问卷', 'Survey'],
         searchPhase: ['搜索环节', 'Search Phase']
