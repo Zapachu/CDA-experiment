@@ -6,7 +6,7 @@ import {RouteComponentProps} from 'react-router'
 import {Card, Modal} from '@antd-component'
 import {Breadcrumb, Loading, Title} from '@client-component'
 import {PhaseFlowChart} from '../Create'
-import {phaseTemplates} from '../../../index'
+import {phaseTemplates} from '../../index'
 
 declare interface IInfoState {
     loading: boolean
@@ -17,12 +17,11 @@ declare interface IInfoState {
 export class Configuration extends React.Component<RouteComponentProps<{ gameId: string }>, IInfoState> {
 
     lang = Lang.extractLang({
-        back2Game: ['返回实验', 'Back to game'],
+        back2Game: ['实验信息', 'Game Info'],
         console: ['控制台', 'CONSOLE'],
         title: ['标题', 'Title'],
         desc: ['描述', 'Description'],
-        groupInfo: ['实验组信息', 'Game Info'],
-        groupPhases: ['实验组环节', 'Game Phases']
+        groupPhases: ['实验环节', 'Game Phases']
     })
 
     state: IInfoState = {
@@ -45,11 +44,11 @@ export class Configuration extends React.Component<RouteComponentProps<{ gameId:
         }
         return <section className={style.groupConfiguration}>
             <Breadcrumb history={history} links={[
-                {to: `/game/info/${game.id}`, label: lang.back2Game},
-                {to: `/group/play/${game.id}`, label: lang.console},
+                {to: `/info/${game.id}`, label: lang.back2Game},
+                {to: `/play/${game.id}`, label: lang.console},
             ]}/>
             <div>
-                <Title label={lang.groupInfo}/>
+                <Title label={lang.groupPhases}/>
                 <Card title={game.title}>
                     {game.desc}
                 </Card>

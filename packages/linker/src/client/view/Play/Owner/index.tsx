@@ -13,7 +13,7 @@ const {PhaseStatus, PlayerStatus} = baseEnum
 @connCtx(playContext)
 export class Play4Owner extends React.Component<TRootContext & TPlayContext & { history: History }> {
     lang = Lang.extractLang({
-        groupConfiguration: ['实验组配置信息', 'GroupConfiguration'],
+        gameConfiguration: ['实验配置信息', 'GameConfiguration'],
         share: ['分享', 'Share'],
         playerList: ['玩家列表', 'PlayerList'],
         phaseStatus: ['环节状态', 'Phase Status'],
@@ -32,9 +32,9 @@ export class Play4Owner extends React.Component<TRootContext & TPlayContext & { 
         console.log(groupState)
         return <section className={style.console}>
             <Breadcrumb history={history} links={[
-                {label: lang.groupConfiguration, to: `/group/configuration/${game.id}`},
-                {label: lang.playerList, to: `/group/player/${game.id}`},
-                {label: lang.share, to: `/group/share/${game.id}`}
+                {label: lang.gameConfiguration, to: `/configuration/${game.id}`},
+                {label: lang.playerList, to: `/player/${game.id}`},
+                {label: lang.share, to: `/share/${game.id}`}
             ]}/>
             <Title label={lang.phaseStatus}/>
             {

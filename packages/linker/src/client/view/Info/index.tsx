@@ -6,7 +6,6 @@ import {RouteComponentProps} from 'react-router'
 import {Button, Card, message} from '@antd-component'
 import {rootContext, TRootContext} from '@client-context'
 import {Breadcrumb, Loading} from '@client-component'
-import {AcademusRole} from '../../../../common/baseEnum'
 
 declare interface IInfoState {
     loading: boolean
@@ -46,17 +45,17 @@ export class Info extends React.Component<TRootContext & RouteComponentProps<{ g
             <li>
                 <Button type={'primary'}
                     block={true}
-                    onClick={() => history.push(`/group/play/${game.id}`)}>{lang.enterPlayRoom}</Button>
+                    onClick={() => history.push(`/play/${game.id}`)}>{lang.enterPlayRoom}</Button>
             </li>
             <li>
                 <Button type={'primary'}
                     block={true}
-                    onClick={() => history.push(`/group/player/${game.id}`)}>{lang.playerList}</Button>
+                    onClick={() => history.push(`/player/${game.id}`)}>{lang.playerList}</Button>
             </li>
             <li>
                 <Button type={'primary'}
                     block={true}
-                    onClick={() => history.push(`/group/share/${game.id}`)}>{lang.share}</Button>
+                    onClick={() => history.push(`/share/${game.id}`)}>{lang.share}</Button>
             </li>
         </ul> ,
             btn4Student = <Button
@@ -65,19 +64,19 @@ export class Info extends React.Component<TRootContext & RouteComponentProps<{ g
                     const {code} = await Api.joinGame(game.id)
                     if (code === baseEnum.ResponseCode.success) {
                         await message.success(lang.joinSuccess)
-                        history.push(`/group/play/${game.id}`)
+                        history.push(`/play/${game.id}`)
                     }
                 }}>{lang.joinGroup}</Button>
         return <section className={style.groupInfo}>
-            <Breadcrumb history={history} links={user.role === AcademusRole.teacher ? [
-                {label: lang.back2Game, to: `/game/info/${game.id}`}
+            <Breadcrumb history={history} links={user.role === baseEnum.AcademusRole.teacher ? [
+                {label: lang.back2Game, to: `/baseInfo/${game.id}`}
             ] : []}/>
             <Card title={game.title}>
                 {game.desc}
             </Card>
             <div className={style.buttonWrapper}>
                 {
-                    user.role === AcademusRole.teacher ? btn4Teacher : btn4Student
+                    user.role === baseEnum.AcademusRole.teacher ? btn4Teacher : btn4Student
                 }
             </div>
         </section>

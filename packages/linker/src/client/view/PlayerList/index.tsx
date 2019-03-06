@@ -31,7 +31,7 @@ export class PlayerList extends React.Component<RouteComponentProps<{ gameId: st
         const {lang, props:{history, match:{params:{gameId}}}} = this
         return <section className={style.playerList}>
             <Breadcrumb history={history} links={[
-                {label: lang.console, to: `/group/play/${gameId}`},
+                {label: lang.console, to: `/play/${gameId}`},
             ]}/>
             <Title label={this.lang.groupPlayers}/>
             <List size={'large'}

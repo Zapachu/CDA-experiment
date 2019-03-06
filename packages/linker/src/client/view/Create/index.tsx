@@ -2,11 +2,11 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {RouteComponentProps} from 'react-router'
 import {baseEnum, IPhaseConfig, CorePhaseNamespace, GameMode} from '@common'
-import {IPhaseTemplate} from '../../../index'
+import {IPhaseTemplate} from '../../index'
 import * as dagre from 'dagre'
 import {Api, connCtx, genePhaseKey, loadScript, Lang} from '@client-util'
 import {rootContext, TRootContext} from '@client-context'
-import {phaseTemplates} from '../../../index'
+import {phaseTemplates} from '../../index'
 import {message, Row, Col, Button, Input, Icon, Card, Modal, Select, Tabs, Tag} from '@antd-component'
 import {Loading, Title} from '@client-component'
 import {Link} from 'react-router-dom'
@@ -199,7 +199,7 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
         const {code} = await Api.postEditGame(match.params.gameId, {phaseConfigs: phaseConfigsToUpdate, published: true})
         if (code === baseEnum.ResponseCode.success) {
             message.success(lang.createSuccess)
-            history.push(`/group/info/${match.params.gameId}`)
+            history.push(`/info/${match.params.gameId}`)
         }
     }
 
@@ -217,8 +217,8 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
         }
         return (
             <div className={style.submitBtnGroup}>
-                <Link style={{marginRight:'50px'}} to={`/group/info/${gameId}`}>{lang.view}</Link>
-                <Link to={`/group/play/${gameId}`}>{lang.console}</Link>
+                <Link style={{marginRight:'50px'}} to={`/info/${gameId}`}>{lang.view}</Link>
+                <Link to={`/play/${gameId}`}>{lang.console}</Link>
             </div>
         )
     }

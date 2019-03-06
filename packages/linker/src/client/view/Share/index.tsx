@@ -38,13 +38,13 @@ export class Share extends React.Component<RouteComponentProps<{ gameId: string 
         const {lang, props: {history, match: {params: {gameId}}}, state} = this
         return <section className={style.share}>
             <Breadcrumb history={history} links={[
-                {label: lang.groupInfo, to: `/group/info/${gameId}`},
-                {label: lang.console, to: `/group/play/${gameId}`}
+                {label: lang.groupInfo, to: `/info/${gameId}`},
+                {label: lang.console, to: `/play/${gameId}`}
             ]}/>
             <div className={style.shareContent}>
                 <h2>{state.title}</h2>
-                <div className={style.qrCodeWrapper} onClick={() => history.push(`/group/info/${gameId}`)}>
-                    <QrCode size={256} value={`/${config.rootName}/${config.apiPrefix}/group/info/${gameId}`}/>
+                <div className={style.qrCodeWrapper} onClick={() => history.push(`/info/${gameId}`)}>
+                    <QrCode size={256} value={`/${config.rootName}/${config.appPrefix}/info/${gameId}`}/>
                 </div>
                 <div className={style.shareCode}>
                     <label>{lang.shareCode}</label>

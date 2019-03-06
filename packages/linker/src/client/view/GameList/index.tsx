@@ -39,14 +39,14 @@ export class GameList extends React.Component<RouteComponentProps<{}>, IGameList
         const {lang, state: {gameList}, props: {history}} = this
         return <section className={style.gameList}>
             <Title label={lang.createdGames}/>
+            <div className={style.createBtnWrapper}>
+                <Button type={'primary'} onClick={() => history.push('/create')}>{lang.create}</Button>
+            </div>
             <List dataSource={gameList}
-                  renderItem={game => <ListItem actions={[<Link to={`/game/info/${game.id}`}>{lang.view}</Link>]}>
+                  renderItem={game => <ListItem actions={[<Link to={`/info/${game.id}`}>{lang.view}</Link>]}>
                       <ListItemMeta title={game.title} description={game.desc}/>
                       <div className={game.published?style.publishedStatus:''}>{game.published?lang.published:lang.unpublished}</div>
                   </ListItem>}/>
-            <div className={style.createBtnWrapper}>
-                <Button type={'primary'} onClick={() => history.push('/game/create')}>{lang.create}</Button>
-            </div>
         </section>
     }
 }

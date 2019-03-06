@@ -18,7 +18,7 @@ export class Join extends React.Component<RouteComponentProps<{}>> {
         const res = await Api.joinGameWithCode(code)
         switch (res.code) {
             case baseEnum.ResponseCode.success: {
-                history.push(`/group/info/${res.gameId}`)
+                history.push(`/info/${res.gameId}`)
                 break
             }
             default: {
