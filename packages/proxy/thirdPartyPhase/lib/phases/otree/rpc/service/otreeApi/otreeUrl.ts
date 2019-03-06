@@ -33,7 +33,6 @@ const getDemoList = async (namespace) => {
     const demoList = demoHrefList.map(item =>
         item.match(/ <a href="\/demo\/(\S*)\/" class="list-group-item" target="_blank">/)[1]
     )
-    console.log('demoList')
     console.log(demoList)
     await ListMap.setList(namespace, demoListRes)
     return demoListRes

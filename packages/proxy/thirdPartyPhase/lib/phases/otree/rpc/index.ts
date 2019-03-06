@@ -7,7 +7,7 @@ import {resolve} from 'path'
 import {readFileSync} from 'fs'
 import {getDemoList} from './service/otreeApi/otreeUrl'
 
-export async function serve() {
+export function serve() {
     const server = new Server()
     PhaseManager.setPhaseService(server, phaseService)
     server.bind(`0.0.0.0:5${setting.otreePort}`, ServerCredentials.createInsecure())

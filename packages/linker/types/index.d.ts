@@ -26,7 +26,7 @@ export interface IPhaseTemplate {
     namespace?: string
     localeNames: Array<string>
     Create?: typeof BaseCreate
-    type: 'bespoke' | 'otree' | 'qualtrics' | 'survey'
+    type: 'bespoke' | 'otree' | 'qualtrics' | 'survey' | 'temp'
     otreeName?: string
 }
 

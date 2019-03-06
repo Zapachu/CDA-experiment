@@ -13,7 +13,7 @@ class Create extends BaseCreate<any> {
     }
 
     async componentDidMount() {
-        const fetchUrl = 'http://127.0.0.1:3070/phases/list'
+        const fetchUrl = '/phases/list'
         const res = await fetchData(fetchUrl)
         if (!res.err) {
             this.createPhase('public_goods')
@@ -87,8 +87,8 @@ class Create extends BaseCreate<any> {
     }
 }
 
-registerOnFramework('otree', {
+registerOnFramework('user001', {
     localeNames: ['OTree', 'OTree'],
     Create,
-    type: 'otree',
+    type: 'temp',
 })

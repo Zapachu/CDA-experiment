@@ -9,6 +9,7 @@ const {localOtreeRootUrl} = settings
 
 const InitWork = (app) => {
     app.use(async (req, res, next) => {
+        console.log(req.url)
         const originWrite = res.write
         const originEnd = res.end
 
@@ -27,27 +28,12 @@ const InitWork = (app) => {
 
         noRes()
         console.log(`${req.method}  ${req.url}`)
-        console.log(req.user)
-        if (!req.user) return ErrorPage(okRes(), 'Not Login')
+        // console.log(req.user)
+        // if (!req.user) return ErrorPage(okRes(), 'Not Login')
         const isInit = req.url.includes('/init')                  // 初始化的标志
         const isGetOtreeList = req.url.includes('/phases/list')   // 获取许可列表
         const otreeParticipantUrl = 'InitializeParticipant/'      // 初始化的标志
 
-        /**
-         * Change:
-         * proxy: run
-         *   oTree server 权限
-         *      all list
-         *   oTree server run
-         *      1.Get Game List
-         *          1.run demo list page √
-         *            get page, get list, send list
-         *          2.read oTree settings file ×
-         *      2.Get multi Proxy Server
-         *          1.each proxy: namespace/elf item
-         *          2.elf show proxy list
-         *          3.run in proxy
-         */
         if (isGetOtreeList) {
             const list = ListMap.getList(settings.otreeUser1)
             return okRes().json({err: 0, list})
