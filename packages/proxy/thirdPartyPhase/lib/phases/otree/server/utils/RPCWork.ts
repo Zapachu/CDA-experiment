@@ -2,8 +2,8 @@
 
 import {serve as RPCServe} from '../../rpc'
 
-const RPCWork = () => {
-    RPCServe()
+const RPCWork = async () => {
+    await RPCServe()
 }
 
 export {

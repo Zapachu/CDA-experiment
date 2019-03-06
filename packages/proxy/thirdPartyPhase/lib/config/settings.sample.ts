@@ -11,6 +11,7 @@ export default {
 
     // otree
     otreePort: 4002,
+    otreeUser1: 'user001',
     localOtreePhaseServiceUri: '127.0.0.1:54002',
     localOtreeRootUrl: 'http://127.0.0.1:4002',
     otreeServerRootUrl: 'http://127.0.0.1:8000',

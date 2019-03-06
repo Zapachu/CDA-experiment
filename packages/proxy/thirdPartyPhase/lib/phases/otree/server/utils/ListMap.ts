@@ -24,4 +24,5 @@ ListMap.getList = async (namespace) => {
 ListMap.setList = async (namespace, data) => {
     let list = {data, lastTime: Date.now()}
     ListMap.set(namespace, list)
+    return true
 }
