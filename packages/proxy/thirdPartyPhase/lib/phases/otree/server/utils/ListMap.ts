@@ -26,3 +26,5 @@ ListMap.setList = async (namespace, data) => {
     ListMap.set(namespace, list)
     return true
 }
+
+export default ListMap

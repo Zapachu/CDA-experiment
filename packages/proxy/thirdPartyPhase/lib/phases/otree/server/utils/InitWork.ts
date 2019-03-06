@@ -1,10 +1,9 @@
 'use strict'
 
 import {ErrorPage} from '../../../common/utils/errorPage'
-import {Model} from 'elf-protocol'
+import ListMap from '../utils/ListMap'
 import {ThirdPartPhase} from '../../../../core/server/models'
 import settings from '../../../../config/settings'
-import {list as otreeDemoList} from './otreeList'
 
 const {localOtreeRootUrl} = settings
 
@@ -20,8 +19,10 @@ const InitWork = (app) => {
         }
 
         const noRes = () => {
-            res.write = () => {}
-            res.end = () => {}
+            res.write = () => {
+            }
+            res.end = () => {
+            }
         }
 
         noRes()
@@ -48,21 +49,8 @@ const InitWork = (app) => {
          *          3.run in proxy
          */
         if (isGetOtreeList) {
-            let permittedList = ['quiz']
-            try {
-                const userGamePermissions: any = await Model.GameUserPermissionModel.find({userId: req.user._id.toString()}).populate('gameTemplateId')
-                console.log(userGamePermissions)
-                userGamePermissions.forEach(rec => {
-                    if (rec.gameTemplateId.namespace === 'otree_demo') {
-                        permittedList = otreeDemoList
-                    }
-                })
-                return okRes().json({err: 0, list: permittedList})
-            } catch (err) {
-                if (err) {
-                    return okRes().json({err: 1, msg: err})
-                }
-            }
+            const list = ListMap.getList(settings.otreeUser1)
+            return okRes().json({err: 0, list})
         }
 
         if (isInit) {
@@ -71,7 +59,7 @@ const InitWork = (app) => {
             const phaseId = req.path.split('InitializeParticipant/')[1]
 
             try {
-                const Phase:any = await ThirdPartPhase.findById(phaseId).exec()
+                const Phase: any = await ThirdPartPhase.findById(phaseId).exec()
 
                 if (!Phase) {
                     return ErrorPage(okRes(), 'phase not found')
