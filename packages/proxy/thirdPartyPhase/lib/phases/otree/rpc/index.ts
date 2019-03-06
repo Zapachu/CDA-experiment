@@ -1,40 +1,42 @@
-import { Server, ServerCredentials } from 'grpc'
-import {phaseService } from './service/OtreeManager'
+import {Server, ServerCredentials} from 'grpc'
+import {phaseService} from './service/OtreeManager'
 import {PhaseManager} from 'elf-protocol'
 import {gameService} from '../../common/utils'
 import setting from '../../../config/settings'
-import { resolve } from 'path'
-import { readFileSync } from 'fs'
+import {resolve} from 'path'
+import {readFileSync} from 'fs'
+import {getDemoList} from './service/otreeApi/otreeUrl'
 
 export function serve() {
     const server = new Server()
     PhaseManager.setPhaseService(server, phaseService)
     server.bind(`0.0.0.0:5${setting.otreePort}`, ServerCredentials.createInsecure())
     server.start()
-    setInterval(() => registerPhases(), 10000)
+    setInterval(async () => await registerPhases(), 10000)
 }
 
+
 /**
- * 注册 phase 提供的信息
+ * Init: list
+ * GET oTree List Functions / oTree List Cache
+ * namespace: oTree + hash
+ * data: {namespace, list}
  */
-function getJsUrls(): Array<{ namespace: string, jsUrl: string }> {
-    const otreePhase = []
-    Object.entries(JSON.parse(readFileSync(resolve(__dirname, '../../../../dist/manifest.json')).toString())).map(([k, v]) => {
-        if (k.replace('.js', '') === 'otree') {
-            otreePhase.push({
-                type:PhaseManager.PhaseType.otree,
-                namespace: k.replace('.js', ''),
-                jsUrl: `${setting.localOtreeRootUrl}${v}`,
-                rpcUri: setting.localOtreePhaseServiceUri
-            })
-        }
-    })
-    return otreePhase
+async function getJsUrls() {
+    const manifest = JSON.parse(readFileSync(resolve(__dirname, '../../../../dist/manifest.json')).toString())
+    const regPhase = {
+        type: PhaseManager.PhaseType.otree,
+        namespace: `oTree-${setting.otreeUser1}`,
+        jsUrl: `${setting.localOtreeRootUrl}${manifest['otree.js']}`,
+        rpcUri: setting.localOtreePhaseServiceUri
+    }
+    await getDemoList(regPhase.namespace)
+    return [regPhase]
 }
 
 // 注册 Otree Phase
-function registerPhases() {
-    gameService.registerPhases({ phases: getJsUrls() }, (err) => {
+async function registerPhases() {
+    gameService.registerPhases({phases: await getJsUrls()}, (err) => {
         if (err) {
             console.log(err)
         }
