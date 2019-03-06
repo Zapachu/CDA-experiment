@@ -27,7 +27,6 @@ export interface IPhaseTemplate {
     localeNames: Array<string>
     Create?: typeof BaseCreate
     type: 'bespoke' | 'otree' | 'qualtrics' | 'survey'
-    otreeName?: string
 }
 
 export function registerPhaseCreate(namespace: string, phaseTemplate: IPhaseTemplate):void

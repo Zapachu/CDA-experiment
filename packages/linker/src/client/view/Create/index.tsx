@@ -283,12 +283,11 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
 
     renderPhaseEditor(curPhaseIndex: number) {
         const {lang, state: {phaseConfigs, activePhaseKey, mode}} = this
-        // const curPhaseIndex = phaseConfigs.findIndex(({key}) => key === activePhaseKey),
         const curPhase = phaseConfigs[curPhaseIndex]
         if (!curPhase) {
             return null
         }
-        const {Create} = phaseTemplates[curPhase.namespace==='otree' ? `otree_${curPhase.param.otreeName}` : curPhase.namespace]
+        const {Create} = phaseTemplates[curPhase.namespace]
         return <Card className={style.phaseCard} actions={mode===GameMode.easy?[]:[
             <Icon type={'play-circle'}
                   onClick={() => this.handleStartPhase(curPhase.key)}>{lang.startPhase}</Icon>,
@@ -353,30 +352,21 @@ class AddPhase extends React.Component<AddPhaseProps, AddPhaseState> {
     }
 
     lang = Lang.extractLang({
-        otree: ['oTree', 'oTree'],
         bespoke: ['定制实验', 'Bespoke'],
         survey: ['问卷', 'Survey'],
         searchPhase: ['搜索环节', 'Search Phase']
     })
 
     formatPhases = (phaseTemplates: {[phase: string]: IPhaseTemplate}) => {
-        const phases: {[type:string]: Array<{name: string, namespace: string, otreeName?: string}>} = {}
+        const phases: {[type:string]: Array<{name: string, namespace: string}>} = {}
         Object.values(phaseTemplates).forEach(tpl => {
             if(phases[tpl.type]) {
-                phases[tpl.type].push(tpl.otreeName ? {
-                    name: Lang.extractLang({name: tpl.localeNames}).name,
-                    namespace: tpl.namespace,
-                    otreeName: tpl.otreeName
-                } : {
+                phases[tpl.type].push({
                     name: Lang.extractLang({name: tpl.localeNames}).name,
                     namespace: tpl.namespace
                 })
             } else {
-                phases[tpl.type] = [tpl.otreeName ? {
-                    name: Lang.extractLang({name: tpl.localeNames}).name,
-                    namespace: tpl.namespace,
-                    otreeName: tpl.otreeName
-                } : {
+                phases[tpl.type] = [{
                     name: Lang.extractLang({name: tpl.localeNames}).name,
                     namespace: tpl.namespace
                 }]
@@ -447,13 +437,13 @@ class AddPhase extends React.Component<AddPhaseProps, AddPhaseState> {
         )
     }
 
-    onTagClick = (node:{name: string, namespace: string, otreeName?: string}) => {
+    onTagClick = (node:{name: string, namespace: string}) => {
         const {lang, state:{phaseType}, props:{onTagClick}} = this
         onTagClick({
             key: genePhaseKey(),
             title: `${lang[phaseType]}-${node.name}`,
             namespace: node.namespace,
-            param: node.namespace==='otree' ? {otreeName: node.otreeName} : {},
+            param: {},
             suffixPhaseKeys: []
         })
     }
