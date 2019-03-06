@@ -121,13 +121,13 @@ export class Request {
     }
 
     /**** V5 ****/
-    static async reward(orgCode:string, gameId: string, data: {
-        money:number,
+    static async reward(orgCode: string, gameId: string, data: {
+        money: number,
         subject: number,
         task: string,
         tasker: string,
         payeeId: string
-    }): Promise<{ err: number }> {
+    }): Promise<{ code: number, msg: string }> {
         return await request(`/v5/apiv5/${orgCode}/researcher/trans/reward`, baseEnum.RequestMethod.post, data)
     }
 }

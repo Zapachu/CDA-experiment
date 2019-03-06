@@ -123,9 +123,9 @@ class RewardPanel extends React.Component<TRewardPanelProps, TRewardPanelState> 
                                 task: gameId,
                                 tasker: playerId,
                                 payeeId: userId
-                            }).then(({err}) => {
-                                if (err !== baseEnum.AcademusResCode.success) {
-                                    message.error(lang.RewardFailed)
+                            }).then(({code, msg}) => {
+                                if (code !== baseEnum.AcademusResCode.success) {
+                                    message.error(`${lang.RewardFailed},${msg}`)
                                 } else {
                                     message.success(lang.RewardSuccess)
                                     this.setState({

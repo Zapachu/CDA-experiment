@@ -792,7 +792,8 @@ $root.SendBackPlayerReq = (function() {
      * @property {string|null} [playUrl] SendBackPlayerReq playUrl
      * @property {string|null} [playerToken] SendBackPlayerReq playerToken
      * @property {string|null} [nextPhaseKey] SendBackPlayerReq nextPhaseKey
-     * @property {number|null} [point] SendBackPlayerReq point
+     * @property {string|null} [phasePlayerId] SendBackPlayerReq phasePlayerId
+     * @property {string|null} [detailIframeUrl] SendBackPlayerReq detailIframeUrl
      */
 
     /**
@@ -843,12 +844,20 @@ $root.SendBackPlayerReq = (function() {
     SendBackPlayerReq.prototype.nextPhaseKey = "";
 
     /**
-     * SendBackPlayerReq point.
-     * @member {number} point
+     * SendBackPlayerReq phasePlayerId.
+     * @member {string} phasePlayerId
      * @memberof SendBackPlayerReq
      * @instance
      */
-    SendBackPlayerReq.prototype.point = 0;
+    SendBackPlayerReq.prototype.phasePlayerId = "";
+
+    /**
+     * SendBackPlayerReq detailIframeUrl.
+     * @member {string} detailIframeUrl
+     * @memberof SendBackPlayerReq
+     * @instance
+     */
+    SendBackPlayerReq.prototype.detailIframeUrl = "";
 
     /**
      * Creates a new SendBackPlayerReq instance using the specified properties.
@@ -882,8 +891,10 @@ $root.SendBackPlayerReq = (function() {
             writer.uint32(/* id 3, wireType 2 =*/26).string(message.playerToken);
         if (message.nextPhaseKey != null && message.hasOwnProperty("nextPhaseKey"))
             writer.uint32(/* id 4, wireType 2 =*/34).string(message.nextPhaseKey);
-        if (message.point != null && message.hasOwnProperty("point"))
-            writer.uint32(/* id 5, wireType 0 =*/40).int32(message.point);
+        if (message.phasePlayerId != null && message.hasOwnProperty("phasePlayerId"))
+            writer.uint32(/* id 5, wireType 2 =*/42).string(message.phasePlayerId);
+        if (message.detailIframeUrl != null && message.hasOwnProperty("detailIframeUrl"))
+            writer.uint32(/* id 6, wireType 2 =*/50).string(message.detailIframeUrl);
         return writer;
     };
 
@@ -931,7 +942,10 @@ $root.SendBackPlayerReq = (function() {
                 message.nextPhaseKey = reader.string();
                 break;
             case 5:
-                message.point = reader.int32();
+                message.phasePlayerId = reader.string();
+                break;
+            case 6:
+                message.detailIframeUrl = reader.string();
                 break;
             default:
                 reader.skipType(tag & 7);
@@ -980,9 +994,12 @@ $root.SendBackPlayerReq = (function() {
         if (message.nextPhaseKey != null && message.hasOwnProperty("nextPhaseKey"))
             if (!$util.isString(message.nextPhaseKey))
                 return "nextPhaseKey: string expected";
-        if (message.point != null && message.hasOwnProperty("point"))
-            if (!$util.isInteger(message.point))
-                return "point: integer expected";
+        if (message.phasePlayerId != null && message.hasOwnProperty("phasePlayerId"))
+            if (!$util.isString(message.phasePlayerId))
+                return "phasePlayerId: string expected";
+        if (message.detailIframeUrl != null && message.hasOwnProperty("detailIframeUrl"))
+            if (!$util.isString(message.detailIframeUrl))
+                return "detailIframeUrl: string expected";
         return null;
     };
 
@@ -1006,8 +1023,10 @@ $root.SendBackPlayerReq = (function() {
             message.playerToken = String(object.playerToken);
         if (object.nextPhaseKey != null)
             message.nextPhaseKey = String(object.nextPhaseKey);
-        if (object.point != null)
-            message.point = object.point | 0;
+        if (object.phasePlayerId != null)
+            message.phasePlayerId = String(object.phasePlayerId);
+        if (object.detailIframeUrl != null)
+            message.detailIframeUrl = String(object.detailIframeUrl);
         return message;
     };
 
@@ -1029,7 +1048,8 @@ $root.SendBackPlayerReq = (function() {
             object.playUrl = "";
             object.playerToken = "";
             object.nextPhaseKey = "";
-            object.point = 0;
+            object.phasePlayerId = "";
+            object.detailIframeUrl = "";
         }
         if (message.groupId != null && message.hasOwnProperty("groupId"))
             object.groupId = message.groupId;
@@ -1039,8 +1059,10 @@ $root.SendBackPlayerReq = (function() {
             object.playerToken = message.playerToken;
         if (message.nextPhaseKey != null && message.hasOwnProperty("nextPhaseKey"))
             object.nextPhaseKey = message.nextPhaseKey;
-        if (message.point != null && message.hasOwnProperty("point"))
-            object.point = message.point;
+        if (message.phasePlayerId != null && message.hasOwnProperty("phasePlayerId"))
+            object.phasePlayerId = message.phasePlayerId;
+        if (message.detailIframeUrl != null && message.hasOwnProperty("detailIframeUrl"))
+            object.detailIframeUrl = message.detailIframeUrl;
         return object;
     };
 
