@@ -11,7 +11,8 @@ export function registerOnFramework(namespace: string, gameTemplate: IGameTempla
         const phaseTemplate: IPhaseTemplate = {
             type: 'bespoke',
             localeNames: gameTemplate.localeNames,
-            Create: gameTemplate.CreateOnElf
+            Create: gameTemplate.CreateOnElf,
+            icon: gameTemplate.icon
         }
         window['ElfLinker'].registerPhaseCreate(namespace, phaseTemplate)
     }

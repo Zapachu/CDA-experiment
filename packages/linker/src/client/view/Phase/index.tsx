@@ -7,7 +7,7 @@ import * as dagre from 'dagre'
 import {Api, connCtx, genePhaseKey, loadScript, Lang} from '@client-util'
 import {rootContext, TRootContext} from '@client-context'
 import {phaseTemplates} from '../../index'
-import {message, Row, Col, Button, Input, Icon, Card, Modal, Select, Tabs, Tag} from '@antd-component'
+import {message, Row, Col, Button, Input, Icon, Card, Modal, Select, Tabs, List} from '@antd-component'
 import {Loading, Title} from '@client-component'
 import {Link} from 'react-router-dom'
 import {cloneDeep} from 'lodash'
@@ -24,7 +24,7 @@ declare interface ICreateState {
 }
 
 @connCtx(rootContext)
-export class Create extends React.Component<TRootContext & RouteComponentProps<{ gameId: string }>, ICreateState> {
+export class Phase extends React.Component<TRootContext & RouteComponentProps<{ gameId: string }>, ICreateState> {
     private mode: GameMode
 
     get defaultState() {
@@ -330,7 +330,7 @@ interface AddPhaseState {
     phaseType: string
     phases: Array<{
         type: string,
-        nodes: Array<{name: string, namespace: string}>
+        nodes: Array<{name: string, namespace: string, icon: string}>
     }>
     options: Array<string>
     searchTerm: string
@@ -340,7 +340,7 @@ interface AddPhaseProps {
     onTagClick: (newPhase: IPhaseConfig) => void
 }
 
-class AddPhase extends React.Component<AddPhaseProps, AddPhaseState> {
+export class AddPhase extends React.Component<AddPhaseProps, AddPhaseState> {
     constructor(props) {
         super(props)
         this.state = {
@@ -348,6 +348,14 @@ class AddPhase extends React.Component<AddPhaseProps, AddPhaseState> {
             phases: this.formatPhases(phaseTemplates),
             options: [],
             searchTerm: ''
+        }
+    }
+
+    componentDidMount(){
+        const {state:{phases}} = this
+        if(phases.length){
+            const {type} = phases[0]
+            this.onTabChange(type)
         }
     }
 
@@ -359,17 +367,19 @@ class AddPhase extends React.Component<AddPhaseProps, AddPhaseState> {
     })
 
     formatPhases = (phaseTemplates: {[phase: string]: IPhaseTemplate}) => {
-        const phases: {[type:string]: Array<{name: string, namespace: string}>} = {}
+        const phases: {[type:string]: Array<{name: string, namespace: string, icon:string}>} = {}
         Object.values(phaseTemplates).forEach(tpl => {
             if(phases[tpl.type]) {
                 phases[tpl.type].push({
                     name: Lang.extractLang({name: tpl.localeNames}).name,
-                    namespace: tpl.namespace
+                    namespace: tpl.namespace,
+                    icon: tpl.icon
                 })
             } else {
                 phases[tpl.type] = [{
                     name: Lang.extractLang({name: tpl.localeNames}).name,
-                    namespace: tpl.namespace
+                    namespace: tpl.namespace,
+                    icon: tpl.icon
                 }]
             }
         })
@@ -430,7 +440,16 @@ class AddPhase extends React.Component<AddPhaseProps, AddPhaseState> {
                         <Tabs.TabPane
                             tab={lang[type]}
                             key={type}>
-                            {nodes.map((node, i) => <Tag key={`${node.namespace}-${i}`} onClick={() => this.onTagClick(node)}>{node.name}</Tag>)}
+                            <List dataSource={nodes}
+                                  grid={{ gutter: 16, column: 6 }}
+                                  renderItem={item=>
+                                <List.Item onClick={()=>this.onTagClick(item)}>
+                                    <div className={style.templateNode}>
+                                        <img src={item.icon}/>
+                                        <span>{item.name}</span>
+                                    </div>
+                                </List.Item>
+                            }/>
                         </Tabs.TabPane>
                     )}
                 </Tabs>

@@ -30,6 +30,9 @@ export class BaseInfo extends React.Component<RouteComponentProps<{ gameId: stri
     }
 
     async componentDidMount() {
+        if(self !== top){
+            this.props.history.push('/createInFrame')
+        }
         const {props: {match: {params: {gameId}}}} = this
         if (gameId) {
             const {game} = await Api.getGame(gameId)
