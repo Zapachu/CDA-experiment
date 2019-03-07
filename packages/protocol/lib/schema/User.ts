@@ -5,7 +5,7 @@ const bcrypt   = require('bcrypt-nodejs')
 const Schema   = mongoose.Schema
 const ObjectId = Schema.ObjectId
 
-const UserSchema = new mongoose.Schema({
+const User = new mongoose.Schema({
     createAt: Date,
     updateAt: Date,
 
@@ -46,7 +46,7 @@ const UserSchema = new mongoose.Schema({
     lastLogin: {type: Date}  //记录上次登录时间
 })
 
-UserSchema.pre('save', function(next) {
+User.pre('save', function(next) {
     const user = this;
     if (user.isModified('password')) {
         this.createAt = this.updateAt = Date.now()
@@ -71,7 +71,7 @@ UserSchema.pre('save', function(next) {
     }
 })
 
-UserSchema.methods = {
+User.methods = {
     comparePassword: function(_password, cb) {
         bcrypt.compare(_password, this.password, function (err, isMatch) {
             if (err) {
@@ -81,11 +81,11 @@ UserSchema.methods = {
         })
     }
 }
-UserSchema.virtual('phone').get(function() {
+User.virtual('phone').get(function() {
     if (!this.mobile || this.mobile.indexOf("null") === 0) {
         return undefined
     }
     return this.mobile
 })
 
-export const UserModel = mongoose.model('User', UserSchema)
+export {User}

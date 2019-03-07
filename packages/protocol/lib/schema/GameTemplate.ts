@@ -1,9 +1,9 @@
 'use strict'
 
-import {model, Schema} from 'mongoose'
+import {Schema} from 'mongoose'
 const {Date: MongodDate, Number: MongodNumber, String: MongodString} = Schema.Types
 
-const GameTemplateSchema = new Schema({
+const GameTemplate = new Schema({
     createAt: {type: MongodDate, default: Date.now},
     updateAt: {type: MongodDate, default: Date.now},
     id: MongodNumber, //实验类型 经典实验才有id
@@ -20,9 +20,8 @@ const GameTemplateSchema = new Schema({
     status: {type: MongodNumber, default: 1}, //状态 0：不正常 1：正常
 })
 
-GameTemplateSchema.pre('save', function(next){
+GameTemplate.pre('save', function(next){
     (this as any).updateAt = Date.now()
     next()
 })
-
-export const GameTemplateModel = model('GameTemplate', GameTemplateSchema)
+export {GameTemplate}

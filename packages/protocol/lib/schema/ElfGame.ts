@@ -1,6 +1,6 @@
-import {Schema, model} from 'mongoose'
+import {Schema} from 'mongoose'
 
-const ElfGameSchema = new Schema({
+export const ElfGame = new Schema({
     owner: String,
     title: String,
     desc: String,
@@ -10,5 +10,3 @@ const ElfGameSchema = new Schema({
     createAt: { type: Date, default: Date.now },
     updateAt: { type: Date, default: Date.now },
 }, {minimize: false})
-
-export const ElfGameModel = model('ElfGame', ElfGameSchema)
