@@ -1,3 +1,5 @@
 export * from './GameTemplate'
 export * from './GameUserPermission'
 export * from './User'
+export * from './ElfGame'
+export * from './ElfPlayer'

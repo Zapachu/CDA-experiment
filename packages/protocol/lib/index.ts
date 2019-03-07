@@ -1,5 +1,4 @@
-import * as Model from './model'
+import * as model from './model'
 
-export {Model}
+export {model}
 export * from './proto'
-
