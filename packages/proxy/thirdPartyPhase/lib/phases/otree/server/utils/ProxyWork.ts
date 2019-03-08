@@ -8,7 +8,7 @@ const otreePlayUrl = settings.otreeServerRootUrl
 
 const proxy = httpProxy({
     target: otreePlayUrl,
-    changeOrigin: true,
+    // changeOrigin: true,
     ws: true,
     autoRewrite: true,
     protocolRewrite: 'http',
