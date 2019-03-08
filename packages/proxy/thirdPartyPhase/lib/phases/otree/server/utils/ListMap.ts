@@ -18,6 +18,7 @@ ListMap.getList = (namespace) => {
         ListMap.set(namespace, list)
     }
     ListMap.clean()
+    console.log(list)
     return list.data
 }
 
