@@ -1,6 +1,7 @@
 import {PhaseStatus, PlayerStatus, Actor, AcademusRole} from './baseEnum'
 import {Socket} from 'socket.io-client'
 import {PhaseManager} from 'elf-protocol'
+import {baseEnum} from '@common'
 
 export type TSocket = typeof Socket
 
@@ -53,7 +54,7 @@ export interface IBaseGame {
     desc: string
     owner?: string
     published?: boolean
-    mode: string
+    mode: baseEnum.GameMode
 }
 
 export interface IBaseGameWithId extends IBaseGame {

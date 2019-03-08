@@ -60,12 +60,13 @@ export class GameCtrl {
     }
 
     static async saveNewGame(req: Request, res: Response) {
-        const {body: {title, desc, mode}, user: {id: owner}} = req
+        const {body: {title, desc, mode, phaseConfigs}, user: {id: owner}} = req
         const gameId = await GameService.saveGame({
             owner,
             title,
             desc,
-            mode
+            mode,
+            ...(phaseConfigs ? {phaseConfigs} : {})
         })
         res.json({
             code: baseEnum.ResponseCode.success,
@@ -179,15 +180,15 @@ export class GameCtrl {
         }
     }
 
-    static async getRewardedMoney(req: Request, res: Response){
-        const {query:{playerId}} = req
-        try{
+    static async getRewardedMoney(req: Request, res: Response) {
+        const {query: {playerId}} = req
+        try {
             const {reward} = await PlayerModel.findById(playerId)
             res.json({
                 code: baseEnum.ResponseCode.success,
                 reward
             })
-        }catch (e) {
+        } catch (e) {
             res.json({
                 code: baseEnum.ResponseCode.notFound
             })
