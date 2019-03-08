@@ -40,7 +40,7 @@ export class GameList extends React.Component<RouteComponentProps<{}>, IGameList
         return <section className={style.gameList}>
             <Title label={lang.createdGames}/>
             <div className={style.createBtnWrapper}>
-                <Button type={'primary'} onClick={() => history.push('/create')}>{lang.create}</Button>
+                <Button type={'primary'} onClick={() => history.push('/baseInfo')}>{lang.create}</Button>
             </div>
             <List dataSource={gameList}
                   renderItem={game => <ListItem actions={[<Link to={`/info/${game.id}`}>{lang.view}</Link>]}>

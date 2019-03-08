@@ -1,5 +1,2 @@
-import * as Model from './model'
-
-export {Model}
+export {getModels} from './schema'
 export * from './proto'
-

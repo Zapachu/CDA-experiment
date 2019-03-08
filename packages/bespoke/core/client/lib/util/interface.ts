@@ -5,6 +5,7 @@ import {Fetcher} from '.'
 
 export interface IGameTemplate {
     namespace?: string
+    icon?: string
     localeNames: Array<string>
     Create?: Core.CreateClass
     CreateOnElf?: Core.CreateOnElfClass

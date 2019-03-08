@@ -34,8 +34,8 @@ const getDemoList = async (namespace) => {
         item.match(/ <a href="\/demo\/(\S*)\/" class="list-group-item" target="_blank">/)[1]
     )
     console.log(demoList)
-    await ListMap.setList(namespace, demoListRes)
-    return demoListRes
+    await ListMap.setList(namespace, demoList)
+    return demoList
 }
 
 // get play link

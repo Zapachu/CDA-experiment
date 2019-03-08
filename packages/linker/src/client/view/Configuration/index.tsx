@@ -5,7 +5,7 @@ import {Api, Lang, loadScript} from '@client-util'
 import {RouteComponentProps} from 'react-router'
 import {Card, Modal} from '@antd-component'
 import {Breadcrumb, Loading, Title} from '@client-component'
-import {PhaseFlowChart} from '../Create'
+import {PhaseFlowChart} from '../Phase'
 import {phaseTemplates} from '../../index'
 
 declare interface IInfoState {

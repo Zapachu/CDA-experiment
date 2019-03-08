@@ -2,14 +2,15 @@
 
 import '../auth/passport'
 import * as passport from 'passport'
-import {Model} from 'elf-protocol'
+import {model} from 'mongoose'
+import {getModels} from 'elf-protocol'
 
 passport.serializeUser(function (user, done) {
     // @ts-ignore
     done(null, user._id);
 });
 passport.deserializeUser(function (id, done) {
-    Model.UserModel.findById(id, function (err, user) {
+    getModels(model).User.findById(id, function (err, user) {
         done(err, user);
     });
 });

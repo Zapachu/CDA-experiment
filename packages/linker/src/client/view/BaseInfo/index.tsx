@@ -1,16 +1,17 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {RouteComponentProps} from 'react-router'
-import {baseEnum, GameMode} from '@common'
+import {baseEnum} from '@common'
 import {Api, Lang} from '@client-util'
 import {Button, Input, message, Switch} from '@antd-component'
+import GameMode = baseEnum.GameMode
 
 interface IBaseInfoState {
     loading: boolean,
     title: string,
     desc: string,
     created: boolean,
-    mode: string
+    mode: GameMode
 }
 
 export class BaseInfo extends React.Component<RouteComponentProps<{ gameId: string }>, IBaseInfoState> {
@@ -26,7 +27,7 @@ export class BaseInfo extends React.Component<RouteComponentProps<{ gameId: stri
         title: '',
         desc: '',
         created: false, //已创建
-        mode: GameMode.easy
+        mode: self === top ? GameMode.easy : GameMode.extended
     }
 
     async componentDidMount() {

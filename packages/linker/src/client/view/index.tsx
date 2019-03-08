@@ -6,7 +6,7 @@ import {Loading} from '@client-component'
 import {Api} from '@client-util'
 import {Route, Switch} from 'react-router'
 import {withSideNav, NAV} from './SideNav'
-import {Create} from './Create'
+import {Phase} from './Phase'
 import {Play} from './Play'
 import {Configuration} from './Configuration'
 import {Share} from './Share'
@@ -15,6 +15,7 @@ import {Join} from './Join'
 import {PlayerList} from './PlayerList'
 import {GameList} from './GameList'
 import {BaseInfo} from './BaseInfo'
+import {CreateInFrame} from './CreateInFrame'
 import * as style from './initial.scss'
 
 declare interface IRootState extends TRootContext {
@@ -39,9 +40,10 @@ export class Root extends React.Component<{}, IRootState> {
                 </div>
                 <BrowserRouter basename={`${config.rootName}/${config.appPrefix}`}>
                     <Switch>
-                        <Route path={'/create'} component={withSideNav(BaseInfo, NAV.basic)}/>
+                        <Route path={'/createInFrame'} component={CreateInFrame}/>
                         <Route path={'/baseInfo/:gameId'} component={withSideNav(BaseInfo, NAV.basic)}/>
-                        <Route path={'/phase/:gameId'} component={withSideNav(Create, NAV.group)}/>
+                        <Route path={'/baseInfo'} component={withSideNav(BaseInfo, NAV.basic)}/>
+                        <Route path={'/phase/:gameId'} component={withSideNav(Phase, NAV.group)}/>
                         <Route path={'/share/:gameId'} component={Share}/>
                         <Route path={'/join/:gameId'} component={Join}/>
                         <Route path={'/info/:gameId'} component={Info}/>

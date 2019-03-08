@@ -14,7 +14,7 @@ const app = Express()
 ConDB()
 StaticPathMiddleware(app, namespace)
 SessionSetMiddleware(app)
-// PassportMiddleware(app)
+PassportMiddleware(app)
 
 SessionTokenCheck(app)
 InitWork(app)

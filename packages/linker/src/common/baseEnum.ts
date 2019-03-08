@@ -51,6 +51,11 @@ export enum LogLevel {
 //endregion
 
 //region elf-linker
+export enum GameMode {
+    easy = 'easy',
+    extended = 'extended'
+}
+
 export enum SocketEvent {
     connection = 'connection',
     disconnect = 'disconnect',

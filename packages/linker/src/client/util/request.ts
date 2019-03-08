@@ -6,7 +6,7 @@ import {
     IBaseGameWithId,
     IUserWithId,
     TApiGroupPlayers,
-    IGameToUpdate
+    IGameToUpdate, IPhaseConfig
 } from '@common'
 import {getCookie} from '@client-util'
 import * as queryString from 'query-string'
@@ -96,11 +96,11 @@ export class Request {
         return await GET('/game/phaseTemplates')
     }
 
-    static async postNewGame(title: string, desc: string, mode: string): Promise<IHttpRes & {
+    static async postNewGame(title: string, desc: string, mode: baseEnum.GameMode, phaseConfigs?: Array<IPhaseConfig<{}>>): Promise<IHttpRes & {
         gameId: string
     }> {
         return await POST('/game/create', null, null, {
-            title, desc, mode
+            title, desc, mode, phaseConfigs
         })
     }
 

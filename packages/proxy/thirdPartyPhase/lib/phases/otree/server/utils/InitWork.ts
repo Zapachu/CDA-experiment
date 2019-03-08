@@ -27,15 +27,13 @@ const InitWork = (app) => {
         }
 
         noRes()
-        console.log(`${req.method}  ${req.url}`)
-        // console.log(req.user)
-        // if (!req.user) return ErrorPage(okRes(), 'Not Login')
         const isInit = req.url.includes('/init')                  // 初始化的标志
         const isGetOtreeList = req.url.includes('/phases/list')   // 获取许可列表
         const otreeParticipantUrl = 'InitializeParticipant/'      // 初始化的标志
 
         if (isGetOtreeList) {
-            const list = ListMap.getList(settings.otreeUser1)
+            const list = await ListMap.getList(`oTree-${settings.otreeUser1}`)
+            console.log(list)
             return okRes().json({err: 0, list})
         }
 

@@ -1,9 +1,9 @@
 'use strict'
 
-import {model, Schema} from 'mongoose'
+import {Schema} from 'mongoose'
 const {ObjectId, Date: MongodDate, String: MongodString, Number: MongodNumber} = Schema.Types
 
-const GameUserPermissionSchema = new Schema({
+const GameUserPermission = new Schema({
     createAt: {type: MongodDate, default: Date.now},
     updateAt: {type: MongodDate, default: Date.now},
     uniKey: {type: MongodString, unique: true}, // gameTemplateId + userId
@@ -15,9 +15,9 @@ const GameUserPermissionSchema = new Schema({
     permitted: MongodNumber, //创建权限 0：不能创建 1：可以创建
 })
 
-GameUserPermissionSchema.pre('save', function(next){
+GameUserPermission.pre('save', function(next){
     (this as any).updateAt = Date.now()
     next()
 })
 
-export const GameUserPermissionModel = model('GameUserPermission', GameUserPermissionSchema)
+export {GameUserPermission}
