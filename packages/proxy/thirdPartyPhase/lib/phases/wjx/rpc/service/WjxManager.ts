@@ -1,18 +1,15 @@
-import { ThirdPartPhase } from '../../../../core/server/models'
+import {ThirdPartPhase} from '../../../../core/server/models'
 import settings from '../../../../config/settings'
 import {PhaseManager} from 'elf-protocol'
+import * as objectHash from 'object-hash'
 
 const {wjxProxy} = settings
 
-/**
- * 真实路由：  https://www.wjx.cn/jq/HASH.aspx
- * 初始化路由： /init/jq/PHASEID?hash=ELFHASH
- * @param groupId
- * @param namespace
- * @param param
- */
+const gen32Token = (source) => {
+    return objectHash(source, {algorithm: 'md5'})
+}
 
-const getUrlByNamespace = async (groupId, namespace, param) => {
+const getUrlByNamespace = async (groupId, namespace, param, owner) => {
     let paramJson = JSON.parse(param)
     const {wjxUrl: realWjxUrl} = paramJson
     paramJson.wjxHash = realWjxUrl.split('/jq/')[1]
@@ -23,6 +20,7 @@ const getUrlByNamespace = async (groupId, namespace, param) => {
             groupId: groupId,
             param: paramString,
             namespace: namespace,
+            ownerToken: gen32Token(owner.toString()),
         }).save()
         return `${wjxProxy}/init/jq/${newWjxPhase._id.toString()}`
     } catch (err) {
@@ -34,7 +32,7 @@ const getUrlByNamespace = async (groupId, namespace, param) => {
 }
 
 export const phaseService = {
-    async newPhase({ request: { groupId, namespace, param } }: { request: PhaseManager.TNewPhaseReq }, callback:PhaseManager.TNewPhaseCallback) {
-        callback(null, { playUrl: await getUrlByNamespace(groupId, namespace, param) })
+    async newPhase({request: {groupId, namespace, param, owner}}: { request: PhaseManager.TNewPhaseReq }, callback: PhaseManager.TNewPhaseCallback) {
+        callback(null, {playUrl: await getUrlByNamespace(groupId, namespace, param, owner)})
     }
 }

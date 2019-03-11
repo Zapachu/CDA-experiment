@@ -20,6 +20,6 @@ ProxyWork(app)
 RPCWork()
 
 app.use(errorhandler())
-const server: any = app.listen(wjxPort, () => {
+app.listen(wjxPort, () => {
     console.log(`listening at ${wjxPort}`)
 })
