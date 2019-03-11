@@ -2,24 +2,18 @@
 
 import {Schema, model} from 'mongoose'
 
-const {String: MongodString, Boolean: MongodBoolean} = Schema.Types
-
 const ThirdPartPhaseSchema = new Schema({
-    groupId: MongodString,
-    // namespace: otree/qualtrics/wjx
-    namespace: MongodString,
-    param: MongodString,
-    playHashs: [
+    groupId: String,            // elf player groupId
+    namespace: String,          // elf namespace, ex: oTree, qualtrics, wjx
+    param: String,              // oTree param
+    playHash: [                 // third party game <=> elf player
         {
-            hash: MongodString,
-            player: MongodString
+            hash: String,       // third party play url or hash
+            player: String,     // elf player id
         }
     ],
-    adminUrl: MongodString,
-    prefixUrl: MongodString,
-    playUrl: MongodString,
-
-    ownerToken: MongodString,  // token
+    playUrl: String,            // play url
+    ownerToken: String,         // token
 })
 
 export const ThirdPartPhase = model('ThirdPartPhase', ThirdPartPhaseSchema)

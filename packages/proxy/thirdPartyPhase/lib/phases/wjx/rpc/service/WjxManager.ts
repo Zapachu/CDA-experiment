@@ -2,7 +2,7 @@ import { ThirdPartPhase } from '../../../../core/server/models'
 import settings from '../../../../config/settings'
 import {PhaseManager} from 'elf-protocol'
 
-const {localWjxRootUrl} = settings
+const {wjxProxy} = settings
 
 /**
  * 真实路由：  https://www.wjx.cn/jq/HASH.aspx
@@ -19,13 +19,12 @@ const getUrlByNamespace = async (groupId, namespace, param) => {
     const paramString = JSON.stringify(paramJson)
     try {
         const newWjxPhase = await new ThirdPartPhase({
-            playHashs: [],
+            playHash: [],
             groupId: groupId,
             param: paramString,
             namespace: namespace,
-            prefixUrl: localWjxRootUrl
         }).save()
-        return `${localWjxRootUrl}/init/jq/${newWjxPhase._id.toString()}`
+        return `${wjxProxy}/init/jq/${newWjxPhase._id.toString()}`
     } catch (err) {
         if (err) {
             console.log(err)

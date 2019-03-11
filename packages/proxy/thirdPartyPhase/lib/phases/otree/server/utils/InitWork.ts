@@ -5,7 +5,7 @@ import ListMap from '../utils/ListMap'
 import {ThirdPartPhase} from '../../../../core/server/models'
 import settings from '../../../../config/settings'
 
-const {localOtreeRootUrl} = settings
+const {oTreeProxy} = settings
 
 const InitWork = (app) => {
     app.use(async (req, res, next) => {
@@ -32,7 +32,7 @@ const InitWork = (app) => {
         const otreeParticipantUrl = 'InitializeParticipant/'      // 初始化的标志
 
         if (isGetOtreeList) {
-            const list = await ListMap.getList(`oTree-${settings.otreeUser1}`)
+            const list = await ListMap.getList(`oTree-${settings.oTreeUser1}`)
             console.log(list)
             return okRes().json({err: 0, list})
         }
@@ -50,14 +50,15 @@ const InitWork = (app) => {
                 }
 
                 if (Phase.ownerToken.toString() === gameServicePlayerHash.toString()) {
-                    return okRes().redirect(Phase.adminUrl)
+                    const phaseParam = JSON.parse(Phase.param)
+                    return okRes().redirect(phaseParam.adminUrl)
                 }
 
-                const findExistOne = Phase.playHashs.filter(h => h.player === gameServicePlayerHash)
+                const findExistOne = Phase.playHash.filter(h => h.player === gameServicePlayerHash)
                 if (findExistOne.length > 0) {
-                    return okRes().redirect(`${localOtreeRootUrl}/${otreeParticipantUrl}${findExistOne[0].hash}`)
+                    return okRes().redirect(`${oTreeProxy}/${otreeParticipantUrl}${findExistOne[0].hash}`)
                 } else {
-                    for (let ph of Phase.playHashs) {
+                    for (let ph of Phase.playHash) {
                         if (ph.player === 'wait') {
                             findHash = ph.hash
                             ph.player = gameServicePlayerHash
@@ -67,9 +68,9 @@ const InitWork = (app) => {
                     if (!findHash) {
                         return ErrorPage(okRes(), 'member full')
                     }
-                    Phase.markModified('playHashs')
+                    Phase.markModified('playHash')
                     await Phase.save()
-                    return okRes().redirect(`${localOtreeRootUrl}/${otreeParticipantUrl}${findHash}`)
+                    return okRes().redirect(`${oTreeProxy}/${otreeParticipantUrl}${findHash}`)
                 }
             } catch (err) {
                 if (err) {

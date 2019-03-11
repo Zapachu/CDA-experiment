@@ -10,7 +10,7 @@ import {getDemoList} from './service/otreeApi/otreeUrl'
 export function serve() {
     const server = new Server()
     PhaseManager.setPhaseService(server, phaseService)
-    server.bind(`0.0.0.0:5${setting.otreePort}`, ServerCredentials.createInsecure())
+    server.bind(`0.0.0.0:5${setting.oTreePort}`, ServerCredentials.createInsecure())
     server.start()
     setInterval(async () => await registerPhases(), 10000)
 }
@@ -26,9 +26,9 @@ async function getJsUrls() {
     const manifest = JSON.parse(readFileSync(resolve(__dirname, '../../../../dist/manifest.json')).toString())
     const regPhase = {
         type: PhaseManager.PhaseType.otree,
-        namespace: `oTree-${setting.otreeUser1}`,
-        jsUrl: `${setting.localOtreeRootUrl}${manifest['otree.js']}`,
-        rpcUri: setting.localOtreePhaseServiceUri
+        namespace: `oTree-${setting.oTreeUser1}`,
+        jsUrl: `${setting.oTreeProxy}${manifest['otree.js']}`,
+        rpcUri: setting.oTreeRpc
     }
     await getDemoList(regPhase.namespace)
     return [regPhase]

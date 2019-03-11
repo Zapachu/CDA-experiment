@@ -10,31 +10,31 @@ export default {
     elfGameServiceUri: '127.0.0.1:54000',
 
     // otree
-    otreePort: 4002,
-    otreeUser1: 'user001',
-    localOtreePhaseServiceUri: '127.0.0.1:54002',
-    localOtreeRootUrl: 'http://127.0.0.1:4002',
-    otreeServerRootUrl: 'http://127.0.0.1:8000',
-    otreeRootName: 'otreePhase',
+    oTreePort: 4002,
+    oTreeUser1: 'user001',
+    oTreeRpc: '127.0.0.1:54002',
+    oTreeProxy: 'http://127.0.0.1:4002',
+    oTreeServer: 'http://127.0.0.1:8000',
+    oTreeStaticPathNamespace: 'otreePhase',
 
     // qualtrics
     qualtricsPort: 4003,
-    localQualtricsServiceUri: '127.0.0.1:54003',
-    localQualtricsRootUrl: 'http://127.0.0.1:4003',
-    qualtricsServerRootUrl: 'https://cessoxford.eu.qualtrics.com',
-    qualtricsRootName: 'qualtricsPhase',
+    qualtricsRpc: '127.0.0.1:54003',
+    qualtricsProxy: 'http://127.0.0.1:4003',
+    qualtricsServer: 'https://cessoxford.eu.qualtrics.com',
+    qualtricsStaticNamespace: 'qualtricsPhase',
 
     // 问卷星
     wjxPort: 4004,
-    localWjxServiceUri: '127.0.0.1:54004',
-    localWjxRootUrl: 'http://127.0.0.1:4004',
-    WjxServerRootUrl: 'https://www.wjx.cn',
-    WjxRootName: 'wjxPhase',
+    wjxRpc: '127.0.0.1:54004',
+    wjxProxy: 'http://127.0.0.1:4004',
+    wjxServer: 'https://www.wjx.cn',
+    wjxStaticNamespace: 'wjxPhase',
 
     // 腾讯问卷 rpc
-    qqwjPort: 4005,
-    localqqwjServiceUri: '127.0.0.1:54005',
-    localqqwjRootUrl: 'http://127.0.0.1:4005',
-    qqwjServerRootUrl: 'https://wj.qq.com',
-    qqwjRootName: 'qqwjPhase'
+    qqSurveyPort: 4005,
+    qqSurveyRpc: '127.0.0.1:54005',
+    qqSurveyProxy: 'http://127.0.0.1:4005',
+    qqSurveyServer: 'https://wj.qq.com',
+    qqSurveyStaticNamespace: 'qqwjPhase'
 }

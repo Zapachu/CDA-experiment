@@ -9,7 +9,7 @@ import { readFileSync } from 'fs'
 export function serve() {
     const server = new Server()
     PhaseManager.setPhaseService(server, phaseService)
-    server.bind(`0.0.0.0:5${setting.qqwjPort}`, ServerCredentials.createInsecure())
+    server.bind(`0.0.0.0:5${setting.qqSurveyPort}`, ServerCredentials.createInsecure())
     server.start()
     setInterval(() => registerPhases(), 10000)
 }
@@ -21,8 +21,8 @@ function getJsUrls(): Array<{ namespace: string, jsUrl: string }> {
             phases.push({
                 type:PhaseManager.PhaseType.qqwj,
                 namespace: k.replace('.js', ''),
-                jsUrl: `${setting.localqqwjRootUrl}${v}`,
-                rpcUri: setting.localqqwjServiceUri
+                jsUrl: `${setting.qqSurveyProxy}${v}`,
+                rpcUri: setting.qqSurveyRpc
             })
         }
     })

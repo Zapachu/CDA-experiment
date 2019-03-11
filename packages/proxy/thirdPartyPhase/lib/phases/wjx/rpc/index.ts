@@ -21,8 +21,8 @@ function getJsUrls(): Array<{ namespace: string, jsUrl: string }> {
             phases.push({
                 type:PhaseManager.PhaseType.wjx,
                 namespace: k.replace('.js', ''),
-                jsUrl: `${setting.localWjxRootUrl}${v}`,
-                rpcUri: setting.localWjxServiceUri
+                jsUrl: `${setting.wjxProxy}${v}`,
+                rpcUri: setting.wjxRpc
             })
         }
     })

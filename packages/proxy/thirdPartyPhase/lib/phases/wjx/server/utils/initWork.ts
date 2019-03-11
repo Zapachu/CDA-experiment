@@ -38,13 +38,13 @@ const InitWork = (app) => {
                 console.log('log > find phase object...')
                 console.log(currentPhase)
 
-                const {playHashs} = currentPhase
+                const {playHash} = currentPhase
 
                 let redirectTo = null
 
-                for (let i = 0; i < playHashs.length; i++) {
-                    if (playHashs[i].player.toString() === currentUserElfGameHash.toString()) {
-                        redirectTo = `${settings.localWjxRootUrl}/jq/${currentPhaseWjxHash}.aspx`
+                for (let i = 0; i < playHash.length; i++) {
+                    if (playHash[i].player.toString() === currentUserElfGameHash.toString()) {
+                        redirectTo = `${settings.wjxProxy}/jq/${currentPhaseWjxHash}.aspx`
                     }
                 }
 
@@ -53,11 +53,11 @@ const InitWork = (app) => {
                 }
 
                 // 新加入成员
-                playHashs.push({hash: currentPhaseWjxHash, player: currentUserElfGameHash})
-                currentPhase.playHashs = playHashs
-                currentPhase.markModified('playHashs')
+                playHash.push({hash: currentPhaseWjxHash, player: currentUserElfGameHash})
+                currentPhase.playHash = playHash
+                currentPhase.markModified('playHash')
                 await currentPhase.save()
-                return res.redirect(`${settings.localWjxRootUrl}/jq/${currentPhaseWjxHash}`)
+                return res.redirect(`${settings.wjxProxy}/jq/${currentPhaseWjxHash}`)
             } catch (err) {
                 if (err) {
                     console.log(err)
