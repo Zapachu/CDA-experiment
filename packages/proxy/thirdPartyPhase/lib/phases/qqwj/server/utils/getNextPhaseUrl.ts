@@ -15,7 +15,7 @@ const getNextPhaseUrl = async (req) => {
         groupId: qqwjPhase.groupId,
         nextPhaseKey: paramsJson.nextPhaseKey || -1,
         playerToken: paramsJson.palyerCode || qqwjPhase.playHash[0].player,
-        playUrl: `${settings.qqSurveyProxy}/init/qqwj/${qqwjPhase._id.toString()}`,
+        playUrl: `${settings.qqwjProxy}/init/qqwj/${qqwjPhase._id.toString()}`,
     }
 
     return await new Promise((resolve, reject) => {

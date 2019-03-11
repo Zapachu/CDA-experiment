@@ -32,9 +32,9 @@ export default {
     wjxStaticNamespace: 'wjxPhase',
 
     // 腾讯问卷 rpc
-    qqSurveyPort: 4005,
-    qqSurveyRpc: '127.0.0.1:54005',
-    qqSurveyProxy: 'http://127.0.0.1:4005',
-    qqSurveyServer: 'https://wj.qq.com',
-    qqSurveyStaticNamespace: 'qqwjPhase'
+    qqwjPort: 4005,
+    qqwjRpc: '127.0.0.1:54005',
+    qqwjProxy: 'http://127.0.0.1:4005',
+    qqwjServer: 'https://wj.qq.com',
+    qqwjStaticNamespace: 'qqwjPhase'
 }

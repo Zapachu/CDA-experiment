@@ -35,7 +35,7 @@ const InitWork = (app) => {
 
                 for (let i = 0; i < playHash.length; i++) {
                     if (playHash[i].player.toString() === currentUserElfGameHash.toString()) {
-                        redirectTo = `${settings.qqSurveyProxy}/s/${currentPhaseqqwjHash}`
+                        redirectTo = `${settings.qqwjProxy}/s/${currentPhaseqqwjHash}`
                     }
                 }
 
@@ -48,7 +48,7 @@ const InitWork = (app) => {
                 currentPhase.playHash = playHash
                 currentPhase.markModified('playHash')
                 await currentPhase.save()
-                return res.redirect(`${settings.qqSurveyProxy}/s/${currentPhaseqqwjHash}`)
+                return res.redirect(`${settings.qqwjProxy}/s/${currentPhaseqqwjHash}`)
             } catch (err) {
                 if (err) {
                     console.log(err)
