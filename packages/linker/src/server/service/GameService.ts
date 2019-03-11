@@ -15,6 +15,9 @@ export class GameService {
     }
 
     static async saveGame(game: IBaseGame | IGame): Promise<string> {
+        if ((game as IGame).phaseConfigs) {
+            game.published = true
+        }
         const {id} = await new GameModel(game).save()
         return id
     }
