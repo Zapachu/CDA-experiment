@@ -9,17 +9,17 @@ import * as Express from 'express'
 ConDB()
 
 const app = Express()
-const {wjxPort, WjxRootName} = settings
+const {wjxPort, wjxStaticNamespace} = settings
 
 SessionSetMiddleware(app)
 PassportMiddleware(app)
-StaticPathMiddleware(app, WjxRootName)
+StaticPathMiddleware(app, wjxStaticNamespace)
 
 InitWork(app)
 ProxyWork(app)
 RPCWork()
 
 app.use(errorhandler())
-const server: any = app.listen(wjxPort, () => {
+app.listen(wjxPort, () => {
     console.log(`listening at ${wjxPort}`)
 })

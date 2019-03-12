@@ -7,7 +7,7 @@ import {ConDB, SessionSetMiddleware, PassportMiddleware, StaticPathMiddleware, S
 import '../../common/auth/passport'
 import settings from '../../../config/settings'
 
-const {otreeRootName: namespace, otreePort: port} = settings
+const {oTreeStaticPathNamespace: namespace, oTreePort: port} = settings
 
 const app = Express()
 

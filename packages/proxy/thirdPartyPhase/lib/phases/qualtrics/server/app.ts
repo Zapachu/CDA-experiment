@@ -4,7 +4,7 @@ import '../../common/auth/passport'
 import {ConDB, PassportMiddleware, SessionSetMiddleware, StaticPathMiddleware} from '../../common/utils'
 import {InitWork, ProxyWork, RPCWork} from './utils'
 import settings from '../../../config/settings'
-const {qualtricsPort, qualtricsRootName} = settings
+const {qualtricsPort, qualtricsStaticNamespace} = settings
 
 
 ConDB()
@@ -13,7 +13,7 @@ const app = express()
 
 SessionSetMiddleware(app)
 PassportMiddleware(app)
-StaticPathMiddleware(app, qualtricsRootName)
+StaticPathMiddleware(app, qualtricsStaticNamespace)
 
 InitWork(app)
 ProxyWork(app)

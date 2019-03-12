@@ -4,7 +4,7 @@
 import {ThirdPartPhase} from "../../../../core/server/models"
 import {gameService} from "../../../common/utils"
 import settings from '../../../../config/settings'
-const {localOtreeRootUrl} = settings
+const {oTreeProxy} = settings
 
 const rewriteResBuffers = async (proxyRes, req, res) => {
 
@@ -27,17 +27,17 @@ const rewriteResBuffers = async (proxyRes, req, res) => {
         try {
             const otreePhase: any = await ThirdPartPhase.findOne({
                 // namespace: 'otree',
-                playHashs: {$elemMatch: {hash: playerOtreeHash}}
+                playHash: {$elemMatch: {hash: playerOtreeHash}}
             }).exec()
             console.log('phase', otreePhase)
-            otreePhase.playHashs.map(op => {
+            otreePhase.playHash.map(op => {
                 if (op.hash.toString() === playerOtreeHash.toString()) {
                     playerGameHash = op.player.toString()
                 }
             })
             const params: { nextPhaseKey: string } = JSON.parse(otreePhase.param)
             const groupId: string = otreePhase.groupId
-            const playUrl: string = `${localOtreeRootUrl}/init/${otreeParticipantUrl}${otreePhase._id}`
+            const playUrl: string = `${oTreeProxy}/init/${otreeParticipantUrl}${otreePhase._id}`
             const playerToken: string = playerGameHash
             const nextPhaseKey: string = params.nextPhaseKey
             gameService.sendBackPlayer({

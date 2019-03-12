@@ -1,5 +1,5 @@
 import settings from '../../../config/settings'
-const { localOtreeRootUrl } = settings
+const { oTreeProxy } = settings
 
 async function request(url): Promise<any> {
     let option = {
@@ -8,7 +8,7 @@ async function request(url): Promise<any> {
         headers: { 'Content-Type': 'application/json; charset=utf-8' },
         cache: 'default',
     } as RequestInit
-    const res = await fetch(`${localOtreeRootUrl}${url}`, option)
+    const res = await fetch(`${oTreeProxy}${url}`, option)
     if (res.ok) {
         return res.json()
     }

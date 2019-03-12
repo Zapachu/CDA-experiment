@@ -29,13 +29,13 @@ const InitWork = (app) => {
                 console.log('log > find phase object...')
                 console.log(currentPhase)
 
-                const {playHashs} = currentPhase
+                const {playHash} = currentPhase
 
                 let redirectTo = null
 
-                for (let i = 0; i < playHashs.length; i++) {
-                    if (playHashs[i].player.toString() === currentUserElfGameHash.toString()) {
-                        redirectTo = `${settings.localqqwjRootUrl}/s/${currentPhaseqqwjHash}`
+                for (let i = 0; i < playHash.length; i++) {
+                    if (playHash[i].player.toString() === currentUserElfGameHash.toString()) {
+                        redirectTo = `${settings.qqwjProxy}/s/${currentPhaseqqwjHash}`
                     }
                 }
 
@@ -44,11 +44,11 @@ const InitWork = (app) => {
                 }
 
                 // 新加入成员
-                playHashs.push({hash: currentPhaseqqwjHash, player: currentUserElfGameHash})
-                currentPhase.playHashs = playHashs
-                currentPhase.markModified('playHashs')
+                playHash.push({hash: currentPhaseqqwjHash, player: currentUserElfGameHash})
+                currentPhase.playHash = playHash
+                currentPhase.markModified('playHash')
                 await currentPhase.save()
-                return res.redirect(`${settings.localqqwjRootUrl}/s/${currentPhaseqqwjHash}`)
+                return res.redirect(`${settings.qqwjProxy}/s/${currentPhaseqqwjHash}`)
             } catch (err) {
                 if (err) {
                     console.log(err)
