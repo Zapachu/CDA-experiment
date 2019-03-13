@@ -4,35 +4,9 @@
   "scripts": {
     "help": "ts-node bin/help"
   },
-  "devDependencies": {
-    "@types/inquirer": "0.0.44",
-    "@types/react-dom": "^16.8.0",
-    "@types/shelljs": "^0.8.3",
-    "bespoke-client-util": "^1.0.0",
-    "css-loader": "^2.1.0",
-    "file-loader": "^3.0.1",
-    "inquirer": "^6.2.2",
-    "node-sass": "^4.11.0",
-    "protobufjs": "^6.8.8",
-    "qiniu-js": "^2.5.3",
-    "react": "^16.8.1",
-    "react-dom": "^16.8.1",
-    "react-spring": "^8.0.5",
-    "request": "^2.88.0",
-    "sass-loader": "^7.1.0",
-    "shelljs": "^0.8.3",
-    "style-loader": "^0.23.1",
-    "ts-loader": "^5.3.3"
-  },
   "dependencies": {
     "bespoke-client-util": "^1.0.0",
     "bespoke-server": "^1.0.0",
-    "dateformat": "3.0.3",
-    "elf-setting": "^1.0.0",
-    "lodash": "^4.17.11",
-    "node-xlsx": "^0.14.1",
-    "qiniu": "^7.2.1",
-    "ts-node": "^8.0.2",
-    "typescript": "^3.3.3333"
+    "elf-setting": "^1.0.0"
   }
 }

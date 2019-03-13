@@ -6,15 +6,7 @@
   "scripts": {
     "install": "tsc"
   },
-  "devDependencies": {
-    "@types/deep-diff": "1.0.0",
-    "@types/lodash": "^4.14.120",
-    "@types/node": "^11.9.0",
-    "@types/socket.io-client": "^1.4.32",
-    "query-string": "^6.2.0"
-  },
   "dependencies": {
-    "elf-setting": "^1.0.0",
-    "lodash": "^4.17.11"
+    "elf-setting": "^1.0.0"
   }
 }
