@@ -19,5 +19,5 @@ export class Create extends Core.Create<ICreateParams, any> {
                 <li>卖家成本上限: <input name='sellerH' onChange={this.inputParams}/></li>
             </ul>
         </div>
-    }
+}
 }
