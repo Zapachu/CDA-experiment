@@ -11,9 +11,12 @@
       - bespoke : 定制实验反向代理，通过解析request.url分发请求至指定gameServer,未找到指定server时随机路由
       - thirdPartyPhase : 与bespokeGame平级,向linker注册所代理的第三方页面，详见thirdPartyPhase/README.MD
 
-## 依赖安装
+## 初始
+ - 新建setting.ts文件
+   - `packages/setting/src/setting.ts`
+   - `packages/bespoke/game/FaceRecognition/src/config/setting.ts`
+   - ...
  - `npm i`
- - `lerna bootstrap`
 
 ## 定制实验开发
  - `cd ./bespoke/game`
