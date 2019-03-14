@@ -3,7 +3,7 @@
 import {ThirdPartPhase} from "../../../../core/server/models"
 import settings from "../../../../config/settings"
 
-const {localQualtricsRootUrl} = settings
+const {qualtricsProxy} = settings
 
 const InitWork = (app) => {
     app.use(async (req, res, next) => {
@@ -32,23 +32,23 @@ const InitWork = (app) => {
                 console.log('log > find phase object...')
                 console.log(currentPhase)
 
-                const {playHashs} = currentPhase
+                const {playHash} = currentPhase
 
                 let redirectTo = null
 
-                for (let i = 0; i < playHashs.length; i++) {
-                    if (playHashs[i].player.toString() === currentUserElfGameHash.toString()) {
-                        redirectTo = `${localQualtricsRootUrl}/jfe/form/${currentPhaseSurveyId}`
+                for (let i = 0; i < playHash.length; i++) {
+                    if (playHash[i].player.toString() === currentUserElfGameHash.toString()) {
+                        redirectTo = `${qualtricsProxy}/jfe/form/${currentPhaseSurveyId}`
                     }
                 }
 
                 if (redirectTo) return res.redirect(redirectTo)
 
-                playHashs.push({hash: currentPhaseSurveyId, player: currentUserElfGameHash})
-                currentPhase.playHashs = playHashs
-                currentPhase.markModified('playHashs')
+                playHash.push({hash: currentPhaseSurveyId, player: currentUserElfGameHash})
+                currentPhase.playHash = playHash
+                currentPhase.markModified('playHash')
                 await currentPhase.save()
-                return res.redirect(`${localQualtricsRootUrl}/jfe/form/${currentPhaseSurveyId}`)
+                return res.redirect(`${qualtricsProxy}/jfe/form/${currentPhaseSurveyId}`)
             } catch (err) {
                 if (err) {
                     console.log(err)

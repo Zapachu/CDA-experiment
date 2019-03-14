@@ -4,7 +4,7 @@ import {ThirdPartPhase} from "../../../../core/server/models"
 import {gameService} from "../../../common/utils"
 import settings from "../../../../config/settings"
 
-const {localQualtricsRootUrl} = settings
+const {qualtricsProxy} = settings
 
 const getNextPhaseUrl = async (req) => {
 
@@ -16,15 +16,15 @@ const getNextPhaseUrl = async (req) => {
 
     const qualtricsPhase: any = await ThirdPartPhase.findOne({
         namespace: 'qualtrics',
-        playHashs: {$elemMatch: {hash: qualtricsHash}}
+        playHash: {$elemMatch: {hash: qualtricsHash}}
     })
     console.log('log > qualtrics phase', qualtricsPhase)
     const paramsJson = JSON.parse(qualtricsPhase.param)
     const request = {
         groupId: qualtricsPhase.groupId,
         nextPhaseKey: paramsJson.nextPhaseKey || -1,
-        playerToken: paramsJson.palyerCode || qualtricsPhase.playHashs[0].player,
-        playUrl: `${localQualtricsRootUrl}/init/jfe/form/${qualtricsPhase._id.toString()}`,
+        playerToken: paramsJson.palyerCode || qualtricsPhase.playHash[0].player,
+        playUrl: `${qualtricsProxy}/init/jfe/form/${qualtricsPhase._id.toString()}`,
     }
 
     return await new Promise((resolve, reject) => {

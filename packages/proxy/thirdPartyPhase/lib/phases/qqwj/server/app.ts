@@ -3,7 +3,7 @@ import * as errorhandler from 'errorhandler'
 import '../../common/auth/passport'
 import settings from '../../../config/settings'
 import {InitWork, ProxyWork, RPCWork} from './utils'
-const {qqwjRootName, qqwjPort} = settings
+const {qqwjStaticNamespace, qqwjPort} = settings
 
 import {ConDB, SessionSetMiddleware, PassportMiddleware, StaticPathMiddleware} from '../../common/utils'
 
@@ -13,7 +13,7 @@ const app = Express()
 
 SessionSetMiddleware(app)
 PassportMiddleware(app)
-StaticPathMiddleware(app, qqwjRootName)
+StaticPathMiddleware(app, qqwjStaticNamespace)
 
 InitWork(app)
 ProxyWork(app)

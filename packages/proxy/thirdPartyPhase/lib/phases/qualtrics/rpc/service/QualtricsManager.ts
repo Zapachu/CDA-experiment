@@ -2,7 +2,7 @@ import setting from '../../../../config/settings'
 import {ThirdPartPhase} from '../../../../core/server/models'
 import {PhaseManager} from 'elf-protocol'
 
-const {localQualtricsRootUrl} = setting
+const {qualtricsProxy} = setting
 
 const getUrlByNamespace = async (groupId, namespace, param) => {
     let paramJson = JSON.parse(param)
@@ -12,13 +12,12 @@ const getUrlByNamespace = async (groupId, namespace, param) => {
     const paramString = JSON.stringify(paramJson)
     try {
         const newQualtricsPhase = await new ThirdPartPhase({
-            playHashs: [],
+            playHash: [],
             groupId: groupId,
             param: paramString,
             namespace: namespace,
-            prefixUrl: localQualtricsRootUrl
         }).save()
-        return `${localQualtricsRootUrl}/init/jfe/form/${newQualtricsPhase._id.toString()}`
+        return `${qualtricsProxy}/init/jfe/form/${newQualtricsPhase._id.toString()}`
     } catch (err) {
         if (err) {
             console.log(err)

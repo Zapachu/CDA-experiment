@@ -4,7 +4,7 @@ import * as httpProxy from "http-proxy-middleware"
 import settings from '../../../../config/settings'
 import {rewriteResBuffers} from "./RewriteResBuffers"
 
-const otreePlayUrl = settings.otreeServerRootUrl
+const otreePlayUrl = settings.oTreeServer
 
 const proxy = httpProxy({
     target: otreePlayUrl,

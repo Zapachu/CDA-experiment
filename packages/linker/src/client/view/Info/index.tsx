@@ -5,7 +5,7 @@ import {Api, connCtx, Lang} from '@client-util'
 import {RouteComponentProps} from 'react-router'
 import {Button, Card, message} from '@antd-component'
 import {rootContext, TRootContext} from '@client-context'
-import {Breadcrumb, Loading} from '@client-component'
+import {Loading} from '@client-component'
 
 declare interface IInfoState {
     loading: boolean
@@ -15,7 +15,6 @@ declare interface IInfoState {
 @connCtx(rootContext)
 export class Info extends React.Component<TRootContext & RouteComponentProps<{ gameId: string }>, IInfoState> {
     lang = Lang.extractLang({
-        back2Game: ['返回实验', 'Back to game'],
         enterPlayRoom: ['进入实验', 'Enter play room'],
         joinGroup: ['加入实验', 'Join Game'],
         joinSuccess: ['加入成功，即将进入实验房间', 'Join success, enter to play room now'],
@@ -68,9 +67,6 @@ export class Info extends React.Component<TRootContext & RouteComponentProps<{ g
                     }
                 }}>{lang.joinGroup}</Button>
         return <section className={style.groupInfo}>
-            <Breadcrumb history={history} links={user.role === baseEnum.AcademusRole.teacher ? [
-                {label: lang.back2Game, to: `/baseInfo/${game.id}`}
-            ] : []}/>
             <Card title={game.title}>
                 {game.desc}
             </Card>

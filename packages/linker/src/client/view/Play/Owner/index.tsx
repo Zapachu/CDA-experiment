@@ -15,6 +15,7 @@ export class Play4Owner extends React.Component<TRootContext & TPlayContext & { 
     lang = Lang.extractLang({
         gameConfiguration: ['实验配置信息', 'GameConfiguration'],
         share: ['分享', 'Share'],
+        gameList: ['实验列表', 'GameList'],
         playerList: ['玩家列表', 'PlayerList'],
         phaseStatus: ['环节状态', 'Phase Status'],
         console: ['控制台', 'Console'],
@@ -32,6 +33,7 @@ export class Play4Owner extends React.Component<TRootContext & TPlayContext & { 
         console.log(groupState)
         return <section className={style.console}>
             <Breadcrumb history={history} links={[
+                {label: lang.gameList, to: `/`},
                 {label: lang.gameConfiguration, to: `/configuration/${game.id}`},
                 {label: lang.playerList, to: `/player/${game.id}`},
                 {label: lang.share, to: `/share/${game.id}`}

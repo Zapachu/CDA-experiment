@@ -3,10 +3,10 @@
 import * as httpProxy from "http-proxy-middleware"
 import settings from "../../../../config/settings"
 import {rewriteResBuffers} from './RewriteResBuffers'
-const {qqwjServerRootUrl} = settings
+const {qqwjServer} = settings
 
 const proxy = httpProxy({
-    target: qqwjServerRootUrl,
+    target: qqwjServer,
     changeOrigin: true,
     ws: true,
     autoRewrite: true,

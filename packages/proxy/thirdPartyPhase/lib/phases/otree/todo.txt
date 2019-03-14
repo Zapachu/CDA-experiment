@@ -1,0 +1,50 @@
+loading session create
+
+1./demo/quiz 301
+
+Request URL: http://localhost:8000/demo/quiz
+Request Method: GET
+Status Code: 301 Moved Permanently
+Remote Address: 127.0.0.1:8000
+Referrer Policy: no-referrer-when-downgrade
+
+2./demo/quiz 302
+
+Request URL: http://localhost:8000/demo/quiz/
+Request Method: GET
+Status Code: 302 Found
+Remote Address: 127.0.0.1:8000
+Referrer Policy: no-referrer-when-downgrade
+
+3.http://localhost:8000/WaitUntilSessionCreated/3060073c24cc4211adee23b797b24570/ 200
+
+Request URL: http://localhost:8000/WaitUntilSessionCreated/3060073c24cc4211adee23b797b24570/
+Request Method: GET
+Status Code: 200 OK
+Remote Address: 127.0.0.1:8000
+Referrer Policy: no-referrer-when-downgrade
+
+4.ws://localhost:8000/wait_for_session/3060073c24cc4211adee23b797b24570/
+
+Request URL: ws://localhost:8000/wait_for_session/3060073c24cc4211adee23b797b24570/
+Request Method: GET
+Status Code: 101 Switching Protocols
+{"status": "ready"}
+
+5.http://localhost:8000/WaitUntilSessionCreated/3060073c24cc4211adee23b797b24570/
+
+Request URL: http://localhost:8000/WaitUntilSessionCreated/3060073c24cc4211adee23b797b24570/
+Request Method: GET
+Status Code: 302 Found
+Remote Address: 127.0.0.1:8000
+Referrer Policy: no-referrer-when-downgrade
+Location: /SessionStartLinks/tk1ku1vg/
+
+
+6.session created
+
+Request URL: http://localhost:8000/SessionStartLinks/tk1ku1vg/
+Request Method: GET
+Status Code: 200 OK
+Remote Address: 127.0.0.1:8000
+Referrer Policy: no-referrer-when-downgrade

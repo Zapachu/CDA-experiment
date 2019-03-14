@@ -10,65 +10,32 @@ export class Create extends BaseCreate<any> {
         isEdit: true
     }
 
-    /**
-     * 新建 phase
-     * @param namespace
-     */
     createPhase(namespace: string) {
         console.log(namespace)
         const {props: {updatePhase}} = this
         updatePhase([], {namespace})
     }
 
-    // 问卷地址
-    handleInputwjxUrl = (event) => {
+    inputWjxUrl = (event) => {
         this.setState({wjxUrl: event.target.value})
     }
 
-    // 提交url
-    hanldeSubmitwjxUrl = () => {
+    submitWjxUrl = () => {
         console.log(this.state.wjxUrl)
         const {props: {updatePhase, curPhase}} = this
         this.setState({isEdit: false})
         updatePhase(curPhase.suffixPhaseKeys, {wjxUrl: this.state.wjxUrl})
     }
 
-    // calcSuffixPhaseKeys(newParam) {
-    //     return Array.from(new Set([newParam.nextPhaseKey].filter(k => k)))
-    // }
+    toEdit = () => this.setState({isEdit: true})
 
-    // 编辑链接
-    toEdit = () => {
-        this.setState({isEdit: true})
-    }
-
-    /**
-     * 新建视图
-     */
     render(): React.ReactNode {
-
-        /**
-         * language: 语言
-         * phases: 所有已创建phases
-         * updatePhase: 创建一个新的phase
-         * highlightPhase: 高亮phase
-         * nextPhaseKey: 下一个phase
-         */
-        const {props: {phases, updatePhase, highlightPhases, curPhase}} = this
-        // const nextPhase = phases[phases.findIndex(({key}) => key === curPhase.key) + 1]
-        console.log(curPhase)
-        console.log(phases)
+        const {props: {phases, updatePhase, curPhase}} = this
 
         const lang = Lang.extractLang({
             name: ['结束后跳转至', 'Link To Next Phase'],
             submit: ['保存', 'Save']
         })
-
-        // if (nextPhase && !curPhase.param.nextPhaseKey) {
-        //     setTimeout(() => updatePhase([nextPhase.key], {
-        //         nextPhaseKey: nextPhase.key
-        //     }), 0)
-        // }
 
         return <section className={style.create}>
 
@@ -76,19 +43,20 @@ export class Create extends BaseCreate<any> {
                 <div className={style.inputTip}>输入问卷星链接</div>
                 {
                     this.state.isEdit ?
-                        <input value={curPhase.param.wjxUrl} onChange={this.handleInputwjxUrl}/> :
+                        <input value={curPhase.param.wjxUrl} onChange={this.inputWjxUrl}/> :
                         <a onClick={this.toEdit}>{this.state.wjxUrl}</a>
                 }
-                <button onClick={this.hanldeSubmitwjxUrl}>提交</button>
+                <button onClick={this.submitWjxUrl}>提交</button>
             </div>
 
             <div className={style.case}>
                 <label>{lang.name}</label>
                 <ul className={style.suffixPhases}>
                     {
-                        phases.map(({key, label}) => <li key={key}
-                                                         className={`${key === curPhase.param.nextPhaseKey ? style.active : ''}`}
-                                                         onClick={() => updatePhase([key], {nextPhaseKey: key})}>
+                        phases.map(({key, label}) =>
+                            <li key={key}
+                                className={`${key === curPhase.param.nextPhaseKey ? style.active : ''}`}
+                                onClick={() => updatePhase([key], {nextPhaseKey: key})}>
                                 {label || key}
                             </li>
                         )

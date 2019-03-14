@@ -21,8 +21,8 @@ function getJsUrls(): Array<{ namespace: string, jsUrl: string }> {
             phases.push({
                 type:PhaseManager.PhaseType.quatrics,
                 namespace: k.replace('.js', ''),
-                jsUrl: `${setting.localQualtricsRootUrl}${v}`,
-                rpcUri: setting.localQualtricsServiceUri
+                jsUrl: `${setting.qualtricsProxy}${v}`,
+                rpcUri: setting.qualtricsRpc
             })
         }
     })

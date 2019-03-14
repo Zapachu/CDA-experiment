@@ -44,7 +44,7 @@ export interface IGameWithId<ICreateParams>extends IGame<ICreateParams> {
 
 export interface IGameThumb {
     id: string
-    namespace:string
+    namespace: string
     title: string
     createAt: number
 }
@@ -105,4 +105,6 @@ export interface ISetting extends Partial<IElfSetting> {
     independent?: boolean
     port?: number
     rpcPort?: number
+    withProxy?: boolean
+    withLinker?: boolean
 }

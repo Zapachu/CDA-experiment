@@ -35,12 +35,17 @@ const SessionTokenCheck = (app) => {
             const sessionPlayerId = req.session.playerId
             const convertToken = gen32Token(req.user._id.toString())
 
+            console.log(sessionToken)
+            console.log(sessionPlayerId)
+            console.log(convertToken)
+
             if (sessionToken === convertToken) {
                 return next()
             }
 
             if (sessionPlayerId) {
                 const playerToken = gen32Token(sessionPlayerId)
+                console.log(playerToken)
                 if (playerToken === sessionToken) {
                     return next()
                 }
