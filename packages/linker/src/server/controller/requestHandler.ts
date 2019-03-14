@@ -7,6 +7,7 @@ import {WebpackHmr} from '../util/WebpackHmr'
 import {PlayerService} from '../service/PlayerService'
 
 const SECONDS_PER_DAY = 86400
+const DEFAULT_PAGE_SIZE = 11
 
 export class UserCtrl {
     static async renderApp(req: Express.Request, res: Response, next: NextFunction) {
@@ -84,10 +85,11 @@ export class GameCtrl {
     }
 
     static async getGameList(req: Request, res: Response) {
-        const {user: {_id}} = req
-        const gameList = await GameService.getGameList(_id)
+        const {user: {_id}, query: {page = 0, pageSize = DEFAULT_PAGE_SIZE}} = req
+        const {count, gameList} = await GameService.getGameList(_id, +page, +pageSize)
         res.json({
             code: baseEnum.ResponseCode.success,
+            count,
             gameList
         })
     }

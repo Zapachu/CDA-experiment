@@ -15,18 +15,14 @@ export function serve() {
 }
 
 function getJsUrls(): Array<{ namespace: string, jsUrl: string }> {
-    const phases = []
-    Object.entries(JSON.parse(readFileSync(resolve(__dirname, '../../../../dist/manifest.json')).toString())).map(([k, v]) => {
-        if (k.replace('.js', '') === 'wjx') {
-            phases.push({
-                type:PhaseManager.PhaseType.wjx,
-                namespace: k.replace('.js', ''),
-                jsUrl: `${setting.localWjxRootUrl}${v}`,
-                rpcUri: setting.localWjxServiceUri
-            })
-        }
-    })
-    return phases
+    const manifest = JSON.parse(readFileSync(resolve(__dirname, '../../../../dist/manifest.json')).toString())
+    const regPhase = {
+        type: PhaseManager.PhaseType.wjx,
+        namespace: `wjx`,
+        jsUrl: `${setting.wjxProxy}${manifest['wjx.js']}`,
+        rpcUri: setting.wjxRpc
+    }
+    return [regPhase]
 }
 
 function registerPhases() {

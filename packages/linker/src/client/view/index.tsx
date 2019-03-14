@@ -1,7 +1,7 @@
-import * as React from 'react'
+import React, {useEffect, useState} from 'react'
 import {BrowserRouter} from 'react-router-dom'
-import {config} from '@common'
-import {TRootContext, rootContext} from '@client-context'
+import {config, IUserWithId} from '@common'
+import {rootContext} from '@client-context'
 import {Loading} from '@client-component'
 import {Api} from '@client-util'
 import {Route, Switch} from 'react-router'
@@ -18,22 +18,14 @@ import {BaseInfo} from './BaseInfo'
 import {CreateInFrame} from './CreateInFrame'
 import * as style from './initial.scss'
 
-declare interface IRootState extends TRootContext {
-}
+export const Root: React.FunctionComponent = () => {
+    const [user, setUser] = useState<IUserWithId>()
 
-export class Root extends React.Component<{}, IRootState> {
-    state: IRootState = {}
-
-    async componentDidMount() {
-        const {user} = await Api.getUser()
-        this.setState({
-            user
-        })
-    }
-
-    render(): React.ReactNode {
-        const {state: {user}} = this
-        return user ? <section className={style.rootView}>
+    useEffect(() => {
+        Api.getUser().then(({user}) => setUser(user))
+    }, [])
+    return user ?
+        <section className={style.rootView}>
             <rootContext.Provider value={{user}}>
                 <div className={style.languageSwitcherWrapper}>
                     {/*<LanguageSwitcher/>*/}
@@ -55,5 +47,4 @@ export class Root extends React.Component<{}, IRootState> {
                 </BrowserRouter>
             </rootContext.Provider>
         </section> : <Loading/>
-    }
 }

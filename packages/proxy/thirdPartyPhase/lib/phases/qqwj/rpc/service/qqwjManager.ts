@@ -2,7 +2,7 @@ import setting from '../../../../config/settings'
 import { ThirdPartPhase } from '../../../../core/server/models'
 import {PhaseManager} from 'elf-protocol'
 
-const {localqqwjRootUrl} = setting
+const {qqwjProxy} = setting
 
 const getUrlByNamespace = async (groupId, namespace, param) => {
     let paramJson = JSON.parse(param)
@@ -12,13 +12,12 @@ const getUrlByNamespace = async (groupId, namespace, param) => {
 
     try {
         const newqqwjPhase = await new ThirdPartPhase({
-            playHashs: [],
+            playHash: [],
             groupId: groupId,
             param: paramString,
             namespace: namespace,
-            prefixUrl: localqqwjRootUrl
         }).save()
-        return `${localqqwjRootUrl}/init/qqwj/${newqqwjPhase._id.toString()}`
+        return `${qqwjProxy}/init/qqwj/${newqqwjPhase._id.toString()}`
     } catch (err) {
         if (err) {
             console.log(err)

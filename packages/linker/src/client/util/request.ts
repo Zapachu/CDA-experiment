@@ -86,8 +86,8 @@ export class Request {
         return await GET('/game/getPlayers/:gameId', {gameId})
     }
 
-    static async getGameList(): Promise<IHttpRes & { gameList: Array<IGameWithId> }> {
-        return await GET('/game/list')
+    static async getGameList(page: number = 0): Promise<IHttpRes & { gameList: Array<IGameWithId>, count: number }> {
+        return await GET('/game/list', {}, {page})
     }
 
     static async getPhaseTemplates(): Promise<IHttpRes & {
@@ -121,7 +121,7 @@ export class Request {
     }
 
     static async getRewarded(playerId: string): Promise<IHttpRes & { reward: string }> {
-        return await GET('/game/rewarded', null,{playerId})
+        return await GET('/game/rewarded', null, {playerId})
     }
 
     /**** V5 ****/

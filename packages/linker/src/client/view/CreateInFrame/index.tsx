@@ -10,7 +10,7 @@ import GameMode = baseEnum.GameMode
 
 interface ICreateInFrameState {
     loading: boolean
-    showBaseInfoModal: boolean
+    showCreateModal: boolean
     title: string
     desc: string
     phaseConfig: IPhaseConfig
@@ -23,7 +23,6 @@ export class CreateInFrame extends React.Component<RouteComponentProps, ICreateI
         invalidBaseInfo: ['请检查实验标题与描述信息', 'Check game title and description please'],
         start: ['开始', 'Start'],
         end: ['结束', 'End'],
-        done: ['完成', 'DONE'],
         submit: ['提交', 'SUBMIT'],
         submitFailed: ['提交失败', 'Submit failed'],
         createSuccess: ['创建成功', 'Created successfully'],
@@ -34,7 +33,7 @@ export class CreateInFrame extends React.Component<RouteComponentProps, ICreateI
 
     state: ICreateInFrameState = {
         loading: true,
-        showBaseInfoModal: false,
+        showCreateModal: false,
         title: '',
         desc: '',
         phaseConfig: null
@@ -80,45 +79,36 @@ export class CreateInFrame extends React.Component<RouteComponentProps, ICreateI
     }
 
     render(): React.ReactNode {
-        const {lang, props:{history}, state: {loading, phaseConfig}} = this
+        const {lang, props: {history}, state: {loading}} = this
         if (loading) {
             return <Loading/>
         }
         return <section>
             <div style={{textAlign: 'right', marginBottom: '2rem'}}>
-                <Button onClick={()=>history.push('/baseInfo')}>{lang.extendedGame}</Button>&nbsp;
-                <Button onClick={()=>history.push('/list')}>{lang.historyGame}</Button>&nbsp;
-                <Button onClick={()=>window.open('https://www.ancademy.org/customexp')} type='primary'>{lang.customize}</Button>
+                <Button onClick={() => history.push('/baseInfo')}>{lang.extendedGame}</Button>&nbsp;
+                <Button onClick={() => history.push('/list')}>{lang.historyGame}</Button>&nbsp;
+                <Button onClick={() => window.open('https://www.ancademy.org/customexp')}
+                        type='primary'>{lang.customize}</Button>
             </div>
             <AddPhase onTagClick={phaseConfig => {
-                this.setState({phaseConfig})
+                this.setState({phaseConfig, showCreateModal: true})
             }
             }/>
             {
-                !phaseConfig ? null : <section>
-                    {
-                        this.renderPhase()
-                    }
-                    <div style={{textAlign: 'center'}}>
-                        <Button type={'primary'}
-                                onClick={() => this.setState({showBaseInfoModal: true})}>{lang.done}</Button>
-                    </div>
-                </section>
-            }
-            {
-                this.renderBaseInfo()
+                this.renderCreate()
             }
         </section>
     }
 
-    renderBaseInfo() {
-        const {lang, state: {showBaseInfoModal, title, desc}} = this
-        return <Modal visible={showBaseInfoModal}
-                      footer={null}
-                      bodyStyle={{minHeight: '200px'}}
-                      width={700}
-                      title={null}
-                      onCancel={() => this.setState(({showBaseInfoModal}) => ({showBaseInfoModal: !showBaseInfoModal}))}>
+    renderCreate() {
+        const {lang, state: {showCreateModal, phaseConfig, title, desc}} = this
+        return <Modal {...{
+            width:'75%',
+            visible: showCreateModal,
+            onCancel: () => this.setState({showCreateModal: false}),
+            onOk: () => this.handleSubmit()
+        }}>
+            <br/>
             <Input value={title}
                    placeholder={lang.title}
                    maxLength={20}
@@ -126,16 +116,13 @@ export class CreateInFrame extends React.Component<RouteComponentProps, ICreateI
             <br/><br/>
             <Input.TextArea value={desc}
                             maxLength={500}
-                            autosize={{minRows: 5, maxRows: 10}}
+                            autosize={{minRows: 4, maxRows: 8}}
                             placeholder={lang.desc}
                             onChange={({target: {value: desc}}) => this.setState({desc})}/>
             <br/><br/>
-            <br/><br/>
-            <div style={{textAlign: 'center'}}>
-                <Button type={'primary'}
-                        onClick={() => this.handleSubmit()}>{lang.submit}
-                </Button>
-            </div>
+            {
+                phaseConfig ? this.renderPhase() : null
+            }
         </Modal>
     }
 

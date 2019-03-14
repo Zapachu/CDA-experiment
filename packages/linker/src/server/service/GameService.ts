@@ -2,19 +2,24 @@ import {IBaseGame, IGameWithId, IGameToUpdate, IGame} from '@common'
 import {GameModel} from '@server-model'
 
 export class GameService {
-    static async getGameList(owner: string): Promise<Array<IGameWithId>> {
-        const gameList = await GameModel.find({owner}).sort('-createAt').limit(12)
-        return gameList.map(({id, title, desc, published, phaseConfigs, mode}) => ({
-            id,
-            title,
-            desc,
-            published,
-            phaseConfigs,
-            mode
-        }))
+    static async getGameList(owner: string, page: number, pageSize: number): Promise<{ gameList: Array<IGameWithId>, count: number }> {
+        const count = await GameModel.count({owner})
+        const _gameList = await GameModel.find({owner}).sort('-createAt').skip(page * pageSize).limit(pageSize),
+            gameList = _gameList.map(({id, title, desc, published, phaseConfigs, mode}) => ({
+                id,
+                title,
+                desc,
+                published,
+                phaseConfigs,
+                mode
+            }))
+        return {count, gameList}
     }
 
     static async saveGame(game: IBaseGame | IGame): Promise<string> {
+        if ((game as IGame).phaseConfigs) {
+            game.published = true
+        }
         const {id} = await new GameModel(game).save()
         return id
     }
