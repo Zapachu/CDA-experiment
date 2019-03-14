@@ -124,10 +124,10 @@ export class Server {
             express = this.initExpress()
         this.bindServerListener(EventDispatcher.startGameSocket(express.listen(port)), port, () => {
             Log.i(`CreateGame：http://127.0.0.1:${port}/${config.rootName}/${setting.namespace}/create`)
-            if (!setting.proxyService) {
+            if (!gameSetting.withProxy) {
                 return
             }
-            if (setting.elfGameServiceUri) {
+            if (setting.withLinker) {
                 serveRPC()
             }
             const heartBeat2Proxy = () => {
@@ -136,7 +136,7 @@ export class Server {
                     err => err ? Log.w(`注册至代理失败，${config.gameRegisterInterval}秒后重试`) : null)
                 setTimeout(() => heartBeat2Proxy(), config.gameRegisterInterval)
             }
-            setTimeout( () => heartBeat2Proxy(), .5 * config.gameRegisterInterval)
+            setTimeout(() => heartBeat2Proxy(), .5 * config.gameRegisterInterval)
         })
         return express
     }
