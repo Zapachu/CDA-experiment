@@ -13,7 +13,7 @@
     "otree": "ts-node ./lib/phases/otree/server/app.ts",
     "qualtrics": "ts-node ./lib/phases/qualtrics/server/app.ts"
   },
-  "dependencies": {
+  "devDependencies":  {
     "elf-protocol": "^1.0.0",
     "elf-setting": "^1.0.0"
   }

@@ -6,7 +6,7 @@
   "scripts": {
     "install": "tsc"
   },
-  "dependencies": {
+  "devDependencies": {
     "elf-setting": "^1.0.0"
   }
 }

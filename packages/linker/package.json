@@ -9,7 +9,7 @@
     "client:dist": "npm run client:build --buildMode=dist",
     "server:ts-serve": "ts-node ./src/server/server.ts"
   },
-  "dependencies": {
+  "devDependencies":  {
     "elf-protocol": "^1.0.0",
     "elf-setting": "^1.0.0"
   }

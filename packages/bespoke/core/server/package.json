@@ -9,7 +9,7 @@
     "dist": "npm run build --buildMode=dist",
     "publish": "npm run build --buildMode=publish"
   },
-  "dependencies": {
+  "devDependencies":  {
     "bespoke-common": "^1.0.0",
     "bespoke-client-util": "^1.0.0",
     "elf-protocol": "^1.0.0",
