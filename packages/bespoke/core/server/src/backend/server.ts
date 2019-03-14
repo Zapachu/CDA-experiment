@@ -119,7 +119,7 @@ export class Server {
         this.initMongo()
         this.initPassPort()
         QCloudSMS.init()
-        GameLogic.initInstance(logicTemplate)
+        GameLogic.init(logicTemplate)
         const {port} = setting,
             express = this.initExpress()
         this.bindServerListener(EventDispatcher.startGameSocket(express.listen(port)), port, () => {

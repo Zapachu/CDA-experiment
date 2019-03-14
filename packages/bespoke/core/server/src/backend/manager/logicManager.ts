@@ -24,45 +24,36 @@ export interface ILogicTemplate {
     Robot?: new(...args) => AnyRobot
 }
 
-export class GameLogic {
-    private readonly namespaceController: AnyController
-    private gameControllers = new Map<string, AnyController>()
-    private robotSchedulers = new Map<string, AnyRobotScheduler>()
+export namespace GameLogic {
+    let template: ILogicTemplate
 
-    private static _gameLogic: GameLogic
+    export let namespaceController: AnyController
 
-    static initInstance(template: ILogicTemplate) {
-        this._gameLogic = new GameLogic(template)
+    export function init(logicTemplate: ILogicTemplate) {
+        template = logicTemplate
+        namespaceController = new template.Controller()
     }
 
-    static get instance(): GameLogic {
-        return this._gameLogic
-    }
+    const gameControllers = new Map<string, AnyController>()
 
-    private constructor(private gameLogicTemplate: ILogicTemplate) {
-        this.namespaceController = new gameLogicTemplate.Controller()
-    }
-
-    getNamespaceController() {
-        return this.namespaceController
-    }
-
-    async getGameController(gameId: string): Promise<AnyController> {
-        if (!this.gameControllers.get(gameId)) {
+    export async function getGameController(gameId: string): Promise<AnyController> {
+        if (!gameControllers.get(gameId)) {
             const game = await GameDAO.getGame(gameId)
-            this.gameControllers.set(gameId, await new this.gameLogicTemplate.Controller(game).init())
+            gameControllers.set(gameId, await new template.Controller(game).init())
         }
-        return this.gameControllers.get(gameId)
+        return gameControllers.get(gameId)
     }
 
-    async startNewRobotScheduler<ICreateParams, IGameState, IPlayerState>(gameId: string, key: string, pythonRobot: boolean): Promise<void> {
+    const robotSchedulers = new Map<string, AnyRobotScheduler>()
+
+    export async function startNewRobotScheduler<ICreateParams, IGameState, IPlayerState>(gameId: string, key: string, pythonRobot: boolean): Promise<void> {
         const game = await GameDAO.getGame<ICreateParams>(gameId)
         const actor: IActor = {
             token: Hash.hashObj(`${game.id}${key}`),
             type: baseEnum.Actor.serverRobot
         }
-        const robotProxy = await (pythonRobot ? new PythonSchedulerProxy(game, actor) : new NodeRobotsScheduler(game, actor, this.gameLogicTemplate.Robot)).init()
-        this.robotSchedulers.set(robotProxy.id, robotProxy)
+        const robotProxy = await (pythonRobot ? new PythonSchedulerProxy(game, actor) : new NodeRobotsScheduler(game, actor, this.template.Robot)).init()
+        robotSchedulers.set(robotProxy.id, robotProxy)
     }
 }
 
@@ -129,7 +120,7 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
     }
 
     async startNewRobotScheduler(key, pythonRobot: boolean) {
-        await GameLogic.instance.startNewRobotScheduler(this.game.id, key, pythonRobot)
+        await GameLogic.startNewRobotScheduler(this.game.id, key, pythonRobot)
     }
 
     async handleFetch(req: Request, res: Response) {
