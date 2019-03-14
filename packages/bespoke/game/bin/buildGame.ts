@@ -38,7 +38,7 @@ function buildProtoDts(protoPath: string, watch: boolean = false) {
     function build() {
         pbjs.main(['-t', 'static-module', '-w', 'commonjs', '-o', `${p}.js`, `${p}.proto`], () =>
             pbts.main(['-o', `${p}.d.ts`, `${p}.js`], () =>
-                fs.unlinkSync(resolve(__dirname, `${p}.js`))
+                fs.unlinkSync(`${p}.js`)
             )
         )
     }
@@ -102,12 +102,7 @@ export function geneClientBuilder(
                                 localIdentName: '[local]_[hash:base64:4]'
                             }
                         },
-                        {
-                            loader: 'sass-loader',
-                            options: {
-                                includePaths: [resolve(__dirname, '../../common/resource')]
-                            }
-                        }
+                        'sass-loader'
                     ]
                 },
                 {

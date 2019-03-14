@@ -5,7 +5,11 @@
     "help": "ts-node bin/help"
   },
   "dependencies": {
+    "ts-node": "^8.0.3",
+    "typescript": "^3.3.3333",
+    "webpack": "^4.29.6",
     "bespoke-client-util": "^1.0.0",
+    "bespoke-common": "^1.0.0",
     "bespoke-server": "^1.0.0",
     "elf-setting": "^1.0.0"
   }

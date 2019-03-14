@@ -15,7 +15,7 @@ import {
     ISendBackPlayerReq,
     ISendBackPlayerRes,
     SendBackPlayerReq
-} from './phaseManager'
+} from './PhaseManager'
 
 export namespace AcademusBespoke {
     let protoDef = loadPackageDefinition(loadSync(resolve(__dirname, './AcademusBespoke.proto'))) as any

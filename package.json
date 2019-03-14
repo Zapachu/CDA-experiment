@@ -1,6 +1,9 @@
 {
   "name": "elf",
   "private": true,
+  "scripts": {
+    "install": "lerna bootstrap"
+  },
   "devDependencies": {
     "@ant-design/icons": "~1.2.1",
     "@types/body-parser": "^1.17.0",

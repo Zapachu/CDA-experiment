@@ -10,6 +10,8 @@
     "publish": "npm run build --buildMode=publish"
   },
   "devDependencies": {
+    "typescript": "^3.3.3333",
+    "webpack": "^4.29.6",
     "@types/elf-linker": "^1.0.0",
     "bespoke-common": "^1.0.0",
     "elf-setting": "^1.0.0"
