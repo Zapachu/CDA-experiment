@@ -8,13 +8,19 @@
   .configFields {
     margin-top: 1rem;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
   }
 
   .privatePriceTable {
-    margin-top: 1rem;
+    margin-top: 3rem;
     color: $color-black;
     text-align: center;
+
+    th {
+      border: $borderLine;
+      width: 5rem;
+      height: 3rem;
+    }
 
     td {
       border: $borderLine;

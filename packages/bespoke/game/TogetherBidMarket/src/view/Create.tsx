@@ -66,49 +66,51 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
 
     render() {
         const {round, groupSize, buyerL, buyerH, sellerL, sellerH, initV, positions, readonly} = this.state
-        return <div>
+        return <div className={style.create}>
             <ul className={style.configFields} style={{visibility: readonly ? 'hidden' : 'visible'}}>
                 <li>
                     <Label label='轮次'/>
                     <RangeInput value={round}
                                 min={1}
                                 max={10}
-                                onChange={(e) => this.setState({round: e.target.value})}/>
+                                onChange={(e) => this.setState({round: parseInt(e.target.value)})}/>
                 </li>
                 <li>
                     <Label label='每组人数'/>
                     <RangeInput value={groupSize}
                                 min={1}
                                 max={6}
-                                onChange={(e) => this.setState({groupSize: e.target.value})}/>
+                                onChange={(e) => this.setState({groupSize: parseInt(e.target.value)})}/>
                 </li>
                 <li>
                     <Label label='初始资金'/>
                     <RangeInput value={initV}
-                                onChange={(e) => this.setState({initV: e.target.value})}/>
+                                onChange={(e) => this.setState({initV: parseInt(e.target.value)})}/>
                 </li>
+                <Button label='生成参数'
+                        onClick={async () => await this.genParams()}/>
+            </ul>
+            <ul className={style.configFields} style={{visibility: readonly ? 'hidden' : 'visible'}}>
                 <li>
                     <Label label='买家心理价值下限'/>
                     <RangeInput value={buyerL}
-                                onChange={(e) => this.setState({buyerL: e.target.value})}/>
+                                onChange={(e) => this.setState({buyerL: parseInt(e.target.value)})}/>
                 </li>
                 <li>
                     <Label label='买家心理价值上限'/>
                     <RangeInput value={buyerH}
-                                onChange={(e) => this.setState({buyerH: e.target.value})}/>
+                                onChange={(e) => this.setState({buyerH: parseInt(e.target.value)})}/>
                 </li>
                 <li>
                     <Label label='卖家心理价值下限'/>
                     <RangeInput value={sellerL}
-                                onChange={(e) => this.setState({sellerL: e.target.value})}/>
+                                onChange={(e) => this.setState({sellerL: parseInt(e.target.value)})}/>
                 </li>
                 <li>
                     <Label label='卖家心理价值上限'/>
                     <RangeInput value={sellerH}
-                                onChange={(e) => this.setState({sellerH: e.target.value})}/>
+                                onChange={(e) => this.setState({sellerH: parseInt(e.target.value)})}/>
                 </li>
-                <Button label='生成参数'
-                        onClick={async () => await this.genParams()}/>
             </ul>
 
             <table className={style.privatePriceTable}>
@@ -120,16 +122,17 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
                 {
                     positions.map((v, i) =>
                         <tbody>
-                        <tr>{`Player ${i + 1}`}</tr>
                         <tr>
-                            <a style={{color: v.role === 0 ? 'blue' : '#333'}}
-                               onClick={this.resetRole.bind(this, i)}>Buyer</a>
-                            <a style={{color: v.role === 1 ? 'blue' : '#333'}}
-                               onClick={this.resetRole.bind(this, i)}>Seller</a>
-                        </tr>
-                        <tr>
-                            <Input type='number' value={v.PV}
-                                   onChange={this.resetPV.bind(this, i)}/>
+                            <td>{`Player ${i + 1}`}</td>
+                            <td>
+                                <a style={{color: v.role === 0 ? 'blue' : '#333'}}
+                                   onClick={this.resetRole.bind(this, i)}>Buyer</a>
+                                <a style={{color: v.role === 1 ? 'blue' : '#333'}}
+                                   onClick={this.resetRole.bind(this, i)}>Seller</a>
+                            </td>
+                            <td>
+                                <Input type='number' value={v.PV} onChange={this.resetPV.bind(this, i)}/>
+                            </td>
                         </tr>
                         </tbody>
                     )
