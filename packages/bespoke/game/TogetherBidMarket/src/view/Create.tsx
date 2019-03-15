@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {ICreateParams} from '../interface'
-import {Button, Core, Label, RangeInput} from 'bespoke-client-util'
+import {Button, Core, Label, RangeInput, Input} from 'bespoke-client-util'
 import {FetchType} from "../config"
 
 interface ICreateState {
@@ -9,11 +9,13 @@ interface ICreateState {
     buyerH: number
     sellerL: number
     sellerH: number
-    buyerPV: Array<number>
-    sellerPV: Array<number>
     initV: number
     round: number
     groupSize: number
+    positions: Array<{
+        role: number
+        PV: number
+    }>
     readonly: boolean
     privatePriceLimit: number
 }
@@ -25,31 +27,45 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
         buyerH: 100,
         sellerL: 0,
         sellerH: 100,
-        buyerPV: [],
-        sellerPV: [],
         initV: 100,
         round: 3,
-        groupSize: 1,
-        readonly: true,
+        groupSize: 2,
+        positions: [{role: 0, PV: 45}, {role: 0, PV: 55}],
+        readonly: false,
         privatePriceLimit: 100,
     }
 
-    genRand = (round: number, groupSize: number, L: number, H: number) => {
-        return Array(round).fill(null).map(() =>
-            Array(groupSize).fill(null).map(() =>
-                ~~(Math.random() * (H - L)) + L).join(',')
-        ).map(v => parseInt(v))
+    genRan = ({L, H}) => ~~(Math.random() * (H - L)) + L
+
+    genPosition = () => {
+        const {buyerL, buyerH, sellerL, sellerH} = this.state
+        const role = this.genRan({L: 0, H: 2})
+        return {
+            role,
+            PV: this.genRan([{L: buyerL, H: buyerH}, {L: sellerL, H: sellerH}][role])
+        }
     }
 
-    genPhase = () => {
-        const {buyerL, buyerH, sellerL, sellerH, round, groupSize} = this.state
-        const buyerPV = this.genRand(round, groupSize, buyerL, buyerH)
-        const sellerPV = this.genRand(round, groupSize, sellerL, sellerH)
-        this.setState({buyerPV, sellerPV})
+    genParams = () => {
+        const {groupSize} = this.state
+        const positions = Array(groupSize).fill(null).map(() => this.genPosition())
+        this.setState({positions})
+    }
+
+    resetRole = (i) => {
+        const {positions} = this.state
+        positions[i].role = positions[i].role === 0 ? 1 : 0
+        this.setState({positions})
+    }
+
+    resetPV = (i, e) => {
+        const {positions} = this.state
+        positions[i].PV = parseInt(e.target.value)
+        this.setState({positions})
     }
 
     render() {
-        const {round, groupSize, buyerL, buyerH, sellerL, sellerH, initV, readonly} = this.state
+        const {round, groupSize, buyerL, buyerH, sellerL, sellerH, initV, positions, readonly} = this.state
         return <div>
             <ul className={style.configFields} style={{visibility: readonly ? 'hidden' : 'visible'}}>
                 <li>
@@ -58,42 +74,67 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
                                 min={1}
                                 max={10}
                                 onChange={(e) => this.setState({round: e.target.value})}/>
-            </li>
-            <li>
-                <Label label='组数'/>
-                <RangeInput value={groupSize}
-                            min={3}
-                            max={6}
-                            onChange={(e) => this.setState({groupSize: e.target.value})}/>
-            </li>
-            <li>
-                <Label label='初始资金'/>
-                <RangeInput value={initV}
-                            onChange={(e) => this.setState({initV: e.target.value})}/>
-            </li>
-            <li>
-                <Label label='买家心理价值下限'/>
-                <RangeInput value={buyerL}
-                            onChange={(e) => this.setState({buyerL: e.target.value})}/>
-            </li>
-            <li>
-                <Label label='买家心理价值上限'/>
-                <RangeInput value={buyerH}
-                            onChange={(e) => this.setState({buyerH: e.target.value})}/>
-            </li>
-            <li>
-                <Label label='卖家心理价值下限'/>
-                <RangeInput value={sellerL}
-                            onChange={(e) => this.setState({sellerL: e.target.value})}/>
-            </li>
-            <li>
-                <Label label='买家心理价值上限'/>
-                <RangeInput value={sellerH}
-                            onChange={(e) => this.setState({sellerH: e.target.value})}/>
-            </li>
-            <Button label='生成参数'
-                    onClick={async () => await this.genPhase()}/>
-        </ul>
-    </div>
+                </li>
+                <li>
+                    <Label label='每组人数'/>
+                    <RangeInput value={groupSize}
+                                min={1}
+                                max={6}
+                                onChange={(e) => this.setState({groupSize: e.target.value})}/>
+                </li>
+                <li>
+                    <Label label='初始资金'/>
+                    <RangeInput value={initV}
+                                onChange={(e) => this.setState({initV: e.target.value})}/>
+                </li>
+                <li>
+                    <Label label='买家心理价值下限'/>
+                    <RangeInput value={buyerL}
+                                onChange={(e) => this.setState({buyerL: e.target.value})}/>
+                </li>
+                <li>
+                    <Label label='买家心理价值上限'/>
+                    <RangeInput value={buyerH}
+                                onChange={(e) => this.setState({buyerH: e.target.value})}/>
+                </li>
+                <li>
+                    <Label label='卖家心理价值下限'/>
+                    <RangeInput value={sellerL}
+                                onChange={(e) => this.setState({sellerL: e.target.value})}/>
+                </li>
+                <li>
+                    <Label label='卖家心理价值上限'/>
+                    <RangeInput value={sellerH}
+                                onChange={(e) => this.setState({sellerH: e.target.value})}/>
+                </li>
+                <Button label='生成参数'
+                        onClick={async () => await this.genParams()}/>
+            </ul>
+
+            <table className={style.privatePriceTable}>
+                <thead>
+                <th>玩家</th>
+                <th>角色</th>
+                <th>心理价值</th>
+                </thead>
+                {
+                    positions.map((v, i) =>
+                        <tbody>
+                        <tr>{`Player ${i + 1}`}</tr>
+                        <tr>
+                            <a style={{color: v.role === 0 ? 'blue' : '#333'}}
+                               onClick={this.resetRole.bind(this, i)}>Buyer</a>
+                            <a style={{color: v.role === 1 ? 'blue' : '#333'}}
+                               onClick={this.resetRole.bind(this, i)}>Seller</a>
+                        </tr>
+                        <tr>
+                            <Input type='number' value={v.PV}
+                                   onChange={this.resetPV.bind(this, i)}/>
+                        </tr>
+                        </tbody>
+                    )
+                }
+            </table>
+        </div>
     }
 }
