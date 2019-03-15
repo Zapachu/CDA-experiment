@@ -1,5 +1,5 @@
 import {baseEnum, IEventHandler, IConnection, IMoveCallback} from 'bespoke-common'
-import {GameLogic} from '../manager/logicManager'
+import {GameLogic} from '../service/GameLogic'
 
 export const EventHandler = {
     [baseEnum.SocketEvent.online]: async (connection: IConnection) => {

@@ -13,6 +13,7 @@
     "experimentalDecorators": true,
     "noUnusedLocals": true,
     "resolveJsonModule": true,
+    "downlevelIteration": true,
     "jsx": "react"
   },
   "include": [
