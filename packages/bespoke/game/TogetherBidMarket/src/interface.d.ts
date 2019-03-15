@@ -8,11 +8,23 @@ export interface ICreateParams {
     /** CreateParams groupSize */
     groupSize?: (number|null);
 
-    /** CreateParams sellerPrivatePrice */
-    sellerPrivatePrice?: (number[]|null);
+    /** CreateParams buyerL */
+    buyerL?: (number|null);
 
-    /** CreateParams buyerPrivatePrice */
-    buyerPrivatePrice?: (number[]|null);
+    /** CreateParams buyerH */
+    buyerH?: (number|null);
+
+    /** CreateParams sellerL */
+    sellerL?: (number|null);
+
+    /** CreateParams sellerH */
+    sellerH?: (number|null);
+
+    /** CreateParams sellerPV */
+    sellerPV?: (number[]|null);
+
+    /** CreateParams buyerPV */
+    buyerPV?: (number[]|null);
 
     /** CreateParams nextPhaseKey */
     nextPhaseKey?: (string|null);
@@ -33,11 +45,23 @@ export class CreateParams implements ICreateParams {
     /** CreateParams groupSize. */
     public groupSize: number;
 
-    /** CreateParams sellerPrivatePrice. */
-    public sellerPrivatePrice: number[];
+    /** CreateParams buyerL. */
+    public buyerL: number;
 
-    /** CreateParams buyerPrivatePrice. */
-    public buyerPrivatePrice: number[];
+    /** CreateParams buyerH. */
+    public buyerH: number;
+
+    /** CreateParams sellerL. */
+    public sellerL: number;
+
+    /** CreateParams sellerH. */
+    public sellerH: number;
+
+    /** CreateParams sellerPV. */
+    public sellerPV: number[];
+
+    /** CreateParams buyerPV. */
+    public buyerPV: number[];
 
     /** CreateParams nextPhaseKey. */
     public nextPhaseKey: string;
