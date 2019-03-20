@@ -107,7 +107,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         default:
                             break
                     }
-                    groupPlayerStates.map(p => p.profits[roundIndex] = p.privatePrices[roundIndex] - p.prices[roundIndex])
                     await this.stateManager.syncState()
                     if (roundIndex == rounds.length - 1) {
                         return

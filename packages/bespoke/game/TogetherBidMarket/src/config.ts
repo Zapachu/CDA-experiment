@@ -22,4 +22,4 @@ export enum PlayerStatus {
     won
 }
 
-export const NEW_ROUND_TIMER = 20
+export const NEW_ROUND_TIMER = 3
