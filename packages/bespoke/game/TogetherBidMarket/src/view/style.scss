@@ -63,4 +63,26 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  div {
+    width: 95%;
+    font-size: 1.3rem;
+    padding: .5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    div {
+      display: flex;
+      justify-content: center;
+      border-bottom: dotted 1px #BDBDBD;
+    }
+  }
+  .highlight {
+    color: #4285f4;;
+  }
+  .title {
+    font-size: 2rem;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
 }
