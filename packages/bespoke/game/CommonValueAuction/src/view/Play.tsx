@@ -116,7 +116,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         const {rounds, roundIndex} = groups[groupIndex],
             newRoundTimer = newRoundTimers[roundIndex]
         return <section className={style.play}>
-            <div className={style.title}>集合竞价市场</div>
+            <div className={style.title}>公共价值拍卖</div>
             {newRoundTimer ? <div className={style.line}>
                 <div>本轮结束剩余时间</div>
                 <div className={style.highlight}>{NEW_ROUND_TIMER - newRoundTimer}</div>
