@@ -2,17 +2,11 @@ import {Log, EventIO, RobotConnection, cacheResultSync, setting} from '../util'
 import * as path from 'path'
 import {credentials, load as grpcLoad, loadPackageDefinition} from 'grpc'
 import {loadSync} from '@grpc/proto-loader'
+import {decode} from 'msgpack-lite'
 import cloneDeep = require('lodash/cloneDeep')
 import {applyChange, Diff} from 'deep-diff'
-import {
-    baseEnum,
-    IActor,
-    TGameState,
-    IGameWithId,
-    TPlayerState,
-    FrameEmitter
-} from 'bespoke-common'
-import {BaseRobot} from '../index'
+import {baseEnum, IActor, TGameState, IGameWithId, TPlayerState, FrameEmitter} from 'bespoke-common'
+import {BaseRobot} from './GameLogic'
 
 export abstract class RobotScheduler<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     public id: string
@@ -32,22 +26,32 @@ export abstract class RobotScheduler<ICreateParams, IGameState, IPlayerState, Mo
 
     async init(): Promise<RobotScheduler<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>> {
         this.connection = EventIO.robotConnect(RobotScheduler.geneConnectionId(), this.actor, this.game)
-        this.connection.on(baseEnum.SocketEvent.syncGameState, (gameState: TGameState<IGameState>) => {
+        this.connection.on(baseEnum.SocketEvent.syncGameState_json, (gameState: TGameState<IGameState>) => {
             this.preGameState = cloneDeep(this.gameState)
             this.gameState = cloneDeep(gameState)
             this.receiveGameState()
         })
-        this.connection.on(baseEnum.SocketEvent.changeGameState, (stateChanges: Array<Diff<IGameState>>) => {
+        this.connection.on(baseEnum.SocketEvent.syncGameState_msgpack, (gameStateBuffer: Array<number>) => {
+            this.preGameState = cloneDeep(this.gameState)
+            this.gameState = cloneDeep(decode(gameStateBuffer))
+            this.receiveGameState()
+        })
+        this.connection.on(baseEnum.SocketEvent.changeGameState_diff, (stateChanges: Array<Diff<IGameState>>) => {
             this.preGameState = cloneDeep(this.gameState)
             stateChanges.forEach(change => applyChange(this.gameState, null, change))
             this.receiveGameState()
         })
-        this.connection.on(baseEnum.SocketEvent.syncPlayerState, (playerState: TPlayerState<IPlayerState>) => {
+        this.connection.on(baseEnum.SocketEvent.syncPlayerState_json, (playerState: TPlayerState<IPlayerState>) => {
             this.prePlayerState = cloneDeep(this.playerState)
             this.playerState = cloneDeep(playerState)
             this.receivePlayerState()
         })
-        this.connection.on(baseEnum.SocketEvent.changePlayerState, (stateChanges: Array<Diff<IPlayerState>>) => {
+        this.connection.on(baseEnum.SocketEvent.syncPlayerState_msgpack, (playerStateBuffer: Array<number>) => {
+            this.prePlayerState = cloneDeep(this.playerState)
+            this.playerState = cloneDeep(decode(playerStateBuffer))
+            this.receivePlayerState()
+        })
+        this.connection.on(baseEnum.SocketEvent.changePlayerState_diff, (stateChanges: Array<Diff<IPlayerState>>) => {
             this.prePlayerState = cloneDeep(this.playerState)
             stateChanges.forEach(change => applyChange(this.playerState, null, change))
             this.receivePlayerState()

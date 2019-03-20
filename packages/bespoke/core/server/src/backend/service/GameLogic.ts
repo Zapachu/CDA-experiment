@@ -9,11 +9,13 @@ import {
     TGameState,
     TPlayerState
 } from 'bespoke-common'
-import GameDAO from '../service/GameDAO'
+import GameDAO from './GameDAO'
 import {NodeRobotsScheduler, PythonSchedulerProxy, RobotScheduler} from './robotSchedulerManager'
-import {MoveQueue, StateManager} from '../service/StateManager'
+import {StateManager} from './StateManager'
+import {MoveQueue} from './MoveQueue'
 import {Request, Response} from 'express'
 import {getGameService} from '../rpc'
+import SyncStrategy = baseEnum.SyncStrategy
 
 export type AnyController = BaseController<any, any, any, any, any, any, any, any>
 type AnyRobotScheduler = RobotScheduler<any, any, any, any, any, any, any>
@@ -22,47 +24,41 @@ type AnyRobot = BaseRobot<any, any, any, any, any, any, any>
 export interface ILogicTemplate {
     Controller: new(...args) => AnyController,
     Robot?: new(...args) => AnyRobot
+    sncStrategy?: SyncStrategy
 }
 
-export class GameLogic {
-    private readonly namespaceController: AnyController
-    private gameControllers = new Map<string, AnyController>()
-    private robotSchedulers = new Map<string, AnyRobotScheduler>()
+export namespace GameLogic {
+    let template: ILogicTemplate
+    export let sncStrategy: SyncStrategy
 
-    private static _gameLogic: GameLogic
+    export let namespaceController: AnyController
 
-    static initInstance(template: ILogicTemplate) {
-        this._gameLogic = new GameLogic(template)
+    export function init(logicTemplate: ILogicTemplate) {
+        template = logicTemplate
+        sncStrategy = logicTemplate.sncStrategy || SyncStrategy.default
+        namespaceController = new template.Controller()
     }
 
-    static get instance(): GameLogic {
-        return this._gameLogic
-    }
+    const gameControllers = new Map<string, AnyController>()
 
-    private constructor(private gameLogicTemplate: ILogicTemplate) {
-        this.namespaceController = new gameLogicTemplate.Controller()
-    }
-
-    getNamespaceController() {
-        return this.namespaceController
-    }
-
-    async getGameController(gameId: string): Promise<AnyController> {
-        if (!this.gameControllers.get(gameId)) {
+    export async function getGameController(gameId: string): Promise<AnyController> {
+        if (!gameControllers.get(gameId)) {
             const game = await GameDAO.getGame(gameId)
-            this.gameControllers.set(gameId, await new this.gameLogicTemplate.Controller(game).init())
+            gameControllers.set(gameId, await new template.Controller(game).init())
         }
-        return this.gameControllers.get(gameId)
+        return gameControllers.get(gameId)
     }
 
-    async startNewRobotScheduler<ICreateParams, IGameState, IPlayerState>(gameId: string, key: string, pythonRobot: boolean): Promise<void> {
+    const robotSchedulers = new Map<string, AnyRobotScheduler>()
+
+    export async function startNewRobotScheduler<ICreateParams, IGameState, IPlayerState>(gameId: string, key: string, pythonRobot: boolean): Promise<void> {
         const game = await GameDAO.getGame<ICreateParams>(gameId)
         const actor: IActor = {
             token: Hash.hashObj(`${game.id}${key}`),
             type: baseEnum.Actor.serverRobot
         }
-        const robotProxy = await (pythonRobot ? new PythonSchedulerProxy(game, actor) : new NodeRobotsScheduler(game, actor, this.gameLogicTemplate.Robot)).init()
-        this.robotSchedulers.set(robotProxy.id, robotProxy)
+        const robotProxy = await (pythonRobot ? new PythonSchedulerProxy(game, actor) : new NodeRobotsScheduler(game, actor, template.Robot)).init()
+        robotSchedulers.set(robotProxy.id, robotProxy)
     }
 }
 
@@ -75,7 +71,7 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
     }
 
     async init() {
-        this.stateManager = await (new StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>(this))
+        this.stateManager = new StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>(GameLogic.sncStrategy, this)
         this.moveQueue = new MoveQueue(this.game, this.stateManager)
         return this
     }
@@ -88,6 +84,10 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
         return {
             status: baseEnum.GameStatus.notStarted
         } as any
+    }
+
+    filterGameState(gameState: TGameState<IGameState>): any {
+        return gameState
     }
 
     async initPlayerState(actor: IActor): Promise<TPlayerState<IPlayerState>> {
@@ -129,7 +129,7 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
     }
 
     async startNewRobotScheduler(key, pythonRobot: boolean) {
-        await GameLogic.instance.startNewRobotScheduler(this.game.id, key, pythonRobot)
+        await GameLogic.startNewRobotScheduler(this.game.id, key, pythonRobot)
     }
 
     async handleFetch(req: Request, res: Response) {
