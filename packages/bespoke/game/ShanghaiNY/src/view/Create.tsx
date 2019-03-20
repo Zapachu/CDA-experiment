@@ -48,7 +48,7 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
       const {lang, props: {params, setParams}} = this
       const gameParams = ['a','b','c','d','eH','eL','s','p','b0','b1'];
       return <section className={style.create}>
-          <ul className={style.baseFields}>
+          <ul className={style.fields}>
               <li>
                   <Label label={lang.playersPerGroup}/>
                   <Input {...{
@@ -82,10 +82,11 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
                   }}/>
               </li>
           </ul>
-          <p>{lang.params}</p>
-          <ul>
+          <p className={style.params}>{lang.params}</p>
+          <ul className={style.fields}>
             {
               gameParams.map(p => {
+                if(params.gameType===GameType.T1 && p==='d') return null;
                 if(params.version===Version.V3 && p==='b') return null;
                 if(params.version!==Version.V3 && ['p','b0','b1'].includes(p)) return null;
                 return <li key={p}>

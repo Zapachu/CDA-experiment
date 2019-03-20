@@ -114,7 +114,7 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
   }
 
   render() {
-    const {lang, props: {frameEmitter, playerState:{stageIndex,groupIndex}, gameState:{groups}, game:{params:{gameType,version}}}, state: {c1, c2}} = this
+    const {lang, props: {frameEmitter, playerState:{stageIndex,groupIndex}, gameState:{groups}, game:{params:{gameType,version,d}}}, state: {c1, c2}} = this
     const curGroup = groups[groupIndex];
     const displayData = this.calcDisplayData();
     let content;
@@ -122,8 +122,8 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
       case 0: {
         content = <div>
           <Display data={displayData} />
-          <Choice1 c1={c1} version={version} gameType={gameType} onChoose={c1 => this.setState({c1})}/>
-          <Choice2 c1={c1} c2={c2} version={version} gameType={gameType} onChoose={c2 => this.setState({c2})}/>
+          <Choice1 c1={c1} d={d} version={version} gameType={gameType} onChoose={c1 => this.setState({c1})}/>
+          <Choice2 c1={c1} c2={c2} d={d} version={version} gameType={gameType} onChoose={c2 => this.setState({c2})}/>
           {gameType===GameType.T1
             ? <Button width={ButtonProps.Width.small}
                       label={lang.confirm}
@@ -136,7 +136,7 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
                 ? <Button width={ButtonProps.Width.small}
                           label={lang.confirm}
                           onClick={() => {
-                            if(c1===Choice.Wait && !c2.length) return;
+                            if(c1===Choice.Wait && c2.length!==2) return;
                             frameEmitter.emit(MoveType.answerMain, {c1, c2})
                           }}
                   />

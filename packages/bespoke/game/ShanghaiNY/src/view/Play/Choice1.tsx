@@ -7,12 +7,13 @@ interface PropsType {
   c1: number,
   onChoose: (c1: number) => void,
   gameType: GameType,
-  version: Version
+  version: Version,
+  d?: number
 }
 
-const Choice1: React.FunctionComponent<PropsType> = ({c1, onChoose, gameType, version}) => {
+const Choice1: React.FunctionComponent<PropsType> = ({c1, onChoose, gameType, version, d=0}) => {
   return <div>
-    <p>第一阶段: 你的选择</p>
+    <p>第一阶段: 你的选择 {d>0 ? `(若在下一轮改选1，需要付出修改费${d}元)` : ''}</p>
     <input type="radio" id="c1-1" checked={c1===Choice.One} onChange={() => onChoose(Choice.One)} />
     <label htmlFor={'c1-1'}>选1</label>
     {gameType===GameType.T1

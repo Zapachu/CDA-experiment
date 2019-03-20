@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, ButtonProps, Core, Lang, MaskLoading, Toast, RadioGroup, Input} from 'bespoke-client-util'
+import {Button, ButtonProps, Core, Lang, MaskLoading, Toast, Label, Input} from 'bespoke-client-util'
 import {FetchType, MoveType, PushType, Stage} from '../../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
 import TestStage from './TestStage'
@@ -30,7 +30,6 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
 
     render(): React.ReactNode {
         const {lang, props: {playerState: {stage}}} = this
-        console.log(this.props.playerState)
         return <section className={style.play}>
             {
                 (() => {
@@ -64,11 +63,13 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
 
     renderSeatNumberStage = () => {
       const {lang, props: {frameEmitter}, state: {seatNumber}} = this
-      return <section className={style.seatNumberStage}>
-          <label>{lang.inputSeatNumberPls}</label>
-          <input value={seatNumber||''}
-                 onChange={({target: {value: seatNumber}}) => this.setState({seatNumber})}/>
-          <Button width={ButtonProps.Width.medium} label={lang.submit} onClick={() => {
+      return <section className={style.seatStage}>
+          <Label label={lang.inputSeatNumberPls}/>
+          <Input {...{
+              value: seatNumber||'',
+              onChange: ({target: {value: seatNumber}}) => this.setState({seatNumber})
+          }}/>
+          <Button style={{marginTop:'1rem'}} width={ButtonProps.Width.medium} label={lang.submit} onClick={() => {
               frameEmitter.emit(MoveType.inputSeatNumber, {seatNumber}, success => {
                   if (!success) {
                       Toast.warn(lang.invalidSeatNumber)

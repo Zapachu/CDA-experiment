@@ -80,12 +80,12 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
     if(stageIndex === 0) {
       switch(gameType) {
         case GameType.T1: {
-          content = <div>
-            <p>本页面是为了帮助你熟悉操作界面。你可以尝试在界面上进行不同的选择。当你确定已经熟悉了操作界面之后，请点击最下方的“确定”按钮。</p>
+          content = <>
+            <p className={style.instruction}>本页面是为了帮助你熟悉操作界面。你可以尝试在界面上进行不同的选择。当你确定已经熟悉了操作界面之后，请点击最下方的“确定”按钮。</p>
             <Display />
-            <p>首先，做出你在第一阶段的选择:</p>
+            <p className={style.instruction}>首先，做出你在第一阶段的选择:</p>
             <Choice1 c1={c1} version={version} gameType={gameType} onChoose={c1 => this.setState({c1})}/>
-            <p>选择完成后，点击“确定”进入下一轮:</p>
+            <p className={style.instruction}>选择完成后，点击“确定”进入下一轮:</p>
             <Button width={ButtonProps.Width.small}
                     label={lang.confirm}
                     onClick={() => {
@@ -94,32 +94,32 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
                       this.setState({c1: 0})
                     }}
             />
-          </div>
+          </>
           break;
         }
         case GameType.T2: {
-          content = <div>
-            <p>本页面是为了帮助你熟悉操作界面。你可以尝试在界面上进行不同的选择。当你确定已经熟悉了操作界面之后，请点击最下方的“确定”按钮。</p>
+          content = <>
+            <p className={style.instruction}>本页面是为了帮助你熟悉操作界面。你可以尝试在界面上进行不同的选择。当你确定已经熟悉了操作界面之后，请点击最下方的“确定”按钮。</p>
             <Display />
-            <p>首先，做出你在第一阶段的选择:</p>
+            <p className={style.instruction}>首先，做出你在第一阶段的选择:</p>
             <Choice1 c1={c1} version={version} gameType={gameType} onChoose={c1 => this.setState({c1})}/>
             {c1
               ? c1 === Choice.Wait
-                  ? <p>因为你在第一阶段已经等待，请针对第一阶段可能出现的两种结果，做出你第二阶段的选择:</p>
-                  : <p>因为你在第一阶段已经选择了1，第二阶段不需要选择，请点击下面的“确定按钮”:</p>
+                  ? <p className={style.instruction}>因为你在第一阶段已经等待，请针对第一阶段可能出现的两种结果，做出你第二阶段的选择:</p>
+                  : <p className={style.instruction}>因为你在第一阶段已经选择了1，第二阶段不需要选择，请点击下面的“确定按钮”:</p>
               : null
             }
             <Choice2 c1={c1} c2={c2} version={version} gameType={gameType} onChoose={c2 => this.setState({c2})}/>
-            <p>选择完成后，点击“确定”进入下一轮:</p>
+            <p className={style.instruction}>选择完成后，点击“确定”进入下一轮:</p>
             <Button width={ButtonProps.Width.small}
                     label={lang.confirm}
                     onClick={() => {
-                      if(!c1) return;
+                      if(!c1 || (c1===Choice.Wait&&c2.length!==2)) return;
                       frameEmitter.emit(MoveType.answerTest)
                       this.setState({c1: 0})
                     }}
             />
-          </div>
+          </>
           break;
         }
       }
@@ -150,7 +150,7 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
         <p>等待其他玩家完成测试</p>
       </div>
     }
-    return <section>
+    return <section className={style.testStage}>
       {content}
     </section>
   }
