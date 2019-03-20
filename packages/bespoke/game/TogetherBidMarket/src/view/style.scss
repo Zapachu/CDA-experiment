@@ -53,7 +53,7 @@
   align-items: center;
   flex-direction: column;
   .line {
-    border-bottom: solid 1px #E0E0E0;
+    border-bottom: 1px solid rgba(49, 70, 89, 0.1);
     width: 95%;
     font-size: 1.3rem;
     padding: .5rem;
@@ -86,6 +86,29 @@
       }
       &.readonly input {
         border-bottom-color: transparent;
+      }
+    }
+  }
+}
+
+.result {
+  margin: 2rem auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: $fontSize-middle;
+
+  .resultTable {
+    margin: 1rem;
+
+    tr {
+      border-bottom: $borderLine;
+      height: 2.5rem;
+      text-align: center;
+
+      td {
+        width: 10rem;
       }
     }
   }

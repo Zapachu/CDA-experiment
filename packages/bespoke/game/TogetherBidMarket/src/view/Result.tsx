@@ -7,7 +7,7 @@ import {FetchType} from '../config'
 export class Result extends Core.Result<ICreateParams, IPlayerState, FetchType> {
     render(): React.ReactNode {
         const {props: {playerState: {profits}}} = this
-        return <section>
+        return <div className={style.result}>
             <table className={style.resultTable}>
                 <tbody>
                 <tr>
@@ -22,6 +22,6 @@ export class Result extends Core.Result<ICreateParams, IPlayerState, FetchType> 
                 }
                 </tbody>
             </table>
-        </section>
+        </div>
     }
 }
