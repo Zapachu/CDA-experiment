@@ -73,6 +73,32 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         </div>
     }
 
+    dynamicResult = () => {
+        const {props: {playerState: {profits, prices, privatePrices}}} = this
+        return <table className={style.profits}>
+            <thead>
+            <tr>
+                <td>轮次</td>
+                <td>心理价值</td>
+                <td>出价</td>
+                <td>收益</td>
+            </tr>
+            </thead>
+            {
+                prices.filter((p) => p !== 0).map((v, i) =>
+                    <tbody key={`tb${i}`}>
+                    <tr>
+                        <td>{i + 1}</td>
+                        <td>{privatePrices[i]}</td>
+                        <td>{v}</td>
+                        <td>{profits[i]}</td>
+                    </tr>
+                    </tbody>
+                )
+            }
+        </table>
+    }
+
     render() {
         const {
             props: {
@@ -95,27 +121,28 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 <div>本轮结束剩余时间</div>
                 <div className={style.highlight}>{NEW_ROUND_TIMER - newRoundTimer}</div>
             </div> : null}
-            <div>
+            <div className={style.line}>
                 <div>游戏共总人数</div>
                 <div className={style.highlight}>{groupSize}</div>
             </div>
-            <div>
+            <div className={style.line}>
                 <div>游戏总轮数</div>
                 <div className={style.highlight}>{rounds.length}</div>
             </div>
-            <div>
+            <div className={style.line}>
                 <div>正在进行轮次</div>
                 <div className={style.highlight}>{roundIndex + 1} </div>
             </div>
-            <div>
+            <div className={style.line}>
                 <div>您的角色</div>
                 <div className={style.highlight}>{['买家', '卖家'][role]}</div>
             </div>
-            <div>
+            <div className={style.line}>
                 <div>物品对于您的心理价值</div>
                 <div className={style.highlight}>{privatePrices[groups[groupIndex].roundIndex]}</div>
             </div>
             {this.dynamicAction()}
+            {this.dynamicResult()}
         </section>
     }
 

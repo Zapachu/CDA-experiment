@@ -1,10 +1,8 @@
 @import "~bespoke-client-util/lib/resource/public";
-
 .create {
   margin: 1.5rem;
   display: flex;
   flex-direction: column;
-
   .configFields {
     margin-top: 1rem;
     display: flex;
@@ -17,39 +15,31 @@
       align-items: center;
     }
   }
-
   .privatePriceTable {
     margin-top: 3rem;
     color: $color-black;
     text-align: center;
-
     td {
       border: $borderLine;
       width: 5rem;
       height: 3rem;
-
       a {
         margin: 0 .3rem;
       }
-
       input {
         width: 4rem;
       }
-
       &.readonly input {
         border-bottom-color: transparent;
       }
     }
   }
-
   .btnSwitch {
     margin-top: 2rem;
     text-align: center;
-
     a {
       transition: $transition-normal;
       color: rgba($color-blue, .9);
-
       &:hover {
         color: $color-blue;
         text-decoration: underline;
@@ -57,24 +47,19 @@
     }
   }
 }
-
 .play {
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  div {
+  .line {
+    border-bottom: solid 1px #E0E0E0;
     width: 95%;
     font-size: 1.3rem;
     padding: .5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    div {
-      display: flex;
-      justify-content: center;
-      border-bottom: dotted 1px #BDBDBD;
-    }
   }
   .highlight {
     color: #4285f4;;
@@ -84,5 +69,24 @@
     display: flex;
     justify-content: center;
     margin-bottom: 1rem;
+  }
+  .profits {
+    margin-top: 3rem;
+    color: $color-black;
+    text-align: center;
+    td {
+      border: $borderLine;
+      width: 5rem;
+      height: 3rem;
+      a {
+        margin: 0 .3rem;
+      }
+      input {
+        width: 4rem;
+      }
+      &.readonly input {
+        border-bottom-color: transparent;
+      }
+    }
   }
 }
