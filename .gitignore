@@ -73,3 +73,5 @@ log
 # setting
 setting.ts
 settings.ts
+
+dump.rdb

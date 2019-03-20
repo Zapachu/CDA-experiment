@@ -4,6 +4,6 @@ import {namespace} from '../src/config'
 
 export = geneClientBuilder({
     namespace,
-    buildMode: 'dist',
+    buildMode: 'dev',
     basePath: resolve(__dirname, '..')
 })
