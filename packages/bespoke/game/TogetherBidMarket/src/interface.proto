@@ -22,8 +22,7 @@ message MoveParams {
 
 message PushParams {
     int32 roundIndex = 1;
-    int32 dealTimer = 2;
-    int32 newRoundTimer = 3;
+    int32 newRoundTimer = 2;
 }
 
 message GameState {

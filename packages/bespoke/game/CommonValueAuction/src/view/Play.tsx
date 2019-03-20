@@ -104,7 +104,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             props: {
                 game: {params: {groupSize}},
                 gameState: {groups},
-                playerState: {role, groupIndex, privatePrices}
+                playerState: {groupIndex, privatePrices}
             }, state: {loading, newRoundTimers}
         } = this
         if (loading) {
@@ -117,7 +117,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             newRoundTimer = newRoundTimers[roundIndex]
         return <section className={style.play}>
             <div className={style.title}>集合竞价市场</div>
-            {newRoundTimer ? <div>
+            {newRoundTimer ? <div className={style.line}>
                 <div>本轮结束剩余时间</div>
                 <div className={style.highlight}>{NEW_ROUND_TIMER - newRoundTimer}</div>
             </div> : null}
@@ -132,10 +132,6 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             <div className={style.line}>
                 <div>正在进行轮次</div>
                 <div className={style.highlight}>{roundIndex + 1} </div>
-            </div>
-            <div className={style.line}>
-                <div>您的角色</div>
-                <div className={style.highlight}>{['买家', '卖家'][role]}</div>
             </div>
             <div className={style.line}>
                 <div>物品对于您的心理价值</div>
