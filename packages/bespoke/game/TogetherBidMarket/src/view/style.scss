@@ -8,7 +8,14 @@
   .configFields {
     margin-top: 1rem;
     display: flex;
+    flex-direction: column;
     justify-content: flex-start;
+    li {
+      margin: .8rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
 
   .privatePriceTable {
@@ -16,16 +23,14 @@
     color: $color-black;
     text-align: center;
 
-    th {
-      border: $borderLine;
-      width: 5rem;
-      height: 3rem;
-    }
-
     td {
       border: $borderLine;
       width: 5rem;
       height: 3rem;
+
+      a {
+        margin: 0 .3rem;
+      }
 
       input {
         width: 4rem;
@@ -38,12 +43,12 @@
   }
 
   .btnSwitch {
-    margin-top: 1rem;
+    margin-top: 2rem;
     text-align: center;
 
     a {
       transition: $transition-normal;
-      color: rgba($color-blue, .6);
+      color: rgba($color-blue, .9);
 
       &:hover {
         color: $color-blue;
@@ -51,4 +56,11 @@
       }
     }
   }
+}
+
+.play {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }

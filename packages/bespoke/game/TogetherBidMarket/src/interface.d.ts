@@ -8,17 +8,20 @@ export interface ICreateParams {
     /** CreateParams groupSize */
     groupSize?: (number|null);
 
-    /** CreateParams buyerL */
-    buyerL?: (number|null);
+    /** CreateParams buyerPriceStart */
+    buyerPriceStart?: (number|null);
 
-    /** CreateParams buyerH */
-    buyerH?: (number|null);
+    /** CreateParams buyerPriceEnd */
+    buyerPriceEnd?: (number|null);
 
-    /** CreateParams sellerL */
-    sellerL?: (number|null);
+    /** CreateParams sellerPriceStart */
+    sellerPriceStart?: (number|null);
 
-    /** CreateParams sellerH */
-    sellerH?: (number|null);
+    /** CreateParams sellerPriceEnd */
+    sellerPriceEnd?: (number|null);
+
+    /** CreateParams InitMoney */
+    InitMoney?: (number|null);
 
     /** CreateParams positions */
     positions?: (CreateParams.IPosition[]|null);
@@ -42,17 +45,20 @@ export class CreateParams implements ICreateParams {
     /** CreateParams groupSize. */
     public groupSize: number;
 
-    /** CreateParams buyerL. */
-    public buyerL: number;
+    /** CreateParams buyerPriceStart. */
+    public buyerPriceStart: number;
 
-    /** CreateParams buyerH. */
-    public buyerH: number;
+    /** CreateParams buyerPriceEnd. */
+    public buyerPriceEnd: number;
 
-    /** CreateParams sellerL. */
-    public sellerL: number;
+    /** CreateParams sellerPriceStart. */
+    public sellerPriceStart: number;
 
-    /** CreateParams sellerH. */
-    public sellerH: number;
+    /** CreateParams sellerPriceEnd. */
+    public sellerPriceEnd: number;
+
+    /** CreateParams InitMoney. */
+    public InitMoney: number;
 
     /** CreateParams positions. */
     public positions: CreateParams.IPosition[];
@@ -139,8 +145,8 @@ export namespace CreateParams {
         /** Position role */
         role?: (number|null);
 
-        /** Position PV */
-        PV?: (number|null);
+        /** Position privatePrice */
+        privatePrice?: (number[]|null);
     }
 
     /** Represents a Position. */
@@ -155,8 +161,8 @@ export namespace CreateParams {
         /** Position role. */
         public role: number;
 
-        /** Position PV. */
-        public PV: number;
+        /** Position privatePrice. */
+        public privatePrice: number[];
 
         /**
          * Creates a new Position instance using the specified properties.
@@ -525,6 +531,9 @@ export namespace GameState {
 
         /** Group playerNum */
         playerNum?: (number|null);
+
+        /** Group results */
+        results?: (GameState.Group.IResult[]|null);
     }
 
     /** Represents a Group. */
@@ -544,6 +553,9 @@ export namespace GameState {
 
         /** Group playerNum. */
         public playerNum: number;
+
+        /** Group results. */
+        public results: GameState.Group.IResult[];
 
         /**
          * Creates a new Group instance using the specified properties.
@@ -707,6 +719,102 @@ export namespace GameState {
              */
             public toJSON(): { [k: string]: any };
         }
+
+        /** Properties of a Result. */
+        interface IResult {
+
+            /** Result buyerPosition */
+            buyerPosition?: (number|null);
+
+            /** Result sellerPosition */
+            sellerPosition?: (number|null);
+        }
+
+        /** Represents a Result. */
+        class Result implements IResult {
+
+            /**
+             * Constructs a new Result.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: GameState.Group.IResult);
+
+            /** Result buyerPosition. */
+            public buyerPosition: number;
+
+            /** Result sellerPosition. */
+            public sellerPosition: number;
+
+            /**
+             * Creates a new Result instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Result instance
+             */
+            public static create(properties?: GameState.Group.IResult): GameState.Group.Result;
+
+            /**
+             * Encodes the specified Result message. Does not implicitly {@link GameState.Group.Result.verify|verify} messages.
+             * @param message Result message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: GameState.Group.IResult, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified Result message, length delimited. Does not implicitly {@link GameState.Group.Result.verify|verify} messages.
+             * @param message Result message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: GameState.Group.IResult, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Result message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Result
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): GameState.Group.Result;
+
+            /**
+             * Decodes a Result message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns Result
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): GameState.Group.Result;
+
+            /**
+             * Verifies a Result message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a Result message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns Result
+             */
+            public static fromObject(object: { [k: string]: any }): GameState.Group.Result;
+
+            /**
+             * Creates a plain object from a Result message. Also converts values to other types if specified.
+             * @param message Result
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: GameState.Group.Result, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this Result to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+        }
     }
 }
 
@@ -727,6 +835,9 @@ export interface IPlayerState {
 
     /** PlayerState profits */
     profits?: (number[]|null);
+
+    /** PlayerState role */
+    role?: (number|null);
 }
 
 /** Represents a PlayerState. */
@@ -752,6 +863,9 @@ export class PlayerState implements IPlayerState {
 
     /** PlayerState profits. */
     public profits: number[];
+
+    /** PlayerState role. */
+    public role: number;
 
     /**
      * Creates a new PlayerState instance using the specified properties.
