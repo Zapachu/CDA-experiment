@@ -81,17 +81,8 @@ export namespace PhaseManager {
         server.addService(protoDef.PhaseService.service, phaseService)
     }
 
-    let phaseService: TPhaseServiceConsumer
-
     export function getPhaseService(serviceURI: string): TPhaseServiceConsumer {
-        if (!phaseService) {
-            try {
-                phaseService = new protoDef.PhaseService(serviceURI, credentials.createInsecure())
-            } catch (e) {
-                console.error(e)
-            }
-        }
-        return phaseService
+        return new protoDef.PhaseService(serviceURI, credentials.createInsecure())
     }
 
     export type TRegisterPhasesReq = IRegisterPhasesReq

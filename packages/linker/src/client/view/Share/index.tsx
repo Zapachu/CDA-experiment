@@ -44,7 +44,7 @@ export class Share extends React.Component<RouteComponentProps<{ gameId: string 
             <div className={style.shareContent}>
                 <h2>{state.title}</h2>
                 <div className={style.qrCodeWrapper} onClick={() => history.push(`/info/${gameId}`)}>
-                    <QrCode size={256} value={`/${config.rootName}/info/${gameId}`}/>
+                    <QrCode size={256} value={`${location.origin}/${config.rootName}/info/${gameId}`}/>
                 </div>
                 <div className={style.shareCode}>
                     <label>{lang.shareCode}</label>

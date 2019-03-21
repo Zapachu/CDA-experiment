@@ -2,13 +2,19 @@ import React, {FunctionComponent, Fragment, useState, useEffect} from 'react'
 import * as style from './style.scss'
 import {Api, Lang} from '@client-util'
 import {RouteComponentProps} from 'react-router'
-import {IGameWithId} from '@common'
+import {baseEnum, IGameWithId, IUserWithId} from '@common'
 import {Button, Icon, List, Pagination} from '@antd-component'
+import {Breadcrumb} from '@client-component'
 
 const {Item: ListItem} = List, {Meta: ListItemMeta} = ListItem
 
-export const GameList: FunctionComponent<RouteComponentProps> = ({history}) => {
+export const GameList: FunctionComponent<RouteComponentProps & { user: IUserWithId }> = ({history, user}) => {
+    if (user.role === baseEnum.AcademusRole.student) {
+        history.push('/join')
+        return null
+    }
     const lang = Lang.extractLang({
+        join: ['快速加入', 'Join'],
         create: ['创建', 'CREATE'],
         title: ['标题', 'Title'],
         desc: ['详情', 'Description'],
@@ -29,6 +35,9 @@ export const GameList: FunctionComponent<RouteComponentProps> = ({history}) => {
     }
 
     return <section className={style.gameList}>
+        <Breadcrumb history={history} links={[
+            {label: lang.join, to: `/join`}
+        ]}/>
         <List
             grid={{gutter: 24, xl: 4, md: 3, sm: 2, xs: 1}}
             dataSource={[{}].concat(gameList)}
