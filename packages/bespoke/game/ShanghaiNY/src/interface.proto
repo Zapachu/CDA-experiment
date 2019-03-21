@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+message CreateParams {
+  int32 playersPerGroup = 1;
+  int32 rounds = 2;
+  int32 gameType = 3;
+  int32 version = 4;
+  float a = 5;
+  float b = 6;
+  float c = 7;
+  float d = 8;
+  float eH = 9;
+  float eL = 10;
+  float s = 11;
+  float p = 12;
+  float b0 = 13;
+  float b1 = 14;
+  string nextPhaseKey = 15;
+}
+
+message GameState {
+  message Group {
+    int32 playerNum = 1;
+    int32 roundIndex = 2;
+    repeated bool probs = 3;
+    repeated bool ones = 4;
+    repeated int32 mins = 5;
+  }
+  repeated Group groups = 1;
+}
+
+message PlayerState {
+  message Choice {
+    int32 c1 = 1;
+    repeated int32 c2 = 2;
+    int32 c = 3;
+  }
+  int32 groupIndex = 1;
+  int32 positionIndex = 2;
+  string seatNumber = 3;
+  int32 stage = 4;
+  int32 stageIndex = 5;
+  repeated Choice choices = 6;
+  repeated float profits = 7;
+  float finalProfit = 8;
+  repeated string surveyAnswers = 9;
+}
+
+message MoveParams {
+  string seatNumber = 1;
+  int32 c1 = 2;
+  repeated int32 c2 = 3;
+  repeated string surveys = 4;
+}
+
+message PushParams {
+}

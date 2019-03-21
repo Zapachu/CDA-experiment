@@ -43,7 +43,8 @@ export const Button: React.FunctionComponent<{
     icon?: ButtonProps.Icon
     width?: ButtonProps.Width
     height?: ButtonProps.Height
-    onClick: () => void
+    onClick: () => void,
+    style?: object
 }> = ({
           label,
           icon,
@@ -51,7 +52,8 @@ export const Button: React.FunctionComponent<{
           color = ButtonProps.Color.blue,
           width = ButtonProps.Width.medium,
           height = ButtonProps.Height.medium,
-          onClick
+          onClick,
+          style: propStyle={}
       }) =>
     <button {...{
         className: style.button,
@@ -69,7 +71,8 @@ export const Button: React.FunctionComponent<{
             } : {
                 color: ButtonProps.Color.white,
                 background: color
-            }
+            },
+            ...propStyle
         },
         onClick: throttle(onClick, CLICK_THROTTLE_TIME, {trailing: false})
     }}>
