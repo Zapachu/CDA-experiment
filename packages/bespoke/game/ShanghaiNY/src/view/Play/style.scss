@@ -1,0 +1,40 @@
+@import "~bespoke-client-util/lib/resource/public";
+
+.play {
+  width: calc(99vh - 2rem);
+  margin: 2rem auto 0;
+
+  .display {
+    border-collapse: separate;
+    width: 100%;
+    max-width: 300px;
+    border: 1px solid;
+    margin: 1rem 0;
+    td {
+      text-align: center;
+    }
+    .data {
+      color: red;
+    }
+  }
+  
+  .instruction {
+    font-size: 16px;
+    font-style: italic;
+  }
+
+  .tipWrong {
+    color: red;
+  }
+
+  .seatStage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .testStage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
