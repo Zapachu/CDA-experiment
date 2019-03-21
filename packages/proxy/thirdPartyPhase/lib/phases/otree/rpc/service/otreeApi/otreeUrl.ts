@@ -1,5 +1,5 @@
 import * as objectHash from 'object-hash'
-import settings from '../../../../../config/settings'
+import {elfSetting as settings} from 'elf-setting'
 import {ThirdPartPhase} from '../../../../../core/server/models'
 
 const oTreeList = `${settings.oTreeServer}/demo/`

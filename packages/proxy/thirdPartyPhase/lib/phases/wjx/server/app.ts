@@ -1,5 +1,5 @@
 import * as errorhandler from 'errorhandler'
-import settings from '../../../config/settings'
+import {elfSetting as settings} from 'elf-setting'
 import '../../common/auth/passport'
 import {InitWork, ProxyWork, RPCWork} from './utils'
 import {ConDB, SessionSetMiddleware, PassportMiddleware, StaticPathMiddleware} from '../../common/utils'

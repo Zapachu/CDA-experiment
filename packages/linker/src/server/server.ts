@@ -1,7 +1,6 @@
 import * as Express from 'express'
 import {csrf} from 'lusca'
 import * as path from 'path'
-import {createServer} from 'http'
 import * as bodyParser from 'body-parser'
 import {connect as connectMongo} from 'mongoose'
 import * as connectRedis from 'connect-redis'
@@ -17,15 +16,15 @@ registerTsConfigPath({
 })
 
 import {config} from '@common'
-import settings from './config/settings'
+import {elfSetting} from 'elf-setting'
 import {redisClient, usePassport} from '@server-util'
 import requestRouter from './controller/requestRouter'
 import {serve as serveRPC} from './rpc'
 import {EventDispatcher} from './controller/eventDispatcher'
 import {WebpackHmr} from './util/WebpackHmr'
 
-connectMongo(settings.mongoUri, {
-    ...settings.mongoUser ? {user: settings.mongoUser, pass: settings.mongoPass} : {},
+connectMongo(elfSetting.mongoUri, {
+    ...elfSetting.mongoUser ? {user: elfSetting.mongoUser, pass: elfSetting.mongoPass} : {},
     useNewUrlParser: true
 }).then(
     ({connection}) => connection.on('error', () => {
@@ -49,7 +48,7 @@ express.use(expressSession({
     name: 'academy.sid',
     resave: true,
     saveUninitialized: true,
-    secret: settings.sessionSecret,
+    secret: elfSetting.sessionSecret,
     store: new RedisStore({
         ttl: 60 * 60 * 24 * 7,
         client: redisClient as any
@@ -73,12 +72,10 @@ express.use((req: Express.Request, res: Express.Response, next: Express.NextFunc
 })
 usePassport(express)
 express.use(`/${config.rootName}`, requestRouter)
-express.set('port', settings.port)
 
-const server = createServer(express)
-    .listen(settings.port)
+const server = express.listen(elfSetting.linkerPort)
     .on('listening', () => {
-        console.info(`Listening on ${settings.port}`)
+        console.info(`Listening on ${elfSetting.linkerPort}`)
     })
 EventDispatcher.startGroupSocket(server)
 serveRPC()

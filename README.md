@@ -12,10 +12,7 @@
       - thirdPartyPhase : 与bespokeGame平级,向linker注册所代理的第三方页面，详见thirdPartyPhase/README.MD
 
 ## 初始
- - 新建setting.ts文件
-   - `packages/setting/src/setting.ts`
-   - `packages/bespoke/game/FaceRecognition/src/config/setting.ts`
-   - ...
+ - 新建`packages/setting/src/setting.ts`
  - `npm i`
 
 ## 定制实验开发
