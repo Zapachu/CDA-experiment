@@ -29,5 +29,5 @@ export class Hash {
 }
 
 export function buildPlayUrl(groupId:string, playerToken:string) {
-    return `${elfSetting.linkerGatewayHost}/${config.rootName}/${config.appPrefix}/group/play/${groupId}?token=${playerToken}`
+    return `${elfSetting.linkerGatewayHost}/${config.rootName}/play/${groupId}?token=${playerToken}`
 }
