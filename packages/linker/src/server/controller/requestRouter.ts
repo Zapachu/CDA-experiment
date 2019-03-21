@@ -1,4 +1,4 @@
-import {Router, Response} from 'express'
+import {Router} from 'express'
 import {config} from '@common'
 
 import {UserCtrl, GameCtrl} from './requestHandler'
@@ -22,17 +22,13 @@ const apiRouter = Router()
         .get('/:gameId', GameCtrl.getGame)
     )
 
-const appRouter = Router()
-    .get('/login', UserCtrl.renderApp)
-    .get('/game/create', UserCtrl.loggedIn, UserCtrl.isTeacher, UserCtrl.renderApp)
-    .get('/group/create', UserCtrl.loggedIn, UserCtrl.isTeacher, UserCtrl.renderApp)
-    .get('/group/play/:gameId', UserCtrl.loggedIn, UserCtrl.isGameAccessible, UserCtrl.renderApp)
-    .get('/*', UserCtrl.loggedIn, UserCtrl.renderApp)
-
 export default Router()
     .use(`/${config.apiPrefix}`, apiRouter)
-    .use(`/${config.appPrefix}`, appRouter)
-    .use('/*', (req, res:Response)=>res.redirect('/'))
-
+    .get('/login', UserCtrl.renderApp)
+    .get('/baseInfo/:gameId', UserCtrl.loggedIn, UserCtrl.isTeacher, UserCtrl.renderApp)
+    .get('/createInFrame/:gameId', UserCtrl.loggedIn, UserCtrl.isTeacher, UserCtrl.renderApp)
+    .get('/configuration/:gameId', UserCtrl.loggedIn, UserCtrl.isTeacher, UserCtrl.renderApp)
+    .get('/play/:gameId', UserCtrl.loggedIn, UserCtrl.isGameAccessible, UserCtrl.renderApp)
+    .get('/*', UserCtrl.loggedIn, UserCtrl.renderApp)
 
 

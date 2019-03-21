@@ -62,6 +62,8 @@ const getUrlByNamespace = async (groupId, namespace, param, owner): Promise<any>
     const waitingUrl = initRes.request.href
     if (waitingUrl.toString().indexOf('WaitUntilSessionCreated/') !== -1) {
         handleBody = await syncWaitingForCreated(waitingUrl)
+    }else if(waitingUrl.includes('SessionStartLinks')){
+        handleBody = initRes.body
     }
     let content = handleBody.split(playerUrl)
     delete content[0]

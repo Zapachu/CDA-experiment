@@ -30,7 +30,7 @@ export const Root: React.FunctionComponent = () => {
                 <div className={style.languageSwitcherWrapper}>
                     {/*<LanguageSwitcher/>*/}
                 </div>
-                <BrowserRouter basename={`${config.rootName}/${config.appPrefix}`}>
+                <BrowserRouter basename={config.rootName}>
                     <Switch>
                         <Route path={'/createInFrame'} component={CreateInFrame}/>
                         <Route path={'/baseInfo/:gameId'} component={withSideNav(BaseInfo, NAV.basic)}/>
