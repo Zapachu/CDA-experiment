@@ -1,7 +1,7 @@
 'use strict'
 
 import * as httpProxy from "http-proxy-middleware"
-import settings from "../../../../config/settings"
+import {elfSetting as settings} from 'elf-setting'
 
 const {wjxServer} = settings
 

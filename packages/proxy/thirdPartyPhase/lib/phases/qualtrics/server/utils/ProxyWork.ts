@@ -2,7 +2,7 @@
 
 import * as httpProxy from "http-proxy-middleware"
 import {rewriteResBuffers} from "./RewriteResBuffers"
-import settings from "../../../../config/settings"
+import {elfSetting as settings} from 'elf-setting'
 const {qualtricsServer} = settings
 
 const proxy = httpProxy({

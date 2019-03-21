@@ -5,5 +5,8 @@
   "types": "build/index",
   "scripts": {
     "install": "tsc"
+  },
+  "dependencies": {
+    "typescript": "^3.3.3333"
   }
 }

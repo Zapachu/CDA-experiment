@@ -3,7 +3,7 @@
 
 import {ThirdPartPhase} from "../../../../core/server/models"
 import {gameService} from "../../../common/utils"
-import settings from '../../../../config/settings'
+import {elfSetting as settings} from 'elf-setting'
 const {oTreeProxy} = settings
 
 const rewriteResBuffers = async (proxyRes, req, res) => {

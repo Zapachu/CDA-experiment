@@ -3,7 +3,7 @@ import * as errorhandler from 'errorhandler'
 import '../../common/auth/passport'
 import {ConDB, PassportMiddleware, SessionSetMiddleware, StaticPathMiddleware} from '../../common/utils'
 import {InitWork, ProxyWork, RPCWork} from './utils'
-import settings from '../../../config/settings'
+import {elfSetting as settings} from 'elf-setting'
 const {qualtricsPort, qualtricsStaticNamespace} = settings
 
 

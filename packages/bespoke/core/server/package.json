@@ -2,7 +2,7 @@
   "name": "bespoke-server",
   "version": "1.0.0",
   "main": "build/backend/index",
-  "types": "build/backend/index.d.ts",
+  "types": "build/backend/index",
   "scripts": {
     "install": "tsc & npm run dist",
     "build": "ts-node ./script/copyClientUtilBundle.ts & webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./script/webpack.config.ts",

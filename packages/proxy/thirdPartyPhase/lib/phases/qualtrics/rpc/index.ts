@@ -4,7 +4,7 @@ import { Server, ServerCredentials } from 'grpc'
 import {PhaseManager} from 'elf-protocol'
 import {gameService} from '../../common/utils'
 import {phaseService } from './service/QualtricsManager'
-import setting from '../../../config/settings'
+import {elfSetting as setting} from 'elf-setting'
 
 export function serve() {
     const server = new Server()

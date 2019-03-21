@@ -5,7 +5,7 @@ import {ProxyWork, RPCWork, InitWork} from './utils'
 import {ConDB, SessionSetMiddleware, PassportMiddleware, StaticPathMiddleware, SessionTokenCheck} from '../../common/utils'
 
 import '../../common/auth/passport'
-import settings from '../../../config/settings'
+import {elfSetting as settings} from 'elf-setting'
 
 const {oTreeStaticPathNamespace: namespace, oTreePort: port} = settings
 
