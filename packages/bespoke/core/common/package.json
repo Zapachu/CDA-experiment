@@ -2,7 +2,7 @@
   "name": "bespoke-common",
   "version": "1.0.0",
   "main": "build/index",
-  "types": "build/index.d.ts",
+  "types": "build/index",
   "scripts": {
     "install": "tsc"
   },

@@ -3,7 +3,7 @@ import { phaseService } from './service/WjxManager'
 import { resolve } from 'path'
 import { readFileSync } from 'fs'
 import {PhaseManager} from 'elf-protocol'
-import setting from '../../../config/settings'
+import {elfSetting as setting} from 'elf-setting'
 import {gameService} from '../../common/utils'
 
 export function serve() {

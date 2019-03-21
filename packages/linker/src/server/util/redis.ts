@@ -1,7 +1,7 @@
 import * as IORedis from 'ioredis'
-import setting from '../config/settings'
+import {elfSetting} from 'elf-setting'
 
-export const redisClient = new IORedis(setting.redisPort, setting.redisHost)
+export const redisClient = new IORedis(elfSetting.redisPort, elfSetting.redisHost)
     .on('error', (err) => {
         console.error(err)
     })

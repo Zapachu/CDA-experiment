@@ -1,7 +1,6 @@
 import {loadPackageDefinition, credentials, Server} from 'grpc'
 import {loadSync} from '@grpc/proto-loader'
 import {resolve} from 'path'
-
 import {ICheckShareCodeReq, ICheckShareCodeRes} from './AcademusBespoke'
 import {proto} from './BespokeProxy'
 import {

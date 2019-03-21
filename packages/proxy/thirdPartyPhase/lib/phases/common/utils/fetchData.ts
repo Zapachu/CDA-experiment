@@ -1,4 +1,4 @@
-import settings from '../../../config/settings'
+import {elfSetting as settings} from 'elf-setting'
 const { oTreeProxy } = settings
 
 async function request(url): Promise<any> {

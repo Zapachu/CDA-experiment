@@ -15,7 +15,7 @@ import {Log, redisClient, setting, initSetting, QCloudSMS} from './util'
 import {baseEnum, config, ISetting} from 'bespoke-common'
 import {EventDispatcher} from './controller/eventDispatcher'
 import {rootRouter, namespaceRouter} from './controller/requestRouter'
-import {GameLogic, ILogicTemplate} from './manager/logicManager'
+import {GameLogic, ILogicTemplate} from './service/GameLogic'
 import {serve as serveRPC, getProxyService} from './rpc'
 import {AddressInfo} from 'net'
 import {UserDoc, UserModel} from './model'
@@ -119,7 +119,7 @@ export class Server {
         this.initMongo()
         this.initPassPort()
         QCloudSMS.init()
-        GameLogic.initInstance(logicTemplate)
+        GameLogic.init(logicTemplate)
         const {port} = setting,
             express = this.initExpress()
         this.bindServerListener(EventDispatcher.startGameSocket(express.listen(port)), port, () => {

@@ -1,7 +1,7 @@
 import * as Express from 'express'
 import * as errorhandler from 'errorhandler'
 import '../../common/auth/passport'
-import settings from '../../../config/settings'
+import {elfSetting as settings} from 'elf-setting'
 import {InitWork, ProxyWork, RPCWork} from './utils'
 const {qqwjStaticNamespace, qqwjPort} = settings
 

@@ -20,5 +20,5 @@ export function setPhaseService(server: Server) {
 }
 
 export function getGameService() {
-    return P.getGameService(setting.elfGameServiceUri)
+    return P.getGameService(setting.linkerServiceUri)
 }

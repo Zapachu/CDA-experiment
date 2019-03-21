@@ -1,7 +1,7 @@
 'use strict'
 
 import {ThirdPartPhase} from "../../../../core/server/models"
-import settings from "../../../../config/settings"
+import {elfSetting as settings} from 'elf-setting'
 import {getNextPhaseUrl} from './getNextPhaseUrl'
 import {ErrorPage} from '../../../common/utils'
 

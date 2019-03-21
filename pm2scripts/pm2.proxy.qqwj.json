@@ -1,0 +1,9 @@
+{
+  "script": "../packages/proxy/thirdPartyPhase/lib/phases/qqwj/server/app.ts",
+  "name": "proxyqqwj",
+  "env": {
+    "NODE_ENV": "production",
+    "PORT": 3073
+  },
+  "log_date_format": "YYYY-MM-DD HH:mm Z"
+}

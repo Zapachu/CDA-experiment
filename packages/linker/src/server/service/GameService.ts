@@ -3,7 +3,7 @@ import {GameModel} from '@server-model'
 
 export class GameService {
     static async getGameList(owner: string, page: number, pageSize: number): Promise<{ gameList: Array<IGameWithId>, count: number }> {
-        const count = await GameModel.count({owner})
+        const count = await GameModel.countDocuments({owner})
         const _gameList = await GameModel.find({owner}).sort('-createAt').skip(page * pageSize).limit(pageSize),
             gameList = _gameList.map(({id, title, desc, published, phaseConfigs, mode}) => ({
                 id,

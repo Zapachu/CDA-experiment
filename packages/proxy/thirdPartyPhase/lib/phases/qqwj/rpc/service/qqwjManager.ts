@@ -1,4 +1,4 @@
-import setting from '../../../../config/settings'
+import {elfSetting as setting} from 'elf-setting'
 import { ThirdPartPhase } from '../../../../core/server/models'
 import {PhaseManager} from 'elf-protocol'
 
