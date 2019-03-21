@@ -131,8 +131,7 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
         <p>{curTest.desc}</p>
         <ul>
           {curTest.questions.map(({title, options}, i) => <li key={i}>
-            <p>{title}</p>
-            {tips[i] === Tip.Wrong ? <p>错误</p> : null}
+            <p className={tips[i]===Tip.Wrong?style.tipWrong:''}>{title} {tips[i] === Tip.Wrong ? <span>(错误)</span> : null}</p>
             <RadioGroup options={options}
                         value={answers[i] || ''}
                         onChange={e => this.answer(e, i)}
