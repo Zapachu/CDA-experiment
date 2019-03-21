@@ -2,7 +2,5 @@ import {readdirSync, copyFileSync} from 'fs'
 import {resolve} from 'path'
 
 readdirSync(resolve(__dirname, '../lib/proto')).forEach(pathName => {
-    if (pathName.endsWith('d.ts')) {
-        copyFileSync(resolve(__dirname, `../lib/proto/${pathName}`), resolve(__dirname, `../build/proto/${pathName}`))
-    }
+    copyFileSync(resolve(__dirname, `../lib/proto/${pathName}`), resolve(__dirname, `../build/proto/${pathName}`))
 })
