@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, ButtonProps, Core, Lang, MaskLoading, Toast, Label, Input} from 'bespoke-client-util'
+import {Button, ButtonProps, Core, Lang, Toast, Label, Input} from 'bespoke-client-util'
 import {FetchType, MoveType, PushType, Stage} from '../../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
 import TestStage from './TestStage'
@@ -29,7 +29,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     }
 
     render(): React.ReactNode {
-        const {lang, props: {playerState: {stage}}} = this
+        const {props: {playerState: {stage}}} = this
         return <section className={style.play}>
             {
                 (() => {

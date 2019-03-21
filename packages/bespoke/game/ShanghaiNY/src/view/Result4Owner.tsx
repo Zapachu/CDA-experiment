@@ -18,8 +18,8 @@ export class Result4Owner extends Core.Result4Owner<ICreateParams, IGameState, I
 
     lang = Lang.extractLang({
         result: ['游戏结果', 'Game Result'],
-        position: ['玩家编号', 'Player Seq'],
-        point: ['实验收益(￥)', 'Profit(￥)'],
+        seatNumber: ['玩家座位号', 'Player Seat Number'],
+        point: ['最终收益(￥)', 'Profit(￥)'],
         award: ['奖励', 'Award'],
         timeLine: ['时间线', 'TimeLine'],
         timeTravel: ['过程回溯', 'Time Travel'],
@@ -41,7 +41,7 @@ export class Result4Owner extends Core.Result4Owner<ICreateParams, IGameState, I
                     <table className={style.resultTable}>
                         <tbody>
                         <tr>
-                            <td>{lang.position}</td>
+                            <td>{lang.seatNumber}</td>
                             <td>{lang.point}</td>
                         </tr>
                         {

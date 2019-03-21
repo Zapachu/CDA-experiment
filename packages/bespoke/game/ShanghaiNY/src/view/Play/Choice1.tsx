@@ -1,6 +1,5 @@
 import * as React from 'react'
-import * as style from './style.scss'
-import {FetchType, MoveType, PushType, Stage, GameType, Test1, Choice, Version} from '../../config'
+import {GameType, Choice, Version} from '../../config'
 
 
 interface PropsType {

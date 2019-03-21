@@ -1,7 +1,6 @@
 import * as React from 'react'
-import * as style from './style.scss'
-import {Button, ButtonProps, Core, Lang, MaskLoading, Toast, RadioGroup, Input} from 'bespoke-client-util'
-import {FetchType, MoveType, PushType, Stage, GameType, Test1, Test2, Version, Choice} from '../../config'
+import {Button, ButtonProps, Core, Lang} from 'bespoke-client-util'
+import {FetchType, MoveType, PushType, GameType, Version, Choice} from '../../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
 import Display from './Display'
 import Choice1 from './Choice1'
@@ -72,7 +71,7 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
   }
 
   renderResult = () => {
-    const {lang, props: {frameEmitter, playerState:{stageIndex,groupIndex,choices,profits,finalProfit}, gameState:{groups}, game:{params:{gameType,version}}}, state: {c1, c2}} = this
+    const {lang, props: {frameEmitter, playerState:{groupIndex,choices,profits,finalProfit}, gameState:{groups}, game:{params:{gameType}}}, state: {c1, c2}} = this
     const curGroup = groups[groupIndex];
     const curRoundIndex = curGroup.roundIndex;
     const curChoice = choices[curRoundIndex];
@@ -98,6 +97,8 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
         return <>
           <p>你在第{curRoundIndex + 1}轮的选择为:</p>
           {this.renderChoice2(c1, c2)}
+          <p>在第一阶段中, {curGroup.ones[curRoundIndex] ? '有人选1' : '没有人选1'}</p>
+          {curChoice.c1!==Choice.One ? <p>你在第二阶段的选择为: {curChoice.c}</p> : null}
           <p>第{curRoundIndex + 1}轮的组内最低选择为: {curGroup.mins[curRoundIndex]}</p>
           <p>你在第{curRoundIndex + 1}轮的收益为: {curProfit}</p>
           <p>截止第{curRoundIndex + 1}轮，你的收益为: {finalProfit}</p>
@@ -136,7 +137,7 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
                 ? <Button width={ButtonProps.Width.small}
                           label={lang.confirm}
                           onClick={() => {
-                            if(c1===Choice.Wait && c2.length!==2) return;
+                            if(c1===Choice.Wait && !c2.every(c => !!c)) return;
                             frameEmitter.emit(MoveType.answerMain, {c1, c2})
                           }}
                   />

@@ -12,7 +12,7 @@ export enum Stage {
 
 export enum GameType {
   T1 = 1,
-  T2
+  T2 = 2
 }
 
 export enum Choice {

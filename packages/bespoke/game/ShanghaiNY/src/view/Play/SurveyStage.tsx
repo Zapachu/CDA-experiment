@@ -1,7 +1,6 @@
 import * as React from 'react'
-import * as style from './style.scss'
-import {Button, ButtonProps, Core, Lang, MaskLoading, Toast, RadioGroup, Input} from 'bespoke-client-util'
-import {FetchType, MoveType, PushType, Stage, GameType, Test1, Test2, Survey} from '../../config'
+import {Button, ButtonProps, Core, Lang, RadioGroup, Select} from 'bespoke-client-util'
+import {FetchType, MoveType, PushType, Survey} from '../../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
 
 interface IPlayState {
@@ -22,8 +21,9 @@ export default class SurveyStage extends Core.Play<ICreateParams, IGameState, IP
   })
 
   submit = () => {
-    const {lang, props: {frameEmitter}, state: {answers}} = this
+    const {props: {frameEmitter}, state: {answers}} = this
     if(answers.length !== Survey.length) return;
+    if(answers.includes(undefined)) return;
     frameEmitter.emit(MoveType.answerSurvey, {surveys: answers});
   }
 
@@ -43,9 +43,12 @@ export default class SurveyStage extends Core.Play<ICreateParams, IGameState, IP
           return <li key={i}>
             <p>{i+1}. {s.title}</p>
             {s.options.length > 10
-              ? <select value={answers[i] || ''} onChange={({target:{value}}) => this.answer(value, i)}>
-                {s.options.map(option => <option key={option} value={option}>{option}</option>)}
-              </select>
+              ? <Select value={answers[i] || ''}
+                        placeholder={'please choose'}
+                        style={{width:'150px'}} 
+                        options={s.options}
+                        onChange={value => this.answer(value as string, i)} 
+                />
               : <RadioGroup options={s.options}
                             value={answers[i] || ''}
                             onChange={e => this.answer(e, i)}

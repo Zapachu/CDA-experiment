@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, ButtonProps, Core, Lang, MaskLoading, Toast, RadioGroup, Input} from 'bespoke-client-util'
-import {FetchType, MoveType, PushType, Stage, GameType, Test1, Test2, Choice} from '../../config'
+import {Button, ButtonProps, Core, Lang, RadioGroup} from 'bespoke-client-util'
+import {FetchType, MoveType, PushType, GameType, Test1, Test2, Choice} from '../../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
 import Display from './Display'
 import Choice1 from './Choice1'
@@ -52,7 +52,7 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
   })
 
   submit = () => {
-    const {lang, props: {frameEmitter, playerState:{stageIndex}}, state: {c1, answers, tips}} = this
+    const { props: {frameEmitter, playerState:{stageIndex}}, state: {answers, tips}} = this
     const curTest = this.Test[stageIndex-1];
     if(answers.length !== curTest.questions.length) {
       return;
@@ -65,7 +65,7 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
   }
 
   answer = (val: string, i: number) => {
-    const {lang, props: {frameEmitter, playerState:{stageIndex}}, state: {answers, tips}} = this
+    const {props: {playerState:{stageIndex}}, state: {answers, tips}} = this
     const newAnswers = [...answers];
     newAnswers[i] = val;
     const answer = this.Test[stageIndex-1].questions[i].answer;
@@ -80,7 +80,7 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
     if(stageIndex === 0) {
       switch(gameType) {
         case GameType.T1: {
-          content = <>
+          content = (<>
             <p className={style.instruction}>本页面是为了帮助你熟悉操作界面。你可以尝试在界面上进行不同的选择。当你确定已经熟悉了操作界面之后，请点击最下方的“确定”按钮。</p>
             <Display />
             <p className={style.instruction}>首先，做出你在第一阶段的选择:</p>
@@ -94,11 +94,11 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
                       this.setState({c1: 0})
                     }}
             />
-          </>
+          </>)
           break;
         }
         case GameType.T2: {
-          content = <>
+          content = (<>
             <p className={style.instruction}>本页面是为了帮助你熟悉操作界面。你可以尝试在界面上进行不同的选择。当你确定已经熟悉了操作界面之后，请点击最下方的“确定”按钮。</p>
             <Display />
             <p className={style.instruction}>首先，做出你在第一阶段的选择:</p>
@@ -114,12 +114,12 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
             <Button width={ButtonProps.Width.small}
                     label={lang.confirm}
                     onClick={() => {
-                      if(!c1 || (c1===Choice.Wait&&c2.length!==2)) return;
+                      if(!c1 || (c1===Choice.Wait&&!c2.every(c => !!c))) return;
                       frameEmitter.emit(MoveType.answerTest)
                       this.setState({c1: 0})
                     }}
             />
-          </>
+          </>)
           break;
         }
       }

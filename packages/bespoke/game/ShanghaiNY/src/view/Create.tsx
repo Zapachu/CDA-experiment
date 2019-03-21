@@ -1,13 +1,36 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Input, Label, Lang, RangeInput, Toast, MaskLoading, Button} from 'bespoke-client-util'
+import {Core, Input, Label, Lang, RangeInput, Select} from 'bespoke-client-util'
 import {FetchType, GameType, Version} from '../config'
 import {ICreateParams} from '../interface'
 
 interface ICreateState {
-    readonly: boolean
-    privatePriceLimit: number
+  playersPerGroup: number,
+  rounds: number,
+  gameType: GameType,
+  version: Version,
+  a: number,
+  b: number,
+  c: number,
+  d: number,
+  eH: number,
+  eL: number,
+  s: number,
+  p: number,
+  b0: number,
+  b1: number
 }
+
+const gameTypes = [
+  {label: 'T1', value: GameType.T1},
+  {label: 'T2', value: GameType.T2},
+]
+
+const versions = [
+  {label: 'V1', value: Version.V1},
+  {label: 'V2', value: Version.V2},
+  {label: 'V3', value: Version.V3},
+]
 
 export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> {
     lang = Lang.extractLang({
@@ -17,11 +40,6 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
         version: ['版本', 'Version'],
         params: ['参数', 'Parameters']
     })
-
-    state: ICreateState = {
-        readonly: true,
-        privatePriceLimit: 100
-    }
 
     componentDidMount(): void {
         const {props: {setParams}} = this
@@ -51,35 +69,29 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
           <ul className={style.fields}>
               <li>
                   <Label label={lang.playersPerGroup}/>
-                  <Input {...{
-                      type: 'number',
-                      value: params.playersPerGroup,
-                      onChange: ({target: {value: playersPerGroup}}) => setParams({playersPerGroup: Number(playersPerGroup)})
-                  }}/>
+                  <RangeInput value={params.playersPerGroup}
+                              min={2}
+                              max={12}
+                              step={2}
+                              onChange={({target: {value: playersPerGroup}}) => setParams({playersPerGroup: Number(playersPerGroup)})}
+                  />
               </li>
               <li>
                   <Label label={lang.round}/>
-                  <Input {...{
-                      type: 'number',
-                      value: params.rounds,
-                      onChange: ({target: {value: rounds}}) => setParams({rounds: Number(rounds)})
-                  }}/>
+                  <RangeInput value={params.rounds}
+                              min={1}
+                              max={30}
+                              step={1}
+                              onChange={({target: {value: rounds}}) => setParams({rounds: Number(rounds)})}
+                  />
               </li>
               <li>
                   <Label label={lang.gameType}/>
-                  <Input {...{
-                      type: 'number',
-                      value: params.gameType,
-                      onChange: ({target: {value: gameType}}) => setParams({gameType: Number(gameType)})
-                  }}/>
+                  <Select value={params.gameType} options={gameTypes} onChange={val => setParams({gameType: +val})} />
               </li>
               <li>
                   <Label label={lang.version}/>
-                  <Input {...{
-                      type: 'number',
-                      value: params.version,
-                      onChange: ({target: {value: version}}) => setParams({version: Number(version)})
-                  }}/>
+                  <Select value={params.version} options={versions} onChange={val => setParams({version: +val})} />
               </li>
           </ul>
           <p className={style.params}>{lang.params}</p>

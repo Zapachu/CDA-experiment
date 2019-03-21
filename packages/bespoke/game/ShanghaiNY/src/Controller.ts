@@ -1,12 +1,9 @@
 import {
   BaseController,
-  baseEnum,
-  FreeStyleModel,
   IActor,
   IMoveCallback,
   TGameState,
   TPlayerState,
-  Log,
 } from 'bespoke-server'
 import nodeXlsx from 'node-xlsx'
 import {
@@ -22,7 +19,6 @@ import {
   SheetType
 } from './config'
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
-import * as dateFormat from 'dateformat'
 
 export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
   private Test: Array<any>;
@@ -58,35 +54,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
       playerState.surveyAnswers = [];
       return playerState
   }
-
-  //region play
-  // protected async teacherMoveReducer(actor: IActor, type: string, params: IMoveParams, cb?: IMoveCallback): Promise<void> {
-  //     const gameState = await this.stateManager.getGameState(),
-  //         playerStates = await this.stateManager.getPlayerStates()
-  //     switch (type) {
-  //         case MoveType.assignPosition: {
-  //             Object.values(playerStates).forEach(async playerState => {
-  //                 const positionIndex = (playerState.actor.type === baseEnum.Actor.serverRobot ?
-  //                     this.positionStack.robot : this.positionStack.player).pop()
-  //                 if (positionIndex === undefined) {
-  //                     return Log.d('角色已分配完')
-  //                 }
-  //                 playerState.positionIndex = positionIndex
-  //                 playerState.unitLists = this.game.params.phases.map(({templateName, params}) =>
-  //                     templateName === phaseNames.mainGame ? params.unitLists[positionIndex] : ''
-  //                 )
-  //                 this.push(playerState.actor, PushType.assignedPosition)
-  //             })
-  //             gameState.positionAssigned = true
-  //             break
-  //         }
-  //         case MoveType.openMarket: {
-  //             gameState.gamePhaseIndex = 1
-  //             await this.startPeriod()
-  //             break
-  //         }
-  //     }
-  // }
 
   protected async playerMoveReducer(actor: IActor, type: string, params: IMoveParams, cb: IMoveCallback): Promise<void> {
       const gameState = await this.stateManager.getGameState(),
@@ -231,31 +198,31 @@ export default class Controller extends BaseController<ICreateParams, IGameState
   async onGameOver() {
       const gameState = await this.stateManager.getGameState()
       const playerStates = await this.stateManager.getPlayerStates()
-      const {rounds} = this.game.params;
+      const {rounds,gameType} = this.game.params;
       const {groups} = gameState;
 
-      const resultData: Array<Array<any>> = [['组', '座位号', '轮次', '第一阶段选择', '第二阶段选择', '最终选择', '组内有人选1', '组内最低选择', '该轮收益', '最终收益', '专业', '年龄', '年级', '家庭住址', '性别']]
+      const choiceTerms = {
+        [Choice.One]: 1,
+        [Choice.Two]: 2,
+        [Choice.Wait]: 'wait',
+      }
+
+      const resultData: Array<Array<any>> = [['组', '座位号', '轮次', '第一阶段选择', '第二阶段选择', '最终选择', '第一阶段有人选1', '组内最低选择', '该轮收益', '最终收益', '专业', '年龄', '年级', '家庭住址', '性别']]
       const playersByGroup = Object.values(playerStates).sort((a, b) => a.groupIndex - b.groupIndex);
       playersByGroup.forEach(ps => {
         const curGroup = groups[ps.groupIndex];
         let curRound = 0;
         while(curRound < rounds) {
-          const row = curRound===0 ? [ps.groupIndex+1, ps.seatNumber, curRound+1] : ['', '', ''];
+          const row = curRound===0 ? [ps.groupIndex+1, ps.seatNumber||'-', curRound+1] : ['', '', curRound+1];
           const curChoice = ps.choices[curRound];
           if(curChoice) {
-            row.push(curChoice.c1, curChoice.c2.toString()||'-')
+            row.push(choiceTerms[curChoice.c1], curChoice.c2.toString()||'-')
             if(curGroup.mins[curRound]) {
-              row.push(curChoice.c?curChoice.c:curChoice.c1, curGroup.ones[curRound]?'yes':'no', curGroup.mins[curRound], ps.profits[curRound], ps.finalProfit)
-              if(ps.surveyAnswers.length) {
+              row.push(curChoice.c?curChoice.c:curChoice.c1, gameType===GameType.T2?(curGroup.ones[curRound]?'yes':'no'):'-', curGroup.mins[curRound], ps.profits[curRound], ps.finalProfit)
+              if(ps.surveyAnswers.length && curRound===0) {
                 row.push(...ps.surveyAnswers)
-              } else {
-                row.push('-','-','-','-','-')
               }
-            } else {
-              row.push('-','-','-','-','-','-','-','-','-','-')
             }
-          } else {
-            row.push('-','-','-','-','-','-','-','-','-','-','-','-')
           }
           resultData.push(row);
           curRound++;
