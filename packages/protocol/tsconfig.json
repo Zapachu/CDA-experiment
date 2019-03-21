@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
     "outDir": "./build",
-    "declaration": true
-  }
+    "declaration": true,
+  },
+  "include": [
+    "lib"
+  ]
 }

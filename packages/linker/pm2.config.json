@@ -1,6 +1,6 @@
 {
-  "script": "lib/game/server/server.ts",
-  "name": "elf",
+  "script": "src/server/server.ts",
+  "name": "linker",
   "env": {
     "NODE_ENV": "production",
     "PORT": 4000
