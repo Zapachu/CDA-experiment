@@ -6,12 +6,9 @@ import {gameService} from "../../../common/utils"
 
 const {wjxProxy} = settings
 
-const getNextPhaseUrl = async (wjxHash) => {
+const getNextPhaseUrl = async (wjxHash, wjxPhaseId, jidx) => {
     console.log('log > wjx hash ', wjxHash)
-    const wjxPhase: any = await ThirdPartPhase.findOne({
-        namespace: 'wjx',
-        playHash: {$elemMatch: {hash: `${wjxHash}.aspx`}}
-    })
+    const wjxPhase: any = await ThirdPartPhase.findById(wjxPhaseId)
     console.log('log > wjx phase', wjxPhase)
     const paramsJson = JSON.parse(wjxPhase.param)
     const request = {
@@ -19,6 +16,7 @@ const getNextPhaseUrl = async (wjxHash) => {
         nextPhaseKey: paramsJson.nextPhaseKey || -1,
         playerToken: paramsJson.palyerCode || wjxPhase.playHash[0].player,
         playUrl: `${wjxProxy}/init/jq/${wjxPhase._id.toString()}`,
+        phasePlayer: {uniKey: jidx}
     }
 
     return await new Promise((resolve, reject) => {

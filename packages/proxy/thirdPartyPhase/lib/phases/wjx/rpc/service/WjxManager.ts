@@ -10,9 +10,13 @@ const gen32Token = (source) => {
 }
 
 const getUrlByNamespace = async (groupId, namespace, param, owner) => {
+
     let paramJson = JSON.parse(param)
     const {wjxUrl: realWjxUrl} = paramJson
-    paramJson.wjxHash = realWjxUrl.split('/jq/')[1]
+
+    paramJson.wjxHash = realWjxUrl.split('/jq/')[1].split('.aspx')[0]
+    paramJson.adminUrl = `https://www.wjx.cn/report/${paramJson.wjxHash}.aspx`
+
     const paramString = JSON.stringify(paramJson)
     try {
         const newWjxPhase = await new ThirdPartPhase({
@@ -25,7 +29,7 @@ const getUrlByNamespace = async (groupId, namespace, param, owner) => {
         return `${wjxProxy}/init/jq/${newWjxPhase._id.toString()}`
     } catch (err) {
         if (err) {
-            console.log(err)
+            console.trace(err)
             return 'Error'
         }
     }

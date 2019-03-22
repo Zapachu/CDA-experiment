@@ -8,6 +8,7 @@ const ThirdPartPhaseSchema = new Schema({
     param: String,              // oTree param
     playHash: [                 // third party game <=> elf player
         {
+            result: String,
             hash: String,       // third party play url or hash
             player: String,     // elf player id
         }
