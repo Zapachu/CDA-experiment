@@ -73,7 +73,7 @@ export const elfSetting: IElfSetting = {
     wjxPort: 3072,
     wjxRpc: '127.0.0.1:53072',
     wjxProxy: 'http://127.0.0.1:3072',
-    wjxServer: 'https://www.wjx.cn',
+    wjxServer: 'https://www.wjx.com',
     wjxStaticNamespace: 'wjxPhase',
     // 腾讯问卷
     qqwjPort: 3073,

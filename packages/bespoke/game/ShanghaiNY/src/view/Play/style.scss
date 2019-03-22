@@ -1,7 +1,7 @@
 @import "~bespoke-client-util/lib/resource/public";
 
 .play {
-  width: calc(99vh - 2rem);
+  width: calc(99vw - 2rem);
   margin: 2rem auto 0;
 
   .display {
@@ -17,14 +17,27 @@
       color: red;
     }
   }
+
+  .choice {
+    font-size: 16px;
+    min-width: 300px;
+  }
   
   .instruction {
     font-size: 16px;
     font-style: italic;
+    margin: 20px 0 10px 0;
   }
 
   .tipWrong {
     color: red;
+  }
+
+  .resultLines {
+    font-size: 16px;
+    >p {
+      margin-bottom: 5px;
+    }
   }
 
   .seatStage {

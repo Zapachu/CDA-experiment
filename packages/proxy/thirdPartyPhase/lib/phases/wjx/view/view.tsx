@@ -17,14 +17,19 @@ export class Create extends BaseCreate<any> {
     }
 
     inputWjxUrl = (event) => {
-        this.setState({wjxUrl: event.target.value})
+        let value = event.target.value
+        this.setState({wjxUrl: event.target.value}, () => {
+            if (value.includes('.aspx') && value.includes('wjx') && value.includes('jq')) {
+                this.submitWjxUrl(value.replace(".cn", ".com").replace(".top", ".com"))
+            }
+        })
     }
 
-    submitWjxUrl = () => {
-        console.log(this.state.wjxUrl)
+    submitWjxUrl = (url) => {
+        console.log(url)
         const {props: {updatePhase, curPhase}} = this
         this.setState({isEdit: false})
-        updatePhase(curPhase.suffixPhaseKeys, {wjxUrl: this.state.wjxUrl})
+        updatePhase(curPhase.suffixPhaseKeys, {wjxUrl: url})
     }
 
     toEdit = () => this.setState({isEdit: true})
@@ -43,10 +48,10 @@ export class Create extends BaseCreate<any> {
                 <div className={style.inputTip}>输入问卷星链接</div>
                 {
                     this.state.isEdit ?
-                        <input value={curPhase.param.wjxUrl} onChange={this.inputWjxUrl}/> :
+                        <input value={this.state.wjxUrl} onChange={this.inputWjxUrl}/> :
                         <a onClick={this.toEdit}>{this.state.wjxUrl}</a>
                 }
-                <button onClick={this.submitWjxUrl}>提交</button>
+                {/*<button onClick={this.submitWjxUrl}>提交</button>*/}
             </div>
 
             <div className={style.case}>
