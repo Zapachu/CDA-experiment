@@ -30,8 +30,8 @@ export class Hash {
 }
 
 export function elfPhaseId2PlayUrl(namespace: string, phaseId: string): string {
-    const {proxyService} = setting
-    return `http://${proxyService.host}:${proxyService.port}/${config.rootName}/${namespace}/play/${phaseId}`
+    const {proxyService:{host,port}} = setting
+    return `${host.startsWith('http')?host:`http://${host}:${port}`}/${config.rootName}/${namespace}/play/${phaseId}`
 }
 
 //region setting
