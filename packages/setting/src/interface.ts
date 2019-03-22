@@ -40,6 +40,7 @@ export interface IElfSetting {
     proxyService: {
         host: string
         port: number
+        rpcHost: string
         rpcPort:number
     }
     adminMobileNumbers: Array<string>

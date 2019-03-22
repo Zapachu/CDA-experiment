@@ -49,6 +49,7 @@ export const elfSetting: IElfSetting = {
     proxyService: {
         host: '127.0.0.1',
         port: 4001,
+        rpcHost:'127.0.0.1',
         rpcPort: 54001
     },
     adminMobileNumbers: ['13000000000'],
