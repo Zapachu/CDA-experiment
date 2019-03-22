@@ -20,7 +20,7 @@ const SessionSet = {
     }),
     cookie: {
         path: '/',
-        domain: 'ancademy.org',
+        // domain: 'ancademy.org',
         maxAge: 1000 * 60 * 60 * 24 * 7
     }
 }

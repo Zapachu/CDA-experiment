@@ -1,4 +1,4 @@
-export const namespace = 'VickreyAuction2'
+export const namespace = 'TogetherBidMarket'
 
 export enum MoveType {
     enterMarket = 'enterMarket',
@@ -22,5 +22,4 @@ export enum PlayerStatus {
     won
 }
 
-export const DEAL_TIMER = 3
-export const NEW_ROUND_TIMER = 10
+export const NEW_ROUND_TIMER = 3

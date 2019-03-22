@@ -3,9 +3,15 @@ syntax = "proto3";
 message CreateParams {
     int32 round = 1;
     int32 groupSize = 2;
-    int32 startingPrice = 3;
-    repeated string privatePrice = 4;
-    string nextPhaseKey = 5;
+    int32 commonValue = 3;
+    message Position {
+        repeated int32 privatePrice = 1;
+    }
+    repeated int32 privatePrice = 4;
+    int32 deviation = 5;
+    int32 mode = 6;
+    string nextPhaseKey = 7;
+    repeated Position positions = 8;
 }
 
 message MoveParams {
@@ -23,9 +29,13 @@ message GameState {
         message Round {
             repeated int32 playerStatus = 1;
         }
+        message Result {
+            int32 winnerPosition = 1;
+        }
         int32 roundIndex = 1;
         repeated Round rounds = 2;
         int32 playerNum = 3;
+        repeated Result result = 4;
     }
     repeated Group groups = 1;
 }
