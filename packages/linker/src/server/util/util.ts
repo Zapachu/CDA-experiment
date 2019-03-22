@@ -1,8 +1,8 @@
 import {config} from '@common'
 import {colorConsole, dailyfile} from 'tracer'
 import * as objHash from 'object-hash'
-import {elfSetting} from "elf-setting"
-import {resolve} from "path"
+import {elfSetting} from 'elf-setting'
+import {resolve} from 'path'
 
 export const inProductEnv = process.env.NODE_ENV === 'production'
 export const webpackHmr = process.env.HMR === 'true'
@@ -28,6 +28,7 @@ export class Hash {
     }
 }
 
-export function buildPlayUrl(groupId:string, playerToken:string) {
-    return `${elfSetting.linkerGatewayHost}/${config.rootName}/play/${groupId}?token=${playerToken}`
+export function buildPlayUrl(groupId: string, playerToken: string) {
+    const {linkerGatewayHost: host, linkerPort: port} = elfSetting
+    return `${host.startsWith('http') ? host : `http://${host}:${port}`}/${config.rootName}/play/${groupId}?token=${playerToken}`
 }
