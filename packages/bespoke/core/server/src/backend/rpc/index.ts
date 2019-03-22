@@ -20,7 +20,7 @@ function registerPhases() {
         phases: [{
             type:PhaseManager.PhaseType.bespoke,
             namespace: setting.namespace,
-            jsUrl: `http://${p.host}:${p.port}/${config.rootName}/static/bespoke-client-util.min.js;http://${p.host}:${p.port}${getClientPath()}`,
+            jsUrl: `${p.host.startsWith('http')?p.host:`http://${p.host}:${p.port}`}/${config.rootName}/static/bespoke-client-util.min.js;http://${p.host}:${p.port}${getClientPath()}`,
             rpcUri: `${host}:${rpcPort}`
         }]
     }, err => err && Log.e(err))
