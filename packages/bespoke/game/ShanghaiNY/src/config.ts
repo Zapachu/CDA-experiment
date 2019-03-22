@@ -16,7 +16,6 @@ export enum GameType {
 }
 
 export enum Choice {
-  OK = -2,
   Wait = -1,
   One = 1,
   Two = 2

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {Button, ButtonProps, Core, Lang, RadioGroup, Select} from 'bespoke-client-util'
+import {Button, ButtonProps, Core, Lang, RadioGroup, Select, Input} from 'bespoke-client-util'
 import {FetchType, MoveType, PushType, Survey} from '../../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
 
@@ -45,7 +45,7 @@ export default class SurveyStage extends Core.Play<ICreateParams, IGameState, IP
             {s.options.length > 10
               ? <Select value={answers[i] || ''}
                         placeholder={'please choose'}
-                        style={{width:'150px'}} 
+                        style={{width:'150px',margin:'10px'}} 
                         options={s.options}
                         onChange={value => this.answer(value as string, i)} 
                 />
@@ -58,7 +58,7 @@ export default class SurveyStage extends Core.Play<ICreateParams, IGameState, IP
         }
         return <li key={i}>
           <p>{i+1}. {s.title}</p>
-          <input value={answers[i] || ''} onChange={({target:{value}}) => this.answer(value, i)} />
+          <Input value={answers[i] || ''} onChange={({target:{value}}) => this.answer(value, i)}/>
         </li>
       })}
       </ul>

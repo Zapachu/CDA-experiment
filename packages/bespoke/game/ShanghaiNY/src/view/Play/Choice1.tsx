@@ -1,6 +1,7 @@
 import * as React from 'react'
+import * as style from './style.scss'
 import {GameType, Choice, Version} from '../../config'
-
+import {Radio} from 'bespoke-client-util'
 
 interface PropsType {
   c1: number,
@@ -11,29 +12,17 @@ interface PropsType {
 }
 
 const Choice1: React.FunctionComponent<PropsType> = ({c1, onChoose, gameType, version, d=0}) => {
-  return <div>
+  const options = gameType===GameType.T1
+    ? [{label: '选1', value: Choice.One}, {label: '选2', value: Choice.Two}]
+    : version===Version.V2
+      ? [{label: '选1', value: Choice.One}, {label: '选2', value: Choice.Two}, {label: '等待', value: Choice.Wait}]
+      : [{label: '选1', value: Choice.One}, {label: '等待', value: Choice.Wait}]
+  return <div className={style.choice}>
     <p>第一阶段: 你的选择 {d>0 ? `(若在下一轮改选1，需要付出修改费${d}元)` : ''}</p>
-    <input type="radio" id="c1-1" checked={c1===Choice.One} onChange={() => onChoose(Choice.One)} />
-    <label htmlFor={'c1-1'}>选1</label>
-    {gameType===GameType.T1
-      ? <>
-        <input type="radio" id="c1-2" checked={c1===Choice.Two} onChange={() => onChoose(Choice.Two)} />
-        <label htmlFor={'c1-2'}>选2</label>
-      </>
-      : version===Version.V2
-          ? <>
-            <input type="radio" id="c1-2" checked={c1===Choice.Two} onChange={() => onChoose(Choice.Two)} />
-            <label htmlFor={'c1-2'}>选2</label>
-          </>
-          : null
-    }
-    {gameType===GameType.T2
-      ? <>
-        <input type="radio" id="c1-3" checked={c1===Choice.Wait} onChange={() => onChoose(Choice.Wait)} />
-        <label htmlFor={'c1-3'}>等待</label>
-      </>
-      : null
-    }
+    <Radio  value={c1} 
+            options={options} 
+            onChange={val => onChoose(val as number)} 
+    />
   </div>
 }
 
