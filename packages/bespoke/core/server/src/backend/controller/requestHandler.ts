@@ -3,7 +3,7 @@ import {Request, Response} from 'express'
 import * as passport from 'passport'
 import {Log, RedisKey, redisClient, Hash, inProductEnv, setting} from '../util'
 import {GameModel, UserModel, UserDoc, MoveLogModel, SimulatePlayerModel} from '../model'
-import {AnyController, GameLogic} from '../manager/logicManager'
+import {AnyController, GameLogic} from '../service/GameLogic'
 import GameDAO from '../service/GameDAO'
 import UserService from '../service/UserService'
 import * as fs from 'fs'
@@ -112,7 +112,7 @@ export class GameCtrl {
         try {
             let game = await GameDAO.getGame(gameId)
             if (!user || user._id.toString() !== game.owner) {
-                game = (await GameLogic.instance.getGameController(gameId)).getGame4Player()
+                game = (await GameLogic.getGameController(gameId)).getGame4Player()
             }
             res.json({
                 code: baseEnum.ResponseCode.success,
@@ -293,9 +293,9 @@ export class GameCtrl {
         const {params: {gameId}} = req
         if (gameId) {
             const game = await GameDAO.getGame(gameId)
-            controller = await GameLogic.instance.getGameController(game.id)
+            controller = await GameLogic.getGameController(game.id)
         } else {
-            controller = GameLogic.instance.getNamespaceController()
+            controller = GameLogic.namespaceController
         }
         await controller.handleFetch(req, res)
     }

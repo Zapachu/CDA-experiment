@@ -1,52 +1,74 @@
-import * as React from 'react'
+import React, {FunctionComponent, Fragment, useState, useEffect} from 'react'
 import * as style from './style.scss'
 import {Api, Lang} from '@client-util'
 import {RouteComponentProps} from 'react-router'
-import {IGameWithId} from '@common'
-import {Button, List} from '@antd-component'
-import {Link} from 'react-router-dom'
-import {Title} from '@client-component'
+import {baseEnum, IGameWithId, IUserWithId} from '@common'
+import {Button, Icon, List, Pagination} from '@antd-component'
+import {Breadcrumb} from '@client-component'
 
 const {Item: ListItem} = List, {Meta: ListItemMeta} = ListItem
 
-interface IGameListState {
-    gameList: Array<IGameWithId>
-}
-
-export class GameList extends React.Component<RouteComponentProps<{}>, IGameListState> {
-    lang = Lang.extractLang({
-        createdGames: ['已创建实验', 'Created games'],
+export const GameList: FunctionComponent<RouteComponentProps & { user: IUserWithId }> = ({history, user}) => {
+    if (user.role === baseEnum.AcademusRole.student) {
+        history.push('/join')
+        return null
+    }
+    const lang = Lang.extractLang({
+        join: ['快速加入', 'Join'],
         create: ['创建', 'CREATE'],
-        view: ['查看', 'VIEW'],
         title: ['标题', 'Title'],
         desc: ['详情', 'Description'],
         cancel: ['取消', 'Cancel'],
         submit: ['提交', 'Submit'],
         published: ['已发布', 'Published'],
-        unpublished: ['未发布', 'Unpublished'],
+        unpublished: ['未发布', 'Unpublished']
     })
+    const [count, setCount] = useState(0)
+    const [gameList, setGameList] = useState<Array<IGameWithId>>([])
+    useEffect(() => fetchPage(0), [])
 
-    state: IGameListState = {
-        gameList: [],
+    function fetchPage(page: number) {
+        Api.getGameList(page).then(({gameList, count}) => {
+            setCount(count)
+            setGameList(gameList)
+        })
     }
 
-    async componentDidMount() {
-        const {gameList} = await Api.getGameList()
-        this.setState({gameList})
-    }
-
-    render(): React.ReactNode {
-        const {lang, state: {gameList}, props: {history}} = this
-        return <section className={style.gameList}>
-            <Title label={lang.createdGames}/>
-            <div className={style.createBtnWrapper}>
-                <Button type={'primary'} onClick={() => history.push('/baseInfo')}>{lang.create}</Button>
-            </div>
-            <List dataSource={gameList}
-                  renderItem={game => <ListItem actions={[<Link to={`/info/${game.id}`}>{lang.view}</Link>]}>
-                      <ListItemMeta title={game.title} description={game.desc}/>
-                      <div className={game.published?style.publishedStatus:''}>{game.published?lang.published:lang.unpublished}</div>
-                  </ListItem>}/>
-        </section>
-    }
+    return <section className={style.gameList}>
+        <Breadcrumb history={history} links={[
+            {label: lang.join, to: `/join`}
+        ]}/>
+        <List
+            grid={{gutter: 24, xl: 4, md: 3, sm: 2, xs: 1}}
+            dataSource={[{}].concat(gameList)}
+            renderItem={({id, title, desc, published}) => <ListItem key={id}>
+                <section
+                    className={style.gameItem}
+                    onClick={() => history.push(id ? `/info/${id}` : '/baseInfo')}>
+                    {
+                        id ? <Fragment>
+                                <ListItemMeta title={title}
+                                              description={desc.slice(0, 50) + (desc.length > 50 ? '...' : '')}/>
+                                <label style={{color: published ? 'green' : ''}}>{
+                                    published ? lang.published : lang.unpublished
+                                }</label>
+                            </Fragment> :
+                            <Button type="dashed" className={style.btnAdd}
+                                    onClick={() => {
+                                    }}>
+                                <Icon type="plus"/> {lang.create}
+                            </Button>
+                    }
+                </section>
+            </ListItem>}>
+        </List>
+        <Pagination {...{
+            total: count,
+            pageSize: 11,
+            onChange: page => fetchPage(page - 1),
+            style: {
+                textAlign: 'center'
+            }
+        }}/>
+    </section>
 }

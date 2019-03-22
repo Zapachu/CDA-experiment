@@ -65,7 +65,6 @@ typings/
 .vscode
 
 # temp
-package-lock.json
 build
 dist
 log

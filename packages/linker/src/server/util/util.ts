@@ -1,7 +1,7 @@
 import {config} from '@common'
 import {colorConsole, dailyfile} from 'tracer'
 import * as objHash from 'object-hash'
-import setting from "../config/settings"
+import {elfSetting} from "elf-setting"
 import {resolve} from "path"
 
 export const inProductEnv = process.env.NODE_ENV === 'production'
@@ -29,5 +29,5 @@ export class Hash {
 }
 
 export function buildPlayUrl(groupId:string, playerToken:string) {
-    return `${setting.localRootUrl}/${config.rootName}/${config.appPrefix}/group/play/${groupId}?token=${playerToken}`
+    return `${elfSetting.linkerGatewayHost}/${config.rootName}/play/${groupId}?token=${playerToken}`
 }

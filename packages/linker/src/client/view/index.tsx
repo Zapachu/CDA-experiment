@@ -1,7 +1,7 @@
-import * as React from 'react'
-import {BrowserRouter} from 'react-router-dom'
-import {config} from '@common'
-import {TRootContext, rootContext} from '@client-context'
+import React, {useEffect, useState} from 'react'
+import {BrowserRouter, RouteComponentProps} from 'react-router-dom'
+import {config, IUserWithId} from '@common'
+import {rootContext} from '@client-context'
 import {Loading} from '@client-component'
 import {Api} from '@client-util'
 import {Route, Switch} from 'react-router'
@@ -18,42 +18,34 @@ import {BaseInfo} from './BaseInfo'
 import {CreateInFrame} from './CreateInFrame'
 import * as style from './initial.scss'
 
-declare interface IRootState extends TRootContext {
-}
+export const Root: React.FunctionComponent = () => {
+    const [user, setUser] = useState<IUserWithId>()
 
-export class Root extends React.Component<{}, IRootState> {
-    state: IRootState = {}
-
-    async componentDidMount() {
-        const {user} = await Api.getUser()
-        this.setState({
-            user
-        })
-    }
-
-    render(): React.ReactNode {
-        const {state: {user}} = this
-        return user ? <section className={style.rootView}>
+    useEffect(() => {
+        Api.getUser().then(({user}) => setUser(user))
+    }, [])
+    return user ?
+        <section className={style.rootView}>
             <rootContext.Provider value={{user}}>
                 <div className={style.languageSwitcherWrapper}>
                     {/*<LanguageSwitcher/>*/}
                 </div>
-                <BrowserRouter basename={`${config.rootName}/${config.appPrefix}`}>
+                <BrowserRouter basename={config.rootName}>
                     <Switch>
                         <Route path={'/createInFrame'} component={CreateInFrame}/>
                         <Route path={'/baseInfo/:gameId'} component={withSideNav(BaseInfo, NAV.basic)}/>
                         <Route path={'/baseInfo'} component={withSideNav(BaseInfo, NAV.basic)}/>
                         <Route path={'/phase/:gameId'} component={withSideNav(Phase, NAV.group)}/>
                         <Route path={'/share/:gameId'} component={Share}/>
-                        <Route path={'/join/:gameId'} component={Join}/>
+                        <Route path={'/join'} component={Join}/>
                         <Route path={'/info/:gameId'} component={Info}/>
                         <Route path={'/configuration/:gameId'} component={Configuration}/>
                         <Route path={'/play/:gameId'} component={Play}/>
                         <Route path={'/player/:gameId'} component={PlayerList}/>
-                        <Route path={'/*'} component={GameList}/>
+                        <Route path={'/*'} component={(props: RouteComponentProps) =>
+                            <GameList {...props} {...{user}}/>}/>
                     </Switch>
                 </BrowserRouter>
             </rootContext.Provider>
         </section> : <Loading/>
-    }
 }

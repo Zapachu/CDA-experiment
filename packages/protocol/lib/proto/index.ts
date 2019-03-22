@@ -1,7 +1,6 @@
 import {loadPackageDefinition, credentials, Server} from 'grpc'
 import {loadSync} from '@grpc/proto-loader'
 import {resolve} from 'path'
-
 import {ICheckShareCodeReq, ICheckShareCodeRes} from './AcademusBespoke'
 import {proto} from './BespokeProxy'
 import {
@@ -15,7 +14,7 @@ import {
     ISendBackPlayerReq,
     ISendBackPlayerRes,
     SendBackPlayerReq
-} from './phaseManager'
+} from './PhaseManager'
 
 export namespace AcademusBespoke {
     let protoDef = loadPackageDefinition(loadSync(resolve(__dirname, './AcademusBespoke.proto'))) as any
@@ -82,17 +81,8 @@ export namespace PhaseManager {
         server.addService(protoDef.PhaseService.service, phaseService)
     }
 
-    let phaseService: TPhaseServiceConsumer
-
     export function getPhaseService(serviceURI: string): TPhaseServiceConsumer {
-        if (!phaseService) {
-            try {
-                phaseService = new protoDef.PhaseService(serviceURI, credentials.createInsecure())
-            } catch (e) {
-                console.error(e)
-            }
-        }
-        return phaseService
+        return new protoDef.PhaseService(serviceURI, credentials.createInsecure())
     }
 
     export type TRegisterPhasesReq = IRegisterPhasesReq

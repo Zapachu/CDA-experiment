@@ -25,16 +25,22 @@ export enum AcademusRole {
 }
 
 export enum SocketEvent {
+    //region baseEvent
     connection = 'connection',
     disconnect = 'disconnect',
     online = 'online',
     move = 'move',
     push = 'push',
     sendBack = 'sendBack',
-    syncGameState = 'sGS',
-    changeGameState = 'cGS',
-    syncPlayerState = 'sPS',
-    changePlayerState = 'cPS',
+    //endregion
+    //region stateEvent
+    syncGameState_json = 'SGJ',
+    syncPlayerState_json = 'SPJ',
+    changeGameState_diff = 'CGD',
+    changePlayerState_diff = 'CPD',
+    syncGameState_msgpack = 'SGM',
+    syncPlayerState_msgpack = 'SPM',
+    //endregion
 }
 
 export enum CoreMove {
@@ -298,4 +304,10 @@ export enum NationCode {
 export enum ThirdPartyLib {
     egret,
     phaser,
+}
+
+export enum SyncStrategy {
+    default,
+    msgPack,
+    diff
 }

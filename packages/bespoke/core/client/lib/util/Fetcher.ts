@@ -6,7 +6,7 @@ export class Fetcher<FetchType> {
     }
 
     buildGetUrl(type: FetchType, params = {}): string {
-        return buildUrl('/game/pass2Game/:gameId', {gameId: this.gameId}, {type, ...params}, this.namespace)
+        return buildUrl('/pass2Game/:gameId', {gameId: this.gameId}, {type, ...params}, this.namespace)
     }
 
     getFromGame(type: FetchType, params = {}) {

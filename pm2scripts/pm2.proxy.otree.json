@@ -1,0 +1,9 @@
+{
+  "script": "../packages/proxy/thirdPartyPhase/lib/phases/otree/server/app.ts",
+  "name": "proxyotree",
+  "env": {
+    "NODE_ENV": "production",
+    "PORT": 3070
+  },
+  "log_date_format": "YYYY-MM-DD HH:mm Z"
+}

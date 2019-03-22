@@ -6,7 +6,7 @@ import {
     IBaseGameWithId,
     IUserWithId,
     TApiGroupPlayers,
-    IGameToUpdate
+    IGameToUpdate, IPhaseConfig
 } from '@common'
 import {getCookie} from '@client-util'
 import * as queryString from 'query-string'
@@ -86,8 +86,8 @@ export class Request {
         return await GET('/game/getPlayers/:gameId', {gameId})
     }
 
-    static async getGameList(): Promise<IHttpRes & { gameList: Array<IGameWithId> }> {
-        return await GET('/game/list')
+    static async getGameList(page: number = 0): Promise<IHttpRes & { gameList: Array<IGameWithId>, count: number }> {
+        return await GET('/game/list', {}, {page})
     }
 
     static async getPhaseTemplates(): Promise<IHttpRes & {
@@ -96,11 +96,11 @@ export class Request {
         return await GET('/game/phaseTemplates')
     }
 
-    static async postNewGame(title: string, desc: string, mode: string): Promise<IHttpRes & {
+    static async postNewGame(title: string, desc: string, mode: baseEnum.GameMode, phaseConfigs?: Array<IPhaseConfig<{}>>): Promise<IHttpRes & {
         gameId: string
     }> {
         return await POST('/game/create', null, null, {
-            title, desc, mode
+            title, desc, mode, phaseConfigs
         })
     }
 
@@ -121,7 +121,7 @@ export class Request {
     }
 
     static async getRewarded(playerId: string): Promise<IHttpRes & { reward: string }> {
-        return await GET('/game/rewarded', null,{playerId})
+        return await GET('/game/rewarded', null, {playerId})
     }
 
     /**** V5 ****/

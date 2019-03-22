@@ -1,5 +1,5 @@
 import {ThirdPartPhase} from '../../../../core/server/models'
-import settings from '../../../../config/settings'
+import {elfSetting as settings} from 'elf-setting'
 import {PhaseManager} from 'elf-protocol'
 import * as objectHash from 'object-hash'
 

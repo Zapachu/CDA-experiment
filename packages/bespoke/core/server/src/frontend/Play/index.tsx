@@ -10,6 +10,7 @@ import {
     IActor,
     IGameWithId
 } from 'bespoke-common'
+import {decode} from 'msgpack-lite'
 import {MaskLoading, Lang, Api, Fetcher} from 'bespoke-client-util'
 import {connCtx, rootContext, TRootCtx} from '../context'
 import {connect} from 'socket.io-client'
@@ -68,24 +69,17 @@ export class Play extends React.Component<TRootCtx & RouteComponentProps<{ gameI
     }
 
     private registerStateReducer(socketClient: TSocket) {
-        socketClient.on(baseEnum.SocketEvent.syncGameState, (gameState: TGameState<{}>) => {
+        socketClient.on(baseEnum.SocketEvent.syncGameState_json, (gameState: TGameState<{}>) => {
             this.setState({gameState})
         })
-        socketClient.on(baseEnum.SocketEvent.changeGameState, (stateChanges: Array<Diff<any>>) => {
+        socketClient.on(baseEnum.SocketEvent.changeGameState_diff, (stateChanges: Array<Diff<any>>) => {
             let gameState = cloneDeep(this.state.gameState) || {} as any
             stateChanges.forEach(change => applyChange(gameState, null, change))
             this.setState({gameState})
         })
-        socketClient.on(baseEnum.SocketEvent.syncPlayerState, (playerState: TPlayerState<{}>, token?: string) => {
-            const {state: {playerStates}} = this
-            token ? this.setState({
-                playerStates: {
-                    ...playerStates,
-                    [token]: playerState
-                }
-            }) : this.setState({playerState})
-        })
-        socketClient.on(baseEnum.SocketEvent.changePlayerState, (stateChanges: Array<Diff<any>>, token?: string) => {
+        socketClient.on(baseEnum.SocketEvent.syncPlayerState_json,
+            (playerState: TPlayerState<{}>, token?: string) => this.applyPlayerState(playerState, token))
+        socketClient.on(baseEnum.SocketEvent.changePlayerState_diff, (stateChanges: Array<Diff<any>>, token?: string) => {
             const {state: {playerStates}} = this
             let playerState: TPlayerState<{}> = cloneDeep(token ? playerStates[token] : this.state.playerState) || {} as any
             stateChanges.forEach(change => applyChange(playerState, null, change))
@@ -96,11 +90,27 @@ export class Play extends React.Component<TRootCtx & RouteComponentProps<{ gameI
                 }
             }) : this.setState({playerState})
         })
+        socketClient.on(baseEnum.SocketEvent.syncGameState_msgpack, (gameStateBuffer: Array<number>) => {
+            console.log(gameStateBuffer.length/JSON.stringify(decode(gameStateBuffer)).length)
+            this.setState({gameState: decode(gameStateBuffer)})
+        })
+        socketClient.on(baseEnum.SocketEvent.syncPlayerState_msgpack,
+            (playerStateBuffer: Array<number>, token?: string) => this.applyPlayerState(decode(playerStateBuffer), token))
         socketClient.on(baseEnum.SocketEvent.sendBack, (sendBackUrl: string) => {
             setTimeout(() => {
                 location.href = sendBackUrl
             }, 1000)
         })
+    }
+
+    applyPlayerState(playerState: TPlayerState<{}>, token?: string) {
+        const {state: {playerStates}} = this
+        token ? this.setState({
+            playerStates: {
+                ...playerStates,
+                [token]: playerState
+            }
+        }) : this.setState({playerState})
     }
 
     render(): React.ReactNode {

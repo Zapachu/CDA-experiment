@@ -7,9 +7,10 @@ import {WebpackHmr} from '../util/WebpackHmr'
 import {PlayerService} from '../service/PlayerService'
 
 const SECONDS_PER_DAY = 86400
+const DEFAULT_PAGE_SIZE = 11
 
 export class UserCtrl {
-    static async renderApp(req: Express.Request, res: Response, next: NextFunction) {
+    static async renderApp(req: Request, res: Response, next: NextFunction) {
         WebpackHmr.sendIndexHtml(res, next)
     }
 
@@ -29,10 +30,11 @@ export class UserCtrl {
             return next()
         }
         const player = await PlayerService.findPlayerId(gameId, userId)
+        console.log(player)
         if (player) {
             return next()
         }
-        res.redirect(`/${config.rootName}/${config.appPrefix}/group/info/${gameId}`)
+        res.redirect(`/${config.rootName}/info/${gameId}`)
     }
 
     static getUser(req, res: Response) {
@@ -60,12 +62,13 @@ export class GameCtrl {
     }
 
     static async saveNewGame(req: Request, res: Response) {
-        const {body: {title, desc, mode}, user: {id: owner}} = req
+        const {body: {title, desc, mode, phaseConfigs}, user: {id: owner}} = req
         const gameId = await GameService.saveGame({
             owner,
             title,
             desc,
-            mode
+            mode,
+            ...(phaseConfigs ? {phaseConfigs} : {})
         })
         res.json({
             code: baseEnum.ResponseCode.success,
@@ -83,10 +86,11 @@ export class GameCtrl {
     }
 
     static async getGameList(req: Request, res: Response) {
-        const {user: {_id}} = req
-        const gameList = await GameService.getGameList(_id)
+        const {user: {_id}, query: {page = 0, pageSize = DEFAULT_PAGE_SIZE}} = req
+        const {count, gameList} = await GameService.getGameList(_id, +page, +pageSize)
         res.json({
             code: baseEnum.ResponseCode.success,
+            count,
             gameList
         })
     }
@@ -179,15 +183,15 @@ export class GameCtrl {
         }
     }
 
-    static async getRewardedMoney(req: Request, res: Response){
-        const {query:{playerId}} = req
-        try{
+    static async getRewardedMoney(req: Request, res: Response) {
+        const {query: {playerId}} = req
+        try {
             const {reward} = await PlayerModel.findById(playerId)
             res.json({
                 code: baseEnum.ResponseCode.success,
                 reward
             })
-        }catch (e) {
+        } catch (e) {
             res.json({
                 code: baseEnum.ResponseCode.notFound
             })

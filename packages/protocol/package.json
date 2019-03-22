@@ -1,16 +1,14 @@
 {
   "name": "elf-protocol",
   "version": "1.0.0",
-  "main": "lib/index.ts",
-  "types": "lib/index.ts",
-  "dependencies": {
-    "@grpc/proto-loader": "^0.4.0",
-    "elf-setting": "^1.0.0",
-    "grpc": "^1.18.0"
+  "main": "build/index",
+  "types": "build/index",
+  "scripts": {
+    "install": "tsc && ts-node ./bin/copyDTS.ts"
   },
   "devDependencies": {
-    "@types/mongoose": "^5.3.20",
-    "bcrypt-nodejs": "0.0.3",
-    "mongoose": "^5.4.17"
+    "elf-setting": "^1.0.0",
+    "typescript": "^3.3.3333",
+    "ts-node": "^8.0.3"
   }
 }

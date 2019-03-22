@@ -98,19 +98,19 @@ export class Request {
     }
 
     async getFromNamespace(namespace: string, type: string, params: {}) {
-        return await this.get_nsp(namespace, `/game/pass2Namespace`, null, {type, ...params})
+        return await this.get_nsp(namespace, `/pass2Namespace`, null, {type, ...params})
     }
 
     async postToNamespace(namespace: string, type: string, params: {}) {
-        return await this.post_nsp(namespace, `/game/pass2Namespace`, null, {type, ...params})
+        return await this.post_nsp(namespace, `/pass2Namespace`, null, {type, ...params})
     }
 
     async getFromGame(namespace: string, gameId: string, type: string, params: {}) {
-        return await this.get_nsp(namespace, `/game/pass2Game/:gameId`, {gameId}, {type, ...params})
+        return await this.get_nsp(namespace, `/pass2Game/:gameId`, {gameId}, {type, ...params})
     }
 
     async postToGame(namespace: string, gameId: string, type: string, params: {}) {
-        return await this.post_nsp(namespace, `/game/pass2Game/:gameId`, {gameId}, {type, ...params})
+        return await this.post_nsp(namespace, `/pass2Game/:gameId`, {gameId}, {type, ...params})
     }
 
     //endregion

@@ -5,7 +5,7 @@ import {Api, connCtx, Lang} from '@client-util'
 import {RouteComponentProps} from 'react-router'
 import {Button, Card, message} from '@antd-component'
 import {rootContext, TRootContext} from '@client-context'
-import {Breadcrumb, Loading} from '@client-component'
+import {Loading} from '@client-component'
 
 declare interface IInfoState {
     loading: boolean
@@ -15,12 +15,11 @@ declare interface IInfoState {
 @connCtx(rootContext)
 export class Info extends React.Component<TRootContext & RouteComponentProps<{ gameId: string }>, IInfoState> {
     lang = Lang.extractLang({
-        back2Game: ['返回实验', 'Back to game'],
         enterPlayRoom: ['进入实验', 'Enter play room'],
         joinGroup: ['加入实验', 'Join Game'],
         joinSuccess: ['加入成功，即将进入实验房间', 'Join success, enter to play room now'],
         share: ['分享', 'Share'],
-        playerList: ['玩家列表', 'PlayerList'],
+        playerList: ['玩家列表', 'PlayerList']
     })
 
     state: IInfoState = {
@@ -42,22 +41,22 @@ export class Info extends React.Component<TRootContext & RouteComponentProps<{ g
             return <Loading/>
         }
         const btn4Teacher = <ul>
-            <li>
-                <Button type={'primary'}
-                    block={true}
-                    onClick={() => history.push(`/play/${game.id}`)}>{lang.enterPlayRoom}</Button>
-            </li>
-            <li>
-                <Button type={'primary'}
-                    block={true}
-                    onClick={() => history.push(`/player/${game.id}`)}>{lang.playerList}</Button>
-            </li>
-            <li>
-                <Button type={'primary'}
-                    block={true}
-                    onClick={() => history.push(`/share/${game.id}`)}>{lang.share}</Button>
-            </li>
-        </ul> ,
+                <li>
+                    <Button type={'primary'}
+                            block={true}
+                            onClick={() => history.push(`/play/${game.id}`)}>{lang.enterPlayRoom}</Button>
+                </li>
+                <li>
+                    <Button type={'primary'}
+                            block={true}
+                            onClick={() => history.push(`/player/${game.id}`)}>{lang.playerList}</Button>
+                </li>
+                <li>
+                    <Button type={'primary'}
+                            block={true}
+                            onClick={() => history.push(`/share/${game.id}`)}>{lang.share}</Button>
+                </li>
+            </ul>,
             btn4Student = <Button
                 type={'primary'}
                 onClick={async () => {
@@ -68,15 +67,12 @@ export class Info extends React.Component<TRootContext & RouteComponentProps<{ g
                     }
                 }}>{lang.joinGroup}</Button>
         return <section className={style.groupInfo}>
-            <Breadcrumb history={history} links={user.role === baseEnum.AcademusRole.teacher ? [
-                {label: lang.back2Game, to: `/baseInfo/${game.id}`}
-            ] : []}/>
             <Card title={game.title}>
                 {game.desc}
             </Card>
             <div className={style.buttonWrapper}>
                 {
-                    user.role === baseEnum.AcademusRole.teacher ? btn4Teacher : btn4Student
+                    user.id === game.owner ? btn4Teacher : btn4Student
                 }
             </div>
         </section>

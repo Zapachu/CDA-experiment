@@ -3,7 +3,7 @@ import * as qiniu from 'qiniu'
 import {BaseController, IActor, IMoveCallback, Log, setting as coreSetting} from 'bespoke-server'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
 import {FetchType, MoveType, PushType, qiniuTokenLifetime} from './config'
-import setting from './config/setting'
+import {elfSetting} from 'elf-setting'
 
 const {qiNiu} = coreSetting
 
@@ -30,7 +30,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             }
             case MoveType.recognize: {
                 request.post({
-                    uri: setting.ocpApim.gateWay,
+                    uri: elfSetting.ocpApim.gateWay,
                     qs: {
                         returnFaceId: true,
                         returnFaceLandmarks: true,
@@ -41,7 +41,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     }),
                     headers: {
                         'Content-Type': 'application/json',
-                        'Ocp-Apim-Subscription-Key': setting.ocpApim.subscriptionKey
+                        'Ocp-Apim-Subscription-Key': elfSetting.ocpApim.subscriptionKey
                     }
                 }, (error, response, body) => {
                     if (error) {

@@ -15,7 +15,7 @@ import {Log, redisClient, setting, initSetting, QCloudSMS} from './util'
 import {baseEnum, config, ISetting} from 'bespoke-common'
 import {EventDispatcher} from './controller/eventDispatcher'
 import {rootRouter, namespaceRouter} from './controller/requestRouter'
-import {GameLogic, ILogicTemplate} from './manager/logicManager'
+import {GameLogic, ILogicTemplate} from './service/GameLogic'
 import {serve as serveRPC, getProxyService} from './rpc'
 import {AddressInfo} from 'net'
 import {UserDoc, UserModel} from './model'
@@ -119,15 +119,15 @@ export class Server {
         this.initMongo()
         this.initPassPort()
         QCloudSMS.init()
-        GameLogic.initInstance(logicTemplate)
+        GameLogic.init(logicTemplate)
         const {port} = setting,
             express = this.initExpress()
         this.bindServerListener(EventDispatcher.startGameSocket(express.listen(port)), port, () => {
             Log.i(`CreateGame：http://127.0.0.1:${port}/${config.rootName}/${setting.namespace}/create`)
-            if (!setting.proxyService) {
+            if (!gameSetting.withProxy) {
                 return
             }
-            if (setting.elfGameServiceUri) {
+            if (setting.withLinker) {
                 serveRPC()
             }
             const heartBeat2Proxy = () => {
@@ -136,7 +136,7 @@ export class Server {
                     err => err ? Log.w(`注册至代理失败，${config.gameRegisterInterval}秒后重试`) : null)
                 setTimeout(() => heartBeat2Proxy(), config.gameRegisterInterval)
             }
-            setTimeout( () => heartBeat2Proxy(), .5 * config.gameRegisterInterval)
+            setTimeout(() => heartBeat2Proxy(), .5 * config.gameRegisterInterval)
         })
         return express
     }
