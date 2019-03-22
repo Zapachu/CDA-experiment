@@ -6,7 +6,7 @@ import {gameService} from "../../../common/utils"
 import {elfSetting as settings} from 'elf-setting'
 const {oTreeProxy} = settings
 
-const rewriteResBuffers = async (proxyRes, req, res) => {
+export const rewriteResBuffers = async (proxyRes, req, res) => {
 
     const isEnd = req.url.includes('OutOfRangeNotification')  // 是否结束标志
     const otreeParticipantUrl = 'InitializeParticipant/'      // 初始化的标志
@@ -59,8 +59,4 @@ const rewriteResBuffers = async (proxyRes, req, res) => {
             }
         }
     }
-}
-
-export {
-    rewriteResBuffers
 }

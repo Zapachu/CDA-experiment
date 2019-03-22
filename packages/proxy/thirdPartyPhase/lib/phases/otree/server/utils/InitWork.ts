@@ -1,14 +1,12 @@
-'use strict'
-
+import {Request, Response, NextFunction} from 'express'
 import {ErrorPage} from '../../../common/utils'
 import ListMap from '../utils/ListMap'
 import {ThirdPartPhase} from '../../../../core/server/models'
-import {elfSetting as settings} from 'elf-setting'
+import {elfSetting as elfSetting} from 'elf-setting'
+import {virtualJsRoute} from '../config'
 
-const {oTreeProxy} = settings
-
-const InitWork = (app) => {
-    app.use(async (req, res, next) => {
+export const InitWork = (app) => {
+    app.use(async (req:Request, res:Response, next:NextFunction) => {
         console.log(req.url)
         const originWrite = res.write
         const originEnd = res.end
@@ -20,10 +18,8 @@ const InitWork = (app) => {
         }
 
         const noRes = () => {
-            res.write = () => {
-            }
-            res.end = () => {
-            }
+            res.write = () => true
+            res.end = () => null
         }
 
         noRes()
@@ -31,12 +27,16 @@ const InitWork = (app) => {
         const isGetOtreeList = req.url.includes('/phases/list')   // 获取许可列表
         const otreeParticipantUrl = 'InitializeParticipant/'      // 初始化的标志
 
+        if(req.url.includes(virtualJsRoute)){
+            okRes()
+            res.setHeader('Content-Type', 'text/javascript')
+            return res.end(`window.registerOtreePhase("${elfSetting.oTreeNodeNamespace}","${elfSetting.oTreeProxy}")`)
+        }
         if (isGetOtreeList) {
-            const list = await ListMap.getList(`oTree-${settings.oTreeUser1}`)
+            const list = await ListMap.getList(`oTree-${elfSetting.oTreeNodeNamespace}`)
             console.log(list)
             return okRes().json({err: 0, list})
         }
-
         if (isInit) {
             let findHash: string
             const gameServicePlayerHash = req.session.token
@@ -56,7 +56,7 @@ const InitWork = (app) => {
 
                 const findExistOne = Phase.playHash.filter(h => h.player === gameServicePlayerHash)
                 if (findExistOne.length > 0) {
-                    return okRes().redirect(`${oTreeProxy}/${otreeParticipantUrl}${findExistOne[0].hash}`)
+                    return okRes().redirect(`${elfSetting.oTreeProxy}/${otreeParticipantUrl}${findExistOne[0].hash}`)
                 } else {
                     for (let ph of Phase.playHash) {
                         if (ph.player === 'wait') {
@@ -70,7 +70,7 @@ const InitWork = (app) => {
                     }
                     Phase.markModified('playHash')
                     await Phase.save()
-                    return okRes().redirect(`${oTreeProxy}/${otreeParticipantUrl}${findHash}`)
+                    return okRes().redirect(`${elfSetting.oTreeProxy}/${otreeParticipantUrl}${findHash}`)
                 }
             } catch (err) {
                 if (err) {
@@ -81,8 +81,4 @@ const InitWork = (app) => {
         okRes()
         next()
     })
-}
-
-export {
-    InitWork
 }

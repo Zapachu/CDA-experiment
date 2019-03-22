@@ -1,9 +1,3 @@
-import {ProxyWork} from './ProxyWork'
-import {RPCWork} from './RPCWork'
-import {InitWork} from './InitWork'
-
-export {
-    ProxyWork,
-    RPCWork,
-    InitWork
-}
+export {serve as RPCWork} from '../../rpc'
+export {ProxyWork} from './ProxyWork'
+export {InitWork} from './InitWork'

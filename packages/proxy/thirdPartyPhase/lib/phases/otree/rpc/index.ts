@@ -5,7 +5,8 @@ import {gameService} from '../../common/utils'
 import {elfSetting as setting} from 'elf-setting'
 import {resolve} from 'path'
 import {readFileSync} from 'fs'
-import {getDemoList} from './service/otreeApi/otreeUrl'
+import {getDemoList} from './service/otreeApi'
+import {virtualJsRoute} from '../server/config'
 
 export function serve() {
     const server = new Server()
@@ -26,8 +27,8 @@ async function getJsUrls() {
     const manifest = JSON.parse(readFileSync(resolve(__dirname, '../../../../dist/manifest.json')).toString())
     const regPhase = {
         type: PhaseManager.PhaseType.otree,
-        namespace: `oTree-${setting.oTreeUser1}`,
-        jsUrl: `${setting.oTreeProxy}${manifest['otree.js']}`,
+        namespace: `oTree-${setting.oTreeNodeNamespace}`,
+        jsUrl: `${setting.oTreeProxy}${manifest['otree.js']};${setting.oTreeProxy}/${setting.oTreeStaticPathNamespace}${virtualJsRoute}`,
         rpcUri: setting.oTreeRpc
     }
     await getDemoList(regPhase.namespace)

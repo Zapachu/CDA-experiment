@@ -58,7 +58,7 @@ export const elfSetting: IElfSetting = {
     //region thirdPartyPhaseProxy
     // otree
     oTreePort: 3070,
-    oTreeUser1: 'user001',
+    oTreeNodeNamespace: 'OtreeDefault',
     oTreeRpc: '127.0.0.1:53070',
     oTreeProxy: 'http://127.0.0.1:3070',
     oTreeServer: 'http://127.0.0.1:8000',
