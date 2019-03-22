@@ -1,5 +1,6 @@
 import * as React from 'react'
-import {Button, ButtonProps, Core, Lang} from 'bespoke-client-util'
+import * as style from './style.scss'
+import {Button, ButtonProps, Core, Lang, MaskLoading} from 'bespoke-client-util'
 import {FetchType, MoveType, PushType, GameType, Version, Choice} from '../../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
 import Display from './Display'
@@ -75,15 +76,15 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
     const curGroup = groups[groupIndex];
     const curRoundIndex = curGroup.roundIndex;
     const curChoice = choices[curRoundIndex];
-    if(!curChoice) return;
+    if(!curChoice) return null;
     const curProfit = profits[curRoundIndex];
     switch(gameType) {
       case GameType.T1: {
         return <>
           <p>你在第{curRoundIndex + 1}轮的选择为: {curChoice.c1}</p>
           <p>第{curRoundIndex + 1}轮的组内最低选择为: {curGroup.mins[curRoundIndex]}</p>
-          <p>你在第{curRoundIndex + 1}轮的收益为: {curProfit}</p>
-          <p>截止第{curRoundIndex + 1}轮，你的收益为: {finalProfit}</p>
+          <p>你在第{curRoundIndex + 1}轮的收益为: {curProfit.toFixed(2)}</p>
+          <p>截止第{curRoundIndex + 1}轮，你的收益为: {finalProfit.toFixed(2)}</p>
           <Button width={ButtonProps.Width.small}
                   label={lang.confirm}
                   onClick={() => {
@@ -95,13 +96,13 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
       }
       case GameType.T2: {
         return <>
-          <p>你在第{curRoundIndex + 1}轮的选择为:</p>
+          <p>你在第{curRoundIndex + 1}轮的选择为: </p>
           {this.renderChoice2(c1, c2)}
-          <p>在第一阶段中, {curGroup.ones[curRoundIndex] ? '有人选1' : '没有人选1'}</p>
+          <p style={{marginTop:'30px'}}>在第一阶段中, {curGroup.ones[curRoundIndex] ? '有人选1' : '没有人选1'}</p>
           {curChoice.c1!==Choice.One ? <p>你在第二阶段的选择为: {curChoice.c}</p> : null}
           <p>第{curRoundIndex + 1}轮的组内最低选择为: {curGroup.mins[curRoundIndex]}</p>
-          <p>你在第{curRoundIndex + 1}轮的收益为: {curProfit}</p>
-          <p>截止第{curRoundIndex + 1}轮，你的收益为: {finalProfit}</p>
+          <p>你在第{curRoundIndex + 1}轮的收益为: {curProfit.toFixed(2)}</p>
+          <p>截止第{curRoundIndex + 1}轮，你的收益为: {finalProfit.toFixed(2)}</p>
           <Button width={ButtonProps.Width.small}
                   label={lang.confirm}
                   onClick={() => {
@@ -149,21 +150,21 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
       case 1: {
         content = <div>
           <Display data={displayData} />
-          <p>等待其他玩家选择</p>
+          <MaskLoading label={'等待其他玩家选择'} />
         </div>
         break;
       }
       case 2: {
         content = <div>
           <Display data={displayData} />
-          {this.renderResult()}
+          <div className={style.resultLines}>{this.renderResult()}</div>
         </div>
         break;
       }
       case 3: {
         content = <div>
           <Display data={displayData} />
-          <p>等待其他玩家进入下一轮</p>
+          <MaskLoading label={'等待其他玩家进入下一轮'} />
         </div>
         break;
       }
