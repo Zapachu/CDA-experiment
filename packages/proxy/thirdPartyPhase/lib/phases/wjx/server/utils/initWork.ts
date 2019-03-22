@@ -46,7 +46,13 @@ const InitWork = (app) => {
                 console.log(currentPhase)
                 const {playHash} = currentPhase
                 req.session.wjxPhaseId = currentPhase._id
-                    let redirectTo = null
+
+                if (currentPhase.ownerToken.toString() === currentUserElfGameHash.toString()) {
+                    const phaseParam = JSON.parse(currentPhase.param)
+                    return res.redirect(phaseParam.adminUrl)
+                }
+
+                let redirectTo = null
                 for (let i = 0; i < playHash.length; i++) {
                     if (playHash[i].player.toString() === currentUserElfGameHash.toString()) {
                         redirectTo = `${settings.wjxProxy}/jq/${currentPhaseWjxHash}.aspx`
