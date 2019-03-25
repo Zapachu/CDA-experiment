@@ -49,6 +49,7 @@ export const elfSetting: IElfSetting = {
     proxyService: {
         host: '127.0.0.1',
         port: 4001,
+        rpcHost:'127.0.0.1',
         rpcPort: 54001
     },
     adminMobileNumbers: ['13000000000'],
@@ -56,28 +57,28 @@ export const elfSetting: IElfSetting = {
     //endregion
     //region thirdPartyPhaseProxy
     // otree
-    oTreePort: 4002,
+    oTreePort: 3070,
     oTreeUser1: 'user001',
-    oTreeRpc: '127.0.0.1:54002',
-    oTreeProxy: 'http://127.0.0.1:4002',
+    oTreeRpc: '127.0.0.1:53070',
+    oTreeProxy: 'http://127.0.0.1:3070',
     oTreeServer: 'http://127.0.0.1:8000',
     oTreeStaticPathNamespace: 'otreePhase',
     // qualtrics
-    qualtricsPort: 4003,
-    qualtricsRpc: '127.0.0.1:54003',
-    qualtricsProxy: 'http://127.0.0.1:4003',
-    qualtricsServer: 'https://cessoxford.eu.qualtrics.com',
+    qualtricsPort: 3071,
+    qualtricsRpc: '127.0.0.1:53071',
+    qualtricsProxy: 'http://127.0.0.1:3071',
+    qualtricsServer: 'https://www.qualtrics.com',
     qualtricsStaticNamespace: 'qualtricsPhase',
     // 问卷星
-    wjxPort: 4004,
-    wjxRpc: '127.0.0.1:54004',
-    wjxProxy: 'http://127.0.0.1:4004',
-    wjxServer: 'https://www.wjx.cn',
+    wjxPort: 3072,
+    wjxRpc: '127.0.0.1:53072',
+    wjxProxy: 'http://127.0.0.1:3072',
+    wjxServer: 'https://www.wjx.com',
     wjxStaticNamespace: 'wjxPhase',
     // 腾讯问卷
-    qqwjPort: 4005,
-    qqwjRpc: '127.0.0.1:54005',
-    qqwjProxy: 'http://127.0.0.1:4005',
+    qqwjPort: 3073,
+    qqwjRpc: '127.0.0.1:53073',
+    qqwjProxy: 'http://127.0.0.1:3073',
     qqwjServer: 'https://wj.qq.com',
     qqwjStaticNamespace: 'qqwjPhase',
     //endregion

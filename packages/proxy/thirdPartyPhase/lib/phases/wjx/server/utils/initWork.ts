@@ -5,25 +5,36 @@ import {elfSetting as settings} from 'elf-setting'
 import {getNextPhaseUrl} from './getNextPhaseUrl'
 import {ErrorPage} from '../../../common/utils'
 
+
 const InitWork = (app) => {
 
     app.use(async (req, res, next) => {
 
         const isGet = req.method === 'GET'
+        const isPOST = req.method === 'POST'
+
         const isInit = req.url.includes('/init/jq/')
         const isDone = req.url.includes('/complete')
+        const isSubmit = req.url.includes('/processjq')
 
 
-        if (!req.user) return ErrorPage(res, 'Not Login')
+        // if (!req.user) return ErrorPage(res, 'Not Login')
+
+        if (isPOST && isSubmit) {
+            console.log(req.body)
+            console.log(req.query)
+        }
 
         if (isGet && isDone) {
             const wjxHash = req.query.q
-            const nextPhaseUrl = await getNextPhaseUrl(wjxHash)
+            const wjxPhaseId = req.session.wjxPhaseId
+            const wjxJidx = req.query.jidx
+            const nextPhaseUrl = await getNextPhaseUrl(wjxHash, wjxPhaseId, wjxJidx)
             return res.redirect(nextPhaseUrl)
         }
 
         if (isGet && isInit) {
-            const currentUserElfGameHash = req.query.token
+            const currentUserElfGameHash = req.session.token
             const currentPhaseId = req.url.split('/jq/')[1].slice(0, 24)
             try {
                 const currentPhase: any = await ThirdPartPhase.findById(currentPhaseId)
@@ -34,6 +45,13 @@ const InitWork = (app) => {
 
                 console.log(currentPhase)
                 const {playHash} = currentPhase
+                req.session.wjxPhaseId = currentPhase._id
+
+                if (currentPhase.ownerToken.toString() === currentUserElfGameHash.toString()) {
+                    const phaseParam = JSON.parse(currentPhase.param)
+                    return res.redirect(phaseParam.adminUrl)
+                }
+
                 let redirectTo = null
                 for (let i = 0; i < playHash.length; i++) {
                     if (playHash[i].player.toString() === currentUserElfGameHash.toString()) {
@@ -48,7 +66,7 @@ const InitWork = (app) => {
                 currentPhase.playHash = playHash
                 currentPhase.markModified('playHash')
                 await currentPhase.save()
-                return res.redirect(`${settings.wjxProxy}/jq/${currentPhaseWjxHash}`)
+                return res.redirect(`${settings.wjxProxy}/jq/${currentPhaseWjxHash}.aspx`)
             } catch (err) {
                 if (err) {
                     console.trace(err)

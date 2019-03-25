@@ -19,7 +19,7 @@ export class Info extends React.Component<TRootContext & RouteComponentProps<{ g
         joinGroup: ['加入实验', 'Join Game'],
         joinSuccess: ['加入成功，即将进入实验房间', 'Join success, enter to play room now'],
         share: ['分享', 'Share'],
-        playerList: ['玩家列表', 'PlayerList'],
+        playerList: ['玩家列表', 'PlayerList']
     })
 
     state: IInfoState = {
@@ -41,22 +41,22 @@ export class Info extends React.Component<TRootContext & RouteComponentProps<{ g
             return <Loading/>
         }
         const btn4Teacher = <ul>
-            <li>
-                <Button type={'primary'}
-                    block={true}
-                    onClick={() => history.push(`/play/${game.id}`)}>{lang.enterPlayRoom}</Button>
-            </li>
-            <li>
-                <Button type={'primary'}
-                    block={true}
-                    onClick={() => history.push(`/player/${game.id}`)}>{lang.playerList}</Button>
-            </li>
-            <li>
-                <Button type={'primary'}
-                    block={true}
-                    onClick={() => history.push(`/share/${game.id}`)}>{lang.share}</Button>
-            </li>
-        </ul> ,
+                <li>
+                    <Button type={'primary'}
+                            block={true}
+                            onClick={() => history.push(`/play/${game.id}`)}>{lang.enterPlayRoom}</Button>
+                </li>
+                <li>
+                    <Button type={'primary'}
+                            block={true}
+                            onClick={() => history.push(`/player/${game.id}`)}>{lang.playerList}</Button>
+                </li>
+                <li>
+                    <Button type={'primary'}
+                            block={true}
+                            onClick={() => history.push(`/share/${game.id}`)}>{lang.share}</Button>
+                </li>
+            </ul>,
             btn4Student = <Button
                 type={'primary'}
                 onClick={async () => {
@@ -72,7 +72,7 @@ export class Info extends React.Component<TRootContext & RouteComponentProps<{ g
             </Card>
             <div className={style.buttonWrapper}>
                 {
-                    user.role === baseEnum.AcademusRole.teacher ? btn4Teacher : btn4Student
+                    user.id === game.owner ? btn4Teacher : btn4Student
                 }
             </div>
         </section>

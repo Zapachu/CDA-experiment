@@ -179,7 +179,7 @@ export class Phase extends React.Component<TRootContext & RouteComponentProps<{ 
                 param: {firstPhaseKey: phaseConfigs[0].key},
                 suffixPhaseKeys: [phaseConfigs[0].key]
             }
-            phaseConfigsToUpdate.push(startPhase)
+            phaseConfigsToUpdate.unshift(startPhase)
         }
         if (!phaseConfigsToUpdate.some(pc => pc.namespace === CorePhaseNamespace.start)) {
             return message.info(lang.lackStartPhase)

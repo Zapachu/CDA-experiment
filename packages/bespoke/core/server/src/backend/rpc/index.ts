@@ -15,12 +15,13 @@ export function serve() {
 }
 
 function registerPhases() {
-    const {proxyService: p, host, rpcPort, getClientPath} = setting
+    const {proxyService: p, host, rpcPort, getClientPath} = setting,
+        domain = p.host.startsWith('http')?p.host:`http://${p.host}:${p.port}`
     getGameService().registerPhases({
         phases: [{
             type:PhaseManager.PhaseType.bespoke,
             namespace: setting.namespace,
-            jsUrl: `http://${p.host}:${p.port}/${config.rootName}/static/bespoke-client-util.min.js;http://${p.host}:${p.port}${getClientPath()}`,
+            jsUrl: `${domain}/${config.rootName}/static/bespoke-client-util.min.js;${domain}${getClientPath()}`,
             rpcUri: `${host}:${rpcPort}`
         }]
     }, err => err && Log.e(err))

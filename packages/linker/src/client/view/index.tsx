@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react'
-import {BrowserRouter} from 'react-router-dom'
+import {BrowserRouter, RouteComponentProps} from 'react-router-dom'
 import {config, IUserWithId} from '@common'
 import {rootContext} from '@client-context'
 import {Loading} from '@client-component'
@@ -30,19 +30,20 @@ export const Root: React.FunctionComponent = () => {
                 <div className={style.languageSwitcherWrapper}>
                     {/*<LanguageSwitcher/>*/}
                 </div>
-                <BrowserRouter basename={`${config.rootName}/${config.appPrefix}`}>
+                <BrowserRouter basename={config.rootName}>
                     <Switch>
                         <Route path={'/createInFrame'} component={CreateInFrame}/>
                         <Route path={'/baseInfo/:gameId'} component={withSideNav(BaseInfo, NAV.basic)}/>
                         <Route path={'/baseInfo'} component={withSideNav(BaseInfo, NAV.basic)}/>
                         <Route path={'/phase/:gameId'} component={withSideNav(Phase, NAV.group)}/>
                         <Route path={'/share/:gameId'} component={Share}/>
-                        <Route path={'/join/:gameId'} component={Join}/>
+                        <Route path={'/join'} component={Join}/>
                         <Route path={'/info/:gameId'} component={Info}/>
                         <Route path={'/configuration/:gameId'} component={Configuration}/>
                         <Route path={'/play/:gameId'} component={Play}/>
                         <Route path={'/player/:gameId'} component={PlayerList}/>
-                        <Route path={'/*'} component={GameList}/>
+                        <Route path={'/*'} component={(props: RouteComponentProps) =>
+                            <GameList {...props} {...{user}}/>}/>
                     </Switch>
                 </BrowserRouter>
             </rootContext.Provider>

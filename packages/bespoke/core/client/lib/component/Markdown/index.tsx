@@ -51,6 +51,6 @@ export class Markdown extends React.Component<IMarkdownProps, IMarkdownState> {
 
 declare const MathJax: any
 
-loadScript(['https://cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-AMS_CHTML'], () =>
+loadScript(['https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js'], () =>
     MathJax.Hub.Queue(['Typeset', MathJax.Hub, 'output'])
 )

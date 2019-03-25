@@ -10,7 +10,7 @@ const SECONDS_PER_DAY = 86400
 const DEFAULT_PAGE_SIZE = 11
 
 export class UserCtrl {
-    static async renderApp(req: Express.Request, res: Response, next: NextFunction) {
+    static async renderApp(req: Request, res: Response, next: NextFunction) {
         WebpackHmr.sendIndexHtml(res, next)
     }
 
@@ -30,10 +30,11 @@ export class UserCtrl {
             return next()
         }
         const player = await PlayerService.findPlayerId(gameId, userId)
+        console.log(player)
         if (player) {
             return next()
         }
-        res.redirect(`/${config.rootName}/${config.appPrefix}/group/info/${gameId}`)
+        res.redirect(`/${config.rootName}/info/${gameId}`)
     }
 
     static getUser(req, res: Response) {

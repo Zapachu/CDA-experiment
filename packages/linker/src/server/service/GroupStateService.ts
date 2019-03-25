@@ -1,15 +1,16 @@
 import {
     baseEnum,
     CorePhaseNamespace,
-    IGroupState,
     IGameWithId,
     IPhaseConfig,
     IPhaseState,
     NFrame,
-    IActor
+    IActor,
+    IGroupState
 } from '@common'
 import {getPhaseService} from '../rpc'
 import {GameService} from './GameService'
+import {GroupStateDoc, GroupStateModel} from '@server-model'
 import {EventDispatcher} from '../controller/eventDispatcher'
 import {Log, RedisKey, redisClient} from '@server-util'
 import {PhaseManager} from 'elf-protocol'
@@ -28,10 +29,6 @@ export class GroupStateService {
     groupState: IGroupState
 
     constructor(public group: IGameWithId) {
-        this.groupState = {
-            groupId: group.id,
-            phaseStates: []
-        }
     }
 
     private async newPhase(phaseCfg: IPhaseConfig): Promise<IPhaseState> {
@@ -62,7 +59,7 @@ export class GroupStateService {
                 resolve({
                     key: phaseCfg.key,
                     status: baseEnum.PhaseStatus.playing,
-                    playUrl:res.playUrl,
+                    playUrl: res.playUrl,
                     playerState: {}
                 })
             })
@@ -70,10 +67,24 @@ export class GroupStateService {
     }
 
     async init(): Promise<GroupStateService> {
+        await this.initState()
+        return this
+    }
+
+    async initState() {
+        const groupStateDoc: GroupStateDoc = await GroupStateModel.findOne({groupId: this.group.id})
+        if (groupStateDoc) {
+            this.groupState = groupStateDoc.data
+            return
+        }
+        this.groupState = {
+            groupId: this.group.id,
+            phaseStates: []
+        }
         const startPhaseCfg = this.group.phaseConfigs.find(({namespace}) => namespace === CorePhaseNamespace.start)
         const phaseState = await this.newPhase(startPhaseCfg)
         this.groupState.phaseStates.push(phaseState)
-        return this
+        await new GroupStateModel({groupId: this.group.id, data: this.groupState}).save()
     }
 
     async joinGroupRoom(actor: IActor): Promise<void> {
@@ -86,18 +97,19 @@ export class GroupStateService {
         }
     }
 
-    async sendBackPlayer(playUrl: string, playerToken: string, nextPhaseKey: string, phasePlayer:PhaseManager.TPhasePlayer): Promise<void> {
+    async sendBackPlayer(playUrl: string, playerToken: string, nextPhaseKey: string, phasePlayer: PhaseManager.TPhasePlayer): Promise<void> {
         const {group: {phaseConfigs}, groupState: {phaseStates}} = this
 
-        let nextPhaseState
+        let nextPhaseState: IPhaseState
         const createNextPhase = async (phaseCfg: IPhaseConfig) => {
             nextPhaseState = await this.newPhase(phaseCfg)
             phaseStates.push(nextPhaseState)
         }
         const currentPhaseState = phaseStates.find(phaseState => phaseState.playUrl === playUrl),
-            currentPhaseCfgIndex = phaseConfigs.findIndex(phaseCfg => phaseCfg.key === currentPhaseState.key)
-        currentPhaseState.playerState[playerToken].status = baseEnum.PlayerStatus.left
-        currentPhaseState.playerState[playerToken].phasePlayer = phasePlayer
+            currentPhaseCfgIndex = phaseConfigs.findIndex(phaseCfg => phaseCfg.key === currentPhaseState.key),
+            playerCurrentPhaseState = currentPhaseState.playerState[playerToken]
+        playerCurrentPhaseState.status = baseEnum.PlayerStatus.left
+        playerCurrentPhaseState.phasePlayer = phasePlayer
         let phaseCfg = phaseConfigs.find(phaseCfg => phaseCfg.key === nextPhaseKey)
         if (!phaseCfg) {
             if (currentPhaseCfgIndex === phaseConfigs.length - 1) {
@@ -116,12 +128,21 @@ export class GroupStateService {
                 await createNextPhase(phaseCfg)
             }
         }
-        nextPhaseState.playerStatus[playerToken] = baseEnum.PlayerStatus.playing
+        nextPhaseState.playerState[playerToken] = {
+            actor: playerCurrentPhaseState.actor,
+            status: baseEnum.PlayerStatus.playing
+        }
     }
 
     broadcastState() {
         Log.d(JSON.stringify(this.groupState))
         EventDispatcher.socket.in(this.group.id)
             .emit(baseEnum.SocketEvent.downFrame, NFrame.DownFrame.syncGroupState, this.groupState)
+        GroupStateModel.findOneAndUpdate({groupId: this.group.id}, {
+            $set: {
+                data: this.groupState,
+                updateAt: Date.now()
+            }
+        }, {new: true}, err => err ? Log.e(err) : null)
     }
 }
