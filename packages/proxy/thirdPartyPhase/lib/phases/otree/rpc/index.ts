@@ -27,7 +27,7 @@ async function getJsUrls() {
     const manifest = JSON.parse(readFileSync(resolve(__dirname, '../../../../dist/manifest.json')).toString())
     const regPhase = {
         type: PhaseManager.PhaseType.otree,
-        namespace: `oTree-${setting.oTreeNodeNamespace}`,
+        namespace: setting.oTreeNamespace,
         jsUrl: `${setting.oTreeProxy}${manifest['otree.js']};${setting.oTreeProxy}/${setting.oTreeStaticPathNamespace}${virtualJsRoute}`,
         rpcUri: setting.oTreeRpc
     }

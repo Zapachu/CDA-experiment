@@ -7,7 +7,7 @@
     "OTREE_RPC": "127.0.0.1:53070",
     "OTREE_PROXY": "http://127.0.0.1:3070",
     "OTREE_SERVER":"http://127.0.0.1:8000",
-    "NAMESPACE": "OtreeA"
+    "OTREE_NAMESPACE": "OtreeA"
   },
   "log_date_format": "YYYY-MM-DD HH:mm Z"
 }

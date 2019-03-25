@@ -49,7 +49,7 @@ export interface IElfSetting {
         subscriptionKey: '4210--------------------'
     }
     oTreePort: number
-    oTreeNodeNamespace: string
+    oTreeNamespace: string
     oTreeRpc: string
     oTreeProxy: string
     oTreeServer: string

@@ -1,7 +1,8 @@
 import {IElfSetting} from './interface'
 
 const d = new Date(),
-    timestamp = `${d.getFullYear()}${d.getMonth()}${d.getDate()}${d.getHours()}${d.getMinutes()}`
+    timestamp = `${d.getFullYear()}${d.getMonth()}${d.getDate()}${d.getHours()}${d.getMinutes()}`,
+    {OTREE_PORT, OTREE_RPC, OTREE_PROXY, OTREE_SERVER, OTREE_NODE_NAMESPACE} = process.env
 export const elfSetting: IElfSetting = {
     //region common
     mongoUri: 'mongodb://127.0.0.1:27017/academy',
@@ -49,7 +50,7 @@ export const elfSetting: IElfSetting = {
     proxyService: {
         host: '127.0.0.1',
         port: 4001,
-        rpcHost:'127.0.0.1',
+        rpcHost: '127.0.0.1',
         rpcPort: 54001
     },
     adminMobileNumbers: ['13000000000'],
@@ -57,11 +58,11 @@ export const elfSetting: IElfSetting = {
     //endregion
     //region thirdPartyPhaseProxy
     // otree
-    oTreePort: 3070,
-    oTreeNodeNamespace: 'OtreeDefault',
-    oTreeRpc: '127.0.0.1:53070',
-    oTreeProxy: 'http://127.0.0.1:3070',
-    oTreeServer: 'http://127.0.0.1:8000',
+    oTreePort: +(OTREE_PORT || 3070),
+    oTreeNamespace: OTREE_NODE_NAMESPACE || 'OtreeDefault',
+    oTreeRpc: OTREE_RPC || '127.0.0.1:53070',
+    oTreeProxy: OTREE_PROXY || 'http://127.0.0.1:3070',
+    oTreeServer: OTREE_SERVER || 'http://127.0.0.1:8000',
     oTreeStaticPathNamespace: 'otreePhase',
     // qualtrics
     qualtricsPort: 3071,

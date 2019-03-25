@@ -7,7 +7,6 @@ import {virtualJsRoute} from '../config'
 
 export const InitWork = (app) => {
     app.use(async (req:Request, res:Response, next:NextFunction) => {
-        console.log(req.url)
         const originWrite = res.write
         const originEnd = res.end
 
@@ -30,11 +29,10 @@ export const InitWork = (app) => {
         if(req.url.includes(virtualJsRoute)){
             okRes()
             res.setHeader('Content-Type', 'text/javascript')
-            return res.end(`window.registerOtreePhase("${elfSetting.oTreeNodeNamespace}","${elfSetting.oTreeProxy}")`)
+            return res.end(`window.registerOtreePhase("${elfSetting.oTreeNamespace}","${elfSetting.oTreeProxy}")`)
         }
         if (isGetOtreeList) {
-            const list = await ListMap.getList(`oTree-${elfSetting.oTreeNodeNamespace}`)
-            console.log(list)
+            const list = await ListMap.getList(elfSetting.oTreeNamespace)
             return okRes().json({err: 0, list})
         }
         if (isInit) {

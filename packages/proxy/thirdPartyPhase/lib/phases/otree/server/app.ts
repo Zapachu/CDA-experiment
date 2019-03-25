@@ -11,15 +11,6 @@ import {
     StaticPathMiddleware
 } from '../../common/utils'
 
-//region overRideSetting
-const {OTREE_PORT, OTREE_RPC, OTREE_PROXY, OTREE_SERVER, NAMESPACE} = process.env
-elfSetting.oTreePort = +(OTREE_PORT || elfSetting.oTreePort)
-elfSetting.oTreeRpc = OTREE_RPC || elfSetting.oTreeRpc
-elfSetting.oTreeProxy = OTREE_PROXY || elfSetting.oTreeProxy
-elfSetting.oTreeServer = OTREE_SERVER || elfSetting.oTreeServer
-elfSetting.oTreeNodeNamespace = NAMESPACE || elfSetting.oTreeNodeNamespace
-//endregion
-
 const {oTreePort: port} = elfSetting
 
 const app = Express()
