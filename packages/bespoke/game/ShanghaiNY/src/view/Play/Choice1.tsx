@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {GameType, Choice, Version} from '../../config'
-import {Radio} from 'bespoke-client-util'
+import {Lang, Radio} from 'bespoke-client-util'
 
 interface PropsType {
   c1: number,
@@ -12,13 +12,21 @@ interface PropsType {
 }
 
 const Choice1: React.FunctionComponent<PropsType> = ({c1, onChoose, gameType, version, d=0}) => {
+  const lang = Lang.extractLang({
+    choose1: ['选1', 'Choose 1'],
+    choose2: ['选2', 'Choose 2'],
+    chooseWait: ['等待', 'Wait'],
+    firstChoice: ['第一阶段: 你的选择', 'In the first action, your choice is'],
+    feeLeft: ['(若在下一轮改选1，需要付出修改费', '(If you choose 1 in the next action, you need to pay $ '],
+    feeRight: ['元)', ')']
+  })
   const options = gameType===GameType.T1
-    ? [{label: '选1', value: Choice.One}, {label: '选2', value: Choice.Two}]
+    ? [{label: lang.choose1, value: Choice.One}, {label: lang.choose2, value: Choice.Two}]
     : version===Version.V2
-      ? [{label: '选1', value: Choice.One}, {label: '选2', value: Choice.Two}, {label: '等待', value: Choice.Wait}]
-      : [{label: '选1', value: Choice.One}, {label: '等待', value: Choice.Wait}]
+      ? [{label: lang.choose1, value: Choice.One}, {label: lang.choose2, value: Choice.Two}, {label: lang.chooseWait, value: Choice.Wait}]
+      : [{label: lang.choose1, value: Choice.One}, {label: lang.chooseWait, value: Choice.Wait}]
   return <div className={style.choice}>
-    <p>第一阶段: 你的选择 {d>0 ? `(若在下一轮改选1，需要付出修改费${d}元)` : ''}</p>
+    <p>{lang.firstChoice} {d>0 ? `${lang.feeLeft}${d}${lang.feeRight}` : ''}</p>
     <Radio  value={c1} 
             options={options} 
             onChange={val => onChoose(val as number)} 
