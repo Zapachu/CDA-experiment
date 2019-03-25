@@ -1,2 +1,1 @@
-export * from './interface'
-export {elfSetting} from './setting'
+export * from './setting'

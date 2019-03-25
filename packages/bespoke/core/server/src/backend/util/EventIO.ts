@@ -2,8 +2,8 @@ import {baseEnum, config, IConnection, IConnectionNamespace, IGameWithId, IActor
 import {Server} from 'http'
 import {EventEmitter} from 'events'
 import * as socketIO from 'socket.io'
+import {elfSetting} from 'elf-setting'
 import GameDAO from '../service/GameDAO'
-import {setting} from './util'
 
 export class EventIO {
     private static socketIOServer: socketIO.Server
@@ -20,7 +20,7 @@ export class EventIO {
     }
 
     static initSocketIOServer(server: Server, subscribeOnConnection: (clientConn: IConnection) => void) {
-        this.socketIOServer = socketIO(server, {path: config.socketPath(setting.namespace)})
+        this.socketIOServer = socketIO(server, {path: config.socketPath(elfSetting.bespokeNamespace)})
         this.socketIOServer.on(baseEnum.SocketEvent.connection, async (connection: socketIO.Socket) => {
             const {token, type, gameId} = connection.handshake.query
             const game = await GameDAO.getGame(gameId)

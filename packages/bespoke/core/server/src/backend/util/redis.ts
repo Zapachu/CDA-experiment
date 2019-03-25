@@ -1,8 +1,8 @@
 import * as IORedis from 'ioredis'
-import {setting} from './util'
+import {elfSetting} from 'elf-setting'
 import {baseEnum} from 'bespoke-common'
 
-export const redisClient = new IORedis(setting.redisPort, setting.redisHost)
+export const redisClient = new IORedis(elfSetting.redisPort, elfSetting.redisHost)
     .on('error', (err) => {
         console.error(err)
     })

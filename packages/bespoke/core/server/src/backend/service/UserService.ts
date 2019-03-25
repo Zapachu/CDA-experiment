@@ -1,5 +1,6 @@
 import {baseEnum, config} from 'bespoke-common'
-import {redisClient, RedisKey, QCloudSMS, Log, inProductEnv, setting} from '../util'
+import {elfSetting} from 'elf-setting'
+import {redisClient, RedisKey, QCloudSMS, Log, inProductEnv} from '../util'
 
 const SEND_TIMES_PER_DAY = 3
 
@@ -33,7 +34,7 @@ export default class UserService {
         }
         const verifyCode = Math.random().toString().substr(2, 6)
         Log.d(verifyCode)
-        const sendSuccess = !inProductEnv || await QCloudSMS.singleSenderWithParam(nationCode, mobile, setting.qCloudSMS.templateId.verifyCode, [verifyCode])
+        const sendSuccess = !inProductEnv || await QCloudSMS.singleSenderWithParam(nationCode, mobile, elfSetting.qCloudSMS.templateId.verifyCode, [verifyCode])
         if (sendSuccess) {
             await redisClient.setex(RedisKey.verifyCode(nationCode, mobile), config.vcodeLifetime, verifyCode)
             await redisClient.hset(RedisKey.verifyCodeSendTimes(nationCode, mobile), dateKey, sentTimes + 1)

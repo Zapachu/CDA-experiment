@@ -1,0 +1,13 @@
+{
+  "script": "packages/bespoke/game/ContinuousDoubleAuction/src/serve.ts",
+  "name": "ContinuousDoubleAuction",
+  "env": {
+    "NODE_ENV": "production",
+    "BESPOKE_PORT": "7645",
+    "BESPOKE_RPC_PORT": "54444",
+    "BESPOKE_NAMESPACE": "ContinuousDoubleAuction",
+    "BESPOKE_WITH_PROXY": "true",
+    "BESPOKE_WITH_LINKER": "true"
+  },
+  "log_date_format": "YYYY-MM-DD HH:mm Z"
+}

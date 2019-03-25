@@ -1,9 +1,19 @@
-import {IElfSetting} from './interface'
-
 const d = new Date(),
     timestamp = `${d.getFullYear()}${d.getMonth()}${d.getDate()}${d.getHours()}${d.getMinutes()}`,
-    {OTREE_PORT, OTREE_RPC, OTREE_PROXY, OTREE_SERVER, OTREE_NODE_NAMESPACE} = process.env
-export const elfSetting: IElfSetting = {
+    {
+        BESPOKE_NAMESPACE,
+        BESPOKE_IP,
+        BESPOKE_PORT,
+        BESPOKE_RPC_PORT,
+        BESPOKE_WITH_PROXY,
+        BESPOKE_WITH_LINKER,
+        OTREE_PORT,
+        OTREE_RPC,
+        OTREE_PROXY,
+        OTREE_SERVER,
+        OTREE_NODE_NAMESPACE
+    } = process.env
+export const elfSetting = {
     //region common
     mongoUri: 'mongodb://127.0.0.1:27017/academy',
     mongoUser: '',
@@ -46,7 +56,12 @@ export const elfSetting: IElfSetting = {
     linkerServiceUri: '127.0.0.1:54000',
     //endregion
     //region bespoke
-    host: '127.0.0.1',//game宿主机内网默认IP，可由game传入配置覆盖
+    bespokeNamespace: BESPOKE_NAMESPACE,
+    bespokeIp: BESPOKE_IP,
+    bespokePort: +BESPOKE_PORT,
+    bespokeRpcPort: +BESPOKE_RPC_PORT,
+    bespokeWithProxy: BESPOKE_WITH_PROXY === 'true',
+    bespokeWithLinker: BESPOKE_WITH_LINKER === 'true',
     proxyService: {
         host: '127.0.0.1',
         port: 4001,

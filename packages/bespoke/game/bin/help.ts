@@ -38,8 +38,9 @@ prompt([
                     type: 'number'
                 }
             ]).then(({port, rpcPort}) => {
-                env.PORT = port
-                env.RPC_PORT = rpcPort
+                env.BESPOKE_PORT = port
+                env.BESPOKE_RPC_PORT = rpcPort
+                env.BESPOKE_NAMESPACE = namespace
                 exec(`ts-node ./${namespace}/src/serve.ts`)
             })
     }

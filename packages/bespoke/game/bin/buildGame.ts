@@ -8,7 +8,7 @@ import * as QiniuPlugin from 'qiniu-webpack-plugin'
 import * as ManifestPlugin from 'webpack-manifest-plugin'
 import * as CleanWebpackPlugin from 'clean-webpack-plugin'
 import {config} from 'bespoke-common'
-import {IQiniuConfig} from 'elf-setting'
+import {elfSetting} from 'elf-setting'
 
 interface IPaths {
     resource?: string
@@ -54,7 +54,7 @@ interface IBuildOption {
     buildMode?: 'dev' | 'dist' | 'publish'
     basePath: string
     paths?: IPaths
-    qiNiu?: IQiniuConfig
+    qiNiu?: typeof elfSetting.qiNiu
 }
 
 export function geneClientBuilder(

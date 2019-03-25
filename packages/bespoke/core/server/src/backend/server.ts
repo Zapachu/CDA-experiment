@@ -11,8 +11,9 @@ import * as errorHandler from 'errorhandler'
 import * as bodyParser from 'body-parser'
 import * as compression from 'compression'
 import * as morgan from 'morgan'
-import {Log, redisClient, setting, initSetting, QCloudSMS} from './util'
-import {baseEnum, config, ISetting} from 'bespoke-common'
+import {elfSetting} from 'elf-setting'
+import {Log, redisClient, Setting, QCloudSMS} from './util'
+import {baseEnum, config, IGameSetting} from 'bespoke-common'
 import {EventDispatcher} from './controller/eventDispatcher'
 import {rootRouter, namespaceRouter} from './controller/requestRouter'
 import {GameLogic, ILogicTemplate} from './service/GameLogic'
@@ -24,15 +25,14 @@ import * as http from 'http'
 
 export class Server {
     private static initMongo() {
-        connectMongo(setting.mongoUri, {
-            ...setting.mongoUser ? {user: setting.mongoUser, pass: setting.mongoPass} : {},
+        connectMongo(elfSetting.mongoUri, {
+            ...elfSetting.mongoUser ? {user: elfSetting.mongoUser, pass: elfSetting.mongoPass} : {},
             useNewUrlParser: true,
             useCreateIndex: true
         }, err => err ? Log.e(err) : null)
     }
 
     private static initExpress(): Express.Express {
-        const {namespace} = setting
         const express = Express()
         express.use(compression())
         express.use(morgan('dev'))
@@ -43,7 +43,7 @@ export class Server {
             name: 'academy.sid',
             resave: true,
             saveUninitialized: true,
-            secret: setting.sessionSecret,
+            secret: elfSetting.sessionSecret,
             store: new RedisStore({
                 client: redisClient as any
             })
@@ -56,9 +56,9 @@ export class Server {
             next()
         })
         express.use(errorHandler())
-        express.use(`/${config.rootName}/${namespace}/static`, Express.static(setting.staticPath, {maxAge: '10d'}))
+        express.use(`/${config.rootName}/${elfSetting.bespokeNamespace}/static`, Express.static(Setting.staticPath, {maxAge: '10d'}))
         express.use(`/${config.rootName}/static`, Express.static(path.join(__dirname, '../../dist/'), {maxAge: '10d'}))
-        express.use(`/${config.rootName}/${namespace}`, namespaceRouter)
+        express.use(`/${config.rootName}/${elfSetting.bespokeNamespace}`, namespaceRouter)
         express.use(`/${config.rootName}`, rootRouter)
         return express
     }
@@ -114,25 +114,25 @@ export class Server {
             })
     }
 
-    static start(gameSetting: ISetting, logicTemplate: ILogicTemplate): Express.Express {
-        initSetting(gameSetting)
+    static start(gameSetting: IGameSetting, logicTemplate: ILogicTemplate): Express.Express {
+        Setting.init(gameSetting)
         this.initMongo()
         this.initPassPort()
         QCloudSMS.init()
         GameLogic.init(logicTemplate)
-        const {port} = setting,
+        const {bespokePort} = elfSetting,
             express = this.initExpress()
-        this.bindServerListener(EventDispatcher.startGameSocket(express.listen(port)), port, () => {
-            Log.i(`CreateGame：http://127.0.0.1:${port}/${config.rootName}/${setting.namespace}/create`)
-            if (!gameSetting.withProxy) {
+        this.bindServerListener(EventDispatcher.startGameSocket(express.listen(bespokePort)), bespokePort, () => {
+            Log.i(`CreateGame：http://127.0.0.1:${bespokePort}/${config.rootName}/${elfSetting.bespokeNamespace}/create`)
+            if (!elfSetting.bespokeWithProxy) {
                 return
             }
-            if (setting.withLinker) {
+            if (elfSetting.bespokeWithLinker) {
                 serveRPC()
             }
             const heartBeat2Proxy = () => {
-                const {namespace, rpcPort} = setting
-                getProxyService().registerGame({namespace, port: port.toString(), rpcPort: rpcPort.toString()},
+                const {bespokeNamespace, bespokePort, bespokeRpcPort} = elfSetting
+                getProxyService().registerGame({namespace:bespokeNamespace, port: bespokePort.toString(), rpcPort: bespokeRpcPort.toString()},
                     err => err ? Log.w(`注册至代理失败，${config.gameRegisterInterval}秒后重试`) : null)
                 setTimeout(() => heartBeat2Proxy(), config.gameRegisterInterval)
             }
