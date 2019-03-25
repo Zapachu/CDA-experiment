@@ -10,7 +10,7 @@ interface Option {
 }
 
 interface PropsType {
-  value: any,
+  value: Value,
   options: Array<Option|string>,
   onChange: (value: Value) => void,
   style?: object,

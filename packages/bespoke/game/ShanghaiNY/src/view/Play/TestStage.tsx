@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, ButtonProps, Core, Lang, RadioGroup} from 'bespoke-client-util'
+import {Button, ButtonProps, Core, Lang, RadioGroup, MaskLoading} from 'bespoke-client-util'
 import {FetchType, MoveType, PushType, GameType, Test1, Test2, Choice} from '../../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
 import Display from './Display'
@@ -146,7 +146,7 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
     }
     else {
       content = <div>
-        <p>等待其他玩家完成测试</p>
+        <MaskLoading label={'等待其他玩家完成测试'} />
       </div>
     }
     return <section className={style.testStage}>

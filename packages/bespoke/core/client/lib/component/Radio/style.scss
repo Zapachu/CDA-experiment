@@ -1,0 +1,16 @@
+@import "public";
+
+.radio {
+  font-size: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  margin: 10px;
+  >li {
+    display: flex;
+    align-items: center;
+    flex-basis: 200px;
+    >input {
+      margin-right: 3px;
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import * as React from 'react'
+import * as style from './style.scss'
 import { GameType, Choice, Version} from '../../config'
-
+import {Radio} from 'bespoke-client-util'
 
 interface PropsType {
   c1: number,
@@ -15,22 +16,23 @@ const Choice2: React.FunctionComponent<PropsType> = ({c1, c2, onChoose, gameType
   if(!c1 || gameType===GameType.T1) {
     return null;
   }
-  return <div>
+  const options = [{label: d>0 ? `选1(修改费${d}元)` : '选1', value: Choice.One}, {label: '选2', value: Choice.Two}];
+  return <div className={style.choice}>
     <p>第二阶段:</p>
     {c1===Choice.Wait
       ? <>
         <p>{version===Version.V3 ? '如果第一阶段有人选1, 且抽中表A' : '如果第一阶段有人选1'} 你的选择:</p>
-        <input type="radio" id="c20-1" checked={c2[0]===Choice.One} onChange={() => onChoose([Choice.One, c2[1]])} />
-        <label htmlFor={'c20-1'}>选1{d>0 ? `(修改费${d}元)` : ''}</label>
-        <input type="radio" id="c20-2" checked={c2[0]===Choice.Two} onChange={() => onChoose([Choice.Two, c2[1]])} />
-        <label htmlFor={'c20-2'}>选2</label>
+        <Radio  value={c2[0]} 
+                options={options} 
+                onChange={val => onChoose([val as number, c2[1]])} 
+        />
         <p>{version===Version.V3 ? '如果不是“第一阶段有人选1, 且抽中表A”' : '如果第一阶段没有人选1'} 你的选择:</p>
-        <input type="radio" id="c21-1" checked={c2[1]===Choice.One} onChange={() => onChoose([c2[0], Choice.One])} />
-        <label htmlFor={'c21-1'}>选1{d>0 ? `(修改费${d}元)` : ''}</label>
-        <input type="radio" id="c21-2" checked={c2[1]===Choice.Two} onChange={() => onChoose([c2[0], Choice.Two])} />
-        <label htmlFor={'c21-2'}>选2</label>
+        <Radio  value={c2[1]} 
+                options={options} 
+                onChange={val => onChoose([c2[0], val as number])} 
+        />
       </>
-      : <p>你不需要选择</p>
+      : <p style={{margin:'10px'}}>你不需要选择</p>
     }
   </div>
 }
