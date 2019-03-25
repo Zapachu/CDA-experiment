@@ -22,6 +22,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         submit: ['提交', 'Submit'],
         invalidSeatNumber: ['座位号有误或已被占用', 'Your seat number is invalid or has been occupied'],
         wait4StartMainTest: ['等待老师开放实验', 'Wait for teacher to start the experiment'],
+        end: ['实验结束', 'Game Over']
     })
 
     componentDidMount() {
@@ -57,7 +58,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
 
     renderEndStage = () => {
       return <section>
-        <p>实验结束</p>
+        <p>{this.lang.end}</p>
       </section>
     }
 

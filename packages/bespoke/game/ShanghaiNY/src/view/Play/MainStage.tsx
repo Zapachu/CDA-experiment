@@ -36,7 +36,25 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
       inputSeatNumberPls: ['请输入座位号', 'Input your seat number please'],
       submit: ['提交', 'Submit'],
       invalidSeatNumber: ['座位号有误或已被占用', 'Your seat number is invalid or has been occupied'],
-      wait4StartMainTest: ['等待老师开放实验', 'Wait for teacher to start the experiment'],
+      chooseInFirstAction: ['在第一阶段选择', 'In the first action chose '],
+      chooseInSecondActionLeft: ['等待, 如果第一阶段有人选1, 则选', 'Wait, if someone has chosen 1 in the first action, choose '],
+      chooseInSecondActionRight: ['; 如果第一阶段没有人选1, 则选', '; if on one has chosen 1 in the first action, choose '],
+      yourFirstChoiceLeft: ['你在第', 'Your choice in round '],
+      yourFirstChoiceRight: ['轮的选择为:', ' is:'],
+      lowestChocieLeft: ['第', 'The lowest choice of the group in round '],
+      lowestChocieRight: ['轮的组内最低选择为:', ' is:'],
+      profitLeft: ['你在第', 'Your profit in round '],
+      profitRight: ['轮的收益为:', ' is:'],
+      totalProfitLeft: ['截止第', 'Until round '],
+      totalProfitRight: ['轮，你的收益为:', ' your total profit is:'],
+      inFirstAction: ['在第一阶段中,', 'In the first action,'],
+      chose1: ['有人选1', 'someone has chosen 1'],
+      notChose1: ['没有人选1', 'no one has chosen 1'],
+      yourSecondChoice: ['你在第二阶段的选择为:', 'Your choice in the second action is:'],
+      wait4Others2Choose: ['等待其他玩家选择', 'Waiting for others to choose'],
+      wait4Others2Next: ['等待其他玩家进入下一轮', 'Waiting for others to enter the next round'],
+      roundLeft: ['第', 'Round '],
+      roundRight: ['轮', ''],
   })
 
   calcDisplayData = () => {
@@ -65,10 +83,11 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
   }
 
   renderChoice2 = (c1, c2) => {
+    const {lang} = this;
     if(c1 !== Choice.Wait) {
-      return <p>在第一阶段选择{c1}</p>
+      return <p>{lang.chooseInFirstAction}{c1}</p>
     }
-    return <p>等待, 如果第一阶段有人选1, 则选{c2[0]}; 如果第一阶段没有人选1, 则选{c2[1]}</p>
+    return <p>{lang.chooseInSecondActionLeft}{c2[0]}{lang.chooseInSecondActionRight}{c2[1]}</p>
   }
 
   renderResult = () => {
@@ -81,10 +100,10 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
     switch(gameType) {
       case GameType.T1: {
         return <>
-          <p>你在第{curRoundIndex + 1}轮的选择为: {curChoice.c1}</p>
-          <p>第{curRoundIndex + 1}轮的组内最低选择为: {curGroup.mins[curRoundIndex]}</p>
-          <p>你在第{curRoundIndex + 1}轮的收益为: {curProfit.toFixed(2)}</p>
-          <p>截止第{curRoundIndex + 1}轮，你的收益为: {finalProfit.toFixed(2)}</p>
+          <p>{lang.yourFirstChoiceLeft}{curRoundIndex + 1}{lang.yourFirstChoiceRight} {curChoice.c1}</p>
+          <p>{lang.lowestChocieLeft}{curRoundIndex + 1}{lang.lowestChocieRight} {curGroup.mins[curRoundIndex]}</p>
+          <p>{lang.profitLeft}{curRoundIndex + 1}{lang.profitRight} {curProfit.toFixed(2)}</p>
+          <p>{lang.totalProfitLeft}{curRoundIndex + 1}{lang.totalProfitRight} {finalProfit.toFixed(2)}</p>
           <Button width={ButtonProps.Width.small}
                   label={lang.confirm}
                   onClick={() => {
@@ -96,13 +115,13 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
       }
       case GameType.T2: {
         return <>
-          <p>你在第{curRoundIndex + 1}轮的选择为: </p>
+          <p>{lang.yourFirstChoiceLeft}{curRoundIndex + 1}{lang.yourFirstChoiceRight} </p>
           {this.renderChoice2(c1, c2)}
-          <p style={{marginTop:'30px'}}>在第一阶段中, {curGroup.ones[curRoundIndex] ? '有人选1' : '没有人选1'}</p>
-          {curChoice.c1!==Choice.One ? <p>你在第二阶段的选择为: {curChoice.c}</p> : null}
-          <p>第{curRoundIndex + 1}轮的组内最低选择为: {curGroup.mins[curRoundIndex]}</p>
-          <p>你在第{curRoundIndex + 1}轮的收益为: {curProfit.toFixed(2)}</p>
-          <p>截止第{curRoundIndex + 1}轮，你的收益为: {finalProfit.toFixed(2)}</p>
+          <p style={{marginTop:'30px'}}>{lang.inFirstAction} {curGroup.ones[curRoundIndex] ? lang.chose1 : lang.notChose1}</p>
+          {curChoice.c1!==Choice.One ? <p>{lang.yourSecondChoice} {curChoice.c}</p> : null}
+          <p>{lang.lowestChocieLeft}{curRoundIndex + 1}{lang.lowestChocieRight} {curGroup.mins[curRoundIndex]}</p>
+          <p>{lang.profitLeft}{curRoundIndex + 1}{lang.profitRight} {curProfit.toFixed(2)}</p>
+          <p>{lang.totalProfitLeft}{curRoundIndex + 1}{lang.totalProfitRight} {finalProfit.toFixed(2)}</p>
           <Button width={ButtonProps.Width.small}
                   label={lang.confirm}
                   onClick={() => {
@@ -150,7 +169,7 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
       case 1: {
         content = <div>
           <Display data={displayData} />
-          <MaskLoading label={'等待其他玩家选择'} />
+          <MaskLoading label={lang.wait4Others2Choose} />
         </div>
         break;
       }
@@ -164,14 +183,14 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
       case 3: {
         content = <div>
           <Display data={displayData} />
-          <MaskLoading label={'等待其他玩家进入下一轮'} />
+          <MaskLoading label={lang.wait4Others2Next} />
         </div>
         break;
       }
     }
 
     return <section>
-      <p>第{curGroup.roundIndex + 1}轮</p>
+      <p>{lang.roundLeft}{curGroup.roundIndex + 1}{lang.roundRight}</p>
       {content}
     </section>
   }
