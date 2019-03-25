@@ -4,9 +4,6 @@ import {MoveType, PushType, FetchType} from './config'
 import {GameState} from "./interface";
 import {NEW_ROUND_TIMER, PlayerStatus} from "./config";
 
-const genRan = ({L, H}) => ~~(Math.random() * (H - L)) + L
-
-
 export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
     initGameState(): TGameState<IGameState> {
         const gameState = super.initGameState()
@@ -23,7 +20,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
     }
 
     protected async playerMoveReducer(actor: IActor, type: string, params: IMoveParams, cb: IMoveCallback): Promise<void> {
-        const {game: {params: {groupSize, round, positions, mode}}} = this
+        const {game: {params: {groupSize, round, positions, mode, winnerNumber}}} = this
         const playerState = await this.stateManager.getPlayerState(actor),
             gameState = await this.stateManager.getGameState(),
             playerStates = await this.stateManager.getPlayerStates()
@@ -65,43 +62,23 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     switch (mode) {
                         case 0: {
                             const highestSorts = groupPlayerStates.sort((a, b) => b.prices[roundIndex] - a.prices[roundIndex])
-                            const winnersPosition = highestSorts.map((p, i) => {
-                                if (p.prices[roundIndex] === highestSorts[0].prices[roundIndex]) {
-                                    return i
+                            highestSorts.map((p, i) => {
+                                if (i <= winnerNumber) {
+                                    p.profits[roundIndex] = p.privatePrices[roundIndex] - p.prices[roundIndex]
                                 }
-                            }).filter(a => a !== undefined)
-                            const winner = winnersPosition[genRan({L: 0, H: winnersPosition.length})]
-                            highestSorts[winner].profits[roundIndex] = highestSorts[winner].privatePrices[roundIndex] - highestSorts[winner].prices[roundIndex]
+                            })
                             break
                         }
                         case 1: {
-                            const secondHighestSorts = groupPlayerStates.sort((a, b) => b.prices[roundIndex] - a.prices[roundIndex])
-                            secondHighestSorts[1].profits[roundIndex] = secondHighestSorts[1].privatePrices[roundIndex] - secondHighestSorts[1].prices[roundIndex]
-                            break
-                        }
-                        case 2: {
-                            const avg = groupPlayerStates.map(p => p.prices[roundIndex]).reduce((pre, cur) => cur += pre) / groupPlayerStates.length
-                            let avgWinnerPosition = -1, avgBest = Number.MAX_VALUE
-                            groupPlayerStates.map((p, i) => {
-                                if (p.prices[roundIndex] - avg < avgBest) {
-                                    avgWinnerPosition = i
-                                }
-                            })
-                            groupPlayerStates[avgWinnerPosition].profits[roundIndex] = groupPlayerStates[avgWinnerPosition].privatePrices[roundIndex] -
-                                groupPlayerStates[avgWinnerPosition].prices[roundIndex]
-                            break
-                        }
-                        case 3: {
+                            let winners = 0
                             const prices = groupPlayerStates.map(p => p.prices[roundIndex])
                             const median = (prices[(prices.length - 1) >> 1] + prices[prices.length >> 1]) / 2
-                            let medianWinnerPosition = -1, medianBest = Number.MAX_VALUE
                             groupPlayerStates.map((p, i) => {
-                                if (p.prices[roundIndex] - median < medianBest) {
-                                    medianWinnerPosition = i
+                                if (p.prices[roundIndex] > median && winners <= winnerNumber) {
+                                    winners++
+                                    p.profits[roundIndex] = p.privatePrices[roundIndex] - p.prices[roundIndex]
                                 }
                             })
-                            groupPlayerStates[medianWinnerPosition].profits[roundIndex] = groupPlayerStates[medianWinnerPosition].privatePrices[roundIndex] -
-                                groupPlayerStates[medianWinnerPosition].prices[roundIndex]
                             break
                         }
                         default:

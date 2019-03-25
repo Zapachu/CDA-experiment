@@ -8,6 +8,4 @@ Server.start({
     port: +process.env.PORT,
     rpcPort: +process.env.RPC_PORT,
     staticPath: resolve(__dirname, '../dist'),
-    elfGameServiceUri: '',
-    proxyService: null,
 }, {Controller})

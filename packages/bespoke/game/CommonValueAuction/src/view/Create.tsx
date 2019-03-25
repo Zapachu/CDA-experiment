@@ -12,15 +12,14 @@ interface ICreateState {
     positions: Array<{
         privatePrice: Array<number>
     }>
+    winnerNumber: number
     readonly: boolean
     mode: string
 }
 
 const winnerModes = [
-    '最高出价的玩家胜利',
-    '第二高出价的玩家胜利',
-    '出价最接近所有玩家出价平均值的玩家胜利',
-    '出价最接近所有玩家出价中位数的玩家胜利',
+    '最高出价的前 m 位玩家胜利',
+    '出价大于所有玩家出价中位数的 m位玩家胜利',
 ]
 
 export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> {
@@ -31,6 +30,7 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
         round: 3,
         groupSize: 2,
         positions: [{privatePrice: [101, 98, 102]}, {privatePrice: [97, 99, 103]}],
+        winnerNumber: 2,
         readonly: false,
         mode: winnerModes[0],
     }
@@ -74,8 +74,8 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
 
     done = () => {
         const {setParams, setSubmitable} = this.props
-        const {round, groupSize, positions, mode, commonValue, deviation} = this.state
-        setParams({round, groupSize, positions, commonValue, deviation, mode: winnerModes.indexOf(mode)})
+        const {round, groupSize, positions, mode, commonValue, deviation, winnerNumber} = this.state
+        setParams({round, groupSize, positions, commonValue, deviation, mode: winnerModes.indexOf(mode), winnerNumber})
         this.setState({readonly: true})
         setSubmitable(true)
     }
@@ -97,6 +97,11 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
                                 min={2}
                                 max={6}
                                 onChange={(e) => this.setState({groupSize: parseInt(e.target.value)})}/>
+                </li>
+                <li>
+                    <Label label='游戏胜利人数 m'/>
+                    <RangeInput value={commonValue}
+                                onChange={(e) => this.setState({winnerNumber: parseInt(e.target.value)})}/>
                 </li>
                 <li>
                     <Label label='买家公共价值'/>
