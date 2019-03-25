@@ -81,7 +81,7 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
     }
 
     render() {
-        const {round, groupSize, commonValue, deviation, positions, readonly, mode} = this.state
+        const {round, groupSize, commonValue, deviation, positions, readonly, mode, winnerNumber} = this.state
         return <div className={style.create}>
             <ul className={style.configFields}>
                 <li>
@@ -95,12 +95,14 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
                     <Label label='每组人数'/>
                     <RangeInput value={groupSize}
                                 min={2}
-                                max={6}
+                                max={100}
                                 onChange={(e) => this.setState({groupSize: parseInt(e.target.value)})}/>
                 </li>
                 <li>
-                    <Label label='游戏胜利人数 m'/>
-                    <RangeInput value={commonValue}
+                    <Label label='游戏胜利人数'/>
+                    <RangeInput value={winnerNumber}
+                                min={1}
+                                max={groupSize}
                                 onChange={(e) => this.setState({winnerNumber: parseInt(e.target.value)})}/>
                 </li>
                 <li>
