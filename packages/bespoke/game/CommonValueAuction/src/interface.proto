@@ -4,14 +4,15 @@ message CreateParams {
     int32 round = 1;
     int32 groupSize = 2;
     int32 commonValue = 3;
+    int32 winnerNumber = 4;
     message Position {
         repeated int32 privatePrice = 1;
     }
-    repeated int32 privatePrice = 4;
-    int32 deviation = 5;
-    int32 mode = 6;
-    string nextPhaseKey = 7;
-    repeated Position positions = 8;
+    repeated int32 privatePrice = 5;
+    int32 deviation = 6;
+    int32 mode = 7;
+    string nextPhaseKey = 8;
+    repeated Position positions = 9;
 }
 
 message MoveParams {

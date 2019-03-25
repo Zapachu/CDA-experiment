@@ -4,11 +4,12 @@ import {ThirdPartPhase} from "../../../../core/server/models"
 import {elfSetting as settings} from 'elf-setting'
 import {getNextPhaseUrl} from './getNextPhaseUrl'
 import {ErrorPage} from '../../../common/utils'
+import {Request} from 'express'
 
 
 const InitWork = (app) => {
 
-    app.use(async (req, res, next) => {
+    app.use(async (req:Request, res, next) => {
 
         const isGet = req.method === 'GET'
         const isPOST = req.method === 'POST'
@@ -23,6 +24,18 @@ const InitWork = (app) => {
         if (isPOST && isSubmit) {
             console.log(req.body)
             console.log(req.query)
+            console.log(req.originalUrl)
+            console.log(req.baseUrl)
+            console.log(req.fresh)
+            console.log(req.hostname)
+            console.log(req.ip)
+            console.log(req.ips)
+            console.log(req.params)
+            console.log(req.path)
+            console.log(req.subdomains)
+            console.log(req.url)
+            console.log(req.xhr)
+            delete req.query.sd
         }
 
         if (isGet && isDone) {
