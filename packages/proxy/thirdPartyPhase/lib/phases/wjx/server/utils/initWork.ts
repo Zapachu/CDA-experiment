@@ -35,6 +35,7 @@ const InitWork = (app) => {
             console.log(req.subdomains)
             console.log(req.url)
             console.log(req.xhr)
+            delete req.query.sd
         }
 
         if (isGet && isDone) {
