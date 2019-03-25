@@ -4,7 +4,7 @@ require('./initial.scss')
 import * as React from 'react'
 import {render} from 'react-dom'
 import {Root} from './view'
-import {IPhaseConfig} from '@common'
+import {IPhaseConfig, TPhaseType} from '@common'
 
 export {Lang} from '@client-util'
 export {IPhaseConfig, CorePhaseNamespace} from '@common'
@@ -30,7 +30,7 @@ export interface IPhaseTemplate {
     namespace?: string
     localeNames: Array<string>
     Create?: typeof BaseCreate
-    type: 'bespoke' | 'otree' | 'qualtrics' | 'survey',
+    type: TPhaseType,
     icon?: string
 }
 
