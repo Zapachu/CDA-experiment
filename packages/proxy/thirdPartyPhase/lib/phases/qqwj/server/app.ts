@@ -1,9 +1,10 @@
 import * as Express from 'express'
 import * as errorhandler from 'errorhandler'
 import '../../common/auth/passport'
+import {routePrefix} from '../../common/config'
 import {elfSetting as settings} from 'elf-setting'
 import {InitWork, ProxyWork, RPCWork} from './utils'
-const {qqwjStaticNamespace, qqwjPort} = settings
+const {qqwjPort} = settings
 
 import {ConDB, SessionSetMiddleware, PassportMiddleware, StaticPathMiddleware} from '../../common/utils'
 
@@ -13,7 +14,7 @@ const app = Express()
 
 SessionSetMiddleware(app)
 PassportMiddleware(app)
-StaticPathMiddleware(app, qqwjStaticNamespace)
+StaticPathMiddleware(app, routePrefix.qqwjStaticNamespace)
 
 InitWork(app)
 ProxyWork(app)

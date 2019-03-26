@@ -1,12 +1,11 @@
 'use strict'
 
 import * as httpProxy from "http-proxy-middleware"
-import {elfSetting as settings} from 'elf-setting'
 import {rewriteResBuffers} from './RewriteResBuffers'
-const {qqwjServer} = settings
+import {proxyTarget} from '../../../common/config'
 
 const proxy = httpProxy({
-    target: qqwjServer,
+    target: proxyTarget.qqwjServer,
     changeOrigin: true,
     ws: true,
     autoRewrite: true,

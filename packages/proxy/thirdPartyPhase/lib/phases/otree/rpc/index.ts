@@ -2,6 +2,7 @@ import {Server, ServerCredentials} from 'grpc'
 import {phaseService} from './service/OtreeManager'
 import {PhaseManager} from 'elf-protocol'
 import {gameService} from '../../common/utils'
+import {routePrefix} from '../../common/config'
 import {elfSetting as setting} from 'elf-setting'
 import {resolve} from 'path'
 import {readFileSync} from 'fs'
@@ -28,7 +29,7 @@ async function getJsUrls() {
     const regPhase = {
         type: PhaseManager.PhaseType.otree,
         namespace: setting.oTreeNamespace,
-        jsUrl: `${setting.oTreeProxy}${manifest['otree.js']};${setting.oTreeProxy}/${setting.oTreeStaticPathNamespace}${virtualJsRoute}`,
+        jsUrl: `${setting.oTreeProxy}${manifest['otree.js']};${setting.oTreeProxy}/${routePrefix.oTreeStaticPathNamespace}${virtualJsRoute}`,
         rpcUri: setting.oTreeRpc
     }
     await getDemoList(regPhase.namespace)

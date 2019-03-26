@@ -2,6 +2,7 @@ import * as Express from 'express'
 import * as errorHandler from 'errorhandler'
 import {elfSetting} from 'elf-setting'
 import '../../common/auth/passport'
+import {routePrefix} from '../../common/config'
 import {ProxyWork, RPCWork, InitWork} from './utils'
 import {
     ConDB,
@@ -16,7 +17,7 @@ const {oTreePort: port} = elfSetting
 const app = Express()
 
 ConDB()
-StaticPathMiddleware(app, elfSetting.oTreeStaticPathNamespace)
+StaticPathMiddleware(app, routePrefix.oTreeStaticPathNamespace)
 SessionSetMiddleware(app)
 PassportMiddleware(app)
 SessionTokenCheck(app)

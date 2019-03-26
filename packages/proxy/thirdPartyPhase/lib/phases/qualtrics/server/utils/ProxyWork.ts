@@ -1,12 +1,11 @@
 'use strict'
 
-import * as httpProxy from "http-proxy-middleware"
-import {rewriteResBuffers} from "./RewriteResBuffers"
-import {elfSetting as settings} from 'elf-setting'
-const {qualtricsServer} = settings
+import * as httpProxy from 'http-proxy-middleware'
+import {rewriteResBuffers} from './RewriteResBuffers'
+import {proxyTarget} from '../../../common/config'
 
 const proxy = httpProxy({
-    target: qualtricsServer,
+    target: proxyTarget.qualtricsServer,
     changeOrigin: true,
     ws: true,
     autoRewrite: true,
