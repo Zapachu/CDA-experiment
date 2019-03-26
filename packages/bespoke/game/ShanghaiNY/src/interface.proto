@@ -15,7 +15,8 @@ message CreateParams {
   float p = 12;
   float b0 = 13;
   float b1 = 14;
-  string nextPhaseKey = 15;
+  float participationFee = 15;
+  string nextPhaseKey = 16;
 }
 
 message GameState {
