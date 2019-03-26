@@ -1,5 +1,5 @@
 import React from 'react'
-import {Api, Lang, loadScript} from '@client-util'
+import {Api, connCtx, Lang, loadScript} from '@client-util'
 import {Loading} from '@client-component'
 import {RouteComponentProps} from 'react-router'
 import {baseEnum, CorePhaseNamespace, IPhaseConfig} from '@common'
@@ -7,6 +7,7 @@ import {AddPhase} from '../Phase'
 import {phaseTemplates} from '../../index'
 import {Button, Input, message, Modal} from '@antd-component'
 import GameMode = baseEnum.GameMode
+import {rootContext, TRootContext} from '@client-context'
 
 interface ICreateInFrameState {
     loading: boolean
@@ -16,7 +17,8 @@ interface ICreateInFrameState {
     phaseConfig: IPhaseConfig
 }
 
-export class CreateInFrame extends React.Component<RouteComponentProps, ICreateInFrameState> {
+@connCtx(rootContext)
+export class CreateInFrame extends React.Component<TRootContext & RouteComponentProps, ICreateInFrameState> {
     lang = Lang.extractLang({
         title: ['标题', 'Title'],
         desc: ['详情', 'Description'],
@@ -40,7 +42,7 @@ export class CreateInFrame extends React.Component<RouteComponentProps, ICreateI
     }
 
     async componentDidMount() {
-        const {code, templates} = await Api.getPhaseTemplates()
+        const {code, templates} = await Api.getPhaseTemplates(this.props.user.orgCode)
         if (code === baseEnum.ResponseCode.success) {
             loadScript(templates.reduce((prev, {jsUrl}) => [...prev, ...jsUrl.split(';')], []), () =>
                 this.setState({loading: false})

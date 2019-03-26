@@ -7,8 +7,7 @@ import {
     IUserWithId,
     TApiGroupPlayers,
     IGameToUpdate,
-    IPhaseConfig,
-    TPhaseType
+    IPhaseConfig
 } from '@common'
 import {getCookie} from '@client-util'
 import * as queryString from 'query-string'
@@ -98,17 +97,17 @@ export class Request {
         return await GET('/game/list', {}, {page})
     }
 
-    static async getPhaseTemplates(): Promise<IHttpRes & {
+    static async getPhaseTemplates(orgCode: string): Promise<IHttpRes & {
         templates: Array<ITemplateRegInfo>
     }> {
         const registeredRes = await GET('/game/phaseTemplates') as IHttpRes & {
             templates: Array<ITemplateRegInfo>
         }
         try {
-            const authorizedRes = await this.getAuthorizedTemplates()
+            const authorizedRes = await this.getAuthorizedTemplates(orgCode)
             if (authorizedRes.code === baseEnum.AcademusResCode.success) {
-                registeredRes.templates = registeredRes.templates.filter(t =>
-                    authorizedRes.templates.find(({type, namespace}) => type === t.type && t.namespace == namespace)
+                registeredRes.templates = registeredRes.templates.filter(({namespace}) =>
+                    authorizedRes.namespaces.includes(namespace)
                 )
             }
         } catch (e) {
@@ -153,12 +152,11 @@ export class Request {
         task: string,
         tasker: string,
         payeeId: string
-    }): Promise<{ code: number, msg: string }> {
+    }): Promise<{ code: baseEnum.AcademusResCode, msg: string }> {
         return await request(`/v5/apiv5/${orgCode}/researcher/trans/reward`, baseEnum.RequestMethod.post, data)
     }
 
-    /**** adminDev****/
-    static async getAuthorizedTemplates(): Promise<{ code: number, templates: Array<{ type: TPhaseType, namespace: string }> }> {
-        return await request('/admindev/api/gametpl/myList')
+    static async getAuthorizedTemplates(orgCode: string): Promise<{ code: baseEnum.AcademusResCode, namespaces: Array<string> }> {
+        return await request(`/v5/apiv5/${orgCode}/researcher/game/gametpl/myList`)
     }
 }

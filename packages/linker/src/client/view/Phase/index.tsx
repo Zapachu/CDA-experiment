@@ -78,7 +78,7 @@ export class Phase extends React.Component<TRootContext & RouteComponentProps<{ 
     }
 
     fetchPhaseTemplates = (): Promise<null> => new Promise(async resolve => {
-        const {code, templates} = await Api.getPhaseTemplates()
+        const {code, templates} = await Api.getPhaseTemplates(this.props.user.orgCode)
         if (code === baseEnum.ResponseCode.success) {
             loadScript(templates.reduce((prev, {jsUrl}) => [...prev, ...jsUrl.split(';')], []), () => {
                 resolve()
