@@ -1,26 +1,29 @@
 import * as Express from 'express'
-import * as errorhandler from 'errorhandler'
-
-import {ProxyWork, RPCWork, InitWork} from './utils'
-import {ConDB, SessionSetMiddleware, PassportMiddleware, StaticPathMiddleware, SessionTokenCheck} from '../../common/utils'
-
+import * as errorHandler from 'errorhandler'
+import {elfSetting} from 'elf-setting'
 import '../../common/auth/passport'
-import {elfSetting as settings} from 'elf-setting'
+import {routePrefix} from '../../common/config'
+import {ProxyWork, RPCWork, InitWork} from './utils'
+import {
+    ConDB,
+    SessionSetMiddleware,
+    PassportMiddleware,
+    SessionTokenCheck,
+    StaticPathMiddleware
+} from '../../common/utils'
 
-const {oTreeStaticPathNamespace: namespace, oTreePort: port} = settings
+const {oTreePort: port} = elfSetting
 
 const app = Express()
 
 ConDB()
-StaticPathMiddleware(app, namespace)
+StaticPathMiddleware(app, routePrefix.oTreeStaticPathNamespace)
 SessionSetMiddleware(app)
 PassportMiddleware(app)
-
 SessionTokenCheck(app)
 InitWork(app)
 ProxyWork(app)
-
 RPCWork()
 
-app.use(errorhandler())
+app.use(errorHandler())
 app.listen(port, () => console.log(`listening at ${port}`))

@@ -4,6 +4,8 @@ import * as style from './style.scss'
 import {registerOnFramework} from '../../index'
 import {fetchData} from '../../common/utils/fetchData'
 
+let otreeNode: { namespace: string,  oTreeProxy:string}
+
 class Create extends BaseCreate<any> {
 
     state = {
@@ -13,7 +15,7 @@ class Create extends BaseCreate<any> {
     }
 
     async componentDidMount() {
-        const fetchUrl = '/phases/list'
+        const fetchUrl = `${otreeNode.oTreeProxy}/phases/list`
         const res = await fetchData(fetchUrl)
         if (!res.err) {
             this.createPhase('public_goods')
@@ -22,6 +24,7 @@ class Create extends BaseCreate<any> {
     }
 
     createPhase(otreeName: string) {
+        console.log(otreeName)
         console.log(otreeName)
         const {props: {updatePhase}} = this
         this.setState({otreeName})
@@ -81,14 +84,18 @@ class Create extends BaseCreate<any> {
                             </li>
                         )
                     }
-                </ul> 
+                </ul>
             </div>
         </section>
     }
 }
 
-registerOnFramework('oTree-user001', {
-    localeNames: ['OTree', 'OTree'],
-    Create,
-    type: 'otree',
-})
+;(window as any).registerOtreePhase = (namespace:string, oTreeProxy:string) => {
+    otreeNode = {namespace, oTreeProxy}
+    registerOnFramework(namespace, {
+        localeNames: [namespace, namespace],
+        Create,
+        type: 'otree'
+    })
+}
+

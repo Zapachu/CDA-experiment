@@ -1,4 +1,4 @@
-import {config, baseEnum, ISetting} from 'bespoke-common'
+import {config, baseEnum, IGameSetting} from 'bespoke-common'
 import {elfSetting} from 'elf-setting'
 import {colorConsole, dailyfile} from 'tracer'
 import {resolve} from 'path'
@@ -30,23 +30,20 @@ export class Hash {
 }
 
 export function elfPhaseId2PlayUrl(namespace: string, phaseId: string): string {
-    const {proxyService:{host,port}} = setting
+    const {proxyService:{host,port}} = elfSetting
     return `${host.startsWith('http')?host:`http://${host}:${port}`}/${config.rootName}/${namespace}/play/${phaseId}`
 }
 
-//region setting
+export class Setting {
+    static staticPath:string
 
-export const setting: Readonly<(Partial<ISetting>)> = elfSetting
+    static init(setting:IGameSetting){
+        this.staticPath = setting.staticPath
+    }
 
-export function initSetting(gameSetting: ISetting) {
-    const {namespace, staticPath} = gameSetting
-    gameSetting.port = gameSetting.port || 0
-    gameSetting.getClientPath = gameSetting.getClientPath || ((): string => {
-        const {[`${namespace}.js`]: clientPath} = JSON.parse(readFileSync(resolve(staticPath, `${namespace}.json`)).toString())
+    static getClientPath():string {
+        const {bespokeNamespace} = elfSetting
+        const {[`${bespokeNamespace}.js`]: clientPath} = JSON.parse(readFileSync(resolve(this.staticPath, `${bespokeNamespace}.json`)).toString())
         return clientPath
-    })
-    Object.assign(setting, gameSetting)
-    setting.qiNiu.upload.path += `/${namespace}`
+    }
 }
-
-//endregion

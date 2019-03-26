@@ -6,7 +6,8 @@ import {
     IBaseGameWithId,
     IUserWithId,
     TApiGroupPlayers,
-    IGameToUpdate, IPhaseConfig
+    IGameToUpdate,
+    IPhaseConfig
 } from '@common'
 import {getCookie} from '@client-util'
 import * as queryString from 'query-string'
@@ -24,7 +25,7 @@ async function request(url, method: baseEnum.RequestMethod = baseEnum.RequestMet
         method,
         ...(data ? {body: JSON.stringify(data)} : {})
     } as RequestInit
-    const res = await fetch(url.startsWith('/v5') ? url : `/${config.rootName}${url}`, option)
+    const res = await fetch(url.match(/^\/v5|admindev/) ? url : `/${config.rootName}${url}`, option)
     if (res.ok) {
         return res.json()
     }
@@ -55,6 +56,12 @@ export async function POST(url: string, params = {}, query = {}, data = {}): Pro
 /******************  API request methods *************************/
 interface IHttpRes {
     code: baseEnum.ResponseCode
+}
+
+interface ITemplateRegInfo {
+    namespace: string,
+    jsUrl: string,
+    type: string
 }
 
 export class Request {
@@ -90,10 +97,24 @@ export class Request {
         return await GET('/game/list', {}, {page})
     }
 
-    static async getPhaseTemplates(): Promise<IHttpRes & {
-        templates: Array<{ namespace: string, jsUrl: string, type: string }>
+    static async getPhaseTemplates(orgCode: string): Promise<IHttpRes & {
+        templates: Array<ITemplateRegInfo>
     }> {
-        return await GET('/game/phaseTemplates')
+        const registeredRes = await GET('/game/phaseTemplates') as IHttpRes & {
+            templates: Array<ITemplateRegInfo>
+        }
+        try {
+            const authorizedRes = await this.getAuthorizedTemplates(orgCode)
+            if (authorizedRes.code === baseEnum.AcademusResCode.success) {
+                registeredRes.templates = registeredRes.templates.filter(({namespace}) =>
+                    authorizedRes.namespaces.includes(namespace)
+                )
+            }
+        } catch (e) {
+            console.log(e)
+            registeredRes.templates = []
+        }
+        return registeredRes
     }
 
     static async postNewGame(title: string, desc: string, mode: baseEnum.GameMode, phaseConfigs?: Array<IPhaseConfig<{}>>): Promise<IHttpRes & {
@@ -131,7 +152,11 @@ export class Request {
         task: string,
         tasker: string,
         payeeId: string
-    }): Promise<{ code: number, msg: string }> {
+    }): Promise<{ code: baseEnum.AcademusResCode, msg: string }> {
         return await request(`/v5/apiv5/${orgCode}/researcher/trans/reward`, baseEnum.RequestMethod.post, data)
+    }
+
+    static async getAuthorizedTemplates(orgCode: string): Promise<{ code: baseEnum.AcademusResCode, namespaces: Array<string> }> {
+        return await request(`/v5/apiv5/${orgCode}/researcher/game/gametpl/myList`)
     }
 }

@@ -15,10 +15,6 @@ const proxy = httpProxy({
     onProxyRes: rewriteResBuffers
 })
 
-const ProxyWork = (app) => {
+export const ProxyWork = (app) => {
     app.use(proxy)
-}
-
-export {
-    ProxyWork
 }

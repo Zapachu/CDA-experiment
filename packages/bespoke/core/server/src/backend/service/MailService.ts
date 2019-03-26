@@ -1,13 +1,13 @@
 import {createTransport} from 'nodemailer'
-import {setting} from '../util'
+import {elfSetting} from 'elf-setting'
 
 const transporter = createTransport({
-    host: setting.mail.smtpHost,
+    host: elfSetting.mail.smtpHost,
     port: 587,
     secure: false, // true for 465, false for other ports
     auth: {
-        user: setting.mail.smtpUsername,
-        pass: setting.mail.smtpPassword
+        user: elfSetting.mail.smtpUsername,
+        pass: elfSetting.mail.smtpPassword
     }
 })
 

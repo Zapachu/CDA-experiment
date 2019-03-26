@@ -1,5 +1,6 @@
-import {Log, EventIO, RobotConnection, cacheResultSync, setting} from '../util'
+import {Log, EventIO, RobotConnection, cacheResultSync} from '../util'
 import * as path from 'path'
+import {elfSetting} from 'elf-setting'
 import {credentials, load as grpcLoad, loadPackageDefinition} from 'grpc'
 import {loadSync} from '@grpc/proto-loader'
 import {decode} from 'msgpack-lite'
@@ -98,7 +99,7 @@ export class PythonSchedulerProxy<ICreateParams, IGameState, IPlayerState, MoveT
         moveStream: any
     } {
         const {PlayChannel} = grpcLoad(`${__dirname}/../../../../dist/${namespace}.proto`)[namespace] as any
-        const playChannel = new PlayChannel(setting.pythonRobotUri, credentials.createInsecure())
+        const playChannel = new PlayChannel(elfSetting.pythonRobotUri, credentials.createInsecure())
         const syncStateStream = playChannel.syncState(() => {
             }),
             moveStream = playChannel.sendMove()
@@ -113,7 +114,7 @@ export class PythonSchedulerProxy<ICreateParams, IGameState, IPlayerState, MoveT
             namespace
         }))(this.game)
         const {RobotManager} = loadPackageDefinition(loadSync(path.resolve(__dirname, `../../../../robot/core/proto/RobotManager.proto`))) as any,
-            robotManager = new RobotManager(setting.pythonRobotUri, credentials.createInsecure())
+            robotManager = new RobotManager(elfSetting.pythonRobotUri, credentials.createInsecure())
         robotManager.newRobot({
             game,
             moveTypes: []

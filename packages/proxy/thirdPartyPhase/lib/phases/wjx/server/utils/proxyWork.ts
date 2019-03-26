@@ -1,12 +1,10 @@
 'use strict'
 
 import * as httpProxy from "http-proxy-middleware"
-import {elfSetting as settings} from 'elf-setting'
-
-const {wjxServer} = settings
+import {proxyTarget} from '../../../common/config'
 
 const proxy = httpProxy({
-    target: wjxServer,
+    target: proxyTarget.wjxServer,
     ws: true,
     changeOrigin: true,
     autoRewrite: true,

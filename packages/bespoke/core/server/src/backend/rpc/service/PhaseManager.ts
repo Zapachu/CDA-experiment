@@ -1,7 +1,8 @@
-import {elfPhaseId2PlayUrl, setting} from '../../util'
+import {elfPhaseId2PlayUrl} from '../../util'
 import {GameModel} from '../../model'
 import {IGame} from 'bespoke-common'
 import {Server} from 'grpc'
+import {elfSetting} from 'elf-setting'
 import {PhaseManager as P} from 'elf-protocol'
 
 export function setPhaseService(server: Server) {
@@ -20,5 +21,5 @@ export function setPhaseService(server: Server) {
 }
 
 export function getGameService() {
-    return P.getGameService(setting.linkerServiceUri)
+    return P.getGameService(elfSetting.linkerServiceUri)
 }

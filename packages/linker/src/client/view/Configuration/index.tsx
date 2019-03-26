@@ -1,12 +1,13 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {CorePhaseNamespace, IGameWithId} from '@common'
-import {Api, Lang, loadScript} from '@client-util'
+import {Api, connCtx, Lang, loadScript} from '@client-util'
 import {RouteComponentProps} from 'react-router'
 import {Card, Modal} from '@antd-component'
 import {Breadcrumb, Loading, Title} from '@client-component'
 import {PhaseFlowChart} from '../Phase'
 import {phaseTemplates} from '../../index'
+import {rootContext,TRootContext} from '@client-context'
 
 declare interface IInfoState {
     loading: boolean
@@ -14,7 +15,8 @@ declare interface IInfoState {
     activePhaseKey?: string
 }
 
-export class Configuration extends React.Component<RouteComponentProps<{ gameId: string }>, IInfoState> {
+@connCtx(rootContext)
+export class Configuration extends React.Component<TRootContext & RouteComponentProps<{ gameId: string }>, IInfoState> {
 
     lang = Lang.extractLang({
         back2Game: ['实验信息', 'Game Info'],
@@ -29,9 +31,9 @@ export class Configuration extends React.Component<RouteComponentProps<{ gameId:
     }
 
     async componentDidMount() {
-        const {props: {match: {params: {gameId}}}} = this
+        const {props: {match: {params: {gameId}}, user:{orgCode}}} = this
         const {game} = await Api.getGame(gameId)
-        const {templates} = await Api.getPhaseTemplates()
+        const {templates} = await Api.getPhaseTemplates(orgCode)
         loadScript(templates.reduce((prev, {jsUrl}) => [...prev, ...jsUrl.split(';')], []), () => {
             this.setState({loading: false, game})
         })

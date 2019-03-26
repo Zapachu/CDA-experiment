@@ -19,7 +19,7 @@ export class UserCtrl {
     }
 
     static isTeacher(req, res: Response, next) {
-        req.user.role === baseEnum.AcademusRole.teacher ? next() : res.redirect(config.academusLoginRoute)
+        req.user.role === baseEnum.AcademusRole.teacher ? next() : res.redirect(`/${config.rootName}/join`)
     }
 
     static async isGameAccessible(req, res: Response, next: NextFunction) {

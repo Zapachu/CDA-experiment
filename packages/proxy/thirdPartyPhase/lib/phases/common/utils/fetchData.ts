@@ -1,6 +1,3 @@
-import {elfSetting as settings} from 'elf-setting'
-const { oTreeProxy } = settings
-
 async function request(url): Promise<any> {
     let option = {
         credentials: 'include',
@@ -8,7 +5,7 @@ async function request(url): Promise<any> {
         headers: { 'Content-Type': 'application/json; charset=utf-8' },
         cache: 'default',
     } as RequestInit
-    const res = await fetch(`${oTreeProxy}${url}`, option)
+    const res = await fetch(url, option)
     if (res.ok) {
         return res.json()
     }
