@@ -44,6 +44,9 @@ export interface ICreateParams {
     /** CreateParams b1 */
     b1?: (number|null);
 
+    /** CreateParams participationFee */
+    participationFee?: (number|null);
+
     /** CreateParams nextPhaseKey */
     nextPhaseKey?: (string|null);
 }
@@ -98,6 +101,9 @@ export class CreateParams implements ICreateParams {
 
     /** CreateParams b1. */
     public b1: number;
+
+    /** CreateParams participationFee. */
+    public participationFee: number;
 
     /** CreateParams nextPhaseKey. */
     public nextPhaseKey: string;

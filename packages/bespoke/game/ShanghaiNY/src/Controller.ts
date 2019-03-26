@@ -119,7 +119,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                   playersInGroup.forEach(ps => {
                     const ui = calcProfit(ps, min);
                     ps.profits[curRoundIndex] = ui;
-                    ps.finalProfit = ps.profits.reduce((acc, cur, i) => acc + Math.pow(cur, i+1)*s, 0);
+                    ps.finalProfit = ps.profits.reduce((acc, cur) => acc + cur*s, 0);
                     ps.stageIndex = 2;
                   })
                   break;
@@ -140,7 +140,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                   playersInGroup.forEach(ps => {
                     const ui = calcProfit(ps, min);
                     ps.profits[curRoundIndex] = ui;
-                    ps.finalProfit = ps.profits.reduce((acc, cur, i) => acc + Math.pow(cur, i+1)*s, 0);
+                    ps.finalProfit = ps.profits.reduce((acc, cur) => acc + cur*s, 0);
                     ps.stageIndex = 2;
                   })
                   break;
@@ -178,7 +178,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         const x = curChoice.c || curChoice.c1;
         const bi = version===Version.V3 ? (probs[roundIndex] ? b1 : b0) : b;
         const ei = eH*(x-1) + eL*(2-x);
-        let ui = a*min - bi*ei + c;
+        const emin = min===Choice.One ? eL : eH;
+        let ui = a*emin - bi*ei + c;
         if(curChoice.c1===Choice.Wait && curChoice.c===Choice.One) ui = ui - d;
         return ui;
       }
@@ -198,7 +199,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
   async onGameOver() {
       const gameState = await this.stateManager.getGameState()
       const playerStates = await this.stateManager.getPlayerStates()
-      const {rounds,gameType} = this.game.params;
+      const {rounds,gameType,participationFee} = this.game.params;
       const {groups} = gameState;
 
       const choiceTerms = {
@@ -207,18 +208,18 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         [Choice.Wait]: 'wait',
       }
 
-      const resultData: Array<Array<any>> = [['组', '座位号', '轮次', '第一阶段选择', '第二阶段选择', '最终选择', '第一阶段有人选1', '组内最低选择', '该轮收益', '最终收益', '专业', '年龄', '年级', '家庭住址', '性别']]
+      const resultData: Array<Array<any>> = [['组', '座位号', '最终收益', '轮次', '第一阶段选择', '第二阶段选择', '最终选择', '第一阶段有人选1', '组内最低选择', '该轮收益', '专业', '年龄', '年级', '家庭住址', '性别']]
       const playersByGroup = Object.values(playerStates).sort((a, b) => a.groupIndex - b.groupIndex);
       playersByGroup.forEach(ps => {
         const curGroup = groups[ps.groupIndex];
         let curRound = 0;
         while(curRound < rounds) {
-          const row = curRound===0 ? [ps.groupIndex+1, ps.seatNumber||'-', curRound+1] : ['', '', curRound+1];
+          const row = curRound===0 ? [ps.groupIndex+1, ps.seatNumber||'-', participationFee+(ps.finalProfit||0), curRound+1] : ['', '', '', curRound+1];
           const curChoice = ps.choices[curRound];
           if(curChoice) {
             row.push(choiceTerms[curChoice.c1], curChoice.c2.toString()||'-')
             if(curGroup.mins[curRound]) {
-              row.push(curChoice.c?curChoice.c:curChoice.c1, gameType===GameType.T2?(curGroup.ones[curRound]?'yes':'no'):'-', curGroup.mins[curRound], ps.profits[curRound], ps.finalProfit)
+              row.push(curChoice.c?curChoice.c:curChoice.c1, gameType===GameType.T2?(curGroup.ones[curRound]?'yes':'no'):'-', curGroup.mins[curRound], ps.profits[curRound])
               if(ps.surveyAnswers.length && curRound===0) {
                 row.push(...ps.surveyAnswers)
               }
