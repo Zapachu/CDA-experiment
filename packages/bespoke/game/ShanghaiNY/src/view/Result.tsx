@@ -9,16 +9,16 @@ interface IResultState {
 
 export class Result extends Core.Result<ICreateParams, IPlayerState, FetchType, IResultState> {
     lang = Lang.extractLang({
-        round: ['轮次', 'Round'],
-        profit: ['利润', 'Profit']
+        end: ['实验结束, 谢谢参与!', 'Game over, thanks for participating!']
     })
 
     state: IResultState = {}
 
     render(): React.ReactNode {
+        const {lang} = this;
         return <section className={style.result} style={{
         }}>
-            <p>实验结束, 谢谢参与!</p>
+            <p>{lang.end}</p>
         </section>
     }
 }

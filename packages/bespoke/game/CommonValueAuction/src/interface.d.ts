@@ -11,6 +11,9 @@ export interface ICreateParams {
     /** CreateParams commonValue */
     commonValue?: (number|null);
 
+    /** CreateParams winnerNumber */
+    winnerNumber?: (number|null);
+
     /** CreateParams privatePrice */
     privatePrice?: (number[]|null);
 
@@ -44,6 +47,9 @@ export class CreateParams implements ICreateParams {
 
     /** CreateParams commonValue. */
     public commonValue: number;
+
+    /** CreateParams winnerNumber. */
+    public winnerNumber: number;
 
     /** CreateParams privatePrice. */
     public privatePrice: number[];
