@@ -9,6 +9,7 @@ interface ICreateState {
   rounds: number,
   gameType: GameType,
   version: Version,
+  participationFee: number,
   a: number,
   b: number,
   c: number,
@@ -35,10 +36,11 @@ const versions = [
 export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> {
     lang = Lang.extractLang({
         round: ['轮次', 'Round'],
-        playersPerGroup: ['每组人数', 'PlayersPerGroup'],
-        gameType: ['类型', 'GameType'],
+        playersPerGroup: ['每组人数', 'Players per Group'],
+        gameType: ['类型', 'Game Type'],
         version: ['版本', 'Version'],
-        params: ['参数', 'Parameters']
+        params: ['参数', 'Parameters'],
+        participationFee: ['参与费', 'Participation Fee']
     })
 
     componentDidMount(): void {
@@ -48,6 +50,7 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
           rounds: 2,
           gameType: GameType.T1,
           version: Version.V1,
+          participationFee: 0,
           a: 0,
           b: 0,
           c: 0,
@@ -84,6 +87,14 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
                               step={1}
                               onChange={({target: {value: rounds}}) => setParams({rounds: Number(rounds)})}
                   />
+              </li>
+              <li>
+                  <Label label={lang.participationFee}/>
+                  <Input {...{
+                      type: 'number',
+                      value: params.participationFee,
+                      onChange: ({target: {value}}) => setParams({participationFee: Number(value)})
+                  }}/>
               </li>
               <li>
                   <Label label={lang.gameType}/>
