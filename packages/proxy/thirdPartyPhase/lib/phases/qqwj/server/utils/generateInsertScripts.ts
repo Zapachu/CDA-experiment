@@ -29,7 +29,7 @@ const generateInsertScript = (nextPhaseUrl) => {
         (function () {
             Timer(() => {
                 console.warn('debug: find end sign')
-                if (document.getElementsByClassName('survey_suffix') && $('.survey_suffix').css('display') != 'none') {
+                if (document.getElementsByClassName('survey_suffix') && document.getElementsByClassName("page-end").length != 0) {
                     window.location.href = '${nextPhaseUrl}'
                 }
             }, 2000)

@@ -12,8 +12,9 @@ const gen32Token = (source) => {
 const getUrlByNamespace = async (groupId, namespace, param, owner) => {
     let paramJson = JSON.parse(param)
     const {qqwjUrl: realqqwjUrl} = paramJson
-    paramJson.qqwjHash = realqqwjUrl.split('/s/')[1]
-    paramJson.adminUrl = `https://wj.qq.com/stat/overview.html?sid=${paramJson.qqwjHash}`
+    paramJson.qqwjHash = realqqwjUrl.split('wj.qq.com')[1]
+    const Id = paramJson.qqwjHash.split('/')[2]
+    paramJson.adminUrl = `https://wj.qq.com/stat/overview.html?sid=${Id}`
     const paramString = JSON.stringify(paramJson)
 
     try {

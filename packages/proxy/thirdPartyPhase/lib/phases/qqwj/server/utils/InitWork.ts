@@ -14,15 +14,16 @@ const InitWork = (app) => {
 
         const isInit = req.url.includes('/init/qqwj/')
         const isMoPush = req.url.includes('/sur/mo_push')
+        const isSubmit = req.url.includes('sur/collect_answer')
 
         if (isInit) {
-            const currentUserElfGameHash = req.query.token
+            const currentUserElfGameHash = req.session.token
             const currentPhaseId = req.url.split('/init/qqwj/')[1].slice(0, 24)
             try {
 
                 const currentPhase: any = await ThirdPartPhase.findById(currentPhaseId)
                 const currentPhaseParamsJson = JSON.parse(currentPhase.param)
-                const currentPhaseqqwjHash = currentPhaseParamsJson.qqwjHash
+                const currentPhaseQQWJHash = currentPhaseParamsJson.qqwjHash
 
                 if (!currentPhase) return ErrorPage(res, "Phase Not Exist")
 
@@ -40,7 +41,7 @@ const InitWork = (app) => {
 
                 for (let i = 0; i < playHash.length; i++) {
                     if (playHash[i].player.toString() === currentUserElfGameHash.toString()) {
-                        redirectTo = `${settings.qqwjProxy}/s/${currentPhaseqqwjHash}`
+                        redirectTo = `${settings.qqwjProxy}${currentPhaseQQWJHash}`
                     }
                 }
 
@@ -49,11 +50,11 @@ const InitWork = (app) => {
                 }
 
                 // 新加入成员
-                playHash.push({hash: currentPhaseqqwjHash, player: currentUserElfGameHash})
+                playHash.push({hash: currentPhaseQQWJHash, player: currentUserElfGameHash})
                 currentPhase.playHash = playHash
                 currentPhase.markModified('playHash')
                 await currentPhase.save()
-                return res.redirect(`${settings.qqwjProxy}/s/${currentPhaseqqwjHash}`)
+                return res.redirect(`${settings.qqwjProxy}${currentPhaseQQWJHash}`)
             } catch (err) {
                 if (err) {
                     console.trace(err)
@@ -69,7 +70,7 @@ const InitWork = (app) => {
                 'accept-encoding': 'gzip, deflate, br',
                 'accept-language': 'zh-CN,zh;q=0.9',
                 'origin': 'https://wj.qq.com',
-                'referer': `https://wj.qq.com/s/${req.url.split('/s/')[1]}`,
+                'referer': `https://wj.qq.com${req.url.split('wj.qq.com')[1]}`,
             })
         }
 
