@@ -17,7 +17,7 @@ const InitWork = (app) => {
         if (!isUser) return res.redirect('https://ancademy.org')
 
         if (isInit && isGet) {
-            const currentUserElfGameHash = req.query.token
+            const currentUserElfGameHash = req.session.token
             console.log('log > Starting init.....')
             console.log('log > current Elf hash ....', currentUserElfGameHash)
             const currentPhaseId = req.url.split('/jfe/form/')[1].slice(0, 24)
@@ -31,6 +31,14 @@ const InitWork = (app) => {
 
                 console.log('log > find phase object...')
                 console.log(currentPhase)
+
+                req.session.qualtricsPhaseId = currentPhase._id
+
+                // Admin Url
+                if (currentPhase.ownerToken.toString() === currentUserElfGameHash.toString()) {
+                    const phaseParam = JSON.parse(currentPhase.param)
+                    return res.redirect(phaseParam.adminUrl)
+                }
 
                 const {playHash} = currentPhase
 

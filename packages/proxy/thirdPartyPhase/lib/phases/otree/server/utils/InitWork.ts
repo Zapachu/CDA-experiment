@@ -47,6 +47,8 @@ export const InitWork = (app) => {
                     return ErrorPage(okRes(), 'phase not found')
                 }
 
+                req.session.oTreePhaseId = Phase._id
+
                 if (Phase.ownerToken.toString() === gameServicePlayerHash.toString()) {
                     const phaseParam = JSON.parse(Phase.param)
                     return okRes().redirect(phaseParam.adminUrl)
