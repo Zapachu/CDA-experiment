@@ -35,13 +35,13 @@ const Display: React.FunctionComponent<PropsType> = ({data}) => {
       <tr>
         <td rowSpan={2}>{lang.yourChoice}</td>
         <td>{lang.choose1}</td>
-        <td className={style.data}>{data ? data.p11 : 'π11'}</td>
+        <td className={style.data}>{data ? data.p11.toFixed(2) : 'π11'}</td>
         <td>{lang.noShow}</td>
       </tr>
       <tr>
         <td>{lang.choose2}</td>
-        <td className={style.data}>{data ? data.p21 : 'π21'}</td>
-        <td className={style.data}>{data ? data.p22 : 'π22'}</td>
+        <td className={style.data}>{data ? data.p21.toFixed(2) : 'π21'}</td>
+        <td className={style.data}>{data ? data.p22.toFixed(2) : 'π22'}</td>
       </tr>
     </tbody>
   </table>
