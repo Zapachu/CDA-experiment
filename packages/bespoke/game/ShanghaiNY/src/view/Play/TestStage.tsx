@@ -19,10 +19,15 @@ enum Tip {
   Wrong,
 }
 
+interface Word {
+  text: string,
+  color?: boolean
+}
+
 interface Test {
-  desc: string,
+  desc: Array<Word>,
   questions: Array<{
-    title: string,
+    title: Array<Word>,
     options: Array<string>,
     answer: string
   }>
@@ -80,6 +85,12 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
     this.setState({answers: newAnswers, tips: newTips});
   }
 
+  joinWords = (words: Array<Word>) => {
+    return <>
+      {words.map(({text, color}, i) => <span key={i} className={color?style.blueWords:''}>{text}</span>)}
+    </>
+  }
+
   render() {
     const {lang, props: {frameEmitter, playerState:{stageIndex}, game:{params:{gameType,version,d}}}, state: {c1, c2, answers, tips}} = this
     let content;
@@ -134,10 +145,10 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
       const curTest = this.Test[stageIndex-1]
       content = <div>
         <Display />
-        <p>{curTest.desc}</p>
+        <p className={style.desc}>{this.joinWords(curTest.desc)}</p>
         <ul>
           {curTest.questions.map(({title, options}, i) => <li key={i}>
-            <p className={tips[i]===Tip.Wrong?style.tipWrong:''}>{title} {tips[i] === Tip.Wrong ? <span>{lang.wrong}</span> : null}</p>
+            <p className={tips[i]===Tip.Wrong?style.tipWrong:''}>{this.joinWords(title)} {tips[i] === Tip.Wrong ? <span>{lang.wrong}</span> : null}</p>
             <RadioGroup options={options}
                         value={answers[i] || ''}
                         onChange={e => this.answer(e, i)}

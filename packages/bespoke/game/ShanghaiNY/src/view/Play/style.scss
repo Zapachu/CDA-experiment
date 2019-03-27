@@ -21,16 +21,29 @@
   .choice {
     font-size: 16px;
     min-width: 300px;
+    .choiceOption {
+      >li>label {
+        color: rgb(66, 133, 244);
+      }
+    }
   }
   
   .instruction {
     font-size: 16px;
     font-style: italic;
     margin: 20px 0 10px 0;
+    color: rgb(66, 133, 244);
+  }
+
+  .blueWords {
+    color: rgb(66, 133, 244);
   }
 
   .tipWrong {
     color: red;
+    span {
+      color: red;
+    }
   }
 
   .resultLines {
@@ -49,5 +62,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    .desc {
+      margin-bottom: 10px;
+    }
   }
 }
