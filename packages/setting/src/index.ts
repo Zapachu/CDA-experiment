@@ -1,6 +1,6 @@
 export * from './setting'
 
-import setting from './setting.sample'
+import setting from './setting'
 
 const {
     BESPOKE_NAMESPACE,
