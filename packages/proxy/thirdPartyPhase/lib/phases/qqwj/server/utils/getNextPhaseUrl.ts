@@ -3,12 +3,10 @@ import {elfSetting as settings} from 'elf-setting'
 import {gameService} from '../../../common/utils'
 
 const getNextPhaseUrl = async (req) => {
+    const phaseId =  req.session.qqwjPhaseId
     const qqwjHash = req.url.split('/s/')[1]
     console.log('log > qqwj hash ', qqwjHash)
-    const qqwjPhase: any = await ThirdPartPhase.findOne({
-        namespace: 'qqwj',
-        playHash: {$elemMatch: {hash: qqwjHash}}
-    })
+    const qqwjPhase: any = await ThirdPartPhase.findById(phaseId)
     console.log('log > qqwj phase', qqwjPhase)
     const paramsJson = JSON.parse(qqwjPhase.param)
     const request = {

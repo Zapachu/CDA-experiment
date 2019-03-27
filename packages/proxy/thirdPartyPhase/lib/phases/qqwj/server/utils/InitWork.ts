@@ -2,34 +2,39 @@
 
 import {ThirdPartPhase} from "../../../../core/server/models"
 import {elfSetting as settings} from 'elf-setting'
+import {ErrorPage} from '../../../common/utils'
+import {Request, Response, NextFunction} from 'express'
 
 const InitWork = (app) => {
-    app.use(async (req, res, next) => {
+    app.use(async (req: Request, res: Response, next: NextFunction) => {
 
         console.log(`${req.method}  ${req.url}`)
 
-        if (!req.user) return res.redirect('https://ancademy.org')
+        if (!req.user) return ErrorPage(res, "Not Login");
 
         const isInit = req.url.includes('/init/qqwj/')
         const isMoPush = req.url.includes('/sur/mo_push')
 
         if (isInit) {
             const currentUserElfGameHash = req.query.token
-            console.log('log > current Elf hash ....', currentUserElfGameHash)
             const currentPhaseId = req.url.split('/init/qqwj/')[1].slice(0, 24)
             try {
+
                 const currentPhase: any = await ThirdPartPhase.findById(currentPhaseId)
                 const currentPhaseParamsJson = JSON.parse(currentPhase.param)
                 const currentPhaseqqwjHash = currentPhaseParamsJson.qqwjHash
 
-                if (!currentPhase) {
-                    return res.redirect('https://ancademy.org')
-                }
+                if (!currentPhase) return ErrorPage(res, "Phase Not Exist")
 
-                console.log('log > find phase object...')
-                console.log(currentPhase)
+                req.session.qqwjPhaseId = currentPhase._id
 
                 const {playHash} = currentPhase
+
+                // Admin Url
+                if (currentPhase.ownerToken.toString() === currentUserElfGameHash.toString()) {
+                    const phaseParam = JSON.parse(currentPhase.param)
+                    return res.redirect(phaseParam.adminUrl)
+                }
 
                 let redirectTo = null
 
@@ -51,8 +56,8 @@ const InitWork = (app) => {
                 return res.redirect(`${settings.qqwjProxy}/s/${currentPhaseqqwjHash}`)
             } catch (err) {
                 if (err) {
-                    console.log(err)
-                    return res.redirect('https://ancademy.org')
+                    console.trace(err)
+                    return ErrorPage(res, "Error")
                 }
             }
             next()

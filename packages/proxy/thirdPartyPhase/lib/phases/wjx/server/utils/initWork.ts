@@ -22,19 +22,6 @@ const InitWork = (app) => {
         // if (!req.user) return ErrorPage(res, 'Not Login')
 
         if (isPOST && isSubmit) {
-            console.log(req.body)
-            console.log(req.query)
-            console.log(req.originalUrl)
-            console.log(req.baseUrl)
-            console.log(req.fresh)
-            console.log(req.hostname)
-            console.log(req.ip)
-            console.log(req.ips)
-            console.log(req.params)
-            console.log(req.path)
-            console.log(req.subdomains)
-            console.log(req.url)
-            console.log(req.xhr)
             delete req.query.sd
         }
 
@@ -56,7 +43,6 @@ const InitWork = (app) => {
 
                 if (!currentPhase) return ErrorPage(res, 'Phase Not Found')
 
-                console.log(currentPhase)
                 const {playHash} = currentPhase
                 req.session.wjxPhaseId = currentPhase._id
 

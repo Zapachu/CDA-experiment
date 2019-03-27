@@ -2,6 +2,7 @@
 
 import * as zlib from "zlib"
 const {Gzip} = require('zlib')
+import {ErrorPage} from '../../../common/utils'
 import {getNextPhaseUrl} from './getNextPhaseUrl'
 import {generateInsertScript} from './generateInsertScripts'
 
@@ -10,6 +11,10 @@ const rewriteResBuffers = async (proxyRes, req, res) => {
     const isMain = req.url.includes('/s/')
     const isInit = req.url.includes('/init/')
     const isDev = req.url.includes('performance-now.js.map')
+
+    const phaseId =  req.session.qqwjPhaseId
+    if (!phaseId) return ErrorPage(res, "Wrong Phase")
+
     if (isGet && isMain && !isInit && !isDev) {
         const originWrite = res.write
         const originEnd = res.end

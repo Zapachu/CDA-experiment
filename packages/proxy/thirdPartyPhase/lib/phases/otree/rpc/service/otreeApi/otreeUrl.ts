@@ -26,7 +26,6 @@ const getDemoList = async (namespace) => {
     const demoList = demoHrefList.map(item =>
         item.match(/ <a href="\/demo\/(\S*)\/" class="list-group-item" target="_blank">/)[1]
     )
-    console.log(demoList)
     await ListMap.setList(namespace, demoList)
     return demoList
 }
@@ -62,7 +61,7 @@ const getUrlByNamespace = async (groupId, namespace, param, owner): Promise<any>
     const waitingUrl = initRes.request.href
     if (waitingUrl.toString().indexOf('WaitUntilSessionCreated/') !== -1) {
         handleBody = await syncWaitingForCreated(waitingUrl)
-    }else if(waitingUrl.includes('SessionStartLinks')){
+    } else if (waitingUrl.includes('SessionStartLinks')) {
         handleBody = initRes.body
     }
     let content = handleBody.split(playerUrl)
@@ -72,7 +71,6 @@ const getUrlByNamespace = async (groupId, namespace, param, owner): Promise<any>
             playHash.push(con.slice(0, 8))
         }
     })
-    console.log(playHash)
     const playHashConf = []
     playHash.map(hash => playHashConf.push({hash: hash, player: 'wait'}))
     paramJson.adminUrl = initRes.request.uri.path

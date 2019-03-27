@@ -1,13 +1,19 @@
 import {elfSetting as setting} from 'elf-setting'
-import { ThirdPartPhase } from '../../../../core/server/models'
+import {ThirdPartPhase} from '../../../../core/server/models'
 import {PhaseManager} from 'elf-protocol'
+import * as objectHash from "object-hash"
 
 const {qqwjProxy} = setting
 
-const getUrlByNamespace = async (groupId, namespace, param) => {
+const gen32Token = (source) => {
+    return objectHash(source, {algorithm: 'md5'})
+}
+
+const getUrlByNamespace = async (groupId, namespace, param, owner) => {
     let paramJson = JSON.parse(param)
     const {qqwjUrl: realqqwjUrl} = paramJson
     paramJson.qqwjHash = realqqwjUrl.split('/s/')[1]
+    paramJson.adminUrl = `https://wj.qq.com/stat/overview.html?sid=${paramJson.qqwjHash}`
     const paramString = JSON.stringify(paramJson)
 
     try {
@@ -16,6 +22,7 @@ const getUrlByNamespace = async (groupId, namespace, param) => {
             groupId: groupId,
             param: paramString,
             namespace: namespace,
+            ownerToken: gen32Token(owner.toString())
         }).save()
         return `${qqwjProxy}/init/qqwj/${newqqwjPhase._id.toString()}`
     } catch (err) {
@@ -27,7 +34,7 @@ const getUrlByNamespace = async (groupId, namespace, param) => {
 }
 
 export const phaseService = {
-    async newPhase({ request: { groupId, namespace, param } }: { request: PhaseManager.TNewPhaseReq }, callback:PhaseManager.TNewPhaseCallback) {
-        callback(null, { playUrl: await getUrlByNamespace(groupId, namespace, param) })
+    async newPhase({request: {groupId, namespace, param, owner}}: { request: PhaseManager.TNewPhaseReq }, callback: PhaseManager.TNewPhaseCallback) {
+        callback(null, {playUrl: await getUrlByNamespace(groupId, namespace, param, owner)})
     }
 }
