@@ -16,7 +16,9 @@ import {
   Test2,
   Choice,
   Version,
-  SheetType
+  SheetType,
+  MainStageIndex,
+  TestStageIndex
 } from './config'
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
 
@@ -48,10 +50,11 @@ export default class Controller extends BaseController<ICreateParams, IGameState
   async initPlayerState(actor: IActor): Promise<TPlayerState<IPlayerState>> {
       const playerState = await super.initPlayerState(actor)
       playerState.stage = Stage.Seat;
-      playerState.stageIndex = 0;
+      playerState.stageIndex = TestStageIndex.Interface;
       playerState.choices = [];
       playerState.profits = [];
       playerState.surveyAnswers = [];
+      playerState.roundIndex = 0;
       return playerState
   }
 
@@ -60,7 +63,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
           playerState = await this.stateManager.getPlayerState(actor),
           playerStates = await this.stateManager.getPlayerStates(),
           {groups} = gameState,
-          {playersPerGroup, gameType, version, rounds, a,b,b0,b1,c,d,eH,eL,s,p} = this.game.params;
+          {playersPerGroup, gameType, version, rounds, a,b,b0,b1,c,d,eH,eL,p} = this.game.params;
       switch (type) {
           case MoveType.initPosition: {
             if (playerState.groupIndex !== undefined) {
@@ -69,7 +72,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             let openGroupIndex = groups.findIndex(({playerNum}) => playerNum < playersPerGroup)
             if (openGroupIndex === -1) {
                 const group: GameState.IGroup = {
-                    roundIndex: 0,
                     playerNum: 0,
                     mins: [],
                     ones: [],
@@ -92,23 +94,32 @@ export default class Controller extends BaseController<ICreateParams, IGameState
               break
           }
           case MoveType.answerTest: {
-            playerState.stageIndex++;
-            if(playerState.stageIndex === this.Test.length+1) {
-              const playersInGroup = await this.getPlayersInGroup(playerState.groupIndex);
-              const ready = playersInGroup.length === playersPerGroup && playersInGroup.every(ps => ps.stageIndex === this.Test.length+1);
-              if(ready) {
-                playersInGroup.forEach(ps => {
-                  ps.stageIndex = 0;
-                  ps.stage = Stage.Main;
-                })
-              }
+            if(playerState.stageIndex < TestStageIndex.Interface) {
+              break;
+            }
+            if(playerState.stageIndex === this.Test.length-1) {
+              playerState.stageIndex = TestStageIndex.Next;
+            } else {
+              playerState.stageIndex++;
+            }
+            break;
+          }
+          case MoveType.toMain: {
+            playerState.stageIndex = TestStageIndex.Wait4Others;
+            const playersInGroup = await this.getPlayersInGroup(playerState.groupIndex);
+            const ready = playersInGroup.length === playersPerGroup && playersInGroup.every(ps => ps.stageIndex === TestStageIndex.Wait4Others);
+            if(ready) {
+              playersInGroup.forEach(ps => {
+                ps.stageIndex = MainStageIndex.Choose;
+                ps.stage = Stage.Main;
+              })
             }
             break;
           }
           case MoveType.answerMain: {
-            const curRoundIndex = groups[playerState.groupIndex].roundIndex;
+            const curRoundIndex = playerState.roundIndex;
             playerState.choices[curRoundIndex] = {c1: params.c1, c2: params.c2 || []};
-            playerState.stageIndex = 1;
+            playerState.stageIndex = MainStageIndex.Wait4Result;
             const playersInGroup = await this.getPlayersInGroup(playerState.groupIndex);
             const ready = playersInGroup.length === playersPerGroup && playersInGroup.every(ps => !!ps.choices[curRoundIndex]);
             if(ready) {
@@ -119,8 +130,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                   playersInGroup.forEach(ps => {
                     const ui = calcProfit(ps, min);
                     ps.profits[curRoundIndex] = ui;
-                    ps.finalProfit = ps.profits.reduce((acc, cur) => acc + cur*s, 0);
-                    ps.stageIndex = 2;
+                    ps.finalProfit = ps.profits.reduce((acc, cur) => acc + cur, 0);
+                    ps.stageIndex = MainStageIndex.Result;
                   })
                   break;
                 }
@@ -140,8 +151,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                   playersInGroup.forEach(ps => {
                     const ui = calcProfit(ps, min);
                     ps.profits[curRoundIndex] = ui;
-                    ps.finalProfit = ps.profits.reduce((acc, cur) => acc + cur*s, 0);
-                    ps.stageIndex = 2;
+                    ps.finalProfit = ps.profits.reduce((acc, cur) => acc + cur, 0);
+                    ps.stageIndex = MainStageIndex.Result;
                   })
                   break;
                 }
@@ -150,18 +161,12 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             break;
           }
           case MoveType.advanceRoundIndex: {
-            playerState.stageIndex = 3;
-            const playersInGroup = await this.getPlayersInGroup(playerState.groupIndex);
-            const ready = playersInGroup.length === playersPerGroup && playersInGroup.every(ps => ps.stageIndex === 3);
-            if(ready) {
-              playersInGroup.forEach(ps => {
-                ps.stageIndex = 0;
-              })
-              if(groups[playerState.groupIndex].roundIndex++ === rounds-1) {
-                playersInGroup.forEach(ps => {
-                  ps.stage = Stage.Survey;
-                })
-              }
+            if(playerState.roundIndex === rounds-1) {
+              playerState.stageIndex = 0;
+              playerState.stage = Stage.Survey;
+            } else {
+              playerState.roundIndex++;
+              playerState.stageIndex = MainStageIndex.Choose;
             }
             break;
           }
@@ -173,7 +178,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
       }
 
       function calcProfit(playerState: TPlayerState<IPlayerState>, min: number): number {
-        const {roundIndex, probs} = groups[playerState.groupIndex];
+        const {probs} = groups[playerState.groupIndex];
+        const roundIndex = playerState.roundIndex;
         const curChoice = playerState.choices[roundIndex];
         const x = curChoice.c || curChoice.c1;
         const bi = version===Version.V3 ? (probs[roundIndex] ? b1 : b0) : b;
@@ -196,47 +202,52 @@ export default class Controller extends BaseController<ICreateParams, IGameState
     return playersInGroup;
   }
 
-  async onGameOver() {
-      const gameState = await this.stateManager.getGameState()
-      const playerStates = await this.stateManager.getPlayerStates()
-      const {rounds,gameType,participationFee} = this.game.params;
-      const {groups} = gameState;
+  private async genExportData(): Promise<Array<Array<any>>> {
+    const gameState = await this.stateManager.getGameState()
+    const playerStates = await this.stateManager.getPlayerStates()
+    const {rounds,gameType,participationFee,s} = this.game.params;
+    const {groups} = gameState;
 
-      const choiceTerms = {
-        [Choice.One]: 1,
-        [Choice.Two]: 2,
-        [Choice.Wait]: 'wait',
-      }
+    const choiceTerms = {
+      [Choice.One]: 1,
+      [Choice.Two]: 2,
+      [Choice.Wait]: 'wait',
+    }
 
-      const resultData: Array<Array<any>> = [['组', '座位号', '最终收益', '轮次', '第一阶段选择', '第二阶段选择', '最终选择', '第一阶段有人选1', '组内最低选择', '该轮收益', '专业', '年龄', '年级', '家庭住址', '性别']]
-      const playersByGroup = Object.values(playerStates).sort((a, b) => a.groupIndex - b.groupIndex);
-      playersByGroup.forEach(ps => {
-        const curGroup = groups[ps.groupIndex];
-        let curRound = 0;
-        while(curRound < rounds) {
-          const row = curRound===0 ? [ps.groupIndex+1, ps.seatNumber||'-', participationFee+(ps.finalProfit||0), curRound+1] : ['', '', '', curRound+1];
-          const curChoice = ps.choices[curRound];
-          if(curChoice) {
-            row.push(choiceTerms[curChoice.c1], curChoice.c2.toString()||'-')
-            if(curGroup.mins[curRound]) {
-              row.push(curChoice.c?curChoice.c:curChoice.c1, gameType===GameType.T2?(curGroup.ones[curRound]?'yes':'no'):'-', curGroup.mins[curRound], ps.profits[curRound])
-              if(ps.surveyAnswers.length && curRound===0) {
-                row.push(...ps.surveyAnswers)
-              }
+    const resultData: Array<Array<any>> = [['组', '座位号', '最终收益', '轮次', '第一阶段选择', '第二阶段选择', '最终选择', '第一阶段有人选1', '组内最低选择', '该轮积分', '专业', '年龄', '年级', '家庭住址', '性别']]
+    const playersByGroup = Object.values(playerStates).sort((a, b) => a.groupIndex - b.groupIndex);
+    playersByGroup.forEach(ps => {
+      const curGroup = groups[ps.groupIndex];
+      let curRound = 0;
+      while(curRound < rounds) {
+        const row = curRound===0 ? [ps.groupIndex+1, ps.seatNumber||'-', participationFee+(ps.finalProfit*s||0), curRound+1] : ['', '', '', curRound+1];
+        const curChoice = ps.choices[curRound];
+        if(curChoice) {
+          row.push(choiceTerms[curChoice.c1], curChoice.c2.toString()||'-')
+          if(curGroup.mins[curRound]) {
+            row.push(curChoice.c?curChoice.c:curChoice.c1, gameType===GameType.T2?(curGroup.ones[curRound]?'yes':'no'):'-', curGroup.mins[curRound], ps.profits[curRound])
+            if(ps.surveyAnswers.length && curRound===0) {
+              row.push(...ps.surveyAnswers)
             }
           }
-          resultData.push(row);
-          curRound++;
         }
-      })
+        resultData.push(row);
+        curRound++;
+      }
+    })
+    return resultData;
+  }
 
-      Object.assign(gameState, {
-          sheets: {
-              [SheetType.result]: {
-                  data: resultData
-              },
-          }
-      })
+  async onGameOver() {
+    const gameState = await this.stateManager.getGameState()
+    const resultData = await this.genExportData();
+    Object.assign(gameState, {
+        sheets: {
+            [SheetType.result]: {
+                data: resultData
+            },
+        }
+    })
   }
 
   async handleFetch(req, res) {
@@ -247,6 +258,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
               const name = SheetType[sheetType]
               let data = [], option = {}
               switch (sheetType) {
+                  case SheetType.result:
                   default: {
                       const sheet = gameState['sheets'][sheetType]
                       data = sheet.data
@@ -258,6 +270,29 @@ export default class Controller extends BaseController<ICreateParams, IGameState
               res.setHeader('Content-Disposition', 'attachment; filename=' + `${encodeURI(name)}.xlsx`)
               return res.end(buffer, 'binary')
           }
+          case FetchType.exportXlsPlaying: {
+            const name = SheetType[sheetType]
+            let data = [], option = {}
+            switch (sheetType) {
+                case SheetType.result:
+                default: {
+                    data = await this.genExportData();
+                }
+            }
+            let buffer = nodeXlsx.build([{name, data}], option)
+            res.setHeader('Content-Type', 'application/vnd.openxmlformats')
+            res.setHeader('Content-Disposition', 'attachment; filename=' + `${encodeURI(name)}.xlsx`)
+            return res.end(buffer, 'binary')
+        }
+        case FetchType.getUserId: {
+          const {token, actorType} = req.query;
+          const userId = req.user._id;
+          if(this.game.owner.toString() !== userId.toString()) {
+            const playerState = await this.stateManager.getPlayerState({type: actorType, token});
+            playerState.userId = userId;
+          }
+          return res.end();
+      }
       }
   }
 }

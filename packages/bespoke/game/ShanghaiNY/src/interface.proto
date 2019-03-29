@@ -17,12 +17,12 @@ message CreateParams {
   float b1 = 14;
   float participationFee = 15;
   string nextPhaseKey = 16;
+  string id = 17;
 }
 
 message GameState {
   message Group {
     int32 playerNum = 1;
-    int32 roundIndex = 2;
     repeated bool probs = 3;
     repeated bool ones = 4;
     repeated int32 mins = 5;
@@ -45,6 +45,8 @@ message PlayerState {
   repeated float profits = 7;
   float finalProfit = 8;
   repeated string surveyAnswers = 9;
+  int32 roundIndex = 10;
+  string userId = 11;
 }
 
 message MoveParams {

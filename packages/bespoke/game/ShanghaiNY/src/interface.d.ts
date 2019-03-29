@@ -49,6 +49,9 @@ export interface ICreateParams {
 
     /** CreateParams nextPhaseKey */
     nextPhaseKey?: (string|null);
+
+    /** CreateParams id */
+    id?: (string|null);
 }
 
 /** Represents a CreateParams. */
@@ -107,6 +110,9 @@ export class CreateParams implements ICreateParams {
 
     /** CreateParams nextPhaseKey. */
     public nextPhaseKey: string;
+
+    /** CreateParams id. */
+    public id: string;
 
     /**
      * Creates a new CreateParams instance using the specified properties.
@@ -277,9 +283,6 @@ export namespace GameState {
         /** Group playerNum */
         playerNum?: (number|null);
 
-        /** Group roundIndex */
-        roundIndex?: (number|null);
-
         /** Group probs */
         probs?: (boolean[]|null);
 
@@ -301,9 +304,6 @@ export namespace GameState {
 
         /** Group playerNum. */
         public playerNum: number;
-
-        /** Group roundIndex. */
-        public roundIndex: number;
 
         /** Group probs. */
         public probs: boolean[];
@@ -415,6 +415,12 @@ export interface IPlayerState {
 
     /** PlayerState surveyAnswers */
     surveyAnswers?: (string[]|null);
+
+    /** PlayerState roundIndex */
+    roundIndex?: (number|null);
+
+    /** PlayerState userId */
+    userId?: (string|null);
 }
 
 /** Represents a PlayerState. */
@@ -452,6 +458,12 @@ export class PlayerState implements IPlayerState {
 
     /** PlayerState surveyAnswers. */
     public surveyAnswers: string[];
+
+    /** PlayerState roundIndex. */
+    public roundIndex: number;
+
+    /** PlayerState userId. */
+    public userId: string;
 
     /**
      * Creates a new PlayerState instance using the specified properties.

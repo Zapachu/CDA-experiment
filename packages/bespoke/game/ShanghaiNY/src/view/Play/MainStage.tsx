@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {Button, ButtonProps, Core, Lang, MaskLoading} from 'bespoke-client-util'
-import {FetchType, MoveType, PushType, GameType, Version, Choice} from '../../config'
+import {FetchType, MoveType, PushType, GameType, Version, Choice, MainStageIndex} from '../../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
 import Display from './Display'
 import Choice1 from './Choice1'
@@ -44,9 +44,9 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
       lowestChocieLeft: ['第', 'The lowest choice of the group in round '],
       lowestChocieRight: ['轮的组内最低选择为:', ' is:'],
       profitLeft: ['你在第', 'Your profit in round '],
-      profitRight: ['轮的收益为:', ' is:'],
+      profitRight: ['轮的积分为:', ' is:'],
       totalProfitLeft: ['截止第', 'Until round '],
-      totalProfitRight: ['轮，你的收益为:', ' your total profit is:'],
+      totalProfitRight: ['轮，你的积分为:', ' your total profit is:'],
       inFirstAction: ['在第一阶段中,', 'In the first action,'],
       chose1: ['有人选1', 'someone has chosen 1'],
       notChose1: ['没有人选1', 'no one has chosen 1'],
@@ -58,10 +58,10 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
   })
 
   calcDisplayData = () => {
-    const {props: {playerState:{groupIndex}, gameState:{groups}, game:{params:{a,b,c,eL,eH,b0,b1,version}}}} = this
+    const {props: {playerState:{groupIndex,roundIndex}, gameState:{groups}, game:{params:{a,b,c,eL,eH,b0,b1,version}}}} = this
     const curGroup = groups[groupIndex];
     if(version === Version.V3) {
-      const prob = curGroup.probs[curGroup.roundIndex];
+      const prob = curGroup.probs[roundIndex];
       return prob 
         ? {
           p11: a*eL-b0*eL+c,
@@ -91,9 +91,9 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
   }
 
   renderResult = () => {
-    const {lang, props: {frameEmitter, playerState:{groupIndex,choices,profits,finalProfit}, gameState:{groups}, game:{params:{gameType}}}, state: {c1, c2}} = this
+    const {lang, props: {frameEmitter, playerState:{groupIndex,roundIndex,choices,profits,finalProfit}, gameState:{groups}, game:{params:{gameType}}}, state: {c1, c2}} = this
     const curGroup = groups[groupIndex];
-    const curRoundIndex = curGroup.roundIndex;
+    const curRoundIndex = roundIndex;
     const curChoice = choices[curRoundIndex];
     if(!curChoice) return null;
     const curProfit = profits[curRoundIndex];
@@ -117,7 +117,7 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
         return <>
           <p>{lang.yourFirstChoiceLeft}{curRoundIndex + 1}{lang.yourFirstChoiceRight} </p>
           {this.renderChoice2(c1, c2)}
-          <p style={{marginTop:'30px'}}>{lang.inFirstAction} {curGroup.ones[curRoundIndex] ? lang.chose1 : lang.notChose1}</p>
+          <p style={{margin:'30px 0'}}>{lang.inFirstAction} {curGroup.ones[curRoundIndex] ? lang.chose1 : lang.notChose1}</p>
           {curChoice.c1!==Choice.One ? <p>{lang.yourSecondChoice} {curChoice.c}</p> : null}
           <p>{lang.lowestChocieLeft}{curRoundIndex + 1}{lang.lowestChocieRight} {curGroup.mins[curRoundIndex]}</p>
           <p>{lang.profitLeft}{curRoundIndex + 1}{lang.profitRight} {curProfit.toFixed(2)}</p>
@@ -135,12 +135,11 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
   }
 
   render() {
-    const {lang, props: {frameEmitter, playerState:{stageIndex,groupIndex}, gameState:{groups}, game:{params:{gameType,version,d}}}, state: {c1, c2}} = this
-    const curGroup = groups[groupIndex];
+    const {lang, props: {frameEmitter, playerState:{stageIndex,roundIndex}, game:{params:{gameType,version,d}}}, state: {c1, c2}} = this;
     const displayData = this.calcDisplayData();
     let content;
     switch(stageIndex) {
-      case 0: {
+      case MainStageIndex.Choose: {
         content = <div>
           <Display data={displayData} />
           <Choice1 c1={c1} d={d} version={version} gameType={gameType} onChoose={c1 => this.setState({c1})}/>
@@ -166,31 +165,24 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
         </div>
         break;
       }
-      case 1: {
+      case MainStageIndex.Wait4Result: {
         content = <div>
           <Display data={displayData} />
           <MaskLoading label={lang.wait4Others2Choose} />
         </div>
         break;
       }
-      case 2: {
+      case MainStageIndex.Result: {
         content = <div>
           <Display data={displayData} />
           <div className={style.resultLines}>{this.renderResult()}</div>
         </div>
         break;
       }
-      case 3: {
-        content = <div>
-          <Display data={displayData} />
-          <MaskLoading label={lang.wait4Others2Next} />
-        </div>
-        break;
-      }
     }
 
     return <section>
-      <p>{lang.roundLeft}{curGroup.roundIndex + 1}{lang.roundRight}</p>
+      <p>{lang.roundLeft}{roundIndex + 1}{lang.roundRight}</p>
       {content}
     </section>
   }
