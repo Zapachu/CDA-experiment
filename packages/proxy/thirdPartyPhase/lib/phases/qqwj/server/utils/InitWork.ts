@@ -21,7 +21,7 @@ const InitWork = (app) => {
             const currentPhaseId = req.url.split('/init/qqwj/')[1].slice(0, 24)
             try {
 
-                const currentPhase: any = await ThirdPartPhase.findById(currentPhaseId)
+                const currentPhase:any = await ThirdPartPhase.findById(currentPhaseId)
                 const currentPhaseParamsJson = JSON.parse(currentPhase.param)
                 const currentPhaseQQWJHash = currentPhaseParamsJson.qqwjHash
 

@@ -3,10 +3,10 @@
 import {Schema, model, Document} from 'mongoose'
 
 interface PlayHash extends Document{
-    result: string;
-    hash: string;
-    player: string;
-    screen: string;
+    result?: string;
+    hash?: string;
+    player?: string;
+    screen?: string;
 }
 
 interface IThirdPartPhaseSchema extends Document{
