@@ -4,9 +4,12 @@ import ListMap from '../utils/ListMap'
 import {ThirdPartPhase} from '../../../../core/server/models'
 import {elfSetting as elfSetting} from 'elf-setting'
 import {virtualJsRoute} from '../config'
+import * as path from "path"
 
 const INIT_SIGN = '/init'
-const START_SIGN = 'InitializeParticipant/'
+const START_SIGN = 'InitializeParticipant'
+
+const JQUERY_REQ = '/static/otree/js/jquery-3.2.1.min.js'
 
 const FETCH_DEMO_LIST = '/phases/list'
 const FETCH_REPORT_SCREEN = '/report/screen'
@@ -30,6 +33,7 @@ export const InitWork = (app) => {
         noRes()
 
         const isInit = req.url.includes(INIT_SIGN)
+        const isJqueryReq = req.url.includes(JQUERY_REQ)
         const isFetchDemoList = req.url.includes(FETCH_DEMO_LIST)
         const isFetchReportScreen = req.url.includes(FETCH_REPORT_SCREEN)
 
@@ -48,14 +52,26 @@ export const InitWork = (app) => {
             const phaseId = req.session.oTreePhaseId
             const phase = await ThirdPartPhase.findById(phaseId)
             const gameServicePlayerHash = req.session.token
-            const {winW, winH} = req.body
-            for (let ph of phase.playHash) {
-                if (ph.player === gameServicePlayerHash) {
-                    ph.screen = JSON.stringify({winW, winH})
-                    break
+            let jsonString = ''
+            req.on('data', (data) => {
+                jsonString += data
+            })
+            req.on('end', async () => {
+                const body = JSON.parse(jsonString)
+                for (let ph of phase.playHash) {
+                    if (ph.player === gameServicePlayerHash) {
+                        ph.screen = JSON.stringify({winW: body.winW, winH: body.winH})
+                        break
+                    }
                 }
-            }
-            return res.json({code: 0, msg: 'reported'})
+                phase.markModified('playHash')
+                await phase.save()
+                return okRes().json({code: 0, msg: 'reported'})
+            })
+        }
+
+        if (isJqueryReq) {
+            return okRes().sendFile(path.resolve(__dirname, './hack.js'))
         }
 
         if (isInit) {

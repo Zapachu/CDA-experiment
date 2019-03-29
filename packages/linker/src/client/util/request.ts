@@ -58,11 +58,11 @@ interface IHttpRes {
     code: baseEnum.ResponseCode
 }
 
-interface ITemplateRegInfo {
-    namespace: string,
-    jsUrl: string,
-    type: string
-}
+// interface ITemplateRegInfo {
+//     namespace: string,
+//     jsUrl: string,
+//     type: string
+// }
 
 export class Request {
     static async getUser(): Promise<IHttpRes & { user: IUserWithId }> {
@@ -97,25 +97,31 @@ export class Request {
         return await GET('/game/list', {}, {page})
     }
 
-    static async getPhaseTemplates(orgCode: string): Promise<IHttpRes & {
-        templates: Array<ITemplateRegInfo>
+    static async getPhaseTemplates(): Promise<IHttpRes & {
+        templates: Array<{ namespace: string, jsUrl: string, type: string }>
     }> {
-        const registeredRes = await GET('/game/phaseTemplates') as IHttpRes & {
-            templates: Array<ITemplateRegInfo>
-        }
-        try {
-            const authorizedRes = await this.getAuthorizedTemplates(orgCode)
-            if (authorizedRes.code === baseEnum.AcademusResCode.success) {
-                registeredRes.templates = registeredRes.templates.filter(({namespace}) =>
-                    authorizedRes.namespaces.includes(namespace)
-                )
-            }
-        } catch (e) {
-            console.log(e)
-            registeredRes.templates = []
-        }
-        return registeredRes
+        return await GET('/game/phaseTemplates')
     }
+
+    // static async getPhaseTemplates(orgCode: string): Promise<IHttpRes & {
+    //     templates: Array<ITemplateRegInfo>
+    // }> {
+    //     const registeredRes = await GET('/game/phaseTemplates') as IHttpRes & {
+    //         templates: Array<ITemplateRegInfo>
+    //     }
+    //     try {
+    //         const authorizedRes = await this.getAuthorizedTemplates(orgCode)
+    //         if (authorizedRes.code === baseEnum.AcademusResCode.success) {
+    //             registeredRes.templates = registeredRes.templates.filter(({namespace}) =>
+    //                 authorizedRes.namespaces.includes(namespace)
+    //             )
+    //         }
+    //     } catch (e) {
+    //         console.log(e)
+    //         registeredRes.templates = []
+    //     }
+    //     return registeredRes
+    // }
 
     static async postNewGame(title: string, desc: string, mode: baseEnum.GameMode, phaseConfigs?: Array<IPhaseConfig<{}>>): Promise<IHttpRes & {
         gameId: string
