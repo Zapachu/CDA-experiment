@@ -28,6 +28,7 @@ const Choice1: React.FunctionComponent<PropsType> = ({c1, onChoose, gameType, ve
   return <div className={style.choice}>
     <p>{lang.firstChoice} {d>0 ? `${lang.feeLeft}${d}${lang.feeRight}` : ''}</p>
     <Radio  value={c1} 
+            className={style.choiceOption}
             options={options} 
             onChange={val => onChoose(val as number)} 
     />

@@ -9,14 +9,14 @@ interface Option {
 }
 
 interface PropsType {
-  title?: string,
   value: Value,
   options: Array<Option|string>,
   onChange: (value: Value) => void,
   style?: object,
+  className?: string
 }
 
-export const Radio: React.FunctionComponent<PropsType> = ({title, value, options, onChange, style: propStyle={}}) => {
+export const Radio: React.FunctionComponent<PropsType> = ({value, options, onChange, style: propStyle={}, className}) => {
     const random = Math.random().toString();
     const newOptions: Array<Option> = options.map(option => {
       return {
@@ -24,7 +24,7 @@ export const Radio: React.FunctionComponent<PropsType> = ({title, value, options
         value: typeof option === 'object' ? option.value : option,
       }
     })
-    return <ul className={style.radio} style={propStyle}>
+    return <ul className={style.radio+' '+className} style={propStyle}>
       {newOptions.map((option, i) => {
         return <li key={i}>
           <input type="radio" id={`${random}-${i}`} checked={value===option.value} onChange={() => onChange(option.value)} />

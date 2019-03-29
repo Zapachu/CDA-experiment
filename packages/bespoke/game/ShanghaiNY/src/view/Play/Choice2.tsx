@@ -37,11 +37,13 @@ const Choice2: React.FunctionComponent<PropsType> = ({c1, c2, onChoose, gameType
       ? <>
         <p>{version===Version.V3 ? lang.if1A : lang.if1} {lang.yourChoice}:</p>
         <Radio  value={c2[0]} 
+                className={style.choiceOption}
                 options={options} 
                 onChange={val => onChoose([val as number, c2[1]])} 
         />
         <p>{version===Version.V3 ? lang.ifNot1A : lang.ifNot1} {lang.yourChoice}:</p>
         <Radio  value={c2[1]} 
+                className={style.choiceOption}
                 options={options} 
                 onChange={val => onChoose([c2[0], val as number])} 
         />

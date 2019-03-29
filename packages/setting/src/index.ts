@@ -1,6 +1,6 @@
 export * from './setting'
 
-import setting from './setting.sample'
+import setting from './setting'
 
 const {
     BESPOKE_NAMESPACE,
@@ -13,7 +13,7 @@ const {
     OTREE_RPC,
     OTREE_PROXY,
     OTREE_SERVER,
-    OTREE_NODE_NAMESPACE
+    OTREE_NAMESPACE
 } = process.env
 
 export const elfSetting = {
@@ -28,7 +28,7 @@ export const elfSetting = {
     //endregion
     //region otree
     oTreePort: +(OTREE_PORT || 3070),
-    oTreeNamespace: OTREE_NODE_NAMESPACE || 'OtreeDefault',
+    oTreeNamespace: OTREE_NAMESPACE || 'OtreeDefault',
     oTreeRpc: OTREE_RPC || '127.0.0.1:53070',
     oTreeProxy: OTREE_PROXY || 'http://127.0.0.1:3070',
     oTreeServer: OTREE_SERVER || 'http://127.0.0.1:8000',
