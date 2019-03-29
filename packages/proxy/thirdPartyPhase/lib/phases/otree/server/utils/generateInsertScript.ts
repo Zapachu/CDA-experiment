@@ -22,11 +22,14 @@ const generateInsertScript = () => {
             }
             console.log(winW, winH);
             var myHeaders = new Headers();
+            myHeaders['Content-Type'] = 'application/json; charset=utf-8'
             var init = {
+                credentials: 'include',
                 method: 'POST',
                 headers: myHeaders,
                 mode: 'cors',
-                cache: 'default' 
+                cache: 'default',
+                body: {winW, winH}
             };
             fetch('/report/screen', init).then(function (log) {
                 console.log(log);
