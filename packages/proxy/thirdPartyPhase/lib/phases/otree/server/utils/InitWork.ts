@@ -3,16 +3,10 @@ import {ErrorPage} from '../../../common/utils'
 import ListMap from '../utils/ListMap'
 import {ThirdPartPhase} from '../../../../core/server/models'
 import {elfSetting as elfSetting} from 'elf-setting'
-import {virtualJsRoute} from '../config'
+import {virtualJsRoute, getOTreeListRoute, reportScreenRoute, jqueryRoute, initRoute} from '../config'
 import * as path from "path"
 
-const INIT_SIGN = '/init'
 const START_SIGN = 'InitializeParticipant'
-
-const JQUERY_REQ = '/static/otree/js/jquery-3.2.1.min.js'
-
-const FETCH_DEMO_LIST = '/phases/list'
-const FETCH_REPORT_SCREEN = '/report/screen'
 
 export const InitWork = (app) => {
     app.use(async (req: Request, res: Response, next: NextFunction) => {
@@ -32,23 +26,17 @@ export const InitWork = (app) => {
 
         noRes()
 
-        const isInit = req.url.includes(INIT_SIGN)
-        const isJqueryReq = req.url.includes(JQUERY_REQ)
-        const isFetchDemoList = req.url.includes(FETCH_DEMO_LIST)
-        const isFetchReportScreen = req.url.includes(FETCH_REPORT_SCREEN)
-
         if (req.url.includes(virtualJsRoute)) {
-            okRes()
-            res.setHeader('Content-Type', 'text/javascript')
-            return res.end(`window.registerOtreePhase("${elfSetting.oTreeNamespace}","${elfSetting.oTreeProxy}")`)
+            okRes().setHeader('Content-Type', 'text/javascript')
+            return okRes().end(`window.registerOtreePhase("${elfSetting.oTreeNamespace}","${elfSetting.oTreeProxy}")`)
         }
 
-        if (isFetchDemoList) {
+        if (req.url.includes(getOTreeListRoute)) {
             const list = await ListMap.getList(elfSetting.oTreeNamespace)
             return okRes().json({err: 0, list})
         }
 
-        if (isFetchReportScreen) {
+        if (req.url.includes(reportScreenRoute)) {
             const phaseId = req.session.oTreePhaseId
             const phase = await ThirdPartPhase.findById(phaseId)
             const gameServicePlayerHash = req.session.token
@@ -70,11 +58,11 @@ export const InitWork = (app) => {
             })
         }
 
-        if (isJqueryReq) {
+        if (req.url.includes(jqueryRoute)) {
             return okRes().sendFile(path.resolve(__dirname, './hack.js'))
         }
 
-        if (isInit) {
+        if (req.url.includes(initRoute)) {
             let findHash: string
             const gameServicePlayerHash = req.session.token
             const phaseId = req.path.split(`${START_SIGN}/`)[1]
@@ -104,9 +92,7 @@ export const InitWork = (app) => {
                             break
                         }
                     }
-                    if (!findHash) {
-                        return ErrorPage(okRes(), 'member full')
-                    }
+                    if (!findHash) return ErrorPage(okRes(), 'member full')
                     phase.markModified('playHash')
                     await phase.save()
                     return okRes().redirect(`${elfSetting.oTreeProxy}/${START_SIGN}/${findHash}`)

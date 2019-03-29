@@ -19,50 +19,6 @@ export const rewriteResBuffers = async (proxyRes, req: Request, res: Response) =
 
     const isEnd = req.url.includes(END_SIGN)
 
-
-    // if (isGet && isPlaying) {
-    //     const originWrite = res.write
-    //     const originEnd = res.end
-    //     let gzipStream = Gzip()
-    //     let buffers = []
-    //     console.log('Hack Insert')
-    //     console.log(req.url)
-    //     res.write = (chunk) => {
-    //         buffers.push(chunk)
-    //         return true
-    //     }
-    //     console.log("Hack 2")
-    //     res.end = () => {
-    //         let fullChunk = Buffer.concat(buffers)
-    //         console.log("Hack 3")
-    //         zlib.unzip(fullChunk, {finishFlush: zlib.constants.Z_SYNC_FLUSH}, async (err, buffer) => {
-    //             if (!err) {
-    //                 console.log("Hack 4")
-    //                 gzipStream.on('data', chunk => {
-    //                     originWrite.call(res, chunk)
-    //                     gzipStream.end()
-    //                 })
-    //                 console.log("Hack 5")
-    //                 gzipStream.on('end', () => {
-    //                     originEnd.call(res)
-    //                 })
-    //                 console.log("Hack 6")
-    //                 const data = buffer.toString()
-    //                 console.log("Hack 7")
-    //                 console.log(data)
-    //                 const dataStart = data.split('<head>')[0]
-    //                 const dataEnd = data.split('<head>')[1]
-    //                 const newData = dataStart + '<head>' + generateInsertScript() + dataEnd
-    //                 console.log(newData)
-    //                 gzipStream.write(new Buffer(newData))
-    //             } else {
-    //                 console.log("Hack false")
-    //                 console.log(err)
-    //             }
-    //         })
-    //     }
-    // }
-
     if (isEnd) {
         const originWrite = res.write
         const originEnd = res.end
@@ -72,19 +28,15 @@ export const rewriteResBuffers = async (proxyRes, req: Request, res: Response) =
             res.end = originEnd
             return res
         }
-        res.write = () => {
-            return true
-        }
+        res.write = () => true
         res.end = () => {
         }
+
+
         let playerGameHash: string
         const playerOtreeHash: string = req.headers.referer.split('/p/')[1].split('/')[0]
         try {
-            const otreePhase: any = await ThirdPartPhase.findOne({
-                // namespace: 'otree',
-                playHash: {$elemMatch: {hash: playerOtreeHash}}
-            }).exec()
-            console.log('phase', otreePhase)
+            const otreePhase: any = await ThirdPartPhase.findOne({playHash: {$elemMatch: {hash: playerOtreeHash}}})
             otreePhase.playHash.map(op => {
                 if (op.hash.toString() === playerOtreeHash.toString()) {
                     playerGameHash = op.player.toString()
@@ -100,16 +52,15 @@ export const rewriteResBuffers = async (proxyRes, req: Request, res: Response) =
                 phasePlayer: {uniKey: playerOtreeHash}
             }, (err: {}, service_res: { sendBackUrl: string }) => {
                 if (err) {
-                    console.log(err)
-                    return okRes().send('Get Next Phase Error From Core')
+                    console.trace(err)
+                    return ErrorPage(okRes(), 'Get Next Phase Error From Core')
                 }
-                console.log(service_res.sendBackUrl)
                 const nextPhaseUrl = service_res.sendBackUrl
                 return okRes().redirect(nextPhaseUrl)
             })
         } catch (err) {
             if (err) {
-                console.log(err)
+                console.trace(err)
                 return okRes().send(err)
             }
         }
