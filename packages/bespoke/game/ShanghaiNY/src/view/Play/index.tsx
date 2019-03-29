@@ -22,11 +22,15 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         submit: ['提交', 'Submit'],
         invalidSeatNumber: ['座位号有误或已被占用', 'Your seat number is invalid or has been occupied'],
         wait4StartMainTest: ['等待老师开放实验', 'Wait for teacher to start the experiment'],
-        end: ['实验结束', 'Game Over']
+        end: ['实验结束', 'Game Over'],
+        totalPoint: ['你在本场试验共获得积分 ', 'Total points you have got in this game are '],
+        totalProfit: ['你的最终收益为 ', 'Total profit you have earned in this game is '],
     })
 
     componentDidMount() {
-      this.props.frameEmitter.emit(MoveType.initPosition);
+      const {playerState:{actor}, frameEmitter, fetcher} = this.props;
+      frameEmitter.emit(MoveType.initPosition);
+      fetcher.getFromGame(FetchType.getUserId, {token: actor.token, actorType: actor.type});
     }
 
     render(): React.ReactNode {
@@ -57,8 +61,10 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     }
 
     renderEndStage = () => {
-      return <section>
-        <p>{this.lang.end}</p>
+      const {lang, props: {game: {params: {s,participationFee}}, playerState: {finalProfit}}} = this;
+      return <section className={style.endStage}>
+        <p>{lang.totalPoint}{isNaN(finalProfit)?'-':finalProfit.toFixed(2)}</p>
+        <p>{lang.totalProfit}{isNaN(finalProfit*s+participationFee)?'-':(finalProfit*s+participationFee).toFixed(2)}</p>
       </section>
     }
 

@@ -16,9 +16,10 @@
   }
 }
 
-.result {
+.play4Owner {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
   .resultTable {
     border-collapse: separate;
     width: 100%;
@@ -27,6 +28,24 @@
     td {
       text-align: center;
     }
+  }
+  .exportBtn {
+    flex: 100%;
+    margin: .5rem;
+    color: $color-blue;
+    text-align: center;
+    transition: $transition-normal;
+    margin-top: 20px;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.result {
+  text-align: center;
+  p {
+    margin: 20px 0;
   }
 }
 

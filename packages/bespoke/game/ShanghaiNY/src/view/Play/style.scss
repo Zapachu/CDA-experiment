@@ -21,10 +21,9 @@
   .choice {
     font-size: 16px;
     min-width: 300px;
-    .choiceOption {
-      >li>label {
-        color: rgb(66, 133, 244);
-      }
+    .disabled {
+      pointer-events: none;
+      color: #b5b5b5;
     }
   }
   
@@ -64,6 +63,16 @@
     align-items: center;
     .desc {
       margin-bottom: 10px;
+    }
+    .testQuestion {
+      width: 80%;
+      min-width: 300px;
+    }
+  }
+  .endStage {
+    text-align: center;
+    p {
+      margin: 20px 0;
     }
   }
 }

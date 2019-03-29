@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, ButtonProps, Core, Lang, RadioGroup, MaskLoading} from 'bespoke-client-util'
-import {FetchType, MoveType, PushType, GameType, Test1, Test2, Choice} from '../../config'
+import {Button, ButtonProps, Core, Lang, Radio, MaskLoading} from 'bespoke-client-util'
+import {FetchType, MoveType, PushType, GameType, Test1, Test2, Choice, TestStageIndex, Version} from '../../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
 import Display from './Display'
 import Choice1 from './Choice1'
@@ -59,15 +59,17 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
       instructionSecond1: ['因为你在第一阶段已经选择了1，第二阶段不需要选择，请点击下面的“确定按钮”:', 'Since you have chosen 1 in the first action, you do not need to make the choice for the second action, please click the "Confirm" button below:'],
       next: ['选择完成后，点击“确定”进入下一轮:', 'After making the choices, click "Confirm" button for the next round:'],
       wait4Others: ['等待其他玩家完成测试', 'Waiting for others to complete the test'],
-      wrong: ['(错误)', '(Wrong)']
+      wrong: ['(错误)', '(Wrong)'],
+      nextToMain: ['理解测试结束，下面进入正式实验', 'The test is over, click "Confirm" button for the main game']
   })
 
   submit = () => {
     const { props: {frameEmitter, playerState:{stageIndex}}, state: {answers, tips}} = this
-    const curTest = this.Test[stageIndex-1];
+    const curTest = this.Test[stageIndex];
     if(answers.length !== curTest.questions.length) {
       return;
     }
+    if(answers.includes(undefined)) return;
     if(tips.some(tip => tip !== Tip.Correct)) {
       return;
     }
@@ -79,10 +81,35 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
     const {props: {playerState:{stageIndex}}, state: {answers, tips}} = this
     const newAnswers = [...answers];
     newAnswers[i] = val;
-    const answer = this.Test[stageIndex-1].questions[i].answer;
+    const answer = this.Test[stageIndex].questions[i].answer;
     const newTips = [...tips];
     newTips[i] = val === answer ? Tip.Correct : Tip.Wrong;
     this.setState({answers: newAnswers, tips: newTips});
+  }
+
+  calcDisplayData = () => {
+    const {props: {playerState:{groupIndex,roundIndex}, gameState:{groups}, game:{params:{a,b,c,eL,eH,b0,b1,version}}}} = this
+    const curGroup = groups[groupIndex];
+    if(version === Version.V3) {
+      const prob = curGroup.probs[roundIndex];
+      return prob 
+        ? {
+          p11: a*eL-b0*eL+c,
+          p21: a*eL-b0*eH+c,
+          p22: a*eH-b0*eH+c,
+        }
+        : {
+          p11: a*eL-b1*eL+c,
+          p21: a*eL-b1*eH+c,
+          p22: a*eH-b1*eH+c,
+        }
+    } else {
+      return {
+        p11: a*eL-b*eL+c,
+        p21: a*eL-b*eH+c,
+        p22: a*eH-b*eH+c,
+      }
+    }
   }
 
   joinWords = (words: Array<Word>) => {
@@ -92,14 +119,15 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
   }
 
   render() {
-    const {lang, props: {frameEmitter, playerState:{stageIndex}, game:{params:{gameType,version,d}}}, state: {c1, c2, answers, tips}} = this
+    const {lang, props: {frameEmitter, playerState:{stageIndex}, game:{params:{gameType,version,d}}}, state: {c1, c2, answers, tips}} = this;
+    const displayData = this.calcDisplayData();
     let content;
-    if(stageIndex === 0) {
+    if(stageIndex === TestStageIndex.Interface) {
       switch(gameType) {
         case GameType.T1: {
           content = (<>
             <p className={style.instruction}>{lang.instructionTitle}</p>
-            <Display />
+            <Display data={displayData} />
             <p className={style.instruction}>{lang.instructionFirst}</p>
             <Choice1 c1={c1} d={d} version={version} gameType={gameType} onChoose={c1 => this.setState({c1})}/>
             <p className={style.instruction}>{lang.next}</p>
@@ -117,7 +145,7 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
         case GameType.T2: {
           content = (<>
             <p className={style.instruction}>{lang.instructionTitle}</p>
-            <Display />
+            <Display data={displayData} />
             <p className={style.instruction}>{lang.instructionFirst}</p>
             <Choice1 c1={c1} d={d} version={version} gameType={gameType} onChoose={c1 => this.setState({c1})}/>
             {c1
@@ -141,17 +169,36 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
         }
       }
     }
-    else if(stageIndex-1 < this.Test.length) {
-      const curTest = this.Test[stageIndex-1]
+    else if(stageIndex === TestStageIndex.Next) {
       content = <div>
-        <Display />
+        <p>{lang.nextToMain}</p>
+        <Button width={ButtonProps.Width.small}
+                style={{marginTop:'10px'}}
+                label={lang.confirm}
+                onClick={() => {
+                  frameEmitter.emit(MoveType.toMain)
+                }}
+        />
+      </div>
+    }
+    else if(stageIndex === TestStageIndex.Wait4Others) {
+      content = <div>
+        <MaskLoading label={lang.wait4Others} />
+      </div>
+    }
+    else {
+      const curTest = this.Test[stageIndex];
+      content = <div className={style.testQuestion}>
+        <Display data={displayData} />
         <p className={style.desc}>{this.joinWords(curTest.desc)}</p>
         <ul>
           {curTest.questions.map(({title, options}, i) => <li key={i}>
             <p className={tips[i]===Tip.Wrong?style.tipWrong:''}>{this.joinWords(title)} {tips[i] === Tip.Wrong ? <span>{lang.wrong}</span> : null}</p>
-            <RadioGroup options={options}
+            <Radio options={options===null
+                                  ?[{label:displayData.p11.toFixed(2),value:'a'},{label:displayData.p21.toFixed(2),value:'b'},{label:displayData.p22.toFixed(2),value:'c'}]
+                                  :options}
                         value={answers[i] || ''}
-                        onChange={e => this.answer(e, i)}
+                        onChange={e => this.answer(e as string, i)}
             />
           </li>)}
         </ul>
@@ -159,11 +206,6 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
                 label={lang.confirm}
                 onClick={this.submit}
         />
-      </div>
-    }
-    else {
-      content = <div>
-        <MaskLoading label={lang.wait4Others} />
       </div>
     }
     return <section className={style.testStage}>

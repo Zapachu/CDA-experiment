@@ -26,6 +26,7 @@ const Choice2: React.FunctionComponent<PropsType> = ({c1, c2, onChoose, gameType
     ifNot1: ['如果第一阶段没有人选1', 'If no one has chosen 1 in the first action,'],
     if1A: ['如果第一阶段有人选1, 且抽中表A', 'If someone has chosen 1 in the first action and this is table A,'],
     ifNot1A: ['如果不是“第一阶段有人选1, 且抽中表A”', 'If no one has chosen 1 in the first action or this is not table A,'],
+    ok: ['确定', 'OK']
   })
   if(!c1 || gameType===GameType.T1) {
     return null;
@@ -33,23 +34,34 @@ const Choice2: React.FunctionComponent<PropsType> = ({c1, c2, onChoose, gameType
   const options = [{label: d>0 ? `${lang.choose1}${lang.feeLeft}${d}${lang.feeRight}` : lang.choose1, value: Choice.One}, {label: lang.choose2, value: Choice.Two}];
   return <div className={style.choice}>
     <p>{lang.secondAction}:</p>
-    {c1===Choice.Wait
-      ? <>
-        <p>{version===Version.V3 ? lang.if1A : lang.if1} {lang.yourChoice}:</p>
-        <Radio  value={c2[0]} 
-                className={style.choiceOption}
-                options={options} 
-                onChange={val => onChoose([val as number, c2[1]])} 
-        />
-        <p>{version===Version.V3 ? lang.ifNot1A : lang.ifNot1} {lang.yourChoice}:</p>
-        <Radio  value={c2[1]} 
-                className={style.choiceOption}
-                options={options} 
-                onChange={val => onChoose([c2[0], val as number])} 
-        />
-      </>
-      : <p style={{margin:'10px'}}>{lang.noChoice}</p>
-    }
+    <div className={c1===Choice.Wait?'':style.disabled}>
+    <p>{version===Version.V3 ? lang.if1A : lang.if1} {lang.yourChoice}:</p>
+    <Radio  value={c2[0]} 
+            options={options} 
+            onChange={val => onChoose([val as number, c2[1]])} 
+    />
+    </div>
+    <div className={c1===Choice.Wait?style.disabled:''}>
+    <p>{lang.noChoice}</p>
+    <Radio  value={c2[0]} 
+            options={[{label: lang.ok, value: 0}]} 
+            onChange={val => onChoose([val as number, c2[1]])} 
+    />
+    </div>
+    <div className={c1===Choice.Wait?'':style.disabled}>
+    <p>{version===Version.V3 ? lang.ifNot1A : lang.ifNot1} {lang.yourChoice}:</p>
+    <Radio  value={c2[1]} 
+            options={options} 
+            onChange={val => onChoose([c2[0], val as number])} 
+    />
+    </div>
+    <div className={c1===Choice.Wait?style.disabled:''}>
+    <p>{lang.noChoice}</p>
+    <Radio  value={c2[1]} 
+            options={[{label: lang.ok, value: 0}]} 
+            onChange={val => onChoose([c2[0], val as number])} 
+    />
+    </div>
   </div>
 }
 

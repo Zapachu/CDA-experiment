@@ -27,19 +27,30 @@ export enum Version {
   V3
 }
 
+export enum MainStageIndex {
+  Choose = 0,
+  Wait4Result,
+  Result
+}
+
+export enum TestStageIndex {
+  Interface = -1,
+  Next = -2,
+  Wait4Others = -3
+}
+
 export enum MoveType {
   //player
   initPosition = 'initPosition',
   inputSeatNumber = 'inputSeatNumber',
-  // advanceStageIndex = 'advanceStageIndex',
   answerTest = 'answerTest',
   answerMain = 'answerMain',
   advanceRoundIndex = 'advanceRoundIndex',
   answerSurvey = 'answerSurvey',
-  // answerMain2 = 'answerMain2',
+  toMain = 'toMain',
   //owner
-  assignPosition = 'assignPosition',
-  openMarket = 'openMarket',
+  // assignPosition = 'assignPosition',
+  // openMarket = 'openMarket',
   //elf
   sendBackPlayer = 'sendBackPlayer'
 }
@@ -52,7 +63,10 @@ export enum PushType {
 }
 
 export enum FetchType {
-  exportXls = 'exportXls'
+  exportXls = 'exportXls',
+  exportXlsPlaying = 'exportXlsPlaying',
+  getUserId = 'getUserId',
+  getOrgCode = 'getOrgCode'
 }
 
 export const Test1 = [
@@ -61,8 +75,8 @@ export const Test1 = [
     questions: [
       {
         title: [{text: '如果你选择“1”, 你在这一轮的收益为:'}],
-        options: ['π11', 'π21', 'π22'],
-        answer: 'π11'
+        options: null,
+        answer: 'a'
       }
     ]
   },
@@ -71,8 +85,8 @@ export const Test1 = [
     questions: [
       {
         title: [{text: '如果你选择“2”, 你在这一轮的收益为:'}],
-        options: ['π11', 'π21', 'π22'],
-        answer: 'π22'
+        options: null,
+        answer: 'c'
       }
     ]
   },
@@ -81,8 +95,8 @@ export const Test1 = [
     questions: [
       {
         title: [{text: '如果你选择“2”, 你在这一轮的收益为:'}],
-        options: ['π11', 'π21', 'π22'],
-        answer: 'π21'
+        options: null,
+        answer: 'b'
       }
     ]
   },
@@ -98,8 +112,8 @@ export const Test2 = [
           {text: '“第一阶段有人选1则在第二阶段选1；第一阶段没有人选1则在第二阶段选1”（无论第一阶段有没有人选1，在第二阶段都选1）', color: true},
           {text: '你在这一轮的收益为'},
         ],
-        options: ['π11', 'π21', 'π22'],
-        answer: 'π11'
+        options: null,
+        answer: 'a'
       },
       {
         title: [
@@ -107,8 +121,8 @@ export const Test2 = [
           {text: '“第一阶段有人选1则在第二阶段选1；第一阶段没有人选1则在第二阶段选2”', color: true},
           {text: '你在这一轮的收益为'},
         ],
-        options: ['π11', 'π21', 'π22'],
-        answer: 'π11'
+        options: null,
+        answer: 'a'
       },
       {
         title: [
@@ -116,8 +130,8 @@ export const Test2 = [
           {text: '“第一阶段有人选1则在第二阶段选2；第一阶段没有人选1则在第二阶段选2”（无论第一阶段有没有人选1，在第二阶段都选2）', color: true},
           {text: '你在这一轮的收益为'},
         ],
-        options: ['π11', 'π21', 'π22'],
-        answer: 'π21'
+        options: null,
+        answer: 'b'
       },
     ]
   },
@@ -141,8 +155,8 @@ export const Test2 = [
       },
       {
         title: [{text: '你在这一轮的收益为:'}],
-        options: ['π11', 'π21', 'π22'],
-        answer: 'π11'
+        options: null,
+        answer: 'a'
       },
     ]
   },
@@ -166,8 +180,8 @@ export const Test2 = [
       },
       {
         title: [{text: '你在这一轮的收益为:'}],
-        options: ['π11', 'π21', 'π22'],
-        answer: 'π11'
+        options: null,
+        answer: 'a'
       },
     ]
   },
@@ -191,8 +205,8 @@ export const Test2 = [
       },
       {
         title: [{text: '你在这一轮的收益为:'}],
-        options: ['π11', 'π21', 'π22'],
-        answer: 'π21'
+        options: null,
+        answer: 'b'
       },
     ]
   },
@@ -216,8 +230,8 @@ export const Test2 = [
       },
       {
         title: [{text: '你在这一轮的收益为:'}],
-        options: ['π11', 'π21', 'π22'],
-        answer: 'π11'
+        options: null,
+        answer: 'a'
       },
     ]
   },
@@ -241,8 +255,8 @@ export const Test2 = [
       },
       {
         title: [{text: '你在这一轮的收益为:'}],
-        options: ['π11', 'π21', 'π22'],
-        answer: 'π22'
+        options: null,
+        answer: 'c'
       },
     ]
   }
