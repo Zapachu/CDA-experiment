@@ -99,6 +99,7 @@ export const InitWork = (app) => {
                 }
             } catch (err) {
                 if (err) {
+                    console.trace(err)
                     return ErrorPage(okRes(), err)
                 }
             }
