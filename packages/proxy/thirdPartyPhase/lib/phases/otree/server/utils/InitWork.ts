@@ -12,7 +12,7 @@ const FETCH_DEMO_LIST = '/phases/list'
 const FETCH_REPORT_SCREEN = '/report/screen'
 
 export const InitWork = (app) => {
-    app.use(async (req:Request, res:Response, next:NextFunction) => {
+    app.use(async (req: Request, res: Response, next: NextFunction) => {
         const originWrite = res.write
         const originEnd = res.end
 
@@ -33,7 +33,7 @@ export const InitWork = (app) => {
         const isFetchDemoList = req.url.includes(FETCH_DEMO_LIST)
         const isFetchReportScreen = req.url.includes(FETCH_REPORT_SCREEN)
 
-        if(req.url.includes(virtualJsRoute)){
+        if (req.url.includes(virtualJsRoute)) {
             okRes()
             res.setHeader('Content-Type', 'text/javascript')
             return res.end(`window.registerOtreePhase("${elfSetting.oTreeNamespace}","${elfSetting.oTreeProxy}")`)
@@ -48,39 +48,40 @@ export const InitWork = (app) => {
             const phaseId = req.session.oTreePhaseId
             const phase = await ThirdPartPhase.findById(phaseId)
             const gameServicePlayerHash = req.session.token
+            const {winW, winH} = req.body
             for (let ph of phase.playHash) {
-                if (ph.player === 'wait') {
-                    findHash = ph.hash
-                    ph.player = gameServicePlayerHash
+                if (ph.player === gameServicePlayerHash) {
+                    ph.screen = JSON.stringify({winW, winH})
                     break
                 }
             }
+            return res.json({code: 0, msg: 'reported'})
         }
 
         if (isInit) {
             let findHash: string
             const gameServicePlayerHash = req.session.token
-            const phaseId = req.path.split('InitializeParticipant/')[1]
+            const phaseId = req.path.split(`${START_SIGN}/`)[1]
 
             try {
-                const Phase: any = await ThirdPartPhase.findById(phaseId).exec()
+                const phase = await ThirdPartPhase.findById(phaseId).exec()
 
-                if (!Phase) {
-                    return ErrorPage(okRes(), 'phase not found')
+                if (!phase) {
+                    return ErrorPage(okRes(), 'Phase Not Found')
                 }
 
-                req.session.oTreePhaseId = Phase._id
+                req.session.oTreePhaseId = phase._id
 
-                if (Phase.ownerToken.toString() === gameServicePlayerHash.toString()) {
-                    const phaseParam = JSON.parse(Phase.param)
+                if (phase.ownerToken.toString() === gameServicePlayerHash.toString()) {
+                    const phaseParam = JSON.parse(phase.param)
                     return okRes().redirect(phaseParam.adminUrl)
                 }
 
-                const findExistOne = Phase.playHash.filter(h => h.player === gameServicePlayerHash)
+                const findExistOne = phase.playHash.filter(h => h.player === gameServicePlayerHash)
                 if (findExistOne.length > 0) {
                     return okRes().redirect(`${elfSetting.oTreeProxy}/${START_SIGN}/${findExistOne[0].hash}`)
                 } else {
-                    for (let ph of Phase.playHash) {
+                    for (let ph of phase.playHash) {
                         if (ph.player === 'wait') {
                             findHash = ph.hash
                             ph.player = gameServicePlayerHash
@@ -90,8 +91,8 @@ export const InitWork = (app) => {
                     if (!findHash) {
                         return ErrorPage(okRes(), 'member full')
                     }
-                    Phase.markModified('playHash')
-                    await Phase.save()
+                    phase.markModified('playHash')
+                    await phase.save()
                     return okRes().redirect(`${elfSetting.oTreeProxy}/${START_SIGN}/${findHash}`)
                 }
             } catch (err) {
