@@ -12,12 +12,11 @@ const getNextPhaseUrl = async (req) => {
 
     const qualtricsHash = req.url.split('/jfe/form/')[1]
 
+    const phaseId = req.session.qualtricsPhaseId
+
     console.log('log > qualtrics hash ', qualtricsHash)
 
-    const qualtricsPhase: any = await ThirdPartPhase.findOne({
-        namespace: 'qualtrics',
-        playHash: {$elemMatch: {hash: qualtricsHash}}
-    })
+    const qualtricsPhase: any = await ThirdPartPhase.findById(phaseId)
     console.log('log > qualtrics phase', qualtricsPhase)
     const paramsJson = JSON.parse(qualtricsPhase.param)
     const request = {

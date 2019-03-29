@@ -10,7 +10,13 @@ const proxy = httpProxy({
     ws: true,
     autoRewrite: true,
     protocolRewrite: 'http',
-    onProxyRes: rewriteResBuffers
+    onProxyRes: rewriteResBuffers,
+    onProxyReq: (proxyReq, req, res) => {
+        
+        proxyReq.setHeader('dnt', 1)
+        proxyReq.setHeader('Origin', 'https://wj.qq.com')
+        proxyReq.setHeader('referer', 'https://wj.qq.com/s2/' + req.headers.referer.split('/s2/')[1])
+    },
 })
 
 const ProxyWork = (app) => {

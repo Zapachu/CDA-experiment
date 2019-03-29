@@ -6,7 +6,7 @@ export const routePrefix = {
 }
 
 export const proxyTarget = {
-    qualtricsServer: 'https://www.qualtrics.com',
+    qualtricsServer: 'https://qualtrics.com',
     wjxServer: 'https://www.wjx.com',
     qqwjServer: 'https://wj.qq.com'
 }

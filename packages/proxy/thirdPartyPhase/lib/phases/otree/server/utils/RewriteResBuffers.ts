@@ -1,15 +1,23 @@
 'use strict'
 
 
+import {ErrorPage} from '../../../common/utils'
 import {ThirdPartPhase} from "../../../../core/server/models"
 import {gameService} from "../../../common/utils"
 import {elfSetting as settings} from 'elf-setting'
+import {Request, Response} from 'express'
+
 const {oTreeProxy} = settings
 
-export const rewriteResBuffers = async (proxyRes, req, res) => {
+const START_SIGN = 'InitializeParticipant'
+const END_SIGN = 'OutOfRangeNotification'
 
-    const isEnd = req.url.includes('OutOfRangeNotification')  // 是否结束标志
-    const otreeParticipantUrl = 'InitializeParticipant/'      // 初始化的标志
+
+export const rewriteResBuffers = async (proxyRes, req: Request, res: Response) => {
+
+    if (!req.session.oTreePhaseId) return ErrorPage(res, 'Error In Rewrite Buffer')
+
+    const isEnd = req.url.includes(END_SIGN)
 
     if (isEnd) {
         const originWrite = res.write
@@ -20,16 +28,15 @@ export const rewriteResBuffers = async (proxyRes, req, res) => {
             res.end = originEnd
             return res
         }
-        res.write = (r) => {}
-        res.end = () => {}
+        res.write = () => true
+        res.end = () => {
+        }
+
+
         let playerGameHash: string
         const playerOtreeHash: string = req.headers.referer.split('/p/')[1].split('/')[0]
         try {
-            const otreePhase: any = await ThirdPartPhase.findOne({
-                // namespace: 'otree',
-                playHash: {$elemMatch: {hash: playerOtreeHash}}
-            }).exec()
-            console.log('phase', otreePhase)
+            const otreePhase: any = await ThirdPartPhase.findOne({playHash: {$elemMatch: {hash: playerOtreeHash}}})
             otreePhase.playHash.map(op => {
                 if (op.hash.toString() === playerOtreeHash.toString()) {
                     playerGameHash = op.player.toString()
@@ -37,24 +44,23 @@ export const rewriteResBuffers = async (proxyRes, req, res) => {
             })
             const params: { nextPhaseKey: string } = JSON.parse(otreePhase.param)
             const groupId: string = otreePhase.groupId
-            const playUrl: string = `${oTreeProxy}/init/${otreeParticipantUrl}${otreePhase._id}`
+            const playUrl: string = `${oTreeProxy}/init/${START_SIGN}/${otreePhase._id}`
             const playerToken: string = playerGameHash
             const nextPhaseKey: string = params.nextPhaseKey
             gameService.sendBackPlayer({
                 groupId, playUrl, playerToken, nextPhaseKey,
-                phasePlayer:{uniKey:playerOtreeHash}
+                phasePlayer: {uniKey: playerOtreeHash}
             }, (err: {}, service_res: { sendBackUrl: string }) => {
                 if (err) {
-                    console.log(err)
-                    return okRes().send('Get Next Phase Error From Core')
+                    console.trace(err)
+                    return ErrorPage(okRes(), 'Get Next Phase Error From Core')
                 }
-                console.log(service_res.sendBackUrl)
                 const nextPhaseUrl = service_res.sendBackUrl
                 return okRes().redirect(nextPhaseUrl)
             })
         } catch (err) {
             if (err) {
-                console.log(err)
+                console.trace(err)
                 return okRes().send(err)
             }
         }
