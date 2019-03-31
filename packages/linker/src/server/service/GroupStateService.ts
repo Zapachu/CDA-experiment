@@ -112,8 +112,8 @@ export class GroupStateService {
         playerCurrentPhaseState.phasePlayer = phasePlayer
         await PhaseResultModel.create({
             gameId:this.group.id,
-            playerId:playerToken,
-            phaseName: phaseConfigs[currentPhaseCfgIndex],
+            playerId:playerCurrentPhaseState.actor.playerId,
+            phaseName: phaseConfigs[currentPhaseCfgIndex].title,
             ...phasePlayer
         })
         let phaseCfg = phaseConfigs.find(phaseCfg => phaseCfg.key === nextPhaseKey)

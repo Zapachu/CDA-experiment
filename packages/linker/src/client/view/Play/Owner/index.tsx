@@ -54,21 +54,22 @@ export class Play4Owner extends React.Component<TRootContext & TPlayContext & { 
                             renderItem={
                                 ([playerToken, {actor, status, phasePlayer = {}}]: [string, IPlayerState]) =>
                                     <List.Item>
-                                        <List.Item.Meta title={`Token : ${playerToken}`}
-                                                        description={`${actor.userName}:${lang[PlayerStatus[status]]||''}`}/>
-                                        <div>
-                                            {
-                                                phasePlayer.point ? <span>{lang.point}:{phasePlayer.point}</span> : null
-                                            }
-                                            {
-                                                phasePlayer.uniKey ?
-                                                    <span>{lang.uniKey}:{phasePlayer.uniKey}</span> : null
-                                            }
-                                            {
-                                                phasePlayer.detailIframeUrl ? <a href={phasePlayer.detailIframeUrl}
-                                                                                 target='_blank'>{lang.detail}</a> : null
-                                            }
-                                        </div>
+                                        <List.Item.Meta title={`${actor.userName}:${lang[PlayerStatus[status]]||''}`}
+                                                        description={
+                                                            <div>
+                                                                {
+                                                                    phasePlayer.point ? <span>{lang.point}&nbsp;&nbsp;{phasePlayer.point}</span> : null
+                                                                }
+                                                                {
+                                                                    phasePlayer.uniKey ?
+                                                                        <span>{lang.uniKey}&nbsp;&nbsp;{phasePlayer.uniKey}</span> : null
+                                                                }
+                                                                {
+                                                                    phasePlayer.detailIframeUrl ? <a href={phasePlayer.detailIframeUrl}
+                                                                                                     target='_blank'>{lang.detail}</a> : null
+                                                                }
+                                                            </div>
+                                                        }/>
                                         <RewardPanel {...{
                                             orgCode: user.orgCode,
                                             gameId: game.id,
