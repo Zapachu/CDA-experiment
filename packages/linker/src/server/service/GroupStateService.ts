@@ -10,7 +10,7 @@ import {
 } from '@common'
 import {getPhaseService} from '../rpc'
 import {GameService} from './GameService'
-import {GroupStateDoc, GroupStateModel} from '@server-model'
+import {GroupStateDoc, GroupStateModel, PhaseResultModel} from '@server-model'
 import {EventDispatcher} from '../controller/eventDispatcher'
 import {Log, RedisKey, redisClient} from '@server-util'
 import {PhaseManager} from 'elf-protocol'
@@ -110,6 +110,12 @@ export class GroupStateService {
             playerCurrentPhaseState = currentPhaseState.playerState[playerToken]
         playerCurrentPhaseState.status = baseEnum.PlayerStatus.left
         playerCurrentPhaseState.phasePlayer = phasePlayer
+        await PhaseResultModel.create({
+            gameId:this.group.id,
+            playerId:playerCurrentPhaseState.actor.playerId,
+            phaseName: phaseConfigs[currentPhaseCfgIndex].title,
+            ...phasePlayer
+        })
         let phaseCfg = phaseConfigs.find(phaseCfg => phaseCfg.key === nextPhaseKey)
         if (!phaseCfg) {
             if (currentPhaseCfgIndex === phaseConfigs.length - 1) {

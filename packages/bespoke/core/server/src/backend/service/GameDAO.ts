@@ -39,5 +39,11 @@ export default class GameDAO {
         return JSON.parse(await redisClient.get(RedisKey.playerState(gameId, token)))
     }
 
+    static async getPlayerTokens(gameId: string): Promise<Array<string>> {
+        const key = RedisKey.playerStates(gameId)
+        const tokens = await redisClient.keys(key)
+        return tokens.map(token => token.slice(key.length - 1))
+    }
+
     //endregion
 }

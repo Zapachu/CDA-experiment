@@ -7,7 +7,8 @@ import {
     IUserWithId,
     TApiGroupPlayers,
     IGameToUpdate,
-    IPhaseConfig
+    IPhaseConfig,
+    TApiPlayerResults
 } from '@common'
 import {getCookie} from '@client-util'
 import * as queryString from 'query-string'
@@ -139,6 +140,10 @@ export class Request {
 
     static async getActor(gameId: string, token: string = ''): Promise<IHttpRes & { actor: IActor }> {
         return await GET('/game/actor/:gameId', {gameId}, {token})
+    }
+
+    static async getPlayerResult(gameId: string, playerId: string):Promise<IHttpRes & {results:TApiPlayerResults}> {
+        return await GET('/game/playerResult', null, {gameId, playerId})
     }
 
     static async getRewarded(playerId: string): Promise<IHttpRes & { reward: string }> {

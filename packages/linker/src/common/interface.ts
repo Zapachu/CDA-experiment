@@ -125,4 +125,6 @@ export type TApiGroupPlayers = Array<{
     userId: string,
     name: string
 }>
+
+export type TApiPlayerResults = Array<{ phaseName: string } & PhaseManager.TPhasePlayer>
 //endregion
