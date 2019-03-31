@@ -16,6 +16,7 @@ import {PlayerList} from './PlayerList'
 import {GameList} from './GameList'
 import {BaseInfo} from './BaseInfo'
 import {CreateInFrame} from './CreateInFrame'
+import {PlayerResult} from './Result/Player'
 import * as style from './initial.scss'
 
 export const Root: React.FunctionComponent = () => {
@@ -42,6 +43,7 @@ export const Root: React.FunctionComponent = () => {
                         <Route path={'/configuration/:gameId'} component={Configuration}/>
                         <Route path={'/play/:gameId'} component={Play}/>
                         <Route path={'/player/:gameId'} component={PlayerList}/>
+                        <Route path={'/playerResult/:gameId/:playerId'} component={PlayerResult}/>
                         <Route path={'/*'} component={(props: RouteComponentProps) =>
                             <GameList {...props} {...{user}}/>}/>
                     </Switch>

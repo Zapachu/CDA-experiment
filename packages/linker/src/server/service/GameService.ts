@@ -1,5 +1,6 @@
 import {IBaseGame, IGameWithId, IGameToUpdate, IGame} from '@common'
-import {GameModel} from '@server-model'
+import {GameModel, PhaseResultModel} from '@server-model'
+import {PhaseManager} from 'elf-protocol'
 
 export class GameService {
     static async getGameList(owner: string, page: number, pageSize: number): Promise<{ gameList: Array<IGameWithId>, count: number }> {
@@ -42,5 +43,15 @@ export class GameService {
             published: updatedGame.published,
             mode: updatedGame.mode
         }
+    }
+
+    static async getPlayerResult(gameId: string, playerId: string): Promise<Array<{ phaseName: string } & PhaseManager.TPhasePlayer>> {
+        const results = await PhaseResultModel.find({gameId, playerId}).sort({createAt: -1})
+        return results.map(({phaseName, point, uniKey, detailIframeUrl}) => ({
+            phaseName,
+            point,
+            uniKey,
+            detailIframeUrl
+        }))
     }
 }

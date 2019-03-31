@@ -212,4 +212,13 @@ export class GameCtrl {
             actor: {token, type, playerId}
         })
     }
+
+    static async getPlayerResult(req, res) {
+        const {query: {gameId, playerId}} = req
+        const results = await GameService.getPlayerResult(gameId, playerId)
+        res.json({
+            code: baseEnum.ResponseCode.success,
+            results
+        })
+    }
 }
