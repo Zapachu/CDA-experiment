@@ -14,4 +14,5 @@ export const RedisKey = {
     share_CodeGame: (code:string)=>`shareCodeMapping:${code}`,
     gameState:(gameId:string)=>`gameState:${gameId}`,
     playerState:(gameId:string, token:string)=>`playerState:${gameId}:${token}`,
+    playerStates:(gameId:string)=>`playerState:${gameId}:*`,
 }

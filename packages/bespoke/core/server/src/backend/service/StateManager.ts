@@ -1,13 +1,14 @@
 import {TGameState, TPlayerState, IActor, baseEnum} from 'bespoke-common'
 import {StateSynchronizer, GameStateSynchronizer, PlayerStateSynchronizer} from './StateSynchronizer'
 import {BaseController} from './GameLogic'
+import GameDAO from './GameDAO'
 
 export class StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
     private gameStateManager: GameStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>
     private playerStateManagers: Array<PlayerStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>> = []
     private stateSynchronizer: StateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>
 
-    constructor(strategy: baseEnum.SyncStrategy, controller: BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>) {
+    constructor(strategy: baseEnum.SyncStrategy, private controller: BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>) {
         this.stateSynchronizer = new StateSynchronizer(strategy, controller)
         this.gameStateManager = this.stateSynchronizer.getGameStateSynchronizer()
     }
@@ -31,6 +32,8 @@ export class StateManager<ICreateParams, IGameState, IPlayerState, MoveType, Pus
 
     async getPlayerStates(): Promise<{ [token: string]: TPlayerState<IPlayerState> }> {
         const playerStates = {}
+        const tokens = await GameDAO.getPlayerTokens(this.controller.game.id)
+        tokens.forEach(async token=>await this.getPlayerManager({token, type:baseEnum.Actor.player}))
         for (let manager of this.playerStateManagers) {
             const playerState = await manager.getState()
             playerStates[playerState.actor.token] = playerState
