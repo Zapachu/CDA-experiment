@@ -1,8 +1,6 @@
 import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from "bespoke-server";
-import {ICreateParams, IGameState, IPlayerState, IPushParams, IMoveParams} from "./interface";
-import {MoveType, PushType, FetchType} from './config'
-import {GameState} from "./interface";
-import {NEW_ROUND_TIMER, PlayerStatus} from "./config";
+import {ICreateParams, IGameState, IPlayerState, IPushParams, IMoveParams, GameState} from "./interface"
+import {MoveType, PushType, FetchType, NEW_ROUND_TIMER, PlayerStatus} from './config'
 
 export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
     initGameState(): TGameState<IGameState> {
@@ -44,12 +42,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 playerState.positionIndex = gameState.groups[groupIndex].playerNum++
                 playerState.privatePrices = positions[playerState.positionIndex].privatePrice
                 break
-            case MoveType.enterMarket: {
-                const {groupIndex, positionIndex} = playerState,
-                    {rounds, roundIndex} = gameState.groups[groupIndex]
-                rounds[roundIndex].playerStatus[positionIndex] = PlayerStatus.prepared
-                break
-            }
             case MoveType.shout: {
                 const {groupIndex, positionIndex} = playerState,
                     groupState = gameState.groups[groupIndex],
@@ -64,6 +56,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                             const highestSorts = groupPlayerStates.sort((a, b) => b.prices[roundIndex] - a.prices[roundIndex])
                             highestSorts.map((p, i) => {
                                 if (i < winnerNumber) {
+                                    playerStatus[i] = PlayerStatus.won
                                     p.profits[roundIndex] = p.privatePrices[roundIndex] - p.prices[roundIndex]
                                 }
                             })
@@ -76,6 +69,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                             groupPlayerStates.map((p, i) => {
                                 if (p.prices[roundIndex] > median && winners < winnerNumber) {
                                     winners++
+                                    playerStatus[i] = PlayerStatus.won
                                     p.profits[roundIndex] = p.privatePrices[roundIndex] - p.prices[roundIndex]
                                 }
                             })
@@ -86,6 +80,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     }
                     await this.stateManager.syncState()
                     if (roundIndex == rounds.length - 1) {
+                        for (let i in playerStatus) playerStatus[i] = PlayerStatus.gameOver
+                        await this.stateManager.syncState()
                         return
                     }
                     let newRoundTimer = 1

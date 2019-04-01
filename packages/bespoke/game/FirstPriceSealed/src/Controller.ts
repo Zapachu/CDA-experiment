@@ -1,31 +1,8 @@
 import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from "bespoke-server";
 import {ICreateParams, IGameState, IPlayerState, IPushParams, IMoveParams} from "./interface";
-import {MoveType, PushType, FetchType, NEW_ROUND_TIMER, PlayerStatus} from './config'
-import {GameState} from "../../VickreyAuction2/src/interface";
-
-const getBestMatching = G => {
-    const MATCHED = 'matched',
-        UNMATCHED = 'unMatched'
-    const _dfs = (G, right, left, r) => {
-        for (let c = 0; c < G[0].length; c++) {
-            if (right[c] !== MATCHED && G[r][c]) {
-                right[c] = MATCHED
-                if (left[c] === UNMATCHED || _dfs(G, right, left, left[c])) {
-                    left[c] = r
-                    return true
-                }
-            }
-        }
-        return false
-    }
-    const left = Array(G[0].length).fill(UNMATCHED)
-    G.forEach((_, r) => {
-        const right = []
-        _dfs(G, right, left, r)
-    })
-    return left.map((linkTo, index) => linkTo === UNMATCHED ? null : [linkTo, index])
-        .filter(_ => _)
-}
+import {MoveType, PushType, FetchType} from './config'
+import {GameState} from "./interface";
+import {NEW_ROUND_TIMER, PlayerStatus} from "./config";
 
 export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
     initGameState(): TGameState<IGameState> {
@@ -65,7 +42,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 }
                 playerState.groupIndex = groupIndex
                 playerState.positionIndex = gameState.groups[groupIndex].playerNum++
-                playerState.role = positions[playerState.positionIndex].role
                 playerState.privatePrices = positions[playerState.positionIndex].privatePrice
                 break
             case MoveType.shout: {
@@ -77,20 +53,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 playerStatus[positionIndex] = PlayerStatus.shouted
                 playerState.prices[roundIndex] = params.price
                 if (playerStatus.every(status => status === PlayerStatus.shouted)) {
-                    const buyerStates = groupPlayerStates.filter(s => s.role === 0)
-                    const sellerStates = groupPlayerStates.filter(s => s.role === 1)
-                    const intentionG = buyerStates.map(({prices: buyPrices}) =>
-                        sellerStates.map(({prices: sellerPrices}) =>
-                            buyPrices[groupIndex] >= sellerPrices[groupIndex]))
-                    groupState.results = []
-                    getBestMatching(intentionG)
-                        .forEach(async ([buyerIndex, sellerIndex]) => {
-                            groupState.results.push({
-                                buyerPosition: buyerStates[buyerIndex].positionIndex,
-                                sellerPosition: sellerStates[sellerIndex].positionIndex
-                            })
-                        })
-                    groupPlayerStates.map(p => p.profits[roundIndex] = p.privatePrices[roundIndex] - p.prices[roundIndex])
+                    groupPlayerStates.sort((s1, s2) => s2.prices[roundIndex] - s1.prices[roundIndex])
+                    groupPlayerStates[0].profits[roundIndex] = groupPlayerStates[0].privatePrices[roundIndex] - groupPlayerStates[1].prices[roundIndex]
                     await this.stateManager.syncState()
                     if (roundIndex == rounds.length - 1) {
                         for (let i in playerStatus) playerStatus[i] = PlayerStatus.gameOver

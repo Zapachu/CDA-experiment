@@ -1,31 +1,8 @@
 import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from "bespoke-server";
 import {ICreateParams, IGameState, IPlayerState, IPushParams, IMoveParams} from "./interface";
-import {MoveType, PushType, FetchType, NEW_ROUND_TIMER, PlayerStatus} from './config'
-import {GameState} from "../../VickreyAuction2/src/interface";
-
-const getBestMatching = G => {
-    const MATCHED = 'matched',
-        UNMATCHED = 'unMatched'
-    const _dfs = (G, right, left, r) => {
-        for (let c = 0; c < G[0].length; c++) {
-            if (right[c] !== MATCHED && G[r][c]) {
-                right[c] = MATCHED
-                if (left[c] === UNMATCHED || _dfs(G, right, left, left[c])) {
-                    left[c] = r
-                    return true
-                }
-            }
-        }
-        return false
-    }
-    const left = Array(G[0].length).fill(UNMATCHED)
-    G.forEach((_, r) => {
-        const right = []
-        _dfs(G, right, left, r)
-    })
-    return left.map((linkTo, index) => linkTo === UNMATCHED ? null : [linkTo, index])
-        .filter(_ => _)
-}
+import {MoveType, PushType, FetchType} from './config'
+import {GameState} from "./interface";
+import {NEW_ROUND_TIMER, PlayerStatus} from "./config";
 
 export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
     initGameState(): TGameState<IGameState> {
@@ -43,7 +20,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
     }
 
     protected async playerMoveReducer(actor: IActor, type: string, params: IMoveParams, cb: IMoveCallback): Promise<void> {
-        const {game: {params: {groupSize, round, positions}}} = this
+        const {game: {params: {groupSize, round, initialFunding, returnOnInvestment}}} = this
         const playerState = await this.stateManager.getPlayerState(actor),
             gameState = await this.stateManager.getGameState(),
             playerStates = await this.stateManager.getPlayerStates()
@@ -65,8 +42,13 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 }
                 playerState.groupIndex = groupIndex
                 playerState.positionIndex = gameState.groups[groupIndex].playerNum++
-                playerState.role = positions[playerState.positionIndex].role
-                playerState.privatePrices = positions[playerState.positionIndex].privatePrice
+                const {rounds, roundIndex} = gameState.groups[groupIndex]
+                if (rounds[roundIndex].playerStatus.every(s => s === PlayerStatus.prepared)) {
+                    if (!rounds[roundIndex].currentPlayer) {
+                        rounds[roundIndex].currentPlayer = 0
+                        rounds[roundIndex].playerStatus[rounds[roundIndex].currentPlayer] = PlayerStatus.timeToShout
+                    }
+                }
                 break
             case MoveType.shout: {
                 const {groupIndex, positionIndex} = playerState,
@@ -76,21 +58,13 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     groupPlayerStates = Object.values(playerStates).filter(s => s.groupIndex === groupIndex)
                 playerStatus[positionIndex] = PlayerStatus.shouted
                 playerState.prices[roundIndex] = params.price
+                rounds[roundIndex].currentPlayer += 1
+                if (rounds[roundIndex].currentPlayer < groupSize) {
+                    rounds[roundIndex].playerStatus[rounds[roundIndex].currentPlayer] = PlayerStatus.timeToShout
+                }
                 if (playerStatus.every(status => status === PlayerStatus.shouted)) {
-                    const buyerStates = groupPlayerStates.filter(s => s.role === 0)
-                    const sellerStates = groupPlayerStates.filter(s => s.role === 1)
-                    const intentionG = buyerStates.map(({prices: buyPrices}) =>
-                        sellerStates.map(({prices: sellerPrices}) =>
-                            buyPrices[groupIndex] >= sellerPrices[groupIndex]))
-                    groupState.results = []
-                    getBestMatching(intentionG)
-                        .forEach(async ([buyerIndex, sellerIndex]) => {
-                            groupState.results.push({
-                                buyerPosition: buyerStates[buyerIndex].positionIndex,
-                                sellerPosition: sellerStates[sellerIndex].positionIndex
-                            })
-                        })
-                    groupPlayerStates.map(p => p.profits[roundIndex] = p.privatePrices[roundIndex] - p.prices[roundIndex])
+                    const share = returnOnInvestment * groupPlayerStates.map(p => p.prices[roundIndex]).reduce((p, c) => p + c) / groupSize
+                    groupPlayerStates.map(p => p.profits[roundIndex] = initialFunding - p.prices[roundIndex] + share)
                     await this.stateManager.syncState()
                     if (roundIndex == rounds.length - 1) {
                         for (let i in playerStatus) playerStatus[i] = PlayerStatus.gameOver
@@ -108,6 +82,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         }
                         global.clearInterval(newRoundInterval)
                         groupState.roundIndex++
+                        rounds[groupState.roundIndex].currentPlayer = 0
+                        rounds[groupState.roundIndex].playerStatus[0] = PlayerStatus.timeToShout
                         await this.stateManager.syncState()
                     }, 1000)
                 }

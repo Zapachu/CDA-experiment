@@ -35,14 +35,13 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     shout = () => {
         const {
             props: {
-                frameEmitter,
-                gameState: {groups},
-                playerState: {groupIndex, privatePrices}
+                game: {params: {initialFunding}},
+                frameEmitter
             }, state
         } = this
         this.setState({price: ''})
         const price = Number(state.price)
-        if (Number.isNaN(price) || price > privatePrices[groups[groupIndex].roundIndex]) {
+        if (Number.isNaN(price) || price > initialFunding) {
             Toast.warn('输入的值无效')
         } else {
             frameEmitter.emit(MoveType.shout, {price: +price})
@@ -59,30 +58,35 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         const {rounds, roundIndex} = groups[groupIndex],
             {playerStatus} = rounds[roundIndex]
         const playerState = playerStatus[positionIndex]
+        if (playerState === PlayerStatus.prepared) {
+            return <MaskLoading label='请等待其它玩家...'/>
+        }
         if (playerState === PlayerStatus.shouted) {
             return <MaskLoading label='您已出价，请等待其他玩家...'/>
         }
         if (playerState === PlayerStatus.gameOver) {
             return <MaskLoading label='所有轮次结束，等待老师结束实验...'/>
         }
-        return <div>
-            <li>
-                <Label label='输入您的价格'/>
-                <Input type='number' value={price} onChange={this.setVal.bind(this)}/>
-            </li>
-            <li>
-                <Button width={ButtonProps.Width.large} label='出价' onClick={this.shout.bind(this)}/>
-            </li>
-        </div>
+        if (playerState === PlayerStatus.timeToShout) {
+            return <div>
+                <li>
+                    <Label label='输入您的价格'/>
+                    <Input type='number' value={price} onChange={this.setVal.bind(this)}/>
+                </li>
+                <li>
+                    <Button width={ButtonProps.Width.large} label='出价' onClick={this.shout.bind(this)}/>
+                </li>
+            </div>
+        }
+        return <MaskLoading label='准备进行下一轮...'/>
     }
 
     dynamicResult = () => {
-        const {props: {playerState: {profits, prices, privatePrices}}} = this
+        const {props: {playerState: {profits, prices}}} = this
         return <table className={style.profits}>
             <thead>
             <tr>
                 <td>轮次</td>
-                <td>心理价值</td>
                 <td>出价</td>
                 <td>收益</td>
             </tr>
@@ -92,7 +96,6 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                     <tbody key={`tb${i}`}>
                     <tr>
                         <td>{i + 1}</td>
-                        <td>{privatePrices[i]}</td>
                         <td>{v}</td>
                         <td>{profits[i]}</td>
                     </tr>
@@ -105,9 +108,9 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     render() {
         const {
             props: {
-                game: {params: {groupSize}},
+                game: {params: {groupSize, initialFunding}},
                 gameState: {groups},
-                playerState: {role, groupIndex, privatePrices}
+                playerState: {groupIndex}
             }, state: {loading, newRoundTimers}
         } = this
         if (loading) {
@@ -119,8 +122,8 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         const {rounds, roundIndex} = groups[groupIndex],
             newRoundTimer = newRoundTimers[roundIndex]
         return <section className={style.play}>
-            <div className={style.title}>集合竞价市场</div>
-            {newRoundTimer ? <div>
+            <div className={style.title}>公共品</div>
+            {newRoundTimer ? <div className={style.line}>
                 <div>本轮结束剩余时间</div>
                 <div className={style.highlight}>{NEW_ROUND_TIMER - newRoundTimer}</div>
             </div> : null}
@@ -137,12 +140,8 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 <div className={style.highlight}>{roundIndex + 1} </div>
             </div>
             <div className={style.line}>
-                <div>您的角色</div>
-                <div className={style.highlight}>{['买家', '卖家'][role]}</div>
-            </div>
-            <div className={style.line}>
-                <div>物品对于您的心理价值</div>
-                <div className={style.highlight}>{privatePrices[groups[groupIndex].roundIndex]}</div>
+                <div>您拥有的资金</div>
+                <div className={style.highlight}>{initialFunding}</div>
             </div>
             {this.dynamicAction()}
             {this.dynamicResult()}
