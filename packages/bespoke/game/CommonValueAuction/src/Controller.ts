@@ -44,12 +44,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 playerState.positionIndex = gameState.groups[groupIndex].playerNum++
                 playerState.privatePrices = positions[playerState.positionIndex].privatePrice
                 break
-            case MoveType.enterMarket: {
-                const {groupIndex, positionIndex} = playerState,
-                    {rounds, roundIndex} = gameState.groups[groupIndex]
-                rounds[roundIndex].playerStatus[positionIndex] = PlayerStatus.prepared
-                break
-            }
             case MoveType.shout: {
                 const {groupIndex, positionIndex} = playerState,
                     groupState = gameState.groups[groupIndex],

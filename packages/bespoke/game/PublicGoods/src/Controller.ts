@@ -42,6 +42,13 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 }
                 playerState.groupIndex = groupIndex
                 playerState.positionIndex = gameState.groups[groupIndex].playerNum++
+                const {rounds, roundIndex} = gameState.groups[groupIndex]
+                if (rounds[roundIndex].playerStatus.every(s => s === PlayerStatus.prepared)) {
+                    if (!rounds[roundIndex].currentPlayer) {
+                        rounds[roundIndex].currentPlayer = 0
+                        rounds[roundIndex].playerStatus[rounds[roundIndex].currentPlayer] = PlayerStatus.timeToShout
+                    }
+                }
                 break
             case MoveType.enterMarket: {
                 const {groupIndex, positionIndex} = playerState,
