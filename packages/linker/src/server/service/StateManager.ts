@@ -6,27 +6,27 @@ import {
     IPhaseState,
     NFrame,
     IActor,
-    IGroupState
+    IGameState
 } from '@common'
 import {getPhaseService} from '../rpc'
 import {GameService} from './GameService'
-import {GroupStateDoc, GroupStateModel, PhaseResultModel} from '@server-model'
+import {GameStateDoc, GameStateModel, PhaseResultModel} from '@server-model'
 import {EventDispatcher} from '../controller/eventDispatcher'
 import {Log, RedisKey, redisClient} from '@server-util'
 import {PhaseManager} from 'elf-protocol'
 
-const groupStateServices: { [elfGameId: string]: GroupStateService } = {}
+const stateManagers: { [gameId: string]: StateManager } = {}
 
-export class GroupStateService {
-    static async getService(elfGameId: string) {
-        if (!groupStateServices[elfGameId]) {
-            const group = await GameService.getGame(elfGameId)
-            groupStateServices[elfGameId] = await (new GroupStateService(group)).init()
+export class StateManager {
+    static async getManager(gameId: string) {
+        if (!stateManagers[gameId]) {
+            const group = await GameService.getGame(gameId)
+            stateManagers[gameId] = await (new StateManager(group)).init()
         }
-        return groupStateServices[elfGameId]
+        return stateManagers[gameId]
     }
 
-    groupState: IGroupState
+    gameState: IGameState
 
     constructor(public group: IGameWithId) {
     }
@@ -66,29 +66,29 @@ export class GroupStateService {
         })
     }
 
-    async init(): Promise<GroupStateService> {
+    async init(): Promise<StateManager> {
         await this.initState()
         return this
     }
 
     async initState() {
-        const groupStateDoc: GroupStateDoc = await GroupStateModel.findOne({elfGameId: this.group.id})
-        if (groupStateDoc) {
-            this.groupState = groupStateDoc.data
+        const gameStateDoc: GameStateDoc = await GameStateModel.findOne({gameId: this.group.id})
+        if (gameStateDoc) {
+            this.gameState = gameStateDoc.data
             return
         }
-        this.groupState = {
-            elfGameId: this.group.id,
+        this.gameState = {
+            gameId: this.group.id,
             phaseStates: []
         }
         const startPhaseCfg = this.group.phaseConfigs.find(({namespace}) => namespace === CorePhaseNamespace.start)
         const phaseState = await this.newPhase(startPhaseCfg)
-        this.groupState.phaseStates.push(phaseState)
-        await new GroupStateModel({elfGameId: this.group.id, data: this.groupState}).save()
+        this.gameState.phaseStates.push(phaseState)
+        await new GameStateModel({gameId: this.group.id, data: this.gameState}).save()
     }
 
     async joinGroupRoom(actor: IActor): Promise<void> {
-        const {groupState: {phaseStates}} = this
+        const {gameState: {phaseStates}} = this
         if (phaseStates.length === 1 && phaseStates[0].playerState[actor.token] === undefined) {
             phaseStates[0].playerState[actor.token] = {
                 actor,
@@ -98,7 +98,7 @@ export class GroupStateService {
     }
 
     async sendBackPlayer(playUrl: string, playerToken: string, nextPhaseKey: string, phaseResult: PhaseManager.TPhaseResult): Promise<void> {
-        const {group: {phaseConfigs}, groupState: {phaseStates}} = this
+        const {group: {phaseConfigs}, gameState: {phaseStates}} = this
 
         let nextPhaseState: IPhaseState
         const createNextPhase = async (phaseCfg: IPhaseConfig) => {
@@ -141,12 +141,12 @@ export class GroupStateService {
     }
 
     broadcastState() {
-        Log.d(JSON.stringify(this.groupState))
+        Log.d(JSON.stringify(this.gameState))
         EventDispatcher.socket.in(this.group.id)
-            .emit(baseEnum.SocketEvent.downFrame, NFrame.DownFrame.syncGroupState, this.groupState)
-        GroupStateModel.findOneAndUpdate({elfGameId: this.group.id}, {
+            .emit(baseEnum.SocketEvent.downFrame, NFrame.DownFrame.syncGameState, this.gameState)
+        GameStateModel.findOneAndUpdate({gameId: this.group.id}, {
             $set: {
-                data: this.groupState,
+                data: this.gameState,
                 updateAt: Date.now()
             }
         }, {new: true}, err => err ? Log.e(err) : null)

@@ -1,6 +1,6 @@
 import {Document, Model, model, Schema} from 'mongoose'
 import {getModels, PhaseManager} from 'elf-protocol'
-import {IGame, IGroupState, IPlayer, IUser} from '@common'
+import {IGame, IGameState, IPlayer, IUser} from '@common'
 
 const {String} = Schema.Types
 
@@ -15,12 +15,12 @@ export const PlayerModel: Model<PlayerDoc> = models.ElfPlayer
 export type UserDoc = IUser & Document
 export const UserModel: Model<UserDoc> = models.User
 
-export type GroupStateDoc = {
-    elfGameId: string,
-    data: IGroupState
+export type GameStateDoc = {
+    gameId: string,
+    data: IGameState
 } & Document
-export const GroupStateModel: Model<GroupStateDoc> = model('LinkerGroupState', new Schema({
-    elfGameId: String,
+export const GameStateModel: Model<GameStateDoc> = model('LinkerGameState', new Schema({
+    gameId: String,
     data: Object,
     createAt: {type: Date, default: Date.now},
     updateAt: {type: Date, default: Date.now}

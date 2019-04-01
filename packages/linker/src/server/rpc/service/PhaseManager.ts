@@ -1,7 +1,7 @@
 import {Server} from 'grpc'
 import {config} from '@common'
 import {Log, redisClient, RedisKey, RedisLifetime, buildPlayUrl} from '@server-util'
-import {GroupStateService} from '@server-service'
+import {StateManager} from '@server-service'
 import {PhaseManager as P} from 'elf-protocol'
 
 export function setGameService(server: Server) {
@@ -22,10 +22,10 @@ export function setGameService(server: Server) {
 
     function sendBackPlayer(req: { request: P.TSendBackPlayerReq }, callback: P.TSendBackPlayerCallback) {
         Log.d('sendBackPlayer:', JSON.stringify(req.request))
-        const {elfGameId, playUrl, playerToken, nextPhaseKey, phaseResult} = req.request
-        GroupStateService.getService(elfGameId).then(async (groupService) => {
-            await groupService.sendBackPlayer(playUrl, playerToken, nextPhaseKey, phaseResult)
-            callback(null, {sendBackUrl: buildPlayUrl(elfGameId, playerToken)})
+        const {elfGameId: gameId, playUrl, playerToken, nextPhaseKey, phaseResult} = req.request
+        StateManager.getManager(gameId).then(async (stateManager) => {
+            await stateManager.sendBackPlayer(playUrl, playerToken, nextPhaseKey, phaseResult)
+            callback(null, {sendBackUrl: buildPlayUrl(gameId, playerToken)})
         })
     }
 
