@@ -97,7 +97,7 @@ export class GroupStateService {
         }
     }
 
-    async sendBackPlayer(playUrl: string, playerToken: string, nextPhaseKey: string, phasePlayer: PhaseManager.TPhasePlayer): Promise<void> {
+    async sendBackPlayer(playUrl: string, playerToken: string, nextPhaseKey: string, phaseResult: PhaseManager.TPhaseResult): Promise<void> {
         const {group: {phaseConfigs}, groupState: {phaseStates}} = this
 
         let nextPhaseState: IPhaseState
@@ -109,12 +109,12 @@ export class GroupStateService {
             currentPhaseCfgIndex = phaseConfigs.findIndex(phaseCfg => phaseCfg.key === currentPhaseState.key),
             playerCurrentPhaseState = currentPhaseState.playerState[playerToken]
         playerCurrentPhaseState.status = baseEnum.PlayerStatus.left
-        playerCurrentPhaseState.phasePlayer = phasePlayer
+        playerCurrentPhaseState.phaseResult = phaseResult
         await PhaseResultModel.create({
             gameId:this.group.id,
             playerId:playerCurrentPhaseState.actor.playerId,
             phaseName: phaseConfigs[currentPhaseCfgIndex].title,
-            ...phasePlayer
+            ...phaseResult
         })
         let phaseCfg = phaseConfigs.find(phaseCfg => phaseCfg.key === nextPhaseKey)
         if (!phaseCfg) {

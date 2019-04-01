@@ -377,8 +377,8 @@ export interface ISendBackPlayerReq {
     /** SendBackPlayerReq nextPhaseKey */
     nextPhaseKey?: (string|null);
 
-    /** SendBackPlayerReq phasePlayer */
-    phasePlayer?: (SendBackPlayerReq.IPhasePlayer|null);
+    /** SendBackPlayerReq phaseResult */
+    phaseResult?: (SendBackPlayerReq.IPhaseResult|null);
 }
 
 /** Represents a SendBackPlayerReq. */
@@ -402,8 +402,8 @@ export class SendBackPlayerReq implements ISendBackPlayerReq {
     /** SendBackPlayerReq nextPhaseKey. */
     public nextPhaseKey: string;
 
-    /** SendBackPlayerReq phasePlayer. */
-    public phasePlayer?: (SendBackPlayerReq.IPhasePlayer|null);
+    /** SendBackPlayerReq phaseResult. */
+    public phaseResult?: (SendBackPlayerReq.IPhaseResult|null);
 
     /**
      * Creates a new SendBackPlayerReq instance using the specified properties.
@@ -478,103 +478,103 @@ export class SendBackPlayerReq implements ISendBackPlayerReq {
 
 export namespace SendBackPlayerReq {
 
-    /** Properties of a PhasePlayer. */
-    interface IPhasePlayer {
+    /** Properties of a PhaseResult. */
+    interface IPhaseResult {
 
-        /** PhasePlayer uniKey */
+        /** PhaseResult uniKey */
         uniKey?: (string|null);
 
-        /** PhasePlayer point */
+        /** PhaseResult point */
         point?: (string|null);
 
-        /** PhasePlayer detailIframeUrl */
+        /** PhaseResult detailIframeUrl */
         detailIframeUrl?: (string|null);
     }
 
-    /** Represents a PhasePlayer. */
-    class PhasePlayer implements IPhasePlayer {
+    /** Represents a PhaseResult. */
+    class PhaseResult implements IPhaseResult {
 
         /**
-         * Constructs a new PhasePlayer.
+         * Constructs a new PhaseResult.
          * @param [properties] Properties to set
          */
-        constructor(properties?: SendBackPlayerReq.IPhasePlayer);
+        constructor(properties?: SendBackPlayerReq.IPhaseResult);
 
-        /** PhasePlayer uniKey. */
+        /** PhaseResult uniKey. */
         public uniKey: string;
 
-        /** PhasePlayer point. */
+        /** PhaseResult point. */
         public point: string;
 
-        /** PhasePlayer detailIframeUrl. */
+        /** PhaseResult detailIframeUrl. */
         public detailIframeUrl: string;
 
         /**
-         * Creates a new PhasePlayer instance using the specified properties.
+         * Creates a new PhaseResult instance using the specified properties.
          * @param [properties] Properties to set
-         * @returns PhasePlayer instance
+         * @returns PhaseResult instance
          */
-        public static create(properties?: SendBackPlayerReq.IPhasePlayer): SendBackPlayerReq.PhasePlayer;
+        public static create(properties?: SendBackPlayerReq.IPhaseResult): SendBackPlayerReq.PhaseResult;
 
         /**
-         * Encodes the specified PhasePlayer message. Does not implicitly {@link SendBackPlayerReq.PhasePlayer.verify|verify} messages.
-         * @param message PhasePlayer message or plain object to encode
+         * Encodes the specified PhaseResult message. Does not implicitly {@link SendBackPlayerReq.PhaseResult.verify|verify} messages.
+         * @param message PhaseResult message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: SendBackPlayerReq.IPhasePlayer, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encode(message: SendBackPlayerReq.IPhaseResult, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Encodes the specified PhasePlayer message, length delimited. Does not implicitly {@link SendBackPlayerReq.PhasePlayer.verify|verify} messages.
-         * @param message PhasePlayer message or plain object to encode
+         * Encodes the specified PhaseResult message, length delimited. Does not implicitly {@link SendBackPlayerReq.PhaseResult.verify|verify} messages.
+         * @param message PhaseResult message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: SendBackPlayerReq.IPhasePlayer, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: SendBackPlayerReq.IPhaseResult, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Decodes a PhasePlayer message from the specified reader or buffer.
+         * Decodes a PhaseResult message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns PhasePlayer
+         * @returns PhaseResult
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): SendBackPlayerReq.PhasePlayer;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): SendBackPlayerReq.PhaseResult;
 
         /**
-         * Decodes a PhasePlayer message from the specified reader or buffer, length delimited.
+         * Decodes a PhaseResult message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns PhasePlayer
+         * @returns PhaseResult
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): SendBackPlayerReq.PhasePlayer;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): SendBackPlayerReq.PhaseResult;
 
         /**
-         * Verifies a PhasePlayer message.
+         * Verifies a PhaseResult message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
         public static verify(message: { [k: string]: any }): (string|null);
 
         /**
-         * Creates a PhasePlayer message from a plain object. Also converts values to their respective internal types.
+         * Creates a PhaseResult message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
-         * @returns PhasePlayer
+         * @returns PhaseResult
          */
-        public static fromObject(object: { [k: string]: any }): SendBackPlayerReq.PhasePlayer;
+        public static fromObject(object: { [k: string]: any }): SendBackPlayerReq.PhaseResult;
 
         /**
-         * Creates a plain object from a PhasePlayer message. Also converts values to other types if specified.
-         * @param message PhasePlayer
+         * Creates a plain object from a PhaseResult message. Also converts values to other types if specified.
+         * @param message PhaseResult
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: SendBackPlayerReq.PhasePlayer, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public static toObject(message: SendBackPlayerReq.PhaseResult, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
-         * Converts this PhasePlayer to JSON.
+         * Converts this PhaseResult to JSON.
          * @returns JSON object
          */
         public toJSON(): { [k: string]: any };
