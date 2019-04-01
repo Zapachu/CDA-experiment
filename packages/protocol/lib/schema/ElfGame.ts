@@ -2,6 +2,7 @@ import {Schema} from 'mongoose'
 
 export const ElfGame = new Schema({
     owner: String,
+    orgCode: String,
     title: String,
     desc: String,
     phaseConfigs: Object,
