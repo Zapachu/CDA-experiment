@@ -8,9 +8,6 @@ export interface ICreateParams {
     /** CreateParams groupSize */
     groupSize?: (number|null);
 
-    /** CreateParams minPrivatePrice */
-    minPrivatePrice?: (number|null);
-
     /** CreateParams maxPrivatePrice */
     maxPrivatePrice?: (number|null);
 
@@ -38,9 +35,6 @@ export class CreateParams implements ICreateParams {
 
     /** CreateParams groupSize. */
     public groupSize: number;
-
-    /** CreateParams minPrivatePrice. */
-    public minPrivatePrice: number;
 
     /** CreateParams maxPrivatePrice. */
     public maxPrivatePrice: number;

@@ -3,14 +3,13 @@ syntax = "proto3";
 message CreateParams {
     int32 round = 1;
     int32 groupSize = 2;
-    int32 minPrivatePrice = 3;
-    int32 maxPrivatePrice = 4;
-    int32 startingPrice = 5;
+    int32 maxPrivatePrice = 3;
+    int32 startingPrice = 4;
     message Position {
         repeated int32 privatePrice = 1;
     }
-    string nextPhaseKey = 6;
-    repeated Position positions = 7;
+    string nextPhaseKey = 5;
+    repeated Position positions = 6;
 }
 
 message MoveParams {

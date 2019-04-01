@@ -53,8 +53,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 playerStatus[positionIndex] = PlayerStatus.shouted
                 playerState.prices[roundIndex] = params.price
                 if (playerStatus.every(status => status === PlayerStatus.shouted)) {
-                    const [{positionIndex: winner}, {prices}] = groupPlayerStates.sort((s1, s2) => s2.prices[roundIndex] - s1.prices[roundIndex])
-                    playerStates[winner].profits[roundIndex] = playerStates[winner].privatePrices[roundIndex] - prices[roundIndex]
+                    groupPlayerStates.sort((s1, s2) => s2.prices[roundIndex] - s1.prices[roundIndex])
+                    groupPlayerStates[0].profits[roundIndex] = groupPlayerStates[0].privatePrices[roundIndex] - groupPlayerStates[1].prices[roundIndex]
                     await this.stateManager.syncState()
                     if (roundIndex == rounds.length - 1) {
                         for (let i in playerStatus) playerStatus[i] = PlayerStatus.gameOver

@@ -6,7 +6,6 @@ import {FetchType} from "../config"
 
 interface ICreateState {
     startingPrice: number
-    minPrivatePrice: number
     maxPrivatePrice: number
     positions: Array<{
         privatePrice: Array<number>
@@ -20,7 +19,6 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
 
     state: ICreateState = {
         startingPrice: 10,
-        minPrivatePrice: 0,
         maxPrivatePrice: 100,
         positions: [{privatePrice: [101, 98, 102]}, {privatePrice: [97, 99, 103]}],
         round: 3,
@@ -48,10 +46,10 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
     genRan = ({L, H}) => ~~(Math.random() * (H - L)) + L
 
     genPosition = () => {
-        const {minPrivatePrice, maxPrivatePrice, round} = this.state
+        const {maxPrivatePrice, startingPrice, round} = this.state
         return {
             privatePrice: Array(round).fill(null).map(() => this.genRan({
-                L: minPrivatePrice,
+                L: startingPrice,
                 H: maxPrivatePrice
             }))
         }
@@ -66,14 +64,14 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
 
     done = () => {
         const {setParams, setSubmitable} = this.props
-        const {round, groupSize, positions, startingPrice, minPrivatePrice, maxPrivatePrice} = this.state
-        setParams({round, groupSize, positions, minPrivatePrice, maxPrivatePrice, startingPrice})
+        const {round, groupSize, positions, startingPrice, maxPrivatePrice} = this.state
+        setParams({round, groupSize, positions, maxPrivatePrice, startingPrice})
         this.setState({readonly: true})
         setSubmitable(true)
     }
 
     render() {
-        const {round, groupSize, positions, startingPrice, minPrivatePrice, maxPrivatePrice, readonly} = this.state
+        const {round, groupSize, positions, startingPrice, maxPrivatePrice, readonly} = this.state
         return <div className={style.create}>
             <ul className={style.configFields}>
                 <li>
@@ -91,11 +89,11 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
                                 onChange={(e) => this.setState({groupSize: parseInt(e.target.value)})}/>
                 </li>
                 <li>
-                    <Label label='最小心理价值'/>
-                    <RangeInput value={minPrivatePrice}
+                    <Label label='起拍价'/>
+                    <RangeInput value={startingPrice}
                                 min={0}
                                 max={1000}
-                                onChange={(e) => this.setState({minPrivatePrice: parseInt(e.target.value)})}/>
+                                onChange={(e) => this.setState({startingPrice: parseInt(e.target.value)})}/>
                 </li>
                 <li>
                     <Label label='最大心理价值'/>
@@ -103,13 +101,6 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
                                 min={0}
                                 max={1000}
                                 onChange={(e) => this.setState({maxPrivatePrice: parseInt(e.target.value)})}/>
-                </li>
-                <li>
-                    <Label label='起拍价'/>
-                    <RangeInput value={startingPrice}
-                                min={0}
-                                max={1000}
-                                onChange={(e) => this.setState({startingPrice: parseInt(e.target.value)})}/>
                 </li>
                 <li>
                     <Button label='生成参数'
