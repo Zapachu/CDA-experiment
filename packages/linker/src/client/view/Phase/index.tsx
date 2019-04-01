@@ -10,7 +10,7 @@ import {phaseTemplates} from '../../index'
 import {message, Row, Col, Button, Input, Icon, Card, Modal, Select, Tabs, List} from '@antd-component'
 import {Loading, Title} from '@client-component'
 import {Link} from 'react-router-dom'
-import {cloneDeep} from 'lodash'
+import cloneDeep = require('lodash/cloneDeep')
 import GameMode = baseEnum.GameMode
 
 declare interface ICreateState {
