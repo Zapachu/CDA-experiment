@@ -52,20 +52,20 @@ export class Play4Owner extends React.Component<TRootContext & TPlayContext & { 
                         <List
                             dataSource={Object.entries(phaseState.playerState)}
                             renderItem={
-                                ([playerToken, {actor, status, phasePlayer = {}}]: [string, IPlayerState]) =>
+                                ([playerToken, {actor, status, phaseResult = {}}]: [string, IPlayerState]) =>
                                     <List.Item>
                                         <List.Item.Meta title={`${actor.userName}:${lang[PlayerStatus[status]]||''}`}
                                                         description={
                                                             <div>
                                                                 {
-                                                                    phasePlayer.point ? <span>{lang.point}&nbsp;&nbsp;{phasePlayer.point}</span> : null
+                                                                    phaseResult.point ? <span>{lang.point}&nbsp;&nbsp;{phaseResult.point}</span> : null
                                                                 }
                                                                 {
-                                                                    phasePlayer.uniKey ?
-                                                                        <span>{lang.uniKey}&nbsp;&nbsp;{phasePlayer.uniKey}</span> : null
+                                                                    phaseResult.uniKey ?
+                                                                        <span>{lang.uniKey}&nbsp;&nbsp;{phaseResult.uniKey}</span> : null
                                                                 }
                                                                 {
-                                                                    phasePlayer.detailIframeUrl ? <a href={phasePlayer.detailIframeUrl}
+                                                                    phaseResult.detailIframeUrl ? <a href={phaseResult.detailIframeUrl}
                                                                                                      target='_blank'>{lang.detail}</a> : null
                                                                 }
                                                             </div>

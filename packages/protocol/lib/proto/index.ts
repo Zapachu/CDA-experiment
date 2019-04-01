@@ -90,7 +90,7 @@ export namespace PhaseManager {
     export type TRegisterPhasesCallBack = (error?: Error, response?: IRegisterPhasesRes) => void
     export type TSendBackPlayerReq = ISendBackPlayerReq
     export type TSendBackPlayerCallback = (error?: Error, response?: ISendBackPlayerRes) => void
-    export type TPhasePlayer = SendBackPlayerReq.IPhasePlayer
+    export type TPhaseResult = SendBackPlayerReq.IPhaseResult
     export type TGameService = {
         registerPhases(req: { request: TRegisterPhasesReq }, callback: TRegisterPhasesCallBack): void
         sendBackPlayer(req: { request: TSendBackPlayerReq }, callback: TSendBackPlayerCallback): void
