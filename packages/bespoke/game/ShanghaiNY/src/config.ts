@@ -49,6 +49,7 @@ export enum MoveType {
   answerSurvey = 'answerSurvey',
   toMain = 'toMain',
   //owner
+  startTest = 'startTest',
   // assignPosition = 'assignPosition',
   // openMarket = 'openMarket',
   //elf

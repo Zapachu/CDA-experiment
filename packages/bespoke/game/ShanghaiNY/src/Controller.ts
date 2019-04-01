@@ -90,7 +90,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                   break
               }
               playerState.seatNumber = params.seatNumber;
-              playerState.stage = Stage.Test;
               break
           }
           case MoveType.answerTest: {
@@ -193,6 +192,20 @@ export default class Controller extends BaseController<ICreateParams, IGameState
       function isP(): boolean {
         const random = Math.floor(Math.random()*10)/10;
         return random < p;
+      }
+  }
+
+  protected async teacherMoveReducer(actor: IActor, type: string, params: IMoveParams, cb: IMoveCallback): Promise<void> {
+      const playerStates = await this.stateManager.getPlayerStates()
+      switch (type) {
+          case MoveType.startTest:{
+              Object.values(playerStates).forEach(playerState=>{
+                  if(playerState.stage === Stage.Seat && playerState.seatNumber){
+                      playerState.stage = Stage.Test
+                  }
+              })
+              break;
+          }
       }
   }
 

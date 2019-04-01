@@ -18,8 +18,8 @@
 
 .play4Owner {
   display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
   .resultTable {
     border-collapse: separate;
     width: 100%;
