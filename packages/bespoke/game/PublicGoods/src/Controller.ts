@@ -76,6 +76,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                             newRoundTimer
                         }))
                         if (newRoundTimer++ < NEW_ROUND_TIMER) {
+                            for (let i in playerStatus) playerStatus[i] = PlayerStatus.gameOver
+                            await this.stateManager.syncState()
                             return
                         }
                         global.clearInterval(newRoundInterval)

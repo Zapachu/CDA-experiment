@@ -58,6 +58,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                             const highestSorts = groupPlayerStates.sort((a, b) => b.prices[roundIndex] - a.prices[roundIndex])
                             highestSorts.map((p, i) => {
                                 if (i < winnerNumber) {
+                                    playerStatus[i] = PlayerStatus.won
                                     p.profits[roundIndex] = p.privatePrices[roundIndex] - p.prices[roundIndex]
                                 }
                             })
@@ -70,6 +71,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                             groupPlayerStates.map((p, i) => {
                                 if (p.prices[roundIndex] > median && winners < winnerNumber) {
                                     winners++
+                                    playerStatus[i] = PlayerStatus.won
                                     p.profits[roundIndex] = p.privatePrices[roundIndex] - p.prices[roundIndex]
                                 }
                             })
