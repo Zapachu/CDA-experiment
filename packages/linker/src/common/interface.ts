@@ -55,6 +55,7 @@ export interface IBaseGame {
     title: string
     desc: string
     owner?: string
+    orgCode? : string
     published?: boolean
     mode: baseEnum.GameMode
 }
