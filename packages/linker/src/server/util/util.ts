@@ -28,7 +28,7 @@ export class Hash {
     }
 }
 
-export function buildPlayUrl(groupId: string, playerToken: string) {
+export function buildPlayUrl(elfGameId: string, playerToken: string) {
     const {linkerGatewayHost: host, linkerPort: port} = elfSetting
-    return `${host.startsWith('http') ? host : `http://${host}:${port}`}/${config.rootName}/play/${groupId}?token=${playerToken}`
+    return `${host.startsWith('http') ? host : `http://${host}:${port}`}/${config.rootName}/play/${elfGameId}?token=${playerToken}`
 }

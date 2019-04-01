@@ -9,7 +9,7 @@ const gen32Token = (source) => {
     return objectHash(source, {algorithm: 'md5'})
 }
 
-const getUrlByNamespace = async (groupId, namespace, param, owner) => {
+const getUrlByNamespace = async (elfGameId, namespace, param, owner) => {
     let paramJson = JSON.parse(param)
     const {qualtricsUrl: realQualtricsUrl} = paramJson
     console.log('paramJson', paramJson)
@@ -19,7 +19,7 @@ const getUrlByNamespace = async (groupId, namespace, param, owner) => {
     try {
         const newQualtricsPhase = await new ThirdPartPhase({
             playHash: [],
-            groupId: groupId,
+            elfGameId: elfGameId,
             param: paramString,
             namespace: namespace,
             ownerToken: gen32Token(owner.toString()),
@@ -34,7 +34,7 @@ const getUrlByNamespace = async (groupId, namespace, param, owner) => {
 }
 
 export const phaseService = {
-    async newPhase({request: {groupId, namespace, param, owner}}: { request: PhaseManager.TNewPhaseReq }, callback: PhaseManager.TNewPhaseCallback) {
-        callback(null, {playUrl: await getUrlByNamespace(groupId, namespace, param, owner)})
+    async newPhase({request: {elfGameId, namespace, param, owner}}: { request: PhaseManager.TNewPhaseReq }, callback: PhaseManager.TNewPhaseCallback) {
+        callback(null, {playUrl: await getUrlByNamespace(elfGameId, namespace, param, owner)})
     }
 }

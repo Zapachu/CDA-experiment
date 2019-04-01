@@ -10,7 +10,7 @@ export default class GameDAO {
 
     @cacheResult
     static async getGame<ICreateParams>(gameId: string): Promise<IGameWithId<ICreateParams>> {
-        const {id, owner, namespace, title, desc, params, groupId} = <GameDoc<ICreateParams>>await GameModel.findById(gameId)
+        const {id, owner, namespace, title, desc, params, elfGameId} = <GameDoc<ICreateParams>>await GameModel.findById(gameId)
         return {
             id,
             owner: owner.toString(),
@@ -18,7 +18,7 @@ export default class GameDAO {
             title,
             desc,
             params,
-            groupId
+            elfGameId
         }
     }
 

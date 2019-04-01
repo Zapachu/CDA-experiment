@@ -40,8 +40,8 @@ export class EventDispatcher {
     static startGroupSocket(server: Server): Server {
         this.socket = socketIO(server, {path: config.socketPath})
         this.socket.on(baseEnum.SocketEvent.connection, async (connection: socketIO.Socket) => {
-            const {token, type, groupId, userId, playerId} = connection.handshake.query
-            const group = await GameService.getGame(groupId)
+            const {token, type, elfGameId, userId, playerId} = connection.handshake.query
+            const group = await GameService.getGame(elfGameId)
             const {name} = await UserModel.findById(userId)
             const actor:IActor = {token, type, userId, userName:name, playerId}
             this.subscribeOnConnection(Object.assign(connection, {actor, group}) as any)

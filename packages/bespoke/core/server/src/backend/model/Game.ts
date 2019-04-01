@@ -9,7 +9,7 @@ export interface GameDoc<ICreateParams> extends IGame<ICreateParams>, Document {
 }
 
 const GameSchema = new Schema({
-    groupId:String,
+    elfGameId:String,
     title: String,
     desc: String,
     namespace: String,

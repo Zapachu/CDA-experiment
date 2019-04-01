@@ -22,10 +22,10 @@ export function setGameService(server: Server) {
 
     function sendBackPlayer(req: { request: P.TSendBackPlayerReq }, callback: P.TSendBackPlayerCallback) {
         Log.d('sendBackPlayer:', JSON.stringify(req.request))
-        const {groupId, playUrl, playerToken, nextPhaseKey, phaseResult} = req.request
-        GroupStateService.getService(groupId).then(async (groupService) => {
+        const {elfGameId, playUrl, playerToken, nextPhaseKey, phaseResult} = req.request
+        GroupStateService.getService(elfGameId).then(async (groupService) => {
             await groupService.sendBackPlayer(playUrl, playerToken, nextPhaseKey, phaseResult)
-            callback(null, {sendBackUrl: buildPlayUrl(groupId, playerToken)})
+            callback(null, {sendBackUrl: buildPlayUrl(elfGameId, playerToken)})
         })
     }
 

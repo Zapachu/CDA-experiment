@@ -90,7 +90,7 @@ export interface IPlayerWithId {
 }
 
 export interface IGroupState {
-    groupId: string,
+    elfGameId: string,
     phaseStates: Array<IPhaseState>
 }
 
@@ -106,7 +106,7 @@ export namespace NFrame {
 
     export interface BaseUpFrame {
         userId: string
-        groupId: string
+        elfGameId: string
     }
 
     export interface JoinRoom extends BaseUpFrame {

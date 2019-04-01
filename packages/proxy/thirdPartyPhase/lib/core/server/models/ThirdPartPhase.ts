@@ -10,7 +10,7 @@ interface PlayHash extends Document{
 }
 
 interface IThirdPartPhaseSchema extends Document{
-    groupId: string;
+    elfGameId: string;
     namespace: string;
     param: string;
     playHash: Array<PlayHash>;
@@ -19,7 +19,7 @@ interface IThirdPartPhaseSchema extends Document{
 }
 
 const ThirdPartPhaseSchema = new Schema({
-    groupId: String,            // elf player groupId
+    elfGameId: String,            // elf player elfGameId
     namespace: String,          // elf namespace, ex: oTree, qualtrics, wjx
     param: String,              // oTree param
     playHash: [                 // third party game <=> elf player

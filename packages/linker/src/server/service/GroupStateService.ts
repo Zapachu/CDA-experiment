@@ -15,15 +15,15 @@ import {EventDispatcher} from '../controller/eventDispatcher'
 import {Log, RedisKey, redisClient} from '@server-util'
 import {PhaseManager} from 'elf-protocol'
 
-const groupStateServices: { [groupId: string]: GroupStateService } = {}
+const groupStateServices: { [elfGameId: string]: GroupStateService } = {}
 
 export class GroupStateService {
-    static async getService(groupId: string) {
-        if (!groupStateServices[groupId]) {
-            const group = await GameService.getGame(groupId)
-            groupStateServices[groupId] = await (new GroupStateService(group)).init()
+    static async getService(elfGameId: string) {
+        if (!groupStateServices[elfGameId]) {
+            const group = await GameService.getGame(elfGameId)
+            groupStateServices[elfGameId] = await (new GroupStateService(group)).init()
         }
-        return groupStateServices[groupId]
+        return groupStateServices[elfGameId]
     }
 
     groupState: IGroupState
@@ -49,7 +49,7 @@ export class GroupStateService {
         return new Promise<IPhaseState>((resolve, reject) => {
             getPhaseService(rpcUri).newPhase({
                 owner: this.group.owner,
-                groupId: this.group.id,
+                elfGameId: this.group.id,
                 namespace: phaseCfg.namespace,
                 param: JSON.stringify(phaseCfg.param)
             }, (err, res) => {
@@ -72,19 +72,19 @@ export class GroupStateService {
     }
 
     async initState() {
-        const groupStateDoc: GroupStateDoc = await GroupStateModel.findOne({groupId: this.group.id})
+        const groupStateDoc: GroupStateDoc = await GroupStateModel.findOne({elfGameId: this.group.id})
         if (groupStateDoc) {
             this.groupState = groupStateDoc.data
             return
         }
         this.groupState = {
-            groupId: this.group.id,
+            elfGameId: this.group.id,
             phaseStates: []
         }
         const startPhaseCfg = this.group.phaseConfigs.find(({namespace}) => namespace === CorePhaseNamespace.start)
         const phaseState = await this.newPhase(startPhaseCfg)
         this.groupState.phaseStates.push(phaseState)
-        await new GroupStateModel({groupId: this.group.id, data: this.groupState}).save()
+        await new GroupStateModel({elfGameId: this.group.id, data: this.groupState}).save()
     }
 
     async joinGroupRoom(actor: IActor): Promise<void> {
@@ -144,7 +144,7 @@ export class GroupStateService {
         Log.d(JSON.stringify(this.groupState))
         EventDispatcher.socket.in(this.group.id)
             .emit(baseEnum.SocketEvent.downFrame, NFrame.DownFrame.syncGroupState, this.groupState)
-        GroupStateModel.findOneAndUpdate({groupId: this.group.id}, {
+        GroupStateModel.findOneAndUpdate({elfGameId: this.group.id}, {
             $set: {
                 data: this.groupState,
                 updateAt: Date.now()

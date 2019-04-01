@@ -16,11 +16,11 @@ export type UserDoc = IUser & Document
 export const UserModel: Model<UserDoc> = models.User
 
 export type GroupStateDoc = {
-    groupId: string,
+    elfGameId: string,
     data: IGroupState
 } & Document
 export const GroupStateModel: Model<GroupStateDoc> = model('LinkerGroupState', new Schema({
-    groupId: String,
+    elfGameId: String,
     data: Object,
     createAt: {type: Date, default: Date.now},
     updateAt: {type: Date, default: Date.now}

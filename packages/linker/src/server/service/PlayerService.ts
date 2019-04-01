@@ -14,6 +14,6 @@ export class PlayerService {
 
     static async getPlayers(gameId: string):Promise<TApiGroupPlayers> {
         const players = await PlayerModel.find({gameId}).populate('userId', 'name') as any
-        return players.map(({id, groupId, userId})=>({playerId:id, userId:userId.id, name:userId.name}))
+        return players.map(({id, elfGameId, userId})=>({playerId:id, userId:userId.id, name:userId.name}))
     }
 }
