@@ -54,10 +54,17 @@ export class UserCtrl {
 export class GameCtrl {
     static async getPhaseTemplates(req, res) {
         const user = req.user as UserDoc
-        const templates = await PhaseService.getPhaseTemplates(user)
+        const namespaces = req.query.namespaces.split(',')
+        const phaseTemplates = await PhaseService.getPhaseTemplates(user)
+        const templates = []
+        phaseTemplates.forEach(({namespace, type, jsUrl}) => {
+            if (namespaces.includes(namespace)) {
+                templates.push({namespace, type, jsUrl})
+            }
+        })
         res.json({
             code: baseEnum.ResponseCode.success,
-            templates: templates.map(({namespace, type, jsUrl}) => ({namespace, type, jsUrl}))
+            templates
         })
     }
 
