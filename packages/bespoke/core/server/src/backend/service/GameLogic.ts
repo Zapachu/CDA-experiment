@@ -16,6 +16,7 @@ import {MoveQueue} from './MoveQueue'
 import {Request, Response} from 'express'
 import {getGameService} from '../rpc'
 import SyncStrategy = baseEnum.SyncStrategy
+import {PhaseManager} from 'elf-protocol'
 
 export type AnyController = BaseController<any, any, any, any, any, any, any, any>
 type AnyRobotScheduler = RobotScheduler<any, any, any, any, any, any, any>
@@ -157,7 +158,7 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
     //endregion
 
     //region elf
-    protected sendBackPlayer(playerToken: string, nextPhaseKey: string) {
+    protected sendBackPlayer(playerToken: string, phaseResult?:PhaseManager.TPhasePlayer, nextPhaseKey?: string) {
         if (!this.game.groupId) {
             return Log.w('Bespoke单独部署，game未关联至Elf group')
         }
@@ -165,7 +166,8 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
             playUrl: elfPhaseId2PlayUrl(this.game.namespace, this.game.id),
             playerToken,
             nextPhaseKey,
-            groupId: this.game.groupId
+            groupId: this.game.groupId,
+            phasePlayer:phaseResult
         }, (err, res) => {
             if (err) {
                 return Log.e(err)
