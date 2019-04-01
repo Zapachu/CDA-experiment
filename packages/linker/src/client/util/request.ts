@@ -104,17 +104,17 @@ export class Request {
         const registeredRes = await GET('/game/phaseTemplates') as IHttpRes & {
             templates: Array<ITemplateRegInfo>
         }
-        /*        try {
-                    const authorizedRes = await this.getAuthorizedTemplates(orgCode)
-                    if (authorizedRes.code === baseEnum.AcademusResCode.success) {
-                        registeredRes.templates = registeredRes.templates.filter(({namespace}) =>
-                            authorizedRes.namespaces.includes(namespace)
-                        )
-                    }
-                } catch (e) {
-                    console.log(e)
-                    registeredRes.templates = []
-                }*/
+        try {
+            const authorizedRes = await this.getAuthorizedTemplates(orgCode)
+            if (authorizedRes.code === baseEnum.AcademusResCode.success) {
+                registeredRes.templates = registeredRes.templates.filter(({namespace}) =>
+                    authorizedRes.namespaces.includes(namespace)
+                )
+            }
+        } catch (e) {
+            console.log(e)
+            registeredRes.templates = []
+        }
         return registeredRes
     }
 
