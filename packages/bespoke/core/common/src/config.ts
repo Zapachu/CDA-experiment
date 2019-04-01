@@ -14,7 +14,7 @@ export const config = {
     vcodeLifetime: 60,
     gameRegisterInterval: 10000,
     logLevel: LogLevel.log,
-    defaultLanguage: Language.en,
+    defaultLanguage: Language.zh,
     cookieKey: {
         csrf: '_csrf'
     }

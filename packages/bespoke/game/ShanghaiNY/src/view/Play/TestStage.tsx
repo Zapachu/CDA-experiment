@@ -54,7 +54,8 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
       submit: ['提交', 'Submit'],
       invalidSeatNumber: ['座位号有误或已被占用', 'Your seat number is invalid or has been occupied'],
       instructionTitle: ['本页面是为了帮助你熟悉操作界面。你可以尝试在界面上进行不同的选择。当你确定已经熟悉了操作界面之后，请点击最下方的“确定”按钮。', 'This page aims to help you get familiar with the interface. You can try to make different choices. After you are familiar with the interface, please click the "Confirm" button below.'],
-      instructionFirst: ['每一轮中，你需要点击按钮做出选择:', 'You should make a choice in every round:'],
+      instructionFirstT1: ['每一轮中，你需要点击按钮做出选择:', 'You should make a choice in every round:'],
+      instructionFirstT2: ['首先，做出你在第一阶段的选择:', 'Now, make your choice for the first action:'],
       instructionSecondWait: ['因为你在第一阶段已经等待，请针对第一阶段可能出现的两种结果，做出你第二阶段的选择:', 'Since you have chosen to wait in the first action, make your choice for the second action based on possible results of the previous action:'],
       instructionSecond1: ['因为你在第一阶段已经选择了1，第二阶段不需要选择，请点击下面的“确定按钮”:', 'Since you have chosen 1 in the first action, you do not need to make the choice for the second action, please click the "Confirm" button below:'],
       next: ['选择完成后，点击“确定”进入下一轮:', 'After making the choices, click "Confirm" button for the next round:'],
@@ -129,7 +130,7 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
           content = (<>
             <p className={style.instruction}>{lang.instructionTitle}</p>
             <Display data={displayData} />
-            <p className={style.instruction}>{lang.instructionFirst}</p>
+            <p className={style.instruction}>{lang.instructionFirstT1}</p>
             <Choice1 c1={c1} d={d} version={version} gameType={gameType} onChoose={c1 => this.setState({c1})}/>
             <p className={style.instruction}>{lang.next}</p>
             <Button width={ButtonProps.Width.small}
@@ -147,7 +148,7 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
           content = (<>
             <p className={style.instruction}>{lang.instructionTitle}</p>
             <Display data={displayData} />
-            <p className={style.instruction}>{lang.instructionFirst}</p>
+            <p className={style.instruction}>{lang.instructionFirstT2}</p>
             <Choice1 c1={c1} d={d} version={version} gameType={gameType} onChoose={c1 => this.setState({c1})}/>
             {c1
               ? c1 === Choice.Wait
@@ -160,7 +161,7 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
             <Button width={ButtonProps.Width.small}
                     label={lang.confirm}
                     onClick={() => {
-                      if(!c1 || (c1===Choice.Wait&&!c2.every(c => !!c))) return;
+                      if(!c1 || c2.length!==2 || c2.includes(undefined)) return;
                       frameEmitter.emit(MoveType.answerTest)
                       this.setState({c1: 0})
                     }}

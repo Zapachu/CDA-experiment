@@ -155,7 +155,7 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
                 ? <Button width={ButtonProps.Width.small}
                           label={lang.confirm}
                           onClick={() => {
-                            if(c1===Choice.Wait && !c2.every(c => !!c)) return;
+                            if(!c1 || c2.length!==2 || c2.includes(undefined)) return;
                             frameEmitter.emit(MoveType.answerMain, {c1, c2})
                           }}
                   />

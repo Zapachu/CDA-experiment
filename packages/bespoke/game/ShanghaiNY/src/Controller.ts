@@ -224,10 +224,10 @@ export default class Controller extends BaseController<ICreateParams, IGameState
     const choiceTerms = {
       [Choice.One]: 1,
       [Choice.Two]: 2,
-      [Choice.Wait]: 'wait',
+      [Choice.Wait]: 0,
     }
 
-    const resultData: Array<Array<any>> = [['组', '座位号', '最终收益', '轮次', '第一阶段选择', '第二阶段选择', '最终选择', '第一阶段有人选1', '组内最低选择', '该轮积分', '专业', '年龄', '年级', '家庭住址', '性别']]
+    const resultData: Array<Array<any>> = [['组', '座位号', '最终收益', '轮次', '第一阶段选择', '第二阶段选择(结果1)', '第二阶段选择(结果2)', '最终选择', '第一阶段有人选1', '组内最低选择', '该轮积分', '专业', '年龄', '年级', '家庭住址', '性别']]
     const playersByGroup = Object.values(playerStates).sort((a, b) => a.groupIndex - b.groupIndex);
     playersByGroup.forEach(ps => {
       const curGroup = groups[ps.groupIndex];
@@ -236,9 +236,9 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         const row = curRound===0 ? [ps.groupIndex+1, ps.seatNumber||'-', participationFee+(ps.finalProfit*s||0), curRound+1] : ['', '', '', curRound+1];
         const curChoice = ps.choices[curRound];
         if(curChoice) {
-          row.push(choiceTerms[curChoice.c1], curChoice.c2.toString()||'-')
+          row.push(choiceTerms[curChoice.c1], curChoice.c1===Choice.Wait?choiceTerms[curChoice.c2[0]]:0, curChoice.c1===Choice.Wait?choiceTerms[curChoice.c2[1]]:0)
           if(curGroup.mins[curRound]) {
-            row.push(curChoice.c?curChoice.c:curChoice.c1, gameType===GameType.T2?(curGroup.ones[curRound]?'yes':'no'):'-', curGroup.mins[curRound], ps.profits[curRound])
+            row.push(curChoice.c?curChoice.c:curChoice.c1, gameType===GameType.T2?(curGroup.ones[curRound]?1:0):'-', curGroup.mins[curRound], ps.profits[curRound])
             if(ps.surveyAnswers.length && curRound===0) {
               row.push(...ps.surveyAnswers)
             }
