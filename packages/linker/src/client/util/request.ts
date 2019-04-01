@@ -101,21 +101,15 @@ export class Request {
     static async getPhaseTemplates(orgCode: string): Promise<IHttpRes & {
         templates: Array<ITemplateRegInfo>
     }> {
-        const registeredRes = await GET('/game/phaseTemplates') as IHttpRes & {
-            templates: Array<ITemplateRegInfo>
-        }
+        let namespaces = ''
         try {
             const authorizedRes = await this.getAuthorizedTemplates(orgCode)
             if (authorizedRes.code === baseEnum.AcademusResCode.success) {
-                registeredRes.templates = registeredRes.templates.filter(({namespace}) =>
-                    authorizedRes.namespaces.includes(namespace)
-                )
+                namespaces = authorizedRes.namespaces.toString()
             }
         } catch (e) {
-            console.log(e)
-            registeredRes.templates = []
         }
-        return registeredRes
+        return await GET('/game/phaseTemplates', null, {namespaces})
     }
 
     static async postNewGame(title: string, desc: string, mode: baseEnum.GameMode, phaseConfigs?: Array<IPhaseConfig<{}>>): Promise<IHttpRes & {
