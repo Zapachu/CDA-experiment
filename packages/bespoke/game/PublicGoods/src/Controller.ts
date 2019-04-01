@@ -34,8 +34,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     const group: GameState.IGroup = {
                         roundIndex: 0,
                         playerNum: 0,
-                        rounds: Array(round).fill(null).map<GameState.Group.IRound>((_, i) => ({
-                            playerStatus: Array(groupSize).fill(i === 0 ? PlayerStatus.outside : PlayerStatus.prepared)
+                        rounds: Array(round).fill(null).map<GameState.Group.IRound>(() => ({
+                            playerStatus: Array(groupSize).fill(PlayerStatus.prepared)
                         }))
                     }
                     groupIndex = gameState.groups.push(group) - 1
@@ -50,18 +50,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     }
                 }
                 break
-            case MoveType.enterMarket: {
-                const {groupIndex, positionIndex} = playerState,
-                    {rounds, roundIndex} = gameState.groups[groupIndex]
-                rounds[roundIndex].playerStatus[positionIndex] = PlayerStatus.prepared
-                if (rounds[roundIndex].playerStatus.every(s => s === PlayerStatus.prepared)) {
-                    if (!rounds[roundIndex].currentPlayer) {
-                        rounds[roundIndex].currentPlayer = 0
-                        rounds[roundIndex].playerStatus[rounds[roundIndex].currentPlayer] = PlayerStatus.timeToShout
-                    }
-                }
-                break
-            }
             case MoveType.shout: {
                 const {groupIndex, positionIndex} = playerState,
                     groupState = gameState.groups[groupIndex],
@@ -69,9 +57,11 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     {playerStatus} = rounds[roundIndex],
                     groupPlayerStates = Object.values(playerStates).filter(s => s.groupIndex === groupIndex)
                 playerStatus[positionIndex] = PlayerStatus.shouted
-                rounds[roundIndex].currentPlayer += 1
-                rounds[roundIndex].playerStatus[rounds[roundIndex].currentPlayer] = PlayerStatus.timeToShout
                 playerState.prices[roundIndex] = params.price
+                rounds[roundIndex].currentPlayer += 1
+                if (rounds[roundIndex].currentPlayer < groupSize) {
+                    rounds[roundIndex].playerStatus[rounds[roundIndex].currentPlayer] = PlayerStatus.timeToShout
+                }
                 if (playerStatus.every(status => status === PlayerStatus.shouted)) {
                     const share = returnOnInvestment * groupPlayerStates.map(p => p.prices[roundIndex]).reduce((p, c) => p + c) / groupSize
                     groupPlayerStates.map(p => p.profits[roundIndex] = initialFunding - p.prices[roundIndex] + share)
@@ -90,6 +80,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         }
                         global.clearInterval(newRoundInterval)
                         groupState.roundIndex++
+                        rounds[groupState.roundIndex].currentPlayer = 0
+                        rounds[groupState.roundIndex].playerStatus[0] = PlayerStatus.timeToShout
                         await this.stateManager.syncState()
                     }, 1000)
                 }

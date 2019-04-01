@@ -16,11 +16,9 @@ export enum FetchType {
 }
 
 export enum PlayerStatus {
-    outside,
     prepared,
     timeToShout,
     shouted,
-    won
 }
 
 export const NEW_ROUND_TIMER = 3

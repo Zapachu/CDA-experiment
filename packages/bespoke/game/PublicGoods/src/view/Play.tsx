@@ -75,7 +75,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 </li>
             </div>
         }
-        return <div> blank </div>
+        return <MaskLoading label='准备进行下一轮...'/>
     }
 
     dynamicResult = () => {
