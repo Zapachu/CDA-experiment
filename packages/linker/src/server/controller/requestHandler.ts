@@ -5,6 +5,7 @@ import {Request, Response, NextFunction} from 'express'
 import {GameService, PhaseService} from '@server-service'
 import {WebpackHmr} from '../util/WebpackHmr'
 import {PlayerService} from '../service/PlayerService'
+import {elfSetting} from 'elf-setting'
 
 const SECONDS_PER_DAY = 86400
 const DEFAULT_PAGE_SIZE = 11
@@ -58,7 +59,7 @@ export class GameCtrl {
         const phaseTemplates = await PhaseService.getPhaseTemplates(user)
         const templates = []
         phaseTemplates.forEach(({namespace, type, jsUrl}) => {
-            if (namespaces.includes(namespace)) {
+            if (!elfSetting.inProductEnv || namespaces.includes(namespace)) {
                 templates.push({namespace, type, jsUrl})
             }
         })
