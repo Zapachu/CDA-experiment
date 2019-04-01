@@ -252,7 +252,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
   }
 
   async onGameOver() {
-    const gameState = await this.stateManager.getGameState()
+    const gameState = await this.stateManager.getGameState();
     const resultData = await this.genExportData();
     Object.assign(gameState, {
         sheets: {
@@ -260,6 +260,12 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 data: resultData
             },
         }
+    })
+    const {participationFee,s} = this.game.params;
+    const playerStates = await this.stateManager.getPlayerStates();
+    Object.keys(playerStates).forEach(token => {
+      const point = participationFee+(playerStates[token].finalProfit*s||0);
+      this.sendBackPlayer(token, {point: point.toString()});
     })
   }
 

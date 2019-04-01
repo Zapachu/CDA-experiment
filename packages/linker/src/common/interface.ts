@@ -39,7 +39,7 @@ export interface IPhaseConfig<ICreateParam = {}> {
 export interface IPlayerState {
     actor: IActor
     status: PlayerStatus
-    phasePlayer?: PhaseManager.TPhasePlayer
+    phaseResult?: PhaseManager.TPhaseResult
 }
 
 export interface IPhaseState {
@@ -55,6 +55,7 @@ export interface IBaseGame {
     title: string
     desc: string
     owner?: string
+    orgCode? : string
     published?: boolean
     mode: baseEnum.GameMode
 }
@@ -126,5 +127,5 @@ export type TApiGroupPlayers = Array<{
     name: string
 }>
 
-export type TApiPlayerResults = Array<{ phaseName: string } & PhaseManager.TPhasePlayer>
+export type TApiPlayerResults = Array<{ phaseName: string } & PhaseManager.TPhaseResult>
 //endregion
