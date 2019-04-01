@@ -36,7 +36,7 @@ export const Root: React.FunctionComponent = () => {
                         <Route path={'/createInFrame'} component={CreateInFrame}/>
                         <Route path={'/baseInfo/:gameId'} component={withSideNav(BaseInfo, NAV.basic)}/>
                         <Route path={'/baseInfo'} component={withSideNav(BaseInfo, NAV.basic)}/>
-                        <Route path={'/phase/:gameId'} component={withSideNav(Phase, NAV.group)}/>
+                        <Route path={'/phase/:gameId'} component={withSideNav(Phase, NAV.phase)}/>
                         <Route path={'/share/:gameId'} component={Share}/>
                         <Route path={'/join'} component={Join}/>
                         <Route path={'/info/:gameId'} component={Info}/>

@@ -8,9 +8,9 @@ import {Loading} from '@client-component'
 @connCtx(playContext)
 export class Play4Player extends React.Component<TRootContext & TPlayContext> {
     get curPhaseState(): IPhaseState {
-        const {actor, groupState} = this.props
+        const {actor, gameState} = this.props
         let curPhaseState: IPhaseState = null
-        groupState.phaseStates.forEach(phaseState => {
+        gameState.phaseStates.forEach(phaseState => {
             if (phaseState.playerState[actor.token] !== undefined) {
                 curPhaseState = phaseState
             }

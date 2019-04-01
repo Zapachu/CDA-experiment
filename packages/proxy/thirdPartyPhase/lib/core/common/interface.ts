@@ -3,7 +3,7 @@ import {Socket} from 'socket.io-client'
 export type TSocket = typeof Socket
 
 export interface IPhase<CP> {
-    groupId: string
+    elfGameId: string
     namespace: string
     param: CP
 }
@@ -22,7 +22,7 @@ export interface IPhaseConfig<ICreateParam> {
 export namespace NSocket {
     export interface OnlineRes {
         id: string
-        groupId: string
+        elfGameId: string
         namespace: string
         jsUrl: string
     }

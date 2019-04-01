@@ -1,6 +1,6 @@
 import * as React from "react";
 import {RouteComponentProps} from "react-router";
-import {config, baseEnum, IGroupState, IGameWithId, TSocket, NFrame, IActor} from "@common";
+import {config, baseEnum, IGameState, IGameWithId, TSocket, NFrame, IActor} from "@common";
 import {Api, connCtx} from "@client-util";
 import {connect} from "socket.io-client"
 import {rootContext, TRootContext, playContext} from "@client-context";
@@ -13,7 +13,7 @@ declare interface IPlayState {
     game?: IGameWithId,
     actor?: IActor,
     socketClient?: TSocket,
-    groupState?: IGroupState
+    gameState?: IGameState
 }
 
 @connCtx(rootContext)
@@ -30,7 +30,7 @@ export class Play extends React.Component<TRootContext & RouteComponentProps<{ g
         }
         const socketClient = connect('/', {
             path: config.socketPath,
-            query: `groupId=${gameId}&userId=${user.id}&token=${actor.token}&type=${actor.type}&playerId=${actor.playerId}`
+            query: `gameId=${gameId}&userId=${user.id}&token=${actor.token}&type=${actor.type}&playerId=${actor.playerId}`
         })
         this.registerStateReducer(socketClient)
         this.setState({
@@ -43,9 +43,9 @@ export class Play extends React.Component<TRootContext & RouteComponentProps<{ g
     private registerStateReducer(socketClient: TSocket) {
         socketClient.on(baseEnum.SocketEvent.downFrame, (frame: NFrame.DownFrame, data: {}) => {
             switch (frame) {
-                case NFrame.DownFrame.syncGroupState: {
+                case NFrame.DownFrame.syncGameState: {
                     this.setState({
-                        groupState: data as IGroupState
+                        gameState: data as IGameState
                     })
                 }
             }
@@ -53,11 +53,11 @@ export class Play extends React.Component<TRootContext & RouteComponentProps<{ g
     }
 
     render(): React.ReactNode {
-        const {props:{history}, state: {game, actor, socketClient, groupState}} = this
-        if (!groupState) {
+        const {props:{history}, state: {game, actor, socketClient, gameState}} = this
+        if (!gameState) {
             return <Loading/>
         }
-        return <playContext.Provider value={{groupState, socketClient, game, actor}}>
+        return <playContext.Provider value={{gameState, socketClient, game, actor}}>
             {
                 actor.type === baseEnum.Actor.owner ?
                     <Play4Owner history={history}/> :

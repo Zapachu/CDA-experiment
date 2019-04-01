@@ -788,7 +788,7 @@ $root.SendBackPlayerReq = (function() {
      * Properties of a SendBackPlayerReq.
      * @exports ISendBackPlayerReq
      * @interface ISendBackPlayerReq
-     * @property {string|null} [groupId] SendBackPlayerReq groupId
+     * @property {string|null} [elfGameId] SendBackPlayerReq elfGameId
      * @property {string|null} [playUrl] SendBackPlayerReq playUrl
      * @property {string|null} [playerToken] SendBackPlayerReq playerToken
      * @property {string|null} [nextPhaseKey] SendBackPlayerReq nextPhaseKey
@@ -811,12 +811,12 @@ $root.SendBackPlayerReq = (function() {
     }
 
     /**
-     * SendBackPlayerReq groupId.
-     * @member {string} groupId
+     * SendBackPlayerReq elfGameId.
+     * @member {string} elfGameId
      * @memberof SendBackPlayerReq
      * @instance
      */
-    SendBackPlayerReq.prototype.groupId = "";
+    SendBackPlayerReq.prototype.elfGameId = "";
 
     /**
      * SendBackPlayerReq playUrl.
@@ -874,8 +874,8 @@ $root.SendBackPlayerReq = (function() {
     SendBackPlayerReq.encode = function encode(message, writer) {
         if (!writer)
             writer = $Writer.create();
-        if (message.groupId != null && message.hasOwnProperty("groupId"))
-            writer.uint32(/* id 1, wireType 2 =*/10).string(message.groupId);
+        if (message.elfGameId != null && message.hasOwnProperty("elfGameId"))
+            writer.uint32(/* id 1, wireType 2 =*/10).string(message.elfGameId);
         if (message.playUrl != null && message.hasOwnProperty("playUrl"))
             writer.uint32(/* id 2, wireType 2 =*/18).string(message.playUrl);
         if (message.playerToken != null && message.hasOwnProperty("playerToken"))
@@ -919,7 +919,7 @@ $root.SendBackPlayerReq = (function() {
             var tag = reader.uint32();
             switch (tag >>> 3) {
             case 1:
-                message.groupId = reader.string();
+                message.elfGameId = reader.string();
                 break;
             case 2:
                 message.playUrl = reader.string();
@@ -968,9 +968,9 @@ $root.SendBackPlayerReq = (function() {
     SendBackPlayerReq.verify = function verify(message) {
         if (typeof message !== "object" || message === null)
             return "object expected";
-        if (message.groupId != null && message.hasOwnProperty("groupId"))
-            if (!$util.isString(message.groupId))
-                return "groupId: string expected";
+        if (message.elfGameId != null && message.hasOwnProperty("elfGameId"))
+            if (!$util.isString(message.elfGameId))
+                return "elfGameId: string expected";
         if (message.playUrl != null && message.hasOwnProperty("playUrl"))
             if (!$util.isString(message.playUrl))
                 return "playUrl: string expected";
@@ -1000,8 +1000,8 @@ $root.SendBackPlayerReq = (function() {
         if (object instanceof $root.SendBackPlayerReq)
             return object;
         var message = new $root.SendBackPlayerReq();
-        if (object.groupId != null)
-            message.groupId = String(object.groupId);
+        if (object.elfGameId != null)
+            message.elfGameId = String(object.elfGameId);
         if (object.playUrl != null)
             message.playUrl = String(object.playUrl);
         if (object.playerToken != null)
@@ -1030,14 +1030,14 @@ $root.SendBackPlayerReq = (function() {
             options = {};
         var object = {};
         if (options.defaults) {
-            object.groupId = "";
+            object.elfGameId = "";
             object.playUrl = "";
             object.playerToken = "";
             object.nextPhaseKey = "";
             object.phaseResult = null;
         }
-        if (message.groupId != null && message.hasOwnProperty("groupId"))
-            object.groupId = message.groupId;
+        if (message.elfGameId != null && message.hasOwnProperty("elfGameId"))
+            object.elfGameId = message.elfGameId;
         if (message.playUrl != null && message.hasOwnProperty("playUrl"))
             object.playUrl = message.playUrl;
         if (message.playerToken != null && message.hasOwnProperty("playerToken"))
@@ -1556,7 +1556,7 @@ $root.NewPhaseReq = (function() {
      * Properties of a NewPhaseReq.
      * @exports INewPhaseReq
      * @interface INewPhaseReq
-     * @property {string|null} [groupId] NewPhaseReq groupId
+     * @property {string|null} [elfGameId] NewPhaseReq elfGameId
      * @property {string|null} [namespace] NewPhaseReq namespace
      * @property {string|null} [param] NewPhaseReq param
      * @property {string|null} [owner] NewPhaseReq owner
@@ -1578,12 +1578,12 @@ $root.NewPhaseReq = (function() {
     }
 
     /**
-     * NewPhaseReq groupId.
-     * @member {string} groupId
+     * NewPhaseReq elfGameId.
+     * @member {string} elfGameId
      * @memberof NewPhaseReq
      * @instance
      */
-    NewPhaseReq.prototype.groupId = "";
+    NewPhaseReq.prototype.elfGameId = "";
 
     /**
      * NewPhaseReq namespace.
@@ -1633,8 +1633,8 @@ $root.NewPhaseReq = (function() {
     NewPhaseReq.encode = function encode(message, writer) {
         if (!writer)
             writer = $Writer.create();
-        if (message.groupId != null && message.hasOwnProperty("groupId"))
-            writer.uint32(/* id 1, wireType 2 =*/10).string(message.groupId);
+        if (message.elfGameId != null && message.hasOwnProperty("elfGameId"))
+            writer.uint32(/* id 1, wireType 2 =*/10).string(message.elfGameId);
         if (message.namespace != null && message.hasOwnProperty("namespace"))
             writer.uint32(/* id 2, wireType 2 =*/18).string(message.namespace);
         if (message.param != null && message.hasOwnProperty("param"))
@@ -1676,7 +1676,7 @@ $root.NewPhaseReq = (function() {
             var tag = reader.uint32();
             switch (tag >>> 3) {
             case 1:
-                message.groupId = reader.string();
+                message.elfGameId = reader.string();
                 break;
             case 2:
                 message.namespace = reader.string();
@@ -1722,9 +1722,9 @@ $root.NewPhaseReq = (function() {
     NewPhaseReq.verify = function verify(message) {
         if (typeof message !== "object" || message === null)
             return "object expected";
-        if (message.groupId != null && message.hasOwnProperty("groupId"))
-            if (!$util.isString(message.groupId))
-                return "groupId: string expected";
+        if (message.elfGameId != null && message.hasOwnProperty("elfGameId"))
+            if (!$util.isString(message.elfGameId))
+                return "elfGameId: string expected";
         if (message.namespace != null && message.hasOwnProperty("namespace"))
             if (!$util.isString(message.namespace))
                 return "namespace: string expected";
@@ -1749,8 +1749,8 @@ $root.NewPhaseReq = (function() {
         if (object instanceof $root.NewPhaseReq)
             return object;
         var message = new $root.NewPhaseReq();
-        if (object.groupId != null)
-            message.groupId = String(object.groupId);
+        if (object.elfGameId != null)
+            message.elfGameId = String(object.elfGameId);
         if (object.namespace != null)
             message.namespace = String(object.namespace);
         if (object.param != null)
@@ -1774,13 +1774,13 @@ $root.NewPhaseReq = (function() {
             options = {};
         var object = {};
         if (options.defaults) {
-            object.groupId = "";
+            object.elfGameId = "";
             object.namespace = "";
             object.param = "";
             object.owner = "";
         }
-        if (message.groupId != null && message.hasOwnProperty("groupId"))
-            object.groupId = message.groupId;
+        if (message.elfGameId != null && message.hasOwnProperty("elfGameId"))
+            object.elfGameId = message.elfGameId;
         if (message.namespace != null && message.hasOwnProperty("namespace"))
             object.namespace = message.namespace;
         if (message.param != null && message.hasOwnProperty("param"))

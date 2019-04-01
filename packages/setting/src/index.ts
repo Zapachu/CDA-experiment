@@ -3,6 +3,7 @@ export * from './setting'
 import setting from './setting'
 
 const {
+    NODE_ENV,
     BESPOKE_NAMESPACE,
     BESPOKE_IP,
     BESPOKE_PORT,
@@ -18,6 +19,7 @@ const {
 
 export const elfSetting = {
     ...setting,
+    inProductEnv: NODE_ENV === 'production',
     //region bespoke
     bespokeNamespace: BESPOKE_NAMESPACE,
     bespokeIp: BESPOKE_IP,
@@ -31,6 +33,6 @@ export const elfSetting = {
     oTreeNamespace: OTREE_NAMESPACE || 'OtreeDefault',
     oTreeRpc: OTREE_RPC || '127.0.0.1:53070',
     oTreeProxy: OTREE_PROXY || 'http://127.0.0.1:3070',
-    oTreeServer: OTREE_SERVER || 'http://127.0.0.1:8000',
+    oTreeServer: OTREE_SERVER || 'http://127.0.0.1:8000'
     //endregion
 }

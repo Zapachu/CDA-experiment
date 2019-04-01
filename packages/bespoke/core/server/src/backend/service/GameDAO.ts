@@ -3,14 +3,15 @@ import {
     IGameWithId,
     TPlayerState
 } from 'bespoke-common'
-import {cacheResult, Log, inProductEnv, redisClient, RedisKey} from '../util'
+import {elfSetting} from 'elf-setting'
+import {cacheResult, Log, redisClient, RedisKey} from '../util'
 import {GameModel, GameDoc} from '../model'
 
 export default class GameDAO {
 
     @cacheResult
     static async getGame<ICreateParams>(gameId: string): Promise<IGameWithId<ICreateParams>> {
-        const {id, owner, namespace, title, desc, params, groupId} = <GameDoc<ICreateParams>>await GameModel.findById(gameId)
+        const {id, owner, namespace, title, desc, params, elfGameId} = <GameDoc<ICreateParams>>await GameModel.findById(gameId)
         return {
             id,
             owner: owner.toString(),
@@ -18,17 +19,17 @@ export default class GameDAO {
             title,
             desc,
             params,
-            groupId
+            elfGameId
         }
     }
 
     //region persist state
     static saveGameState(gameId: string, gameState: TGameState<any>) {
-        inProductEnv && redisClient.set(RedisKey.gameState(gameId), JSON.stringify(gameState)).catch(reason => Log.e(reason))
+        elfSetting.inProductEnv && redisClient.set(RedisKey.gameState(gameId), JSON.stringify(gameState)).catch(reason => Log.e(reason))
     }
 
     static savePlayerState(gameId: string, token: string, playerState: TPlayerState<any>) {
-        inProductEnv && redisClient.set(RedisKey.playerState(gameId, token), JSON.stringify(playerState)).catch(reason => Log.e(reason))
+        elfSetting.inProductEnv && redisClient.set(RedisKey.playerState(gameId, token), JSON.stringify(playerState)).catch(reason => Log.e(reason))
     }
 
     static async queryGameState<IGameState>(gameId: string): Promise<TGameState<IGameState>> {

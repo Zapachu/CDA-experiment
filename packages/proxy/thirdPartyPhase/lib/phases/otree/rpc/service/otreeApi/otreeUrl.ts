@@ -48,7 +48,7 @@ const syncWaitingForCreated = async (uri) => {
 }
 
 // get play link
-const getUrlByNamespace = async (groupId, namespace, param, owner): Promise<any> => {
+const getUrlByNamespace = async (elfGameId, namespace, param, owner): Promise<any> => {
     let handleBody = ''
     const playHash = []
     const paramJson = JSON.parse(param)
@@ -76,7 +76,7 @@ const getUrlByNamespace = async (groupId, namespace, param, owner): Promise<any>
     paramJson.adminUrl = initRes.request.uri.path
     const newOTreePhase = await new ThirdPartPhase({
         param: JSON.stringify(paramJson),
-        groupId: groupId,
+        elfGameId: elfGameId,
         namespace: namespace,
         playHash: playHashConf,
         ownerToken: gen32Token(owner.toString()),

@@ -1,8 +1,7 @@
 import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from "bespoke-server";
 import {ICreateParams, IGameState, IPlayerState, IPushParams, IMoveParams} from "./interface";
-import {MoveType, PushType, FetchType} from './config'
+import {MoveType, PushType, FetchType, NEW_ROUND_TIMER, PlayerStatus} from './config'
 import {GameState} from "../../VickreyAuction2/src/interface";
-import {NEW_ROUND_TIMER, PlayerStatus} from "../../VickreyAuction2/src/config";
 
 const getBestMatching = G => {
     const MATCHED = 'matched',
@@ -58,8 +57,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     const group: GameState.IGroup = {
                         roundIndex: 0,
                         playerNum: 0,
-                        rounds: Array(round).fill(null).map<GameState.Group.IRound>((_, i) => ({
-                            playerStatus: Array(groupSize).fill(i === 0 ? PlayerStatus.outside : PlayerStatus.prepared)
+                        rounds: Array(round).fill(null).map<GameState.Group.IRound>(() => ({
+                            playerStatus: Array(groupSize).fill(PlayerStatus.prepared)
                         }))
                     }
                     groupIndex = gameState.groups.push(group) - 1
@@ -69,12 +68,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 playerState.role = positions[playerState.positionIndex].role
                 playerState.privatePrices = positions[playerState.positionIndex].privatePrice
                 break
-            case MoveType.enterMarket: {
-                const {groupIndex, positionIndex} = playerState,
-                    {rounds, roundIndex} = gameState.groups[groupIndex]
-                rounds[roundIndex].playerStatus[positionIndex] = PlayerStatus.prepared
-                break
-            }
             case MoveType.shout: {
                 const {groupIndex, positionIndex} = playerState,
                     groupState = gameState.groups[groupIndex],
@@ -100,6 +93,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     groupPlayerStates.map(p => p.profits[roundIndex] = p.privatePrices[roundIndex] - p.prices[roundIndex])
                     await this.stateManager.syncState()
                     if (roundIndex == rounds.length - 1) {
+                        for (let i in playerStatus) playerStatus[i] = PlayerStatus.gameOver
+                        await this.stateManager.syncState()
                         return
                     }
                     let newRoundTimer = 1

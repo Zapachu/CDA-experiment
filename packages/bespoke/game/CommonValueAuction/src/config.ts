@@ -1,7 +1,6 @@
 export const namespace = 'CommonValueAuction'
 
 export enum MoveType {
-    enterMarket = 'enterMarket',
     shout = 'shout',
     getPosition = 'getPosition'
 }
@@ -19,7 +18,8 @@ export enum PlayerStatus {
     outside,
     prepared,
     shouted,
-    won
+    won,
+    gameOver
 }
 
 export const NEW_ROUND_TIMER = 3

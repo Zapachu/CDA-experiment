@@ -32,8 +32,8 @@ export class Play4Owner extends React.Component<TRootContext & TPlayContext & { 
     })
 
     render(): React.ReactNode {
-        const {props: {user, game, groupState, history}, lang} = this
-        console.log(groupState)
+        const {props: {user, game, gameState, history}, lang} = this
+        console.log(gameState)
         return <section className={style.console}>
             <Breadcrumb history={history} links={[
                 {label: lang.gameList, to: `/`},
@@ -43,7 +43,7 @@ export class Play4Owner extends React.Component<TRootContext & TPlayContext & { 
             ]}/>
             <Title label={lang.phaseStatus}/>
             {
-                groupState.phaseStates.map((phaseState, i) =>
+                gameState.phaseStates.map((phaseState, i) =>
                     <Card key={i}
                           title={game.phaseConfigs.find(({key}) => key === phaseState.key).title}
                           extra={lang[PhaseStatus[phaseState.status]]}

@@ -43,12 +43,12 @@ export const rewriteResBuffers = async (proxyRes, req: Request, res: Response) =
                 }
             })
             const params: { nextPhaseKey: string } = JSON.parse(otreePhase.param)
-            const groupId: string = otreePhase.groupId
+            const elfGameId: string = otreePhase.elfGameId
             const playUrl: string = `${oTreeProxy}/init/${START_SIGN}/${otreePhase._id}`
             const playerToken: string = playerGameHash
             const nextPhaseKey: string = params.nextPhaseKey
             gameService.sendBackPlayer({
-                groupId, playUrl, playerToken, nextPhaseKey,
+                elfGameId, playUrl, playerToken, nextPhaseKey,
                 phaseResult: {uniKey: playerOtreeHash}
             }, (err: {}, service_res: { sendBackUrl: string }) => {
                 if (err) {

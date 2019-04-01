@@ -10,7 +10,7 @@ const getNextPhaseUrl = async (req) => {
     console.log('log > qqwj phase', qqwjPhase)
     const paramsJson = JSON.parse(qqwjPhase.param)
     const request = {
-        groupId: qqwjPhase.groupId,
+        elfGameId: qqwjPhase.elfGameId,
         nextPhaseKey: paramsJson.nextPhaseKey || -1,
         playerToken: paramsJson.palyerCode || qqwjPhase.playHash[0].player,
         playUrl: `${settings.qqwjProxy}/init/qqwj/${qqwjPhase._id.toString()}`,

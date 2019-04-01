@@ -2,18 +2,18 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {Api, Lang} from '@client-util'
 import {RouteComponentProps} from 'react-router'
-import {TApiGroupPlayers} from '@common'
+import {TApiPlayers} from '@common'
 import {List} from '@antd-component'
 import {Title, Breadcrumb} from '@client-component'
 
 interface IPlayerListState {
-    players: TApiGroupPlayers
+    players: TApiPlayers
 }
 
 export class PlayerList extends React.Component<RouteComponentProps<{ gameId: string }>, IPlayerListState> {
     lang = Lang.extractLang({
         console:['控制台','Console'],
-        groupPlayers: ['实验组成员', 'Group Players']
+        players: ['成员', 'Players']
     })
 
     state: IPlayerListState = {
@@ -33,7 +33,7 @@ export class PlayerList extends React.Component<RouteComponentProps<{ gameId: st
             <Breadcrumb history={history} links={[
                 {label: lang.console, to: `/play/${gameId}`},
             ]}/>
-            <Title label={this.lang.groupPlayers}/>
+            <Title label={this.lang.players}/>
             <List size={'large'}
                   dataSource={this.state.players}
                   renderItem={item => <List.Item>{item.name}</List.Item>}/>

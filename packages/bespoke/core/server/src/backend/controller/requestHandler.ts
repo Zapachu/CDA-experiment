@@ -1,7 +1,8 @@
 import {config, baseEnum, IGameThumb} from 'bespoke-common'
 import {Request, Response} from 'express'
 import * as passport from 'passport'
-import {Log, RedisKey, redisClient, Hash, inProductEnv, Setting} from '../util'
+import {elfSetting} from 'elf-setting'
+import {Log, RedisKey, redisClient, Hash, Setting} from '../util'
 import {GameModel, UserModel, UserDoc, MoveLogModel, SimulatePlayerModel} from '../model'
 import {AnyController, GameLogic} from '../service/GameLogic'
 import GameDAO from '../service/GameDAO'
@@ -56,7 +57,7 @@ export class UserCtrl {
     static async handleLogin(req, res: Response, next) {
         const {body: {nationCode, mobile, verifyCode}, session: {returnToUrl}} = req
         const _verifyCode = await redisClient.get(RedisKey.verifyCode(nationCode, mobile))
-        if (inProductEnv && verifyCode !== _verifyCode) {
+        if (elfSetting.inProductEnv && verifyCode !== _verifyCode) {
             return res.json({
                 code: baseEnum.ResponseCode.notFound
             })

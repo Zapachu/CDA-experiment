@@ -20,7 +20,7 @@ const getNextPhaseUrl = async (req) => {
     console.log('log > qualtrics phase', qualtricsPhase)
     const paramsJson = JSON.parse(qualtricsPhase.param)
     const request = {
-        groupId: qualtricsPhase.groupId,
+        elfGameId: qualtricsPhase.elfGameId,
         nextPhaseKey: paramsJson.nextPhaseKey || -1,
         playerToken: paramsJson.palyerCode || qualtricsPhase.playHash[0].player,
         playUrl: `${qualtricsProxy}/init/jfe/form/${qualtricsPhase._id.toString()}`,

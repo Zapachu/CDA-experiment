@@ -4,17 +4,16 @@ import * as objHash from 'object-hash'
 import {elfSetting} from 'elf-setting'
 import {resolve} from 'path'
 
-export const inProductEnv = process.env.NODE_ENV === 'production'
 export const webpackHmr = process.env.HMR === 'true'
 
-const {log: l, info: i, debug: d, warn: w, error: e} = (inProductEnv ? dailyfile : colorConsole)({
+const {log: l, info: i, debug: d, warn: w, error: e} = (elfSetting.inProductEnv ? dailyfile : colorConsole)({
     level: config.logLevel.toString(),
     root: resolve(__dirname, '../../../../log')
 } as any)
 
 export const Log = {l, d, i, w, e}
 
-if (!inProductEnv) {
+if (!elfSetting.inProductEnv) {
     Log.w('当前为开发环境')
 }
 
@@ -28,7 +27,7 @@ export class Hash {
     }
 }
 
-export function buildPlayUrl(groupId: string, playerToken: string) {
+export function buildPlayUrl(gameId: string, playerToken: string) {
     const {linkerGatewayHost: host, linkerPort: port} = elfSetting
-    return `${host.startsWith('http') ? host : `http://${host}:${port}`}/${config.rootName}/play/${groupId}?token=${playerToken}`
+    return `${host.startsWith('http') ? host : `http://${host}:${port}`}/${config.rootName}/play/${gameId}?token=${playerToken}`
 }

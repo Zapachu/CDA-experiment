@@ -365,8 +365,8 @@ export class RegisterPhasesRes implements IRegisterPhasesRes {
 /** Properties of a SendBackPlayerReq. */
 export interface ISendBackPlayerReq {
 
-    /** SendBackPlayerReq groupId */
-    groupId?: (string|null);
+    /** SendBackPlayerReq elfGameId */
+    elfGameId?: (string|null);
 
     /** SendBackPlayerReq playUrl */
     playUrl?: (string|null);
@@ -390,8 +390,8 @@ export class SendBackPlayerReq implements ISendBackPlayerReq {
      */
     constructor(properties?: ISendBackPlayerReq);
 
-    /** SendBackPlayerReq groupId. */
-    public groupId: string;
+    /** SendBackPlayerReq elfGameId. */
+    public elfGameId: string;
 
     /** SendBackPlayerReq playUrl. */
     public playUrl: string;
@@ -719,8 +719,8 @@ export namespace PhaseService {
 /** Properties of a NewPhaseReq. */
 export interface INewPhaseReq {
 
-    /** NewPhaseReq groupId */
-    groupId?: (string|null);
+    /** NewPhaseReq elfGameId */
+    elfGameId?: (string|null);
 
     /** NewPhaseReq namespace */
     namespace?: (string|null);
@@ -741,8 +741,8 @@ export class NewPhaseReq implements INewPhaseReq {
      */
     constructor(properties?: INewPhaseReq);
 
-    /** NewPhaseReq groupId. */
-    public groupId: string;
+    /** NewPhaseReq elfGameId. */
+    public elfGameId: string;
 
     /** NewPhaseReq namespace. */
     public namespace: string;

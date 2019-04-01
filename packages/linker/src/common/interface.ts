@@ -89,8 +89,8 @@ export interface IPlayerWithId {
     id: string
 }
 
-export interface IGroupState {
-    groupId: string,
+export interface IGameState {
+    gameId: string,
     phaseStates: Array<IPhaseState>
 }
 
@@ -101,12 +101,12 @@ export namespace NFrame {
     }
 
     export enum DownFrame {
-        syncGroupState = 'joinRoom'
+        syncGameState = 'joinRoom'
     }
 
     export interface BaseUpFrame {
         userId: string
-        groupId: string
+        gameId: string
     }
 
     export interface JoinRoom extends BaseUpFrame {
@@ -115,13 +115,13 @@ export namespace NFrame {
     export interface JoinFirstPhase extends BaseUpFrame {
     }
 
-    export interface SyncGroupState {
-        groupState: IGroupState
+    export interface SyncGameState {
+        gameState: IGameState
     }
 }
 
 //region Api
-export type TApiGroupPlayers = Array<{
+export type TApiPlayers = Array<{
     playerId: string,
     userId: string,
     name: string

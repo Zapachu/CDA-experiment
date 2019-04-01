@@ -9,8 +9,8 @@ export const redisClient = new IORedis(elfSetting.redisPort, elfSetting.redisHos
 export const RedisKey = {
     registeredPhaseSet: 'registeredPhaseSet',
     phaseRegInfo: (namespace: string) => `phaseRegInfo:${namespace}`,
-    share_GroupCode: (gameId:string)=>`shareCode:${gameId}`,
-    share_CodeGroup: (code:string)=>`shareCodeMapping:${code}`,
+    share_GameCode: (gameId: string) => `shareGameCode:${gameId}`,
+    share_CodeGame: (code: string) => `shareCodeGame:${code}`
 }
 
 export const RedisLifetime = {

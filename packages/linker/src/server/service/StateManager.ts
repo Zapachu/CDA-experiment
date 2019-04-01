@@ -6,35 +6,35 @@ import {
     IPhaseState,
     NFrame,
     IActor,
-    IGroupState
+    IGameState
 } from '@common'
 import {getPhaseService} from '../rpc'
 import {GameService} from './GameService'
-import {GroupStateDoc, GroupStateModel, PhaseResultModel} from '@server-model'
+import {GameStateDoc, GameStateModel, PhaseResultModel} from '@server-model'
 import {EventDispatcher} from '../controller/eventDispatcher'
 import {Log, RedisKey, redisClient} from '@server-util'
 import {PhaseManager} from 'elf-protocol'
 
-const groupStateServices: { [groupId: string]: GroupStateService } = {}
+const stateManagers: { [gameId: string]: StateManager } = {}
 
-export class GroupStateService {
-    static async getService(groupId: string) {
-        if (!groupStateServices[groupId]) {
-            const group = await GameService.getGame(groupId)
-            groupStateServices[groupId] = await (new GroupStateService(group)).init()
+export class StateManager {
+    static async getManager(gameId: string) {
+        if (!stateManagers[gameId]) {
+            const game = await GameService.getGame(gameId)
+            stateManagers[gameId] = await (new StateManager(game)).init()
         }
-        return groupStateServices[groupId]
+        return stateManagers[gameId]
     }
 
-    groupState: IGroupState
+    gameState: IGameState
 
-    constructor(public group: IGameWithId) {
+    constructor(public game: IGameWithId) {
     }
 
     private async newPhase(phaseCfg: IPhaseConfig): Promise<IPhaseState> {
         if (phaseCfg.namespace === CorePhaseNamespace.start) {
             const {firstPhaseKey} = phaseCfg.param as any,
-                firstPhaseCfg = this.group.phaseConfigs.find(({key}) => key === firstPhaseKey)
+                firstPhaseCfg = this.game.phaseConfigs.find(({key}) => key === firstPhaseKey)
             return await this.newPhase(firstPhaseCfg)
         }
         if (phaseCfg.namespace === CorePhaseNamespace.end) {
@@ -48,8 +48,8 @@ export class GroupStateService {
         const {rpcUri} = JSON.parse(regInfo) as PhaseManager.IPhaseRegInfo
         return new Promise<IPhaseState>((resolve, reject) => {
             getPhaseService(rpcUri).newPhase({
-                owner: this.group.owner,
-                groupId: this.group.id,
+                owner: this.game.owner,
+                elfGameId: this.game.id,
                 namespace: phaseCfg.namespace,
                 param: JSON.stringify(phaseCfg.param)
             }, (err, res) => {
@@ -66,29 +66,29 @@ export class GroupStateService {
         })
     }
 
-    async init(): Promise<GroupStateService> {
+    async init(): Promise<StateManager> {
         await this.initState()
         return this
     }
 
     async initState() {
-        const groupStateDoc: GroupStateDoc = await GroupStateModel.findOne({groupId: this.group.id})
-        if (groupStateDoc) {
-            this.groupState = groupStateDoc.data
+        const gameStateDoc: GameStateDoc = await GameStateModel.findOne({gameId: this.game.id})
+        if (gameStateDoc) {
+            this.gameState = gameStateDoc.data
             return
         }
-        this.groupState = {
-            groupId: this.group.id,
+        this.gameState = {
+            gameId: this.game.id,
             phaseStates: []
         }
-        const startPhaseCfg = this.group.phaseConfigs.find(({namespace}) => namespace === CorePhaseNamespace.start)
+        const startPhaseCfg = this.game.phaseConfigs.find(({namespace}) => namespace === CorePhaseNamespace.start)
         const phaseState = await this.newPhase(startPhaseCfg)
-        this.groupState.phaseStates.push(phaseState)
-        await new GroupStateModel({groupId: this.group.id, data: this.groupState}).save()
+        this.gameState.phaseStates.push(phaseState)
+        await new GameStateModel({gameId: this.game.id, data: this.gameState}).save()
     }
 
-    async joinGroupRoom(actor: IActor): Promise<void> {
-        const {groupState: {phaseStates}} = this
+    async joinRoom(actor: IActor): Promise<void> {
+        const {gameState: {phaseStates}} = this
         if (phaseStates.length === 1 && phaseStates[0].playerState[actor.token] === undefined) {
             phaseStates[0].playerState[actor.token] = {
                 actor,
@@ -98,7 +98,7 @@ export class GroupStateService {
     }
 
     async sendBackPlayer(playUrl: string, playerToken: string, nextPhaseKey: string, phaseResult: PhaseManager.TPhaseResult): Promise<void> {
-        const {group: {phaseConfigs}, groupState: {phaseStates}} = this
+        const {game: {phaseConfigs}, gameState: {phaseStates}} = this
 
         let nextPhaseState: IPhaseState
         const createNextPhase = async (phaseCfg: IPhaseConfig) => {
@@ -111,7 +111,7 @@ export class GroupStateService {
         playerCurrentPhaseState.status = baseEnum.PlayerStatus.left
         playerCurrentPhaseState.phaseResult = phaseResult
         await PhaseResultModel.create({
-            gameId:this.group.id,
+            gameId:this.game.id,
             playerId:playerCurrentPhaseState.actor.playerId,
             phaseName: phaseConfigs[currentPhaseCfgIndex].title,
             ...phaseResult
@@ -141,12 +141,12 @@ export class GroupStateService {
     }
 
     broadcastState() {
-        Log.d(JSON.stringify(this.groupState))
-        EventDispatcher.socket.in(this.group.id)
-            .emit(baseEnum.SocketEvent.downFrame, NFrame.DownFrame.syncGroupState, this.groupState)
-        GroupStateModel.findOneAndUpdate({groupId: this.group.id}, {
+        Log.d(JSON.stringify(this.gameState))
+        EventDispatcher.socket.in(this.game.id)
+            .emit(baseEnum.SocketEvent.downFrame, NFrame.DownFrame.syncGameState, this.gameState)
+        GameStateModel.findOneAndUpdate({gameId: this.game.id}, {
             $set: {
-                data: this.groupState,
+                data: this.gameState,
                 updateAt: Date.now()
             }
         }, {new: true}, err => err ? Log.e(err) : null)

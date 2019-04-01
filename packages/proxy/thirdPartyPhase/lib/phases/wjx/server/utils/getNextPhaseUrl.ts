@@ -12,7 +12,7 @@ const getNextPhaseUrl = async (wjxHash, wjxPhaseId, jidx) => {
     console.log('log > wjx phase', wjxPhase)
     const paramsJson = JSON.parse(wjxPhase.param)
     const request = {
-        groupId: wjxPhase.groupId,
+        elfGameId: wjxPhase.elfGameId,
         nextPhaseKey: paramsJson.nextPhaseKey || -1,
         playerToken: paramsJson.palyerCode || wjxPhase.playHash[0].player,
         playUrl: `${wjxProxy}/init/jq/${wjxPhase._id.toString()}`,

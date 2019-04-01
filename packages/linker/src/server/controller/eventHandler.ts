@@ -1,21 +1,21 @@
 import {baseEnum, NFrame} from '@common'
 import {IEventHandler, IConnection} from './eventDispatcher'
-import {GroupStateService} from '@server-service'
+import {StateManager} from '@server-service'
 import {Actor} from '../../common/baseEnum'
 
 export const EventHandler = {
     [baseEnum.SocketEvent.upFrame]: async (connection: IConnection, frame: NFrame.UpFrame, data: {}, cb?: () => void) => {
-        const {actor, group} = connection,
-            groupService = await GroupStateService.getService(group.id)
+        const {actor, game} = connection,
+            stateManager = await StateManager.getManager(game.id)
         switch (frame) {
             case NFrame.UpFrame.joinRoom: {
-                connection.join(group.id)
+                connection.join(game.id)
                 if(actor.type !== Actor.owner){
-                    await groupService.joinGroupRoom(actor)
+                    await stateManager.joinRoom(actor)
                 }
                 break
             }
         }
-        groupService.broadcastState()
+        stateManager.broadcastState()
     }
 } as { [s: string]: IEventHandler }

@@ -32,7 +32,7 @@ export interface IGameConfig<ICreateParams> {
 }
 
 export interface IGame<ICreateParams> extends IGameConfig<ICreateParams> {
-    groupId?: string
+    elfGameId?: string
     owner: string
     namespace: string
 }

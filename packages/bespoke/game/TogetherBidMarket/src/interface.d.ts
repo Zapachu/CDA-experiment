@@ -332,9 +332,6 @@ export interface IPushParams {
     /** PushParams roundIndex */
     roundIndex?: (number|null);
 
-    /** PushParams dealTimer */
-    dealTimer?: (number|null);
-
     /** PushParams newRoundTimer */
     newRoundTimer?: (number|null);
 }
@@ -350,9 +347,6 @@ export class PushParams implements IPushParams {
 
     /** PushParams roundIndex. */
     public roundIndex: number;
-
-    /** PushParams dealTimer. */
-    public dealTimer: number;
 
     /** PushParams newRoundTimer. */
     public newRoundTimer: number;

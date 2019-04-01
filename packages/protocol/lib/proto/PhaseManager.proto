@@ -26,7 +26,7 @@ message SendBackPlayerReq {
         string point = 2;
         string detailIframeUrl = 3;
     }
-    string groupId = 1;
+    string elfGameId = 1;
     string playUrl = 2;
     string playerToken = 3;
     string nextPhaseKey = 4;
@@ -41,7 +41,7 @@ service PhaseService {
     }
 }
 message NewPhaseReq {
-    string groupId = 1;
+    string elfGameId = 1;
     string namespace = 2;
     string param = 3; //JSON string
     string owner = 4;

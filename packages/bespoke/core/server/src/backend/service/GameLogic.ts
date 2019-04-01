@@ -159,14 +159,14 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
 
     //region elf
     protected sendBackPlayer(playerToken: string, phaseResult?:PhaseManager.TPhaseResult, nextPhaseKey?: string) {
-        if (!this.game.groupId) {
+        if (!this.game.elfGameId) {
             return Log.w('Bespoke单独部署，game未关联至Elf group')
         }
         getGameService().sendBackPlayer({
             playUrl: elfPhaseId2PlayUrl(this.game.namespace, this.game.id),
             playerToken,
             nextPhaseKey,
-            groupId: this.game.groupId,
+            elfGameId: this.game.elfGameId,
             phaseResult
         }, (err, res) => {
             if (err) {

@@ -42,11 +42,9 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
 
     genRan = ({L, H}) => ~~(Math.random() * (H - L)) + L
 
-    genPosition = (i) => {
+    genPosition = () => {
         const {commonValue, deviation, round} = this.state
-        const role = i % 2
         return {
-            role,
             privatePrice: Array(round).fill(null).map(() => this.genRan({
                 L: commonValue - deviation,
                 H: commonValue + deviation
@@ -56,7 +54,7 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
 
     genParams = () => {
         const {groupSize} = this.state
-        const positions = Array(groupSize).fill(null).map((v, i) => this.genPosition(i))
+        const positions = Array(groupSize).fill(null).map(() => this.genPosition())
         this.setState({positions})
     }
 
