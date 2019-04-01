@@ -82,6 +82,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     }
                     await this.stateManager.syncState()
                     if (roundIndex == rounds.length - 1) {
+                        for (let i in playerStatus) playerStatus[i] = PlayerStatus.gameOver
+                        await this.stateManager.syncState()
                         return
                     }
                     let newRoundTimer = 1

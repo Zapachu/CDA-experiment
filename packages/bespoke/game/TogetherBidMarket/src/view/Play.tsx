@@ -62,6 +62,9 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         if (playerState === PlayerStatus.shouted) {
             return <MaskLoading label='您已出价，请等待其他玩家...'/>
         }
+        if (playerState === PlayerStatus.gameOver) {
+            return <MaskLoading label='所有轮次结束，等待老师结束实验...'/>
+        }
         return <div>
             <li>
                 <Label label='输入您的价格'/>

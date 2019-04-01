@@ -19,7 +19,7 @@ export enum PlayerStatus {
     outside,
     prepared,
     shouted,
-    won
+    gameOver,
 }
 
 export const NEW_ROUND_TIMER = 3
