@@ -20,7 +20,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
     }
 
     protected async playerMoveReducer(actor: IActor, type: string, params: IMoveParams, cb: IMoveCallback): Promise<void> {
-        const {game: {params: {groupSize, round}}} = this
+        const {game: {params: {groupSize, round, positions}}} = this
         const playerState = await this.stateManager.getPlayerState(actor),
             gameState = await this.stateManager.getGameState(),
             playerStates = await this.stateManager.getPlayerStates()
@@ -42,6 +42,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 }
                 playerState.groupIndex = groupIndex
                 playerState.positionIndex = gameState.groups[groupIndex].playerNum++
+                playerState.privatePrices = positions[playerState.positionIndex].privatePrice
                 break
             case MoveType.shout: {
                 const {groupIndex, positionIndex} = playerState,

@@ -603,9 +603,6 @@ export namespace GameState {
         /** Properties of a Round. */
         interface IRound {
 
-            /** Round currentPlayer */
-            currentPlayer?: (number|null);
-
             /** Round playerStatus */
             playerStatus?: (number[]|null);
         }
@@ -618,9 +615,6 @@ export namespace GameState {
              * @param [properties] Properties to set
              */
             constructor(properties?: GameState.Group.IRound);
-
-            /** Round currentPlayer. */
-            public currentPlayer: number;
 
             /** Round playerStatus. */
             public playerStatus: number[];
