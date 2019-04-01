@@ -60,9 +60,6 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         const {rounds, roundIndex} = groups[groupIndex],
             {playerStatus} = rounds[roundIndex]
         const playerState = playerStatus[positionIndex]
-        if (playerState === PlayerStatus.prepared) {
-            return <MaskLoading label='请等待其它玩家...'/>
-        }
         if (playerState === PlayerStatus.shouted) {
             return <MaskLoading label='您已出价，请等待其他玩家...'/>
         }
