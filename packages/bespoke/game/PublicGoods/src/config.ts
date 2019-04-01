@@ -1,10 +1,8 @@
 export const namespace = 'PublicGoods'
 
 export enum MoveType {
-    enterMarket = 'enterMarket',
     shout = 'shout',
     getPosition = 'getPosition',
-    timeToShout = 'timeToShout',
 }
 
 export enum PushType {

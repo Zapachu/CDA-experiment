@@ -1,12 +1,11 @@
-export const namespace = 'CommonValueAuction'
+export const namespace = 'FirstPriceSealed'
 
 export enum MoveType {
     shout = 'shout',
-    getPosition = 'getPosition'
+    getPosition = 'getPosition',
 }
 
 export enum PushType {
-    dealTimer,
     newRoundTimer
 }
 
@@ -15,10 +14,8 @@ export enum FetchType {
 }
 
 export enum PlayerStatus {
-    outside,
     prepared,
     shouted,
-    won,
     gameOver
 }
 

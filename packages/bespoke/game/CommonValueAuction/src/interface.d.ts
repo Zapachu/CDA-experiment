@@ -14,9 +14,6 @@ export interface ICreateParams {
     /** CreateParams winnerNumber */
     winnerNumber?: (number|null);
 
-    /** CreateParams privatePrice */
-    privatePrice?: (number[]|null);
-
     /** CreateParams deviation */
     deviation?: (number|null);
 
@@ -50,9 +47,6 @@ export class CreateParams implements ICreateParams {
 
     /** CreateParams winnerNumber. */
     public winnerNumber: number;
-
-    /** CreateParams privatePrice. */
-    public privatePrice: number[];
 
     /** CreateParams deviation. */
     public deviation: number;
@@ -326,9 +320,6 @@ export interface IPushParams {
     /** PushParams roundIndex */
     roundIndex?: (number|null);
 
-    /** PushParams dealTimer */
-    dealTimer?: (number|null);
-
     /** PushParams newRoundTimer */
     newRoundTimer?: (number|null);
 }
@@ -344,9 +335,6 @@ export class PushParams implements IPushParams {
 
     /** PushParams roundIndex. */
     public roundIndex: number;
-
-    /** PushParams dealTimer. */
-    public dealTimer: number;
 
     /** PushParams newRoundTimer. */
     public newRoundTimer: number;
@@ -525,9 +513,6 @@ export namespace GameState {
 
         /** Group playerNum */
         playerNum?: (number|null);
-
-        /** Group result */
-        result?: (GameState.Group.IResult[]|null);
     }
 
     /** Represents a Group. */
@@ -547,9 +532,6 @@ export namespace GameState {
 
         /** Group playerNum. */
         public playerNum: number;
-
-        /** Group result. */
-        public result: GameState.Group.IResult[];
 
         /**
          * Creates a new Group instance using the specified properties.
@@ -709,96 +691,6 @@ export namespace GameState {
 
             /**
              * Converts this Round to JSON.
-             * @returns JSON object
-             */
-            public toJSON(): { [k: string]: any };
-        }
-
-        /** Properties of a Result. */
-        interface IResult {
-
-            /** Result winnerPosition */
-            winnerPosition?: (number|null);
-        }
-
-        /** Represents a Result. */
-        class Result implements IResult {
-
-            /**
-             * Constructs a new Result.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: GameState.Group.IResult);
-
-            /** Result winnerPosition. */
-            public winnerPosition: number;
-
-            /**
-             * Creates a new Result instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns Result instance
-             */
-            public static create(properties?: GameState.Group.IResult): GameState.Group.Result;
-
-            /**
-             * Encodes the specified Result message. Does not implicitly {@link GameState.Group.Result.verify|verify} messages.
-             * @param message Result message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: GameState.Group.IResult, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Encodes the specified Result message, length delimited. Does not implicitly {@link GameState.Group.Result.verify|verify} messages.
-             * @param message Result message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encodeDelimited(message: GameState.Group.IResult, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a Result message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns Result
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): GameState.Group.Result;
-
-            /**
-             * Decodes a Result message from the specified reader or buffer, length delimited.
-             * @param reader Reader or buffer to decode from
-             * @returns Result
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): GameState.Group.Result;
-
-            /**
-             * Verifies a Result message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-
-            /**
-             * Creates a Result message from a plain object. Also converts values to their respective internal types.
-             * @param object Plain object
-             * @returns Result
-             */
-            public static fromObject(object: { [k: string]: any }): GameState.Group.Result;
-
-            /**
-             * Creates a plain object from a Result message. Also converts values to other types if specified.
-             * @param message Result
-             * @param [options] Conversion options
-             * @returns Plain object
-             */
-            public static toObject(message: GameState.Group.Result, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-            /**
-             * Converts this Result to JSON.
              * @returns JSON object
              */
             public toJSON(): { [k: string]: any };

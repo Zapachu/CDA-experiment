@@ -1,8 +1,6 @@
 import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from "bespoke-server";
-import {ICreateParams, IGameState, IPlayerState, IPushParams, IMoveParams} from "./interface";
-import {MoveType, PushType, FetchType} from './config'
-import {GameState} from "./interface";
-import {NEW_ROUND_TIMER, PlayerStatus} from "./config";
+import {ICreateParams, IGameState, IPlayerState, IPushParams, IMoveParams, GameState} from "./interface"
+import {MoveType, PushType, FetchType, NEW_ROUND_TIMER, PlayerStatus} from './config'
 
 export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
     initGameState(): TGameState<IGameState> {

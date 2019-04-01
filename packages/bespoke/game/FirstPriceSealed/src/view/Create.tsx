@@ -1,67 +1,36 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {ICreateParams} from '../interface'
-import {Button, Core, Label, RangeInput, Input, RadioGroup} from 'bespoke-client-util'
+import {Core, Label, RangeInput, Input, Button} from 'bespoke-client-util'
 import {FetchType} from "../config"
 
 interface ICreateState {
-    commonValue: number
-    deviation: number
-    round: number
-    groupSize: number
+    startingPrice: number
+    minPrivatePrice: number
+    maxPrivatePrice: number
     positions: Array<{
         privatePrice: Array<number>
     }>
-    winnerNumber: number
+    round: number
+    groupSize: number
     readonly: boolean
-    mode: string
 }
-
-const winnerModes = [
-    '最高出价的前 m 位玩家胜利',
-    '出价大于所有玩家出价中位数的 m位玩家胜利',
-]
 
 export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> {
 
     state: ICreateState = {
-        commonValue: 100,
-        deviation: 5,
+        startingPrice: 10,
+        minPrivatePrice: 0,
+        maxPrivatePrice: 100,
+        positions: [{privatePrice: [101, 98, 102]}, {privatePrice: [97, 99, 103]}],
         round: 3,
         groupSize: 2,
-        positions: [{privatePrice: [101, 98, 102]}, {privatePrice: [97, 99, 103]}],
-        winnerNumber: 2,
         readonly: false,
-        mode: winnerModes[0],
     }
 
     componentDidMount(): void {
         const {props: {setSubmitable}} = this
         setSubmitable(false)
-    }
-
-    genRan = ({L, H}) => ~~(Math.random() * (H - L)) + L
-
-    genPosition = () => {
-        const {commonValue, deviation, round} = this.state
-        return {
-            privatePrice: Array(round).fill(null).map(() => this.genRan({
-                L: commonValue - deviation,
-                H: commonValue + deviation
-            }))
-        }
-    }
-
-    genParams = () => {
-        const {groupSize} = this.state
-        const positions = Array(groupSize).fill(null).map(() => this.genPosition())
-        this.setState({positions})
-    }
-
-    resetPrivatePrice = (i, i1, e) => {
-        const {positions} = this.state
-        positions[i].privatePrice[i1] = parseInt(e.target.value)
-        this.setState({positions})
     }
 
     edit = () => {
@@ -70,16 +39,41 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
         setSubmitable(false)
     }
 
+    genParams = () => {
+        const {groupSize} = this.state
+        const positions = Array(groupSize).fill(null).map(() => this.genPosition())
+        this.setState({positions})
+    }
+
+    genRan = ({L, H}) => ~~(Math.random() * (H - L)) + L
+
+    genPosition = () => {
+        const {minPrivatePrice, maxPrivatePrice, round} = this.state
+        return {
+            privatePrice: Array(round).fill(null).map(() => this.genRan({
+                L: minPrivatePrice,
+                H: maxPrivatePrice
+            }))
+        }
+    }
+
+    resetPrivatePrice = (i, i1, e) => {
+        const {positions} = this.state
+        positions[i].privatePrice[i1] = parseInt(e.target.value)
+        this.setState({positions})
+    }
+
+
     done = () => {
         const {setParams, setSubmitable} = this.props
-        const {round, groupSize, positions, mode, commonValue, deviation, winnerNumber} = this.state
-        setParams({round, groupSize, positions, commonValue, deviation, mode: winnerModes.indexOf(mode), winnerNumber})
+        const {round, groupSize, positions, startingPrice, minPrivatePrice, maxPrivatePrice} = this.state
+        setParams({round, groupSize, positions, minPrivatePrice, maxPrivatePrice, startingPrice})
         this.setState({readonly: true})
         setSubmitable(true)
     }
 
     render() {
-        const {round, groupSize, commonValue, deviation, positions, readonly, mode, winnerNumber} = this.state
+        const {round, groupSize, positions, startingPrice, minPrivatePrice, maxPrivatePrice, readonly} = this.state
         return <div className={style.create}>
             <ul className={style.configFields}>
                 <li>
@@ -97,26 +91,25 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
                                 onChange={(e) => this.setState({groupSize: parseInt(e.target.value)})}/>
                 </li>
                 <li>
-                    <Label label='游戏胜利人数'/>
-                    <RangeInput value={winnerNumber}
-                                min={1}
-                                max={groupSize}
-                                onChange={(e) => this.setState({winnerNumber: parseInt(e.target.value)})}/>
+                    <Label label='最小心理价值'/>
+                    <RangeInput value={minPrivatePrice}
+                                min={0}
+                                max={1000}
+                                onChange={(e) => this.setState({minPrivatePrice: parseInt(e.target.value)})}/>
                 </li>
                 <li>
-                    <Label label='买家公共价值'/>
-                    <RangeInput value={commonValue}
-                                onChange={(e) => this.setState({commonValue: parseInt(e.target.value)})}/>
+                    <Label label='最大心理价值'/>
+                    <RangeInput value={maxPrivatePrice}
+                                min={0}
+                                max={1000}
+                                onChange={(e) => this.setState({maxPrivatePrice: parseInt(e.target.value)})}/>
                 </li>
                 <li>
-                    <Label label='买家价值偏差'/>
-                    <RangeInput value={deviation}
-                                onChange={(e) => this.setState({deviation: parseInt(e.target.value)})}/>
-                </li>
-                <li>
-                    <Label label='获胜方式'/>
-                    <RadioGroup value={mode} options={winnerModes}
-                                onChange={(v) => this.setState({mode: v})}/>
+                    <Label label='起拍价'/>
+                    <RangeInput value={startingPrice}
+                                min={0}
+                                max={1000}
+                                onChange={(e) => this.setState({startingPrice: parseInt(e.target.value)})}/>
                 </li>
                 <li>
                     <Button label='生成参数'
@@ -152,6 +145,7 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
                     )
                 }
             </table>
+
 
             <div className={style.btnSwitch}>
                 {

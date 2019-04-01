@@ -35,13 +35,15 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     shout = () => {
         const {
             props: {
-                game: {params: {initialFunding}},
-                frameEmitter
+                frameEmitter,
+                gameState: {groups},
+                game: {params: {startingPrice}},
+                playerState: {groupIndex, privatePrices}
             }, state
         } = this
         this.setState({price: ''})
         const price = Number(state.price)
-        if (Number.isNaN(price) || price > initialFunding) {
+        if (Number.isNaN(price) || price > privatePrices[groups[groupIndex].roundIndex] || price < startingPrice) {
             Toast.warn('输入的值无效')
         } else {
             frameEmitter.emit(MoveType.shout, {price: +price})
@@ -67,18 +69,15 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         if (playerState === PlayerStatus.gameOver) {
             return <MaskLoading label='所有轮次结束，等待老师结束实验...'/>
         }
-        if (playerState === PlayerStatus.timeToShout) {
-            return <div>
-                <li>
-                    <Label label='输入您的价格'/>
-                    <Input type='number' value={price} onChange={this.setVal.bind(this)}/>
-                </li>
-                <li>
-                    <Button width={ButtonProps.Width.large} label='出价' onClick={this.shout.bind(this)}/>
-                </li>
-            </div>
-        }
-        return <MaskLoading label='准备进行下一轮...'/>
+        return <div>
+            <li>
+                <Label label='输入您的价格'/>
+                <Input type='number' value={price} onChange={this.setVal.bind(this)}/>
+            </li>
+            <li>
+                <Button width={ButtonProps.Width.large} label='出价' onClick={this.shout.bind(this)}/>
+            </li>
+        </div>
     }
 
     dynamicResult = () => {
@@ -108,9 +107,9 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     render() {
         const {
             props: {
-                game: {params: {groupSize, initialFunding}},
+                game: {params: {groupSize, startingPrice}},
                 gameState: {groups},
-                playerState: {groupIndex}
+                playerState: {groupIndex, privatePrices}
             }, state: {loading, newRoundTimers}
         } = this
         if (loading) {
@@ -122,7 +121,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         const {rounds, roundIndex} = groups[groupIndex],
             newRoundTimer = newRoundTimers[roundIndex]
         return <section className={style.play}>
-            <div className={style.title}>公共品</div>
+            <div className={style.title}>第一密封价格拍卖</div>
             {newRoundTimer ? <div className={style.line}>
                 <div>本轮结束剩余时间</div>
                 <div className={style.highlight}>{NEW_ROUND_TIMER - newRoundTimer}</div>
@@ -140,8 +139,12 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 <div className={style.highlight}>{roundIndex + 1} </div>
             </div>
             <div className={style.line}>
-                <div>您拥有的资金</div>
-                <div className={style.highlight}>{initialFunding}</div>
+                <div>起拍价</div>
+                <div className={style.highlight}>{startingPrice} </div>
+            </div>
+            <div className={style.line}>
+                <div>您的心理价值</div>
+                <div className={style.highlight}>{privatePrices[groups[groupIndex].roundIndex]}</div>
             </div>
             {this.dynamicAction()}
             {this.dynamicResult()}

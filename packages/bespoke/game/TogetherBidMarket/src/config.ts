@@ -1,7 +1,6 @@
 export const namespace = 'TogetherBidMarket'
 
 export enum MoveType {
-    enterMarket = 'enterMarket',
     shout = 'shout',
     getPosition = 'getPosition'
 }
