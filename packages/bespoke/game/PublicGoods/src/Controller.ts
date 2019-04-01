@@ -67,6 +67,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     groupPlayerStates.map(p => p.profits[roundIndex] = initialFunding - p.prices[roundIndex] + share)
                     await this.stateManager.syncState()
                     if (roundIndex == rounds.length - 1) {
+                        for (let i in playerStatus) playerStatus[i] = PlayerStatus.gameOver
+                        await this.stateManager.syncState()
                         return
                     }
                     let newRoundTimer = 1
@@ -76,8 +78,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                             newRoundTimer
                         }))
                         if (newRoundTimer++ < NEW_ROUND_TIMER) {
-                            for (let i in playerStatus) playerStatus[i] = PlayerStatus.gameOver
-                            await this.stateManager.syncState()
                             return
                         }
                         global.clearInterval(newRoundInterval)
