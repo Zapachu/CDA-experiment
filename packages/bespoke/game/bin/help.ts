@@ -8,6 +8,12 @@ enum Command {
     serve = 'serve'
 }
 
+enum BuildMode {
+    dev = 'dev',
+    dist = 'dist',
+    publish = 'publish'
+}
+
 prompt([
     {
         name: 'namespace',
@@ -24,8 +30,18 @@ prompt([
 ]).then(({namespace, command}: { namespace: string, command: Command }) => {
     switch (command) {
         case Command.build:
-            cd(resolve(__dirname, '..'))
-            exec(`webpack --env.TS_NODE_PROJECT="tsconfig.json" --config ./${namespace}/script/webpack.config.ts`)
+            prompt([
+                {
+                    name: 'mode',
+                    type: 'list',
+                    choices: [BuildMode.dev, BuildMode.dist, BuildMode.publish],
+                    message: 'Mode:'
+                }
+            ]).then(({mode})=>{
+                env.BUILD_MODE = mode
+                cd(resolve(__dirname, '..'))
+                exec(`webpack --env.TS_NODE_PROJECT="tsconfig.json" --config ./${namespace}/script/webpack.config.ts`)
+            })
             break
         case Command.serve:
             prompt([
