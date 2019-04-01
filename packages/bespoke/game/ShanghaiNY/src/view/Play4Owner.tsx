@@ -1,8 +1,8 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang} from 'bespoke-client-util'
+import {Button, Core, Lang} from 'bespoke-client-util'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
-import {FetchType, MoveType, PushType, Stage, SheetType} from '../config'
+import {FetchType, MoveType, PushType, SheetType, Stage} from '../config'
 
 interface IPlay4OwnerState {
   timer?: number
@@ -14,6 +14,7 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
         seatNumber: ['座位号', 'Seat Number'],
         stage: ['阶段', 'Stage'],
         round: ['轮次', 'Round'],
+        startTest:['开始理解力测试','Start Comprehension Test'],
         [Stage[Stage.Seat]]: ['输入座位号', 'Input Seat Number'],
         [Stage[Stage.Test]]: ['理解测试', 'Comprehension Test'],
         [Stage[Stage.Main]]: ['主实验', 'Main Game'],
@@ -25,7 +26,7 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
     state: IPlay4OwnerState = {}
 
     render(): React.ReactNode {
-        const {lang, props: {playerStates, fetcher}} = this
+        const {lang, props: {playerStates, fetcher, frameEmitter}} = this
         return <section className={style.play4Owner}>
             <a className={style.exportBtn} href={fetcher.buildGetUrl(FetchType.exportXlsPlaying, {sheetType: SheetType.result})}>{lang[SheetType[SheetType.result]]}</a>
             <table className={style.resultTable}>
@@ -37,7 +38,9 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
                     <td>{lang.round}</td>
                 </tr>
                 {
-                    Object.values(playerStates).map((ps, i) => <tr key={i}>
+                    Object.values(playerStates)
+                        .sort(({seatNumber:s1=0},{seatNumber:s2=0})=>(+s1)-(+s2))
+                        .map((ps, i) => <tr key={i}>
                         <td>{ps.groupIndex!==undefined ? ps.groupIndex+1 : '-'}</td>
                         <td>{ps.seatNumber!==undefined ? ps.seatNumber : '-'}</td>
                         <td>{lang[Stage[ps.stage]] || '-'}</td>
@@ -46,6 +49,7 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
                 }
                 </tbody>
             </table>
+            <Button label={lang.startTest} onClick={()=>frameEmitter.emit(MoveType.startTest)}/>
         </section>
     }
 }
