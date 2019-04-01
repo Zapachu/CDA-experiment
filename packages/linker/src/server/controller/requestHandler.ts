@@ -69,10 +69,10 @@ export class GameCtrl {
     }
 
     static async saveNewGame(req: Request, res: Response) {
-        const {body: {title, desc, mode, phaseConfigs}, user: {id: owner}, session:{orgCode}} = req
+        const {body: {title, desc, mode, phaseConfigs}, user: {id: owner, orgCode}, session} = req
         const gameId = await GameService.saveGame({
             owner,
-            orgCode,
+            orgCode: session.orgCode || orgCode,
             title,
             desc,
             mode,

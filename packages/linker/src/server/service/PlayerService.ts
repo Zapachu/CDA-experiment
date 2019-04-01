@@ -12,8 +12,8 @@ export class PlayerService {
         return player ? player.id : null
     }
 
-    static async getPlayers(groupId: string):Promise<TApiGroupPlayers> {
-        const players = await PlayerModel.find({groupId}).populate('userId', 'name') as any
+    static async getPlayers(gameId: string):Promise<TApiGroupPlayers> {
+        const players = await PlayerModel.find({gameId}).populate('userId', 'name') as any
         return players.map(({id, groupId, userId})=>({playerId:id, userId:userId.id, name:userId.name}))
     }
 }
