@@ -30,7 +30,7 @@ export type PhaseResultDoc = {
     gameId: string
     playerId: string
     phaseName: string
-} & PhaseManager.TPhasePlayer & Document
+} & PhaseManager.TPhaseResult & Document
 export const PhaseResultModel: Model<PhaseResultDoc> = model('LinkerPhaseResult', new Schema({
     gameId: String,
     playerId: String,

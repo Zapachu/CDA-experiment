@@ -45,7 +45,7 @@ export class GameService {
         }
     }
 
-    static async getPlayerResult(gameId: string, playerId: string): Promise<Array<{ phaseName: string } & PhaseManager.TPhasePlayer>> {
+    static async getPlayerResult(gameId: string, playerId: string): Promise<Array<{ phaseName: string } & PhaseManager.TPhaseResult>> {
         const results = await PhaseResultModel.find({gameId, playerId}).sort({createAt: -1})
         return results.map(({phaseName, point, uniKey, detailIframeUrl}) => ({
             phaseName,

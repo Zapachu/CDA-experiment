@@ -62,9 +62,10 @@ export class GameCtrl {
     }
 
     static async saveNewGame(req: Request, res: Response) {
-        const {body: {title, desc, mode, phaseConfigs}, user: {id: owner}} = req
+        const {body: {title, desc, mode, phaseConfigs}, user: {id: owner}, session:{orgCode}} = req
         const gameId = await GameService.saveGame({
             owner,
+            orgCode,
             title,
             desc,
             mode,
@@ -203,7 +204,7 @@ export class GameCtrl {
         let {user, params: {gameId}, query: {token: queryToken}} = req, userId = user._id.toString()
         const game = await GameService.getGame(gameId), playerId = await PlayerService.findPlayerId(gameId, userId)
         let token = Hash.isHash(queryToken) ? queryToken : userId === game.owner ? Hash.hashObj(userId) : Hash.hashObj(playerId)
-        let type = token === Hash.hashObj(userId) ? Actor.owner : userId === game.owner ? Actor.clientRobot : Actor.player
+        let type = token === Hash.hashObj(userId) ? Actor.owner : Actor.player
         req.session.token = token
         req.session.playerId = playerId
         res.json({

@@ -53,8 +53,7 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
       yourSecondChoice: ['你在第二阶段的选择为:', 'Your choice in the second action is:'],
       wait4Others2Choose: ['等待其他玩家选择', 'Waiting for others to choose'],
       wait4Others2Next: ['等待其他玩家进入下一轮', 'Waiting for others to enter the next round'],
-      roundLeft: ['第', 'Round '],
-      roundRight: ['轮', ''],
+      roundIndex:[(m,n)=>`第${m}/${n}轮`,(m,n)=>`Round ${m}/${n}`],
   })
 
   calcDisplayData = () => {
@@ -62,7 +61,7 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
     const curGroup = groups[groupIndex];
     if(version === Version.V3) {
       const prob = curGroup.probs[roundIndex];
-      return prob 
+      return prob
         ? {
           p11: a*eL-b0*eL+c,
           p21: a*eL-b0*eH+c,
@@ -135,7 +134,7 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
   }
 
   render() {
-    const {lang, props: {frameEmitter, playerState:{stageIndex,roundIndex}, game:{params:{gameType,version,d}}}, state: {c1, c2}} = this;
+    const {lang, props: {frameEmitter, playerState:{stageIndex,roundIndex}, game:{params:{gameType,version,d, rounds}}}, state: {c1, c2}} = this;
     const displayData = this.calcDisplayData();
     let content;
     switch(stageIndex) {
@@ -156,7 +155,7 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
                 ? <Button width={ButtonProps.Width.small}
                           label={lang.confirm}
                           onClick={() => {
-                            if(c1===Choice.Wait && !c2.every(c => !!c)) return;
+                            if(!c1 || c2.length!==2 || c2.includes(undefined)) return;
                             frameEmitter.emit(MoveType.answerMain, {c1, c2})
                           }}
                   />
@@ -182,7 +181,7 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
     }
 
     return <section>
-      <p>{lang.roundLeft}{roundIndex + 1}{lang.roundRight}</p>
+      <p>{lang.roundIndex(roundIndex+1, rounds)}</p>
       {content}
     </section>
   }

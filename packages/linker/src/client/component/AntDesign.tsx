@@ -1,5 +1,3 @@
-import 'antd/dist/antd.min.css'
-
 export {default as Button} from 'antd/lib/button'
 export {default as Icon} from 'antd/lib/icon'
 export {default as Input} from 'antd/lib/input'

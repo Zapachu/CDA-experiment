@@ -51,7 +51,6 @@ function buildProtoDts(protoPath: string, watch: boolean = false) {
 
 interface IBuildOption {
     namespace: string
-    buildMode?: 'dev' | 'dist' | 'publish'
     basePath: string
     paths?: IPaths
     qiNiu?: typeof elfSetting.qiNiu
@@ -60,13 +59,12 @@ interface IBuildOption {
 export function geneClientBuilder(
     {
         namespace,
-        buildMode = 'dev',
         basePath,
         paths,
         qiNiu
     }: IBuildOption): webpack.Configuration {
     const {resource, proto, entry, output} = resolvePaths(basePath, paths)
-    console.log(entry)
+    const buildMode = process.env.BUILD_MODE || 'dev'
     buildProtoDts(proto, buildMode === 'dev')
     return {
         devtool: buildMode === 'dev' ? 'cheap-module-eval-source-map' : false,

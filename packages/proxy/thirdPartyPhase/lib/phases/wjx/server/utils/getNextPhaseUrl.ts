@@ -16,7 +16,7 @@ const getNextPhaseUrl = async (wjxHash, wjxPhaseId, jidx) => {
         nextPhaseKey: paramsJson.nextPhaseKey || -1,
         playerToken: paramsJson.palyerCode || wjxPhase.playHash[0].player,
         playUrl: `${wjxProxy}/init/jq/${wjxPhase._id.toString()}`,
-        phasePlayer: {uniKey: jidx}
+        phaseResult: {uniKey: jidx}
     }
 
     return await new Promise((resolve, reject) => {

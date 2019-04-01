@@ -49,7 +49,7 @@ export const rewriteResBuffers = async (proxyRes, req: Request, res: Response) =
             const nextPhaseKey: string = params.nextPhaseKey
             gameService.sendBackPlayer({
                 groupId, playUrl, playerToken, nextPhaseKey,
-                phasePlayer: {uniKey: playerOtreeHash}
+                phaseResult: {uniKey: playerOtreeHash}
             }, (err: {}, service_res: { sendBackUrl: string }) => {
                 if (err) {
                     console.trace(err)

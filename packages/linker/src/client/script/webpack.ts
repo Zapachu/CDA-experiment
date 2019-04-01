@@ -11,8 +11,8 @@ export = ({webpackHmr}: { webpackHmr: boolean }) => {
     const buildMode = process.env.npm_config_buildMode || 'dev'
     const webpackHotDevEntry = webpackHmr ? [`webpack-hot-middleware/client?path=/${config.rootName}/__webpack_hmr&reload=true`] : []
     return {
-        mode: buildMode ? 'development' : 'production',
-        devtool: buildMode ? 'eval' : '',
+        mode: buildMode === 'dev' ? 'development' : 'production',
+        devtool: buildMode === 'dev' ? 'eval' : '',
         watch: buildMode === 'dev',
         watchOptions: {
             poll: true
@@ -20,7 +20,7 @@ export = ({webpackHmr}: { webpackHmr: boolean }) => {
         entry: [...webpackHotDevEntry, path.resolve(__dirname, '../../client/index.tsx')],
         output: {
             path: path.resolve(__dirname, '../../../dist'),
-            filename: 'elf-linker.js',
+            filename: 'elf-linker.[hash:4].js',
             library: 'ElfLinker',
             libraryTarget: 'umd',
             publicPath: `/${config.rootName}/static/`
@@ -28,7 +28,7 @@ export = ({webpackHmr}: { webpackHmr: boolean }) => {
         resolve: {
             extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
             alias: {
-                // '@ant-design/icons/lib/dist$': path.resolve(__dirname, '../../lib/game/client/component/AntDesignIcon.ts')
+                '@ant-design/icons/lib/dist$': path.resolve(__dirname, '../component/AntDesignIcon.ts')
             },
             plugins: [new TsconfigPathsPlugin({
                 configFile: path.resolve(__dirname, `../../../tsconfig.json`)

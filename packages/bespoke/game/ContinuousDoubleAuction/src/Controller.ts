@@ -6,7 +6,7 @@ import {
     IMoveCallback,
     TGameState,
     TPlayerState,
-    Log,
+    Log
 } from 'bespoke-server'
 import nodeXlsx from 'node-xlsx'
 import {
@@ -227,7 +227,9 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 break
             }
             case MoveType.sendBackPlayer: {
-                this.sendBackPlayer(actor.token, this.game.params.nextPhaseKey)
+                this.sendBackPlayer(actor.token, {
+                    point: playerState.point.toString()
+                }, this.game.params.nextPhaseKey)
                 break
             }
         }

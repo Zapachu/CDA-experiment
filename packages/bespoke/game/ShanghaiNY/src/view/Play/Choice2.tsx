@@ -41,7 +41,7 @@ const Choice2: React.FunctionComponent<PropsType> = ({c1, c2, onChoose, gameType
             onChange={val => onChoose([val as number, c2[1]])} 
     />
     </div>
-    <div className={c1===Choice.Wait?style.disabled:''}>
+    <div className={c1===Choice.Wait?style.hidden:''}>
     <p>{lang.noChoice}</p>
     <Radio  value={c2[0]} 
             options={[{label: lang.ok, value: 0}]} 
@@ -55,7 +55,7 @@ const Choice2: React.FunctionComponent<PropsType> = ({c1, c2, onChoose, gameType
             onChange={val => onChoose([c2[0], val as number])} 
     />
     </div>
-    <div className={c1===Choice.Wait?style.disabled:''}>
+    <div className={c1===Choice.Wait?style.hidden:''}>
     <p>{lang.noChoice}</p>
     <Radio  value={c2[1]} 
             options={[{label: lang.ok, value: 0}]} 

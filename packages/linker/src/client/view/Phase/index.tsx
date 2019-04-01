@@ -10,7 +10,6 @@ import {phaseTemplates} from '../../index'
 import {message, Row, Col, Button, Input, Icon, Card, Modal, Select, Tabs, List} from '@antd-component'
 import {Loading, Title} from '@client-component'
 import {Link} from 'react-router-dom'
-import {cloneDeep} from 'lodash'
 import GameMode = baseEnum.GameMode
 
 declare interface ICreateState {
@@ -170,7 +169,7 @@ export class Phase extends React.Component<TRootContext & RouteComponentProps<{ 
         if (!phaseConfigs.length) {
             return message.info(lang.lackPhaseConfigs)
         }
-        const phaseConfigsToUpdate = cloneDeep(phaseConfigs)
+        const phaseConfigsToUpdate = phaseConfigs.slice()
         if (mode === GameMode.easy) {
             const startPhase = {
                 key: CorePhaseNamespace.start,

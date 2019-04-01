@@ -33,9 +33,7 @@ export enum ResponseCode {
 
 export enum Actor {
     owner = 'o',
-    player = 'p',
-    clientRobot = 'cr',
-    serverRobot = 'sr'
+    player = 'p'
 }
 
 export enum LogLevel {

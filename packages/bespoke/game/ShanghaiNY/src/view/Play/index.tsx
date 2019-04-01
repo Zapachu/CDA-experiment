@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, ButtonProps, Core, Lang, Toast, Label, Input} from 'bespoke-client-util'
+import {Button, ButtonProps, MaskLoading, Core, Lang, Toast, Label, Input} from 'bespoke-client-util'
 import {FetchType, MoveType, PushType, Stage} from '../../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
 import TestStage from './TestStage'
@@ -69,21 +69,23 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     }
 
     renderSeatNumberStage = () => {
-      const {lang, props: {frameEmitter}, state: {seatNumber}} = this
-      return <section className={style.seatStage}>
-          <Label label={lang.inputSeatNumberPls}/>
-          <Input {...{
-              value: seatNumber||'',
-              onChange: ({target: {value: seatNumber}}) => this.setState({seatNumber})
-          }}/>
-          <Button style={{marginTop:'1rem'}} width={ButtonProps.Width.medium} label={lang.submit} onClick={() => {
-              frameEmitter.emit(MoveType.inputSeatNumber, {seatNumber}, success => {
-                  if (!success) {
-                      Toast.warn(lang.invalidSeatNumber)
-                  }
-              })
-          }}/>
-      </section>
+      const {lang, props: {frameEmitter, playerState}, state: {seatNumber}} = this
+      return playerState.seatNumber ? <MaskLoading label={lang.wait4StartMainTest}/>:
+          <section className={style.seatStage}>
+              <span>{playerState.seatNumber}</span>
+              <Label label={lang.inputSeatNumberPls}/>
+              <Input {...{
+                  value: seatNumber||'',
+                  onChange: ({target: {value: seatNumber}}) => this.setState({seatNumber})
+              }}/>
+              <Button style={{marginTop:'1rem'}} width={ButtonProps.Width.medium} label={lang.submit} onClick={() => {
+                  frameEmitter.emit(MoveType.inputSeatNumber, {seatNumber}, success => {
+                      if (!success) {
+                          Toast.warn(lang.invalidSeatNumber)
+                      }
+                  })
+              }}/>
+          </section>
   }
 
 }
