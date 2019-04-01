@@ -20,7 +20,7 @@ export = ({webpackHmr}: { webpackHmr: boolean }) => {
         entry: [...webpackHotDevEntry, path.resolve(__dirname, '../../client/index.tsx')],
         output: {
             path: path.resolve(__dirname, '../../../dist'),
-            filename: 'elf-linker.js',
+            filename: 'elf-linker.[hash:4].js',
             library: 'ElfLinker',
             libraryTarget: 'umd',
             publicPath: `/${config.rootName}/static/`
