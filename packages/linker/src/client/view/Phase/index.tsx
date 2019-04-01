@@ -48,18 +48,16 @@ export class Phase extends React.Component<TRootContext & RouteComponentProps<{ 
         cancel: ['取消', 'Cancel'],
         submit: ['提交', 'Submit'],
         name: ['名称', 'Name'],
-        groupPhases: ['实验组环节', 'Game Phases'],
+        phases: ['环节', 'Phases'],
         add: ['添加', 'ADD'],
         remove: ['移除', 'REMOVE'],
         clone: ['复制', 'CLONE'],
         title: ['标题', 'Title'],
         desc: ['描述', 'Description'],
-        groupInfo: ['实验组信息', 'Game Info'],
         phasePointedByAnotherOne: ['尚有其它环节指向此环节,无法移除', 'This phase cannot be removed since there is another one pointing to it'],
         createSuccess: ['创建成功', 'Created successfully'],
         view: ['查看', 'VIEW'],
         console: ['控制台', 'CONSOLE'],
-        newGroup: ['新建组', 'New Group'],
         goPublish: ['去发布', 'Go Publish'],
         lackPhaseConfigs: ['实验环节缺失', 'Please complete phase configs'],
         lackStartPhase: ['开始环节缺失', 'Please set starting phase']
@@ -229,7 +227,7 @@ export class Phase extends React.Component<TRootContext & RouteComponentProps<{ 
     render(): React.ReactNode {
         const {lang, state: {showAddPhaseModal, mode}} = this
         return this.state.loading ? <Loading/> :
-            <section className={style.createGroup}>
+            <section className={style.create}>
                 <div className={style.addPhaseBtn}>
                     <Button onClick={() => this.setState({showAddPhaseModal: true})}>{lang.addPhase}</Button>
                 </div>
@@ -259,7 +257,7 @@ export class Phase extends React.Component<TRootContext & RouteComponentProps<{ 
         }}/>
         const curPhaseIndex = phaseConfigs.findIndex(({key}) => key === activePhaseKey)
         return <section className={style.phasesSection}>
-            <Title label={lang.groupPhases}/>
+            <Title label={lang.phases}/>
             <Row>
                 <Col span={7}>
                     {

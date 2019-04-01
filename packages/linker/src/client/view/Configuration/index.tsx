@@ -23,7 +23,7 @@ export class Configuration extends React.Component<TRootContext & RouteComponent
         console: ['控制台', 'CONSOLE'],
         title: ['标题', 'Title'],
         desc: ['描述', 'Description'],
-        groupPhases: ['实验环节', 'Game Phases']
+        phases: ['环节', 'Phases']
     })
 
     state: IInfoState = {
@@ -44,13 +44,13 @@ export class Configuration extends React.Component<TRootContext & RouteComponent
         if (loading) {
             return <Loading/>
         }
-        return <section className={style.groupConfiguration}>
+        return <section className={style.configuration}>
             <Breadcrumb history={history} links={[
                 {to: `/info/${game.id}`, label: lang.back2Game},
                 {to: `/play/${game.id}`, label: lang.console},
             ]}/>
             <div>
-                <Title label={lang.groupPhases}/>
+                <Title label={lang.phases}/>
                 <Card title={game.title}>
                     {game.desc}
                 </Card>

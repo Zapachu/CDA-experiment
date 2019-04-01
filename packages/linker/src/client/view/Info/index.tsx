@@ -16,7 +16,7 @@ declare interface IInfoState {
 export class Info extends React.Component<TRootContext & RouteComponentProps<{ gameId: string }>, IInfoState> {
     lang = Lang.extractLang({
         enterPlayRoom: ['进入实验', 'Enter play room'],
-        joinGroup: ['加入实验', 'Join Game'],
+        joinGame: ['加入实验', 'Join Game'],
         joinSuccess: ['加入成功，即将进入实验房间', 'Join success, enter to play room now'],
         share: ['分享', 'Share'],
         playerList: ['玩家列表', 'PlayerList']
@@ -65,8 +65,8 @@ export class Info extends React.Component<TRootContext & RouteComponentProps<{ g
                         await message.success(lang.joinSuccess)
                         history.push(`/play/${game.id}`)
                     }
-                }}>{lang.joinGroup}</Button>
-        return <section className={style.groupInfo}>
+                }}>{lang.joinGame}</Button>
+        return <section className={style.info}>
             <Card title={game.title}>
                 {game.desc}
             </Card>

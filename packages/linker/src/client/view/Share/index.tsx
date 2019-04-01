@@ -19,7 +19,7 @@ export class Share extends React.Component<RouteComponentProps<{ gameId: string 
     }
 
     lang = Lang.extractLang({
-        groupInfo: ['实验组信息', 'Group Info'],
+        info: ['实验信息', 'Game Info'],
         console: ['控制台', 'Console'],
         shareCode: ['快速加入码', 'QuickAccessCode'],
         failed2GeneShareCode: ['生成快速加入码失败', 'Failed to Generate Quick Access Code']
@@ -38,7 +38,7 @@ export class Share extends React.Component<RouteComponentProps<{ gameId: string 
         const {lang, props: {history, match: {params: {gameId}}}, state} = this
         return <section className={style.share}>
             <Breadcrumb history={history} links={[
-                {label: lang.groupInfo, to: `/info/${gameId}`},
+                {label: lang.info, to: `/info/${gameId}`},
                 {label: lang.console, to: `/play/${gameId}`}
             ]}/>
             <div className={style.shareContent}>

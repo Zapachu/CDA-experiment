@@ -77,7 +77,7 @@ const server = express.listen(elfSetting.linkerPort)
     .on('listening', () => {
         console.info(`Listening on ${elfSetting.linkerPort}`)
     })
-EventDispatcher.startGroupSocket(server)
+EventDispatcher.startSocketService(server)
 serveRPC()
 
 

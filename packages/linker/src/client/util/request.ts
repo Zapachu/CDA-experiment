@@ -5,7 +5,7 @@ import {
     IActor,
     IBaseGameWithId,
     IUserWithId,
-    TApiGroupPlayers,
+    TApiPlayers,
     IGameToUpdate,
     IPhaseConfig,
     TApiPlayerResults
@@ -90,7 +90,7 @@ export class Request {
         return await POST('/game/join/:gameId', {gameId})
     }
 
-    static async getPlayers(gameId: string): Promise<IHttpRes & { players: TApiGroupPlayers }> {
+    static async getPlayers(gameId: string): Promise<IHttpRes & { players: TApiPlayers }> {
         return await GET('/game/getPlayers/:gameId', {gameId})
     }
 

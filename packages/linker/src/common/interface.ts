@@ -121,7 +121,7 @@ export namespace NFrame {
 }
 
 //region Api
-export type TApiGroupPlayers = Array<{
+export type TApiPlayers = Array<{
     playerId: string,
     userId: string,
     name: string

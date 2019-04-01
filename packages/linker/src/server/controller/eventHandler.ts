@@ -5,13 +5,13 @@ import {Actor} from '../../common/baseEnum'
 
 export const EventHandler = {
     [baseEnum.SocketEvent.upFrame]: async (connection: IConnection, frame: NFrame.UpFrame, data: {}, cb?: () => void) => {
-        const {actor, group} = connection,
-            stateManager = await StateManager.getManager(group.id)
+        const {actor, game} = connection,
+            stateManager = await StateManager.getManager(game.id)
         switch (frame) {
             case NFrame.UpFrame.joinRoom: {
-                connection.join(group.id)
+                connection.join(game.id)
                 if(actor.type !== Actor.owner){
-                    await stateManager.joinGroupRoom(actor)
+                    await stateManager.joinRoom(actor)
                 }
                 break
             }

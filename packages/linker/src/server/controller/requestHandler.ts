@@ -124,7 +124,7 @@ export class GameCtrl {
 
     static async shareGame(req, res) {
         const {gameId} = req.params
-        let shareCode = await redisClient.get(RedisKey.share_GroupCode(gameId))
+        let shareCode = await redisClient.get(RedisKey.share_GameCode(gameId))
         const {title} = await GameService.getGame(gameId)
         if (shareCode) {
             return res.json({
@@ -135,8 +135,8 @@ export class GameCtrl {
         }
         shareCode = Math.random().toString().substr(2, 6)
         try {
-            await redisClient.setex(RedisKey.share_GroupCode(gameId), SECONDS_PER_DAY, shareCode)
-            await redisClient.setex(RedisKey.share_CodeGroup(shareCode), SECONDS_PER_DAY, gameId)
+            await redisClient.setex(RedisKey.share_GameCode(gameId), SECONDS_PER_DAY, shareCode)
+            await redisClient.setex(RedisKey.share_CodeGame(shareCode), SECONDS_PER_DAY, gameId)
             res.json({
                 code: baseEnum.ResponseCode.success,
                 title,
@@ -151,7 +151,7 @@ export class GameCtrl {
 
     static async joinWithShareCode(req, res) {
         const {body: {code}} = req
-        const gameId = await redisClient.get(RedisKey.share_CodeGroup(code))
+        const gameId = await redisClient.get(RedisKey.share_CodeGame(code))
         res.json(gameId ? {
             code: baseEnum.ResponseCode.success,
             gameId

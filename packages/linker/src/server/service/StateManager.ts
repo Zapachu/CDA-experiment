@@ -20,21 +20,21 @@ const stateManagers: { [gameId: string]: StateManager } = {}
 export class StateManager {
     static async getManager(gameId: string) {
         if (!stateManagers[gameId]) {
-            const group = await GameService.getGame(gameId)
-            stateManagers[gameId] = await (new StateManager(group)).init()
+            const game = await GameService.getGame(gameId)
+            stateManagers[gameId] = await (new StateManager(game)).init()
         }
         return stateManagers[gameId]
     }
 
     gameState: IGameState
 
-    constructor(public group: IGameWithId) {
+    constructor(public game: IGameWithId) {
     }
 
     private async newPhase(phaseCfg: IPhaseConfig): Promise<IPhaseState> {
         if (phaseCfg.namespace === CorePhaseNamespace.start) {
             const {firstPhaseKey} = phaseCfg.param as any,
-                firstPhaseCfg = this.group.phaseConfigs.find(({key}) => key === firstPhaseKey)
+                firstPhaseCfg = this.game.phaseConfigs.find(({key}) => key === firstPhaseKey)
             return await this.newPhase(firstPhaseCfg)
         }
         if (phaseCfg.namespace === CorePhaseNamespace.end) {
@@ -48,8 +48,8 @@ export class StateManager {
         const {rpcUri} = JSON.parse(regInfo) as PhaseManager.IPhaseRegInfo
         return new Promise<IPhaseState>((resolve, reject) => {
             getPhaseService(rpcUri).newPhase({
-                owner: this.group.owner,
-                elfGameId: this.group.id,
+                owner: this.game.owner,
+                elfGameId: this.game.id,
                 namespace: phaseCfg.namespace,
                 param: JSON.stringify(phaseCfg.param)
             }, (err, res) => {
@@ -72,22 +72,22 @@ export class StateManager {
     }
 
     async initState() {
-        const gameStateDoc: GameStateDoc = await GameStateModel.findOne({gameId: this.group.id})
+        const gameStateDoc: GameStateDoc = await GameStateModel.findOne({gameId: this.game.id})
         if (gameStateDoc) {
             this.gameState = gameStateDoc.data
             return
         }
         this.gameState = {
-            gameId: this.group.id,
+            gameId: this.game.id,
             phaseStates: []
         }
-        const startPhaseCfg = this.group.phaseConfigs.find(({namespace}) => namespace === CorePhaseNamespace.start)
+        const startPhaseCfg = this.game.phaseConfigs.find(({namespace}) => namespace === CorePhaseNamespace.start)
         const phaseState = await this.newPhase(startPhaseCfg)
         this.gameState.phaseStates.push(phaseState)
-        await new GameStateModel({gameId: this.group.id, data: this.gameState}).save()
+        await new GameStateModel({gameId: this.game.id, data: this.gameState}).save()
     }
 
-    async joinGroupRoom(actor: IActor): Promise<void> {
+    async joinRoom(actor: IActor): Promise<void> {
         const {gameState: {phaseStates}} = this
         if (phaseStates.length === 1 && phaseStates[0].playerState[actor.token] === undefined) {
             phaseStates[0].playerState[actor.token] = {
@@ -98,7 +98,7 @@ export class StateManager {
     }
 
     async sendBackPlayer(playUrl: string, playerToken: string, nextPhaseKey: string, phaseResult: PhaseManager.TPhaseResult): Promise<void> {
-        const {group: {phaseConfigs}, gameState: {phaseStates}} = this
+        const {game: {phaseConfigs}, gameState: {phaseStates}} = this
 
         let nextPhaseState: IPhaseState
         const createNextPhase = async (phaseCfg: IPhaseConfig) => {
@@ -111,7 +111,7 @@ export class StateManager {
         playerCurrentPhaseState.status = baseEnum.PlayerStatus.left
         playerCurrentPhaseState.phaseResult = phaseResult
         await PhaseResultModel.create({
-            gameId:this.group.id,
+            gameId:this.game.id,
             playerId:playerCurrentPhaseState.actor.playerId,
             phaseName: phaseConfigs[currentPhaseCfgIndex].title,
             ...phaseResult
@@ -142,9 +142,9 @@ export class StateManager {
 
     broadcastState() {
         Log.d(JSON.stringify(this.gameState))
-        EventDispatcher.socket.in(this.group.id)
+        EventDispatcher.socket.in(this.game.id)
             .emit(baseEnum.SocketEvent.downFrame, NFrame.DownFrame.syncGameState, this.gameState)
-        GameStateModel.findOneAndUpdate({gameId: this.group.id}, {
+        GameStateModel.findOneAndUpdate({gameId: this.game.id}, {
             $set: {
                 data: this.gameState,
                 updateAt: Date.now()

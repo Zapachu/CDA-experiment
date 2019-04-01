@@ -4,7 +4,7 @@ import {Lang} from '@client-util'
 
 export enum NAV {
     basic,
-    group
+    phase
 }
 
 export const withSideNav = (Component, nav:NAV) => props => {
@@ -14,7 +14,7 @@ export const withSideNav = (Component, nav:NAV) => props => {
         save: ['保存', 'Save'],
         return: ['返回列表', 'Return to List'],
         basic: ['实验信息', 'Game Info'],
-        group: ['实验环节', 'Game Phase'],
+        phases: ['实验环节', 'Game Phase'],
     })
     const {history, match:{params:{gameId}}} = props;
     let classes, navFuncs;
@@ -27,7 +27,7 @@ export const withSideNav = (Component, nav:NAV) => props => {
             ]
             break;
         }
-        case NAV.group: {
+        case NAV.phase: {
             classes = ['', style.active, ''];
             navFuncs = [
                 () => history.push(`/baseInfo/${gameId}`),
@@ -41,14 +41,14 @@ export const withSideNav = (Component, nav:NAV) => props => {
         <section className={style.nav}>
             <nav>
                 <ul>
-                    <li 
-                        style={{fontSize:'14px',color:'gray'}} 
+                    <li
+                        style={{fontSize:'14px',color:'gray'}}
                         onClick={() => history.push('/')}>{lang.return}</li>
-                    <li 
+                    <li
                         className={classes[0]}
                         onClick={navFuncs[0]}>{lang.basic}</li>
                     <li className={classes[1]}
-                        onClick={navFuncs[1]}>{lang.group}</li>
+                        onClick={navFuncs[1]}>{lang.phases}</li>
                 </ul>
             </nav>
             <div className={style.navHolder}></div>
