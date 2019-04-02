@@ -2,8 +2,8 @@ import {Server} from 'http'
 import {config, baseEnum, IActor, IGameWithId} from '@common'
 import * as socketIO from 'socket.io'
 import {EventHandler} from './eventHandler'
-import {Log} from "@server-util"
-import {EventEmitter} from "events"
+import {Log} from '@server-util'
+import {EventEmitter} from 'events'
 import {GameService} from '@server-service'
 import {UserModel} from '@server-model'
 
@@ -37,15 +37,16 @@ export class EventDispatcher {
         })
     }
 
-    static startSocketService(server: Server): Server {
+    static startSocketService(server: Server): socketIO.Server {
         this.socket = socketIO(server, {path: config.socketPath})
         this.socket.on(baseEnum.SocketEvent.connection, async (connection: socketIO.Socket) => {
-            const {token, type, gameId, userId, playerId} = connection.handshake.query
+            const {token, type, gameId, playerId} = connection.handshake.query
+            const userId = connection.handshake.session.passport.user
             const game = await GameService.getGame(gameId)
             const {name} = await UserModel.findById(userId)
-            const actor:IActor = {token, type, userId, userName:name, playerId}
+            const actor: IActor = {token, type, userId, userName: name, playerId}
             this.subscribeOnConnection(Object.assign(connection, {actor, game}) as any)
         })
-        return server
+        return this.socket
     }
 }
