@@ -12,6 +12,10 @@ export class Join extends React.Component<RouteComponentProps<{}>> {
         tips: ['输入6位数字快速加入实验', 'Input a 6-digit number to join an experiment']
     })
 
+    componentDidMount(): void {
+        location.reload()
+    }
+
     async joinGame(code: string) {
         const {lang, props: {history}} = this
         const res = await Api.joinGameWithCode(code)

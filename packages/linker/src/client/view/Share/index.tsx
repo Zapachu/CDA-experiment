@@ -26,6 +26,8 @@ export class Share extends React.Component<RouteComponentProps<{ gameId: string 
     })
 
     async componentDidMount() {
+        location.reload()
+        return
         const {code, shareCode, title} = await Api.shareGame(this.props.match.params.gameId)
         if (code === baseEnum.ResponseCode.success) {
             this.setState({shareCode, title})

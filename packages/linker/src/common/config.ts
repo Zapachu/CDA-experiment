@@ -5,8 +5,15 @@ export const config = {
     apiPrefix: 'api',
     socketPath: '/elf/socket.io',
     logLevel: LogLevel.log,
-    academusLoginRoute: '/login',
-    cookieKey:{
-        csrf:'_csrf'
+    academus: {
+        route: {
+            prefix: '/v5',
+            login: '/login',
+            share: gameId=>`/share?id=${gameId}&type=10`,
+            join:'/subject/fastJoin'
+        }
+    },
+    cookieKey: {
+        csrf: '_csrf'
     }
 }
