@@ -1,7 +1,7 @@
 import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from "bespoke-server";
 import {ICreateParams, IGameState, IPlayerState, IPushParams, IMoveParams} from "./interface";
 import {MoveType, PushType, FetchType, NEW_ROUND_TIMER, PlayerStatus} from './config'
-import {GameState} from "../../VickreyAuction2/src/interface";
+import {GameState} from "./interface";
 
 const getBestMatching = G => {
     const MATCHED = 'matched',
