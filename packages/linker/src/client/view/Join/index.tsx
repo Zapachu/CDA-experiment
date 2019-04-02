@@ -31,6 +31,7 @@ export class Join extends React.Component<RouteComponentProps<{}>> {
     }
 
     render(): React.ReactNode {
+        return null
         return <section className={style.Join}>
             <div className={style.tips}>{this.lang.tips}</div>
             <CodePanel number={6}

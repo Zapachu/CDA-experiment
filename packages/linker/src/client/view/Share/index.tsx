@@ -37,6 +37,7 @@ export class Share extends React.Component<RouteComponentProps<{ gameId: string 
     }
 
     render(): React.ReactNode {
+        return null
         const {lang, props: {history, match: {params: {gameId}}}, state} = this
         return <section className={style.share}>
             <Breadcrumb history={history} links={[
