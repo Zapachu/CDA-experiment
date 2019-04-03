@@ -1,5 +1,4 @@
 import {Server} from 'grpc'
-import {config} from '@common'
 import {Log, redisClient, RedisKey, RedisLifetime, buildPlayUrl} from '@server-util'
 import {StateManager} from '@server-service'
 import {PhaseManager as P} from 'elf-protocol'
@@ -15,21 +14,29 @@ export function setGameService(server: Server) {
             await redisClient.sadd(RedisKey.registeredPhaseSet, req.request.phases.map(({namespace}) => namespace))
             resolve()
         }).then(() => callback(null, {
-            success: true,
-            waitURL: `/${config.rootName}/waiting`
+            success: true
         }))
     }
 
+    function setPhaseResult(req: { request: P.TSetPhaseResultReq }, callback: P.TSetPhaseResultCallback) {
+        Log.i(JSON.stringify(req.request))
+        const {elfGameId: gameId, playUrl, playerToken, phaseResult} = req.request
+        StateManager.getManager(gameId).then(async stateManager => {
+            await stateManager.setPhaseResult(playUrl, playerToken, phaseResult)
+            callback(null, {success: true})
+        })
+    }
+
     function sendBackPlayer(req: { request: P.TSendBackPlayerReq }, callback: P.TSendBackPlayerCallback) {
-        Log.d('sendBackPlayer:', JSON.stringify(req.request))
+        Log.i(JSON.stringify(req.request))
         const {elfGameId: gameId, playUrl, playerToken, nextPhaseKey, phaseResult} = req.request
-        StateManager.getManager(gameId).then(async (stateManager) => {
+        StateManager.getManager(gameId).then(async stateManager => {
             await stateManager.sendBackPlayer(playUrl, playerToken, nextPhaseKey, phaseResult)
             callback(null, {sendBackUrl: buildPlayUrl(gameId, playerToken)})
         })
     }
 
-    P.setGameService(server, {registerPhases, sendBackPlayer})
+    P.setGameService(server, {registerPhases, setPhaseResult, sendBackPlayer})
 }
 
 const phaseServices: { [k: string]: P.TPhaseServiceConsumer } = {}

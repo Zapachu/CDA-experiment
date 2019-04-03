@@ -97,6 +97,25 @@ export class StateManager {
         }
     }
 
+    async setPhaseResult(playUrl: string, playerToken: string, phaseResult: PhaseManager.TPhaseResult): Promise<void> {
+        const {game: {phaseConfigs}, gameState: {phaseStates}} = this
+        const curPhaseState = phaseStates.find(phaseState => phaseState.playUrl === playUrl),
+            curPhaseCfgIndex = phaseConfigs.findIndex(phaseCfg => phaseCfg.key === curPhaseState.key),
+            playerCurPhaseState = curPhaseState.playerState[playerToken]
+        playerCurPhaseState.phaseResult = {...playerCurPhaseState.phaseResult, ...phaseResult}
+        if(!playerCurPhaseState || playerCurPhaseState.status === baseEnum.PlayerStatus.left){
+            Log.w('玩家不在此环节中')
+        }
+        const query = {gameId: this.game.id, playerId: playerCurPhaseState.actor.playerId}
+        await PhaseResultModel.findOneAndUpdate(query, {
+            ...query,
+            phaseName: phaseConfigs[curPhaseCfgIndex].title,
+            ...playerCurPhaseState.phaseResult
+        }, {
+            upsert: true
+        })
+    }
+
     async sendBackPlayer(playUrl: string, playerToken: string, nextPhaseKey: string, phaseResult: PhaseManager.TPhaseResult): Promise<void> {
         const {game: {phaseConfigs}, gameState: {phaseStates}} = this
 
@@ -105,37 +124,33 @@ export class StateManager {
             nextPhaseState = await this.newPhase(phaseCfg)
             phaseStates.push(nextPhaseState)
         }
-        const currentPhaseState = phaseStates.find(phaseState => phaseState.playUrl === playUrl),
-            currentPhaseCfgIndex = phaseConfigs.findIndex(phaseCfg => phaseCfg.key === currentPhaseState.key),
-            playerCurrentPhaseState = currentPhaseState.playerState[playerToken]
-        playerCurrentPhaseState.status = baseEnum.PlayerStatus.left
-        playerCurrentPhaseState.phaseResult = phaseResult
-        await PhaseResultModel.create({
-            gameId:this.game.id,
-            playerId:playerCurrentPhaseState.actor.playerId,
-            phaseName: phaseConfigs[currentPhaseCfgIndex].title,
-            ...phaseResult
-        })
-        let phaseCfg = phaseConfigs.find(phaseCfg => phaseCfg.key === nextPhaseKey)
-        if (!phaseCfg) {
-            if (currentPhaseCfgIndex === phaseConfigs.length - 1) {
+        const curPhaseState = phaseStates.find(phaseState => phaseState.playUrl === playUrl),
+            curPhaseCfgIndex = phaseConfigs.findIndex(phaseCfg => phaseCfg.key === curPhaseState.key),
+            playerCurPhaseState = curPhaseState.playerState[playerToken]
+        if(!playerCurPhaseState || playerCurPhaseState.status === baseEnum.PlayerStatus.left){
+            Log.w('玩家不在此环节中')
+        }
+        playerCurPhaseState.status = baseEnum.PlayerStatus.left
+        await this.setPhaseResult(playUrl, playerToken, phaseResult)
+        let nextPhaseCfg = phaseConfigs.find(phaseCfg => phaseCfg.key === nextPhaseKey)
+        if (!nextPhaseCfg) {
+            if (curPhaseCfgIndex === phaseConfigs.length - 1) {
                 return
             }
-            phaseCfg = phaseConfigs[currentPhaseCfgIndex + 1]
+            nextPhaseCfg = phaseConfigs[curPhaseCfgIndex + 1]
         }
-        if (phaseCfg.key === currentPhaseState.key) {
-            currentPhaseState.status = baseEnum.PhaseStatus.closed
-            await createNextPhase(phaseCfg)
+        if (nextPhaseCfg.key === curPhaseState.key) {
+            curPhaseState.status = baseEnum.PhaseStatus.closed
+            await createNextPhase(nextPhaseCfg)
         } else {
-            nextPhaseState = phaseStates.find(
-                ({key, status}) => key === nextPhaseKey && status !== baseEnum.PhaseStatus.closed
-            )
+            nextPhaseState = phaseStates.find(({key, status}) =>
+                key === nextPhaseKey && status !== baseEnum.PhaseStatus.closed)
             if (!nextPhaseState) {
-                await createNextPhase(phaseCfg)
+                await createNextPhase(nextPhaseCfg)
             }
         }
         nextPhaseState.playerState[playerToken] = {
-            actor: playerCurrentPhaseState.actor,
+            actor: playerCurPhaseState.actor,
             status: baseEnum.PlayerStatus.playing
         }
     }

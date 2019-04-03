@@ -8,12 +8,14 @@ import {
     PhaseService,
     INewPhaseReq,
     INewPhaseRes,
+    IPhaseResult,
     IRegisterPhasesReq,
     RegisterPhasesReq,
     IRegisterPhasesRes,
     ISendBackPlayerReq,
     ISendBackPlayerRes,
-    SendBackPlayerReq
+    ISetPhaseResultReq,
+    ISetPhaseResultRes
 } from './PhaseManager'
 
 export namespace AcademusBespoke {
@@ -88,11 +90,14 @@ export namespace PhaseManager {
     export type TRegisterPhasesReq = IRegisterPhasesReq
     export type IPhaseRegInfo = RegisterPhasesReq.IphaseRegInfo
     export type TRegisterPhasesCallBack = (error?: Error, response?: IRegisterPhasesRes) => void
+    export type TPhaseResult = IPhaseResult
+    export type TSetPhaseResultReq = ISetPhaseResultReq
+    export type TSetPhaseResultCallback = (error?: Error, response?: ISetPhaseResultRes) => void
     export type TSendBackPlayerReq = ISendBackPlayerReq
     export type TSendBackPlayerCallback = (error?: Error, response?: ISendBackPlayerRes) => void
-    export type TPhaseResult = SendBackPlayerReq.IPhaseResult
     export type TGameService = {
         registerPhases(req: { request: TRegisterPhasesReq }, callback: TRegisterPhasesCallBack): void
+        setPhaseResult(req: { request: TSetPhaseResultReq }, callback: TSetPhaseResultCallback): void
         sendBackPlayer(req: { request: TSendBackPlayerReq }, callback: TSendBackPlayerCallback): void
     }
 
