@@ -9,9 +9,7 @@ import {withSideNav, NAV} from './SideNav'
 import {Phase} from './Phase'
 import {Play} from './Play'
 import {Configuration} from './Configuration'
-import {Share} from './Share'
 import {Info} from './Info'
-import {Join} from './Join'
 import {PlayerList} from './PlayerList'
 import {GameList} from './GameList'
 import {BaseInfo} from './BaseInfo'
@@ -20,6 +18,7 @@ import {PlayerResult} from './Result/Player'
 import * as style from './initial.scss'
 
 export const Root: React.FunctionComponent = () => {
+    const {academus: {route: academusRoute}} = config
     const [user, setUser] = useState<IUserWithId>()
 
     useEffect(() => {
@@ -37,8 +36,14 @@ export const Root: React.FunctionComponent = () => {
                         <Route path={'/baseInfo/:gameId'} component={withSideNav(BaseInfo, NAV.basic)}/>
                         <Route path={'/baseInfo'} component={withSideNav(BaseInfo, NAV.basic)}/>
                         <Route path={'/phase/:gameId'} component={withSideNav(Phase, NAV.phase)}/>
-                        <Route path={'/share/:gameId'} component={Share}/>
-                        <Route path={'/join'} component={Join}/>
+                        <Route path={'/share/:gameId'} render={({match: {params: {gameId}}}) => {
+                            window.location.href = `${academusRoute.prefix}${academusRoute.share(gameId)}`
+                            return null
+                        }}/>
+                        <Route path={'/join'} render={() => {
+                            window.location.href = `${academusRoute.prefix}${academusRoute.join}`
+                            return null
+                        }}/>
                         <Route path={'/info/:gameId'} component={Info}/>
                         <Route path={'/configuration/:gameId'} component={Configuration}/>
                         <Route path={'/play/:gameId'} component={Play}/>

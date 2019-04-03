@@ -3,7 +3,7 @@ import {config} from '@common'
 
 import {UserCtrl, GameCtrl} from './requestHandler'
 
-const {academus: {route: academusRoute}, apiPrefix} = config
+const {apiPrefix} = config
 
 const apiRouter = Router()
     .use('/user', Router()
@@ -31,8 +31,6 @@ export default Router()
     .get('/createInFrame', UserCtrl.loggedIn, UserCtrl.isTeacher, UserCtrl.renderApp)
     .get('/configuration/:gameId', UserCtrl.loggedIn, UserCtrl.isTeacher, UserCtrl.renderApp)
     .get('/play/:gameId', UserCtrl.loggedIn, UserCtrl.isGameAccessible, UserCtrl.renderApp)
-    .get('/share/:gameId', ({params: {gameId}}, res) => res.redirect(`${academusRoute.prefix}${academusRoute.share(gameId)}`))
-    .get('/join', (req, res) => res.redirect(`${academusRoute.prefix}${academusRoute.join}`))
     .get('/*', UserCtrl.loggedIn, UserCtrl.renderApp)
 
 
