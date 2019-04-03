@@ -21,7 +21,8 @@ enum Tip {
 
 interface Word {
   text: string,
-  color?: boolean
+  color?: boolean,
+  br?: boolean
 }
 
 interface Test {
@@ -116,7 +117,12 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
 
   joinWords = (words: Array<Word>) => {
     return <>
-      {words.map(({text, color}, i) => <span key={i} className={color?style.blueWords:''}>{text}</span>)}
+      {words.map(({text, color, br}, i) => {
+        let className = '';
+        if(color) className = className ? className+' '+style.blueWords : style.blueWords;
+        if(br) className = className ? className+' '+style.newLine : style.newLine;
+        return <span key={i} className={className}>{text}</span>
+      })}
     </>
   }
 
@@ -198,7 +204,7 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
           {curTest.questions.map(({title, options}, i) => <li key={i}>
             <p className={tips[i]===Tip.Wrong?style.tipWrong:''}>{this.joinWords(title)} {tips[i] === Tip.Wrong ? <span>{lang.wrong}</span> : null}</p>
             <Radio options={options===null
-                                  ?[{label:displayData.p11.toFixed(2),value:'a'},{label:displayData.p21.toFixed(2),value:'b'},{label:displayData.p22.toFixed(2),value:'c'}]
+                                  ?[{label:(displayData.p11-d).toFixed(2),value:'a'},{label:(displayData.p21-d).toFixed(2),value:'b'},{label:displayData.p22.toFixed(2),value:'c'}]
                                   :options}
                         value={answers[i] || ''}
                         onChange={e => this.answer(e as string, i)}
