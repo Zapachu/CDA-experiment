@@ -1,6 +1,6 @@
-import {prompt} from 'inquirer'
+import * as path from 'path'
 import {readdirSync} from 'fs'
-import {resolve} from 'path'
+import {prompt} from 'inquirer'
 import {cd, exec, env} from 'shelljs'
 
 enum Command {
@@ -14,37 +14,56 @@ enum BuildMode {
     publish = 'publish'
 }
 
-prompt([
-    {
-        name: 'namespace',
-        type: 'list',
-        choices: readdirSync(resolve(__dirname, '../')).filter(name => name[0] < 'a'),
-        message: 'Namespace:'
-    },
-    {
-        name: 'command',
-        type: 'list',
-        choices: [Command.build, Command.serve],
-        message: 'Command:'
+(async function () {
+    let namespace: string
+    let namespacePath: string
+    const {group} = (await prompt<{ group: string }>([
+        {
+            name: 'group',
+            type: 'list',
+            choices: readdirSync(path.resolve(__dirname, '../')).filter(name => name[0] < 'a'),
+            message: 'Group/NameSpace:'
+        }
+    ]))
+    const namespaces = readdirSync(path.resolve(__dirname, `../${group}/`)).filter(name => name[0] < 'a')
+    if (!namespaces.length) {
+        namespace = group
+        namespacePath = namespace
+    } else {
+        namespace = (await prompt<{ namespace: string }>([
+            {
+                name: 'namespace',
+                type: 'list',
+                choices: namespaces,
+                message: 'NameSpace:'
+            }
+        ])).namespace
+        namespacePath = `${group}/${namespace}`
     }
-]).then(({namespace, command}: { namespace: string, command: Command }) => {
+    const {command} = (await prompt<{ command: Command }>([
+        {
+            name: 'command',
+            type: 'list',
+            choices: [Command.build, Command.serve],
+            message: 'Command:'
+        }
+    ]))
     switch (command) {
         case Command.build:
-            prompt([
+            const {mode} = await prompt<{ mode: BuildMode }>([
                 {
                     name: 'mode',
                     type: 'list',
                     choices: [BuildMode.dev, BuildMode.dist, BuildMode.publish],
                     message: 'Mode:'
                 }
-            ]).then(({mode})=>{
-                env.BUILD_MODE = mode
-                cd(resolve(__dirname, '..'))
-                exec(`webpack --env.TS_NODE_PROJECT="tsconfig.json" --config ./${namespace}/script/webpack.config.ts`)
-            })
+            ])
+            env.BUILD_MODE = mode
+            cd(path.resolve(__dirname, '..'))
+            exec(`webpack --env.TS_NODE_PROJECT="tsconfig.json" --config ./${namespacePath}/script/webpack.config.ts`)
             break
         case Command.serve:
-            prompt([
+            const {port, rpcPort} = await prompt([
                 {
                     name: 'port',
                     type: 'number'
@@ -53,11 +72,10 @@ prompt([
                     name: 'rpcPort',
                     type: 'number'
                 }
-            ]).then(({port, rpcPort}) => {
-                env.BESPOKE_PORT = port
-                env.BESPOKE_RPC_PORT = rpcPort
-                env.BESPOKE_NAMESPACE = namespace
-                exec(`ts-node ./${namespace}/src/serve.ts`)
-            })
+            ])
+            env.BESPOKE_PORT = port
+            env.BESPOKE_RPC_PORT = rpcPort
+            env.BESPOKE_NAMESPACE = namespace
+            exec(`ts-node ./${namespacePath}/src/serve.ts`)
     }
-})
+})()

@@ -16,7 +16,8 @@ export class UserCtrl {
     }
 
     static loggedIn(req, res: Response, next: NextFunction) {
-        req.isAuthenticated() ? next() : res.redirect(config.academusLoginRoute)
+        const {prefix, login} = config.academus.route
+        req.isAuthenticated() ? next() : res.redirect(`${prefix}${login}`)
     }
 
     static isTeacher(req, res: Response, next) {
