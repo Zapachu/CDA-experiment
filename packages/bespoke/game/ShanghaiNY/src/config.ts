@@ -105,7 +105,11 @@ export const Test1 = [
 
 export const Test2 = [
   {
-    desc: [{text: '如果你在第一阶段选择等待。并且第一阶段的结果为：有人选1。'}],
+    desc: [
+      {text: '如果你在第一阶段选择等待。'},
+      {text: '', br: true},
+      {text: '并且第一阶段的结果为：有人选1。', color: true},
+    ],
     questions: [
       {
         title: [
@@ -140,7 +144,8 @@ export const Test2 = [
     desc: [
       {text: '假设其他三个组员都选择'},
       {text: '“在第一阶段选1”', color: true},
-      {text: '。如果你选择'},
+      {text: '', br: true},
+      {text: '如果你选择'},
       {text: '“在第一阶段选1”', color: true},
     ],
     questions: [
@@ -165,7 +170,8 @@ export const Test2 = [
     desc: [
       {text: '假设其他三个组员都选择'},
       {text: '“在第一阶段选1”', color: true},
-      {text: '。如果你选择'},
+      {text: '', br: true},
+      {text: '如果你选择'},
       {text: '“在第一阶段等待；如果第一阶段有人选1则在第二阶段选1；第一阶段没有人选1则在第二阶段选2”', color: true},
     ],
     questions: [
@@ -190,7 +196,8 @@ export const Test2 = [
     desc: [
       {text: '假设其他三个组员都选择'},
       {text: '“在第一阶段等待；无论第一阶段有没有人选1，在第二阶段都选1”', color: true},
-      {text: '。如果你选择'},
+      {text: '', br: true},
+      {text: '如果你选择'},
       {text: '“在第一阶段等待；如果第一阶段有人选1则在第二阶段选1；第一阶段没有人选1则在第二阶段选2”', color: true},
     ],
     questions: [
@@ -215,7 +222,8 @@ export const Test2 = [
     desc: [
       {text: '假设其他三个组员都选择'},
       {text: '“在第一阶段等待；如果第一阶段有人选1则在第二阶段选1；第一阶段没有人选1则在第二阶段选2”', color: true},
-      {text: '。如果你选择'},
+      {text: '', br: true},
+      {text: '如果你选择'},
       {text: '“在第一阶段选1”', color: true},
     ],
     questions: [
@@ -240,7 +248,8 @@ export const Test2 = [
     desc: [
       {text: '假设其他三个组员都选择'},
       {text: '“在第一阶段等待；如果第一阶段有人选1则在第二阶段选1；第一阶段没有人选1则在第二阶段选2”', color: true},
-      {text: '。如果你选择'},
+      {text: '', br: true},
+      {text: '如果你选择'},
       {text: '“在第一阶段等待；如果第一阶段有人选1则在第二阶段选1；第一阶段没有人选1则在第二阶段选2”', color: true},
     ],
     questions: [
