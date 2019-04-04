@@ -55,7 +55,7 @@ export interface IBaseGame {
     title: string
     desc: string
     owner?: string
-    orgCode? : string
+    orgCode?: string
     published?: boolean
     mode: baseEnum.GameMode
 }
@@ -121,5 +121,11 @@ export namespace NFrame {
 }
 
 //region Api
+export type TApiPlayers = Array<{
+    playerId: string,
+    userId: string,
+    name: string
+}>
+
 export type TApiPlayerResults = Array<{ phaseName: string } & PhaseManager.TPhaseResult>
 //endregion
