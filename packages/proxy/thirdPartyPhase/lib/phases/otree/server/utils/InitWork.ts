@@ -3,8 +3,17 @@ import {ErrorPage} from '../../../common/utils'
 import ListMap from '../utils/ListMap'
 import {ThirdPartPhase} from '../../../../core/server/models'
 import {elfSetting as elfSetting} from 'elf-setting'
-import {virtualJsRoute, getOTreeListRoute, reportScreenRoute, jqueryRoute, initRoute} from '../config'
-import * as path from "path"
+import nodeXlsx from 'node-xlsx'
+import {
+    virtualJsRoute,
+    getOTreeListRoute,
+    reportScreenRoute,
+    jqueryRoute,
+    initRoute,
+    previewScreenXlsxRoute,
+    downloadScreenXlsxRoute
+} from '../config'
+import * as path from 'path'
 
 const START_SIGN = 'InitializeParticipant'
 
@@ -103,6 +112,35 @@ export const InitWork = (app) => {
                     return ErrorPage(okRes(), err)
                 }
             }
+        }
+
+        if (req.url.includes(previewScreenXlsxRoute)) {
+            const [, , phaseId] = req.url.split('/')
+            const screens = (await ThirdPartPhase.findById(phaseId)).playHash
+                .filter(({screen}) => screen)
+                .map(({hash, screen}) => {
+                    const {winW, winH} = JSON.parse(screen)
+                    return {hash, winW, winH}
+                })
+            return okRes().render('previewScreenXlsx', {
+                phaseId,
+                screens
+            })
+        }
+        if (req.url.includes(downloadScreenXlsxRoute)) {
+            const [, , phaseId] = req.url.split('/')
+            const data = (await ThirdPartPhase.findById(phaseId)).playHash
+                .filter(({screen}) => screen)
+                .map(({hash, screen}) => {
+                    const {winW, winH} = JSON.parse(screen)
+                    return [hash, winW, winH]
+                })
+            data.unshift(['Player','ScreenWidth(px)','ScreenHeight(px)'])
+            const name = 'ScreenSize'
+            let buffer = nodeXlsx.build([{name, data}], {})
+            res.setHeader('Content-Type', 'application/vnd.openxmlformats')
+            res.setHeader('Content-Disposition', 'attachment; filename=' + `${encodeURI(name)}.xlsx`)
+            return okRes().end(buffer, 'binary')
         }
         okRes()
         next()

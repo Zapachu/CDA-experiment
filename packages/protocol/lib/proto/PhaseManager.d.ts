@@ -34,6 +34,20 @@ export class GameService extends $protobuf.rpc.Service {
     public registerPhases(request: IRegisterPhasesReq): Promise<RegisterPhasesRes>;
 
     /**
+     * Calls setPhaseResult.
+     * @param request SetPhaseResultReq message or plain object
+     * @param callback Node-style callback called with the error, if any, and SetPhaseResultRes
+     */
+    public setPhaseResult(request: ISetPhaseResultReq, callback: GameService.setPhaseResultCallback): void;
+
+    /**
+     * Calls setPhaseResult.
+     * @param request SetPhaseResultReq message or plain object
+     * @returns Promise
+     */
+    public setPhaseResult(request: ISetPhaseResultReq): Promise<SetPhaseResultRes>;
+
+    /**
      * Calls sendBackPlayer.
      * @param request SendBackPlayerReq message or plain object
      * @param callback Node-style callback called with the error, if any, and SendBackPlayerRes
@@ -56,6 +70,13 @@ export namespace GameService {
      * @param [response] RegisterPhasesRes
      */
     type registerPhasesCallback = (error: (Error|null), response?: RegisterPhasesRes) => void;
+
+    /**
+     * Callback as used by {@link GameService#setPhaseResult}.
+     * @param error Error, if any
+     * @param [response] SetPhaseResultRes
+     */
+    type setPhaseResultCallback = (error: (Error|null), response?: SetPhaseResultRes) => void;
 
     /**
      * Callback as used by {@link GameService#sendBackPlayer}.
@@ -271,9 +292,6 @@ export interface IRegisterPhasesRes {
 
     /** RegisterPhasesRes success */
     success?: (boolean|null);
-
-    /** RegisterPhasesRes waitURL */
-    waitURL?: (string|null);
 }
 
 /** Represents a RegisterPhasesRes. */
@@ -287,9 +305,6 @@ export class RegisterPhasesRes implements IRegisterPhasesRes {
 
     /** RegisterPhasesRes success. */
     public success: boolean;
-
-    /** RegisterPhasesRes waitURL. */
-    public waitURL: string;
 
     /**
      * Creates a new RegisterPhasesRes instance using the specified properties.
@@ -362,6 +377,108 @@ export class RegisterPhasesRes implements IRegisterPhasesRes {
     public toJSON(): { [k: string]: any };
 }
 
+/** Properties of a PhaseResult. */
+export interface IPhaseResult {
+
+    /** PhaseResult uniKey */
+    uniKey?: (string|null);
+
+    /** PhaseResult point */
+    point?: (string|null);
+
+    /** PhaseResult detailIframeUrl */
+    detailIframeUrl?: (string|null);
+}
+
+/** Represents a PhaseResult. */
+export class PhaseResult implements IPhaseResult {
+
+    /**
+     * Constructs a new PhaseResult.
+     * @param [properties] Properties to set
+     */
+    constructor(properties?: IPhaseResult);
+
+    /** PhaseResult uniKey. */
+    public uniKey: string;
+
+    /** PhaseResult point. */
+    public point: string;
+
+    /** PhaseResult detailIframeUrl. */
+    public detailIframeUrl: string;
+
+    /**
+     * Creates a new PhaseResult instance using the specified properties.
+     * @param [properties] Properties to set
+     * @returns PhaseResult instance
+     */
+    public static create(properties?: IPhaseResult): PhaseResult;
+
+    /**
+     * Encodes the specified PhaseResult message. Does not implicitly {@link PhaseResult.verify|verify} messages.
+     * @param message PhaseResult message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encode(message: IPhaseResult, writer?: $protobuf.Writer): $protobuf.Writer;
+
+    /**
+     * Encodes the specified PhaseResult message, length delimited. Does not implicitly {@link PhaseResult.verify|verify} messages.
+     * @param message PhaseResult message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encodeDelimited(message: IPhaseResult, writer?: $protobuf.Writer): $protobuf.Writer;
+
+    /**
+     * Decodes a PhaseResult message from the specified reader or buffer.
+     * @param reader Reader or buffer to decode from
+     * @param [length] Message length if known beforehand
+     * @returns PhaseResult
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): PhaseResult;
+
+    /**
+     * Decodes a PhaseResult message from the specified reader or buffer, length delimited.
+     * @param reader Reader or buffer to decode from
+     * @returns PhaseResult
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): PhaseResult;
+
+    /**
+     * Verifies a PhaseResult message.
+     * @param message Plain object to verify
+     * @returns `null` if valid, otherwise the reason why it is not
+     */
+    public static verify(message: { [k: string]: any }): (string|null);
+
+    /**
+     * Creates a PhaseResult message from a plain object. Also converts values to their respective internal types.
+     * @param object Plain object
+     * @returns PhaseResult
+     */
+    public static fromObject(object: { [k: string]: any }): PhaseResult;
+
+    /**
+     * Creates a plain object from a PhaseResult message. Also converts values to other types if specified.
+     * @param message PhaseResult
+     * @param [options] Conversion options
+     * @returns Plain object
+     */
+    public static toObject(message: PhaseResult, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+    /**
+     * Converts this PhaseResult to JSON.
+     * @returns JSON object
+     */
+    public toJSON(): { [k: string]: any };
+}
+
 /** Properties of a SendBackPlayerReq. */
 export interface ISendBackPlayerReq {
 
@@ -378,7 +495,7 @@ export interface ISendBackPlayerReq {
     nextPhaseKey?: (string|null);
 
     /** SendBackPlayerReq phaseResult */
-    phaseResult?: (SendBackPlayerReq.IPhaseResult|null);
+    phaseResult?: (IPhaseResult|null);
 }
 
 /** Represents a SendBackPlayerReq. */
@@ -403,7 +520,7 @@ export class SendBackPlayerReq implements ISendBackPlayerReq {
     public nextPhaseKey: string;
 
     /** SendBackPlayerReq phaseResult. */
-    public phaseResult?: (SendBackPlayerReq.IPhaseResult|null);
+    public phaseResult?: (IPhaseResult|null);
 
     /**
      * Creates a new SendBackPlayerReq instance using the specified properties.
@@ -476,109 +593,202 @@ export class SendBackPlayerReq implements ISendBackPlayerReq {
     public toJSON(): { [k: string]: any };
 }
 
-export namespace SendBackPlayerReq {
+/** Properties of a SetPhaseResultReq. */
+export interface ISetPhaseResultReq {
 
-    /** Properties of a PhaseResult. */
-    interface IPhaseResult {
+    /** SetPhaseResultReq elfGameId */
+    elfGameId?: (string|null);
 
-        /** PhaseResult uniKey */
-        uniKey?: (string|null);
+    /** SetPhaseResultReq playUrl */
+    playUrl?: (string|null);
 
-        /** PhaseResult point */
-        point?: (string|null);
+    /** SetPhaseResultReq playerToken */
+    playerToken?: (string|null);
 
-        /** PhaseResult detailIframeUrl */
-        detailIframeUrl?: (string|null);
-    }
+    /** SetPhaseResultReq phaseResult */
+    phaseResult?: (IPhaseResult|null);
+}
 
-    /** Represents a PhaseResult. */
-    class PhaseResult implements IPhaseResult {
+/** Represents a SetPhaseResultReq. */
+export class SetPhaseResultReq implements ISetPhaseResultReq {
 
-        /**
-         * Constructs a new PhaseResult.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: SendBackPlayerReq.IPhaseResult);
+    /**
+     * Constructs a new SetPhaseResultReq.
+     * @param [properties] Properties to set
+     */
+    constructor(properties?: ISetPhaseResultReq);
 
-        /** PhaseResult uniKey. */
-        public uniKey: string;
+    /** SetPhaseResultReq elfGameId. */
+    public elfGameId: string;
 
-        /** PhaseResult point. */
-        public point: string;
+    /** SetPhaseResultReq playUrl. */
+    public playUrl: string;
 
-        /** PhaseResult detailIframeUrl. */
-        public detailIframeUrl: string;
+    /** SetPhaseResultReq playerToken. */
+    public playerToken: string;
 
-        /**
-         * Creates a new PhaseResult instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns PhaseResult instance
-         */
-        public static create(properties?: SendBackPlayerReq.IPhaseResult): SendBackPlayerReq.PhaseResult;
+    /** SetPhaseResultReq phaseResult. */
+    public phaseResult?: (IPhaseResult|null);
 
-        /**
-         * Encodes the specified PhaseResult message. Does not implicitly {@link SendBackPlayerReq.PhaseResult.verify|verify} messages.
-         * @param message PhaseResult message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: SendBackPlayerReq.IPhaseResult, writer?: $protobuf.Writer): $protobuf.Writer;
+    /**
+     * Creates a new SetPhaseResultReq instance using the specified properties.
+     * @param [properties] Properties to set
+     * @returns SetPhaseResultReq instance
+     */
+    public static create(properties?: ISetPhaseResultReq): SetPhaseResultReq;
 
-        /**
-         * Encodes the specified PhaseResult message, length delimited. Does not implicitly {@link SendBackPlayerReq.PhaseResult.verify|verify} messages.
-         * @param message PhaseResult message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: SendBackPlayerReq.IPhaseResult, writer?: $protobuf.Writer): $protobuf.Writer;
+    /**
+     * Encodes the specified SetPhaseResultReq message. Does not implicitly {@link SetPhaseResultReq.verify|verify} messages.
+     * @param message SetPhaseResultReq message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encode(message: ISetPhaseResultReq, writer?: $protobuf.Writer): $protobuf.Writer;
 
-        /**
-         * Decodes a PhaseResult message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns PhaseResult
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): SendBackPlayerReq.PhaseResult;
+    /**
+     * Encodes the specified SetPhaseResultReq message, length delimited. Does not implicitly {@link SetPhaseResultReq.verify|verify} messages.
+     * @param message SetPhaseResultReq message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encodeDelimited(message: ISetPhaseResultReq, writer?: $protobuf.Writer): $protobuf.Writer;
 
-        /**
-         * Decodes a PhaseResult message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns PhaseResult
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): SendBackPlayerReq.PhaseResult;
+    /**
+     * Decodes a SetPhaseResultReq message from the specified reader or buffer.
+     * @param reader Reader or buffer to decode from
+     * @param [length] Message length if known beforehand
+     * @returns SetPhaseResultReq
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): SetPhaseResultReq;
 
-        /**
-         * Verifies a PhaseResult message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
+    /**
+     * Decodes a SetPhaseResultReq message from the specified reader or buffer, length delimited.
+     * @param reader Reader or buffer to decode from
+     * @returns SetPhaseResultReq
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): SetPhaseResultReq;
 
-        /**
-         * Creates a PhaseResult message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns PhaseResult
-         */
-        public static fromObject(object: { [k: string]: any }): SendBackPlayerReq.PhaseResult;
+    /**
+     * Verifies a SetPhaseResultReq message.
+     * @param message Plain object to verify
+     * @returns `null` if valid, otherwise the reason why it is not
+     */
+    public static verify(message: { [k: string]: any }): (string|null);
 
-        /**
-         * Creates a plain object from a PhaseResult message. Also converts values to other types if specified.
-         * @param message PhaseResult
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: SendBackPlayerReq.PhaseResult, options?: $protobuf.IConversionOptions): { [k: string]: any };
+    /**
+     * Creates a SetPhaseResultReq message from a plain object. Also converts values to their respective internal types.
+     * @param object Plain object
+     * @returns SetPhaseResultReq
+     */
+    public static fromObject(object: { [k: string]: any }): SetPhaseResultReq;
 
-        /**
-         * Converts this PhaseResult to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
-    }
+    /**
+     * Creates a plain object from a SetPhaseResultReq message. Also converts values to other types if specified.
+     * @param message SetPhaseResultReq
+     * @param [options] Conversion options
+     * @returns Plain object
+     */
+    public static toObject(message: SetPhaseResultReq, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+    /**
+     * Converts this SetPhaseResultReq to JSON.
+     * @returns JSON object
+     */
+    public toJSON(): { [k: string]: any };
+}
+
+/** Properties of a SetPhaseResultRes. */
+export interface ISetPhaseResultRes {
+
+    /** SetPhaseResultRes success */
+    success?: (boolean|null);
+}
+
+/** Represents a SetPhaseResultRes. */
+export class SetPhaseResultRes implements ISetPhaseResultRes {
+
+    /**
+     * Constructs a new SetPhaseResultRes.
+     * @param [properties] Properties to set
+     */
+    constructor(properties?: ISetPhaseResultRes);
+
+    /** SetPhaseResultRes success. */
+    public success: boolean;
+
+    /**
+     * Creates a new SetPhaseResultRes instance using the specified properties.
+     * @param [properties] Properties to set
+     * @returns SetPhaseResultRes instance
+     */
+    public static create(properties?: ISetPhaseResultRes): SetPhaseResultRes;
+
+    /**
+     * Encodes the specified SetPhaseResultRes message. Does not implicitly {@link SetPhaseResultRes.verify|verify} messages.
+     * @param message SetPhaseResultRes message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encode(message: ISetPhaseResultRes, writer?: $protobuf.Writer): $protobuf.Writer;
+
+    /**
+     * Encodes the specified SetPhaseResultRes message, length delimited. Does not implicitly {@link SetPhaseResultRes.verify|verify} messages.
+     * @param message SetPhaseResultRes message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encodeDelimited(message: ISetPhaseResultRes, writer?: $protobuf.Writer): $protobuf.Writer;
+
+    /**
+     * Decodes a SetPhaseResultRes message from the specified reader or buffer.
+     * @param reader Reader or buffer to decode from
+     * @param [length] Message length if known beforehand
+     * @returns SetPhaseResultRes
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): SetPhaseResultRes;
+
+    /**
+     * Decodes a SetPhaseResultRes message from the specified reader or buffer, length delimited.
+     * @param reader Reader or buffer to decode from
+     * @returns SetPhaseResultRes
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): SetPhaseResultRes;
+
+    /**
+     * Verifies a SetPhaseResultRes message.
+     * @param message Plain object to verify
+     * @returns `null` if valid, otherwise the reason why it is not
+     */
+    public static verify(message: { [k: string]: any }): (string|null);
+
+    /**
+     * Creates a SetPhaseResultRes message from a plain object. Also converts values to their respective internal types.
+     * @param object Plain object
+     * @returns SetPhaseResultRes
+     */
+    public static fromObject(object: { [k: string]: any }): SetPhaseResultRes;
+
+    /**
+     * Creates a plain object from a SetPhaseResultRes message. Also converts values to other types if specified.
+     * @param message SetPhaseResultRes
+     * @param [options] Conversion options
+     * @returns Plain object
+     */
+    public static toObject(message: SetPhaseResultRes, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+    /**
+     * Converts this SetPhaseResultRes to JSON.
+     * @returns JSON object
+     */
+    public toJSON(): { [k: string]: any };
 }
 
 /** Properties of a SendBackPlayerRes. */

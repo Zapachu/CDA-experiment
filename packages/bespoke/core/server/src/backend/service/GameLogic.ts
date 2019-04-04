@@ -158,7 +158,19 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
     //endregion
 
     //region elf
-    protected sendBackPlayer(playerToken: string, phaseResult?:PhaseManager.TPhaseResult, nextPhaseKey?: string) {
+    protected setPhaseResult(playerToken: string, phaseResult: PhaseManager.TPhaseResult) {
+        if (!this.game.elfGameId) {
+            return Log.w('Bespoke单独部署，game未关联至Elf group')
+        }
+        getGameService().setPhaseResult({
+            playUrl: elfPhaseId2PlayUrl(this.game.namespace, this.game.id),
+            playerToken,
+            elfGameId: this.game.elfGameId,
+            phaseResult
+        }, err => err ? Log.e(err) : null)
+    }
+
+    protected sendBackPlayer(playerToken: string, phaseResult?: PhaseManager.TPhaseResult, nextPhaseKey?: string) {
         if (!this.game.elfGameId) {
             return Log.w('Bespoke单独部署，game未关联至Elf group')
         }

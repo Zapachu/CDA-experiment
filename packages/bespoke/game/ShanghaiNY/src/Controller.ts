@@ -90,6 +90,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                   break
               }
               playerState.seatNumber = params.seatNumber;
+              this.setPhaseResult(playerState.actor.token, {uniKey:params.seatNumber})
               break
           }
           case MoveType.answerTest: {

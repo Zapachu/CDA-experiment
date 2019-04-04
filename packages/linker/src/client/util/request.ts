@@ -5,7 +5,6 @@ import {
     IActor,
     IBaseGameWithId,
     IUserWithId,
-    TApiPlayers,
     IGameToUpdate,
     IPhaseConfig,
     TApiPlayerResults
@@ -90,10 +89,6 @@ export class Request {
         return await POST('/game/join/:gameId', {gameId})
     }
 
-    static async getPlayers(gameId: string): Promise<IHttpRes & { players: TApiPlayers }> {
-        return await GET('/game/getPlayers/:gameId', {gameId})
-    }
-
     static async getGameList(page: number = 0): Promise<IHttpRes & { gameList: Array<IGameWithId>, count: number }> {
         return await GET('/game/list', {}, {page})
     }
@@ -140,20 +135,7 @@ export class Request {
         return await GET('/game/playerResult', null, {gameId, playerId})
     }
 
-    static async getRewarded(playerId: string): Promise<IHttpRes & { reward: string }> {
-        return await GET('/game/rewarded', null, {playerId})
-    }
-
     /**** V5 ****/
-    static async reward(orgCode: string, gameId: string, data: {
-        money: number,
-        subject: number,
-        task: string,
-        tasker: string,
-        payeeId: string
-    }): Promise<{ code: baseEnum.AcademusResCode, msg: string }> {
-        return await request(`/v5/apiv5/${orgCode}/researcher/trans/reward`, baseEnum.RequestMethod.post, data)
-    }
 
     static async getAuthorizedTemplates(orgCode: string): Promise<{ code: baseEnum.AcademusResCode, namespaces: Array<string> }> {
         return await request(`/v5/apiv5/${orgCode}/researcher/game/gametpl/myList`)

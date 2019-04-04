@@ -75,6 +75,39 @@ $root.GameService = (function() {
      */
 
     /**
+     * Callback as used by {@link GameService#setPhaseResult}.
+     * @memberof GameService
+     * @typedef setPhaseResultCallback
+     * @type {function}
+     * @param {Error|null} error Error, if any
+     * @param {SetPhaseResultRes} [response] SetPhaseResultRes
+     */
+
+    /**
+     * Calls setPhaseResult.
+     * @function setPhaseResult
+     * @memberof GameService
+     * @instance
+     * @param {ISetPhaseResultReq} request SetPhaseResultReq message or plain object
+     * @param {GameService.setPhaseResultCallback} callback Node-style callback called with the error, if any, and SetPhaseResultRes
+     * @returns {undefined}
+     * @variation 1
+     */
+    Object.defineProperty(GameService.prototype.setPhaseResult = function setPhaseResult(request, callback) {
+        return this.rpcCall(setPhaseResult, $root.SetPhaseResultReq, $root.SetPhaseResultRes, request, callback);
+    }, "name", { value: "setPhaseResult" });
+
+    /**
+     * Calls setPhaseResult.
+     * @function setPhaseResult
+     * @memberof GameService
+     * @instance
+     * @param {ISetPhaseResultReq} request SetPhaseResultReq message or plain object
+     * @returns {Promise<SetPhaseResultRes>} Promise
+     * @variation 2
+     */
+
+    /**
      * Callback as used by {@link GameService#sendBackPlayer}.
      * @memberof GameService
      * @typedef sendBackPlayerCallback
@@ -579,7 +612,6 @@ $root.RegisterPhasesRes = (function() {
      * @exports IRegisterPhasesRes
      * @interface IRegisterPhasesRes
      * @property {boolean|null} [success] RegisterPhasesRes success
-     * @property {string|null} [waitURL] RegisterPhasesRes waitURL
      */
 
     /**
@@ -604,14 +636,6 @@ $root.RegisterPhasesRes = (function() {
      * @instance
      */
     RegisterPhasesRes.prototype.success = false;
-
-    /**
-     * RegisterPhasesRes waitURL.
-     * @member {string} waitURL
-     * @memberof RegisterPhasesRes
-     * @instance
-     */
-    RegisterPhasesRes.prototype.waitURL = "";
 
     /**
      * Creates a new RegisterPhasesRes instance using the specified properties.
@@ -639,8 +663,6 @@ $root.RegisterPhasesRes = (function() {
             writer = $Writer.create();
         if (message.success != null && message.hasOwnProperty("success"))
             writer.uint32(/* id 1, wireType 0 =*/8).bool(message.success);
-        if (message.waitURL != null && message.hasOwnProperty("waitURL"))
-            writer.uint32(/* id 2, wireType 2 =*/18).string(message.waitURL);
         return writer;
     };
 
@@ -677,9 +699,6 @@ $root.RegisterPhasesRes = (function() {
             switch (tag >>> 3) {
             case 1:
                 message.success = reader.bool();
-                break;
-            case 2:
-                message.waitURL = reader.string();
                 break;
             default:
                 reader.skipType(tag & 7);
@@ -719,9 +738,6 @@ $root.RegisterPhasesRes = (function() {
         if (message.success != null && message.hasOwnProperty("success"))
             if (typeof message.success !== "boolean")
                 return "success: boolean expected";
-        if (message.waitURL != null && message.hasOwnProperty("waitURL"))
-            if (!$util.isString(message.waitURL))
-                return "waitURL: string expected";
         return null;
     };
 
@@ -739,8 +755,6 @@ $root.RegisterPhasesRes = (function() {
         var message = new $root.RegisterPhasesRes();
         if (object.success != null)
             message.success = Boolean(object.success);
-        if (object.waitURL != null)
-            message.waitURL = String(object.waitURL);
         return message;
     };
 
@@ -757,14 +771,10 @@ $root.RegisterPhasesRes = (function() {
         if (!options)
             options = {};
         var object = {};
-        if (options.defaults) {
+        if (options.defaults)
             object.success = false;
-            object.waitURL = "";
-        }
         if (message.success != null && message.hasOwnProperty("success"))
             object.success = message.success;
-        if (message.waitURL != null && message.hasOwnProperty("waitURL"))
-            object.waitURL = message.waitURL;
         return object;
     };
 
@@ -782,6 +792,238 @@ $root.RegisterPhasesRes = (function() {
     return RegisterPhasesRes;
 })();
 
+$root.PhaseResult = (function() {
+
+    /**
+     * Properties of a PhaseResult.
+     * @exports IPhaseResult
+     * @interface IPhaseResult
+     * @property {string|null} [uniKey] PhaseResult uniKey
+     * @property {string|null} [point] PhaseResult point
+     * @property {string|null} [detailIframeUrl] PhaseResult detailIframeUrl
+     */
+
+    /**
+     * Constructs a new PhaseResult.
+     * @exports PhaseResult
+     * @classdesc Represents a PhaseResult.
+     * @implements IPhaseResult
+     * @constructor
+     * @param {IPhaseResult=} [properties] Properties to set
+     */
+    function PhaseResult(properties) {
+        if (properties)
+            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                if (properties[keys[i]] != null)
+                    this[keys[i]] = properties[keys[i]];
+    }
+
+    /**
+     * PhaseResult uniKey.
+     * @member {string} uniKey
+     * @memberof PhaseResult
+     * @instance
+     */
+    PhaseResult.prototype.uniKey = "";
+
+    /**
+     * PhaseResult point.
+     * @member {string} point
+     * @memberof PhaseResult
+     * @instance
+     */
+    PhaseResult.prototype.point = "";
+
+    /**
+     * PhaseResult detailIframeUrl.
+     * @member {string} detailIframeUrl
+     * @memberof PhaseResult
+     * @instance
+     */
+    PhaseResult.prototype.detailIframeUrl = "";
+
+    /**
+     * Creates a new PhaseResult instance using the specified properties.
+     * @function create
+     * @memberof PhaseResult
+     * @static
+     * @param {IPhaseResult=} [properties] Properties to set
+     * @returns {PhaseResult} PhaseResult instance
+     */
+    PhaseResult.create = function create(properties) {
+        return new PhaseResult(properties);
+    };
+
+    /**
+     * Encodes the specified PhaseResult message. Does not implicitly {@link PhaseResult.verify|verify} messages.
+     * @function encode
+     * @memberof PhaseResult
+     * @static
+     * @param {IPhaseResult} message PhaseResult message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    PhaseResult.encode = function encode(message, writer) {
+        if (!writer)
+            writer = $Writer.create();
+        if (message.uniKey != null && message.hasOwnProperty("uniKey"))
+            writer.uint32(/* id 1, wireType 2 =*/10).string(message.uniKey);
+        if (message.point != null && message.hasOwnProperty("point"))
+            writer.uint32(/* id 2, wireType 2 =*/18).string(message.point);
+        if (message.detailIframeUrl != null && message.hasOwnProperty("detailIframeUrl"))
+            writer.uint32(/* id 3, wireType 2 =*/26).string(message.detailIframeUrl);
+        return writer;
+    };
+
+    /**
+     * Encodes the specified PhaseResult message, length delimited. Does not implicitly {@link PhaseResult.verify|verify} messages.
+     * @function encodeDelimited
+     * @memberof PhaseResult
+     * @static
+     * @param {IPhaseResult} message PhaseResult message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    PhaseResult.encodeDelimited = function encodeDelimited(message, writer) {
+        return this.encode(message, writer).ldelim();
+    };
+
+    /**
+     * Decodes a PhaseResult message from the specified reader or buffer.
+     * @function decode
+     * @memberof PhaseResult
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @param {number} [length] Message length if known beforehand
+     * @returns {PhaseResult} PhaseResult
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    PhaseResult.decode = function decode(reader, length) {
+        if (!(reader instanceof $Reader))
+            reader = $Reader.create(reader);
+        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.PhaseResult();
+        while (reader.pos < end) {
+            var tag = reader.uint32();
+            switch (tag >>> 3) {
+            case 1:
+                message.uniKey = reader.string();
+                break;
+            case 2:
+                message.point = reader.string();
+                break;
+            case 3:
+                message.detailIframeUrl = reader.string();
+                break;
+            default:
+                reader.skipType(tag & 7);
+                break;
+            }
+        }
+        return message;
+    };
+
+    /**
+     * Decodes a PhaseResult message from the specified reader or buffer, length delimited.
+     * @function decodeDelimited
+     * @memberof PhaseResult
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @returns {PhaseResult} PhaseResult
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    PhaseResult.decodeDelimited = function decodeDelimited(reader) {
+        if (!(reader instanceof $Reader))
+            reader = new $Reader(reader);
+        return this.decode(reader, reader.uint32());
+    };
+
+    /**
+     * Verifies a PhaseResult message.
+     * @function verify
+     * @memberof PhaseResult
+     * @static
+     * @param {Object.<string,*>} message Plain object to verify
+     * @returns {string|null} `null` if valid, otherwise the reason why it is not
+     */
+    PhaseResult.verify = function verify(message) {
+        if (typeof message !== "object" || message === null)
+            return "object expected";
+        if (message.uniKey != null && message.hasOwnProperty("uniKey"))
+            if (!$util.isString(message.uniKey))
+                return "uniKey: string expected";
+        if (message.point != null && message.hasOwnProperty("point"))
+            if (!$util.isString(message.point))
+                return "point: string expected";
+        if (message.detailIframeUrl != null && message.hasOwnProperty("detailIframeUrl"))
+            if (!$util.isString(message.detailIframeUrl))
+                return "detailIframeUrl: string expected";
+        return null;
+    };
+
+    /**
+     * Creates a PhaseResult message from a plain object. Also converts values to their respective internal types.
+     * @function fromObject
+     * @memberof PhaseResult
+     * @static
+     * @param {Object.<string,*>} object Plain object
+     * @returns {PhaseResult} PhaseResult
+     */
+    PhaseResult.fromObject = function fromObject(object) {
+        if (object instanceof $root.PhaseResult)
+            return object;
+        var message = new $root.PhaseResult();
+        if (object.uniKey != null)
+            message.uniKey = String(object.uniKey);
+        if (object.point != null)
+            message.point = String(object.point);
+        if (object.detailIframeUrl != null)
+            message.detailIframeUrl = String(object.detailIframeUrl);
+        return message;
+    };
+
+    /**
+     * Creates a plain object from a PhaseResult message. Also converts values to other types if specified.
+     * @function toObject
+     * @memberof PhaseResult
+     * @static
+     * @param {PhaseResult} message PhaseResult
+     * @param {$protobuf.IConversionOptions} [options] Conversion options
+     * @returns {Object.<string,*>} Plain object
+     */
+    PhaseResult.toObject = function toObject(message, options) {
+        if (!options)
+            options = {};
+        var object = {};
+        if (options.defaults) {
+            object.uniKey = "";
+            object.point = "";
+            object.detailIframeUrl = "";
+        }
+        if (message.uniKey != null && message.hasOwnProperty("uniKey"))
+            object.uniKey = message.uniKey;
+        if (message.point != null && message.hasOwnProperty("point"))
+            object.point = message.point;
+        if (message.detailIframeUrl != null && message.hasOwnProperty("detailIframeUrl"))
+            object.detailIframeUrl = message.detailIframeUrl;
+        return object;
+    };
+
+    /**
+     * Converts this PhaseResult to JSON.
+     * @function toJSON
+     * @memberof PhaseResult
+     * @instance
+     * @returns {Object.<string,*>} JSON object
+     */
+    PhaseResult.prototype.toJSON = function toJSON() {
+        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+    };
+
+    return PhaseResult;
+})();
+
 $root.SendBackPlayerReq = (function() {
 
     /**
@@ -792,7 +1034,7 @@ $root.SendBackPlayerReq = (function() {
      * @property {string|null} [playUrl] SendBackPlayerReq playUrl
      * @property {string|null} [playerToken] SendBackPlayerReq playerToken
      * @property {string|null} [nextPhaseKey] SendBackPlayerReq nextPhaseKey
-     * @property {SendBackPlayerReq.IPhaseResult|null} [phaseResult] SendBackPlayerReq phaseResult
+     * @property {IPhaseResult|null} [phaseResult] SendBackPlayerReq phaseResult
      */
 
     /**
@@ -844,7 +1086,7 @@ $root.SendBackPlayerReq = (function() {
 
     /**
      * SendBackPlayerReq phaseResult.
-     * @member {SendBackPlayerReq.IPhaseResult|null|undefined} phaseResult
+     * @member {IPhaseResult|null|undefined} phaseResult
      * @memberof SendBackPlayerReq
      * @instance
      */
@@ -883,7 +1125,7 @@ $root.SendBackPlayerReq = (function() {
         if (message.nextPhaseKey != null && message.hasOwnProperty("nextPhaseKey"))
             writer.uint32(/* id 4, wireType 2 =*/34).string(message.nextPhaseKey);
         if (message.phaseResult != null && message.hasOwnProperty("phaseResult"))
-            $root.SendBackPlayerReq.PhaseResult.encode(message.phaseResult, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+            $root.PhaseResult.encode(message.phaseResult, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
         return writer;
     };
 
@@ -931,7 +1173,7 @@ $root.SendBackPlayerReq = (function() {
                 message.nextPhaseKey = reader.string();
                 break;
             case 5:
-                message.phaseResult = $root.SendBackPlayerReq.PhaseResult.decode(reader, reader.uint32());
+                message.phaseResult = $root.PhaseResult.decode(reader, reader.uint32());
                 break;
             default:
                 reader.skipType(tag & 7);
@@ -981,7 +1223,7 @@ $root.SendBackPlayerReq = (function() {
             if (!$util.isString(message.nextPhaseKey))
                 return "nextPhaseKey: string expected";
         if (message.phaseResult != null && message.hasOwnProperty("phaseResult")) {
-            var error = $root.SendBackPlayerReq.PhaseResult.verify(message.phaseResult);
+            var error = $root.PhaseResult.verify(message.phaseResult);
             if (error)
                 return "phaseResult." + error;
         }
@@ -1011,7 +1253,7 @@ $root.SendBackPlayerReq = (function() {
         if (object.phaseResult != null) {
             if (typeof object.phaseResult !== "object")
                 throw TypeError(".SendBackPlayerReq.phaseResult: object expected");
-            message.phaseResult = $root.SendBackPlayerReq.PhaseResult.fromObject(object.phaseResult);
+            message.phaseResult = $root.PhaseResult.fromObject(object.phaseResult);
         }
         return message;
     };
@@ -1045,7 +1287,7 @@ $root.SendBackPlayerReq = (function() {
         if (message.nextPhaseKey != null && message.hasOwnProperty("nextPhaseKey"))
             object.nextPhaseKey = message.nextPhaseKey;
         if (message.phaseResult != null && message.hasOwnProperty("phaseResult"))
-            object.phaseResult = $root.SendBackPlayerReq.PhaseResult.toObject(message.phaseResult, options);
+            object.phaseResult = $root.PhaseResult.toObject(message.phaseResult, options);
         return object;
     };
 
@@ -1060,239 +1302,453 @@ $root.SendBackPlayerReq = (function() {
         return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
     };
 
-    SendBackPlayerReq.PhaseResult = (function() {
-
-        /**
-         * Properties of a PhaseResult.
-         * @memberof SendBackPlayerReq
-         * @interface IPhaseResult
-         * @property {string|null} [uniKey] PhaseResult uniKey
-         * @property {string|null} [point] PhaseResult point
-         * @property {string|null} [detailIframeUrl] PhaseResult detailIframeUrl
-         */
-
-        /**
-         * Constructs a new PhaseResult.
-         * @memberof SendBackPlayerReq
-         * @classdesc Represents a PhaseResult.
-         * @implements IPhaseResult
-         * @constructor
-         * @param {SendBackPlayerReq.IPhaseResult=} [properties] Properties to set
-         */
-        function PhaseResult(properties) {
-            if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                    if (properties[keys[i]] != null)
-                        this[keys[i]] = properties[keys[i]];
-        }
-
-        /**
-         * PhaseResult uniKey.
-         * @member {string} uniKey
-         * @memberof SendBackPlayerReq.PhaseResult
-         * @instance
-         */
-        PhaseResult.prototype.uniKey = "";
-
-        /**
-         * PhaseResult point.
-         * @member {string} point
-         * @memberof SendBackPlayerReq.PhaseResult
-         * @instance
-         */
-        PhaseResult.prototype.point = "";
-
-        /**
-         * PhaseResult detailIframeUrl.
-         * @member {string} detailIframeUrl
-         * @memberof SendBackPlayerReq.PhaseResult
-         * @instance
-         */
-        PhaseResult.prototype.detailIframeUrl = "";
-
-        /**
-         * Creates a new PhaseResult instance using the specified properties.
-         * @function create
-         * @memberof SendBackPlayerReq.PhaseResult
-         * @static
-         * @param {SendBackPlayerReq.IPhaseResult=} [properties] Properties to set
-         * @returns {SendBackPlayerReq.PhaseResult} PhaseResult instance
-         */
-        PhaseResult.create = function create(properties) {
-            return new PhaseResult(properties);
-        };
-
-        /**
-         * Encodes the specified PhaseResult message. Does not implicitly {@link SendBackPlayerReq.PhaseResult.verify|verify} messages.
-         * @function encode
-         * @memberof SendBackPlayerReq.PhaseResult
-         * @static
-         * @param {SendBackPlayerReq.IPhaseResult} message PhaseResult message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        PhaseResult.encode = function encode(message, writer) {
-            if (!writer)
-                writer = $Writer.create();
-            if (message.uniKey != null && message.hasOwnProperty("uniKey"))
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.uniKey);
-            if (message.point != null && message.hasOwnProperty("point"))
-                writer.uint32(/* id 2, wireType 2 =*/18).string(message.point);
-            if (message.detailIframeUrl != null && message.hasOwnProperty("detailIframeUrl"))
-                writer.uint32(/* id 3, wireType 2 =*/26).string(message.detailIframeUrl);
-            return writer;
-        };
-
-        /**
-         * Encodes the specified PhaseResult message, length delimited. Does not implicitly {@link SendBackPlayerReq.PhaseResult.verify|verify} messages.
-         * @function encodeDelimited
-         * @memberof SendBackPlayerReq.PhaseResult
-         * @static
-         * @param {SendBackPlayerReq.IPhaseResult} message PhaseResult message or plain object to encode
-         * @param {$protobuf.Writer} [writer] Writer to encode to
-         * @returns {$protobuf.Writer} Writer
-         */
-        PhaseResult.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
-        };
-
-        /**
-         * Decodes a PhaseResult message from the specified reader or buffer.
-         * @function decode
-         * @memberof SendBackPlayerReq.PhaseResult
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @param {number} [length] Message length if known beforehand
-         * @returns {SendBackPlayerReq.PhaseResult} PhaseResult
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        PhaseResult.decode = function decode(reader, length) {
-            if (!(reader instanceof $Reader))
-                reader = $Reader.create(reader);
-            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.SendBackPlayerReq.PhaseResult();
-            while (reader.pos < end) {
-                var tag = reader.uint32();
-                switch (tag >>> 3) {
-                case 1:
-                    message.uniKey = reader.string();
-                    break;
-                case 2:
-                    message.point = reader.string();
-                    break;
-                case 3:
-                    message.detailIframeUrl = reader.string();
-                    break;
-                default:
-                    reader.skipType(tag & 7);
-                    break;
-                }
-            }
-            return message;
-        };
-
-        /**
-         * Decodes a PhaseResult message from the specified reader or buffer, length delimited.
-         * @function decodeDelimited
-         * @memberof SendBackPlayerReq.PhaseResult
-         * @static
-         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-         * @returns {SendBackPlayerReq.PhaseResult} PhaseResult
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        PhaseResult.decodeDelimited = function decodeDelimited(reader) {
-            if (!(reader instanceof $Reader))
-                reader = new $Reader(reader);
-            return this.decode(reader, reader.uint32());
-        };
-
-        /**
-         * Verifies a PhaseResult message.
-         * @function verify
-         * @memberof SendBackPlayerReq.PhaseResult
-         * @static
-         * @param {Object.<string,*>} message Plain object to verify
-         * @returns {string|null} `null` if valid, otherwise the reason why it is not
-         */
-        PhaseResult.verify = function verify(message) {
-            if (typeof message !== "object" || message === null)
-                return "object expected";
-            if (message.uniKey != null && message.hasOwnProperty("uniKey"))
-                if (!$util.isString(message.uniKey))
-                    return "uniKey: string expected";
-            if (message.point != null && message.hasOwnProperty("point"))
-                if (!$util.isString(message.point))
-                    return "point: string expected";
-            if (message.detailIframeUrl != null && message.hasOwnProperty("detailIframeUrl"))
-                if (!$util.isString(message.detailIframeUrl))
-                    return "detailIframeUrl: string expected";
-            return null;
-        };
-
-        /**
-         * Creates a PhaseResult message from a plain object. Also converts values to their respective internal types.
-         * @function fromObject
-         * @memberof SendBackPlayerReq.PhaseResult
-         * @static
-         * @param {Object.<string,*>} object Plain object
-         * @returns {SendBackPlayerReq.PhaseResult} PhaseResult
-         */
-        PhaseResult.fromObject = function fromObject(object) {
-            if (object instanceof $root.SendBackPlayerReq.PhaseResult)
-                return object;
-            var message = new $root.SendBackPlayerReq.PhaseResult();
-            if (object.uniKey != null)
-                message.uniKey = String(object.uniKey);
-            if (object.point != null)
-                message.point = String(object.point);
-            if (object.detailIframeUrl != null)
-                message.detailIframeUrl = String(object.detailIframeUrl);
-            return message;
-        };
-
-        /**
-         * Creates a plain object from a PhaseResult message. Also converts values to other types if specified.
-         * @function toObject
-         * @memberof SendBackPlayerReq.PhaseResult
-         * @static
-         * @param {SendBackPlayerReq.PhaseResult} message PhaseResult
-         * @param {$protobuf.IConversionOptions} [options] Conversion options
-         * @returns {Object.<string,*>} Plain object
-         */
-        PhaseResult.toObject = function toObject(message, options) {
-            if (!options)
-                options = {};
-            var object = {};
-            if (options.defaults) {
-                object.uniKey = "";
-                object.point = "";
-                object.detailIframeUrl = "";
-            }
-            if (message.uniKey != null && message.hasOwnProperty("uniKey"))
-                object.uniKey = message.uniKey;
-            if (message.point != null && message.hasOwnProperty("point"))
-                object.point = message.point;
-            if (message.detailIframeUrl != null && message.hasOwnProperty("detailIframeUrl"))
-                object.detailIframeUrl = message.detailIframeUrl;
-            return object;
-        };
-
-        /**
-         * Converts this PhaseResult to JSON.
-         * @function toJSON
-         * @memberof SendBackPlayerReq.PhaseResult
-         * @instance
-         * @returns {Object.<string,*>} JSON object
-         */
-        PhaseResult.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        return PhaseResult;
-    })();
-
     return SendBackPlayerReq;
+})();
+
+$root.SetPhaseResultReq = (function() {
+
+    /**
+     * Properties of a SetPhaseResultReq.
+     * @exports ISetPhaseResultReq
+     * @interface ISetPhaseResultReq
+     * @property {string|null} [elfGameId] SetPhaseResultReq elfGameId
+     * @property {string|null} [playUrl] SetPhaseResultReq playUrl
+     * @property {string|null} [playerToken] SetPhaseResultReq playerToken
+     * @property {IPhaseResult|null} [phaseResult] SetPhaseResultReq phaseResult
+     */
+
+    /**
+     * Constructs a new SetPhaseResultReq.
+     * @exports SetPhaseResultReq
+     * @classdesc Represents a SetPhaseResultReq.
+     * @implements ISetPhaseResultReq
+     * @constructor
+     * @param {ISetPhaseResultReq=} [properties] Properties to set
+     */
+    function SetPhaseResultReq(properties) {
+        if (properties)
+            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                if (properties[keys[i]] != null)
+                    this[keys[i]] = properties[keys[i]];
+    }
+
+    /**
+     * SetPhaseResultReq elfGameId.
+     * @member {string} elfGameId
+     * @memberof SetPhaseResultReq
+     * @instance
+     */
+    SetPhaseResultReq.prototype.elfGameId = "";
+
+    /**
+     * SetPhaseResultReq playUrl.
+     * @member {string} playUrl
+     * @memberof SetPhaseResultReq
+     * @instance
+     */
+    SetPhaseResultReq.prototype.playUrl = "";
+
+    /**
+     * SetPhaseResultReq playerToken.
+     * @member {string} playerToken
+     * @memberof SetPhaseResultReq
+     * @instance
+     */
+    SetPhaseResultReq.prototype.playerToken = "";
+
+    /**
+     * SetPhaseResultReq phaseResult.
+     * @member {IPhaseResult|null|undefined} phaseResult
+     * @memberof SetPhaseResultReq
+     * @instance
+     */
+    SetPhaseResultReq.prototype.phaseResult = null;
+
+    /**
+     * Creates a new SetPhaseResultReq instance using the specified properties.
+     * @function create
+     * @memberof SetPhaseResultReq
+     * @static
+     * @param {ISetPhaseResultReq=} [properties] Properties to set
+     * @returns {SetPhaseResultReq} SetPhaseResultReq instance
+     */
+    SetPhaseResultReq.create = function create(properties) {
+        return new SetPhaseResultReq(properties);
+    };
+
+    /**
+     * Encodes the specified SetPhaseResultReq message. Does not implicitly {@link SetPhaseResultReq.verify|verify} messages.
+     * @function encode
+     * @memberof SetPhaseResultReq
+     * @static
+     * @param {ISetPhaseResultReq} message SetPhaseResultReq message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    SetPhaseResultReq.encode = function encode(message, writer) {
+        if (!writer)
+            writer = $Writer.create();
+        if (message.elfGameId != null && message.hasOwnProperty("elfGameId"))
+            writer.uint32(/* id 1, wireType 2 =*/10).string(message.elfGameId);
+        if (message.playUrl != null && message.hasOwnProperty("playUrl"))
+            writer.uint32(/* id 2, wireType 2 =*/18).string(message.playUrl);
+        if (message.playerToken != null && message.hasOwnProperty("playerToken"))
+            writer.uint32(/* id 3, wireType 2 =*/26).string(message.playerToken);
+        if (message.phaseResult != null && message.hasOwnProperty("phaseResult"))
+            $root.PhaseResult.encode(message.phaseResult, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+        return writer;
+    };
+
+    /**
+     * Encodes the specified SetPhaseResultReq message, length delimited. Does not implicitly {@link SetPhaseResultReq.verify|verify} messages.
+     * @function encodeDelimited
+     * @memberof SetPhaseResultReq
+     * @static
+     * @param {ISetPhaseResultReq} message SetPhaseResultReq message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    SetPhaseResultReq.encodeDelimited = function encodeDelimited(message, writer) {
+        return this.encode(message, writer).ldelim();
+    };
+
+    /**
+     * Decodes a SetPhaseResultReq message from the specified reader or buffer.
+     * @function decode
+     * @memberof SetPhaseResultReq
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @param {number} [length] Message length if known beforehand
+     * @returns {SetPhaseResultReq} SetPhaseResultReq
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    SetPhaseResultReq.decode = function decode(reader, length) {
+        if (!(reader instanceof $Reader))
+            reader = $Reader.create(reader);
+        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.SetPhaseResultReq();
+        while (reader.pos < end) {
+            var tag = reader.uint32();
+            switch (tag >>> 3) {
+            case 1:
+                message.elfGameId = reader.string();
+                break;
+            case 2:
+                message.playUrl = reader.string();
+                break;
+            case 3:
+                message.playerToken = reader.string();
+                break;
+            case 4:
+                message.phaseResult = $root.PhaseResult.decode(reader, reader.uint32());
+                break;
+            default:
+                reader.skipType(tag & 7);
+                break;
+            }
+        }
+        return message;
+    };
+
+    /**
+     * Decodes a SetPhaseResultReq message from the specified reader or buffer, length delimited.
+     * @function decodeDelimited
+     * @memberof SetPhaseResultReq
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @returns {SetPhaseResultReq} SetPhaseResultReq
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    SetPhaseResultReq.decodeDelimited = function decodeDelimited(reader) {
+        if (!(reader instanceof $Reader))
+            reader = new $Reader(reader);
+        return this.decode(reader, reader.uint32());
+    };
+
+    /**
+     * Verifies a SetPhaseResultReq message.
+     * @function verify
+     * @memberof SetPhaseResultReq
+     * @static
+     * @param {Object.<string,*>} message Plain object to verify
+     * @returns {string|null} `null` if valid, otherwise the reason why it is not
+     */
+    SetPhaseResultReq.verify = function verify(message) {
+        if (typeof message !== "object" || message === null)
+            return "object expected";
+        if (message.elfGameId != null && message.hasOwnProperty("elfGameId"))
+            if (!$util.isString(message.elfGameId))
+                return "elfGameId: string expected";
+        if (message.playUrl != null && message.hasOwnProperty("playUrl"))
+            if (!$util.isString(message.playUrl))
+                return "playUrl: string expected";
+        if (message.playerToken != null && message.hasOwnProperty("playerToken"))
+            if (!$util.isString(message.playerToken))
+                return "playerToken: string expected";
+        if (message.phaseResult != null && message.hasOwnProperty("phaseResult")) {
+            var error = $root.PhaseResult.verify(message.phaseResult);
+            if (error)
+                return "phaseResult." + error;
+        }
+        return null;
+    };
+
+    /**
+     * Creates a SetPhaseResultReq message from a plain object. Also converts values to their respective internal types.
+     * @function fromObject
+     * @memberof SetPhaseResultReq
+     * @static
+     * @param {Object.<string,*>} object Plain object
+     * @returns {SetPhaseResultReq} SetPhaseResultReq
+     */
+    SetPhaseResultReq.fromObject = function fromObject(object) {
+        if (object instanceof $root.SetPhaseResultReq)
+            return object;
+        var message = new $root.SetPhaseResultReq();
+        if (object.elfGameId != null)
+            message.elfGameId = String(object.elfGameId);
+        if (object.playUrl != null)
+            message.playUrl = String(object.playUrl);
+        if (object.playerToken != null)
+            message.playerToken = String(object.playerToken);
+        if (object.phaseResult != null) {
+            if (typeof object.phaseResult !== "object")
+                throw TypeError(".SetPhaseResultReq.phaseResult: object expected");
+            message.phaseResult = $root.PhaseResult.fromObject(object.phaseResult);
+        }
+        return message;
+    };
+
+    /**
+     * Creates a plain object from a SetPhaseResultReq message. Also converts values to other types if specified.
+     * @function toObject
+     * @memberof SetPhaseResultReq
+     * @static
+     * @param {SetPhaseResultReq} message SetPhaseResultReq
+     * @param {$protobuf.IConversionOptions} [options] Conversion options
+     * @returns {Object.<string,*>} Plain object
+     */
+    SetPhaseResultReq.toObject = function toObject(message, options) {
+        if (!options)
+            options = {};
+        var object = {};
+        if (options.defaults) {
+            object.elfGameId = "";
+            object.playUrl = "";
+            object.playerToken = "";
+            object.phaseResult = null;
+        }
+        if (message.elfGameId != null && message.hasOwnProperty("elfGameId"))
+            object.elfGameId = message.elfGameId;
+        if (message.playUrl != null && message.hasOwnProperty("playUrl"))
+            object.playUrl = message.playUrl;
+        if (message.playerToken != null && message.hasOwnProperty("playerToken"))
+            object.playerToken = message.playerToken;
+        if (message.phaseResult != null && message.hasOwnProperty("phaseResult"))
+            object.phaseResult = $root.PhaseResult.toObject(message.phaseResult, options);
+        return object;
+    };
+
+    /**
+     * Converts this SetPhaseResultReq to JSON.
+     * @function toJSON
+     * @memberof SetPhaseResultReq
+     * @instance
+     * @returns {Object.<string,*>} JSON object
+     */
+    SetPhaseResultReq.prototype.toJSON = function toJSON() {
+        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+    };
+
+    return SetPhaseResultReq;
+})();
+
+$root.SetPhaseResultRes = (function() {
+
+    /**
+     * Properties of a SetPhaseResultRes.
+     * @exports ISetPhaseResultRes
+     * @interface ISetPhaseResultRes
+     * @property {boolean|null} [success] SetPhaseResultRes success
+     */
+
+    /**
+     * Constructs a new SetPhaseResultRes.
+     * @exports SetPhaseResultRes
+     * @classdesc Represents a SetPhaseResultRes.
+     * @implements ISetPhaseResultRes
+     * @constructor
+     * @param {ISetPhaseResultRes=} [properties] Properties to set
+     */
+    function SetPhaseResultRes(properties) {
+        if (properties)
+            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                if (properties[keys[i]] != null)
+                    this[keys[i]] = properties[keys[i]];
+    }
+
+    /**
+     * SetPhaseResultRes success.
+     * @member {boolean} success
+     * @memberof SetPhaseResultRes
+     * @instance
+     */
+    SetPhaseResultRes.prototype.success = false;
+
+    /**
+     * Creates a new SetPhaseResultRes instance using the specified properties.
+     * @function create
+     * @memberof SetPhaseResultRes
+     * @static
+     * @param {ISetPhaseResultRes=} [properties] Properties to set
+     * @returns {SetPhaseResultRes} SetPhaseResultRes instance
+     */
+    SetPhaseResultRes.create = function create(properties) {
+        return new SetPhaseResultRes(properties);
+    };
+
+    /**
+     * Encodes the specified SetPhaseResultRes message. Does not implicitly {@link SetPhaseResultRes.verify|verify} messages.
+     * @function encode
+     * @memberof SetPhaseResultRes
+     * @static
+     * @param {ISetPhaseResultRes} message SetPhaseResultRes message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    SetPhaseResultRes.encode = function encode(message, writer) {
+        if (!writer)
+            writer = $Writer.create();
+        if (message.success != null && message.hasOwnProperty("success"))
+            writer.uint32(/* id 1, wireType 0 =*/8).bool(message.success);
+        return writer;
+    };
+
+    /**
+     * Encodes the specified SetPhaseResultRes message, length delimited. Does not implicitly {@link SetPhaseResultRes.verify|verify} messages.
+     * @function encodeDelimited
+     * @memberof SetPhaseResultRes
+     * @static
+     * @param {ISetPhaseResultRes} message SetPhaseResultRes message or plain object to encode
+     * @param {$protobuf.Writer} [writer] Writer to encode to
+     * @returns {$protobuf.Writer} Writer
+     */
+    SetPhaseResultRes.encodeDelimited = function encodeDelimited(message, writer) {
+        return this.encode(message, writer).ldelim();
+    };
+
+    /**
+     * Decodes a SetPhaseResultRes message from the specified reader or buffer.
+     * @function decode
+     * @memberof SetPhaseResultRes
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @param {number} [length] Message length if known beforehand
+     * @returns {SetPhaseResultRes} SetPhaseResultRes
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    SetPhaseResultRes.decode = function decode(reader, length) {
+        if (!(reader instanceof $Reader))
+            reader = $Reader.create(reader);
+        var end = length === undefined ? reader.len : reader.pos + length, message = new $root.SetPhaseResultRes();
+        while (reader.pos < end) {
+            var tag = reader.uint32();
+            switch (tag >>> 3) {
+            case 1:
+                message.success = reader.bool();
+                break;
+            default:
+                reader.skipType(tag & 7);
+                break;
+            }
+        }
+        return message;
+    };
+
+    /**
+     * Decodes a SetPhaseResultRes message from the specified reader or buffer, length delimited.
+     * @function decodeDelimited
+     * @memberof SetPhaseResultRes
+     * @static
+     * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+     * @returns {SetPhaseResultRes} SetPhaseResultRes
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    SetPhaseResultRes.decodeDelimited = function decodeDelimited(reader) {
+        if (!(reader instanceof $Reader))
+            reader = new $Reader(reader);
+        return this.decode(reader, reader.uint32());
+    };
+
+    /**
+     * Verifies a SetPhaseResultRes message.
+     * @function verify
+     * @memberof SetPhaseResultRes
+     * @static
+     * @param {Object.<string,*>} message Plain object to verify
+     * @returns {string|null} `null` if valid, otherwise the reason why it is not
+     */
+    SetPhaseResultRes.verify = function verify(message) {
+        if (typeof message !== "object" || message === null)
+            return "object expected";
+        if (message.success != null && message.hasOwnProperty("success"))
+            if (typeof message.success !== "boolean")
+                return "success: boolean expected";
+        return null;
+    };
+
+    /**
+     * Creates a SetPhaseResultRes message from a plain object. Also converts values to their respective internal types.
+     * @function fromObject
+     * @memberof SetPhaseResultRes
+     * @static
+     * @param {Object.<string,*>} object Plain object
+     * @returns {SetPhaseResultRes} SetPhaseResultRes
+     */
+    SetPhaseResultRes.fromObject = function fromObject(object) {
+        if (object instanceof $root.SetPhaseResultRes)
+            return object;
+        var message = new $root.SetPhaseResultRes();
+        if (object.success != null)
+            message.success = Boolean(object.success);
+        return message;
+    };
+
+    /**
+     * Creates a plain object from a SetPhaseResultRes message. Also converts values to other types if specified.
+     * @function toObject
+     * @memberof SetPhaseResultRes
+     * @static
+     * @param {SetPhaseResultRes} message SetPhaseResultRes
+     * @param {$protobuf.IConversionOptions} [options] Conversion options
+     * @returns {Object.<string,*>} Plain object
+     */
+    SetPhaseResultRes.toObject = function toObject(message, options) {
+        if (!options)
+            options = {};
+        var object = {};
+        if (options.defaults)
+            object.success = false;
+        if (message.success != null && message.hasOwnProperty("success"))
+            object.success = message.success;
+        return object;
+    };
+
+    /**
+     * Converts this SetPhaseResultRes to JSON.
+     * @function toJSON
+     * @memberof SetPhaseResultRes
+     * @instance
+     * @returns {Object.<string,*>} JSON object
+     */
+    SetPhaseResultRes.prototype.toJSON = function toJSON() {
+        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+    };
+
+    return SetPhaseResultRes;
 })();
 
 $root.SendBackPlayerRes = (function() {

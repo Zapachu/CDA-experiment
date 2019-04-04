@@ -1,7 +1,12 @@
 @import "public";
 .console{
-  max-width: 64rem;
+  max-width: 80rem;
   margin: 0 auto;
+  .phaseResult{
+    display: flex;
+    flex-direction: column;
+    min-height: 5rem;
+  }
 }
 
 .rewardPanel{

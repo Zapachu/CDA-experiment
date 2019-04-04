@@ -8,4 +8,7 @@
     stroke: rgba($color-black, 0);
     stroke-width: 1;
   }
+  foreignObject{
+    overflow: visible;
+  }
 }

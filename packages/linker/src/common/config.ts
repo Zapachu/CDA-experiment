@@ -9,8 +9,9 @@ export const config = {
         route: {
             prefix: '/v5',
             login: '/login',
-            share: gameId=>`/share?id=${gameId}&type=10`,
-            join:'/subject/fastJoin'
+            share: gameId => `/share?id=${gameId}&type=10`,
+            join: '/subject/fastJoin',
+            member: (orgCode, gameId) => `/org/${orgCode}/task/game/item/members/${gameId}`
         }
     },
     cookieKey: {

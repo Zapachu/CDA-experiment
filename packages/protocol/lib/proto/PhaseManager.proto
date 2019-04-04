@@ -4,6 +4,9 @@ service GameService {
     rpc registerPhases (RegisterPhasesReq) returns (RegisterPhasesRes) {
     }
 
+    rpc setPhaseResult (SetPhaseResultReq) returns (SetPhaseResultRes) {
+    }
+
     rpc sendBackPlayer (SendBackPlayerReq) returns (SendBackPlayerRes) {
     }
 }
@@ -18,19 +21,27 @@ message RegisterPhasesReq {
 }
 message RegisterPhasesRes {
     bool success = 1;
-    string waitURL = 2;
+}
+message PhaseResult {
+    string uniKey = 1;
+    string point = 2;
+    string detailIframeUrl = 3;
 }
 message SendBackPlayerReq {
-    message PhaseResult {
-        string uniKey = 1;
-        string point = 2;
-        string detailIframeUrl = 3;
-    }
     string elfGameId = 1;
     string playUrl = 2;
     string playerToken = 3;
     string nextPhaseKey = 4;
     PhaseResult phaseResult = 5;
+}
+message SetPhaseResultReq {
+    string elfGameId = 1;
+    string playUrl = 2;
+    string playerToken = 3;
+    PhaseResult phaseResult = 4;
+}
+message SetPhaseResultRes {
+    bool success = 1;
 }
 message SendBackPlayerRes {
     string sendBackUrl = 1;
