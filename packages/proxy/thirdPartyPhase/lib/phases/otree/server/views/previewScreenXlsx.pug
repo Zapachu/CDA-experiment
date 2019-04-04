@@ -1,0 +1,25 @@
+html
+    head
+        title= 'ExportScreen'
+        style.
+            .screenTable {
+                border-collapse: collapse;
+            }
+
+            .screenTable th,td {
+                padding: .5rem 1.5rem;
+                text-align: center;
+            }
+    body
+        a(href=`/downloadScreenXlsx/${phaseId}`) Download
+        table(class='screenTable', border='1')
+            tbody
+                tr
+                    th Player
+                    th ScreenWidth(px)
+                    th ScreenHeight(px)
+                each screen in screens
+                    tr
+                        td=screen.hash
+                        td=screen.winW
+                        td=screen.winH

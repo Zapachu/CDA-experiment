@@ -6,6 +6,7 @@ import {ThirdPartPhase} from "../../../../core/server/models"
 import {gameService} from "../../../common/utils"
 import {elfSetting as settings} from 'elf-setting'
 import {Request, Response} from 'express'
+import {previewScreenXlsxRoute} from '../config'
 
 const {oTreeProxy} = settings
 
@@ -49,7 +50,7 @@ export const rewriteResBuffers = async (proxyRes, req: Request, res: Response) =
             const nextPhaseKey: string = params.nextPhaseKey
             gameService.sendBackPlayer({
                 elfGameId, playUrl, playerToken, nextPhaseKey,
-                phaseResult: {uniKey: playerOtreeHash}
+                phaseResult: {uniKey: playerOtreeHash, detailIframeUrl:`${oTreeProxy}${previewScreenXlsxRoute}/${otreePhase.id}`}
             }, (err: {}, service_res: { sendBackUrl: string }) => {
                 if (err) {
                     console.trace(err)
