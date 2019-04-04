@@ -121,11 +121,5 @@ export namespace NFrame {
 }
 
 //region Api
-export type TApiPlayers = Array<{
-    playerId: string,
-    userId: string,
-    name: string
-}>
-
 export type TApiPlayerResults = Array<{ phaseName: string } & PhaseManager.TPhaseResult>
 //endregion

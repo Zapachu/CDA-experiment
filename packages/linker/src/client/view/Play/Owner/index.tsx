@@ -1,9 +1,9 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {connCtx, Lang, Api} from '@client-util'
+import {connCtx, Lang} from '@client-util'
 import {baseEnum, IPlayerState} from '@common'
 import {playContext, rootContext, TPlayContext, TRootContext} from '@client-context'
-import {Card, List, message} from '@antd-component'
+import {Card, List, Button} from '@antd-component'
 import {Breadcrumb, Title} from '@client-component'
 import {History} from 'history'
 
@@ -17,7 +17,6 @@ export class Play4Owner extends React.Component<TRootContext & TPlayContext & { 
         share: ['分享', 'Share'],
         gameList: ['实验列表', 'GameList'],
         playerList: ['玩家列表', 'PlayerList'],
-        phaseStatus: ['环节状态', 'Phase Status'],
         console: ['控制台', 'Console'],
         [PhaseStatus[PhaseStatus.playing]]: ['进行中', 'Playing'],
         [PhaseStatus[PhaseStatus.paused]]: ['已暂停', 'Paused'],
@@ -32,7 +31,7 @@ export class Play4Owner extends React.Component<TRootContext & TPlayContext & { 
     })
 
     render(): React.ReactNode {
-        const {props: {user, game, gameState, history}, lang} = this
+        const {props: {game, gameState, history}, lang} = this
         console.log(gameState)
         return <section className={style.console}>
             <Breadcrumb history={history} links={[
@@ -41,144 +40,49 @@ export class Play4Owner extends React.Component<TRootContext & TPlayContext & { 
                 {label: lang.playerList, to: `/player/${game.id}`},
                 {label: lang.share, to: `/share/${game.id}`}
             ]}/>
-            <Title label={lang.phaseStatus}/>
-            {
-                gameState.phaseStates.map((phaseState, i) =>
-                    <Card key={i}
-                          title={game.phaseConfigs.find(({key}) => key === phaseState.key).title}
-                          extra={lang[PhaseStatus[phaseState.status]]}
-                          actions={[<a onClick={() => window.open(phaseState.playUrl, '_blank')}>{lang.console}</a>]}
-                    >
-                        <List
-                            dataSource={Object.entries(phaseState.playerState)}
-                            renderItem={
-                                ([playerToken, {actor, status, phaseResult = {}}]: [string, IPlayerState]) =>
-                                    <List.Item>
-                                        <List.Item.Meta title={`${actor.userName}:${lang[PlayerStatus[status]]||''}`}
-                                                        description={
-                                                            <div>
-                                                                {
-                                                                    phaseResult.point ? <span>{lang.point}&nbsp;&nbsp;{phaseResult.point}</span> : null
-                                                                }
-                                                                {
-                                                                    phaseResult.uniKey ?
-                                                                        <span>{lang.uniKey}&nbsp;&nbsp;{phaseResult.uniKey}</span> : null
-                                                                }
-                                                                {
-                                                                    phaseResult.detailIframeUrl ? <a href={phaseResult.detailIframeUrl}
-                                                                                                     target='_blank'>{lang.detail}</a> : null
-                                                                }
-                                                            </div>
-                                                        }/>
-                                        <RewardPanel {...{
-                                            orgCode: user.orgCode,
-                                            gameId: game.id,
-                                            playerId: actor.playerId,
-                                            userId: actor.userId
-                                        }}/>
-                                    </List.Item>
-                            }>
-                        </List>
-                    </Card>)
-            }
-        </section>
-    }
-}
-
-declare type TRewardPanelProps = {
-    orgCode: string
-    gameId: string
-    playerId: string
-    userId: string
-}
-
-declare type TRewardPanelState = {
-    money: number | string
-    rewarding: boolean
-    reward: number
-}
-
-class RewardPanel extends React.Component<TRewardPanelProps, TRewardPanelState> {
-    lang = Lang.extractLang({
-        InvalidAwardAmount: ['奖励金额有误', 'InvalidAwardAmount'],
-        RewardFailed: ['奖励失败', 'RewardFailed'],
-        RewardSuccess: ['奖励成功', 'RewardSuccess'],
-        Rewarded: ['已奖励', 'Rewarded'],
-        Reward: ['奖励', 'Reward'],
-        Submit: ['提交', 'Submit']
-    })
-
-    async componentDidMount() {
-        const {props: {playerId}} = this
-        if (!playerId) {
-            return
-        }
-        const {code, reward} = await Api.getRewarded(playerId)
-        if (code == baseEnum.ResponseCode.success) {
-            this.setState({
-                reward: +reward
-            })
-        }
-    }
-
-    state = {
-        money: '',
-        rewarding: false,
-        reward: 0
-    }
-
-    render() {
-        const {
-            lang,
-            props: {orgCode, gameId, playerId, userId},
-            state: {money, rewarding, reward}
-        } = this
-        return <section className={style.rewardPanel}>
-            <div className={style.rewardedMoney}>
-                <label>{lang.Rewarded}</label>
-                <em>{reward}</em>
-            </div>
-            <div className={style.rewardInputSpan}>
-                <input {...{
-                    className: `${style.rewardInput} ${rewarding ? style.active : ''}`,
-                    type: 'number',
-                    value: money,
-                    onChange: (({target: {value: money}}) => this.setState({money}))
-                }}/>
-                <a {...{
-                    className: style.rewardBtn,
-                    onClick: () => {
-                        if (rewarding) {
-                            const _money = Number(money)
-                            if (isNaN(_money) || _money <= 0) {
-                                return message.warn(lang.InvalidAwardAmount)
-                            }
-                            Api.reward(orgCode, gameId, {
-                                money: _money,
-                                subject: 11,
-                                task: gameId,
-                                tasker: playerId,
-                                payeeId: userId
-                            }).then(({code, msg}) => {
-                                if (code !== baseEnum.AcademusResCode.success) {
-                                    message.error(`${lang.RewardFailed},${msg}`)
-                                } else {
-                                    message.success(lang.RewardSuccess)
-                                    this.setState({
-                                        money: '',
-                                        rewarding: false,
-                                        reward: reward + _money
-                                    })
-                                }
-                            })
-                        } else {
-                            this.setState({
-                                rewarding: true
-                            })
-                        }
-                    }
-                }}>{rewarding ? lang.Submit : lang.Reward}</a>
-            </div>
+            <Title label={lang.playerStatus}/>
+            <List
+                dataSource={gameState.phaseStates}
+                grid={{gutter: 12, column: 2}}
+                renderItem={(phaseState, i) =>
+                    <List.Item>
+                        <Card key={i}
+                              title={game.phaseConfigs.find(({key}) => key === phaseState.key).title}
+                              extra={lang[PhaseStatus[phaseState.status]]}
+                              actions={[<Button onClick={
+                                  () => window.open(phaseState.playUrl, '_blank')
+                              }>{lang.console}</Button>]}
+                        >
+                            <List dataSource={Object.entries(phaseState.playerState)}
+                                  grid={{gutter: 12, column: 3}}
+                                  renderItem={
+                                      ([playerToken, {actor, status, phaseResult = {}}]: [string, IPlayerState]) =>
+                                          <List.Item>
+                                              <List.Item.Meta
+                                                  title={`${actor.userName}:${lang[PlayerStatus[status]] || ''}`}
+                                                  description={
+                                                      <div className={style.phaseResult}>
+                                                          {
+                                                              phaseResult.point ?
+                                                                  <span>{lang.point}&nbsp;&nbsp;{phaseResult.point}</span> : null
+                                                          }
+                                                          {
+                                                              phaseResult.uniKey ?
+                                                                  <span>{lang.uniKey}&nbsp;&nbsp;{phaseResult.uniKey}</span> : null
+                                                          }
+                                                          {
+                                                              phaseResult.detailIframeUrl ?
+                                                                  <a href={phaseResult.detailIframeUrl}
+                                                                     target='_blank'>{lang.detail}</a> : null
+                                                          }
+                                                      </div>
+                                                  }/>
+                                          </List.Item>
+                                  }>
+                            </List>
+                        </Card>
+                    </List.Item>
+                }/>
         </section>
     }
 }
