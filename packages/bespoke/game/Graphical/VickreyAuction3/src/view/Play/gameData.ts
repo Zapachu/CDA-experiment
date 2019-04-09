@@ -42,9 +42,9 @@ export const gameData = new class {
     get stageSize() {
         return this.cellSize * this.col
     }
+}
 
-    span(n: number) {
-        return this.cellSize * n
-    }
+export function span(n: number | string) {
+    return gameData.cellSize * +n
 }
 

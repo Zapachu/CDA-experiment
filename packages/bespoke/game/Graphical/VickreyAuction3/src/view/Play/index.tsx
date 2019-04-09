@@ -1,18 +1,17 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {Core, Lang, MaskLoading, Toast} from 'bespoke-client-util'
-import throttle = require('lodash/throttle')
-import {Keyframes, config, SpringProps} from 'react-spring/renderprops'
+import {animated, useSpring} from 'react-spring'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
 import {FetchType, MoveType, NEW_ROUND_TIMER, PlayerStatus, PushType} from '../../config'
-import {gameData, Role, Direction} from './gameData'
+import {Direction, gameData, Role, span} from './gameData'
 import {loadImgGroup} from '../util/imgGroup'
+import throttle = require('lodash/throttle')
 
-//region Button
-const Button: React.FunctionComponent<{
+function Button({label, onClick}: {
     label: string,
     onClick: () => void
-}> = ({label, onClick}) => {
+}) {
     const {imageGroup: {button}} = gameData
     return <button style={{
         width: button.width,
@@ -26,66 +25,38 @@ const Button: React.FunctionComponent<{
         fontSize: button.height / 3
     }} onClick={throttle(onClick, 500)}>{label}</button>
 }
-//endregion
 
-//region Host
-import {DEAL_TIMER} from '../../config'
-
-enum HostStatus {
-    normal = 'normal',
-    dealTimer = 'dealTimer',
-    deal = 'deal',
-    dealed = 'dealed'
+function Host({msg = ''}: { msg?: string }) {
+    const {imageGroup: {host, dialog}} = gameData
+    const {opacity} = useSpring(({opacity: msg ? 1 : 0, from: {opacity: 0}}))
+    return <g>
+        <animated.g {...{
+            transform: `translate(${span(1.6)},${span(-.8)})`,
+            opacity
+        }}>
+            <image href={dialog.src} width={span(2)}/>
+            <foreignObject transform={`translate(${span(.15)},${span(.15)})`}>
+                <animated.p style={{width: `${span(1.8)}px`}}>{msg}</animated.p>
+            </foreignObject>
+        </animated.g>
+        <image {...{
+            href: host.src
+        }}/>
+    </g>
 }
 
-export const Host: React.FunctionComponent<{ dealTimer: number, newRoundTimer: number }> = ({dealTimer = 0, newRoundTimer}) => {
-    const lang = Lang.extractLang({
-        dealed: ['成交！', 'Dealed !']
-    })
-    const {imageGroup: {host}} = gameData
-    const SpringKeyframes = Keyframes.Spring<null, { rotate: number }>({
-        [HostStatus.normal]: {rotate: 10},
-        [HostStatus.dealTimer]: [
-            {rotate: 0, config: {duration: 100}},
-            {rotate: 30, config: config.wobbly}
-        ],
-        [HostStatus.deal]: [
-            {rotate: 0, config: {duration: 100}},
-            {rotate: 80, config: config.wobbly}
-        ],
-        [HostStatus.dealed]: {rotate: 80}
-    }) as any
-
-    return <SpringKeyframes state={
-        newRoundTimer ? HostStatus.dealed :
-            dealTimer === DEAL_TIMER ? HostStatus.deal :
-                dealTimer ? HostStatus.dealTimer : HostStatus.normal}>
-        {
-            () => <g>
-                <text x={-10}>{dealTimer === DEAL_TIMER ? lang.dealed : ''}</text>
-                <image {...{
-                    href: host.src
-                }}/>
-            </g>
-        }
-    </SpringKeyframes>
-}
-//endregion
-
-//region Input
-const padding = .15
-
-export const Input: React.SFC<{
+function Input({value = '', onChange}: {
     value: string
     onChange: (value: string) => void
-}> = ({value = '', onChange}) => {
+}) {
+    const PADDING = .15
     const {imageGroup: {input}} = gameData,
-        width = (1 - 2 * padding) * input.width, height = (1 - 2 * padding) * input.height
+        width = (1 - 2 * PADDING) * input.width, height = (1 - 2 * PADDING) * input.height
     return <input {...{
         style: {
             width,
             height,
-            padding: `${padding * input.height}px ${padding * input.width}px`,
+            padding: `${PADDING * input.height}px ${PADDING * input.width}px`,
             position: 'relative',
             left: -input.width >> 1,
             top: -input.height >> 1,
@@ -98,95 +69,47 @@ export const Input: React.SFC<{
         onChange: ({target: {value}}) => onChange(value)
     }}/>
 }
-//endregion
 
-//region Player
-interface KeyFrameState extends SpringProps {
-    opacity: number
-    x: number
-    y: number
-    rotateL: number
-    rotateR: number
-}
-
-export class Player extends React.Component<{
+function Player({playerStatus, direction, privatePrice}: {
     privatePrice?: number
-    position: { x: number, y: number }
     playerStatus: PlayerStatus
     direction?: Direction
-}> {
-    SpringKeyframes
-
-    constructor(props) {
-        super(props)
-        const normalState: KeyFrameState = {
-            ...props.position,
-            opacity: 1,
-            rotateL: 0,
-            rotateR: 0,
-            config: {duration: 200}
+}) {
+    const {imageGroup: {playerL, playerR, playerL_dealed, playerR_dealed, shadow, shadow_player, idea, winner}} = gameData
+    const [player_normal, player_dealed] = direction === Direction.L ? [playerR, playerR_dealed] : [playerL, playerL_dealed],
+        player = playerStatus == PlayerStatus.won ? player_dealed : player_normal
+    const {opacity} = useSpring({opacity: playerStatus == PlayerStatus.outside ? 0 : 1})
+    return <animated.g opacity={opacity}>
+        {
+            playerStatus == PlayerStatus.won ?
+                <image
+                    transform={`translate(${span(-.2)},${span(-.6)})`}
+                    width={span(1.5)}
+                    href={winner.src}/> : null
         }
-        this.SpringKeyframes = Keyframes.Spring<null, KeyFrameState>({
-            [PlayerStatus.outside.toString()]: {...normalState, opacity: 0, x: 0},
-            [PlayerStatus.prepared.toString()]: normalState,
-            [PlayerStatus.shouted.toString()]: [
-                {...normalState, rotateL: 30},
-                normalState
-            ],
-            [PlayerStatus.won.toString()]: async next => {
-                // noinspection InfiniteLoopJS
-                while (true) {
-                    await next({...normalState, rotateL: 85, rotateR: 85, y: -20, config: {duration: 300}})
-                    await next({...normalState, rotateL: 60, rotateR: 60})
-                }
-            }
-        })
-    }
-
-    render(): React.ReactNode {
-        const {SpringKeyframes, props: {playerStatus, privatePrice, direction}} = this
-        const {imageGroup: {playerL, playerR, playerL_dealed, playerR_dealed, shadow, shadow_player, idea, winner}} = gameData
-        const [player_normal, player_dealed] = direction === Direction.L ? [playerR, playerR_dealed] : [playerL, playerL_dealed],
-            player = playerStatus == PlayerStatus.won ? player_dealed : player_normal
-        return <SpringKeyframes state={playerStatus.toString()}>
-            {
-                ({opacity, x, y}: KeyFrameState) => <g
-                    opacity={opacity}
-                    transform={`translate(${x},${y})`}>
-                    <image width={shadow.width}
-                           transform={`translate(${player.width - shadow.width >> 1},${player.height * .9})`}
-                           href={privatePrice ? shadow_player.src : shadow.src}/>
-                    <image {...{
-                        href: player.src
-                    }}/>
-                    {
-                        privatePrice && playerStatus == PlayerStatus.prepared ?
-                            <g transform={`translate(${idea.width >> 1},${-idea.height})`}>
-                                <image href={idea.src}/>
-                                <text {...{
-                                    fontSize: idea.height / 3,
-                                    y: idea.height * .6,
-                                    x: idea.width * .3
-                                }}>{privatePrice}</text>
-                            </g> : null
-                    }
-                    {
-                        playerStatus == PlayerStatus.won ?
-                            <image transform={`translate(0,${-winner.height})`}
-                                   href={winner.src}/> : null
-                    }
-                </g>
-            }
-        </SpringKeyframes>
-    }
+        <image width={shadow.width}
+               transform={`translate(${player.width - shadow.width >> 1},${player.height * .9})`}
+               href={privatePrice ? shadow_player.src : shadow.src}/>
+        <image {...{
+            href: player.src
+        }}/>
+        {
+            privatePrice && playerStatus == PlayerStatus.prepared ?
+                <g transform={`translate(${idea.width >> 1},${-idea.height})`}>
+                    <image href={idea.src}/>
+                    <text {...{
+                        fontSize: idea.height / 3,
+                        y: idea.height * .6,
+                        x: idea.width * .3
+                    }}>{privatePrice}</text>
+                </g> : null
+        }
+    </animated.g>
 }
-
-//endregion
 
 interface IPlayState {
     loading: boolean
     price: string,
-    dealTimers: Array<number>,
     newRoundTimers: Array<number>
 }
 
@@ -197,26 +120,19 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         enterMarket: ['进入市场', 'Enter Market'],
         shout: ['报价', 'Shout'],
         toNewRound: [n => `${n} 秒后进入下一轮`, n => `Market will enter into next round in ${n}s`],
-        startingPrice: ['起拍价', 'Starting Price'],
-        invalidPrice: ['价格需在起拍价与心理价值之间', 'Price shout be between starting price and private price']
+        invalidPrice: ['价格需在起拍价与心理价值之间', 'Price shout be between starting price and private price'],
+        curPaintStartingPrice: [n => `当前画作起拍价：${n}`, n => `The starting price of this paint is ${n}`],
+        tradeSuccess: ['交易成功！', 'Traded successfully']
     })
 
     state: IPlayState = {
         loading: true,
         price: '',
-        dealTimers: [],
         newRoundTimers: []
     }
 
     async componentDidMount() {
         const {props: {frameEmitter}} = this
-        frameEmitter.on(PushType.dealTimer, ({roundIndex, dealTimer}) => {
-            this.setState(state => {
-                const dealTimers = state.dealTimers.slice()
-                dealTimers[roundIndex] = dealTimer
-                return {dealTimers}
-            })
-        })
         frameEmitter.on(PushType.newRoundTimer, ({roundIndex, newRoundTimer}) => {
             this.setState(state => {
                 const newRoundTimers = state.newRoundTimers.slice()
@@ -224,7 +140,6 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 return {newRoundTimers}
             })
         })
-
         frameEmitter.emit(MoveType.getPosition)
         gameData.imageGroup = await loadImgGroup()
         this.setState({loading: false})
@@ -235,8 +150,8 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             lang, props: {
                 game: {params: {startingPrice}},
                 gameState: {groups},
-                playerState: {groupIndex,positionIndex, privatePrices}
-            }, state: {loading, dealTimers, newRoundTimers}
+                playerState: {groupIndex, positionIndex}
+            }, state: {loading, newRoundTimers}
         } = this
         if (loading) {
             return <MaskLoading label={lang.loading}/>
@@ -246,22 +161,23 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         }
         const {imageGroup: {paintFrame, roundSwitching, painting1, painting2, painting3, painting4, painting5}} = gameData
         const {rounds, roundIndex} = groups[groupIndex],
-            {playerStatus} = rounds[roundIndex],
-            newRoundTimer = newRoundTimers[roundIndex]
+            newRoundTimer = newRoundTimers[roundIndex],
+            {playerStatus} = rounds[roundIndex]
         const paintings = [painting1, painting2, painting3, painting4, painting5],
             paint = paintings[roundIndex % paintings.length]
+        const someoneWon = playerStatus.some(s => s === PlayerStatus.won)
         return <section className={style.play}>
             <svg viewBox={`0 0 ${gameData.stageSize} ${gameData.stageSize}`}>
                 <g className={style.auxiliaryLine}>
                     {
                         Array(gameData.col).fill(null).map((_, i) => <React.Fragment key={i}>
                             <line {...{
-                                x1: 0, y1: gameData.span(i),
-                                x2: gameData.stageSize, y2: gameData.span(i)
+                                x1: 0, y1: span(i),
+                                x2: gameData.stageSize, y2: span(i)
                             }}/>
                             <line {...{
-                                x1: gameData.span(i), y1: 0,
-                                x2: gameData.span(i), y2: gameData.stageSize
+                                x1: span(i), y1: 0,
+                                x2: span(i), y2: gameData.stageSize
                             }}/>
                         </React.Fragment>)
                     }
@@ -271,55 +187,44 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                         <>
                             <image {...{
                                 href: roundSwitching.src,
-                                x: gameData.span(5) - (roundSwitching.width>>1),
-                                y: gameData.span(1.5),
+                                x: span(5) - (roundSwitching.width >> 1),
+                                y: span(1.5)
                             }}/>
                             <text {...{
-                                fontSize: gameData.span(.3),
-                                x: gameData.span(5),
-                                y: gameData.span(7),
+                                fontSize: span(.3),
+                                x: span(5),
+                                y: span(7),
                                 textAnchor: 'middle'
                             }}>{lang.toNewRound(NEW_ROUND_TIMER - newRoundTimer)}</text>
                         </> :
                         <>
                             <image {...{
                                 href: paintFrame.src,
-                                x: gameData.span(4),
-                                y: gameData.span(.5),
-                                width: gameData.span(3.5),
-                                height: gameData.span(2)
+                                x: span(5),
+                                y: span(.5),
+                                width: span(3.5),
+                                height: span(2)
                             }}/>
                             <image {...{
                                 href: paint.src,
-                                x: gameData.span(4.5),
-                                y: gameData.span(.7),
-                                width: gameData.span(2.4),
-                                height: gameData.span(1.6)
+                                x: span(5.5),
+                                y: span(.7),
+                                width: span(2.4),
+                                height: span(1.6)
                             }}/>
-                            <text {...{
-                                x: gameData.span(8),
-                                y: gameData.span(2.1),
-                                fontSize: 25
-                            }}>{lang.startingPrice}:{startingPrice}</text>
-                            <g transform={`translate(${gameData.span(2.2)},${gameData.span(1.8)})`}>
-                                <Host {...{
-                                    dealTimer: dealTimers[roundIndex],
-                                    newRoundTimer: newRoundTimers[roundIndex]
-                                }}/>
+                            <g transform={`translate(${span(1)},${span(1.8)})`}>
+                                <Host
+                                    msg={someoneWon ? lang.tradeSuccess : lang.curPaintStartingPrice(startingPrice)}/>
                             </g>
-                            <g transform={`translate(${gameData.span(1)},${gameData.span(4.5)})`}>
-                                {
-                                    gameData.players.map(({direction, role}, i) =>
-                                        <Player key={i}
-                                                position={{x: gameData.span(1.8 * i + .8), y: 0}}
-                                                playerStatus={role === Role.player ? playerStatus[positionIndex] : PlayerStatus.prepared}
-                                                privatePrice={role === Role.player ? privatePrices[positionIndex] : null}
-                                                direction={direction}/>)
-                                }
-                            </g>
+                            {
+                                this.renderPlayers()
+                            }
                             {
                                 this.renderOperateWidget()
                             }
+                            <g transform={`translate(${span(4.1)},${span(7.8)})`}>
+                                <Envelope playerStatus={playerStatus[positionIndex]}/>
+                            </g>
                         </>
                 }
             </svg>
@@ -347,6 +252,27 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         }
     }
 
+    renderPlayers() {
+        const {props: {gameState: {groups}, playerState: {groupIndex, positionIndex, privatePrices}}} = this
+        const {rounds, roundIndex} = groups[groupIndex], {playerStatus} = rounds[roundIndex]
+        const partnerStatus = playerStatus.some((status, i) => status === PlayerStatus.won && i !== positionIndex) ?
+            PlayerStatus.won : PlayerStatus.prepared
+        return <g transform={`translate(${span(1.8)},${span(4.5)})`}>
+            {
+                gameData.players.map(({direction, role}, i) =>
+                    <g transform={`translate(${span(1.8 * i)},0)`}
+                       opacity={role === Role.player ? 1 : role === Role.partner ? .7 : .4}>
+                        <Player key={i}
+                                playerStatus={role === Role.player ? playerStatus[positionIndex] :
+                                    role === Role.partner ? partnerStatus : PlayerStatus.prepared
+                                }
+                                privatePrice={role === Role.player ? privatePrices[roundIndex] : null}
+                                direction={direction}/>
+                    </g>)
+            }
+        </g>
+    }
+
     renderOperateWidget() {
         const {
             lang, props: {
@@ -360,38 +286,51 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         switch (playerStatus[positionIndex]) {
             case PlayerStatus.outside: {
                 return <foreignObject {...{
-                    x: gameData.span(5),
-                    y: gameData.span(8)
+                    x: span(5),
+                    y: span(8)
                 }}>
                     <Button label={lang.enterMarket} onClick={() => frameEmitter.emit(MoveType.enterMarket)}/>
                 </foreignObject>
             }
             case PlayerStatus.prepared: {
                 return <>
-                    <image {...{
-                        href: gameData.imageGroup.envelope.src,
-                        width: gameData.span(.9),
-                        x: gameData.span(4),
-                        y: gameData.span(8)
-                    }}/>
                     <foreignObject {...{
-                        x: gameData.span(6),
-                        y: gameData.span(8)
+                        x: span(6),
+                        y: span(8)
                     }}>
                         <Input value={price} onChange={price => this.setState({price})}/>
                     </foreignObject>
                     <foreignObject {...{
-                        x: gameData.span(6),
-                        y: gameData.span(8.6)
+                        x: span(6),
+                        y: span(8.6)
                     }}>
                         <Button label={lang.shout} onClick={() => this.shout()}/>
                     </foreignObject>
                 </>
             }
-            default: {
+            default:
                 return null
-            }
         }
     }
+}
 
+function Envelope({playerStatus}: { playerStatus: PlayerStatus }) {
+    const {imageGroup: {envelope_open, envelope_closing}} = gameData
+    switch (playerStatus) {
+        case PlayerStatus.prepared:
+            return <image href={envelope_open.src} width={span(.8)}/>
+        case PlayerStatus.shouted:
+            const {x, y, width} = useSpring({
+                x: -2, y: -5, width: 0,
+                from: {x: 0, y: 0, width: .8}
+            })
+            return <animated.image {...{
+                href: envelope_closing.src,
+                width: width.interpolate(span),
+                x: x.interpolate(span),
+                y: y.interpolate(span)
+            }}/>
+        default:
+            return null
+    }
 }

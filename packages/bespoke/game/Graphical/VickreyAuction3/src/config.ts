@@ -7,7 +7,6 @@ export enum MoveType {
 }
 
 export enum PushType {
-    dealTimer,
     newRoundTimer
 }
 
@@ -22,5 +21,5 @@ export enum PlayerStatus {
     won
 }
 
-export const DEAL_TIMER = 3
-export const NEW_ROUND_TIMER = 10
+export const DEAL_TIMER = 5
+export const NEW_ROUND_TIMER = 5

@@ -59,16 +59,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 playerStatus[positionIndex] = PlayerStatus.shouted
                 playerState.prices[roundIndex] = params.price
                 if (playerStatus.every(status => status === PlayerStatus.shouted)) {
-                    let dealTimer = 1
-                    const dealInterval = global.setInterval(async () => {
-                        groupPlayerStates.forEach(({actor}) => this.push(actor, PushType.dealTimer, {
-                            roundIndex,
-                            dealTimer
-                        }))
-                        if (dealTimer++ < DEAL_TIMER) {
-                            return
-                        }
-                        global.clearInterval(dealInterval)
+                    setTimeout(async () => {
                         const [{positionIndex}, {prices}] = groupPlayerStates.sort((s1, s2) => s2.prices[roundIndex] - s1.prices[roundIndex])
                         playerStatus[positionIndex] = PlayerStatus.won
                         playerState.profits[roundIndex] = prices[roundIndex] - startingPrice
@@ -76,20 +67,22 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         if (roundIndex == rounds.length - 1) {
                             return
                         }
-                        let newRoundTimer = 1
-                        const newRoundInterval = global.setInterval(async () => {
-                            groupPlayerStates.forEach(({actor}) => this.push(actor, PushType.newRoundTimer, {
-                                roundIndex,
-                                newRoundTimer
-                            }))
-                            if (newRoundTimer++ < NEW_ROUND_TIMER) {
-                                return
-                            }
-                            global.clearInterval(newRoundInterval)
-                            groupState.roundIndex++
-                            await this.stateManager.syncState()
-                        }, 1000)
-                    }, 1000)
+                        global.setTimeout(() => {
+                            let newRoundTimer = 1
+                            const newRoundInterval = global.setInterval(async () => {
+                                groupPlayerStates.forEach(({actor}) => this.push(actor, PushType.newRoundTimer, {
+                                    roundIndex,
+                                    newRoundTimer
+                                }))
+                                if (newRoundTimer++ < NEW_ROUND_TIMER) {
+                                    return
+                                }
+                                global.clearInterval(newRoundInterval)
+                                groupState.roundIndex++
+                                await this.stateManager.syncState()
+                            }, 1000)
+                        }, DEAL_TIMER * 1000)
+                    }, 2000)
                 }
             }
         }

@@ -9,7 +9,9 @@ function loadImg(src: string) {
 export async function loadImgGroup() {
     return {
         button : await loadImg(require('../../../resource/img/button.svg')),
-		envelope : await loadImg(require('../../../resource/img/envelope.svg')),
+		dialog : await loadImg(require('../../../resource/img/dialog.svg')),
+		envelope_closing : await loadImg(require('../../../resource/img/envelope_closing.gif')),
+		envelope_open : await loadImg(require('../../../resource/img/envelope_open.svg')),
 		host : await loadImg(require('../../../resource/img/host.svg')),
 		idea : await loadImg(require('../../../resource/img/idea.svg')),
 		input : await loadImg(require('../../../resource/img/input.svg')),
@@ -32,7 +34,9 @@ export async function loadImgGroup() {
 
 export type TImgGroup = {
     button: HTMLImageElement,
-	envelope: HTMLImageElement,
+	dialog: HTMLImageElement,
+	envelope_closing: HTMLImageElement,
+	envelope_open: HTMLImageElement,
 	host: HTMLImageElement,
 	idea: HTMLImageElement,
 	input: HTMLImageElement,
