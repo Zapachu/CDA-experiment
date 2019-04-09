@@ -22,7 +22,7 @@ enum Tip {
 interface Word {
   text: string,
   color?: boolean,
-  br?: boolean
+  br?: number
 }
 
 interface Test {
@@ -120,8 +120,8 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
       {words.map(({text, color, br}, i) => {
         let className = '';
         if(color) className = className ? className+' '+style.blueWords : style.blueWords;
-        if(br) className = className ? className+' '+style.newLine : style.newLine;
-        return <span key={i} className={className}>{text}</span>
+        if(br!==undefined) className = className ? className+' '+style.newLine : style.newLine;
+        return <span key={i} className={className} style={{marginTop: `${br}px`}}>{text}</span>
       })}
     </>
   }
