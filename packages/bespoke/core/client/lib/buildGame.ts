@@ -11,14 +11,12 @@ import {config} from 'bespoke-common'
 import {elfSetting} from 'elf-setting'
 
 interface IPaths {
-    resource?: string
     proto?: string
     entry?: string
     output?: string
 }
 
 const defaultPaths: IPaths = {
-    resource: './resource',
     proto: './src/interface.proto',
     entry: './src/view',
     output: './dist'
@@ -63,7 +61,7 @@ export function geneClientBuilder(
         paths,
         qiNiu
     }: IBuildOption): webpack.Configuration {
-    const {resource, proto, entry, output} = resolvePaths(basePath, paths)
+    const {proto, entry, output} = resolvePaths(basePath, paths)
     const buildMode = process.env.BUILD_MODE || 'dev'
     buildProtoDts(proto, buildMode === 'dev')
     return {
@@ -110,8 +108,7 @@ export function geneClientBuilder(
                     use: {
                         loader: 'file-loader',
                         options: {
-                            name: `[path][name].[ext]`,
-                            context: resource
+                            name: `[path][name].[ext]`
                         }
                     }
                 }
