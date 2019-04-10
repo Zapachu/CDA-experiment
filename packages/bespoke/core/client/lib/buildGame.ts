@@ -74,7 +74,7 @@ export function geneClientBuilder(
         entry: {[namespace]: entry},
         output: {
             path: output,
-            filename: '[name].[hash:4].js',
+            filename: `[name]${buildMode === 'dev' ? '' : '.[hash:4]'}.js`,
             publicPath: buildMode === 'publish' ? `${qiNiu.download.jsDomain}/${qiNiu.upload.path}/${namespace}` : `/${config.rootName}/${namespace}/static/`
         },
         resolve: {
@@ -105,7 +105,7 @@ export function geneClientBuilder(
                 },
                 {
                     type: 'javascript/auto',
-                    test: /\.(svg|png|jpg|json|fnt)$/,
+                    test: /\.(svg|png|jpg|gif|json|fnt)$/,
                     exclude: /node_modules/,
                     use: {
                         loader: 'file-loader',

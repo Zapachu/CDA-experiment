@@ -108,6 +108,9 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         console.log(type)
         switch (type) {
             case FetchType.getRobotInputSeqList: {
+                if(req.user.role !== baseEnum.AcademusRole.teacher){
+                    return res.end('Invalid Request')
+                }
                 res.json({
                     code: baseEnum.ResponseCode.success,
                     historyGames: []

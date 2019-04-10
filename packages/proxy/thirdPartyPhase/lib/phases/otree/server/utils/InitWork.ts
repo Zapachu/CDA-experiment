@@ -3,6 +3,7 @@ import {ErrorPage} from '../../../common/utils'
 import ListMap from '../utils/ListMap'
 import {ThirdPartPhase} from '../../../../core/server/models'
 import {elfSetting as elfSetting} from 'elf-setting'
+import {gameService} from "../../../common/utils"
 import nodeXlsx from 'node-xlsx'
 import {
     virtualJsRoute,
@@ -14,8 +15,8 @@ import {
     downloadScreenXlsxRoute
 } from '../config'
 import * as path from 'path'
-
 const START_SIGN = 'InitializeParticipant'
+const {oTreeProxy} = elfSetting
 
 export const InitWork = (app) => {
     app.use(async (req: Request, res: Response, next: NextFunction) => {
@@ -47,9 +48,14 @@ export const InitWork = (app) => {
 
         if (req.url.includes(reportScreenRoute)) {
             const phaseId = req.session.oTreePhaseId
-            const phase = await ThirdPartPhase.findById(phaseId)
             const gameServicePlayerHash = req.session.token
-            let jsonString = ''
+            const phase = await ThirdPartPhase.findById(phaseId)
+            const curPlayer = phase.playHash.filter(p => p.player.toString === gameServicePlayerHash.toString())[0]
+
+            if (!curPlayer.hash) return ErrorPage(res, 'Wrong Player')
+
+            let jsonString = '', playerOtreeHash = ''
+            playerOtreeHash = curPlayer.hash
             req.on('data', (data) => {
                 jsonString += data
             })
@@ -63,6 +69,16 @@ export const InitWork = (app) => {
                 }
                 phase.markModified('playHash')
                 await phase.save()
+                await gameService.setPhaseResult({
+                    elfGameId: phase.elfGameId,
+                    playUrl: `${oTreeProxy}/init/${START_SIGN}/${phase._id}`,
+                    playerToken: gameServicePlayerHash,
+                    phaseResult: {
+                        uniKey: playerOtreeHash,
+                        detailIframeUrl: `${oTreeProxy}${previewScreenXlsxRoute}/${phaseId}`
+                    }
+                })
+
                 return okRes().json({code: 0, msg: 'reported'})
             })
         }
@@ -135,7 +151,7 @@ export const InitWork = (app) => {
                     const {winW, winH} = JSON.parse(screen)
                     return [hash, winW, winH]
                 })
-            data.unshift(['Player','ScreenWidth(px)','ScreenHeight(px)'])
+            data.unshift(['Player', 'ScreenWidth(px)', 'ScreenHeight(px)'])
             const name = 'ScreenSize'
             let buffer = nodeXlsx.build([{name, data}], {})
             res.setHeader('Content-Type', 'application/vnd.openxmlformats')
