@@ -32,6 +32,9 @@ function resolvePaths(basePath, paths: IPaths = defaultPaths): IPaths {
 
 function buildProtoDts(protoPath: string, watch: boolean = false) {
     const p = protoPath.replace('.proto', '')
+    if(!fs.existsSync(`${p}.proto`)){
+        return
+    }
 
     function build() {
         pbjs.main(['-t', 'static-module', '-w', 'commonjs', '-o', `${p}.js`, `${p}.proto`], () =>
