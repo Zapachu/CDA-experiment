@@ -31,7 +31,7 @@ function Host({msg = ''}: { msg?: string }) {
     const {opacity} = useSpring(({opacity: msg ? .95 : 0, from: {opacity: 0}}))
     return <g>
         <animated.g {...{
-            transform: `translate(${span(1.8)},${span(-.5)})`,
+            transform: `translate(${span(1.7)},${span(-.7)})`,
             opacity
         }}>
             <image href={dialog.src} width={span(3.2)}/>
