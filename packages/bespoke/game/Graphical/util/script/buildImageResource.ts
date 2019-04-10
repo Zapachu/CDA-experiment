@@ -3,7 +3,7 @@ import {readdirSync, writeFileSync} from 'fs'
 
 const fileNames = readdirSync(resolve(__dirname, '../resource/img'))
 
-writeFileSync('../src/view/util/imgGroup.ts',
+writeFileSync('../lib/imgGroup.ts',
     `function loadImg(src: string) {
     return new Promise<HTMLImageElement>(resolve => {
         const img = new Image()
@@ -15,7 +15,7 @@ writeFileSync('../src/view/util/imgGroup.ts',
 export async function loadImgGroup() {
     return {
         ${fileNames
-        .map(fileName => `${fileName.split('.')[0]} : await loadImg(require('../../../resource/img/${fileName}'))`)
+        .map(fileName => `${fileName.split('.')[0]} : await loadImg(require('../resource/img/${fileName}'))`)
         .join(',\n\t\t')}
     }
 }

@@ -1,4 +1,4 @@
-import {TImgGroup} from '../util/imgGroup'
+import {TImgGroup} from 'bespoke-game-graphical-util'
 
 export enum Direction {
     L, R

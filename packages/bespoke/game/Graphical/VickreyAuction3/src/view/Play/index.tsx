@@ -5,7 +5,7 @@ import {animated, useSpring} from 'react-spring'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
 import {FetchType, MoveType, NEW_ROUND_TIMER, PlayerStatus, PushType} from '../../config'
 import {Direction, gameData, Role, span} from './gameData'
-import {loadImgGroup} from '../util/imgGroup'
+import {loadImgGroup} from 'bespoke-game-graphical-util'
 import throttle = require('lodash/throttle')
 
 function Button({label, onClick}: {
