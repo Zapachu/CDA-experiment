@@ -22,21 +22,21 @@ function Button({label, onClick}: {
         background: `url(${button.src}) no-repeat`,
         border: 'none',
         outline: 'none',
-        fontSize: button.height / 3
+        fontSize: button.height / 2
     }} onClick={throttle(onClick, 500)}>{label}</button>
 }
 
 function Host({msg = ''}: { msg?: string }) {
     const {imageGroup: {host, dialog}} = gameData
-    const {opacity} = useSpring(({opacity: msg ? 1 : 0, from: {opacity: 0}}))
+    const {opacity} = useSpring(({opacity: msg ? .95 : 0, from: {opacity: 0}}))
     return <g>
         <animated.g {...{
-            transform: `translate(${span(1.6)},${span(-.8)})`,
+            transform: `translate(${span(1.8)},${span(-.5)})`,
             opacity
         }}>
-            <image href={dialog.src} width={span(2)}/>
+            <image href={dialog.src} width={span(3.2)}/>
             <foreignObject transform={`translate(${span(.15)},${span(.15)})`}>
-                <animated.p style={{width: `${span(1.8)}px`}}>{msg}</animated.p>
+                <animated.p style={{width: `${span(3)}px`, fontSize: '1.8rem'}}>{msg}</animated.p>
             </foreignObject>
         </animated.g>
         <image {...{
@@ -107,6 +107,41 @@ function Player({playerStatus, direction, privatePrice}: {
     </animated.g>
 }
 
+function Paint({roundIndex}: { roundIndex: number }) {
+    const {imageGroup: {painting1, painting2, painting3, painting4, painting5}} = gameData
+    const paintings = [painting1, painting2, painting3, painting4, painting5],
+        paint = paintings[roundIndex % paintings.length]
+    return <image {...{
+        href: paint.src,
+        width: span(3)
+    }}/>
+}
+
+function Envelope({playerStatus}: { playerStatus: PlayerStatus }) {
+    const {imageGroup: {envelope_open, envelope_closing}} = gameData
+    switch (playerStatus) {
+        case PlayerStatus.prepared:
+            return <image href={envelope_open.src} width={span(.8)}/>
+        case PlayerStatus.shouted:
+            const {x, y, width} = useSpring({
+                x: -2, y: -5, width: 0,
+                from: {x: 0, y: 0, width: .8},
+                delay: 1000,
+                config: {
+                    duration: 800
+                }
+            })
+            return <animated.image {...{
+                href: `${envelope_closing.src}?k=${Math.random()}`,
+                width: width.interpolate(span),
+                x: x.interpolate(span),
+                y: y.interpolate(span)
+            }}/>
+        default:
+            return null
+    }
+}
+
 interface IPlayState {
     loading: boolean
     price: string,
@@ -159,12 +194,10 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         if (groupIndex === undefined) {
             return <MaskLoading label={lang.matchPlayers}/>
         }
-        const {imageGroup: {paintFrame, roundSwitching, painting1, painting2, painting3, painting4, painting5}} = gameData
+        const {imageGroup: {roundSwitching}} = gameData
         const {rounds, roundIndex} = groups[groupIndex],
             newRoundTimer = newRoundTimers[roundIndex],
             {playerStatus} = rounds[roundIndex]
-        const paintings = [painting1, painting2, painting3, painting4, painting5],
-            paint = paintings[roundIndex % paintings.length]
         const someoneWon = playerStatus.some(s => s === PlayerStatus.won)
         return <section className={style.play}>
             <svg viewBox={`0 0 ${gameData.stageSize} ${gameData.stageSize}`}>
@@ -198,20 +231,12 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                             }}>{lang.toNewRound(NEW_ROUND_TIMER - newRoundTimer)}</text>
                         </> :
                         <>
-                            <image {...{
-                                href: paintFrame.src,
-                                x: span(5),
-                                y: span(.5),
-                                width: span(3.5),
-                                height: span(2)
-                            }}/>
-                            <image {...{
-                                href: paint.src,
-                                x: span(5.5),
-                                y: span(.7),
-                                width: span(2.4),
-                                height: span(1.6)
-                            }}/>
+                            <g transform={`translate(${span(4.1)},${span(7.8)})`}>
+                                <Envelope key={roundIndex} playerStatus={playerStatus[positionIndex]}/>
+                            </g>
+                            <g transform={`translate(${span(5)},${span(.5)})`}>
+                                <Paint roundIndex={roundIndex}/>
+                            </g>
                             <g transform={`translate(${span(1)},${span(1.8)})`}>
                                 <Host
                                     msg={someoneWon ? lang.tradeSuccess : lang.curPaintStartingPrice(startingPrice)}/>
@@ -222,9 +247,6 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                             {
                                 this.renderOperateWidget()
                             }
-                            <g transform={`translate(${span(4.1)},${span(7.8)})`}>
-                                <Envelope playerStatus={playerStatus[positionIndex]}/>
-                            </g>
                         </>
                 }
             </svg>
@@ -311,26 +333,5 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             default:
                 return null
         }
-    }
-}
-
-function Envelope({playerStatus}: { playerStatus: PlayerStatus }) {
-    const {imageGroup: {envelope_open, envelope_closing}} = gameData
-    switch (playerStatus) {
-        case PlayerStatus.prepared:
-            return <image href={envelope_open.src} width={span(.8)}/>
-        case PlayerStatus.shouted:
-            const {x, y, width} = useSpring({
-                x: -2, y: -5, width: 0,
-                from: {x: 0, y: 0, width: .8}
-            })
-            return <animated.image {...{
-                href: envelope_closing.src,
-                width: width.interpolate(span),
-                x: x.interpolate(span),
-                y: y.interpolate(span)
-            }}/>
-        default:
-            return null
     }
 }
