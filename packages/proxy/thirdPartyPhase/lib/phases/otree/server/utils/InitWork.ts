@@ -50,8 +50,7 @@ export const InitWork = (app) => {
             const phaseId = req.session.oTreePhaseId
             const gameServicePlayerHash = req.session.token
             const phase = await ThirdPartPhase.findById(phaseId)
-            const curPlayer = phase.playHash.filter(p => p.player.toString === gameServicePlayerHash.toString())[0]
-
+            const curPlayer = phase.playHash.filter(p => p.player.toString() === gameServicePlayerHash.toString())[0]
             if (!curPlayer.hash) return ErrorPage(res, 'Wrong Player')
 
             let jsonString = '', playerOtreeHash = ''
@@ -69,7 +68,7 @@ export const InitWork = (app) => {
                 }
                 phase.markModified('playHash')
                 await phase.save()
-                await gameService.setPhaseResult({
+                gameService.setPhaseResult({
                     elfGameId: phase.elfGameId,
                     playUrl: `${oTreeProxy}/init/${START_SIGN}/${phase._id}`,
                     playerToken: gameServicePlayerHash,
@@ -77,7 +76,7 @@ export const InitWork = (app) => {
                         uniKey: playerOtreeHash,
                         detailIframeUrl: `${oTreeProxy}${previewScreenXlsxRoute}/${phaseId}`
                     }
-                })
+                },err => err ? console.error(err) : null)
 
                 return okRes().json({code: 0, msg: 'reported'})
             })
