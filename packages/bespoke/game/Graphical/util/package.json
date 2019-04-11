@@ -1,13 +1,12 @@
 {
   "name": "bespoke-game-graphical-util",
   "version": "1.0.0",
-  "main": "build/index",
-  "types": "build/index",
+  "main": "lib/index",
+  "types": "lib/index",
   "scripts": {
-    "install": "ts-node ./script/buildImageResource.ts && tsc"
+    "install": "ts-node ./script/buildImageResource.ts"
   },
   "devDependencies": {
-    "typescript": "^3.3.3333",
     "ts-node": "^8.0.3"
   }
 }

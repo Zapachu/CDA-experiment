@@ -1,1 +1,1 @@
-export * from './imgGroup'
+export * from './component'
