@@ -155,7 +155,7 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
             <p className={style.instruction}>{lang.instructionTitle}</p>
             <Display data={displayData} />
             <p className={style.instruction}>{lang.instructionFirstT2}</p>
-            <Choice1 c1={c1} d={d} version={version} gameType={gameType} onChoose={c1 => this.setState({c1})}/>
+            <Choice1 c1={c1} d={d} version={version} gameType={gameType} onChoose={c1 => this.setState({c1, c2: []})}/>
             {c1
               ? c1 === Choice.Wait
                   ? <p className={style.instruction}>{lang.instructionSecondWait}</p>
