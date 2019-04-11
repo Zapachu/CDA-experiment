@@ -69,7 +69,7 @@ export class PlayerStateSynchronizer<ICreateParams, IGameState, IPlayerState, Mo
             await this.syncClientState(wholeState)
         }
         this._stateSnapshot = cloneDeep(state)
-        GameDAO.savePlayerState(this.controller.game.id, this.actor.token, this.getState())
+        GameDAO.savePlayerState(this.controller.game.id, this.actor.token, state)
     }
 
     async syncClientState(wholeState?: boolean){
