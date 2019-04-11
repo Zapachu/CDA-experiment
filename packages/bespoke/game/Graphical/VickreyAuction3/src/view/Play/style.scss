@@ -6,12 +6,4 @@
   @media (max-width: $layout-mediaWidth) {
     width: 100%;
   }
-
-  .auxiliaryLine {
-    stroke: rgba($color-black, 0);
-    stroke-width: 1;
-  }
-  foreignObject{
-    overflow: visible;
-  }
 }
