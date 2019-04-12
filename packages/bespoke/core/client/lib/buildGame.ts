@@ -32,7 +32,7 @@ function resolvePaths(basePath, paths: IPaths = defaultPaths): IPaths {
 
 function buildProtoDts(protoPath: string, watch: boolean = false) {
     const p = protoPath.replace('.proto', '')
-    if(!fs.existsSync(`${p}.proto`)){
+    if (!fs.existsSync(`${p}.proto`)) {
         return
     }
 
@@ -69,6 +69,14 @@ export function geneClientBuilder(
     buildProtoDts(proto, buildMode === 'dev')
     return {
         devtool: buildMode === 'dev' ? 'cheap-module-eval-source-map' : false,
+        devServer: {
+            hot: buildMode === 'dev',
+            contentBase: './dist',
+            port: config.devPort.client,
+            proxy: {
+                '*': `http://localhost:${config.devPort.server}`
+            }
+        },
         mode: buildMode === 'dev' ? 'development' : 'production',
         watch: buildMode === 'dev',
         watchOptions: {poll: true},
@@ -132,6 +140,8 @@ export function geneClientBuilder(
             })
         ].concat(buildMode === 'publish' ? [
             new QiniuPlugin(qiNiu.upload)
-        ] : buildMode === 'dist' ? [] : [])
-    }
+        ] : buildMode === 'dist' ? [] : [
+            new webpack.HotModuleReplacementPlugin()
+        ])
+    } as any
 }
