@@ -110,7 +110,7 @@ enum BuildMode {
             const _env = {
                 BUILD_MODE: mode
             }
-            Object.assign(_env)
+            Object.assign(env, _env)
             cd(path.resolve(__dirname, '..'))
             const command = `${mode === BuildMode.dev ? 'webpack-dev-server' : 'webpack'} --env.TS_NODE_PROJECT="tsconfig.json" --config ./${namespacePath}/script/webpack.config.ts`
             RecentTask.appendLog({
@@ -157,7 +157,7 @@ enum BuildMode {
                 Object.assign(_env, {
                     BESPOKE_PORT: port,
                     BESPOKE_IP: ip,
-                    BESPOKE_RPC_PORT:rpcPort,
+                    BESPOKE_RPC_PORT: rpcPort,
                     BESPOKE_WITH_PROXY: withProxy,
                     BESPOKE_WITH_LINKER: withLinker,
                     NODE_ENV: 'production'
