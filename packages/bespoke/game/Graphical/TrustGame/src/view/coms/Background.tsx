@@ -1,4 +1,4 @@
-import {span} from "../../../../util/lib/component/Stage"
+import {span} from 'bespoke-game-graphical-util'
 import * as React from "react"
 
 const Background = () => {

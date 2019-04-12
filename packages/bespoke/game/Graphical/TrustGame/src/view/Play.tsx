@@ -2,8 +2,8 @@ import * as React from 'react'
 import Cash from './coms/Cash'
 import Referee from './coms/Referee'
 import Background from './coms/Background'
-import {Core, Input, Lang, MaskLoading, Toast} from 'bespoke-client-util'
-import {Stage, span, Button, RoundSwitching} from 'bespoke-game-graphical-util'
+import {Core, Lang, MaskLoading, Toast} from 'bespoke-client-util'
+import {Stage, span, Input, Button, RoundSwitching} from 'bespoke-game-graphical-util'
 import {
     ICreateParams,
     IGameState,
@@ -67,44 +67,6 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         } else {
             frameEmitter.emit(MoveType.shout, {price: +price})
         }
-    }
-
-    dynamicAction = () => {
-        const {
-            props: {
-                gameState: {groups},
-                playerState: {groupIndex, positionIndex}
-            }
-        } = this
-        const {rounds, roundIndex} = groups[groupIndex],
-            {playerStatus} = rounds[roundIndex]
-        const playerState = playerStatus[positionIndex]
-        if (playerState === PlayerStatus.prepared) {
-            return <section className={style.play}>
-                <Stage dev={true}>
-                    <RoundSwitching msg='其他玩家正在赶来...'/>
-                </Stage>
-            </section>
-        }
-        // if (playerState === PlayerStatus.shouted) {
-        //     return <MaskLoading label='您已出价，请等待其他玩家...'/>
-        // }
-        // if (playerState === PlayerStatus.gameOver) {
-        //     return <MaskLoading label='所有轮次结束，等待老师结束实验...'/>
-        // }
-
-        // if (playerState === PlayerStatus.timeToShout) {
-        //     return <div>
-        //         <li>
-        //             <Label label='输入您的价格'/>
-        //             <Input type='number' value={price} onChange={this.setVal.bind(this)}/>
-        //         </li>
-        //         <li>
-        //             <Button width={ButtonProps.Width.large} label='出价' onClick={this.shout.bind(this)}/>
-        //         </li>
-        //     </div>
-        // }
-        // return <MaskLoading label='准备进行下一轮...'/>
     }
 
     renderOperateWidget() {
@@ -187,7 +149,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                         <RoundSwitching msg={lang.toNewRound(NEW_ROUND_TIMER - newRoundTimer)}/> :
                         <>
                             <Background/>
-                            <Cash playerState={playerState} position={positionIndex}/>
+                            <Cash playerState={playerState} position={positionIndex} balance={balances[roundIndex]}/>
                             <Referee playerState={playerState} position={positionIndex} balance={balances[roundIndex]}/>
                             {this.renderOperateWidget()}
                         </>
