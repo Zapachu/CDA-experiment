@@ -167,6 +167,9 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         const {query: {type, sheetType}} = req
         switch (type) {
             case FetchType.exportXls: {
+                if(req.user.id !== this.game.owner){
+                    return res.end('Invalid Request')
+                }
                 const name = SheetType[sheetType]
                 let data = [], option = {}
                 switch (sheetType) {

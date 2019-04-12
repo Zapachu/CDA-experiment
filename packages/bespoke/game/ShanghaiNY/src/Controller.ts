@@ -3,7 +3,7 @@ import {
   IActor,
   IMoveCallback,
   TGameState,
-  TPlayerState,
+  TPlayerState
 } from 'bespoke-server'
 import nodeXlsx from 'node-xlsx'
 import {
@@ -117,6 +117,10 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             break;
           }
           case MoveType.answerMain: {
+            if(!validateAnswer(params)) {
+              cb('invalid input');
+              break;
+            }
             const curRoundIndex = playerState.roundIndex;
             playerState.choices[curRoundIndex] = {c1: params.c1, c2: params.c2 || []};
             playerState.stageIndex = MainStageIndex.Wait4Result;
@@ -175,6 +179,18 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             playerState.stage = Stage.End;
             break;
           }
+      }
+
+      function validateAnswer(params): boolean {
+        const {c1, c2} = params;
+        switch(gameType) {
+          case GameType.T1: {
+            return !!c1
+          }
+          case GameType.T2: {
+            return !!c1 && !!c2 && !c2.includes(undefined) && c2.every(c => !!c)
+          }
+        }
       }
 
       function calcProfit(playerState: TPlayerState<IPlayerState>, min: number): number {
@@ -276,6 +292,9 @@ export default class Controller extends BaseController<ICreateParams, IGameState
       const gameState = await this.stateManager.getGameState()
       switch (type) {
           case FetchType.exportXls: {
+              if(req.user.id !== this.game.owner){
+                  return res.end('Invalid Request')
+              }
               const name = SheetType[sheetType]
               let data = [], option = {}
               switch (sheetType) {
@@ -292,6 +311,9 @@ export default class Controller extends BaseController<ICreateParams, IGameState
               return res.end(buffer, 'binary')
           }
           case FetchType.exportXlsPlaying: {
+              if(req.user.id !== this.game.owner){
+                  return res.end('Invalid Request')
+              }
             const name = SheetType[sheetType]
             let data = [], option = {}
             switch (sheetType) {
