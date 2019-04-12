@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="79px" height="29px" viewBox="0 0 79 29" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
+    <title>钱</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="信任博弈2" transform="translate(-417.000000, -763.000000)">
+            <g id="分组-7" transform="translate(421.000000, 763.000000)">
+                <g id="钱" transform="translate(2.000000, 1.000000)">
+                    <path d="M10.0630879,15.9534884 L70.5435421,15.9534884 L58.9414401,26.744186 L-1.97890109,26.744186 L10.0630879,15.9534884 Z" id="路径-2-copy-4" stroke="#FFC30F" stroke-width="2" fill="#FFFFFF" fill-rule="nonzero"></path>
+                    <path d="M10.0630879,13.4418605 L70.5435421,13.4418605 L58.9414401,24.2325581 L-1.97890109,24.2325581 L10.0630879,13.4418605 Z" id="路径-2-copy-3" stroke="#FFC30F" stroke-width="2" fill="#FFFFFF" fill-rule="nonzero"></path>
+                    <path d="M10.0630879,10.9302326 L70.5435421,10.9302326 L58.9414401,21.7209302 L-1.97890109,21.7209302 L10.0630879,10.9302326 Z" id="路径-2-copy-2" stroke="#FFC30F" stroke-width="2" fill="#FFFFFF" fill-rule="nonzero"></path>
+                    <path d="M10.0630879,8.41860465 L70.5435421,8.41860465 L58.9414401,19.2093023 L-1.97890109,19.2093023 L10.0630879,8.41860465 Z" id="路径-2" stroke="#FFC30F" stroke-width="2" fill="#FFFFFF" fill-rule="nonzero"></path>
+                    <path d="M10.0630879,5.90697674 L70.5435421,5.90697674 L58.9414401,16.6976744 L-1.97890109,16.6976744 L10.0630879,5.90697674 Z" id="路径-2-copy-5" stroke="#FFC30F" stroke-width="2" fill="#FFFFFF" fill-rule="nonzero"></path>
+                    <g id="分组-5" transform="translate(0.000000, 1.883721)" fill="#FFFFFF" fill-rule="nonzero" stroke="#FFC30F" stroke-width="2">
+                        <path d="M9.45281033,9.27484144 L70.0798187,9.27484144 L58.3998437,19.8372093 L-2.67000413,19.8372093 L9.45281033,9.27484144 Z" id="路径-2-copy-6"></path>
+                        <path d="M9.45281033,6.70613108 L70.0798187,6.70613108 L58.3998437,17.2684989 L-2.67000413,17.2684989 L9.45281033,6.70613108 Z" id="路径-2-copy-7"></path>
+                        <path d="M9.45281033,4.13742072 L70.0798187,4.13742072 L58.3998437,14.6997886 L-2.67000413,14.6997886 L9.45281033,4.13742072 Z" id="路径-2-copy-8"></path>
+                        <path d="M9.45281033,1.56871036 L70.0798187,1.56871036 L58.3998437,12.1310782 L-2.67000413,12.1310782 L9.45281033,1.56871036 Z" id="路径-2-copy-9"></path>
+                        <path d="M9.45281033,-1 L70.0798187,-1 L58.3998437,9.56236786 L-2.67000413,9.56236786 L9.45281033,-1 Z" id="路径-2-copy-10"></path>
+                    </g>
+                    <path d="M29.757312,1 L22.3608109,8.88582815 L21.9936465,26 L36.9190031,26 L36.9190031,9.03999896 L42.0298487,1 L29.757312,1 Z" id="矩形" stroke="#FFC30F" stroke-width="2" fill="#FFFFFF" fill-rule="nonzero"></path>
+                    <text id="¥" font-family="PingFangSC-Semibold, PingFang SC" font-size="18" font-weight="500" letter-spacing="1" fill="#FFC30F">
+                        <tspan x="24.7850467" y="23.7674419">¥</tspan>
+                    </text>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

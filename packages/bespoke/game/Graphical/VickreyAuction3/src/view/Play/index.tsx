@@ -78,6 +78,7 @@ function Envelope({playerStatus}: { playerStatus: PlayerStatus }) {
     }
 }
 
+//region config
 export enum Direction {
     L, R
 }
@@ -88,31 +89,28 @@ export enum Role {
     other
 }
 
-interface PlayerCfg {
+const PlayersCfg: Array<{
     direction: Direction
     role: Role
-}
-
-export const gameData = new class {
-    players: Array<PlayerCfg> = [
-        {
-            direction: Direction.R,
-            role: Role.other
-        },
-        {
-            direction: Direction.R,
-            role: Role.partner
-        },
-        {
-            direction: Direction.L,
-            role: Role.player
-        },
-        {
-            direction: Direction.L,
-            role: Role.other
-        }
-    ]
-}
+}> = [
+    {
+        direction: Direction.R,
+        role: Role.other
+    },
+    {
+        direction: Direction.R,
+        role: Role.partner
+    },
+    {
+        direction: Direction.L,
+        role: Role.player
+    },
+    {
+        direction: Direction.L,
+        role: Role.other
+    }
+]
+//endregion
 
 interface IPlayState {
     loading: boolean
@@ -224,8 +222,8 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             PlayerStatus.won : PlayerStatus.prepared
         return <g transform={`translate(${span(1.8)},${span(4.5)})`}>
             {
-                gameData.players.map(({direction, role}, i) =>
-                    <g transform={`translate(${span(1.8 * i)},0)`}
+                PlayersCfg.map(({direction, role}, i) =>
+                    <g key={i} transform={`translate(${span(1.8 * i)},0)`}
                        opacity={role === Role.player ? 1 : role === Role.partner ? .7 : .4}>
                         <Player key={i}
                                 playerStatus={role === Role.player ? playerStatus[positionIndex] :
