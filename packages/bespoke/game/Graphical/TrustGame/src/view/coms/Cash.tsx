@@ -3,8 +3,8 @@ import {span} from 'bespoke-game-graphical-util'
 import * as React from "react"
 import CashText from './CashText'
 
-const Cash = ({playerState, position, balance}: { playerState: number, position: number, balance: number}) => {
-    const val = balance.toString()
+const Cash = ({playerState, position, balance}: { playerState: number, position: number, balance: number }) => {
+    const val = `持有钱币: ${balance}`
     const imgSrc = require('../svgs/cash.svg')
 
     console.log(playerState)
@@ -16,15 +16,13 @@ const Cash = ({playerState, position, balance}: { playerState: number, position:
             switch (position) {
                 case 0:
                     return <>
-                        <g transform={`translate(${span(2)},${span(7)})`}>
+                        <g transform={`translate(${span(2)},${span(7.5)})`}>
                             <image {...{href: imgSrc, width: span(1)}}/>
                         </g>
-                        <g transform={`translate(${span(3)},${span(7)})`}>
+                        <g transform={`translate(${span(3)},${span(7.5)})`}>
                             <image {...{href: imgSrc, width: span(1)}}/>
                         </g>
-                        <g>
-                            <CashText val={val} transform={`translate(${span(2)},${span(7.5)})`}/>
-                        </g>
+                        <CashText val={val} transform={`translate(${span(2.22)},${span(8)})`}/>
                     </>
                 case 1:
                     return <>
@@ -40,9 +38,7 @@ const Cash = ({playerState, position, balance}: { playerState: number, position:
                         <g transform={`translate(${span(7.1)},${span(8.9)})`}>
                             <image {...{href: imgSrc, width: span(1)}}/>
                         </g>
-                        <g>
-                            <CashText val={val} transform={`translate(${span(2)},${span(9)})`}/>
-                        </g>
+                        <CashText val={val} transform={`translate(${span(2)},${span(9)})`}/>
                     </>
             }
             break
@@ -59,9 +55,7 @@ const Cash = ({playerState, position, balance}: { playerState: number, position:
                         <g transform={`translate(${span(8)},${span(8.5)})`}>
                             <image {...{href: imgSrc, width: span(1)}}/>
                         </g>
-                        <g>
-                            <CashText val={val} transform={`translate(${span(2)},${span(9)})`}/>
-                        </g>
+                        <CashText val={val} transform={`translate(${span(2)},${span(9)})`}/>
                     </>
                 case 1:
                     return <>
@@ -74,9 +68,7 @@ const Cash = ({playerState, position, balance}: { playerState: number, position:
                         <g transform={`translate(${span(8)},${span(8.5)})`}>
                             <image {...{href: imgSrc, width: span(1)}}/>
                         </g>
-                        <g>
-                            <CashText val={val} transform={`translate(${span(2)},${span(9)})`}/>
-                        </g>
+                        <CashText val={val} transform={`translate(${span(2)},${span(9)})`}/>
                     </>
             }
             break

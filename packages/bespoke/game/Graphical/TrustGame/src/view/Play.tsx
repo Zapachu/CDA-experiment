@@ -1,6 +1,7 @@
 import * as React from 'react'
 import Cash from './coms/Cash'
 import Referee from './coms/Referee'
+import PushShadow from './coms/PutShadow'
 import Background from './coms/Background'
 import {Core, Lang, MaskLoading, Toast} from 'bespoke-client-util'
 import {Stage, span, Input, Button, RoundSwitching} from 'bespoke-game-graphical-util'
@@ -13,6 +14,7 @@ import {
 } from '../interface'
 import {FetchType, MoveType, PlayerStatus, PushType, NEW_ROUND_TIMER} from '../config'
 import * as style from './style.scss'
+import PutShadow from "./coms/PutShadow";
 
 interface IPlayState {
     price: string
@@ -149,6 +151,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                         <RoundSwitching msg={lang.toNewRound(NEW_ROUND_TIMER - newRoundTimer)}/> :
                         <>
                             <Background/>
+                            <PutShadow curPlayer={rounds[roundIndex].currentPlayer}/>
                             <Cash playerState={playerState} position={positionIndex} balance={balances[roundIndex]}/>
                             <Referee playerState={playerState} position={positionIndex} balance={balances[roundIndex]}/>
                             {this.renderOperateWidget()}
