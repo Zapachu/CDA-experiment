@@ -73,7 +73,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             lang, props: {
                 frameEmitter,
                 gameState: {groups},
-                playerState: {groupIndex, positionIndex}
+                playerState: {groupIndex, positionIndex, balances}
             }, state: {price}
         } = this
         const {rounds, roundIndex} = groups[groupIndex],
@@ -92,7 +92,10 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                     x: span(5),
                     y: span(8)
                 }}>
-                    <Button label={lang.prepare} onClick={() => frameEmitter.emit(MoveType.prepare)}/>
+                    <p style={{width: 300, marginLeft: '-5rem', fontSize: '1.8rem', marginBottom: '3rem'}}>
+                        您的收益 {balances[roundIndex]}
+                    </p>
+                    <Button label={lang.nextRound} onClick={() => frameEmitter.emit(MoveType.toNextRound)}/>
                 </foreignObject>
             }
             case PlayerStatus.timeToShout: {

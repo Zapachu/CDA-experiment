@@ -94,18 +94,18 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 const {groupIndex, positionIndex} = playerState,
                     groupState = gameState.groups[groupIndex],
                     {rounds, roundIndex} = groupState,
-                    {playerStatus} = rounds[roundIndex],
+                    {playerStatus, currentPlayer} = rounds[roundIndex],
                     groupPlayerStates = Object.values(playerStates).filter(s => s.groupIndex === groupIndex)
 
                 playerState.prices[roundIndex] = params.price
                 playerStatus[positionIndex] = PlayerStatus.shouted
 
-                if (positionIndex === 0) {
+                if (currentPlayer === 0) {
                     playerState.balances[roundIndex] -= params.price
                     groupPlayerStates[1].balances[roundIndex] += params.price * magnification
                 }
 
-                if (positionIndex === 1) {
+                if (currentPlayer === 1) {
                     playerState.balances[roundIndex] -= params.price
                     groupPlayerStates[0].balances[roundIndex] += params.price
                 }
@@ -118,10 +118,9 @@ export default class Controller extends BaseController<ICreateParams, IGameState
 
                 if (playerStatus.every(status => status === PlayerStatus.shouted)) {
                     groupPlayerStates.map(p => p.profits[roundIndex] = p.balances[roundIndex])
-                    rounds[roundIndex].playerStatus.map(p => {
-                        p = PlayerStatus.nextRound
-                        return p
-                    })
+                    for (let i = 0; i < rounds[roundIndex].playerStatus.length; i++) {
+                        rounds[roundIndex].playerStatus[i] = PlayerStatus.nextRound
+                    }
                     await this.stateManager.syncState()
                     if (roundIndex == rounds.length - 1) {
                         for (let i in playerStatus) playerStatus[i] = PlayerStatus.gameOver
