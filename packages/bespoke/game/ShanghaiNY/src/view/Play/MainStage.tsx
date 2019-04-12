@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, ButtonProps, Core, Lang, MaskLoading} from 'bespoke-client-util'
+import {Button, ButtonProps, Core, Lang, MaskLoading, Toast} from 'bespoke-client-util'
 import {FetchType, MoveType, PushType, GameType, Version, Choice, MainStageIndex} from '../../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
 import Display from './Display'
@@ -141,14 +141,16 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
       case MainStageIndex.Choose: {
         content = <div>
           <Display data={displayData} />
-          <Choice1 c1={c1} d={d} version={version} gameType={gameType} onChoose={c1 => this.setState({c1})}/>
+          <Choice1 c1={c1} d={d} version={version} gameType={gameType} onChoose={c1 => this.setState({c1, c2: []})}/>
           <Choice2 c1={c1} c2={c2} d={d} version={version} gameType={gameType} onChoose={c2 => this.setState({c2})}/>
           {gameType===GameType.T1
             ? <Button width={ButtonProps.Width.small}
                       label={lang.confirm}
                       onClick={() => {
                         if(!c1) return;
-                        frameEmitter.emit(MoveType.answerMain, {c1})
+                        frameEmitter.emit(MoveType.answerMain, {c1}, err => {
+                          if(err) Toast.warn(err);
+                        })
                       }}
               />
             : c1
@@ -156,7 +158,9 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
                           label={lang.confirm}
                           onClick={() => {
                             if(!c1 || c2.length!==2 || c2.includes(undefined)) return;
-                            frameEmitter.emit(MoveType.answerMain, {c1, c2})
+                            frameEmitter.emit(MoveType.answerMain, {c1, c2}, err => {
+                              if(err) Toast.warn(err);
+                            })
                           }}
                   />
                 : null
