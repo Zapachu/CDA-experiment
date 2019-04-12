@@ -1,7 +1,7 @@
 import * as React from 'react'
 import Cash from './coms/Cash'
 import Referee from './coms/Referee'
-import PushShadow from './coms/PutShadow'
+import PutShadow from "./coms/PutShadow"
 import Background from './coms/Background'
 import {Core, Lang, MaskLoading, Toast} from 'bespoke-client-util'
 import {Stage, span, Input, Button, RoundSwitching} from 'bespoke-game-graphical-util'
@@ -14,7 +14,6 @@ import {
 } from '../interface'
 import {FetchType, MoveType, PlayerStatus, PushType, NEW_ROUND_TIMER} from '../config'
 import * as style from './style.scss'
-import PutShadow from "./coms/PutShadow";
 
 interface IPlayState {
     price: string
@@ -50,8 +49,6 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         frameEmitter.emit(MoveType.getPosition)
         this.setState({loading: false})
     }
-
-    setVal = (e) => this.setState({price: e.target.value})
 
     shout = () => {
         const {
@@ -101,13 +98,13 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             case PlayerStatus.timeToShout: {
                 return <>
                     <foreignObject {...{
-                        x: span(6),
+                        x: span(5),
                         y: span(8)
                     }}>
-                        <Input value={price} onChange={this.setVal.bind(this)}/>
+                        <Input value={price} onChange={price => this.setState({price})}/>
                     </foreignObject>
                     <foreignObject {...{
-                        x: span(6),
+                        x: span(5),
                         y: span(8.6)
                     }}>
                         <Button label={lang.shout} onClick={this.shout.bind(this)}/>
@@ -150,8 +147,8 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                     newRoundTimer ?
                         <RoundSwitching msg={lang.toNewRound(NEW_ROUND_TIMER - newRoundTimer)}/> :
                         <>
-                            <Background/>
                             <PutShadow curPlayer={rounds[roundIndex].currentPlayer}/>
+                            <Background/>
                             <Cash playerState={playerState} position={positionIndex} balance={balances[roundIndex]}/>
                             <Referee playerState={playerState} position={positionIndex} balance={balances[roundIndex]}/>
                             {this.renderOperateWidget()}

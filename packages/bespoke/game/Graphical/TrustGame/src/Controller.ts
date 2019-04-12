@@ -70,11 +70,22 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     groupPlayerStates = Object.values(playerStates).filter(s => s.groupIndex === groupIndex)
                 rounds[roundIndex].playerStatus[positionIndex] = PlayerStatus.preparedNextRound
                 if (playerStatus.every(status => status === PlayerStatus.preparedNextRound)) {
-                    groupState.roundIndex++
-                    rounds[groupState.roundIndex].currentPlayer = 0
-                    rounds[groupState.roundIndex].playerStatus[0] = PlayerStatus.timeToShout
-                    groupPlayerStates[0].balances[groupState.roundIndex] = initialFunding
-                    await this.stateManager.syncState()
+                    let newRoundTimer = 1
+                    const newRoundInterval = global.setInterval(async () => {
+                        groupPlayerStates.forEach(({actor}) => this.push(actor, PushType.newRoundTimer, {
+                            roundIndex,
+                            newRoundTimer
+                        }))
+                        if (newRoundTimer++ < NEW_ROUND_TIMER) {
+                            return
+                        }
+                        global.clearInterval(newRoundInterval)
+                        groupState.roundIndex++
+                        rounds[groupState.roundIndex].currentPlayer = 0
+                        rounds[groupState.roundIndex].playerStatus[0] = PlayerStatus.timeToShout
+                        groupPlayerStates[0].balances[groupState.roundIndex] = initialFunding
+                        await this.stateManager.syncState()
+                    }, 1000)
                 }
                 break
             }
@@ -107,29 +118,16 @@ export default class Controller extends BaseController<ICreateParams, IGameState
 
                 if (playerStatus.every(status => status === PlayerStatus.shouted)) {
                     groupPlayerStates.map(p => p.profits[roundIndex] = p.balances[roundIndex])
-                    rounds[roundIndex].playerStatus.map(() => PlayerStatus.nextRound)
+                    rounds[roundIndex].playerStatus.map(p => {
+                        p = PlayerStatus.nextRound
+                        return p
+                    })
                     await this.stateManager.syncState()
                     if (roundIndex == rounds.length - 1) {
                         for (let i in playerStatus) playerStatus[i] = PlayerStatus.gameOver
                         await this.stateManager.syncState()
                         return
                     }
-                    let newRoundTimer = 1
-                    const newRoundInterval = global.setInterval(async () => {
-                        groupPlayerStates.forEach(({actor}) => this.push(actor, PushType.newRoundTimer, {
-                            roundIndex,
-                            newRoundTimer
-                        }))
-                        if (newRoundTimer++ < NEW_ROUND_TIMER) {
-                            return
-                        }
-                        global.clearInterval(newRoundInterval)
-                        groupState.roundIndex++
-                        rounds[groupState.roundIndex].currentPlayer = 0
-                        rounds[groupState.roundIndex].playerStatus[0] = PlayerStatus.timeToShout
-                        groupPlayerStates[0].balances[groupState.roundIndex] = initialFunding
-                        await this.stateManager.syncState()
-                    }, 1000)
                 }
             }
         }
