@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "main": "lib/index",
   "types": "lib/index",
-  "scripts": {
-    "install": "ts-node ./script/buildImageResource.ts"
-  },
   "devDependencies": {
     "ts-node": "^8.0.3"
   }
