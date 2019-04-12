@@ -122,6 +122,9 @@ export default class Controller extends BaseController<ICreateParams, IGameState
               break;
             }
             const curRoundIndex = playerState.roundIndex;
+            if(playerState.choices[curRoundIndex]) {
+              break;
+            }
             playerState.choices[curRoundIndex] = {c1: params.c1, c2: params.c2 || []};
             playerState.stageIndex = MainStageIndex.Wait4Result;
             const playersInGroup = await this.getPlayersInGroup(playerState.groupIndex);
