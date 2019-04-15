@@ -94,6 +94,9 @@ export const InitWork = (app) => {
                         } else if (ph.userAgent.indexOf('Mac') > -1) {
                             ph.userSystem = 'Mac OS'
                             ph.userSystemVersion = ph.userAgent.split('(')[1].split(')')[0]
+                        } else {
+                            ph.userSystem = 'unknown'
+                            ph.userSystemVersion = 'unknown'
                         }
                         break
                     }
