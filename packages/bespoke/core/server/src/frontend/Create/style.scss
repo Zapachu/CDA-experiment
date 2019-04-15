@@ -73,7 +73,10 @@
     }
   }
   .bespokeWrapper {
-    flex-grow: 1;
+    flex-basis: 66%;
+    @media (max-width: $layout-mediaWidth) {
+      width: 100%;
+    }
   }
   .submitBtnWrapper {
     position: fixed;

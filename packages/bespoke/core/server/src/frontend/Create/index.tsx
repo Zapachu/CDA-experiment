@@ -74,6 +74,7 @@ export class Create extends React.Component<RouteComponentProps<{ namespace: str
                     params: game.params,
                     fetcher: new Fetcher<any>(namespace),
                     setParams: newParams => this.setState({game: {...game, params: {...game.params, ...newParams}}}),
+                    submitable,
                     setSubmitable: submitable => this.setSubmitable(submitable)
                 }}/>
             </div>

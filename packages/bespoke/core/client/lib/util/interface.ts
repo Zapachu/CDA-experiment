@@ -22,9 +22,10 @@ export namespace Core {
 
     interface ICreateProps<ICreateParams, FetchType> {
         params: ICreateParams
-        fetcher: Fetcher<FetchType>
         setParams: (newParams: ICreateParams) => void
-        setSubmitable: (submitable: boolean) => void
+        fetcher?: Fetcher<FetchType>
+        submitable?: boolean
+        setSubmitable?: (submitable: boolean) => void
     }
 
     interface IInfoProps<ICreateParams> {
