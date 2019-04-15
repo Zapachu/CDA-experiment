@@ -7,6 +7,9 @@ interface PlayHash extends Document{
     hash?: string;
     player?: string;
     screen?: string;
+    referer?: string;
+    ipAddress?: string;
+    userAgent?: string;
 }
 
 interface IThirdPartPhaseSchema extends Document{
@@ -28,6 +31,9 @@ const ThirdPartPhaseSchema = new Schema({
             player: String,     // elf player id
             screen: String,     // player's equipment of screen report
             result: String,     // player's score
+            referer: String,    // player's referer
+            ipAddress: String,  // player's ip address
+            userAgent: String,  // player's user agent
         }
     ],
     playUrl: String,            // play url

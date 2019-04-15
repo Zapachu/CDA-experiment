@@ -55,6 +55,7 @@ export const InitWork = (app) => {
 
             let jsonString = '', playerOtreeHash = ''
             playerOtreeHash = curPlayer.hash
+
             req.on('data', (data) => {
                 jsonString += data
             })
@@ -63,6 +64,9 @@ export const InitWork = (app) => {
                 for (let ph of phase.playHash) {
                     if (ph.player === gameServicePlayerHash) {
                         ph.screen = JSON.stringify({winW: body.winW, winH: body.winH})
+                        ph.referer = req.headers.referer
+                        ph.userAgent = req.headers["user-agent"]
+                        ph.ipAddress = req.connection.remoteAddress
                         break
                     }
                 }
