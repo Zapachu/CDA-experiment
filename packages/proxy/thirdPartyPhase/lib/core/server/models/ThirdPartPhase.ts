@@ -10,6 +10,8 @@ interface PlayHash extends Document{
     referer?: string;
     ipAddress?: string;
     userAgent?: string;
+    userSystem?:string;
+    userSystemVersion?:string;
 }
 
 interface IThirdPartPhaseSchema extends Document{
@@ -34,6 +36,8 @@ const ThirdPartPhaseSchema = new Schema({
             referer: String,    // player's referer
             ipAddress: String,  // player's ip address
             userAgent: String,  // player's user agent
+            userSystem: String,         // player's system
+            userSystemVersion: String,  // player's system version
         }
     ],
     playUrl: String,            // play url

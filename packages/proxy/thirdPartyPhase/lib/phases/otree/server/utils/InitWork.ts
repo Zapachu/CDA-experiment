@@ -15,6 +15,7 @@ import {
     downloadScreenXlsxRoute
 } from '../config'
 import * as path from 'path'
+
 const START_SIGN = 'InitializeParticipant'
 const {oTreeProxy} = elfSetting
 
@@ -67,6 +68,33 @@ export const InitWork = (app) => {
                         ph.referer = req.headers.referer
                         ph.userAgent = req.headers["user-agent"]
                         ph.ipAddress = req.connection.remoteAddress
+
+                        let os = {android: false, iphone: false, ios: false, version: undefined}
+                        const android = ph.userAgent.match(/(Android);?[\s\/]+([\d.]+)?/)
+                        const iPad = ph.userAgent.match(/(iPad).*OS\s([\d_]+)/)
+                        const iPhone = !iPad && ph.userAgent.match(/(iPhone\sOS)\s([\d_]+)/)
+                        const iPod = ph.userAgent.match(/(iPod)(.*OS\s([\d_]+))?/)
+                        if (android) {
+                            os.android = true
+                            os.version = android[2]
+                        }
+                        if (iPhone && !iPod) {
+                            os.ios = os.iphone = true
+                            os.version = iPhone[2].replace(/_/g, '.')
+                        }
+                        if (os.android) {
+                            ph.userSystem = 'Android'
+                            ph.userSystemVersion = os.version
+                        } else if (os.ios) {
+                            ph.userSystem = 'ios'
+                            ph.userSystemVersion = os.version
+                        } else if (ph.userAgent.indexOf('Windows NT') > -1) {
+                            ph.userSystem = 'Windows OS'
+                            ph.userSystemVersion = ph.userAgent.split('(')[1].split(')')[0]
+                        } else if (ph.userAgent.indexOf('Mac') > -1) {
+                            ph.userSystem = 'Mac OS'
+                            ph.userSystemVersion = ph.userAgent.split('(')[1].split(')')[0]
+                        }
                         break
                     }
                 }
@@ -80,7 +108,7 @@ export const InitWork = (app) => {
                         uniKey: playerOtreeHash,
                         detailIframeUrl: `${oTreeProxy}${previewScreenXlsxRoute}/${phaseId}`
                     }
-                },err => err ? console.error(err) : null)
+                }, err => err ? console.error(err) : null)
 
                 return okRes().json({code: 0, msg: 'reported'})
             })
@@ -137,9 +165,9 @@ export const InitWork = (app) => {
             const [, , phaseId] = req.url.split('/')
             const screens = (await ThirdPartPhase.findById(phaseId)).playHash
                 .filter(({screen}) => screen)
-                .map(({hash, screen}) => {
+                .map(({hash, screen, ipAddress, userAgent, userSystem, userSystemVersion}) => {
                     const {winW, winH} = JSON.parse(screen)
-                    return {hash, winW, winH}
+                    return {hash, winW, winH, ipAddress, userAgent, userSystem, userSystemVersion}
                 })
             return okRes().render('previewScreenXlsx', {
                 phaseId,
@@ -150,11 +178,11 @@ export const InitWork = (app) => {
             const [, , phaseId] = req.url.split('/')
             const data = (await ThirdPartPhase.findById(phaseId)).playHash
                 .filter(({screen}) => screen)
-                .map(({hash, screen}) => {
+                .map(({hash, screen, ipAddress, userAgent, userSystem, userSystemVersion}) => {
                     const {winW, winH} = JSON.parse(screen)
-                    return [hash, winW, winH]
+                    return [hash, winW, winH, ipAddress, userAgent, userSystem, userSystemVersion]
                 })
-            data.unshift(['Player', 'ScreenWidth(px)', 'ScreenHeight(px)'])
+            data.unshift(['Player', 'ScreenWidth(px)', 'ScreenHeight(px)', 'IP Address', 'User Agent', 'User System', 'User System Version'])
             const name = 'ScreenSize'
             let buffer = nodeXlsx.build([{name, data}], {})
             res.setHeader('Content-Type', 'application/vnd.openxmlformats')
