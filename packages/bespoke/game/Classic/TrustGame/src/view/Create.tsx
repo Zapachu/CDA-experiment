@@ -19,12 +19,7 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
         magnification: '2',
         round: 3,
         groupSize: 2,
-        readonly: false,
-    }
-
-    componentDidMount(): void {
-        const {props: {setSubmitable}} = this
-        setSubmitable(false)
+        readonly: true,
     }
 
     edit = () => {

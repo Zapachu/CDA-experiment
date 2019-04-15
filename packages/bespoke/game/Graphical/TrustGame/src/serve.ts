@@ -1,6 +1,6 @@
 import {resolve} from 'path'
 import {Server} from 'bespoke-server'
-import Controller from '../../../Classic/TrustGame/src/Controller'
+import Controller from './Controller'
 
 Server.start({
     staticPath: resolve(__dirname, '../dist')
