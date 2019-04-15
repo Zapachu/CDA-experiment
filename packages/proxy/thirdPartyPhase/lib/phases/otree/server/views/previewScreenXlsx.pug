@@ -18,8 +18,16 @@ html
                     th Player
                     th ScreenWidth(px)
                     th ScreenHeight(px)
+                    th IP Adress
+                    th User Agent
+                    th User System
+                    th User System Version
                 each screen in screens
                     tr
                         td=screen.hash
                         td=screen.winW
                         td=screen.winH
+                        td=screen.ipAddress
+                        td=screen.userAgent
+                        td=screen.userSystem
+                        td=screen.userSystemVersion
