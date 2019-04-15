@@ -21,7 +21,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
     }
 
     protected async playerMoveReducer(actor: IActor, type: string, params: IMoveParams, cb: IMoveCallback): Promise<void> {
-        const {game: {params: {groupSize, round, initialFunding, magnification}}} = this
+        const {game: {params: {group:groupNum, groupParams, groupSize, round}}} = this
         const playerState = await this.stateManager.getPlayerState(actor),
             gameState = await this.stateManager.getGameState(),
             playerStates = await this.stateManager.getPlayerStates()
@@ -46,8 +46,17 @@ export default class Controller extends BaseController<ICreateParams, IGameState
 
                 const {rounds, roundIndex} = gameState.groups[groupIndex]
 
+                if (gameState.groups.length > groupNum) {
+                    rounds[roundIndex].playerStatus[rounds[roundIndex].currentPlayer] = PlayerStatus.memberFull
+                    break
+                }
+
+                console.log(gameState.groups)
+                console.log(groupIndex)
+                console.log(groupSize)
+
                 if (playerState.positionIndex === 0) {
-                    playerState.balances[roundIndex] = initialFunding
+                    playerState.balances[roundIndex] = groupParams[groupIndex].initialFunding
                 }
                 if (rounds[roundIndex].playerStatus.every(s => s === PlayerStatus.prepared)) {
                     if (!rounds[roundIndex].currentPlayer) {
@@ -69,7 +78,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
 
                 if (positionIndex === 0) {
                     playerState.balances[roundIndex] -= params.price
-                    groupPlayerStates[1].balances[roundIndex] += params.price * magnification
+                    groupPlayerStates[1].balances[roundIndex] += params.price * groupParams[groupIndex].magnification
                 }
 
                 if (positionIndex === 1) {
@@ -104,7 +113,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         groupState.roundIndex++
                         rounds[groupState.roundIndex].currentPlayer = 0
                         rounds[groupState.roundIndex].playerStatus[0] = PlayerStatus.timeToShout
-                        groupPlayerStates[0].balances[groupState.roundIndex] = initialFunding
+                        groupPlayerStates[0].balances[groupState.roundIndex] = groupParams[groupIndex].initialFunding
                         await this.stateManager.syncState()
                     }, 1000)
                 }

@@ -2,9 +2,13 @@ syntax = "proto3";
 
 message CreateParams {
     int32 round = 1;
-    int32 groupSize = 2;
-    int32 initialFunding = 3;
-    int32 magnification = 4;
+    int32 group = 2;
+    message GroupParams {
+        int32 initialFunding = 1;
+        int32 magnification = 2;
+    };
+    int32 groupSize = 3;
+    repeated GroupParams groupParams = 4;
     string nextPhaseKey = 5;
 }
 
