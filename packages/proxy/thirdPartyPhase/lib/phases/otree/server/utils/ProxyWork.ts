@@ -8,7 +8,7 @@ const otreePlayUrl = settings.oTreeServer
 
 const proxy = httpProxy({
     target: otreePlayUrl,
-    // changeOrigin: true,
+    xfwd:true,
     ws: true,
     autoRewrite: true,
     protocolRewrite: 'http',
