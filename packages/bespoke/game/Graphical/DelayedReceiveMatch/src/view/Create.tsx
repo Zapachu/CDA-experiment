@@ -1,9 +1,25 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang, Label, RangeInput, Button, MaskLoading, Input} from 'bespoke-client-util'
+import {Core, Lang, Label, RangeInput, Button, MaskLoading, Input, Toast} from 'bespoke-client-util'
 import {Tabs} from './Tabs'
 import {FetchType} from '../config'
 import {ICreateParams, CreateParams} from '../interface'
+import cloneDeep = require('lodash/cloneDeep')
+
+const RANGE = {
+    group: {
+        min: 3,
+        max: 6
+    },
+    round: {
+        min: 1,
+        max: 6
+    },
+    groupSize: {
+        min: 4,
+        max: 8
+    }
+}
 
 interface ICreateState {
     activeGroupIndex: number
@@ -26,7 +42,11 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
         maxPrivatePrice: ['最高心理价格', 'Max Private Price'],
         generate: ['随机生成', 'Generate'],
         player: ['玩家', 'Player'],
-        good: ['商品', 'Good']
+        good: ['商品', 'Good'],
+        checkPrivatePricePls: [
+            (g, r, p, good) => `玩家心理价格有误，请检查：第${g + 1}组:第${r + 1}轮:玩家${p + 1}:物品${good + 1}`,
+            (g, r, p, good) => `Private prices of players are invalid, check them please : Group${g + 1}:Round${r + 1}:Player${p + 1}:Good${good + 1}`
+        ]
     })
     state: ICreateState = {
         activeGroupIndex: 0,
@@ -37,9 +57,9 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
 
     componentDidMount(): void {
         let defaultParams: ICreateParams = {
-            group: 3,
-            groupSize: 8,
-            round: 3
+            group: RANGE.group.max,
+            groupSize: RANGE.groupSize.max,
+            round: RANGE.round.max
         }
         defaultParams.groupPPs = this.geneGroupPrivatePrices(defaultParams)
         this.props.setParams(defaultParams)
@@ -51,17 +71,51 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
     }
 
     done() {
-        const {props: {setSubmitable}} = this
+        const {lang, props: {setSubmitable, params: {round, groupSize, group, groupPPs}, setParams}} = this
+        let invalidIndex: {
+            groupIndex: number
+            roundIndex: number
+            playerIndex: number
+            goodIndex: number
+        } = null
+        const _groupPPs = Array(group).fill(null).map((_, groupIndex) => ({
+            roundPPs: Array(round).fill(null).map((_, roundIndex) => ({
+                    playerPPs: Array(groupSize).fill(null).map((_, playerIndex) => ({
+                        privatePrices: Array(groupSize).fill(null).map((_, goodIndex) => {
+                            if (invalidIndex) {
+                                return null
+                            }
+                            const price = +groupPPs[groupIndex].roundPPs[roundIndex].playerPPs[playerIndex].privatePrices[goodIndex]
+                            if (price <= 0 || isNaN(price)) {
+                                invalidIndex = {groupIndex, roundIndex, playerIndex, goodIndex}
+                                return null
+                            }
+                            return price
+                        })
+                    }))
+                })
+            )
+        }))
+        if (invalidIndex) {
+            const {groupIndex, roundIndex, playerIndex, goodIndex} = invalidIndex
+            return Toast.warn(lang.checkPrivatePricePls(groupIndex, roundIndex, playerIndex, goodIndex))
+        }
+        setParams({groupPPs: _groupPPs})
         setSubmitable(true)
     }
 
     geneGroupPrivatePrices({group, groupSize, round}: ICreateParams): Array<CreateParams.IGroupPP> {
         const {state: {minPrivatePrice, maxPrivatePrice}} = this
-        return Array(group).fill(null).map(() => ({
-            roundPPs: Array(round).fill(null).map(() => ({
-                    playerPPs: Array(groupSize).fill(null).map(() => ({
-                        privatePrices: Array(groupSize).fill(null).map(() =>
-                            ~~(Math.random() * (maxPrivatePrice - minPrivatePrice)) + minPrivatePrice)
+        return Array(RANGE.group.max).fill(null).map((_, groupIndex) => ({
+            roundPPs: Array(RANGE.round.max).fill(null).map((_, roundIndex) => ({
+                    playerPPs: Array(RANGE.groupSize.max).fill(null).map((_, playerIndex) => ({
+                        privatePrices: Array(RANGE.groupSize.max).fill(null).map((_, goodIndex) =>
+                            groupIndex < group &&
+                            roundIndex < round &&
+                            playerIndex < groupSize &&
+                            goodIndex < groupSize ?
+                                ~~(Math.random() * (maxPrivatePrice - minPrivatePrice)) + minPrivatePrice : null
+                        )
                     }))
                 })
             )
@@ -78,28 +132,32 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
         const {
             lang,
             props: {params: {group, groupSize, round}, setParams, submitable},
-            state: {minPrivatePrice, maxPrivatePrice}
+            state: {activeGroupIndex, activeRoundIndex, minPrivatePrice, maxPrivatePrice}
         } = this
         return <ul className={style.configFields} style={{visibility: submitable ? 'hidden' : 'visible'}}>
             <li>
                 <Label label={lang.group}/>
-                <RangeInput value={group}
-                            min={3}
-                            max={6}
-                            onChange={({target: {value}}) => setParams({group: +value})}/>
+                <RangeInput {...RANGE.group} value={group}
+                            onChange={({target: {value}}) => {
+                                setParams({group: +value})
+                                if (value < activeGroupIndex) {
+                                    this.setState({activeGroupIndex: +value})
+                                }
+                            }}/>
             </li>
             <li>
                 <Label label={lang.groupSize}/>
-                <RangeInput value={groupSize}
-                            min={3}
-                            max={6}
-                            onChange={({target: {value}}) => setParams({groupSize: +value})}/>
+                <RangeInput {...RANGE.groupSize} value={groupSize}
+                            onChange={({target: {value}}) => {
+                                setParams({groupSize: +value})
+                                if (value < activeRoundIndex) {
+                                    this.setState({activeRoundIndex: +value})
+                                }
+                            }}/>
             </li>
             <li>
                 <Label label={lang.round}/>
-                <RangeInput value={round}
-                            min={1}
-                            max={10}
+                <RangeInput {...RANGE.round} value={round}
                             onChange={({target: {value}}) => setParams({round: +value})}/>
             </li>
             <li>
@@ -128,29 +186,30 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
     }
 
     render(): React.ReactNode {
-        const {lang, props: {params: {groupPPs}, submitable}, state: {activeGroupIndex, activeRoundIndex}} = this
+        const {lang, props: {params: {group, round, groupPPs}, submitable}, state: {activeGroupIndex, activeRoundIndex}} = this
         if (!groupPPs) {
             return <MaskLoading/>
         }
+        const groupIterator = Array(group).fill(null),
+            roundIterator = Array(round).fill(null)
         return <section className={style.create}>
             {
                 this.renderBaseFields()
             }
-            <Tabs labels={groupPPs.map((_, i) => lang.groupIndex(i))}
+            <Tabs labels={groupIterator.map((_, i) => lang.groupIndex(i))}
                   activeTabIndex={activeGroupIndex}
                   switchTab={i => this.setState({activeGroupIndex: i})}
             >
                 {
-                    groupPPs.map((group, i) =>
-                        <Tabs labels={group.roundPPs.map((_, i) => lang.roundIndex(i))}
+                    groupIterator.map((_, i) =>
+                        <Tabs key={i} labels={roundIterator.map((_, i) => lang.roundIndex(i))}
                               activeTabIndex={activeRoundIndex}
                               switchTab={i => this.setState({activeRoundIndex: i})}
                               vertical={true}
                         >
                             {
-                                group.roundPPs.map((round, j) => this.renderGroupRound(i, j))
+                                roundIterator.map((_, j) => this.renderGroupRound(i, j))
                             }
-
                         </Tabs>)
                 }
             </Tabs>
@@ -164,22 +223,22 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
     }
 
     renderGroupRound(groupIndex: number, roundIndex: number) {
-        const {lang, props: {submitable, params: {groupPPs, groupSize}}} = this,
+        const {lang, props: {submitable, params: {groupPPs, groupSize}, setParams}} = this,
             {playerPPs} = groupPPs[groupIndex].roundPPs[roundIndex]
-        return <table className={style.privatePriceTable}>
+        return <table key={`${groupIndex}-${roundIndex}`} className={style.privatePriceTable}>
             <tbody>
             <tr>
                 <td>{lang.privatePrice}</td>
                 {
 
-                    Array(groupSize).fill('').map((_, c) => <td key={c}>{lang.good}{c + 1}</td>)
+                    Array(groupSize).fill(null).map((_, c) => <td key={c}>{lang.good}{c + 1}</td>)
                 }
             </tr>
             {
                 Array(groupSize).fill(null).map((_, r) => <tr key={r}>
                     <td>{lang.player}{r + 1}</td>
                     {
-                        Array(groupSize).fill('').map((_, c) => {
+                        Array(groupSize).fill(null).map((_, c) => {
                             const value = playerPPs[r].privatePrices[c]
                             return <td key={c} className={submitable ? style.readonly : null}>
                                 <Input value={value}
@@ -187,7 +246,9 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
                                            if (submitable) {
                                                return
                                            }
-                                           console.log(value)
+                                           const _groupPPs = cloneDeep(groupPPs)
+                                           _groupPPs[groupIndex].roundPPs[roundIndex].playerPPs[r].privatePrices[c] = value as any
+                                           setParams({groupPPs: _groupPPs})
                                        }}
 
                                 />
