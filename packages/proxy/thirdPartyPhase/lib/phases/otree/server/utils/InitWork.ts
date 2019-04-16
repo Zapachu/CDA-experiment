@@ -67,8 +67,7 @@ export const InitWork = (app) => {
                         ph.screen = JSON.stringify({winW: body.winW, winH: body.winH})
                         ph.referer = req.headers.referer
                         ph.userAgent = req.headers["user-agent"]
-                        ph.ipAddress = req.connection.remoteAddress
-
+                        ph.ipAddress = req.headers['x-forwarded-for'] as string||req.connection.remoteAddress
                         let os = {android: false, iphone: false, ios: false, version: undefined}
                         const android = ph.userAgent.match(/(Android);?[\s\/]+([\d.]+)?/)
                         const iPad = ph.userAgent.match(/(iPad).*OS\s([\d_]+)/)
