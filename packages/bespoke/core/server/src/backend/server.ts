@@ -120,10 +120,10 @@ export class Server {
         this.initPassPort()
         QCloudSMS.init()
         GameLogic.init(logicTemplate)
-        const {bespokePort} = elfSetting,
-            express = this.initExpress()
-        this.bindServerListener(EventDispatcher.startGameSocket(express.listen(bespokePort)), bespokePort, () => {
-            Log.i(`CreateGame：http://127.0.0.1:${bespokePort}/${config.rootName}/${elfSetting.bespokeNamespace}/create`)
+        const express = this.initExpress()
+        const port = elfSetting.inProductEnv ? elfSetting.bespokePort : config.devPort.server
+        this.bindServerListener(EventDispatcher.startGameSocket(express.listen(port)), port, () => {
+            Log.i(`CreateGame：http://127.0.0.1:${elfSetting.inProductEnv?port:config.devPort.client}/${config.rootName}/${elfSetting.bespokeNamespace}/create`)
             if (!elfSetting.bespokeWithProxy) {
                 return
             }
@@ -131,8 +131,11 @@ export class Server {
                 serveRPC()
             }
             const heartBeat2Proxy = () => {
-                const {bespokeNamespace, bespokePort, bespokeRpcPort} = elfSetting
-                getProxyService().registerGame({namespace:bespokeNamespace, port: bespokePort.toString(), rpcPort: bespokeRpcPort.toString()},
+                getProxyService().registerGame({
+                        namespace: elfSetting.bespokeNamespace,
+                        port: port.toString(),
+                        rpcPort: elfSetting.bespokeRpcPort.toString()
+                    },
                     err => err ? Log.w(`注册至代理失败，${config.gameRegisterInterval}秒后重试`) : null)
                 setTimeout(() => heartBeat2Proxy(), config.gameRegisterInterval)
             }
