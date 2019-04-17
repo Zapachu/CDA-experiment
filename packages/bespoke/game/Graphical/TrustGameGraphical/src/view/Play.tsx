@@ -146,7 +146,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         }
 
         return <section className={style.play}>
-            <Stage>
+            <Stage dev={false}>
                 {
                     newRoundTimer ?
                         <RoundSwitching msg={lang.toNewRound(NEW_ROUND_TIMER - newRoundTimer)}/> :
