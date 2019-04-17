@@ -133,14 +133,14 @@ export function geneClientBuilder(
         plugins: [
             new ManifestPlugin({
                 fileName: `${namespace}.json`
-            }),
-            new CleanWebpackPlugin(`${namespace}.*`, {
-                root: output,
-                watch: true
             })
         ].concat(buildMode === 'publish' ? [
             new QiniuPlugin(qiNiu.upload)
-        ] : buildMode === 'dist' ? [] : [
+        ] : buildMode === 'dist' ? [
+            new CleanWebpackPlugin(`${namespace}.*`, {
+                root: output
+            })
+        ] : [
             new webpack.HotModuleReplacementPlugin()
         ])
     } as any
