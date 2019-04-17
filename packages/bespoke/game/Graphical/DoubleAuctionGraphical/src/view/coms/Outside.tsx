@@ -4,7 +4,7 @@ import * as React from "react"
 const Outside = ({playing}: { playing: boolean }) => {
     const imgSrc = '../svgs/outsideMan'
     if (playing) {
-        return <div>
+        return <>
             <g transform={`translate(${span(2)},${span(6)})`}>
                 <image {...{href: imgSrc, width: span(2)}}/>
             </g>
@@ -45,7 +45,7 @@ const Outside = ({playing}: { playing: boolean }) => {
                     <h2>买方</h2>
                 </div>
             </foreignObject>
-        </div>
+        </>
     }
     return null
 }

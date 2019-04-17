@@ -174,7 +174,7 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
             <div className={style.btnSwitch}>
                 {
                     readonly ? <a onClick={() => this.edit()}>重新编辑</a> :
-                        <a onClick={() => this.done()}>生成参数</a>
+                        <a onClick={() => this.done()}>确认参数</a>
                 }
             </div>
         </div>

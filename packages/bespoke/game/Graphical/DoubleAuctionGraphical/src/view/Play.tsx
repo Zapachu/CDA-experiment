@@ -127,16 +127,16 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         const playerState = playerStatus[positionIndex]
 
         return <section className={style.play}>
-            <Stage dev={false}>
+            <Stage dev={true}>
                 {
                     newRoundTimer ?
                         <RoundSwitching msg={lang.toNewRound(NEW_ROUND_TIMER - newRoundTimer)}/> :
-                        <div>
+                        <>
                             <Referee playerState={playerState}/>
                             <Outside playing={playing}/>
                             <PutShadow playerState={playerState} playing={playing} role={role}/>
                             {this.renderOperateWidget()}
-                        </div>
+                        </>
                 }
             </Stage>
         </section>
