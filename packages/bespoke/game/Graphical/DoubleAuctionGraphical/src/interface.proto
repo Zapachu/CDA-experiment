@@ -29,7 +29,8 @@ message GameState {
     message Group {
         message Board {
             int32 position = 1;
-            int32 price = 2;
+            bool deal = 2;
+            int32 price = 3;
         }
         message Round {
             repeated int32 playerStatus = 1;
