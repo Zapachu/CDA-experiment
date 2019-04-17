@@ -6,6 +6,8 @@ import {FetchType, MoveType, PushType, NEW_ROUND_TIMER, PlayerStatus} from '../c
 import {Stage, Input, Button, RoundSwitching, span} from 'bespoke-game-graphical-util'
 
 import Referee from './coms/Referee'
+import Outside from './coms/Outside'
+import PutShadow from './coms/PutShadow'
 
 interface IPlayState {
     price: string
@@ -66,7 +68,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             lang, props: {
                 frameEmitter,
                 gameState: {groups},
-                playerState: {groupIndex, positionIndex, balances}
+                playerState: {groupIndex, positionIndex}
             }, state: {price}
         } = this
         const {rounds, roundIndex} = groups[groupIndex],
@@ -107,7 +109,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             props: {
                 game: {params: {}},
                 gameState: {groups},
-                playerState: {groupIndex, positionIndex}
+                playerState: {groupIndex, positionIndex, role}
             }, state: {loading, newRoundTimers}
         } = this
         if (loading) {
@@ -119,7 +121,8 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
 
         const {rounds, roundIndex} = groups[groupIndex],
             newRoundTimer = newRoundTimers[roundIndex],
-            {playerStatus} = rounds[roundIndex]
+            {playerStatus} = rounds[roundIndex],
+            {playing} = rounds[roundIndex]
 
         const playerState = playerStatus[positionIndex]
 
@@ -129,7 +132,9 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                     newRoundTimer ?
                         <RoundSwitching msg={lang.toNewRound(NEW_ROUND_TIMER - newRoundTimer)}/> :
                         <div>
-                            <Referee playerState={playerState} />
+                            <Referee playerState={playerState}/>
+                            <Outside playing={playing}/>
+                            <PutShadow playerState={playerState} playing={playing} role={role}/>
                             {this.renderOperateWidget()}
                         </div>
                 }
