@@ -81,6 +81,11 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
         setSubmitable(true)
     }
 
+    setGroupSize = (e) => {
+        const val = parseInt(e.target.value)
+        this.setState({groupSize: val % 2 === 0 ? val + 1 : val})
+    }
+
     render() {
         const {round, groupSize, buyerPriceStart, buyerPriceEnd, sellerPriceStart, sellerPriceEnd, InitMoney, positions, readonly} = this.state
         return <div className={style.create}>
@@ -96,8 +101,8 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
                     <Label label='每组人数'/>
                     <RangeInput value={groupSize}
                                 min={2}
-                                max={6}
-                                onChange={(e) => this.setState({groupSize: parseInt(e.target.value)})}/>
+                                max={8}
+                                onChange={this.setGroupSize}/>
                 </li>
                 <li>
                     <Label label='初始资金'/>
@@ -169,7 +174,7 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
             <div className={style.btnSwitch}>
                 {
                     readonly ? <a onClick={() => this.edit()}>重新编辑</a> :
-                        <a onClick={() => this.done()}>确认参数</a>
+                        <a onClick={() => this.done()}>生成参数</a>
                 }
             </div>
         </div>

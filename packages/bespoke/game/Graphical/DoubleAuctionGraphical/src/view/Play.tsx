@@ -1,8 +1,11 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, MaskLoading, Input, Label, Button, ButtonProps, Toast} from 'bespoke-client-util'
+import {Core, Lang, MaskLoading, Toast} from 'bespoke-client-util'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import {FetchType, MoveType, PushType, NEW_ROUND_TIMER, PlayerStatus} from '../config'
+import {Stage, Input, Button, RoundSwitching, span} from 'bespoke-game-graphical-util'
+
+import Referee from './coms/Referee'
 
 interface IPlayState {
     price: string
@@ -16,6 +19,15 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         loading: true,
         newRoundTimers: []
     }
+
+    lang = Lang.extractLang({
+        hello: ['你好', 'Hello'],
+        shout: ['出价', 'Shout',],
+        prepare: ['准备好了', 'Prepared'],
+        nextRound: ['下一轮', 'Next Round'],
+        matchingPlayer: ['正在匹配玩家', 'Matching Players...'],
+        toNewRound: [n => `${n} 秒后进入下一轮`, n => `Market will enter into next round in ${n}s`],
+    })
 
     async componentDidMount() {
         const {props: {frameEmitter}} = this
@@ -49,65 +61,53 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         }
     }
 
-    dynamicAction = () => {
+    renderOperateWidget() {
         const {
-            props: {
+            lang, props: {
+                frameEmitter,
                 gameState: {groups},
-                playerState: {groupIndex, positionIndex}
+                playerState: {groupIndex, positionIndex, balances}
             }, state: {price}
         } = this
         const {rounds, roundIndex} = groups[groupIndex],
             {playerStatus} = rounds[roundIndex]
-        const playerState = playerStatus[positionIndex]
-        if (playerState === PlayerStatus.shouted) {
-            return <MaskLoading label='您已出价，请等待其他玩家...'/>
-        }
-        if (playerState === PlayerStatus.gameOver) {
-            return <MaskLoading label='所有轮次结束，等待老师结束实验...'/>
-        }
-        return <div>
-            <li>
-                <Label label='输入您的价格'/>
-                <Input type='number' value={price} onChange={this.setVal.bind(this)}/>
-            </li>
-            <li>
-                <Button width={ButtonProps.Width.large} label='出价' onClick={this.shout.bind(this)}/>
-            </li>
-        </div>
-    }
-
-    dynamicResult = () => {
-        const {props: {playerState: {profits, prices, privatePrices}}} = this
-        return <table className={style.profits}>
-            <thead>
-            <tr>
-                <td>轮次</td>
-                <td>心理价值</td>
-                <td>出价</td>
-                <td>收益</td>
-            </tr>
-            </thead>
-            {
-                prices.filter((p) => p !== 0).map((v, i) =>
-                    <tbody key={`tb${i}`}>
-                    <tr>
-                        <td>{i + 1}</td>
-                        <td>{privatePrices[i]}</td>
-                        <td>{v}</td>
-                        <td>{profits[i]}</td>
-                    </tr>
-                    </tbody>
-                )
+        switch (playerStatus[positionIndex]) {
+            case PlayerStatus.outside: {
+                return <foreignObject {...{
+                    x: span(5),
+                    y: span(8)
+                }}>
+                    <Button label={lang.prepare} onClick={() => frameEmitter.emit(MoveType.prepare)}/>
+                </foreignObject>
             }
-        </table>
+            case PlayerStatus.prepared: {
+                return <>
+                    <foreignObject {...{
+                        x: span(5),
+                        y: span(8)
+                    }}>
+                        <Input value={price} onChange={price => this.setState({price})}/>
+                    </foreignObject>
+                    <foreignObject {...{
+                        x: span(5),
+                        y: span(8.6)
+                    }}>
+                        <Button label={lang.shout} onClick={this.shout.bind(this)}/>
+                    </foreignObject>
+                </>
+            }
+            default:
+                return null
+        }
     }
 
     render() {
         const {
+            lang,
             props: {
-                game: {params: {groupSize}},
+                game: {params: {}},
                 gameState: {groups},
-                playerState: {role, groupIndex, privatePrices}
+                playerState: {groupIndex, positionIndex}
             }, state: {loading, newRoundTimers}
         } = this
         if (loading) {
@@ -116,36 +116,24 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         if (groupIndex === undefined) {
             return <MaskLoading label='正在匹配玩家...'/>
         }
+
         const {rounds, roundIndex} = groups[groupIndex],
-            newRoundTimer = newRoundTimers[roundIndex]
+            newRoundTimer = newRoundTimers[roundIndex],
+            {playerStatus} = rounds[roundIndex]
+
+        const playerState = playerStatus[positionIndex]
+
         return <section className={style.play}>
-            <div className={style.title}>集合竞价市场</div>
-            {newRoundTimer ? <div>
-                <div>本轮结束剩余时间</div>
-                <div className={style.highlight}>{NEW_ROUND_TIMER - newRoundTimer}</div>
-            </div> : null}
-            <div className={style.line}>
-                <div>游戏总人数</div>
-                <div className={style.highlight}>{groupSize}</div>
-            </div>
-            <div className={style.line}>
-                <div>游戏总轮数</div>
-                <div className={style.highlight}>{rounds.length}</div>
-            </div>
-            <div className={style.line}>
-                <div>正在进行轮次</div>
-                <div className={style.highlight}>{roundIndex + 1} </div>
-            </div>
-            <div className={style.line}>
-                <div>您的角色</div>
-                <div className={style.highlight}>{['买家', '卖家'][role]}</div>
-            </div>
-            <div className={style.line}>
-                <div>物品对于您的心理价值</div>
-                <div className={style.highlight}>{privatePrices[groups[groupIndex].roundIndex]}</div>
-            </div>
-            {this.dynamicAction()}
-            {this.dynamicResult()}
+            <Stage dev={false}>
+                {
+                    newRoundTimer ?
+                        <RoundSwitching msg={lang.toNewRound(NEW_ROUND_TIMER - newRoundTimer)}/> :
+                        <div>
+                            <Referee playerState={playerState} />
+                            {this.renderOperateWidget()}
+                        </div>
+                }
+            </Stage>
         </section>
     }
 
