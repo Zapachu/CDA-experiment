@@ -3,6 +3,7 @@ export const namespace = 'DoubleAuctionGraphical'
 export enum MoveType {
     prepare = 'prepare',
     shout = 'shout',
+    deal = 'deal',
     getPosition = 'getPosition',
 }
 
