@@ -123,7 +123,6 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         const {
             lang,
             props: {
-                game: {params: {groupSize}},
                 gameState: {groups},
                 playerState: {groupIndex, balances, positionIndex}
             }, state: {loading, newRoundTimers}
@@ -142,7 +141,9 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
 
         const playerState = playerStatus[positionIndex]
 
-        console.log(groupSize, balances, loading, newRoundTimer, rounds, playerState)
+        if (playerState === PlayerStatus.memberFull) {
+            return <MaskLoading label='满员...'/>
+        }
 
         return <section className={style.play}>
             <Stage dev={true}>

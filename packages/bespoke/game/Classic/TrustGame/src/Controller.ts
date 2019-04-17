@@ -43,12 +43,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     groupIndex = gameState.groups.push(group) - 1
                 }
 
-                console.log('Final groupIndex: ' + groupIndex)
-                console.log('groupsLength: ' + gameState.groups.length)
-                console.log('groups: ')
-                console.log(gameState.groups)
-                console.log('groupNum: ' + groupNum)
-
                 playerState.groupIndex = groupIndex
                 playerState.positionIndex = gameState.groups[groupIndex].playerNum++
 
@@ -56,7 +50,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
 
 
                 if (gameState.groups.length > groupNum) {
-                    rounds[roundIndex].playerStatus[rounds[roundIndex].currentPlayer] = PlayerStatus.memberFull
+                    rounds[roundIndex].playerStatus = Array(gameState.groups[groupIndex].playerNum).fill(PlayerStatus.memberFull)
                     break
                 }
 
