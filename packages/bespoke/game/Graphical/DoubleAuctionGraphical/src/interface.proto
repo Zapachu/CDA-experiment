@@ -27,8 +27,13 @@ message PushParams {
 
 message GameState {
     message Group {
+        message Board {
+            int32 position = 1;
+            int32 price = 2;
+        }
         message Round {
             repeated int32 playerStatus = 1;
+            repeated Board board = 2;
         }
         int32 roundIndex = 1;
         repeated Round rounds = 2;

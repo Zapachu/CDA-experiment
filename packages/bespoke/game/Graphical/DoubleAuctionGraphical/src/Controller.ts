@@ -34,7 +34,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         roundIndex: 0,
                         playerNum: 0,
                         rounds: Array(round).fill(null).map<GameState.Group.IRound>(() => ({
-                            playerStatus: Array(groupSize).fill(PlayerStatus.prepared)
+                            playerStatus: Array(groupSize).fill(PlayerStatus.outside)
                         }))
                     }
                     groupIndex = gameState.groups.push(group) - 1
@@ -44,8 +44,19 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 playerState.role = positions[playerState.positionIndex].role
                 playerState.privatePrices = positions[playerState.positionIndex].privatePrice
                 break
+            case MoveType.prepare: {
+                const {groupIndex, positionIndex} = playerState
+                const {rounds, roundIndex} = gameState.groups[groupIndex]
+                rounds[roundIndex].playerStatus[positionIndex] = PlayerStatus.prepared
+                break
+            }
             case MoveType.shout: {
                 console.log(playerStates)
+                // TODO Timer to Next Round
+                break
+            }
+            case MoveType.deal: {
+                // TODO Status to dealed
                 break
             }
         }
