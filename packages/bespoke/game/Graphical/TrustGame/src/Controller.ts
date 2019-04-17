@@ -21,7 +21,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
     }
 
     protected async playerMoveReducer(actor: IActor, type: string, params: IMoveParams, cb: IMoveCallback): Promise<void> {
-        const {game: {params: {group, groupParams, groupSize, round}}} = this
+        const {game: {params: {group: groupNum, groupParams, groupSize, round}}} = this
         const playerState = await this.stateManager.getPlayerState(actor),
             gameState = await this.stateManager.getGameState(),
             playerStates = await this.stateManager.getPlayerStates()
@@ -46,8 +46,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
 
                 const {rounds, roundIndex} = gameState.groups[groupIndex]
 
-                if (gameState.groups.length > group) {
-                    rounds[roundIndex].playerStatus[rounds[roundIndex].currentPlayer] = PlayerStatus.memberFull
+                if (gameState.groups.length > groupNum) {
+                    rounds[roundIndex].playerStatus = Array(gameState.groups[groupIndex].playerNum).fill(PlayerStatus.memberFull)
                     break
                 }
 
