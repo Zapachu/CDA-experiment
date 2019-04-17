@@ -31,7 +31,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     break
                 }
                 let groupIndex = gameState.groups.findIndex(({playerNum}) => playerNum < groupSize)
-                console.log('groupIndex find: ' + groupIndex)
                 if (groupIndex === -1) {
                     const group: GameState.IGroup = {
                         roundIndex: 0,
