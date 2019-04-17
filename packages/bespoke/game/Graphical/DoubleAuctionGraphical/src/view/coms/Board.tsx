@@ -27,7 +27,7 @@ const Board = ({playerState, board, role, dealIt}: any) => {
                             <div style={{
                                 display: 'flex',
                                 flex: 1,
-                                height: '100%;',
+                                height: '100%',
                                 borderRight: 'solid 5px #333',
                                 justifyContent: 'center'
                             }}>
@@ -36,7 +36,7 @@ const Board = ({playerState, board, role, dealIt}: any) => {
                             <div style={{
                                 display: 'flex',
                                 flex: 1,
-                                height: '100%;',
+                                height: '100%',
                                 justifyContent: 'center'
                             }}>
                                 买方
