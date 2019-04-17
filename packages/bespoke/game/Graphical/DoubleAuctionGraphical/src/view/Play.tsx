@@ -5,6 +5,8 @@ import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from 
 import {FetchType, MoveType, PushType, NEW_ROUND_TIMER, PlayerStatus} from '../config'
 import {Stage, Input, Button, RoundSwitching, span} from 'bespoke-game-graphical-util'
 
+import Role from './coms/Role'
+import Board from './coms/Board'
 import Referee from './coms/Referee'
 import Outside from './coms/Outside'
 import PutShadow from './coms/PutShadow'
@@ -68,39 +70,74 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             lang, props: {
                 frameEmitter,
                 gameState: {groups},
-                playerState: {groupIndex, positionIndex}
+                playerState: {groupIndex, positionIndex, role}
             }, state: {price}
         } = this
         const {rounds, roundIndex} = groups[groupIndex],
             {playerStatus} = rounds[roundIndex]
         switch (playerStatus[positionIndex]) {
             case PlayerStatus.outside: {
-                return <foreignObject {...{
-                    x: span(5),
-                    y: span(8)
-                }}>
-                    <Button label={lang.prepare} onClick={() => frameEmitter.emit(MoveType.prepare)}/>
-                </foreignObject>
-            }
-            case PlayerStatus.prepared: {
                 return <>
                     <foreignObject {...{
-                        x: span(5),
+                        x: span(2),
                         y: span(8)
                     }}>
-                        <Input value={price} onChange={price => this.setState({price})}/>
+                        <div style={{width: 100}}>
+                            <h2>卖方</h2>
+                        </div>
+                    </foreignObject>
+                    <foreignObject {...{
+                        x: span(7.6),
+                        y: span(8)
+                    }}>
+                        <div style={{width: 100}}>
+                            <h2>买方</h2>
+                        </div>
                     </foreignObject>
                     <foreignObject {...{
                         x: span(5),
-                        y: span(8.6)
+                        y: span(9)
                     }}>
-                        <Button label={lang.shout} onClick={this.shout.bind(this)}/>
+                        <Button label={lang.prepare} onClick={() => frameEmitter.emit(MoveType.prepare)}/>
                     </foreignObject>
                 </>
             }
-            default:
-                return null
+            case PlayerStatus.prepared: {
+                switch (role) {
+                    case 0:
+                        return <>
+                            <foreignObject {...{
+                                x: span(3),
+                                y: span(7)
+                            }}>
+                                <Input value={price} onChange={price => this.setState({price})}/>
+                            </foreignObject>
+                            <foreignObject {...{
+                                x: span(3),
+                                y: span(7.7)
+                            }}>
+                                <Button label={lang.shout} onClick={this.shout.bind(this)}/>
+                            </foreignObject>
+                        </>
+                    case 1:
+                        return <>
+                            <foreignObject {...{
+                                x: span(7),
+                                y: span(7)
+                            }}>
+                                <Input value={price} onChange={price => this.setState({price})}/>
+                            </foreignObject>
+                            <foreignObject {...{
+                                x: span(7),
+                                y: span(7.7)
+                            }}>
+                                <Button label={lang.shout} onClick={this.shout.bind(this)}/>
+                            </foreignObject>
+                        </>
+                }
+            }
         }
+        return null
     }
 
     render() {
@@ -109,7 +146,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             props: {
                 game: {params: {}},
                 gameState: {groups},
-                playerState: {groupIndex, positionIndex, role}
+                playerState: {groupIndex, positionIndex, role, privatePrices},
             }, state: {loading, newRoundTimers}
         } = this
         if (loading) {
@@ -121,8 +158,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
 
         const {rounds, roundIndex} = groups[groupIndex],
             newRoundTimer = newRoundTimers[roundIndex],
-            {playerStatus} = rounds[roundIndex],
-            {playing} = rounds[roundIndex]
+            {playerStatus, board} = rounds[roundIndex]
 
         const playerState = playerStatus[positionIndex]
 
@@ -132,9 +168,11 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                     newRoundTimer ?
                         <RoundSwitching msg={lang.toNewRound(NEW_ROUND_TIMER - newRoundTimer)}/> :
                         <>
+                            <PutShadow playerState={playerState} role={role}/>
                             <Referee playerState={playerState}/>
-                            <Outside playing={playing}/>
-                            <PutShadow playerState={playerState} playing={playing} role={role}/>
+                            <Outside playerState={playerState}/>
+                            <Role playerState={playerState} role={role} privatePrice={privatePrices[roundIndex]}/>
+                            <Board playerState={playerState} role={role} board={board}/>
                             {this.renderOperateWidget()}
                         </>
                 }

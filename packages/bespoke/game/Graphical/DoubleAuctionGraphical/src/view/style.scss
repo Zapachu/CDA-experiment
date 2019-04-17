@@ -47,49 +47,16 @@
     }
   }
 }
+
+
 .play {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  .line {
-    border-bottom: 1px solid rgba(49, 70, 89, 0.1);
-    width: 95%;
-    font-size: 1.3rem;
-    padding: .5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .highlight {
-    color: #4285f4;;
-  }
-  .title {
-    font-size: 2rem;
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1rem;
-  }
-  .profits {
-    margin-top: 3rem;
-    color: $color-black;
-    text-align: center;
-    td {
-      border: $borderLine;
-      width: 5rem;
-      height: 3rem;
-      a {
-        margin: 0 .3rem;
-      }
-      input {
-        width: 4rem;
-      }
-      &.readonly input {
-        border-bottom-color: transparent;
-      }
-    }
+  width: calc(99vh - 2rem);
+  margin: 2rem auto 0;
+  @media (max-width: $layout-mediaWidth) {
+    width: 100%;
   }
 }
+
 
 .result {
   margin: 2rem auto;

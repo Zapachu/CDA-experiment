@@ -1,50 +1,36 @@
 import {span} from 'bespoke-game-graphical-util'
 import * as React from "react"
+import {PlayerStatus} from '../../config'
 
-const Outside = ({playing}: { playing: boolean }) => {
-    const imgSrc = '../svgs/outsideMan'
-    if (playing) {
+const Outside = ({playerState}: { playerState: number }) => {
+    const imgSrc = require('../svgs/outsideMan.svg')
+    console.log(playerState)
+    if (playerState === PlayerStatus.outside) {
         return <>
-            <g transform={`translate(${span(2)},${span(6)})`}>
-                <image {...{href: imgSrc, width: span(2)}}/>
+            <g transform={`translate(${span(1)},${span(4)})`}>
+                <image {...{href: imgSrc, width: span(1)}}/>
             </g>
-            <g transform={`translate(${span(2.5)},${span(6.5)})`}>
-                <image {...{href: imgSrc, width: span(2)}}/>
+            <g transform={`translate(${span(2)},${span(4.5)})`}>
+                <image {...{href: imgSrc, width: span(1)}}/>
             </g>
-            <g transform={`translate(${span(3)},${span(6)})`}>
-                <image {...{href: imgSrc, width: span(2)}}/>
+            <g transform={`translate(${span(3)},${span(4)})`}>
+                <image {...{href: imgSrc, width: span(1)}}/>
             </g>
-            <g transform={`translate(${span(3.5)},${span(6.5)})`}>
-                <image {...{href: imgSrc, width: span(2)}}/>
+            <g transform={`translate(${span(4)},${span(4.5)})`}>
+                <image {...{href: imgSrc, width: span(1)}}/>
             </g>
-            <foreignObject {...{
-                x: span(3),
-                y: span(7)
-            }}>
-                <div>
-                    <h2>卖方</h2>
-                </div>
-            </foreignObject>
-            <g transform={`translate(${span(6)},${span(6)})`}>
-                <image {...{href: imgSrc, width: span(2)}}/>
+            <g transform={`translate(${span(6)},${span(4)})`}>
+                <image {...{href: imgSrc, width: span(1)}}/>
             </g>
-            <g transform={`translate(${span(6.5)},${span(6.5)})`}>
-                <image {...{href: imgSrc, width: span(2)}}/>
+            <g transform={`translate(${span(7)},${span(4.5)})`}>
+                <image {...{href: imgSrc, width: span(1)}}/>
             </g>
-            <g transform={`translate(${span(7)},${span(6)})`}>
-                <image {...{href: imgSrc, width: span(2)}}/>
+            <g transform={`translate(${span(8)},${span(4)})`}>
+                <image {...{href: imgSrc, width: span(1)}}/>
             </g>
-            <g transform={`translate(${span(7.5)},${span(6.5)})`}>
-                <image {...{href: imgSrc, width: span(2)}}/>
+            <g transform={`translate(${span(9)},${span(4.5)})`}>
+                <image {...{href: imgSrc, width: span(1)}}/>
             </g>
-            <foreignObject {...{
-                x: span(7),
-                y: span(7)
-            }}>
-                <div>
-                    <h2>买方</h2>
-                </div>
-            </foreignObject>
         </>
     }
     return null

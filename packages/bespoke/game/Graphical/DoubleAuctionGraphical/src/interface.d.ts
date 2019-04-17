@@ -723,9 +723,6 @@ export namespace GameState {
         /** Properties of a Round. */
         interface IRound {
 
-            /** Round playing */
-            playing?: (boolean|null);
-
             /** Round board */
             board?: (GameState.Group.IBoard[]|null);
 
@@ -741,9 +738,6 @@ export namespace GameState {
              * @param [properties] Properties to set
              */
             constructor(properties?: GameState.Group.IRound);
-
-            /** Round playing. */
-            public playing: boolean;
 
             /** Round board. */
             public board: GameState.Group.IBoard[];

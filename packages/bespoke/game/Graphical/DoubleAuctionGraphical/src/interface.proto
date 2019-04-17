@@ -33,9 +33,8 @@ message GameState {
             int32 position = 3;
         }
         message Round {
-            bool playing = 1;
-            repeated Board board = 2;
-            repeated int32 playerStatus = 3;
+            repeated Board board = 1;
+            repeated int32 playerStatus = 2;
         }
         int32 playerNum = 1;
         int32 roundIndex = 2;
