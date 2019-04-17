@@ -18,6 +18,7 @@ export enum PlayerStatus {
     outside,
     prepared,
     shouted,
+    dealed,
     gameOver,
 }
 

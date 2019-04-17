@@ -16,6 +16,7 @@ interface ICreateState {
     group: number
     groupParams: Array<IGroupParams>
     groupSize: number
+    readonly: boolean
 }
 
 export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> {
@@ -27,6 +28,7 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
         group: 2,
         groupParams: [{initialFunding: 100, magnification: 2}, {initialFunding: 100, magnification: 2}],
         groupSize: 2,
+        readonly: true,
     }
 
     setGroup = (e) => {
@@ -64,6 +66,12 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
         this.setState({magnification, groupParams})
     }
 
+    edit = () => {
+        const {props: {setSubmitable}} = this
+        this.setState({readonly: false})
+        setSubmitable(false)
+    }
+
     resetVal = (i, name, e) => {
         const {groupParams} = this.state
         const stringVal = e.target.value
@@ -78,18 +86,12 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
         const {setParams, setSubmitable} = this.props
         const {round, group, groupSize, groupParams} = this.state
         setParams({round, group, groupParams, groupSize})
-        setSubmitable(true)
-    }
-
-    componentDidMount(): void {
-        const {setParams, setSubmitable} = this.props
-        const {round, group, groupSize, groupParams} = this.state
-        setParams({round, group, groupParams, groupSize})
+        this.setState({readonly: true})
         setSubmitable(true)
     }
 
     render() {
-        const {round, group, groupParams, initialFunding, magnification} = this.state
+        const {round, group, groupParams, initialFunding, magnification, readonly} = this.state
         return <div className={style.create}>
             <ul className={style.configFields}>
                 <li>
@@ -149,6 +151,14 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
                     )
                 }
             </table>
+
+
+            <div className={style.btnSwitch}>
+                {
+                    readonly ? <a onClick={() => this.edit()}>重新编辑</a> :
+                        <a onClick={() => this.done()}>确认参数</a>
+                }
+            </div>
         </div>
     }
 }
