@@ -31,6 +31,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     break
                 }
                 let groupIndex = gameState.groups.findIndex(({playerNum}) => playerNum < groupSize)
+                console.log('groupIndex find: ' + groupIndex)
                 if (groupIndex === -1) {
                     const group: GameState.IGroup = {
                         roundIndex: 0,
@@ -41,19 +42,23 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     }
                     groupIndex = gameState.groups.push(group) - 1
                 }
+
+                console.log('Final groupIndex: ' + groupIndex)
+                console.log('groupsLength: ' + gameState.groups.length)
+                console.log('groups: ')
+                console.log(gameState.groups)
+                console.log('groupNum: ' + groupNum)
+
                 playerState.groupIndex = groupIndex
                 playerState.positionIndex = gameState.groups[groupIndex].playerNum++
 
                 const {rounds, roundIndex} = gameState.groups[groupIndex]
 
+
                 if (gameState.groups.length > groupNum) {
                     rounds[roundIndex].playerStatus[rounds[roundIndex].currentPlayer] = PlayerStatus.memberFull
                     break
                 }
-
-                console.log(gameState.groups)
-                console.log(groupIndex)
-                console.log(groupSize)
 
                 if (playerState.positionIndex === 0) {
                     playerState.balances[roundIndex] = groupParams[groupIndex].initialFunding

@@ -63,6 +63,9 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         if (playerState === PlayerStatus.prepared) {
             return <MaskLoading label='请等待其它玩家...'/>
         }
+        if (playerState === PlayerStatus.memberFull) {
+            return <MaskLoading label='满员...'/>
+        }
         if (playerState === PlayerStatus.shouted) {
             return <MaskLoading label='您已出价，请等待其他玩家...'/>
         }

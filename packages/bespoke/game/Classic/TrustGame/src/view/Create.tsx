@@ -81,6 +81,13 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
         setSubmitable(true)
     }
 
+    componentDidMount(): void {
+        const {setParams, setSubmitable} = this.props
+        const {round, group, groupSize, groupParams} = this.state
+        setParams({round, group, groupParams, groupSize})
+        setSubmitable(true)
+    }
+
     render() {
         const {round, group, groupParams, initialFunding, magnification} = this.state
         return <div className={style.create}>
