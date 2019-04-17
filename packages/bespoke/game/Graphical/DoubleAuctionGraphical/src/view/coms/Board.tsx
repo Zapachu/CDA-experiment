@@ -47,8 +47,8 @@ const Board = ({playerState, board, role, dealIt}: any) => {
             case 1:
                 return <>
                     <foreignObject {...{
-                        x: span(5),
-                        y: span(2.5)
+                        x: span(1),
+                        y: span(3.5)
                     }}>
                         <div style={{
                             width: 400,
@@ -65,7 +65,7 @@ const Board = ({playerState, board, role, dealIt}: any) => {
                             <div style={{
                                 display: 'flex',
                                 flex: 1,
-                                height: '100%;',
+                                height: '100%',
                                 borderRight: 'solid 5px #333',
                                 justifyContent: 'center'
                             }}>
@@ -74,7 +74,7 @@ const Board = ({playerState, board, role, dealIt}: any) => {
                             <div style={{
                                 display: 'flex',
                                 flex: 1,
-                                height: '100%;',
+                                height: '100%',
                                 justifyContent: 'center'
                             }}>
                                 买方
