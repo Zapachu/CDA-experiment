@@ -396,7 +396,7 @@ export namespace CreateParams {
 export interface IMoveParams {
 
     /** MoveParams preferences */
-    preferences?: (number|null);
+    preferences?: (number[]|null);
 }
 
 /** Represents a MoveParams. */
@@ -409,7 +409,7 @@ export class MoveParams implements IMoveParams {
     constructor(properties?: IMoveParams);
 
     /** MoveParams preferences. */
-    public preferences: number;
+    public preferences: number[];
 
     /**
      * Creates a new MoveParams instance using the specified properties.
@@ -485,6 +485,9 @@ export class MoveParams implements IMoveParams {
 /** Properties of a PushParams. */
 export interface IPushParams {
 
+    /** PushParams roundIndex */
+    roundIndex?: (number|null);
+
     /** PushParams newRoundTimer */
     newRoundTimer?: (number|null);
 }
@@ -497,6 +500,9 @@ export class PushParams implements IPushParams {
      * @param [properties] Properties to set
      */
     constructor(properties?: IPushParams);
+
+    /** PushParams roundIndex. */
+    public roundIndex: number;
 
     /** PushParams newRoundTimer. */
     public newRoundTimer: number;
@@ -670,6 +676,9 @@ export namespace GameState {
         /** Group roundIndex */
         roundIndex?: (number|null);
 
+        /** Group rounds */
+        rounds?: (GameState.Group.IRound[]|null);
+
         /** Group playerNum */
         playerNum?: (number|null);
     }
@@ -685,6 +694,9 @@ export namespace GameState {
 
         /** Group roundIndex. */
         public roundIndex: number;
+
+        /** Group rounds. */
+        public rounds: GameState.Group.IRound[];
 
         /** Group playerNum. */
         public playerNum: number;
@@ -758,6 +770,204 @@ export namespace GameState {
          * @returns JSON object
          */
         public toJSON(): { [k: string]: any };
+    }
+
+    namespace Group {
+
+        /** Properties of a Round. */
+        interface IRound {
+
+            /** Round playerStatus */
+            playerStatus?: (number[]|null);
+
+            /** Round matchResults */
+            matchResults?: (GameState.Group.Round.IMatchResult[]|null);
+        }
+
+        /** Represents a Round. */
+        class Round implements IRound {
+
+            /**
+             * Constructs a new Round.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: GameState.Group.IRound);
+
+            /** Round playerStatus. */
+            public playerStatus: number[];
+
+            /** Round matchResults. */
+            public matchResults: GameState.Group.Round.IMatchResult[];
+
+            /**
+             * Creates a new Round instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Round instance
+             */
+            public static create(properties?: GameState.Group.IRound): GameState.Group.Round;
+
+            /**
+             * Encodes the specified Round message. Does not implicitly {@link GameState.Group.Round.verify|verify} messages.
+             * @param message Round message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: GameState.Group.IRound, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified Round message, length delimited. Does not implicitly {@link GameState.Group.Round.verify|verify} messages.
+             * @param message Round message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: GameState.Group.IRound, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Round message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Round
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): GameState.Group.Round;
+
+            /**
+             * Decodes a Round message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns Round
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): GameState.Group.Round;
+
+            /**
+             * Verifies a Round message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a Round message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns Round
+             */
+            public static fromObject(object: { [k: string]: any }): GameState.Group.Round;
+
+            /**
+             * Creates a plain object from a Round message. Also converts values to other types if specified.
+             * @param message Round
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: GameState.Group.Round, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this Round to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+        }
+
+        namespace Round {
+
+            /** Properties of a MatchResult. */
+            interface IMatchResult {
+
+                /** MatchResult index */
+                index?: (number|null);
+
+                /** MatchResult price */
+                price?: (number|null);
+            }
+
+            /** Represents a MatchResult. */
+            class MatchResult implements IMatchResult {
+
+                /**
+                 * Constructs a new MatchResult.
+                 * @param [properties] Properties to set
+                 */
+                constructor(properties?: GameState.Group.Round.IMatchResult);
+
+                /** MatchResult index. */
+                public index: number;
+
+                /** MatchResult price. */
+                public price: number;
+
+                /**
+                 * Creates a new MatchResult instance using the specified properties.
+                 * @param [properties] Properties to set
+                 * @returns MatchResult instance
+                 */
+                public static create(properties?: GameState.Group.Round.IMatchResult): GameState.Group.Round.MatchResult;
+
+                /**
+                 * Encodes the specified MatchResult message. Does not implicitly {@link GameState.Group.Round.MatchResult.verify|verify} messages.
+                 * @param message MatchResult message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encode(message: GameState.Group.Round.IMatchResult, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Encodes the specified MatchResult message, length delimited. Does not implicitly {@link GameState.Group.Round.MatchResult.verify|verify} messages.
+                 * @param message MatchResult message or plain object to encode
+                 * @param [writer] Writer to encode to
+                 * @returns Writer
+                 */
+                public static encodeDelimited(message: GameState.Group.Round.IMatchResult, writer?: $protobuf.Writer): $protobuf.Writer;
+
+                /**
+                 * Decodes a MatchResult message from the specified reader or buffer.
+                 * @param reader Reader or buffer to decode from
+                 * @param [length] Message length if known beforehand
+                 * @returns MatchResult
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): GameState.Group.Round.MatchResult;
+
+                /**
+                 * Decodes a MatchResult message from the specified reader or buffer, length delimited.
+                 * @param reader Reader or buffer to decode from
+                 * @returns MatchResult
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): GameState.Group.Round.MatchResult;
+
+                /**
+                 * Verifies a MatchResult message.
+                 * @param message Plain object to verify
+                 * @returns `null` if valid, otherwise the reason why it is not
+                 */
+                public static verify(message: { [k: string]: any }): (string|null);
+
+                /**
+                 * Creates a MatchResult message from a plain object. Also converts values to their respective internal types.
+                 * @param object Plain object
+                 * @returns MatchResult
+                 */
+                public static fromObject(object: { [k: string]: any }): GameState.Group.Round.MatchResult;
+
+                /**
+                 * Creates a plain object from a MatchResult message. Also converts values to other types if specified.
+                 * @param message MatchResult
+                 * @param [options] Conversion options
+                 * @returns Plain object
+                 */
+                public static toObject(message: GameState.Group.Round.MatchResult, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+                /**
+                 * Converts this MatchResult to JSON.
+                 * @returns JSON object
+                 */
+                public toJSON(): { [k: string]: any };
+            }
+        }
     }
 }
 
@@ -874,8 +1084,8 @@ export namespace PlayerState {
         /** Round preferences */
         preferences?: (number[]|null);
 
-        /** Round matchResult */
-        matchResult?: (number|null);
+        /** Round submitTime */
+        submitTime?: (number|null);
     }
 
     /** Represents a Round. */
@@ -893,8 +1103,8 @@ export namespace PlayerState {
         /** Round preferences. */
         public preferences: number[];
 
-        /** Round matchResult. */
-        public matchResult: number;
+        /** Round submitTime. */
+        public submitTime: number;
 
         /**
          * Creates a new Round instance using the specified properties.

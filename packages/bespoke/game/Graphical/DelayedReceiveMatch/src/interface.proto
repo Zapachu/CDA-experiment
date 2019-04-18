@@ -18,16 +18,26 @@ message CreateParams {
 }
 
 message MoveParams {
-    int32 preferences = 1;
+    repeated int32 preferences = 1;
 }
 
 message PushParams {
-    int32 newRoundTimer = 3;
+    int32 roundIndex = 1;
+    int32 newRoundTimer = 2;
 }
 
 message GameState {
     message Group {
+        message Round {
+            message MatchResult {
+                int32 index = 1;
+                int32 price = 2;
+            }
+            repeated int32 playerStatus = 1;
+            repeated MatchResult matchResults = 2;
+        }
         int32 roundIndex = 1;
+        repeated Round rounds = 2;
         int32 playerNum = 3;
     }
     repeated Group groups = 1;
@@ -37,7 +47,7 @@ message PlayerState {
     message Round {
         repeated int32 privatePrices = 1;
         repeated int32 preferences = 2;
-        int32 matchResult = 3;
+        int32 submitTime = 3;
     }
     int32 groupIndex = 1;
     int32 positionIndex = 2;
