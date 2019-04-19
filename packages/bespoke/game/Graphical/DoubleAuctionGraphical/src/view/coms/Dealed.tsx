@@ -8,14 +8,14 @@ const Role = ({playerState, role}: { playerState: number, role: number }) => {
         switch (role) {
             case 0:
                 return <>
-                    <g transform={`translate(${span(1)},${span(4)})`}>
-                        <image {...{href: dealedSrc, width: span(1)}}/>
+                    <g transform={`translate(${span(3)},${span(6)})`}>
+                        <image {...{href: dealedSrc, width: span(1.5)}}/>
                     </g>
                 </>
             case 1:
                 return <>
-                    <g transform={`translate(${span(8)},${span(4)})`}>
-                        <image {...{href: dealedSrc, width: span(1)}}/>
+                    <g transform={`translate(${span(6)},${span(6)})`}>
+                        <image {...{href: dealedSrc, width: span(1.5)}}/>
                     </g>
                 </>
             default:

@@ -47,7 +47,10 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
         const role = i % 2
         return {
             role,
-            privatePrice: Array(round).fill(null).map(() => this.genRan([{L: buyerPriceStart, H: buyerPriceEnd}, {L: sellerPriceStart, H: sellerPriceEnd}][role]))
+            privatePrice: Array(round).fill(null).map(() => this.genRan([{
+                L: buyerPriceStart,
+                H: buyerPriceEnd
+            }, {L: sellerPriceStart, H: sellerPriceEnd}][role]))
         }
     }
 
@@ -85,7 +88,7 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
 
     setGroupSize = (e) => {
         const val = parseInt(e.target.value)
-        this.setState({groupSize: val % 2 === 0 ? val + 1 : val})
+        this.setState({groupSize: val % 2 === 0 ? val : val + 1})
     }
 
     setCountdown = (e) => {
@@ -171,7 +174,7 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
                             <td>
                                 {
                                     v.privatePrice.map((v1, i1) =>
-                                        <li key={`pv-${i}-${i1}`} >
+                                        <li key={`pv-${i}-${i1}`}>
                                             <Label label={`第 ${i1 + 1} 轮`}/>
                                             <Input type='number' value={v1}
                                                    onChange={this.resetPrivatePrice.bind(this, i, i1)}/>

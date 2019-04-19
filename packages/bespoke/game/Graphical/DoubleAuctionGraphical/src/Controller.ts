@@ -89,7 +89,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     }, 1000)
                 }
 
-                if (playerStatus.filter(p => p === PlayerStatus.shouted).length === 1) {
+                if (playerStatus.filter(p => p === PlayerStatus.shouted).length === 1 && playerStatus.filter(p => p === PlayerStatus.prepared).length === playerStatus.length - 1) {
                     let timeAcc = 1
                     const countdownInterval = global.setInterval(async () => {
                         groupPlayerStates.forEach(({actor}) => this.push(actor, PushType.countdown, {
@@ -116,7 +116,29 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 playerStatus[params.position] = PlayerStatus.dealed
                 playerState.profits[roundIndex] = playerState.privatePrices[roundIndex] - params.price
                 groupPlayerStates[params.position].profits[roundIndex] = groupPlayerStates[params.position].privatePrices[roundIndex] - playerState.prices[roundIndex]
+                const curBoardIdx = rounds[roundIndex].board.findIndex(b => b.position === params.position)
+                rounds[roundIndex].board[curBoardIdx].deal = true
                 await this.stateManager.syncState()
+                if (playerStatus.every(p => p === PlayerStatus.dealed)) {
+                    if (roundIndex == rounds.length - 1) {
+                        for (let i in playerStatus) playerStatus[i] = PlayerStatus.gameOver
+                        await this.stateManager.syncState()
+                        return
+                    }
+                    let newRoundTimer = 1
+                    const newRoundInterval = global.setInterval(async () => {
+                        groupPlayerStates.forEach(({actor}) => this.push(actor, PushType.newRoundTimer, {
+                            roundIndex,
+                            newRoundTimer
+                        }))
+                        if (newRoundTimer++ < NEW_ROUND_TIMER) {
+                            return
+                        }
+                        global.clearInterval(newRoundInterval)
+                        groupState.roundIndex++
+                        await this.stateManager.syncState()
+                    }, 1000)
+                }
                 break
             }
         }

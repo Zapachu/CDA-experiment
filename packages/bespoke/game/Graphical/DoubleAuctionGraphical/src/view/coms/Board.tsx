@@ -47,6 +47,9 @@ const Board = ({playerState, board = [], role, dealIt, positionIndex}: IBoard) =
     }
 
     const genCursor = (boardItem, role, positionIndex) => {
+        if (playerState === PlayerStatus.dealed) {
+            return 'no-drop'
+        }
         if (boardItem.deal) {
             return 'no-drop'
         }
@@ -60,39 +63,46 @@ const Board = ({playerState, board = [], role, dealIt, positionIndex}: IBoard) =
     }
 
     const dealItFunc = (position, price) => {
+        if (playerState === PlayerStatus.dealed) {
+            return
+        }
         dealIt(position, price)
     }
 
     const ListBuyer = (board = [], role, positionIndex) => {
-        return board.filter(b => b && b.role === 1).map(b =>
-            <div style={{
-                color: genColor(b),
-                margin: '1rem',
-                border: genBorder(b),
-                padding: '.3rem 3rem',
-                borderRadius: '.5rem',
-                background: genBG(b, role, positionIndex),
-                cursor: genCursor(b, role, positionIndex)
-            }}
-                 onClick={(b.role !== role && !b.deal) ? dealItFunc.bind(this, b.position, b.price) : () => {
-                 }}
+        return board.filter(b => b && b.role === 1).map((b, i) =>
+            <div
+                key={`listBuyer${i}`}
+                style={{
+                    color: genColor(b),
+                    margin: '1rem',
+                    border: genBorder(b),
+                    padding: '.3rem 3rem',
+                    borderRadius: '.5rem',
+                    background: genBG(b, role, positionIndex),
+                    cursor: genCursor(b, role, positionIndex)
+                }}
+                onClick={(b.role !== role && !b.deal) ? dealItFunc.bind(this, b.position, b.price) : () => {
+                }}
             >
                 {b.price}
             </div>)
     }
     const ListSeller = (board = [], role, positionIndex) => {
-        return board.filter(b => b && b.role === 0).map(b =>
-            <div style={{
-                color: genColor(b),
-                margin: '1rem',
-                border: genBorder(b),
-                padding: '.3rem 3rem',
-                borderRadius: '.5rem',
-                background: genBG(b, role, positionIndex),
-                cursor: genCursor(b, role, positionIndex)
-            }}
-                 onClick={(b.role !== role && !b.deal) ? dealItFunc.bind(this, b.position, b.price) : () => {
-                 }}
+        return board.filter(b => b && b.role === 0).map((b, i) =>
+            <div
+                key={`listSeller${i}`}
+                style={{
+                    color: genColor(b),
+                    margin: '1rem',
+                    border: genBorder(b),
+                    padding: '.3rem 3rem',
+                    borderRadius: '.5rem',
+                    background: genBG(b, role, positionIndex),
+                    cursor: genCursor(b, role, positionIndex)
+                }}
+                onClick={(b.role !== role && !b.deal) ? dealItFunc.bind(this, b.position, b.price) : () => {
+                }}
             >
                 {b.price}
             </div>)
