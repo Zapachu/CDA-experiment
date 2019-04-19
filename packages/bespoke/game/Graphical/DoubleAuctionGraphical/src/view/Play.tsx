@@ -8,6 +8,7 @@ import {Button, Input, RoundSwitching, span, Stage} from 'bespoke-game-graphical
 import Tip from './coms/Tip'
 import Role from './coms/Role'
 import Board from './coms/Board'
+import Dialog from './coms/Dialog'
 import Dealed from './coms/Dealed'
 import Referee from './coms/Referee'
 import Outside from './coms/Outside'
@@ -16,6 +17,8 @@ import PutShadow from './coms/PutShadow'
 interface IPlayState {
     price: string
     loading: boolean
+    dealDialog: boolean
+    dealObj: { price: number, position: number }
     countdowns: Array<number>
     newRoundTimers: Array<number>
 }
@@ -24,6 +27,8 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     state = {
         price: '',
         loading: true,
+        dealDialog: false,
+        dealObj: {price: 0, position: 0},
         countdowns: [],
         newRoundTimers: []
     }
@@ -154,12 +159,25 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
 
     dealIt = (position, price) => {
         console.log(position, price)
-        const {
-            props: {
-                frameEmitter,
+        this.setState({
+            dealDialog: true,
+            dealObj: {
+                price,
+                position
             }
-        } = this
-        frameEmitter.emit(MoveType.deal, {position, price})
+        })
+    }
+
+    dealDone = (position, price, status) => {
+        if (status) {
+            const {
+                props: {
+                    frameEmitter,
+                }
+            } = this
+            frameEmitter.emit(MoveType.deal, {position, price})
+        }
+        this.setState({dealDialog: false})
     }
 
     render() {
@@ -169,7 +187,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 game: {params: {countdown: roundTime}},
                 gameState: {groups},
                 playerState: {groupIndex, positionIndex, role, privatePrices},
-            }, state: {loading, newRoundTimers, countdowns}
+            }, state: {loading, newRoundTimers, countdowns, dealDialog, dealObj}
         } = this
         if (loading) {
             return <MaskLoading label='加载中...'/>
@@ -198,6 +216,8 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                                    dealIt={this.dealIt.bind(this)}/>
                             <Tip playerState={playerState} role={role} countdown={countdown} roundTime={roundTime}/>
                             <Dealed playerState={playerState} role={role}/>
+                            <Dialog dealDialog={dealDialog} position={dealObj.position} price={dealObj.price}
+                                    dealDone={this.dealDone.bind(this)} role={role}/>
                             {this.renderOperateWidget()}
                         </>
                 }

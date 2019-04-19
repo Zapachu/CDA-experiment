@@ -747,6 +747,9 @@ export namespace GameState {
         /** Properties of a Round. */
         interface IRound {
 
+            /** Round hasTimer */
+            hasTimer?: (boolean|null);
+
             /** Round board */
             board?: (GameState.Group.IBoard[]|null);
 
@@ -762,6 +765,9 @@ export namespace GameState {
              * @param [properties] Properties to set
              */
             constructor(properties?: GameState.Group.IRound);
+
+            /** Round hasTimer. */
+            public hasTimer: boolean;
 
             /** Round board. */
             public board: GameState.Group.IBoard[];

@@ -1,8 +1,8 @@
 import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from "bespoke-server"
 import {ICreateParams, IGameState, IPlayerState, IPushParams, IMoveParams} from "./interface"
 import {MoveType, PushType, FetchType, PlayerStatus} from './config'
-import {GameState} from "./interface"
-import {NEW_ROUND_TIMER} from "../../../Classic/TogetherBidMarket/src/config";
+import {GameState} from './interface'
+import {NEW_ROUND_TIMER} from './config'
 
 export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
     initGameState(): TGameState<IGameState> {
@@ -89,7 +89,9 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     }, 1000)
                 }
 
-                if (playerStatus.filter(p => p === PlayerStatus.shouted).length === 1 && playerStatus.filter(p => p === PlayerStatus.prepared).length === playerStatus.length - 1) {
+                // the first one shout and start countdown
+                if (!rounds[roundIndex].hasTimer) {
+                    rounds[roundIndex].hasTimer = true
                     let timeAcc = 1
                     const countdownInterval = global.setInterval(async () => {
                         groupPlayerStates.forEach(({actor}) => this.push(actor, PushType.countdown, {
@@ -112,19 +114,37 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     {rounds, roundIndex} = groupState,
                     {playerStatus} = rounds[roundIndex],
                     groupPlayerStates = Object.values(playerStates).filter(s => s.groupIndex === groupIndex)
+
+                // status change
                 playerStatus[positionIndex] = PlayerStatus.dealed
                 playerStatus[params.position] = PlayerStatus.dealed
+
+                // profit calculate
                 playerState.profits[roundIndex] = playerState.privatePrices[roundIndex] - params.price
                 groupPlayerStates[params.position].profits[roundIndex] = groupPlayerStates[params.position].privatePrices[roundIndex] - playerState.prices[roundIndex]
+
+                // find board item
                 const curBoardIdx = rounds[roundIndex].board.findIndex(b => b.position === params.position)
-                rounds[roundIndex].board[curBoardIdx].deal = true
+                const targetBoardIdx = rounds[roundIndex].board.findIndex(b => b.position === positionIndex)
+
+                // mark board item as deal = true
+                if (curBoardIdx !== -1) rounds[roundIndex].board[curBoardIdx].deal = true
+                if (targetBoardIdx !== -1) rounds[roundIndex].board[targetBoardIdx].deal = true
+
+                // synchronized status
                 await this.stateManager.syncState()
+
+                // if everyone dealed, jump to next round
                 if (playerStatus.every(p => p === PlayerStatus.dealed)) {
+
+                    // if all rounds over, synchronize all players status as game over
                     if (roundIndex == rounds.length - 1) {
                         for (let i in playerStatus) playerStatus[i] = PlayerStatus.gameOver
                         await this.stateManager.syncState()
                         return
                     }
+
+                    // timer to next round
                     let newRoundTimer = 1
                     const newRoundInterval = global.setInterval(async () => {
                         groupPlayerStates.forEach(({actor}) => this.push(actor, PushType.newRoundTimer, {
