@@ -109,7 +109,7 @@ function GoodBorder({width, height}: { width: number, height: number }) {
     }}/>
 }
 
-const ROW_SIZE = 4, PLAYER_POSITION = 6
+const ROW_SIZE = 4, PLAYER_POSITION = 0
 
 interface IPlayState {
     preferences: Array<number>
@@ -218,6 +218,12 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                     )
                 }
             </g>
+            <g transform={`translate(${span(6)},${span(-1.5)})`}>
+                <foreignObject>
+                    <div style={{position: 'fixed'}}>
+                    </div>
+                </foreignObject>
+            </g>
         </g>
     }
 
@@ -230,7 +236,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 Array(groupSize).fill(null)
                     .map((_, i) => ({
                         i,
-                        j: i === PLAYER_POSITION ? positionIndex : i === positionIndex ? PLAYER_POSITION : i
+                        j: (groupSize - 1) - (i === PLAYER_POSITION ? positionIndex : i === positionIndex ? PLAYER_POSITION : i)
                     }))
                     .sort(({j: j1}, {j: j2}) => j1 - j2)
                     .map(({i, j}) =>
