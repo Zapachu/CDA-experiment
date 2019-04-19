@@ -1,5 +1,5 @@
 import {registerOnFramework} from 'bespoke-client-util'
-import {namespace} from '../../../../Classic/TrustGame/src/config'
+import {namespace} from '../config'
 import {Create} from '../../../../Classic/TrustGame/src/view/Create'
 import {CreateOnElf} from '../../../../Classic/TrustGame/src/view/CreateOnElf'
 import {Result} from '../../../../Classic/TrustGame/src/view/Result'

@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+message CreateParams {
+    message Position {
+        int32 role = 1;
+        repeated int32 privatePrice = 2;
+    }
+    int32 round = 1;
+    int32 groupSize = 2;
+    int32 buyerPriceStart = 3;
+    int32 buyerPriceEnd = 4;
+    int32 sellerPriceStart = 5;
+    int32 sellerPriceEnd = 6;
+    int32 InitMoney = 7;
+    repeated Position positions = 8;
+    string nextPhaseKey = 9;
+    int32 countdown = 10;
+}
+
+message MoveParams {
+    int32 price = 1;
+    int32 position = 2;
+}
+
+message PushParams {
+    int32 roundIndex = 1;
+    int32 newRoundTimer = 2;
+    int32 countdown = 3;
+}
+
+message GameState {
+    message Group {
+        message Board {
+            bool deal = 1;
+            int32 role = 2;
+            int32 price = 3;
+            int32 position = 4;
+        }
+        message Round {
+            bool hasTimer = 1;
+            repeated Board board = 2;
+            repeated int32 playerStatus = 3;
+        }
+        int32 playerNum = 1;
+        int32 roundIndex = 2;
+        repeated Round rounds = 3;
+    }
+    repeated Group groups = 1;
+}
+
+message PlayerState {
+    int32 groupIndex = 1;
+    int32 positionIndex = 2;
+    repeated int32 privatePrices = 3;
+    repeated int32 prices = 4;
+    repeated int32 profits = 5;
+    int32 role = 6;
+}

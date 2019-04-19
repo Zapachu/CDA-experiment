@@ -1,6 +1,6 @@
 import {resolve} from 'path'
 import {geneClientBuilder} from 'bespoke-client-util/build/buildGame'
-import {namespace} from '../../../Classic/TrustGame/src/config'
+import {namespace} from '../src/config'
 
 export = geneClientBuilder({
     namespace,
