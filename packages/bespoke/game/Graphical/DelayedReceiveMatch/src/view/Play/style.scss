@@ -1,9 +1,10 @@
 @import "~bespoke-client-util/lib/resource/public";
 
 .play {
-  width: calc(99vh - 2rem);
-  margin: 2rem auto 0;
+  position: relative;
+  width: 99vh;
+  margin: auto;
   @media (max-width: $layout-mediaWidth) {
-    width: 100%;
+    width: 100vw;
   }
 }

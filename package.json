@@ -67,6 +67,7 @@
     "qrcode.react": "^0.9.3",
     "rc-switch": "^1.9.0",
     "react": "^16.8.4",
+    "react-beautiful-dnd": "^11.0.0",
     "react-dom": "^16.8.4",
     "react-router-dom": "^4.3.1",
     "react-spring": "^8.0.15",

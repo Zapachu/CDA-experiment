@@ -1,7 +1,8 @@
 import * as React from 'react'
 import './style.scss'
 
-const CELL_SIZE = 100, STAGE_COL = 10, STAGE_SIZE = span(STAGE_COL)
+const CELL_SIZE = 100, STAGE_COL = 10
+export const STAGE_SIZE = span(STAGE_COL)
 
 export function span(n: number | string) {
     return CELL_SIZE * +n

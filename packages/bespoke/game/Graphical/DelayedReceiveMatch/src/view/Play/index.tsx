@@ -1,9 +1,16 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {Core, Lang, MaskLoading} from 'bespoke-client-util'
-import {Button, Host, ImgLoader, RoundSwitching, Shadow, span, Stage} from 'bespoke-game-graphical-util'
+import {DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd'
+import {Button, Host, ImgLoader, RoundSwitching, Shadow, span, Stage, STAGE_SIZE} from 'bespoke-game-graphical-util'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, GameState} from '../../interface'
 import {FetchType, MoveType, PlayerStatus, PushType, NEW_ROUND_TIMER} from '../../config'
+
+function spanDom(n: number | string) {
+    const {innerHeight, innerWidth} = window
+    const viewSize = innerHeight < innerWidth ? .99 * innerHeight : innerWidth
+    return viewSize / STAGE_SIZE * span(n)
+}
 
 function Player({active, showBack, matched}: {
     active: boolean
@@ -97,6 +104,7 @@ function Good({index, price, scale = 1}: { index: number, price: number, scale?:
     }/>
 }
 
+/*
 function GoodBorder({width, height}: { width: number, height: number }) {
     return <rect {...{
         width,
@@ -108,6 +116,7 @@ function GoodBorder({width, height}: { width: number, height: number }) {
         fill: 'transparent'
     }}/>
 }
+*/
 
 const ROW_SIZE = 4, PLAYER_POSITION = 0
 
@@ -147,18 +156,18 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
 
     submit() {
         const {props: {frameEmitter}, state: {preferences}} = this
-        console.log(preferences)
-        frameEmitter.emit(MoveType.submit, {preferences: [1, 3, 4, 6, 7, 2, 5, 0]})
+        frameEmitter.emit(MoveType.submit, {preferences})
     }
 
     render(): React.ReactNode {
-        const {lang, props: {gameState: {groups}, playerState: {groupIndex, positionIndex}}, state: {newRoundTimers}} = this
+        const {lang, props: {gameState: {groups}, playerState: {groupIndex, positionIndex, rounds: playerRounds}}, state: {newRoundTimers}} = this
         if (groupIndex === undefined) {
             return <MaskLoading label={lang.matchPlayers}/>
         }
-        const {rounds, roundIndex} = groups[groupIndex],
+        const {rounds: groupRounds, roundIndex} = groups[groupIndex],
             newRoundTimer = newRoundTimers[roundIndex],
-            {playerStatus} = rounds[roundIndex]
+            {playerStatus} = groupRounds[roundIndex],
+            {privatePrices} = playerRounds[roundIndex]
         return <section className={style.play}>
             <Stage dev={true}>
                 {
@@ -190,40 +199,17 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                         </>
                 }
             </Stage>
+            {
+                playerStatus[positionIndex] === PlayerStatus.prepared ?
+                    <Preference privatePrices={privatePrices}
+                                setPreferences={preferences => this.setState({preferences})}/> : null
+            }
         </section>
     }
 
     renderPlay() {
-        const BOX_SCALE = .8
-        const {props: {gameState: {groups}, playerState: {groupIndex, rounds}}} = this
-        const {roundIndex} = groups[groupIndex],
-            {privatePrices} = rounds[roundIndex]
         return <g transform={`translate(${span(1.2)},${span(3.5)})`}>
             <image href={require('./img/playerSide.svg')}/>
-            <g transform={`translate(${span(6)},${span(-1.5)})`}>
-                {
-                    privatePrices.map((price, index) =>
-                        <g transform={`translate(0,${span(index - .05)})`}>
-                            <GoodBorder width={span(1.5)} height={span(BOX_SCALE)}/>
-                        </g>
-                    )
-                }
-            </g>
-            <g transform={`translate(${span(5)},${span(-1.5)})`}>
-                {
-                    privatePrices.map((price, index) =>
-                        <g transform={`translate(0,${span(index)})`}>
-                            <Good {...{index, price, scale: BOX_SCALE}}/>
-                        </g>
-                    )
-                }
-            </g>
-            <g transform={`translate(${span(6)},${span(-1.5)})`}>
-                <foreignObject>
-                    <div style={{position: 'fixed'}}>
-                    </div>
-                </foreignObject>
-            </g>
         </g>
     }
 
@@ -276,3 +262,202 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         }
     }
 }
+
+//region
+
+// fake data generator
+const reorder = (list, startIndex, endIndex) => {
+    const result = Array.from(list)
+    const [removed] = result.splice(startIndex, 1)
+    result.splice(endIndex, 0, removed)
+
+    return result
+}
+
+const move = (source, destination, droppableSource, droppableDestination) => {
+    const sourceClone = Array.from(source)
+    const destClone = Array.from(destination)
+    const [removed] = sourceClone.splice(droppableSource.index, 1)
+
+    destClone.splice(droppableDestination.index, 0, removed)
+
+    const result = {}
+    result[droppableSource.droppableId] = sourceClone
+    result[droppableDestination.droppableId] = destClone
+
+    return result
+}
+
+const getItemStyle = (isDragging, draggableStyle) => ({
+    userSelect: 'none',
+    background: `url(${require('./img/box.svg')}) no-repeat`,
+    backgroundSize: 'contain',
+    height: '4rem',
+    marginTop: '.5rem',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontSize: '1.5rem',
+    ...draggableStyle
+})
+const listStyle = {
+    marginLeft: spanDom(.2),
+    padding: '.5rem',
+    width: spanDom(1),
+    minHeight: `${spanDom(4)}px`
+}
+
+interface IPreferenceState {
+    items: Array<{
+        id: string
+        content: string
+    }>,
+    selected
+}
+
+enum Container {
+    droppable = 'droppable',
+    droppable2 = 'droppable2'
+}
+
+interface IPreferenceProps {
+    privatePrices: Array<number>
+    setPreferences: (preferences: Array<number>) => void
+}
+
+export class Preference extends React.Component<IPreferenceProps, IPreferenceState> {
+    constructor(props: IPreferenceProps) {
+        super(props)
+        this.state = {
+            items: props.privatePrices.map((price, i) => ({
+                id: i.toString(),
+                content: price.toString()
+            })),
+            selected: []
+        }
+    }
+
+    getList(id: Container) {
+        const {state: {items, selected}} = this
+        return id === Container.droppable ? items : selected
+    }
+
+    onDragEnd(result: {
+        source: {
+            index: number
+            droppableId: Container
+        },
+        destination?: {
+            index: number
+            droppableId: Container
+        }
+    }) {
+        const {source, destination} = result
+
+        if (!destination) {
+            return
+        }
+        let newState
+        if (source.droppableId === destination.droppableId) {
+            const items = reorder(
+                this.getList(source.droppableId),
+                source.index,
+                destination.index
+            )
+
+            let state = {items}
+
+            if (source.droppableId === Container.droppable2) {
+                state = {selected: items} as any
+            }
+            newState = state
+        } else {
+            const result = move(
+                this.getList(source.droppableId),
+                this.getList(destination.droppableId),
+                source,
+                destination
+            ) as any
+            newState = {
+                items: result.droppable,
+                selected: result.droppable2
+            }
+        }
+        this.setState(newState)
+        this.props.setPreferences({...this.state, ...newState}.selected.map(({id}) => +id))
+    }
+
+    render() {
+        return <div style={{
+            position: 'absolute',
+            display: 'flex',
+            top: spanDom(2),
+            left: spanDom(5.5)
+        }}>
+            <DragDropContext onDragEnd={result => this.onDragEnd(result)}>
+                <Droppable droppableId={Container.droppable}>
+                    {provided => (
+                        <div
+                            ref={provided.innerRef}
+                            style={listStyle}>
+                            {this.state.items.map((item, index) => (
+                                <Draggable
+                                    key={item.id}
+                                    draggableId={item.id}
+                                    index={index}>
+                                    {(provided, snapshot) => (
+                                        <div
+                                            ref={provided.innerRef}
+                                            {...provided.draggableProps}
+                                            {...provided.dragHandleProps}
+                                            style={getItemStyle(
+                                                snapshot.isDragging,
+                                                provided.draggableProps.style
+                                            )}>
+                                            {item.content}
+                                        </div>
+                                    )}
+                                </Draggable>
+                            ))}
+                            {provided.placeholder}
+                        </div>
+                    )}
+                </Droppable>
+                <Droppable droppableId={Container.droppable2}>
+                    {provided => (
+                        <div
+                            ref={provided.innerRef}
+                            style={{
+                                ...listStyle,
+                                border: '2px solid #333',
+                                borderRadius: '.5rem'
+                            }}>
+                            {this.state.selected.map((item, index) => (
+                                <Draggable
+                                    key={item.id}
+                                    draggableId={item.id}
+                                    index={index}>
+                                    {(provided, snapshot) => (
+                                        <div
+                                            ref={provided.innerRef}
+                                            {...provided.draggableProps}
+                                            {...provided.dragHandleProps}
+                                            style={getItemStyle(
+                                                snapshot.isDragging,
+                                                provided.draggableProps.style
+                                            )}>
+                                            {item.content}
+                                        </div>
+                                    )}
+                                </Draggable>
+                            ))}
+                            {provided.placeholder}
+                        </div>
+                    )}
+                </Droppable>
+            </DragDropContext>
+        </div>
+    }
+}
+
+//endregion
