@@ -5,8 +5,7 @@ import {PlayerStatus} from '../../config'
 const Role = ({playerState, role, privatePrice}: { playerState: number, role: number, privatePrice: number }) => {
     const buyerImg = require('../svgs/buyer.svg')
     const sellerImg = require('../svgs/seller.svg')
-    console.log(playerState)
-    if (playerState === PlayerStatus.prepared) {
+    if (playerState === PlayerStatus.prepared || playerState === PlayerStatus.shouted || playerState === PlayerStatus.dealed) {
         switch (role) {
             case 0:
                 return <>

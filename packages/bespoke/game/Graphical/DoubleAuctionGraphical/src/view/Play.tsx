@@ -2,11 +2,13 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {Core, Lang, MaskLoading, Toast} from 'bespoke-client-util'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
-import {FetchType, MoveType, PushType, NEW_ROUND_TIMER, PlayerStatus} from '../config'
-import {Stage, Input, Button, RoundSwitching, span} from 'bespoke-game-graphical-util'
+import {FetchType, MoveType, NEW_ROUND_TIMER, PlayerStatus, PushType} from '../config'
+import {Button, Input, RoundSwitching, span, Stage} from 'bespoke-game-graphical-util'
 
+import Tip from './coms/Tip'
 import Role from './coms/Role'
 import Board from './coms/Board'
+import Dealed from './coms/Dealed'
 import Referee from './coms/Referee'
 import Outside from './coms/Outside'
 import PutShadow from './coms/PutShadow'
@@ -14,6 +16,7 @@ import PutShadow from './coms/PutShadow'
 interface IPlayState {
     price: string
     loading: boolean
+    countdowns: Array<number>
     newRoundTimers: Array<number>
 }
 
@@ -21,6 +24,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     state = {
         price: '',
         loading: true,
+        countdowns: [],
         newRoundTimers: []
     }
 
@@ -40,6 +44,13 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 const newRoundTimers = state.newRoundTimers.slice()
                 newRoundTimers[roundIndex] = newRoundTimer
                 return {newRoundTimers}
+            })
+        })
+        frameEmitter.on(PushType.countdown, ({roundIndex, countdown}) => {
+            this.setState(state => {
+                const countdowns = state.countdowns.slice()
+                countdowns[roundIndex] = countdown
+                return {countdowns: countdowns}
             })
         })
         frameEmitter.emit(MoveType.getPosition)
@@ -102,6 +113,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                     </foreignObject>
                 </>
             }
+            case PlayerStatus.shouted:
             case PlayerStatus.prepared: {
                 switch (role) {
                     case 0:
@@ -140,14 +152,24 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         return null
     }
 
+    dealIt = (position, price) => {
+        console.log(position, price)
+        const {
+            props: {
+                frameEmitter,
+            }
+        } = this
+        frameEmitter.emit(MoveType.deal, {position, price})
+    }
+
     render() {
         const {
             lang,
             props: {
-                game: {params: {}},
+                game: {params: {countdown: roundTime}},
                 gameState: {groups},
                 playerState: {groupIndex, positionIndex, role, privatePrices},
-            }, state: {loading, newRoundTimers}
+            }, state: {loading, newRoundTimers, countdowns}
         } = this
         if (loading) {
             return <MaskLoading label='加载中...'/>
@@ -158,10 +180,10 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
 
         const {rounds, roundIndex} = groups[groupIndex],
             newRoundTimer = newRoundTimers[roundIndex],
+            countdown = countdowns[roundIndex],
             {playerStatus, board} = rounds[roundIndex]
 
         const playerState = playerStatus[positionIndex]
-
         return <section className={style.play}>
             <Stage dev={true}>
                 {
@@ -172,7 +194,10 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                             <Referee playerState={playerState}/>
                             <Outside playerState={playerState}/>
                             <Role playerState={playerState} role={role} privatePrice={privatePrices[roundIndex]}/>
-                            <Board playerState={playerState} role={role} board={board}/>
+                            <Board playerState={playerState} role={role} board={board} positionIndex={positionIndex}
+                                   dealIt={this.dealIt.bind(this)}/>
+                            <Tip playerState={playerState} role={role} countdown={countdown} roundTime={roundTime}/>
+                            <Dealed playerState={playerState} role={role}/>
                             {this.renderOperateWidget()}
                         </>
                 }

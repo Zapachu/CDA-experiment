@@ -14,23 +14,27 @@ message CreateParams {
     int32 InitMoney = 7;
     repeated Position positions = 8;
     string nextPhaseKey = 9;
+    int32 countdown = 10;
 }
 
 message MoveParams {
     int32 price = 1;
+    int32 position = 2;
 }
 
 message PushParams {
     int32 roundIndex = 1;
     int32 newRoundTimer = 2;
+    int32 countdown = 3;
 }
 
 message GameState {
     message Group {
         message Board {
             bool deal = 1;
-            int32 price = 2;
-            int32 position = 3;
+            int32 role = 2;
+            int32 price = 3;
+            int32 position = 4;
         }
         message Round {
             repeated Board board = 1;

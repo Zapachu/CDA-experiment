@@ -4,7 +4,6 @@ import {PlayerStatus} from '../../config'
 
 const Outside = ({playerState}: { playerState: number }) => {
     const imgSrc = require('../svgs/outsideMan.svg')
-    console.log(playerState)
     if (playerState === PlayerStatus.outside) {
         return <>
             <g transform={`translate(${span(1)},${span(4)})`}>

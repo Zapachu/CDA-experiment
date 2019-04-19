@@ -8,6 +8,7 @@ export enum MoveType {
 }
 
 export enum PushType {
+    countdown,
     newRoundTimer
 }
 

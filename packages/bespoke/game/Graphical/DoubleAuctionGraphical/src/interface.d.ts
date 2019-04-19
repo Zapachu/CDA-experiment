@@ -28,6 +28,9 @@ export interface ICreateParams {
 
     /** CreateParams nextPhaseKey */
     nextPhaseKey?: (string|null);
+
+    /** CreateParams countdown */
+    countdown?: (number|null);
 }
 
 /** Represents a CreateParams. */
@@ -65,6 +68,9 @@ export class CreateParams implements ICreateParams {
 
     /** CreateParams nextPhaseKey. */
     public nextPhaseKey: string;
+
+    /** CreateParams countdown. */
+    public countdown: number;
 
     /**
      * Creates a new CreateParams instance using the specified properties.
@@ -241,6 +247,9 @@ export interface IMoveParams {
 
     /** MoveParams price */
     price?: (number|null);
+
+    /** MoveParams position */
+    position?: (number|null);
 }
 
 /** Represents a MoveParams. */
@@ -254,6 +263,9 @@ export class MoveParams implements IMoveParams {
 
     /** MoveParams price. */
     public price: number;
+
+    /** MoveParams position. */
+    public position: number;
 
     /**
      * Creates a new MoveParams instance using the specified properties.
@@ -334,6 +346,9 @@ export interface IPushParams {
 
     /** PushParams newRoundTimer */
     newRoundTimer?: (number|null);
+
+    /** PushParams countdown */
+    countdown?: (number|null);
 }
 
 /** Represents a PushParams. */
@@ -350,6 +365,9 @@ export class PushParams implements IPushParams {
 
     /** PushParams newRoundTimer. */
     public newRoundTimer: number;
+
+    /** PushParams countdown. */
+    public countdown: number;
 
     /**
      * Creates a new PushParams instance using the specified properties.
@@ -624,6 +642,9 @@ export namespace GameState {
             /** Board deal */
             deal?: (boolean|null);
 
+            /** Board role */
+            role?: (number|null);
+
             /** Board price */
             price?: (number|null);
 
@@ -642,6 +663,9 @@ export namespace GameState {
 
             /** Board deal. */
             public deal: boolean;
+
+            /** Board role. */
+            public role: number;
 
             /** Board price. */
             public price: number;

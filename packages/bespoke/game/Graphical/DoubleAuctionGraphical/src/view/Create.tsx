@@ -11,6 +11,7 @@ interface ICreateState {
     sellerPriceEnd: number
     InitMoney: number
     round: number
+    countdown: number
     groupSize: number
     positions: Array<{
         role: number
@@ -28,6 +29,7 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
         sellerPriceEnd: 100,
         InitMoney: 100,
         round: 3,
+        countdown: 30,
         groupSize: 2,
         positions: [{role: 0, privatePrice: [10, 40, 60]}, {role: 1, privatePrice: [30, 50, 60]}],
         readonly: false,
@@ -75,8 +77,8 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
 
     done = () => {
         const {setParams, setSubmitable} = this.props
-        const {round, groupSize, positions, InitMoney} = this.state
-        setParams({round, groupSize, positions, InitMoney})
+        const {round, countdown, groupSize, positions, InitMoney} = this.state
+        setParams({round, countdown, groupSize, positions, InitMoney})
         this.setState({readonly: true})
         setSubmitable(true)
     }
@@ -86,8 +88,13 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
         this.setState({groupSize: val % 2 === 0 ? val + 1 : val})
     }
 
+    setCountdown = (e) => {
+        const countdown = parseInt(e.target.value)
+        this.setState({countdown})
+    }
+
     render() {
-        const {round, groupSize, buyerPriceStart, buyerPriceEnd, sellerPriceStart, sellerPriceEnd, InitMoney, positions, readonly} = this.state
+        const {round, countdown, groupSize, buyerPriceStart, buyerPriceEnd, sellerPriceStart, sellerPriceEnd, InitMoney, positions, readonly} = this.state
         return <div className={style.create}>
             <ul className={style.configFields}>
                 <li>
@@ -108,6 +115,13 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
                     <Label label='初始资金'/>
                     <RangeInput value={InitMoney}
                                 onChange={(e) => this.setState({InitMoney: parseInt(e.target.value)})}/>
+                </li>
+                <li>
+                    <Label label='拍卖计时'/>
+                    <RangeInput value={countdown}
+                                min={30}
+                                max={120}
+                                onChange={this.setCountdown}/>
                 </li>
                 <li>
                     <Label label='买家心理价值下限'/>

@@ -2,6 +2,7 @@ import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from "b
 import {ICreateParams, IGameState, IPlayerState, IPushParams, IMoveParams} from "./interface"
 import {MoveType, PushType, FetchType, PlayerStatus} from './config'
 import {GameState} from "./interface"
+import {NEW_ROUND_TIMER} from "../../../Classic/TogetherBidMarket/src/config";
 
 export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
     initGameState(): TGameState<IGameState> {
@@ -19,7 +20,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
     }
 
     protected async playerMoveReducer(actor: IActor, type: string, params: IMoveParams, cb: IMoveCallback): Promise<void> {
-        const {game: {params: {groupSize, round, positions}}} = this
+        const {game: {params: {groupSize, round, positions, countdown}}} = this
         const playerState = await this.stateManager.getPlayerState(actor),
             gameState = await this.stateManager.getGameState(),
             playerStates = await this.stateManager.getPlayerStates()
@@ -51,12 +52,71 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 break
             }
             case MoveType.shout: {
-                console.log(playerStates)
-                // TODO Timer to Next Round
+                const {groupIndex, positionIndex} = playerState,
+                    groupState = gameState.groups[groupIndex],
+                    {rounds, roundIndex} = groupState,
+                    {playerStatus} = rounds[roundIndex],
+                    groupPlayerStates = Object.values(playerStates).filter(s => s.groupIndex === groupIndex)
+                playerStatus[positionIndex] = PlayerStatus.shouted
+                playerState.prices[roundIndex] = params.price
+                rounds[roundIndex].board = rounds[roundIndex].board || []
+                const existIdx = rounds[roundIndex].board.findIndex(b => b.position === positionIndex)
+                existIdx === -1 ? rounds[roundIndex].board.push({
+                    deal: false,
+                    price: params.price,
+                    position: positionIndex,
+                    role: playerState.role
+                }) : rounds[roundIndex].board[existIdx].price = params.price
+
+                const nextRound = async () => {
+                    if (roundIndex == rounds.length - 1) {
+                        for (let i in playerStatus) playerStatus[i] = PlayerStatus.gameOver
+                        await this.stateManager.syncState()
+                        return
+                    }
+                    let newRoundTimer = 1
+                    const newRoundInterval = global.setInterval(async () => {
+                        groupPlayerStates.forEach(({actor}) => this.push(actor, PushType.newRoundTimer, {
+                            roundIndex,
+                            newRoundTimer
+                        }))
+                        if (newRoundTimer++ < NEW_ROUND_TIMER) {
+                            return
+                        }
+                        global.clearInterval(newRoundInterval)
+                        groupState.roundIndex++
+                        await this.stateManager.syncState()
+                    }, 1000)
+                }
+
+                if (playerStatus.filter(p => p === PlayerStatus.shouted).length === 1) {
+                    let timeAcc = 1
+                    const countdownInterval = global.setInterval(async () => {
+                        groupPlayerStates.forEach(({actor}) => this.push(actor, PushType.countdown, {
+                            roundIndex,
+                            countdown: timeAcc
+                        }))
+                        if (timeAcc++ < countdown) {
+                            return
+                        }
+                        global.clearInterval(countdownInterval)
+                        await this.stateManager.syncState()
+                        await nextRound()
+                    }, 1000)
+                }
                 break
             }
             case MoveType.deal: {
-                // TODO Status to dealed
+                const {groupIndex, positionIndex} = playerState,
+                    groupState = gameState.groups[groupIndex],
+                    {rounds, roundIndex} = groupState,
+                    {playerStatus} = rounds[roundIndex],
+                    groupPlayerStates = Object.values(playerStates).filter(s => s.groupIndex === groupIndex)
+                playerStatus[positionIndex] = PlayerStatus.dealed
+                playerStatus[params.position] = PlayerStatus.dealed
+                playerState.profits[roundIndex] = playerState.privatePrices[roundIndex] - params.price
+                groupPlayerStates[params.position].profits[roundIndex] = groupPlayerStates[params.position].privatePrices[roundIndex] - playerState.prices[roundIndex]
+                await this.stateManager.syncState()
                 break
             }
         }
