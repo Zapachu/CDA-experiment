@@ -7,16 +7,15 @@ export function Button({label, onClick}: {
     onClick: () => void
 }) {
     return <ImgLoader src={require('./button.svg')} render={({images: [button]}) =>
-        <button style={{
-            width: button.width,
-            height: button.height,
-            position: 'relative',
-            left: -button.width >> 1,
-            top: -button.height >> 1,
-            background: `url(${button.src}) no-repeat`,
-            border: 'none',
-            outline: 'none',
-            fontSize: button.height / 2
-        }} onClick={throttle(onClick, 500)}>{label}</button>
+        <foreignObject x={-button.width >> 1} y={-button.height >> 1}>
+            <button style={{
+                width: button.width,
+                height: button.height,
+                background: `url(${button.src}) no-repeat`,
+                border: 'none',
+                outline: 'none',
+                fontSize: button.height / 2
+            }} onClick={throttle(onClick, 500)}>{label}</button>
+        </foreignObject>
     }/>
 }

@@ -11,8 +11,12 @@
     "declaration": true,
     "sourceMap": true,
     "experimentalDecorators": true,
+    "skipLibCheck": true,
     "noUnusedLocals": true,
     "resolveJsonModule": true,
     "jsx": "react"
-  }
+  },
+  "include": [
+    "."
+  ]
 }

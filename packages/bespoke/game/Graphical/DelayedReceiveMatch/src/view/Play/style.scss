@@ -1,0 +1,10 @@
+@import "~bespoke-client-util/lib/resource/public";
+
+.play {
+  position: relative;
+  width: 99vh;
+  margin: auto;
+  @media (max-width: $layout-mediaWidth) {
+    width: 100vw;
+  }
+}

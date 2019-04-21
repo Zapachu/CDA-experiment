@@ -2,9 +2,15 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {ErrorBoundary} from '../ErrorBoundary'
 
-export const Tabs: React.SFC<{ labels: Array<string>, children: Array<JSX.Element>, activeTabIndex: number, switchTab: (i: number) => void }> =
-    ({children, labels, activeTabIndex, switchTab}) =>
-        <section className={style.tabs}>
+export const Tabs: React.FunctionComponent<{
+    labels: Array<string>,
+    children: Array<JSX.Element>,
+    activeTabIndex: number,
+    switchTab: (i: number) => void,
+    vertical?: boolean
+}> =
+    ({children, labels, activeTabIndex, switchTab, vertical}) =>
+        <section className={`${style.tabs} ${vertical ? style.vertical : ''}`}>
             <ul className={style.tabsHeader}>{
                 children.map((child, index) => {
                         return <li key={index} className={index === activeTabIndex ? style.active : ''}
