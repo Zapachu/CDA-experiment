@@ -5,17 +5,32 @@ export interface ICreateParams {
     /** CreateParams round */
     round?: (number|null);
 
-    /** CreateParams group */
-    group?: (number|null);
-
     /** CreateParams groupSize */
     groupSize?: (number|null);
 
-    /** CreateParams groupParams */
-    groupParams?: (CreateParams.IGroupParams[]|null);
+    /** CreateParams buyerPriceStart */
+    buyerPriceStart?: (number|null);
+
+    /** CreateParams buyerPriceEnd */
+    buyerPriceEnd?: (number|null);
+
+    /** CreateParams sellerPriceStart */
+    sellerPriceStart?: (number|null);
+
+    /** CreateParams sellerPriceEnd */
+    sellerPriceEnd?: (number|null);
+
+    /** CreateParams InitMoney */
+    InitMoney?: (number|null);
+
+    /** CreateParams positions */
+    positions?: (CreateParams.IPosition[]|null);
 
     /** CreateParams nextPhaseKey */
     nextPhaseKey?: (string|null);
+
+    /** CreateParams countdown */
+    countdown?: (number|null);
 }
 
 /** Represents a CreateParams. */
@@ -30,17 +45,32 @@ export class CreateParams implements ICreateParams {
     /** CreateParams round. */
     public round: number;
 
-    /** CreateParams group. */
-    public group: number;
-
     /** CreateParams groupSize. */
     public groupSize: number;
 
-    /** CreateParams groupParams. */
-    public groupParams: CreateParams.IGroupParams[];
+    /** CreateParams buyerPriceStart. */
+    public buyerPriceStart: number;
+
+    /** CreateParams buyerPriceEnd. */
+    public buyerPriceEnd: number;
+
+    /** CreateParams sellerPriceStart. */
+    public sellerPriceStart: number;
+
+    /** CreateParams sellerPriceEnd. */
+    public sellerPriceEnd: number;
+
+    /** CreateParams InitMoney. */
+    public InitMoney: number;
+
+    /** CreateParams positions. */
+    public positions: CreateParams.IPosition[];
 
     /** CreateParams nextPhaseKey. */
     public nextPhaseKey: string;
+
+    /** CreateParams countdown. */
+    public countdown: number;
 
     /**
      * Creates a new CreateParams instance using the specified properties.
@@ -115,97 +145,97 @@ export class CreateParams implements ICreateParams {
 
 export namespace CreateParams {
 
-    /** Properties of a GroupParams. */
-    interface IGroupParams {
+    /** Properties of a Position. */
+    interface IPosition {
 
-        /** GroupParams initialFunding */
-        initialFunding?: (number|null);
+        /** Position role */
+        role?: (number|null);
 
-        /** GroupParams magnification */
-        magnification?: (number|null);
+        /** Position privatePrice */
+        privatePrice?: (number[]|null);
     }
 
-    /** Represents a GroupParams. */
-    class GroupParams implements IGroupParams {
+    /** Represents a Position. */
+    class Position implements IPosition {
 
         /**
-         * Constructs a new GroupParams.
+         * Constructs a new Position.
          * @param [properties] Properties to set
          */
-        constructor(properties?: CreateParams.IGroupParams);
+        constructor(properties?: CreateParams.IPosition);
 
-        /** GroupParams initialFunding. */
-        public initialFunding: number;
+        /** Position role. */
+        public role: number;
 
-        /** GroupParams magnification. */
-        public magnification: number;
+        /** Position privatePrice. */
+        public privatePrice: number[];
 
         /**
-         * Creates a new GroupParams instance using the specified properties.
+         * Creates a new Position instance using the specified properties.
          * @param [properties] Properties to set
-         * @returns GroupParams instance
+         * @returns Position instance
          */
-        public static create(properties?: CreateParams.IGroupParams): CreateParams.GroupParams;
+        public static create(properties?: CreateParams.IPosition): CreateParams.Position;
 
         /**
-         * Encodes the specified GroupParams message. Does not implicitly {@link CreateParams.GroupParams.verify|verify} messages.
-         * @param message GroupParams message or plain object to encode
+         * Encodes the specified Position message. Does not implicitly {@link CreateParams.Position.verify|verify} messages.
+         * @param message Position message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: CreateParams.IGroupParams, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encode(message: CreateParams.IPosition, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Encodes the specified GroupParams message, length delimited. Does not implicitly {@link CreateParams.GroupParams.verify|verify} messages.
-         * @param message GroupParams message or plain object to encode
+         * Encodes the specified Position message, length delimited. Does not implicitly {@link CreateParams.Position.verify|verify} messages.
+         * @param message Position message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: CreateParams.IGroupParams, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: CreateParams.IPosition, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Decodes a GroupParams message from the specified reader or buffer.
+         * Decodes a Position message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns GroupParams
+         * @returns Position
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): CreateParams.GroupParams;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): CreateParams.Position;
 
         /**
-         * Decodes a GroupParams message from the specified reader or buffer, length delimited.
+         * Decodes a Position message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns GroupParams
+         * @returns Position
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): CreateParams.GroupParams;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): CreateParams.Position;
 
         /**
-         * Verifies a GroupParams message.
+         * Verifies a Position message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
         public static verify(message: { [k: string]: any }): (string|null);
 
         /**
-         * Creates a GroupParams message from a plain object. Also converts values to their respective internal types.
+         * Creates a Position message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
-         * @returns GroupParams
+         * @returns Position
          */
-        public static fromObject(object: { [k: string]: any }): CreateParams.GroupParams;
+        public static fromObject(object: { [k: string]: any }): CreateParams.Position;
 
         /**
-         * Creates a plain object from a GroupParams message. Also converts values to other types if specified.
-         * @param message GroupParams
+         * Creates a plain object from a Position message. Also converts values to other types if specified.
+         * @param message Position
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: CreateParams.GroupParams, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public static toObject(message: CreateParams.Position, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
-         * Converts this GroupParams to JSON.
+         * Converts this Position to JSON.
          * @returns JSON object
          */
         public toJSON(): { [k: string]: any };
@@ -217,6 +247,9 @@ export interface IMoveParams {
 
     /** MoveParams price */
     price?: (number|null);
+
+    /** MoveParams position */
+    position?: (number|null);
 }
 
 /** Represents a MoveParams. */
@@ -230,6 +263,9 @@ export class MoveParams implements IMoveParams {
 
     /** MoveParams price. */
     public price: number;
+
+    /** MoveParams position. */
+    public position: number;
 
     /**
      * Creates a new MoveParams instance using the specified properties.
@@ -310,6 +346,9 @@ export interface IPushParams {
 
     /** PushParams newRoundTimer */
     newRoundTimer?: (number|null);
+
+    /** PushParams countdown */
+    countdown?: (number|null);
 }
 
 /** Represents a PushParams. */
@@ -326,6 +365,9 @@ export class PushParams implements IPushParams {
 
     /** PushParams newRoundTimer. */
     public newRoundTimer: number;
+
+    /** PushParams countdown. */
+    public countdown: number;
 
     /**
      * Creates a new PushParams instance using the specified properties.
@@ -493,14 +535,14 @@ export namespace GameState {
     /** Properties of a Group. */
     interface IGroup {
 
+        /** Group playerNum */
+        playerNum?: (number|null);
+
         /** Group roundIndex */
         roundIndex?: (number|null);
 
         /** Group rounds */
         rounds?: (GameState.Group.IRound[]|null);
-
-        /** Group playerNum */
-        playerNum?: (number|null);
     }
 
     /** Represents a Group. */
@@ -512,14 +554,14 @@ export namespace GameState {
          */
         constructor(properties?: GameState.IGroup);
 
+        /** Group playerNum. */
+        public playerNum: number;
+
         /** Group roundIndex. */
         public roundIndex: number;
 
         /** Group rounds. */
         public rounds: GameState.Group.IRound[];
-
-        /** Group playerNum. */
-        public playerNum: number;
 
         /**
          * Creates a new Group instance using the specified properties.
@@ -594,11 +636,122 @@ export namespace GameState {
 
     namespace Group {
 
+        /** Properties of a Board. */
+        interface IBoard {
+
+            /** Board deal */
+            deal?: (boolean|null);
+
+            /** Board role */
+            role?: (number|null);
+
+            /** Board price */
+            price?: (number|null);
+
+            /** Board position */
+            position?: (number|null);
+        }
+
+        /** Represents a Board. */
+        class Board implements IBoard {
+
+            /**
+             * Constructs a new Board.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: GameState.Group.IBoard);
+
+            /** Board deal. */
+            public deal: boolean;
+
+            /** Board role. */
+            public role: number;
+
+            /** Board price. */
+            public price: number;
+
+            /** Board position. */
+            public position: number;
+
+            /**
+             * Creates a new Board instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Board instance
+             */
+            public static create(properties?: GameState.Group.IBoard): GameState.Group.Board;
+
+            /**
+             * Encodes the specified Board message. Does not implicitly {@link GameState.Group.Board.verify|verify} messages.
+             * @param message Board message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: GameState.Group.IBoard, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified Board message, length delimited. Does not implicitly {@link GameState.Group.Board.verify|verify} messages.
+             * @param message Board message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: GameState.Group.IBoard, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Board message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Board
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): GameState.Group.Board;
+
+            /**
+             * Decodes a Board message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns Board
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): GameState.Group.Board;
+
+            /**
+             * Verifies a Board message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a Board message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns Board
+             */
+            public static fromObject(object: { [k: string]: any }): GameState.Group.Board;
+
+            /**
+             * Creates a plain object from a Board message. Also converts values to other types if specified.
+             * @param message Board
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: GameState.Group.Board, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this Board to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+        }
+
         /** Properties of a Round. */
         interface IRound {
 
-            /** Round currentPlayer */
-            currentPlayer?: (number|null);
+            /** Round hasTimer */
+            hasTimer?: (boolean|null);
+
+            /** Round board */
+            board?: (GameState.Group.IBoard[]|null);
 
             /** Round playerStatus */
             playerStatus?: (number[]|null);
@@ -613,8 +766,11 @@ export namespace GameState {
              */
             constructor(properties?: GameState.Group.IRound);
 
-            /** Round currentPlayer. */
-            public currentPlayer: number;
+            /** Round hasTimer. */
+            public hasTimer: boolean;
+
+            /** Round board. */
+            public board: GameState.Group.IBoard[];
 
             /** Round playerStatus. */
             public playerStatus: number[];
@@ -701,14 +857,17 @@ export interface IPlayerState {
     /** PlayerState positionIndex */
     positionIndex?: (number|null);
 
+    /** PlayerState privatePrices */
+    privatePrices?: (number[]|null);
+
     /** PlayerState prices */
     prices?: (number[]|null);
 
     /** PlayerState profits */
     profits?: (number[]|null);
 
-    /** PlayerState balances */
-    balances?: (number[]|null);
+    /** PlayerState role */
+    role?: (number|null);
 }
 
 /** Represents a PlayerState. */
@@ -726,14 +885,17 @@ export class PlayerState implements IPlayerState {
     /** PlayerState positionIndex. */
     public positionIndex: number;
 
+    /** PlayerState privatePrices. */
+    public privatePrices: number[];
+
     /** PlayerState prices. */
     public prices: number[];
 
     /** PlayerState profits. */
     public profits: number[];
 
-    /** PlayerState balances. */
-    public balances: number[];
+    /** PlayerState role. */
+    public role: number;
 
     /**
      * Creates a new PlayerState instance using the specified properties.

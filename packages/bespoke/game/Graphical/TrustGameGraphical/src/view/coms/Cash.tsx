@@ -7,8 +7,6 @@ const Cash = ({playerState, position, balance}: { playerState: number, position:
     const val = `持有钱币: ${balance}`
     const imgSrc = require('../svgs/cash.svg')
 
-    console.log(playerState)
-
     switch (playerState) {
         case PlayerStatus.prepared:
             return <></>

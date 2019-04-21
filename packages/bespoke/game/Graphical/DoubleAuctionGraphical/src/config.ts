@@ -1,13 +1,14 @@
-export const namespace = 'TrustGameGraphical'
+export const namespace = 'DoubleAuctionGraphical'
 
 export enum MoveType {
     prepare = 'prepare',
-    toNextRound = 'toNextRound',
     shout = 'shout',
+    deal = 'deal',
     getPosition = 'getPosition',
 }
 
 export enum PushType {
+    countdown,
     newRoundTimer
 }
 
@@ -18,11 +19,9 @@ export enum FetchType {
 export enum PlayerStatus {
     outside,
     prepared,
-    timeToShout,
     shouted,
-    nextRound,
-    preparedNextRound,
-    gameOver
+    dealed,
+    gameOver,
 }
 
 export const NEW_ROUND_TIMER = 3

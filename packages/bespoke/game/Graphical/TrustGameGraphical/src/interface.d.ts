@@ -5,14 +5,14 @@ export interface ICreateParams {
     /** CreateParams round */
     round?: (number|null);
 
+    /** CreateParams group */
+    group?: (number|null);
+
     /** CreateParams groupSize */
     groupSize?: (number|null);
 
-    /** CreateParams initialFunding */
-    initialFunding?: (number|null);
-
-    /** CreateParams magnification */
-    magnification?: (number|null);
+    /** CreateParams groupParams */
+    groupParams?: (CreateParams.IGroupParams[]|null);
 
     /** CreateParams nextPhaseKey */
     nextPhaseKey?: (string|null);
@@ -30,14 +30,14 @@ export class CreateParams implements ICreateParams {
     /** CreateParams round. */
     public round: number;
 
+    /** CreateParams group. */
+    public group: number;
+
     /** CreateParams groupSize. */
     public groupSize: number;
 
-    /** CreateParams initialFunding. */
-    public initialFunding: number;
-
-    /** CreateParams magnification. */
-    public magnification: number;
+    /** CreateParams groupParams. */
+    public groupParams: CreateParams.IGroupParams[];
 
     /** CreateParams nextPhaseKey. */
     public nextPhaseKey: string;
@@ -111,6 +111,105 @@ export class CreateParams implements ICreateParams {
      * @returns JSON object
      */
     public toJSON(): { [k: string]: any };
+}
+
+export namespace CreateParams {
+
+    /** Properties of a GroupParams. */
+    interface IGroupParams {
+
+        /** GroupParams initialFunding */
+        initialFunding?: (number|null);
+
+        /** GroupParams magnification */
+        magnification?: (number|null);
+    }
+
+    /** Represents a GroupParams. */
+    class GroupParams implements IGroupParams {
+
+        /**
+         * Constructs a new GroupParams.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: CreateParams.IGroupParams);
+
+        /** GroupParams initialFunding. */
+        public initialFunding: number;
+
+        /** GroupParams magnification. */
+        public magnification: number;
+
+        /**
+         * Creates a new GroupParams instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns GroupParams instance
+         */
+        public static create(properties?: CreateParams.IGroupParams): CreateParams.GroupParams;
+
+        /**
+         * Encodes the specified GroupParams message. Does not implicitly {@link CreateParams.GroupParams.verify|verify} messages.
+         * @param message GroupParams message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: CreateParams.IGroupParams, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified GroupParams message, length delimited. Does not implicitly {@link CreateParams.GroupParams.verify|verify} messages.
+         * @param message GroupParams message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: CreateParams.IGroupParams, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a GroupParams message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns GroupParams
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): CreateParams.GroupParams;
+
+        /**
+         * Decodes a GroupParams message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns GroupParams
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): CreateParams.GroupParams;
+
+        /**
+         * Verifies a GroupParams message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a GroupParams message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns GroupParams
+         */
+        public static fromObject(object: { [k: string]: any }): CreateParams.GroupParams;
+
+        /**
+         * Creates a plain object from a GroupParams message. Also converts values to other types if specified.
+         * @param message GroupParams
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: CreateParams.GroupParams, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this GroupParams to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+    }
 }
 
 /** Properties of a MoveParams. */

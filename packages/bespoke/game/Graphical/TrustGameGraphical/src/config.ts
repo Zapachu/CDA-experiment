@@ -1,6 +1,8 @@
-export const namespace = 'TrustGame'
+export const namespace = 'TrustGameGraphical'
 
 export enum MoveType {
+    prepare = 'prepare',
+    toNextRound = 'toNextRound',
     shout = 'shout',
     getPosition = 'getPosition',
 }
@@ -14,9 +16,12 @@ export enum FetchType {
 }
 
 export enum PlayerStatus {
+    outside,
     prepared,
     timeToShout,
     shouted,
+    nextRound,
+    preparedNextRound,
     gameOver,
     memberFull,
 }
