@@ -111,7 +111,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                         </div>
                     </foreignObject>
                     <foreignObject {...{
-                        x: span(5),
+                        x: span(4.7),
                         y: span(9)
                     }}>
                         <Button label={lang.prepare} onClick={() => frameEmitter.emit(MoveType.prepare)}/>
@@ -130,7 +130,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                                 <Input value={price} onChange={price => this.setState({price})}/>
                             </foreignObject>
                             <foreignObject {...{
-                                x: span(3),
+                                x: span(2.2),
                                 y: span(7.7)
                             }}>
                                 <Button label={lang.shout} onClick={this.shout.bind(this)}/>
@@ -145,7 +145,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                                 <Input value={price} onChange={price => this.setState({price})}/>
                             </foreignObject>
                             <foreignObject {...{
-                                x: span(7),
+                                x: span(6.2),
                                 y: span(7.7)
                             }}>
                                 <Button label={lang.shout} onClick={this.shout.bind(this)}/>

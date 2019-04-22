@@ -81,22 +81,29 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         switch (playerStatus[positionIndex]) {
             case PlayerStatus.outside: {
                 return <foreignObject {...{
-                    x: span(5),
+                    x: span(4),
                     y: span(8)
                 }}>
                     <Button label={lang.prepare} onClick={() => frameEmitter.emit(MoveType.prepare)}/>
                 </foreignObject>
             }
             case PlayerStatus.nextRound: {
-                return <foreignObject {...{
-                    x: span(5),
-                    y: span(8)
-                }}>
-                    <p style={{width: 300, marginLeft: '-5rem', fontSize: '1.8rem', marginBottom: '3rem'}}>
-                        您的收益 {balances[roundIndex]}
-                    </p>
-                    <Button label={lang.nextRound} onClick={() => frameEmitter.emit(MoveType.toNextRound)}/>
-                </foreignObject>
+                return <>
+                    <foreignObject {...{
+                        x: span(5),
+                        y: span(8)
+                    }}>
+                        <p style={{width: 300, marginLeft: '-5rem', fontSize: '1.8rem', marginBottom: '3rem'}}>
+                            您的收益 {balances[roundIndex]}
+                        </p>
+                    </foreignObject>
+                    <foreignObject {...{
+                        x: span(4.2),
+                        y: span(8.6)
+                    }}>
+                        <Button label={lang.nextRound} onClick={() => frameEmitter.emit(MoveType.toNextRound)}/>
+                    </foreignObject>
+                </>
             }
             case PlayerStatus.timeToShout: {
                 return <>
@@ -107,7 +114,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                         <Input value={price} onChange={price => this.setState({price})}/>
                     </foreignObject>
                     <foreignObject {...{
-                        x: span(5),
+                        x: span(4.15),
                         y: span(8.6)
                     }}>
                         <Button label={lang.shout} onClick={this.shout.bind(this)}/>
