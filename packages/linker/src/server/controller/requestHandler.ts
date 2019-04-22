@@ -1,11 +1,9 @@
 import {baseEnum, config} from '@common'
-import {UserDoc} from '@server-model'
 import {Hash, redisClient, RedisKey} from '@server-util'
 import {Request, Response, NextFunction} from 'express'
 import {GameService, PhaseService} from '@server-service'
 import {WebpackHmr} from '../util/WebpackHmr'
 import {PlayerService} from '../service/PlayerService'
-import {elfSetting} from 'elf-setting'
 
 const SECONDS_PER_DAY = 86400
 const DEFAULT_PAGE_SIZE = 11
@@ -22,6 +20,11 @@ export class UserCtrl {
 
     static isTeacher(req, res: Response, next) {
         req.user.role === baseEnum.AcademusRole.teacher ? next() : res.redirect(`/${config.rootName}/join`)
+    }
+
+    static async isTemplateAccessible(req, res: Response, next) {
+        const templates = await PhaseService.getPhaseTemplates(req.user._id.toString())
+        templates.some(({namespace}) => namespace === req.params.namespace) ? next() : res.redirect(`/${config.rootName}`)
     }
 
     static async isGameAccessible(req, res: Response, next: NextFunction) {
@@ -54,16 +57,8 @@ export class UserCtrl {
 }
 
 export class GameCtrl {
-    static async getPhaseTemplates(req, res) {
-        const user = req.user as UserDoc
-        const namespaces = req.query.namespaces.split(',')
-        const phaseTemplates = await PhaseService.getPhaseTemplates(user)
-        const templates = []
-        phaseTemplates.forEach(({namespace, type, jsUrl}) => {
-            if (!elfSetting.inProductEnv || namespaces.includes(namespace)) {
-                templates.push({namespace, type, jsUrl})
-            }
-        })
+    static async getPhaseTemplates(req, res: Response) {
+        const templates = await PhaseService.getPhaseTemplates(req.user._id.toString())
         res.json({
             code: baseEnum.ResponseCode.success,
             templates

@@ -1,7 +1,6 @@
 import {loadPackageDefinition, credentials, Server} from 'grpc'
 import {loadSync} from '@grpc/proto-loader'
 import {resolve} from 'path'
-import {ICheckShareCodeReq, ICheckShareCodeRes} from './AcademusBespoke'
 import {proto} from './BespokeProxy'
 import {
     GameService,
@@ -17,18 +16,36 @@ import {
     ISetPhaseResultReq,
     ISetPhaseResultRes
 } from './PhaseManager'
+import {
+    IGetOnlineTemplatesReq,
+    IGetOnlineTemplatesRes,
+    AdminService
+} from './ElfAdmin'
 
-export namespace AcademusBespoke {
-    let protoDef = loadPackageDefinition(loadSync(resolve(__dirname, './AcademusBespoke.proto'))) as any
+export namespace ElfAdmin {
+    let protoDef = loadPackageDefinition(loadSync(resolve(__dirname, './ElfAdmin.proto'))) as any
 
-    export type TCheckShareCodeReq = ICheckShareCodeReq
-    export type TCheckShareCodeCallback = (error?: Error, response?: ICheckShareCodeRes) => void
-    export type TBespokeService = {
-        checkShareCode(req: { request: ICheckShareCodeReq }, callback: TCheckShareCodeCallback): void
+    let adminService: AdminService
+
+    export function getAdminService(serviceURI: string): AdminService {
+        if (!adminService) {
+            try {
+                adminService = new protoDef.AdminService(serviceURI, credentials.createInsecure())
+            } catch (e) {
+                console.error(e)
+            }
+        }
+        return adminService
     }
 
-    export function setBespokeService(server: Server, bespokeService: TBespokeService) {
-        server.addService(protoDef.BespokeService.service, bespokeService)
+    export type TGetOnlineTemplatesReq = IGetOnlineTemplatesReq
+    export type TGetOnlineTemplatesCallback = (error?: Error, response?: IGetOnlineTemplatesRes) => void
+    export type TElfService = {
+        getOnlineTemplates(req: { request: TGetOnlineTemplatesReq }, callback: TGetOnlineTemplatesCallback): void
+    }
+
+    export function setElfService(server: Server, elfService: TElfService) {
+        server.addService(protoDef.ElfService.service, elfService)
     }
 }
 

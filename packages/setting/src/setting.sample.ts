@@ -67,6 +67,7 @@ export default {
     qqwjProxy: 'http://127.0.0.1:3073',
     //endregion
     //region other
-    academusServiceUri: '127.0.0.1:53008'
+    academusServiceUri: '127.0.0.1:53008',
+    adminServiceUri: '127.0.0.1:53010'
     //endregion
 }
