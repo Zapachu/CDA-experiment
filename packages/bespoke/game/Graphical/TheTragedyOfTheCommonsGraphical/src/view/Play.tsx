@@ -5,21 +5,17 @@ import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from 
 import {FetchType, MoveType, NEW_ROUND_TIMER, PlayerStatus, PushType} from '../config'
 import {Button, Input, RoundSwitching, span, Stage} from 'bespoke-game-graphical-util'
 
-import Tip from './coms/Tip'
-import Role from './coms/Role'
-import Board from './coms/Board'
-import Dialog from './coms/Dialog'
-import Dealed from './coms/Dealed'
+
+import Fish from './coms/Fish'
+import Bucket from './coms/Bucket'
 import Referee from './coms/Referee'
-import Outside from './coms/Outside'
+import Players from './coms/Players'
+import FishPool from './coms/FishPool'
 import PutShadow from './coms/PutShadow'
 
 interface IPlayState {
     price: string
     loading: boolean
-    dealDialog: boolean
-    dealObj: { price: number, position: number }
-    countdowns: Array<number>
     newRoundTimers: Array<number>
 }
 
@@ -27,9 +23,6 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     state = {
         price: '',
         loading: true,
-        dealDialog: false,
-        dealObj: {price: 0, position: 0},
-        countdowns: [],
         newRoundTimers: []
     }
 
@@ -48,14 +41,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             this.setState(state => {
                 const newRoundTimers = state.newRoundTimers.slice()
                 newRoundTimers[roundIndex] = newRoundTimer
-                return {newRoundTimers, dealDialog: false}
-            })
-        })
-        frameEmitter.on(PushType.countdown, ({roundIndex, countdown}) => {
-            this.setState(state => {
-                const countdowns = state.countdowns.slice()
-                countdowns[roundIndex] = countdown
-                return {countdowns: countdowns}
+                return {newRoundTimers}
             })
         })
         frameEmitter.emit(MoveType.getPosition)
@@ -68,13 +54,12 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         const {
             props: {
                 frameEmitter,
-                gameState: {groups},
-                playerState: {groupIndex, privatePrices}
+                game: {params: {fishCount, groupSize}}
             }, state
         } = this
         this.setState({price: ''})
         const price = Number(state.price)
-        if (Number.isNaN(price) || price > privatePrices[groups[groupIndex].roundIndex]) {
+        if (Number.isNaN(price) || price > fishCount / groupSize) {
             Toast.warn('输入的值无效')
         } else {
             frameEmitter.emit(MoveType.shout, {price: +price})
@@ -86,7 +71,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             lang, props: {
                 frameEmitter,
                 gameState: {groups},
-                playerState: {groupIndex, positionIndex, role}
+                playerState: {groupIndex, positionIndex}
             }, state: {price}
         } = this
         const {rounds, roundIndex} = groups[groupIndex],
@@ -95,99 +80,51 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             case PlayerStatus.outside: {
                 return <>
                     <foreignObject {...{
-                        x: span(2),
-                        y: span(8)
-                    }}>
-                        <div style={{width: 100}}>
-                            <h2>卖方</h2>
-                        </div>
-                    </foreignObject>
-                    <foreignObject {...{
-                        x: span(7.6),
-                        y: span(8)
-                    }}>
-                        <div style={{width: 100}}>
-                            <h2>买方</h2>
-                        </div>
-                    </foreignObject>
-                    <foreignObject {...{
-                        x: span(4.7),
+                        x: span(4.2),
                         y: span(9)
                     }}>
                         <Button label={lang.prepare} onClick={() => frameEmitter.emit(MoveType.prepare)}/>
                     </foreignObject>
                 </>
             }
-            case PlayerStatus.shouted:
+            case PlayerStatus.nextRound: {
+                return <>
+                    <foreignObject {...{
+                        x: span(4.2),
+                        y: span(9)
+                    }}>
+                        <Button label={lang.nextRound} onClick={() => frameEmitter.emit(MoveType.toNextRound)}/>
+                    </foreignObject>
+                </>
+            }
             case PlayerStatus.prepared: {
-                switch (role) {
-                    case 0:
-                        return <>
-                            <foreignObject {...{
-                                x: span(3),
-                                y: span(7)
-                            }}>
-                                <Input value={price} onChange={price => this.setState({price})}/>
-                            </foreignObject>
-                            <foreignObject {...{
-                                x: span(2.2),
-                                y: span(7.7)
-                            }}>
-                                <Button label={lang.shout} onClick={this.shout.bind(this)}/>
-                            </foreignObject>
-                        </>
-                    case 1:
-                        return <>
-                            <foreignObject {...{
-                                x: span(7),
-                                y: span(7)
-                            }}>
-                                <Input value={price} onChange={price => this.setState({price})}/>
-                            </foreignObject>
-                            <foreignObject {...{
-                                x: span(6.2),
-                                y: span(7.7)
-                            }}>
-                                <Button label={lang.shout} onClick={this.shout.bind(this)}/>
-                            </foreignObject>
-                        </>
-                }
+                return <>
+                    <foreignObject {...{
+                        x: span(5),
+                        y: span(8)
+                    }}>
+                        <Input value={price} onChange={price => this.setState({price})}/>
+                    </foreignObject>
+                    <foreignObject {...{
+                        x: span(4.15),
+                        y: span(8.5)
+                    }}>
+                        <Button label={lang.shout} onClick={this.shout.bind(this)}/>
+                    </foreignObject>
+                </>
             }
         }
         return null
-    }
-
-    dealIt = (position, price) => {
-        console.log(position, price)
-        this.setState({
-            dealDialog: true,
-            dealObj: {
-                price,
-                position
-            }
-        })
-    }
-
-    dealDone = (position, price, status) => {
-        if (status) {
-            const {
-                props: {
-                    frameEmitter,
-                }
-            } = this
-            frameEmitter.emit(MoveType.deal, {position, price})
-        }
-        this.setState({dealDialog: false})
     }
 
     render() {
         const {
             lang,
             props: {
-                game: {params: {countdown: roundTime}},
+                game: {params: {}},
                 gameState: {groups},
-                playerState: {groupIndex, positionIndex, role, privatePrices},
-            }, state: {loading, newRoundTimers, countdowns, dealDialog, dealObj}
+                playerState: {groupIndex, positionIndex, profits},
+            }, state: {price, loading, newRoundTimers}
         } = this
         if (loading) {
             return <MaskLoading label='加载中...'/>
@@ -198,26 +135,22 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
 
         const {rounds, roundIndex} = groups[groupIndex],
             newRoundTimer = newRoundTimers[roundIndex],
-            countdown = countdowns[roundIndex],
-            {playerStatus, board} = rounds[roundIndex]
+            {playerStatus, fishLeft} = rounds[roundIndex]
 
         const playerState = playerStatus[positionIndex]
+        const playerProfit = profits[roundIndex]
         return <section className={style.play}>
             <Stage dev={true}>
                 {
                     newRoundTimer ?
                         <RoundSwitching msg={lang.toNewRound(NEW_ROUND_TIMER - newRoundTimer)}/> :
                         <>
-                            <PutShadow playerState={playerState} role={role}/>
-                            <Referee playerState={playerState}/>
-                            <Outside playerState={playerState}/>
-                            <Role playerState={playerState} role={role} privatePrice={privatePrices[roundIndex]}/>
-                            <Board playerState={playerState} role={role} board={board} positionIndex={positionIndex}
-                                   dealIt={this.dealIt.bind(this)}/>
-                            <Tip playerState={playerState} role={role} countdown={countdown} roundTime={roundTime}/>
-                            <Dealed playerState={playerState} role={role}/>
-                            <Dialog dealDialog={dealDialog} position={dealObj.position} price={dealObj.price}
-                                    dealDone={this.dealDone.bind(this)} role={role}/>
+                            <PutShadow/>
+                            <Referee playerState={playerState} fishLeft={fishLeft} playerProfit={playerProfit}/>
+                            <Bucket playerState={playerState} playerProfit={playerProfit}/>
+                            <Players/>
+                            <FishPool/>
+                            <Fish playerState={playerState}/>
                             {this.renderOperateWidget()}
                         </>
                 }

@@ -4,6 +4,7 @@ export enum MoveType {
     prepare = 'prepare',
     shout = 'shout',
     getPosition = 'getPosition',
+    toNextRound = 'toNextRound',
 }
 
 export enum PushType {
@@ -18,6 +19,8 @@ export enum PlayerStatus {
     outside,
     prepared,
     shouted,
+    nextRound,
+    preparedNextRound,
     gameOver,
 }
 

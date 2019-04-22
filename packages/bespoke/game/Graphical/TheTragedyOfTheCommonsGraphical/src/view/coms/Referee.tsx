@@ -2,21 +2,20 @@ import {span, Host} from 'bespoke-game-graphical-util'
 import {PlayerStatus} from '../../config'
 import * as React from "react"
 
-const Referee = ({playerState}: { playerState: number }) => {
+const Referee = ({playerState, fishLeft, playerProfit}: { playerState: number, fishLeft: number, playerProfit: number }) => {
     let msg = ''
     switch (playerState) {
         case PlayerStatus.outside:
-            msg = '买方与卖方的物品交易'
-            break
-        case PlayerStatus.dealed:
-            msg = `交易成功~`
+            msg = `抓鱼，可抓${fishLeft}条，剩余翻倍均分`
             break
         case PlayerStatus.shouted:
-            msg = '已出价，根据您的心里价值来交易吧~'
+            msg = '已捕鱼，等待剩余鱼翻倍'
             break
         case PlayerStatus.prepared:
-            msg = '请根据您的心里价值来交易'
+            msg = '请选择要捕多少鱼'
             break
+        case PlayerStatus.nextRound:
+            msg = `捕鱼完成且已翻倍，您获得${playerProfit}`
         case PlayerStatus.gameOver:
             msg = '所有实验结束，等待老师结束实验'
 
