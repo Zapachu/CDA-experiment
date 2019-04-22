@@ -20,7 +20,7 @@ export class PhaseService {
             getAdminService().getAuthorizedTemplates({userId}, (err, response) => {
                 if (err) {
                     Log.e(err)
-                    resolve([])
+                    return resolve([])
                 }
                 resolve(phaseTemplates.filter(({namespace}) =>
                     response.namespaces.includes(namespace)
