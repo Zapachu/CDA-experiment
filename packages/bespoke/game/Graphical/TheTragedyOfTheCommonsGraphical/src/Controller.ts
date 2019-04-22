@@ -62,6 +62,11 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     groupPlayerStates = Object.values(playerStates).filter(s => s.groupIndex === groupIndex)
                 rounds[roundIndex].playerStatus[positionIndex] = PlayerStatus.preparedNextRound
                 if (playerStatus.every(status => status === PlayerStatus.preparedNextRound)) {
+                    if (roundIndex == rounds.length - 1) {
+                        for (let i in playerStatus) playerStatus[i] = PlayerStatus.gameOver
+                        await this.stateManager.syncState()
+                        return
+                    }
                     let newRoundTimer = 1
                     const newRoundInterval = global.setInterval(async () => {
                         groupPlayerStates.forEach(({actor}) => this.push(actor, PushType.newRoundTimer, {
@@ -88,6 +93,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 playerState.prices[roundIndex] = params.price
                 playerState.profits[roundIndex] = params.price
                 rounds[roundIndex].fishLeft -= params.price
+                await this.stateManager.syncState()
                 if (playerStatus.every(p => p === PlayerStatus.shouted)) {
                     const lastFish = rounds[roundIndex].fishLeft * magnification
                     const everyGet = lastFish / groupSize

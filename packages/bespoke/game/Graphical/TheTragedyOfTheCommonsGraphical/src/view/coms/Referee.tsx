@@ -16,6 +16,7 @@ const Referee = ({playerState, fishLeft, playerProfit}: { playerState: number, f
             break
         case PlayerStatus.nextRound:
             msg = `捕鱼完成且已翻倍，您获得${playerProfit}`
+            break
         case PlayerStatus.gameOver:
             msg = '所有实验结束，等待老师结束实验'
 
