@@ -1,5 +1,4 @@
 import {Server, ServerCredentials} from 'grpc'
-import {setBespokeService} from './service/AcademusBespoke'
 import {getGameService, setPhaseService} from './service/PhaseManager'
 import {PhaseManager} from 'elf-protocol'
 import {config} from 'bespoke-common'
@@ -9,7 +8,6 @@ import {Log, Setting} from '../util'
 export function serve() {
     const server = new Server()
     setPhaseService(server)
-    setBespokeService(server)
     server.bind(`0.0.0.0:${elfSetting.bespokeRpcPort}`, ServerCredentials.createInsecure())
     server.start()
     registerPhases()
