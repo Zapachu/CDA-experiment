@@ -42,7 +42,7 @@ const Dialog = ({dealDialog, price, position, dealDone, role}: IDialog) => {
                     </div>
                 </foreignObject>
                 <foreignObject {...{
-                    x: span(3.3),
+                    x: span(2.5),
                     y: span(5.8)
                 }}>
                     <Button label='成交' onClick={deal.bind(this, position, price, true)}/>
@@ -76,7 +76,7 @@ const Dialog = ({dealDialog, price, position, dealDone, role}: IDialog) => {
                     </div>
                 </foreignObject>
                 <foreignObject {...{
-                    x: span(7.3),
+                    x: span(6.5),
                     y: span(5.8)
                 }}>
                     <Button label='成交' onClick={deal.bind(this, position, price, true)}/>

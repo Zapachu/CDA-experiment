@@ -1,19 +1,17 @@
 import * as React from 'react'
-import Cash from './coms/Cash'
-import Referee from './coms/Referee'
-import PutShadow from "./coms/PutShadow"
-import Background from './coms/Background'
-import {Core, Lang, MaskLoading, Toast} from 'bespoke-client-util'
-import {Stage, span, Input, Button, RoundSwitching} from 'bespoke-game-graphical-util'
-import {
-    ICreateParams,
-    IGameState,
-    IMoveParams,
-    IPlayerState,
-    IPushParams
-} from '../interface'
-import {FetchType, MoveType, PlayerStatus, PushType, NEW_ROUND_TIMER} from '../config'
 import * as style from './style.scss'
+import {Core, Lang, MaskLoading, Toast} from 'bespoke-client-util'
+import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
+import {FetchType, MoveType, NEW_ROUND_TIMER, PlayerStatus, PushType} from '../config'
+import {Button, Input, RoundSwitching, span, Stage} from 'bespoke-game-graphical-util'
+
+
+import Fish from './coms/Fish'
+import Bucket from './coms/Bucket'
+import Referee from './coms/Referee'
+import Players from './coms/Players'
+import FishPool from './coms/FishPool'
+import PutShadow from './coms/PutShadow'
 
 interface IPlayState {
     price: string
@@ -50,19 +48,19 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         this.setState({loading: false})
     }
 
+    setVal = (e) => this.setState({price: e.target.value})
+
     shout = () => {
         const {
             props: {
-                gameState: {groups},
-                playerState: {groupIndex, balances},
-                frameEmitter
+                frameEmitter,
+                game: {params: {fishCount, groupSize}}
             }, state
         } = this
-        const {roundIndex} = groups[groupIndex]
         this.setState({price: ''})
         const price = Number(state.price)
-        if (Number.isNaN(price) || price > balances[roundIndex]) {
-            Toast.warn('你的出价大于您拥有的资金')
+        if (Number.isNaN(price) || price > fishCount / groupSize) {
+            Toast.warn('输入的值无效')
         } else {
             frameEmitter.emit(MoveType.shout, {price: +price})
         }
@@ -73,39 +71,33 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             lang, props: {
                 frameEmitter,
                 gameState: {groups},
-                playerState: {groupIndex, positionIndex, balances}
+                playerState: {groupIndex, positionIndex}
             }, state: {price}
         } = this
         const {rounds, roundIndex} = groups[groupIndex],
             {playerStatus} = rounds[roundIndex]
         switch (playerStatus[positionIndex]) {
             case PlayerStatus.outside: {
-                return <foreignObject {...{
-                    x: span(4),
-                    y: span(8)
-                }}>
-                    <Button label={lang.prepare} onClick={() => frameEmitter.emit(MoveType.prepare)}/>
-                </foreignObject>
+                return <>
+                    <foreignObject {...{
+                        x: span(4.2),
+                        y: span(9)
+                    }}>
+                        <Button label={lang.prepare} onClick={() => frameEmitter.emit(MoveType.prepare)}/>
+                    </foreignObject>
+                </>
             }
             case PlayerStatus.nextRound: {
                 return <>
                     <foreignObject {...{
-                        x: span(5),
-                        y: span(8)
-                    }}>
-                        <p style={{width: 300, marginLeft: '-5rem', fontSize: '1.8rem', marginBottom: '3rem'}}>
-                            您的收益 {balances[roundIndex]}
-                        </p>
-                    </foreignObject>
-                    <foreignObject {...{
                         x: span(4.2),
-                        y: span(8.6)
+                        y: span(9)
                     }}>
                         <Button label={lang.nextRound} onClick={() => frameEmitter.emit(MoveType.toNextRound)}/>
                     </foreignObject>
                 </>
             }
-            case PlayerStatus.timeToShout: {
+            case PlayerStatus.prepared: {
                 return <>
                     <foreignObject {...{
                         x: span(5),
@@ -115,53 +107,50 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                     </foreignObject>
                     <foreignObject {...{
                         x: span(4.15),
-                        y: span(8.6)
+                        y: span(8.5)
                     }}>
                         <Button label={lang.shout} onClick={this.shout.bind(this)}/>
                     </foreignObject>
                 </>
             }
-            default:
-                return null
         }
+        return null
     }
 
     render() {
         const {
             lang,
             props: {
+                game: {params: {}},
                 gameState: {groups},
-                playerState: {groupIndex, balances, positionIndex}
+                playerState: {groupIndex, positionIndex, profits},
             }, state: {loading, newRoundTimers}
         } = this
-
         if (loading) {
             return <MaskLoading label='加载中...'/>
         }
         if (groupIndex === undefined) {
-            return <MaskLoading label={lang.matchingPlayer}/>
+            return <MaskLoading label='正在匹配玩家...'/>
         }
 
         const {rounds, roundIndex} = groups[groupIndex],
             newRoundTimer = newRoundTimers[roundIndex],
-            {playerStatus} = rounds[roundIndex]
+            {playerStatus, fishLeft} = rounds[roundIndex]
 
         const playerState = playerStatus[positionIndex]
-
-        if (playerState === PlayerStatus.memberFull) {
-            return <MaskLoading label='满员...'/>
-        }
-
+        const playerProfit = profits[roundIndex]
         return <section className={style.play}>
-            <Stage dev={false}>
+            <Stage dev={true}>
                 {
                     newRoundTimer ?
                         <RoundSwitching msg={lang.toNewRound(NEW_ROUND_TIMER - newRoundTimer)}/> :
                         <>
-                            <PutShadow curPlayer={rounds[roundIndex].currentPlayer}/>
-                            <Background/>
-                            <Cash playerState={playerState} position={positionIndex} balance={balances[roundIndex]}/>
-                            <Referee playerState={playerState} position={positionIndex} balance={balances[roundIndex]}/>
+                            <PutShadow/>
+                            <Referee playerState={playerState} fishLeft={fishLeft} playerProfit={playerProfit}/>
+                            <Bucket playerState={playerState} playerProfit={playerProfit}/>
+                            <Players/>
+                            <FishPool/>
+                            <Fish playerState={playerState}/>
                             {this.renderOperateWidget()}
                         </>
                 }
