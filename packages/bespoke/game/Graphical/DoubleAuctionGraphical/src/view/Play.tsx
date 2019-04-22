@@ -48,7 +48,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             this.setState(state => {
                 const newRoundTimers = state.newRoundTimers.slice()
                 newRoundTimers[roundIndex] = newRoundTimer
-                return {newRoundTimers}
+                return {newRoundTimers, dealDialog: false}
             })
         })
         frameEmitter.on(PushType.countdown, ({roundIndex, countdown}) => {
