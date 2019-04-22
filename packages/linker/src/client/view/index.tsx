@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react'
+import * as style from './initial.scss'
 import {BrowserRouter, RouteComponentProps} from 'react-router-dom'
 import {config, IUserWithId} from '@common'
 import {rootContext} from '@client-context'
@@ -12,10 +13,8 @@ import {Configuration} from './Configuration'
 import {Info} from './Info'
 import {GameList} from './GameList'
 import {BaseInfo} from './BaseInfo'
-import {CreateInFrame} from './CreateInFrame'
 import {PlayerResult} from './Result/Player'
-import * as style from './initial.scss'
-
+import {Create} from './Create'
 
 interface IToV5Props extends RouteComponentProps<{ gameId?: string }> {
 }
@@ -43,7 +42,7 @@ export const Root: React.FunctionComponent = () => {
                 </div>
                 <BrowserRouter basename={config.rootName}>
                     <Switch>
-                        <Route path={'/createInFrame'} component={CreateInFrame}/>
+                        <Route path={'/Create/:namespace'} component={Create}/>
                         <Route path={'/baseInfo/:gameId'} component={withSideNav(BaseInfo, NAV.basic)}/>
                         <Route path={'/baseInfo'} component={withSideNav(BaseInfo, NAV.basic)}/>
                         <Route path={'/phase/:gameId'} component={withSideNav(Phase, NAV.phase)}/>
