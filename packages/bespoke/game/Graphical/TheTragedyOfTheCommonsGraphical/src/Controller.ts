@@ -78,6 +78,9 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         }
                         global.clearInterval(newRoundInterval)
                         groupState.roundIndex++
+                        if (!rounds[groupState.roundIndex].fishLeft) {
+                            rounds[groupState.roundIndex].fishLeft = fishCount
+                        }
                         await this.stateManager.syncState()
                     }, 1000)
                 }

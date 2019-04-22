@@ -124,7 +124,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 game: {params: {}},
                 gameState: {groups},
                 playerState: {groupIndex, positionIndex, profits},
-            }, state: {price, loading, newRoundTimers}
+            }, state: {loading, newRoundTimers}
         } = this
         if (loading) {
             return <MaskLoading label='加载中...'/>
