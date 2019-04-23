@@ -6,8 +6,6 @@ const {
     NODE_ENV,
     BESPOKE_NAMESPACE,
     BESPOKE_IP,
-    BESPOKE_PORT,
-    BESPOKE_RPC_PORT,
     BESPOKE_WITH_PROXY,
     BESPOKE_WITH_LINKER,
     OTREE_PORT,
@@ -23,8 +21,6 @@ export const elfSetting = {
     //region bespoke
     bespokeNamespace: BESPOKE_NAMESPACE,
     bespokeIp: BESPOKE_IP,
-    bespokePort: +BESPOKE_PORT,
-    bespokeRpcPort: +BESPOKE_RPC_PORT,
     bespokeWithProxy: BESPOKE_WITH_PROXY === 'true',
     bespokeWithLinker: BESPOKE_WITH_LINKER === 'true',
     //endregion

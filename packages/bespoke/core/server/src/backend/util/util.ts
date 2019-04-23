@@ -16,7 +16,7 @@ export const Log = {l, d, i, w, e}
 
 if (elfSetting.inProductEnv) {
     console.log(`当前为生成环境,日志记录于:${LogPath}`)
-}else{
+} else {
     Log.w('当前为开发环境,短信/邮件发送、游戏状态持久化等可能受影响')
 }
 
@@ -37,9 +37,31 @@ export function elfPhaseId2PlayUrl(namespace: string, phaseId: string): string {
 
 export class Setting {
     static staticPath: string
+    private static _port: number
+    private static _rpcPort: number
+
+    static get port() {
+        return this._port
+    }
+
+    static get rpcPort() {
+        return this._rpcPort
+    }
+
+    static setPort(port:number){
+        this._port = port
+        Log.i(`Listening on port ${port}`)
+    }
+
+    static setRpcPort(rpcPort:number){
+        this._rpcPort = rpcPort
+        Log.i(`Serving on rpcPort ${rpcPort}`)
+    }
 
     static init(setting: IGameSetting) {
         this.staticPath = setting.staticPath
+        this._port = setting.port || (elfSetting.inProductEnv ? 0 : config.devPort.server)
+        this._rpcPort = setting.rpcPort || 0
     }
 
     static getClientPath(): string {

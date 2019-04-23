@@ -8,20 +8,21 @@ import {Log, Setting} from '../util'
 export function serve() {
     const server = new Server()
     setPhaseService(server)
-    server.bind(`0.0.0.0:${elfSetting.bespokeRpcPort}`, ServerCredentials.createInsecure())
+    const rpcPort = server.bind(`0.0.0.0:${Setting.rpcPort}`, ServerCredentials.createInsecure())
+    Setting.setRpcPort(rpcPort)
     server.start()
     registerPhases()
 }
 
 function registerPhases() {
-    const {proxyService: p, bespokeIp, bespokeRpcPort, bespokeNamespace} = elfSetting,
+    const {proxyService: p, bespokeIp, bespokeNamespace} = elfSetting,
         domain = p.host.startsWith('http') ? p.host : `http://${p.host}:${p.port}`
     getGameService().registerPhases({
         phases: [{
             type: PhaseManager.PhaseType.bespoke,
             namespace: bespokeNamespace,
             jsUrl: `${domain}/${config.rootName}/static/bespoke-client-util.min.js;${domain}${Setting.getClientPath()}`,
-            rpcUri: `${bespokeIp}:${bespokeRpcPort}`
+            rpcUri: `${bespokeIp}:${Setting.rpcPort}`
         }]
     }, err => err && Log.e(err))
     setTimeout(() => registerPhases(), config.gameRegisterInterval)

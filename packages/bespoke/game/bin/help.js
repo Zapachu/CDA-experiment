@@ -81,7 +81,7 @@ var BuildMode;
 })(BuildMode || (BuildMode = {}));
 (function () {
     return __awaiter(this, void 0, void 0, function () {
-        var namespace, namespacePath, group, taskLog, _a, command, _env, namespaces, side, _b, mode, _env, command, dev, _env, _c, port, rpcPort, ip, withProxy, withLinker, command;
+        var namespace, namespacePath, group, taskLog, _a, command, _env, namespaces, side, _b, mode, _env, command, dev, _env, _c, ip, withProxy, withLinker, command;
         return __generator(this, function (_d) {
             switch (_d.label) {
                 case 0: return [4 /*yield*/, inquirer_1.prompt([
@@ -179,14 +179,6 @@ var BuildMode;
                     if (!!dev) return [3 /*break*/, 13];
                     return [4 /*yield*/, inquirer_1.prompt([
                             {
-                                name: 'port',
-                                type: 'number'
-                            },
-                            {
-                                name: 'rpcPort',
-                                type: 'number'
-                            },
-                            {
                                 name: 'ip',
                                 type: 'input',
                                 message: '本机内网IP:'
@@ -201,11 +193,9 @@ var BuildMode;
                             }
                         ])];
                 case 12:
-                    _c = _d.sent(), port = _c.port, rpcPort = _c.rpcPort, ip = _c.ip, withProxy = _c.withProxy, withLinker = _c.withLinker;
+                    _c = _d.sent(), ip = _c.ip, withProxy = _c.withProxy, withLinker = _c.withLinker;
                     Object.assign(_env, {
-                        BESPOKE_PORT: port,
                         BESPOKE_IP: ip,
-                        BESPOKE_RPC_PORT: rpcPort,
                         BESPOKE_WITH_PROXY: withProxy,
                         BESPOKE_WITH_LINKER: withLinker,
                         NODE_ENV: 'production'
