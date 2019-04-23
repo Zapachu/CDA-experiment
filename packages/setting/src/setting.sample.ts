@@ -55,15 +55,15 @@ export default {
     //region thirdPartyPhaseProxy
     // qualtrics
     qualtricsPort: 3071,
-    qualtricsRpc: '127.0.0.1:53071',
+    qualtricsRpcPort: 53071,
     qualtricsProxy: 'http://127.0.0.1:3071',
     // 问卷星
     wjxPort: 3072,
-    wjxRpc: '127.0.0.1:53072',
+    wjxRpcPort: 53072,
     wjxProxy: 'http://127.0.0.1:3072',
     // 腾讯问卷
     qqwjPort: 3073,
-    qqwjRpc: '127.0.0.1:53073',
+    qqwjRpcPort: 53073,
     qqwjProxy: 'http://127.0.0.1:3073',
     //endregion
     //region other

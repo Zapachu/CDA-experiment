@@ -24,13 +24,12 @@ export function serve() {
  * namespace: oTree + hash
  * data: {namespace, list}
  */
-async function getJsUrls() {
+async function getJsUrls():Promise<Array<PhaseManager.TPhaseRegInfo>> {
     const manifest = JSON.parse(readFileSync(resolve(__dirname, '../../../../dist/manifest.json')).toString())
-    const regPhase = {
-        type: PhaseManager.PhaseType.otree,
+    const regPhase:PhaseManager.TPhaseRegInfo = {
         namespace: setting.oTreeNamespace,
         jsUrl: `${setting.oTreeProxy}${manifest['otree.js']};${setting.oTreeProxy}/${routePrefix.oTreeStaticPathNamespace}${virtualJsRoute}`,
-        rpcUri: setting.oTreeRpc
+        rpcPort: setting.oTreeRpcPort
     }
     await getDemoList(regPhase.namespace)
     return [regPhase]

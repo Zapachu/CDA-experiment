@@ -1,9 +1,9 @@
-import { resolve } from 'path'
-import { readFileSync } from 'fs'
-import { Server, ServerCredentials } from 'grpc'
+import {resolve} from 'path'
+import {readFileSync} from 'fs'
+import {Server, ServerCredentials} from 'grpc'
 import {PhaseManager} from 'elf-protocol'
 import {gameService} from '../../common/utils'
-import {phaseService } from './service/QualtricsManager'
+import {phaseService} from './service/QualtricsManager'
 import {elfSetting as setting} from 'elf-setting'
 
 export function serve() {
@@ -14,23 +14,18 @@ export function serve() {
     setInterval(() => registerPhases(), 10000)
 }
 
-function getJsUrls(): Array<{ namespace: string, jsUrl: string }> {
-    const phases = []
-    Object.entries(JSON.parse(readFileSync(resolve(__dirname, '../../../../dist/manifest.json')).toString())).map(([k, v]) => {
-        if (k.replace('.js', '') === 'qualtrics') {
-            phases.push({
-                type:PhaseManager.PhaseType.quatrics,
-                namespace: k.replace('.js', ''),
-                jsUrl: `${setting.qualtricsProxy}${v}`,
-                rpcUri: setting.qualtricsRpc
-            })
-        }
-    })
-    return phases
+function getJsUrls(): Array<PhaseManager.TPhaseRegInfo> {
+    const manifest = JSON.parse(readFileSync(resolve(__dirname, '../../../../dist/manifest.json')).toString())
+    const regPhase: PhaseManager.TPhaseRegInfo = {
+        namespace: `qualtrics`,
+        jsUrl: `${setting.qualtricsProxy}${manifest['qualtrics.js']}`,
+        rpcPort: setting.qualtricsRpcPort
+    }
+    return [regPhase]
 }
 
 function registerPhases() {
-    gameService.registerPhases({ phases: getJsUrls() }, (err) => {
+    gameService.registerPhases({phases: getJsUrls()}, (err) => {
         if (err) {
             console.log(err)
         }

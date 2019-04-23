@@ -83,7 +83,6 @@ export class Create extends BaseCreate<any> {
 
 registerOnFramework('qualtrics', {
     localeNames: ['Qualtrics 环节', 'Qualtrics Phase'],
-    Create,
-    type: 'survey'
+    Create
 })
 

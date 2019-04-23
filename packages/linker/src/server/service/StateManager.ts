@@ -6,7 +6,8 @@ import {
     IPhaseState,
     NFrame,
     IActor,
-    IGameState
+    IGameState,
+    IPhaseRegInfo
 } from '@common'
 import {getPhaseService} from '../rpc'
 import {GameService} from './GameService'
@@ -45,7 +46,7 @@ export class StateManager {
             })
         }
         const regInfo = await redisClient.get(RedisKey.phaseRegInfo(phaseCfg.namespace))
-        const {rpcUri} = JSON.parse(regInfo) as PhaseManager.IPhaseRegInfo
+        const {rpcUri} = JSON.parse(regInfo) as IPhaseRegInfo
         return new Promise<IPhaseState>((resolve, reject) => {
             getPhaseService(rpcUri).newPhase({
                 owner: this.game.owner,
@@ -103,7 +104,7 @@ export class StateManager {
             curPhaseCfgIndex = phaseConfigs.findIndex(phaseCfg => phaseCfg.key === curPhaseState.key),
             playerCurPhaseState = curPhaseState.playerState[playerToken]
         playerCurPhaseState.phaseResult = {...playerCurPhaseState.phaseResult, ...phaseResult}
-        if(!playerCurPhaseState || playerCurPhaseState.status === baseEnum.PlayerStatus.left){
+        if (!playerCurPhaseState || playerCurPhaseState.status === baseEnum.PlayerStatus.left) {
             Log.w('玩家不在此环节中')
         }
         const query = {gameId: this.game.id, playerId: playerCurPhaseState.actor.playerId}
@@ -127,7 +128,7 @@ export class StateManager {
         const curPhaseState = phaseStates.find(phaseState => phaseState.playUrl === playUrl),
             curPhaseCfgIndex = phaseConfigs.findIndex(phaseCfg => phaseCfg.key === curPhaseState.key),
             playerCurPhaseState = curPhaseState.playerState[playerToken]
-        if(!playerCurPhaseState || playerCurPhaseState.status === baseEnum.PlayerStatus.left){
+        if (!playerCurPhaseState || playerCurPhaseState.status === baseEnum.PlayerStatus.left) {
             Log.w('玩家不在此环节中')
         }
         playerCurPhaseState.status = baseEnum.PlayerStatus.left

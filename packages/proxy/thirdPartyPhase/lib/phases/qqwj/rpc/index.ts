@@ -14,19 +14,14 @@ export function serve() {
     setInterval(() => registerPhases(), 10000)
 }
 
-function getJsUrls(): Array<{ namespace: string, jsUrl: string }> {
-    const phases = []
-    Object.entries(JSON.parse(readFileSync(resolve(__dirname, '../../../../dist/manifest.json')).toString())).map(([k, v]) => {
-        if (k.replace('.js', '') === 'qqwj') {
-            phases.push({
-                type:PhaseManager.PhaseType.qqwj,
-                namespace: k.replace('.js', ''),
-                jsUrl: `${setting.qqwjProxy}${v}`,
-                rpcUri: setting.qqwjRpc
-            })
-        }
-    })
-    return phases
+function getJsUrls(): Array<PhaseManager.TPhaseRegInfo> {
+    const manifest = JSON.parse(readFileSync(resolve(__dirname, '../../../../dist/manifest.json')).toString())
+    const regPhase: PhaseManager.TPhaseRegInfo = {
+        namespace: `qqwj`,
+        jsUrl: `${setting.qqwjProxy}${manifest['qqwj.js']}`,
+        rpcPort: setting.qqwjRpcPort
+    }
+    return [regPhase]
 }
 
 function registerPhases() {

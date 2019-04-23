@@ -131,12 +131,7 @@ enum BuildMode {
                 BESPOKE_NAMESPACE: namespace
             }
             if (!dev) {
-                const {ip, withProxy, withLinker} = await prompt([
-                    {
-                        name: 'ip',
-                        type: 'input',
-                        message: '本机内网IP:'
-                    },
+                const {withProxy, withLinker} = await prompt([
                     {
                         name: 'withProxy',
                         type: 'confirm'
@@ -147,7 +142,6 @@ enum BuildMode {
                     }
                 ])
                 Object.assign(_env, {
-                    BESPOKE_IP: ip,
                     BESPOKE_WITH_PROXY: withProxy,
                     BESPOKE_WITH_LINKER: withLinker,
                     NODE_ENV: 'production'

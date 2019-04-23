@@ -94,8 +94,7 @@ class Create extends BaseCreate<any> {
     otreeNode = {namespace, oTreeProxy}
     registerOnFramework(namespace, {
         localeNames: [namespace, namespace],
-        Create,
-        type: 'otree'
+        Create
     })
 }
 
