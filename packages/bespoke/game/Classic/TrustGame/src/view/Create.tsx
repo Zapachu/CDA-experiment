@@ -31,6 +31,11 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
         readonly: true,
     }
 
+    componentDidMount() {
+        const {round, group, groupSize, groupParams} = this.state;
+        this.props.setParams({round, group, groupParams, groupSize});
+    }
+
     setGroup = (e) => {
         const curGroupCount = parseInt(e.target.value)
         const {group, groupParams} = this.state

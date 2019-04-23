@@ -36,7 +36,9 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
     }
 
     componentDidMount(): void {
-        const {props: {setSubmitable}} = this
+        const {props: {setSubmitable, setParams}} = this
+        const {buyerPriceStart, buyerPriceEnd, sellerPriceStart, sellerPriceEnd, InitMoney, round, countdown, groupSize, positions} = this.state;
+        setParams({buyerPriceStart, buyerPriceEnd, sellerPriceStart, sellerPriceEnd, InitMoney, round, countdown, groupSize, positions});
         setSubmitable(false)
     }
 
