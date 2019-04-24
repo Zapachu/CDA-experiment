@@ -1,6 +1,6 @@
+import './initial.scss'
 import * as React from 'react'
-import * as style from './initial.scss'
-import {Lang, LanguageSwitcher} from 'bespoke-client-util'
+import {Lang} from 'bespoke-client-util'
 import {BrowserRouter, Switch, Route, RouteComponentProps} from 'react-router-dom'
 import {config} from 'bespoke-common'
 import {rootContext, TRootCtx} from './context'
@@ -17,9 +17,6 @@ import {render} from 'react-dom'
 
 const Root: React.FunctionComponent<TRootCtx> = props =>
     <rootContext.Provider value={props}>
-        <div className={style.languageSwitcherWrapper}>
-            <LanguageSwitcher/>
-        </div>
         <BrowserRouter basename={config.rootName}>
             <Switch>
                 <Route path={`/${props.gameTemplate.namespace}`} component={NamespaceRoute}/>

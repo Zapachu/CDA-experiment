@@ -48,7 +48,7 @@ export function loadThirdPartyLib(target: baseEnum.ThirdPartyLib, callback = ()=
         }
         case baseEnum.ThirdPartyLib.phaser:{
             loadScript([
-                'https://cdn.jsdelivr.net/npm/phaser@3.15/dist/phaser.min.js'
+                'https://cdn.jsdelivr.net/npm/phaser@3.16.2/dist/phaser.min.js'
             ], callback)
         }
     }
