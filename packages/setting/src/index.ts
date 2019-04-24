@@ -25,7 +25,6 @@ export const elfSetting = {
     //region otree
     oTreeNamespace: OTREE_NAMESPACE || 'OtreeDefault',
     oTreePort: +(OTREE_PORT || 3070),
-    oTreeRpcPort: +(OTREE_RPC || 53070),
     oTreeProxy: OTREE_PROXY || 'http://127.0.0.1:3070',
     oTreeServer: OTREE_SERVER || 'http://127.0.0.1:8000'
     //endregion

@@ -9,25 +9,19 @@ import {gameService} from '../../common/utils'
 export function serve() {
     const server = new Server()
     PhaseManager.setPhaseService(server, phaseService)
-    server.bind(`0.0.0.0:5${setting.wjxPort}`, ServerCredentials.createInsecure())
+    const rpcPort = server.bind('0.0.0.0:0', ServerCredentials.createInsecure())
     server.start()
-    setInterval(() => registerPhases(), 10000)
+    registerPhases(rpcPort)
 }
 
-function getJsUrls(): Array<PhaseManager.TPhaseRegInfo> {
-    const manifest = JSON.parse(readFileSync(resolve(__dirname, '../../../../dist/manifest.json')).toString())
-    const regPhase: PhaseManager.TPhaseRegInfo = {
-        namespace: `wjx`,
-        jsUrl: `${setting.wjxProxy}${manifest['wjx.js']}`,
-        rpcPort: setting.wjxRpcPort
-    }
-    return [regPhase]
-}
-
-function registerPhases() {
-    gameService.registerPhases({phases: getJsUrls()}, (err) => {
-        if (err) {
-            console.log(err)
+function registerPhases(rpcPort: number) {
+    setInterval(() => {
+        const manifest = JSON.parse(readFileSync(resolve(__dirname, '../../../../dist/manifest.json')).toString())
+        const regPhase: PhaseManager.TPhaseRegInfo = {
+            namespace: `wjx`,
+            jsUrl: `${setting.wjxProxy}${manifest['wjx.js']}`,
+            rpcPort
         }
-    })
+        gameService.registerPhases({phases: [regPhase]}, err => err ? console.error(err) : null)
+    }, 10000)
 }

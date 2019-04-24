@@ -12,34 +12,20 @@ import {virtualJsRoute} from '../server/config'
 export function serve() {
     const server = new Server()
     PhaseManager.setPhaseService(server, phaseService)
-    server.bind(`0.0.0.0:5${setting.oTreePort}`, ServerCredentials.createInsecure())
+    const rpcPort = server.bind('0.0.0.0:0', ServerCredentials.createInsecure())
     server.start()
-    setInterval(async () => await registerPhases(), 10000)
+    registerPhases(rpcPort)
+    getDemoList(setting.oTreeNamespace).catch(err => err ? console.error(err) : null)
 }
 
-
-/**
- * Init: list
- * GET oTree List Functions / oTree List Cache
- * namespace: oTree + hash
- * data: {namespace, list}
- */
-async function getJsUrls():Promise<Array<PhaseManager.TPhaseRegInfo>> {
-    const manifest = JSON.parse(readFileSync(resolve(__dirname, '../../../../dist/manifest.json')).toString())
-    const regPhase:PhaseManager.TPhaseRegInfo = {
-        namespace: setting.oTreeNamespace,
-        jsUrl: `${setting.oTreeProxy}${manifest['otree.js']};${setting.oTreeProxy}/${routePrefix.oTreeStaticPathNamespace}${virtualJsRoute}`,
-        rpcPort: setting.oTreeRpcPort
-    }
-    await getDemoList(regPhase.namespace)
-    return [regPhase]
-}
-
-// 注册 Otree Phase
-async function registerPhases() {
-    gameService.registerPhases({phases: await getJsUrls()}, (err) => {
-        if (err) {
-            console.log(err)
+function registerPhases(rpcPort: number) {
+    setInterval(() => {
+        const manifest = JSON.parse(readFileSync(resolve(__dirname, '../../../../dist/manifest.json')).toString())
+        const regPhase: PhaseManager.TPhaseRegInfo = {
+            namespace: setting.oTreeNamespace,
+            jsUrl: `${setting.oTreeProxy}${manifest['otree.js']};${setting.oTreeProxy}/${routePrefix.oTreeStaticPathNamespace}${virtualJsRoute}`,
+            rpcPort
         }
-    })
+        gameService.registerPhases({phases: [regPhase]}, err => err ? console.error(err) : null)
+    }, 10000)
 }
