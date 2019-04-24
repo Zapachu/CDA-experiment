@@ -123,7 +123,7 @@ export class Server {
             server = express.listen(Setting.port)
         EventDispatcher.startGameSocket(server)
         this.bindServerListener(server, () => {
-            Log.i(`CreateGame：http://127.0.0.1:${elfSetting.inProductEnv ? Setting.port : config.devPort.client}/${config.rootName}/${elfSetting.bespokeNamespace}/create`)
+            Log.i(`CreateGame：http://localhost:${elfSetting.inProductEnv ? Setting.port : config.devPort.client}/${config.rootName}/${elfSetting.bespokeNamespace}/create`)
             if (!elfSetting.bespokeWithProxy) {
                 return
             }
