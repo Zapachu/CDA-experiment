@@ -3,9 +3,6 @@
   "name": "ContinuousDoubleAuction",
   "env": {
     "NODE_ENV": "production",
-    "BESPOKE_IP": "127.0.0.1",
-    "BESPOKE_PORT": "5009",
-    "BESPOKE_RPC_PORT": "55009",
     "BESPOKE_NAMESPACE": "ContinuousDoubleAuction",
     "BESPOKE_WITH_PROXY": "true",
     "BESPOKE_WITH_LINKER": "true"

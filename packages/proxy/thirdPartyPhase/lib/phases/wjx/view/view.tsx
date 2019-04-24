@@ -74,6 +74,5 @@ export class Create extends BaseCreate<any> {
 
 registerOnFramework('wjx', {
     localeNames: ['问卷星', 'WJX Phase'],
-    Create,
-    type: 'survey'
+    Create
 })

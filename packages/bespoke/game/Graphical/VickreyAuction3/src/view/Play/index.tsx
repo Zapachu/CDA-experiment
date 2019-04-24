@@ -168,7 +168,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             {playerStatus} = rounds[roundIndex]
         const someoneWon = playerStatus.some(s => s === PlayerStatus.won)
         return <section className={style.play}>
-            <Stage dev={true}>
+            <Stage>
                 {
                     newRoundTimer ?
                         <RoundSwitching msg={lang.toNewRound(NEW_ROUND_TIMER - newRoundTimer)}/> :

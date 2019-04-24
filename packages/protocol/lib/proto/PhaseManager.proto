@@ -14,13 +14,11 @@ message RegisterPhasesReq {
     message phaseRegInfo {
         string namespace = 1;
         string jsUrl = 2;
-        string rpcUri = 3;
-        string type = 4;
+        int32 rpcPort = 3;
     }
     repeated phaseRegInfo phases = 1;
 }
 message RegisterPhasesRes {
-    bool success = 1;
 }
 message PhaseResult {
     string uniKey = 1;

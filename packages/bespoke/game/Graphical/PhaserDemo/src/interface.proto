@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+message CreateParams {
+    string nextPhaseKey = 5;
+}
+
+message MoveParams {
+}
+
+message PushParams {
+}
+
+message GameState {
+}
+
+message PlayerState {
+}

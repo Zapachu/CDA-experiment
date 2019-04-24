@@ -1,15 +1,19 @@
-import {Server} from 'grpc'
+import {Server,ServerUnaryCall} from 'grpc'
 import {Log, redisClient, RedisKey, RedisLifetime, buildPlayUrl} from '@server-util'
 import {StateManager} from '@server-service'
 import {PhaseManager as P} from 'elf-protocol'
 
 export function setGameService(server: Server) {
 
-    function registerPhases(req: { request: P.TRegisterPhasesReq }, callback: P.TRegisterPhasesCallBack) {
-        Log.d('registerPhases:', JSON.stringify(req.request))
+    function registerPhases(req: ServerUnaryCall<P.TRegisterPhasesReq>, callback: P.TRegisterPhasesCallBack) {
+        const clientHost = req.getPeer().split(':')[1]
+        Log.d(`registerPhases: ${clientHost}`, JSON.stringify(req.request), clientHost)
         new Promise(async resolve => {
             req.request.phases.forEach(async phase => {
-                await redisClient.setex(RedisKey.phaseRegInfo(phase.namespace), RedisLifetime.phaseRegInfo, JSON.stringify(phase))
+                await redisClient.setex(RedisKey.phaseRegInfo(phase.namespace), RedisLifetime.phaseRegInfo, JSON.stringify({
+                    ...phase,
+                    rpcUri:`${clientHost}:${phase.rpcPort}`
+                }))
             })
             await redisClient.sadd(RedisKey.registeredPhaseSet, req.request.phases.map(({namespace}) => namespace))
             resolve()

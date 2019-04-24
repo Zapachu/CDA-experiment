@@ -9,30 +9,19 @@ import { readFileSync } from 'fs'
 export function serve() {
     const server = new Server()
     PhaseManager.setPhaseService(server, phaseService)
-    server.bind(`0.0.0.0:5${setting.qqwjPort}`, ServerCredentials.createInsecure())
+    const rpcPort = server.bind('0.0.0.0:0', ServerCredentials.createInsecure())
     server.start()
-    setInterval(() => registerPhases(), 10000)
+    registerPhases(rpcPort)
 }
 
-function getJsUrls(): Array<{ namespace: string, jsUrl: string }> {
-    const phases = []
-    Object.entries(JSON.parse(readFileSync(resolve(__dirname, '../../../../dist/manifest.json')).toString())).map(([k, v]) => {
-        if (k.replace('.js', '') === 'qqwj') {
-            phases.push({
-                type:PhaseManager.PhaseType.qqwj,
-                namespace: k.replace('.js', ''),
-                jsUrl: `${setting.qqwjProxy}${v}`,
-                rpcUri: setting.qqwjRpc
-            })
+function registerPhases(rpcPort: number) {
+    setInterval(() => {
+        const manifest = JSON.parse(readFileSync(resolve(__dirname, '../../../../dist/manifest.json')).toString())
+        const regPhase: PhaseManager.TPhaseRegInfo = {
+            namespace: `qqwj`,
+            jsUrl: `${setting.qqwjProxy}${manifest['qqwj.js']}`,
+            rpcPort
         }
-    })
-    return phases
-}
-
-function registerPhases() {
-    gameService.registerPhases({ phases: getJsUrls() }, (err) => {
-        if (err) {
-            console.log(err)
-        }
-    })
+        gameService.registerPhases({phases: [regPhase]}, err => err ? console.error(err) : null)
+    }, 10000)
 }

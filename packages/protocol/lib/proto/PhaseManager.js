@@ -356,8 +356,7 @@ $root.RegisterPhasesReq = (function() {
          * @interface IphaseRegInfo
          * @property {string|null} [namespace] phaseRegInfo namespace
          * @property {string|null} [jsUrl] phaseRegInfo jsUrl
-         * @property {string|null} [rpcUri] phaseRegInfo rpcUri
-         * @property {string|null} [type] phaseRegInfo type
+         * @property {number|null} [rpcPort] phaseRegInfo rpcPort
          */
 
         /**
@@ -392,20 +391,12 @@ $root.RegisterPhasesReq = (function() {
         phaseRegInfo.prototype.jsUrl = "";
 
         /**
-         * phaseRegInfo rpcUri.
-         * @member {string} rpcUri
+         * phaseRegInfo rpcPort.
+         * @member {number} rpcPort
          * @memberof RegisterPhasesReq.phaseRegInfo
          * @instance
          */
-        phaseRegInfo.prototype.rpcUri = "";
-
-        /**
-         * phaseRegInfo type.
-         * @member {string} type
-         * @memberof RegisterPhasesReq.phaseRegInfo
-         * @instance
-         */
-        phaseRegInfo.prototype.type = "";
+        phaseRegInfo.prototype.rpcPort = 0;
 
         /**
          * Creates a new phaseRegInfo instance using the specified properties.
@@ -435,10 +426,8 @@ $root.RegisterPhasesReq = (function() {
                 writer.uint32(/* id 1, wireType 2 =*/10).string(message.namespace);
             if (message.jsUrl != null && message.hasOwnProperty("jsUrl"))
                 writer.uint32(/* id 2, wireType 2 =*/18).string(message.jsUrl);
-            if (message.rpcUri != null && message.hasOwnProperty("rpcUri"))
-                writer.uint32(/* id 3, wireType 2 =*/26).string(message.rpcUri);
-            if (message.type != null && message.hasOwnProperty("type"))
-                writer.uint32(/* id 4, wireType 2 =*/34).string(message.type);
+            if (message.rpcPort != null && message.hasOwnProperty("rpcPort"))
+                writer.uint32(/* id 3, wireType 0 =*/24).int32(message.rpcPort);
             return writer;
         };
 
@@ -480,10 +469,7 @@ $root.RegisterPhasesReq = (function() {
                     message.jsUrl = reader.string();
                     break;
                 case 3:
-                    message.rpcUri = reader.string();
-                    break;
-                case 4:
-                    message.type = reader.string();
+                    message.rpcPort = reader.int32();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -526,12 +512,9 @@ $root.RegisterPhasesReq = (function() {
             if (message.jsUrl != null && message.hasOwnProperty("jsUrl"))
                 if (!$util.isString(message.jsUrl))
                     return "jsUrl: string expected";
-            if (message.rpcUri != null && message.hasOwnProperty("rpcUri"))
-                if (!$util.isString(message.rpcUri))
-                    return "rpcUri: string expected";
-            if (message.type != null && message.hasOwnProperty("type"))
-                if (!$util.isString(message.type))
-                    return "type: string expected";
+            if (message.rpcPort != null && message.hasOwnProperty("rpcPort"))
+                if (!$util.isInteger(message.rpcPort))
+                    return "rpcPort: integer expected";
             return null;
         };
 
@@ -551,10 +534,8 @@ $root.RegisterPhasesReq = (function() {
                 message.namespace = String(object.namespace);
             if (object.jsUrl != null)
                 message.jsUrl = String(object.jsUrl);
-            if (object.rpcUri != null)
-                message.rpcUri = String(object.rpcUri);
-            if (object.type != null)
-                message.type = String(object.type);
+            if (object.rpcPort != null)
+                message.rpcPort = object.rpcPort | 0;
             return message;
         };
 
@@ -574,17 +555,14 @@ $root.RegisterPhasesReq = (function() {
             if (options.defaults) {
                 object.namespace = "";
                 object.jsUrl = "";
-                object.rpcUri = "";
-                object.type = "";
+                object.rpcPort = 0;
             }
             if (message.namespace != null && message.hasOwnProperty("namespace"))
                 object.namespace = message.namespace;
             if (message.jsUrl != null && message.hasOwnProperty("jsUrl"))
                 object.jsUrl = message.jsUrl;
-            if (message.rpcUri != null && message.hasOwnProperty("rpcUri"))
-                object.rpcUri = message.rpcUri;
-            if (message.type != null && message.hasOwnProperty("type"))
-                object.type = message.type;
+            if (message.rpcPort != null && message.hasOwnProperty("rpcPort"))
+                object.rpcPort = message.rpcPort;
             return object;
         };
 
@@ -611,7 +589,6 @@ $root.RegisterPhasesRes = (function() {
      * Properties of a RegisterPhasesRes.
      * @exports IRegisterPhasesRes
      * @interface IRegisterPhasesRes
-     * @property {boolean|null} [success] RegisterPhasesRes success
      */
 
     /**
@@ -628,14 +605,6 @@ $root.RegisterPhasesRes = (function() {
                 if (properties[keys[i]] != null)
                     this[keys[i]] = properties[keys[i]];
     }
-
-    /**
-     * RegisterPhasesRes success.
-     * @member {boolean} success
-     * @memberof RegisterPhasesRes
-     * @instance
-     */
-    RegisterPhasesRes.prototype.success = false;
 
     /**
      * Creates a new RegisterPhasesRes instance using the specified properties.
@@ -661,8 +630,6 @@ $root.RegisterPhasesRes = (function() {
     RegisterPhasesRes.encode = function encode(message, writer) {
         if (!writer)
             writer = $Writer.create();
-        if (message.success != null && message.hasOwnProperty("success"))
-            writer.uint32(/* id 1, wireType 0 =*/8).bool(message.success);
         return writer;
     };
 
@@ -697,9 +664,6 @@ $root.RegisterPhasesRes = (function() {
         while (reader.pos < end) {
             var tag = reader.uint32();
             switch (tag >>> 3) {
-            case 1:
-                message.success = reader.bool();
-                break;
             default:
                 reader.skipType(tag & 7);
                 break;
@@ -735,9 +699,6 @@ $root.RegisterPhasesRes = (function() {
     RegisterPhasesRes.verify = function verify(message) {
         if (typeof message !== "object" || message === null)
             return "object expected";
-        if (message.success != null && message.hasOwnProperty("success"))
-            if (typeof message.success !== "boolean")
-                return "success: boolean expected";
         return null;
     };
 
@@ -752,10 +713,7 @@ $root.RegisterPhasesRes = (function() {
     RegisterPhasesRes.fromObject = function fromObject(object) {
         if (object instanceof $root.RegisterPhasesRes)
             return object;
-        var message = new $root.RegisterPhasesRes();
-        if (object.success != null)
-            message.success = Boolean(object.success);
-        return message;
+        return new $root.RegisterPhasesRes();
     };
 
     /**
@@ -767,15 +725,8 @@ $root.RegisterPhasesRes = (function() {
      * @param {$protobuf.IConversionOptions} [options] Conversion options
      * @returns {Object.<string,*>} Plain object
      */
-    RegisterPhasesRes.toObject = function toObject(message, options) {
-        if (!options)
-            options = {};
-        var object = {};
-        if (options.defaults)
-            object.success = false;
-        if (message.success != null && message.hasOwnProperty("success"))
-            object.success = message.success;
-        return object;
+    RegisterPhasesRes.toObject = function toObject() {
+        return {};
     };
 
     /**
