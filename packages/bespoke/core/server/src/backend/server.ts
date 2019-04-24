@@ -88,19 +88,18 @@ export class Server {
         }))
     }
 
-    private static bindServerListener(server: http.Server, port: number, cb: () => void) {
+    private static bindServerListener(server: http.Server, cb: () => void) {
         server.on('error', (error: NodeJS.ErrnoException) => {
             if (error.syscall !== 'listen') {
                 Log.e(error)
             }
-            const bind = `${typeof port !== 'number' ? 'Pipe' : 'Port'} ${port}`
             switch (error.code) {
                 case 'EACCES':
-                    console.error(bind + ' requires elevated privileges')
+                    console.error('Port requires elevated privileges')
                     process.exit(1)
                     break
                 case 'EADDRINUSE':
-                    console.error(bind + ' is already in use')
+                    console.error('Port is already in use')
                     process.exit(1)
                     break
                 default:
@@ -109,7 +108,7 @@ export class Server {
         })
             .on('listening', () => {
                 const {port} = server.address() as AddressInfo
-                Log.i(`Listening on port ${port}`)
+                Setting.setPort(port)
                 cb()
             })
     }
@@ -120,10 +119,11 @@ export class Server {
         this.initPassPort()
         QCloudSMS.init()
         GameLogic.init(logicTemplate)
-        const express = this.initExpress()
-        const port = elfSetting.inProductEnv ? elfSetting.bespokePort : config.devPort.server
-        this.bindServerListener(EventDispatcher.startGameSocket(express.listen(port)), port, () => {
-            Log.i(`CreateGame：http://127.0.0.1:${elfSetting.inProductEnv?port:config.devPort.client}/${config.rootName}/${elfSetting.bespokeNamespace}/create`)
+        const express = this.initExpress(),
+            server = express.listen(Setting.port)
+        EventDispatcher.startGameSocket(server)
+        this.bindServerListener(server, () => {
+            Log.i(`CreateGame：http://localhost:${elfSetting.inProductEnv ? Setting.port : config.devPort.client}/${config.rootName}/${elfSetting.bespokeNamespace}/create`)
             if (!elfSetting.bespokeWithProxy) {
                 return
             }
@@ -133,8 +133,8 @@ export class Server {
             const heartBeat2Proxy = () => {
                 getProxyService().registerGame({
                         namespace: elfSetting.bespokeNamespace,
-                        port: port.toString(),
-                        rpcPort: elfSetting.bespokeRpcPort.toString()
+                        port: Setting.port.toString(),
+                        rpcPort: Setting.rpcPort.toString()
                     },
                     err => err ? Log.w(`注册至代理失败，${config.gameRegisterInterval}秒后重试`) : null)
                 setTimeout(() => heartBeat2Proxy(), config.gameRegisterInterval)

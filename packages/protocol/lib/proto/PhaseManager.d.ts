@@ -187,11 +187,8 @@ export namespace RegisterPhasesReq {
         /** phaseRegInfo jsUrl */
         jsUrl?: (string|null);
 
-        /** phaseRegInfo rpcUri */
-        rpcUri?: (string|null);
-
-        /** phaseRegInfo type */
-        type?: (string|null);
+        /** phaseRegInfo rpcPort */
+        rpcPort?: (number|null);
     }
 
     /** Represents a phaseRegInfo. */
@@ -209,11 +206,8 @@ export namespace RegisterPhasesReq {
         /** phaseRegInfo jsUrl. */
         public jsUrl: string;
 
-        /** phaseRegInfo rpcUri. */
-        public rpcUri: string;
-
-        /** phaseRegInfo type. */
-        public type: string;
+        /** phaseRegInfo rpcPort. */
+        public rpcPort: number;
 
         /**
          * Creates a new phaseRegInfo instance using the specified properties.
@@ -289,9 +283,6 @@ export namespace RegisterPhasesReq {
 
 /** Properties of a RegisterPhasesRes. */
 export interface IRegisterPhasesRes {
-
-    /** RegisterPhasesRes success */
-    success?: (boolean|null);
 }
 
 /** Represents a RegisterPhasesRes. */
@@ -302,9 +293,6 @@ export class RegisterPhasesRes implements IRegisterPhasesRes {
      * @param [properties] Properties to set
      */
     constructor(properties?: IRegisterPhasesRes);
-
-    /** RegisterPhasesRes success. */
-    public success: boolean;
 
     /**
      * Creates a new RegisterPhasesRes instance using the specified properties.

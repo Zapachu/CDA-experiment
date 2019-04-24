@@ -329,7 +329,6 @@ export class Phase extends React.Component<TRootContext & RouteComponentProps<{ 
 
 
 interface AddPhaseState {
-    phaseType: string
     phases: Array<{
         type: string,
         nodes: Array<{ name: string, namespace: string, icon: string }>
@@ -346,18 +345,9 @@ export class AddPhase extends React.Component<AddPhaseProps, AddPhaseState> {
     constructor(props) {
         super(props)
         this.state = {
-            phaseType: '',
             phases: this.formatPhases(phaseTemplates),
             options: [],
             searchTerm: ''
-        }
-    }
-
-    componentDidMount() {
-        const {state: {phases}} = this
-        if (phases.length) {
-            const {type} = phases[0]
-            this.onTabChange(type)
         }
     }
 
@@ -371,19 +361,11 @@ export class AddPhase extends React.Component<AddPhaseProps, AddPhaseState> {
     formatPhases = (phaseTemplates: { [phase: string]: IPhaseTemplate }) => {
         const phases: { [type: string]: Array<{ name: string, namespace: string, icon: string }> } = {}
         Object.values(phaseTemplates).forEach(tpl => {
-            if (phases[tpl.type]) {
-                phases[tpl.type].push({
-                    name: Lang.extractLang({name: tpl.localeNames}).name,
-                    namespace: tpl.namespace,
-                    icon: tpl.icon
-                })
-            } else {
-                phases[tpl.type] = [{
-                    name: Lang.extractLang({name: tpl.localeNames}).name,
-                    namespace: tpl.namespace,
-                    icon: tpl.icon
-                }]
-            }
+            phases[tpl.namespace] = [{
+                name: Lang.extractLang({name: tpl.localeNames}).name,
+                namespace: tpl.namespace,
+                icon: tpl.icon
+            }]
         })
         return Object.entries(phases).map(([type, nodes]) => ({type, nodes}))
     }
@@ -401,7 +383,7 @@ export class AddPhase extends React.Component<AddPhaseProps, AddPhaseState> {
     }
 
     handleChange = (name: string) => {
-        const {options, phases, phaseType} = this.state
+        const {options, phases} = this.state
         if (!name) {
             this.setState({phases: this.formatPhases(phaseTemplates), options: [], searchTerm: ''})
         } else if (options.length) {
@@ -415,14 +397,13 @@ export class AddPhase extends React.Component<AddPhaseProps, AddPhaseState> {
                 }))
             this.setState({
                 phases: newPhases,
-                phaseType: newPhases[0] ? newPhases[0].type : phaseType,
                 searchTerm: name
             })
         }
     }
 
     render() {
-        const {lang, state: {phaseType, phases, options, searchTerm}} = this
+        const {lang, state: {phases, options, searchTerm}} = this
         return (
             <section className={style.addPhase}>
                 <div className={style.searchBar}>
@@ -439,8 +420,7 @@ export class AddPhase extends React.Component<AddPhaseProps, AddPhaseState> {
                         {options.map(option => <Select.Option key={option}>{option}</Select.Option>)}
                     </Select>
                 </div>
-                <Tabs activeKey={phaseType}
-                      onChange={this.onTabChange}>
+                <Tabs>
                     {phases.map(({nodes, type}) =>
                         <Tabs.TabPane
                             tab={lang[type]}
@@ -463,18 +443,14 @@ export class AddPhase extends React.Component<AddPhaseProps, AddPhaseState> {
     }
 
     onTagClick = (node: { name: string, namespace: string }) => {
-        const {lang, state: {phaseType}, props: {onTagClick}} = this
+        const {props: {onTagClick}} = this
         onTagClick({
             key: genePhaseKey(),
-            title: `${lang[phaseType]}-${node.name}`,
+            title: node.name,
             namespace: node.namespace,
             param: {},
             suffixPhaseKeys: []
         })
-    }
-
-    onTabChange = (key: string) => {
-        this.setState({phaseType: key})
     }
 }
 

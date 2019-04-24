@@ -66,14 +66,6 @@ export namespace BespokeProxy {
 }
 
 export namespace PhaseManager {
-    export enum PhaseType {
-        bespoke = 'bespoke',
-        otree = 'otree',
-        quatrics = 'quatrics',
-        qqwj = 'qqwj',
-        wjx = 'wjx'
-    }
-
     let protoDef = loadPackageDefinition(loadSync(resolve(__dirname, './PhaseManager.proto'))) as any
 
     let gameService: GameService
@@ -105,7 +97,7 @@ export namespace PhaseManager {
     }
 
     export type TRegisterPhasesReq = IRegisterPhasesReq
-    export type IPhaseRegInfo = RegisterPhasesReq.IphaseRegInfo
+    export type TPhaseRegInfo = RegisterPhasesReq.IphaseRegInfo
     export type TRegisterPhasesCallBack = (error?: Error, response?: IRegisterPhasesRes) => void
     export type TPhaseResult = IPhaseResult
     export type TSetPhaseResultReq = ISetPhaseResultReq

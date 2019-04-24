@@ -3,8 +3,6 @@ import {Socket} from 'socket.io-client'
 import {PhaseManager} from 'elf-protocol'
 import {baseEnum} from '@common'
 
-export type TPhaseType = 'bespoke' | 'otree' | 'qualtrics' | 'survey'
-
 export type TSocket = typeof Socket
 
 export interface IUser {
@@ -27,6 +25,9 @@ export interface IActor {
     playerId: string
 }
 
+export interface IPhaseRegInfo extends PhaseManager.TPhaseRegInfo {
+    rpcUri: string
+}
 
 export interface IPhaseConfig<ICreateParam = {}> {
     namespace: string

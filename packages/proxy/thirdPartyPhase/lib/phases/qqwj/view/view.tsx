@@ -82,7 +82,6 @@ class Create extends BaseCreate<any> {
 
 registerOnFramework('qqwj', {
     localeNames: ['腾讯问卷', 'Tencent Survey'],
-    Create,
-    type: 'survey'
+    Create
 })
 
