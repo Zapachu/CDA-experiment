@@ -39,14 +39,14 @@ var path = require("path");
 var fs = require("fs");
 var inquirer_1 = require("inquirer");
 var shelljs_1 = require("shelljs");
-var RecentTask;
-(function (RecentTask) {
-    RecentTask.groupName = 'RecentTask';
+var TaskHelper;
+(function (TaskHelper) {
+    TaskHelper.groupName = 'RecentTask';
     var logPath = path.resolve(__dirname, './help.log');
     function getGroups() {
-        return fs.existsSync(logPath) ? [RecentTask.groupName] : [];
+        return fs.existsSync(logPath) ? [TaskHelper.groupName] : [];
     }
-    RecentTask.getGroups = getGroups;
+    TaskHelper.getGroups = getGroups;
     function getLogs() {
         try {
             return fs.readFileSync(logPath).toString().split('\n').map(function (row) { return JSON.parse(row); });
@@ -55,7 +55,7 @@ var RecentTask;
             return [];
         }
     }
-    RecentTask.getLogs = getLogs;
+    TaskHelper.getLogs = getLogs;
     function appendLog(_a) {
         var command = _a.command, env = _a.env;
         var logs = getLogs().map(function (log) { return JSON.stringify(log); });
@@ -66,48 +66,57 @@ var RecentTask;
         logs.unshift(newLog);
         fs.writeFileSync(logPath, logs.slice(0, 5).join('\n'));
     }
-    RecentTask.appendLog = appendLog;
-})(RecentTask || (RecentTask = {}));
+    function execTask(task) {
+        appendLog(task);
+        Object.assign(shelljs_1.env, task.env);
+        shelljs_1.exec(task.command);
+    }
+    TaskHelper.execTask = execTask;
+})(TaskHelper || (TaskHelper = {}));
 var Side;
 (function (Side) {
     Side["client"] = "client";
     Side["server"] = "server";
 })(Side || (Side = {}));
-var BuildMode;
-(function (BuildMode) {
-    BuildMode["dev"] = "dev";
-    BuildMode["dist"] = "dist";
-    BuildMode["publish"] = "publish";
-})(BuildMode || (BuildMode = {}));
+var ClientTask;
+(function (ClientTask) {
+    ClientTask["dev"] = "dev";
+    ClientTask["dist"] = "dist";
+    ClientTask["publish"] = "publish";
+})(ClientTask || (ClientTask = {}));
+var ServerTask;
+(function (ServerTask) {
+    ServerTask["dev"] = "dev";
+    ServerTask["dist"] = "dist";
+    ServerTask["serve"] = "serve";
+})(ServerTask || (ServerTask = {}));
 (function () {
     return __awaiter(this, void 0, void 0, function () {
-        var namespace, namespacePath, group, taskLog, _a, command, _env, namespaces, side, _b, mode, _env, command, dev, _env, _c, withProxy, withLinker, command;
+        var namespace, namespacePath, group, taskLog, namespaces, side, _a, mode, task, _b, _c, withProxy, withLinker;
         return __generator(this, function (_d) {
             switch (_d.label) {
                 case 0: return [4 /*yield*/, inquirer_1.prompt([
                         {
                             name: 'group',
                             type: 'list',
-                            choices: RecentTask.getGroups().concat(fs.readdirSync(path.resolve(__dirname, '../')).filter(function (name) { return name[0] < 'a'; })),
+                            choices: TaskHelper.getGroups().concat(fs.readdirSync(path.resolve(__dirname, '../')).filter(function (name) { return name[0] < 'a'; })),
                             message: 'Group/NameSpace:'
                         }
                     ])];
                 case 1:
                     group = (_d.sent()).group;
-                    if (!(group === RecentTask.groupName)) return [3 /*break*/, 3];
+                    if (!(group === TaskHelper.groupName)) return [3 /*break*/, 3];
                     return [4 /*yield*/, inquirer_1.prompt([
                             {
                                 name: 'taskLog',
                                 type: 'list',
-                                choices: RecentTask.getLogs().map(function (log) { return JSON.stringify(log); }),
+                                choices: TaskHelper.getLogs().map(function (log) { return JSON.stringify(log); }),
                                 message: 'TaskLog:'
                             }
                         ])];
                 case 2:
                     taskLog = (_d.sent()).taskLog;
-                    _a = JSON.parse(taskLog), command = _a.command, _env = _a.env;
-                    Object.assign(shelljs_1.env, _env);
-                    shelljs_1.exec(command);
+                    TaskHelper.execTask(JSON.parse(taskLog));
                     return [2 /*return*/];
                 case 3:
                     namespaces = fs.readdirSync(path.resolve(__dirname, "../" + group + "/")).filter(function (name) { return name[0] < 'a'; });
@@ -137,73 +146,91 @@ var BuildMode;
                     ])];
                 case 7:
                     side = (_d.sent()).side;
-                    _b = side;
-                    switch (_b) {
+                    _a = side;
+                    switch (_a) {
                         case Side.client: return [3 /*break*/, 8];
                         case Side.server: return [3 /*break*/, 10];
                     }
-                    return [3 /*break*/, 14];
+                    return [3 /*break*/, 16];
                 case 8: return [4 /*yield*/, inquirer_1.prompt([
                         {
                             name: 'mode',
                             type: 'list',
-                            choices: [BuildMode.dev, BuildMode.dist, BuildMode.publish],
+                            choices: [ClientTask.dev, ClientTask.dist, ClientTask.publish],
                             message: 'Mode:'
                         }
                     ])];
                 case 9:
                     mode = (_d.sent()).mode;
-                    _env = {
-                        BUILD_MODE: mode
-                    };
-                    Object.assign(shelljs_1.env, _env);
                     shelljs_1.cd(path.resolve(__dirname, '..'));
-                    command = (mode === BuildMode.dev ? 'webpack-dev-server' : 'webpack') + " --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + namespacePath + "/script/webpack.config.ts";
-                    RecentTask.appendLog({
-                        command: command,
-                        env: _env
+                    TaskHelper.execTask({
+                        env: { BUILD_MODE: mode },
+                        command: (mode === ClientTask.dev ? 'webpack-dev-server' : 'webpack') + " --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + namespacePath + "/script/webpack.config.ts"
                     });
-                    shelljs_1.exec(command);
-                    return [3 /*break*/, 14];
+                    return [3 /*break*/, 16];
                 case 10: return [4 /*yield*/, inquirer_1.prompt([
                         {
-                            name: 'dev',
-                            type: 'confirm'
+                            name: 'task',
+                            type: 'list',
+                            choices: [ServerTask.dev, ServerTask.dist, ServerTask.serve],
+                            message: 'Task:'
                         }
                     ])];
                 case 11:
-                    dev = (_d.sent()).dev;
-                    _env = {
-                        BESPOKE_NAMESPACE: namespace
-                    };
-                    if (!!dev) return [3 /*break*/, 13];
-                    return [4 /*yield*/, inquirer_1.prompt([
-                            {
-                                name: 'withProxy',
-                                type: 'confirm'
-                            },
-                            {
-                                name: 'withLinker',
-                                type: 'confirm'
-                            }
-                        ])];
+                    task = (_d.sent()).task;
+                    _b = task;
+                    switch (_b) {
+                        case ServerTask.dist: return [3 /*break*/, 12];
+                        case ServerTask.dev: return [3 /*break*/, 13];
+                        case ServerTask.serve: return [3 /*break*/, 14];
+                    }
+                    return [3 /*break*/, 16];
                 case 12:
-                    _c = _d.sent(), withProxy = _c.withProxy, withLinker = _c.withLinker;
-                    Object.assign(_env, {
-                        BESPOKE_WITH_PROXY: withProxy,
-                        BESPOKE_WITH_LINKER: withLinker,
-                        NODE_ENV: 'production'
-                    });
+                    {
+                        TaskHelper.execTask({
+                            env: {
+                                namespacePath: namespacePath,
+                                namespace: namespace
+                            },
+                            command: "tsc --outDir ./" + namespacePath + "/build --listEmittedFiles true ./" + namespacePath + "/src/serve.ts"
+                        });
+                        return [3 /*break*/, 16];
+                    }
                     _d.label = 13;
                 case 13:
-                    Object.assign(shelljs_1.env, _env);
-                    command = "ts-node ./" + namespacePath + "/src/serve.ts";
-                    RecentTask.appendLog({
-                        command: command, env: _env
+                    {
+                        TaskHelper.execTask({
+                            env: {
+                                BESPOKE_NAMESPACE: namespace
+                            },
+                            command: "ts-node ./" + namespacePath + "/src/serve.ts"
+                        });
+                        return [3 /*break*/, 16];
+                    }
+                    _d.label = 14;
+                case 14: return [4 /*yield*/, inquirer_1.prompt([
+                        {
+                            name: 'withProxy',
+                            type: 'confirm'
+                        },
+                        {
+                            name: 'withLinker',
+                            type: 'confirm'
+                        }
+                    ])];
+                case 15:
+                    _c = _d.sent(), withProxy = _c.withProxy, withLinker = _c.withLinker;
+                    TaskHelper.execTask({
+                        env: {
+                            BESPOKE_NAMESPACE: namespace,
+                            BESPOKE_WITH_PROXY: withProxy,
+                            BESPOKE_WITH_LINKER: withLinker,
+                            NODE_ENV: 'production'
+                        },
+                        command: "node ./" + namespacePath + "/build/serve.js"
                     });
-                    shelljs_1.exec(command);
-                    return [3 /*break*/, 14];
-                case 14: return [2 /*return*/];
+                    return [3 /*break*/, 16];
+                case 16: return [2 /*return*/];
             }
         });
     });

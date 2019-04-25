@@ -99,6 +99,7 @@ export interface IEventHandler {
 
 export interface IGameSetting {
     staticPath: string
+    logPath?: string
     port?: number
     rpcPort?: number
 }
