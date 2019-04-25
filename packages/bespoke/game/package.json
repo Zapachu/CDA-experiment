@@ -2,7 +2,7 @@
   "name": "bespoke-game",
   "version": "1.0.0",
   "scripts": {
-    "install": "tsc && tsc bin/help",
+    "install": "tsc bin/help",
     "help": "node bin/help"
   },
   "dependencies": {

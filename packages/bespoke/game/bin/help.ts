@@ -3,12 +3,12 @@ import * as fs from 'fs'
 import {prompt} from 'inquirer'
 import {cd, exec, env} from 'shelljs'
 
-interface TaskLog {
+interface Task {
+    env?: { [key: string]: string }
     command: string,
-    env: { [key: string]: string }
 }
 
-namespace RecentTask {
+namespace TaskHelper {
     export const groupName = 'RecentTask'
     const logPath = path.resolve(__dirname, './help.log')
 
@@ -16,7 +16,7 @@ namespace RecentTask {
         return fs.existsSync(logPath) ? [groupName] : []
     }
 
-    export function getLogs(): Array<TaskLog> {
+    export function getLogs(): Array<Task> {
         try {
             return fs.readFileSync(logPath).toString().split('\n').map(row => JSON.parse(row))
         } catch (e) {
@@ -24,7 +24,7 @@ namespace RecentTask {
         }
     }
 
-    export function appendLog({command, env}: TaskLog) {
+    function appendLog({command, env}: Task) {
         const logs = getLogs().map(log => JSON.stringify(log))
         const newLog = JSON.stringify({command, env})
         if (logs.includes(newLog)) {
@@ -33,6 +33,12 @@ namespace RecentTask {
         logs.unshift(newLog)
         fs.writeFileSync(logPath, logs.slice(0, 5).join('\n'))
     }
+
+    export function execTask(task: Task) {
+        appendLog(task)
+        Object.assign(env, task.env)
+        exec(task.command)
+    }
 }
 
 enum Side {
@@ -40,10 +46,16 @@ enum Side {
     server = 'server'
 }
 
-enum BuildMode {
+enum ClientTask {
     dev = 'dev',
     dist = 'dist',
     publish = 'publish'
+}
+
+enum ServerTask {
+    dev = 'dev',
+    dist = 'dist',
+    serve = 'serve'
 }
 
 (async function () {
@@ -54,24 +66,22 @@ enum BuildMode {
             name: 'group',
             type: 'list',
             choices: [
-                ...RecentTask.getGroups(),
+                ...TaskHelper.getGroups(),
                 ...fs.readdirSync(path.resolve(__dirname, '../')).filter(name => name[0] < 'a')
             ],
             message: 'Group/NameSpace:'
         }
     ]))
-    if (group === RecentTask.groupName) {
+    if (group === TaskHelper.groupName) {
         const {taskLog} = (await prompt<{ taskLog: string }>([
             {
                 name: 'taskLog',
                 type: 'list',
-                choices: RecentTask.getLogs().map(log => JSON.stringify(log)),
+                choices: TaskHelper.getLogs().map(log => JSON.stringify(log)),
                 message: 'TaskLog:'
             }
         ]))
-        const {command, env: _env}: TaskLog = JSON.parse(taskLog)
-        Object.assign(env, _env)
-        exec(command)
+        TaskHelper.execTask(JSON.parse(taskLog))
         return
     }
     const namespaces = fs.readdirSync(path.resolve(__dirname, `../${group}/`)).filter(name => name[0] < 'a')
@@ -99,61 +109,73 @@ enum BuildMode {
     ]))
     switch (side) {
         case Side.client: {
-            const {mode} = await prompt<{ mode: BuildMode }>([
+            const {mode} = await prompt<{ mode: ClientTask }>([
                 {
                     name: 'mode',
                     type: 'list',
-                    choices: [BuildMode.dev, BuildMode.dist, BuildMode.publish],
+                    choices: [ClientTask.dev, ClientTask.dist, ClientTask.publish],
                     message: 'Mode:'
                 }
             ])
-            const _env = {
-                BUILD_MODE: mode
-            }
-            Object.assign(env, _env)
             cd(path.resolve(__dirname, '..'))
-            const command = `${mode === BuildMode.dev ? 'webpack-dev-server' : 'webpack'} --env.TS_NODE_PROJECT="tsconfig.json" --config ./${namespacePath}/script/webpack.config.ts`
-            RecentTask.appendLog({
-                command,
-                env: _env
+            TaskHelper.execTask({
+                env: {BUILD_MODE: mode},
+                command: `${mode === ClientTask.dev ? 'webpack-dev-server' : 'webpack'} --env.TS_NODE_PROJECT="tsconfig.json" --config ./${namespacePath}/script/webpack.config.ts`
             })
-            exec(command)
             break
         }
         case Side.server: {
-            const {dev} = await prompt([
+            const {task} = await prompt<{ task: ServerTask }>([
                 {
-                    name: 'dev',
-                    type: 'confirm'
+                    name: 'task',
+                    type: 'list',
+                    choices: [ServerTask.dev, ServerTask.dist, ServerTask.serve],
+                    message: 'Task:'
                 }
             ])
-            const _env = {
-                BESPOKE_NAMESPACE: namespace
+            switch (task) {
+                case ServerTask.dist: {
+                    TaskHelper.execTask({
+                        env: {
+                            namespacePath,
+                            namespace
+                        },
+                        command: `tsc --outDir ./${namespacePath}/build --listEmittedFiles true ./${namespacePath}/src/serve.ts`
+                    })
+                    break
+                }
+                case ServerTask.dev: {
+                    TaskHelper.execTask({
+                        env: {
+                            BESPOKE_NAMESPACE: namespace
+                        },
+                        command: `ts-node ./${namespacePath}/src/serve.ts`
+                    })
+                    break
+                }
+                case ServerTask.serve: {
+                    const {withProxy, withLinker} = await prompt([
+                        {
+                            name: 'withProxy',
+                            type: 'confirm'
+                        },
+                        {
+                            name: 'withLinker',
+                            type: 'confirm'
+                        }
+                    ])
+                    TaskHelper.execTask({
+                        env: {
+                            BESPOKE_NAMESPACE: namespace,
+                            BESPOKE_WITH_PROXY: withProxy,
+                            BESPOKE_WITH_LINKER: withLinker,
+                            NODE_ENV: 'production'
+                        },
+                        command: `node ./${namespacePath}/build/serve.js`
+                    })
+                    break
+                }
             }
-            if (!dev) {
-                const {withProxy, withLinker} = await prompt([
-                    {
-                        name: 'withProxy',
-                        type: 'confirm'
-                    },
-                    {
-                        name: 'withLinker',
-                        type: 'confirm'
-                    }
-                ])
-                Object.assign(_env, {
-                    BESPOKE_WITH_PROXY: withProxy,
-                    BESPOKE_WITH_LINKER: withLinker,
-                    NODE_ENV: 'production'
-                })
-            }
-            Object.assign(env, _env)
-            const command = `ts-node ./${namespacePath}/src/serve.ts`
-            RecentTask.appendLog({
-                command, env: _env
-            })
-            exec(command)
-            break
         }
     }
 })()
