@@ -44,9 +44,10 @@ export namespace Core {
         frameEmitter?: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
     }
 
-    interface IResult4PlayerProps<ICreateParams, IPlayerState, FetchType> {
-        game: IGame<ICreateParams>,
+    interface IResult4PlayerProps<ICreateParams, IGameState, IPlayerState, FetchType> {
+        game: IGame<ICreateParams>
         fetcher: Fetcher<FetchType>
+        gameState: TGameState<IGameState>,
         playerState: TPlayerState<IPlayerState>
     }
 
@@ -68,13 +69,13 @@ export namespace Core {
     export class Create<ICreateParams, FetchType, S = {}> extends React.Component<ICreateProps<ICreateParams, FetchType>, S> {
     }
 
-    export type CreateSFC<ICreateParams, FetchType> = React.SFC<ICreateProps<ICreateParams, FetchType>>
+    export type CreateSFC<ICreateParams, FetchType> = React.FC<ICreateProps<ICreateParams, FetchType>>
 
 
     export class Info<ICreateParams, S = {}> extends React.Component<IInfoProps<ICreateParams>, S> {
     }
 
-    export type InfoSFC<ICreateParams> = React.SFC<IInfoProps<ICreateParams>>
+    export type InfoSFC<ICreateParams> = React.FC<IInfoProps<ICreateParams>>
 
 
     export class Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, S = {}>
@@ -82,7 +83,7 @@ export namespace Core {
     }
 
     export type PlaySFC<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> =
-        React.SFC<IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>>
+        React.FC<IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>>
 
 
     export class Play4Owner<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, S = {}>
@@ -90,23 +91,22 @@ export namespace Core {
     }
 
     export type Play4OwnerSFC<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> =
-        React.SFC<IPlay4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>>
+        React.FC<IPlay4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>>
 
 
-    export class Result<ICreateParams, IPlayerState, FetchType, S = {}>
-        extends React.Component<IResult4PlayerProps<ICreateParams, IPlayerState, FetchType>, S> {
+    export class Result<ICreateParams, IGameState, IPlayerState, FetchType, S = {}>
+        extends React.Component<IResult4PlayerProps<ICreateParams, IGameState, IPlayerState, FetchType>, S> {
     }
 
-    export type ResultSFC<ICreateParams, IPlayerState, FetchType> =
-        React.SFC<IResult4PlayerProps<ICreateParams, IPlayerState, FetchType>>
-
+    export type ResultSFC<ICreateParams, IGameState, IPlayerState, FetchType> =
+        React.FC<IResult4PlayerProps<ICreateParams, IGameState, IPlayerState, FetchType>>
 
     export class Result4Owner<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams, FetchType, S = {}>
         extends React.Component<IResult4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams, FetchType>, S> {
     }
 
     export type Result4OwnerSFC<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams, FetchType> =
-        React.SFC<IResult4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams, FetchType>>
+        React.FC<IResult4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams, FetchType>>
 
     export type CreateClass = (new(...args) => Create<{}, any>) | CreateSFC<{}, any>
 
@@ -118,8 +118,8 @@ export namespace Core {
     export type Play4OwnerClass = (new(...args) => Play4Owner<{}, {}, {}, any, any, {}, {}, any>)
         | Play4OwnerSFC<{}, {}, {}, any, any, {}, {}, any>
 
-    export type ResultClass = (new(...args) => Result<{}, {}, any>)
-        | ResultSFC<{}, {}, any>
+    export type ResultClass = (new(...args) => Result<{}, {}, {}, any>)
+        | ResultSFC<{}, {}, {}, any>
 
     export type Result4OwnerClass = (new(...args) => Result4Owner<{}, {}, {}, any, {}, any>)
         | Result4OwnerSFC<{}, {}, {}, any, {}, any>

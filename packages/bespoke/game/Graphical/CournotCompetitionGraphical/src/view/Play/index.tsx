@@ -73,7 +73,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             {playerStatus} = rounds[roundIndex],
             curPlayerStatus = playerStatus[positionIndex]
         return <section className={style.play}>
-            <Stage dev={true}>
+            <Stage>
                 {
                     newRoundTimer ?
                         <RoundSwitching msg={lang.toNewRound(NEW_ROUND_TIMER - newRoundTimer)}/> :
