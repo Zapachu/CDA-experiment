@@ -91,7 +91,7 @@ export class Play extends React.Component<TRootCtx & RouteComponentProps<{ gameI
             }) : this.setState({playerState})
         })
         socketClient.on(baseEnum.SocketEvent.syncGameState_msgpack, (gameStateBuffer: Array<number>) => {
-            console.log(gameStateBuffer.length/JSON.stringify(decode(gameStateBuffer)).length)
+            console.log(gameStateBuffer.length / JSON.stringify(decode(gameStateBuffer)).length)
             this.setState({gameState: decode(gameStateBuffer)})
         })
         socketClient.on(baseEnum.SocketEvent.syncPlayerState_msgpack,
@@ -151,9 +151,9 @@ export class Play extends React.Component<TRootCtx & RouteComponentProps<{ gameI
             case baseEnum.GameStatus.paused:
                 return <MaskLoading label={lang.Mask_GamePaused}/>
             case baseEnum.GameStatus.started:
-                return <Play {...{game, fetcher, frameEmitter, gameState, playerState}}/>
+                return <Play {...{game, fetcher, gameState, playerState, frameEmitter}}/>
             case baseEnum.GameStatus.over:
-                return <Result {...{game, playerState, fetcher}}/>
+                return <Result {...{game, fetcher, gameState, playerState}}/>
         }
     }
 }

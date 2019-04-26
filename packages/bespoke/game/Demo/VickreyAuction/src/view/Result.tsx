@@ -1,10 +1,10 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {Core, Lang, Label} from 'bespoke-client-util'
-import {ICreateParams, IMoveParams, IPlayerState} from '../interface'
+import {ICreateParams, IGameState, IMoveParams, IPlayerState} from '../interface'
 import {FetchType} from '../config'
 
-export class Result extends Core.Result<ICreateParams, IPlayerState, IMoveParams, FetchType> {
+export class Result extends Core.Result<ICreateParams, IGameState, IPlayerState, IMoveParams, FetchType> {
     lang = Lang.extractLang({
         profit: ['利润', 'Profit'],
         round: [n => `第${n}轮`, n => `Round ${n}`]
