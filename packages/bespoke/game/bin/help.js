@@ -92,7 +92,7 @@ var ServerTask;
 })(ServerTask || (ServerTask = {}));
 (function () {
     return __awaiter(this, void 0, void 0, function () {
-        var namespace, namespacePath, group, taskLog, namespaces, side, _a, mode, task, _b, _c, withProxy, withLinker;
+        var namespace, namespacePath, group, taskLog, namespaces, side, _a, mode, HMR, task, _b, HMR, _c, withProxy, withLinker;
         return __generator(this, function (_d) {
             switch (_d.label) {
                 case 0: return [4 /*yield*/, inquirer_1.prompt([
@@ -149,26 +149,48 @@ var ServerTask;
                     _a = side;
                     switch (_a) {
                         case Side.client: return [3 /*break*/, 8];
-                        case Side.server: return [3 /*break*/, 10];
+                        case Side.server: return [3 /*break*/, 12];
                     }
-                    return [3 /*break*/, 16];
-                case 8: return [4 /*yield*/, inquirer_1.prompt([
-                        {
-                            name: 'mode',
-                            type: 'list',
-                            choices: [ClientTask.dev, ClientTask.dist, ClientTask.publish],
-                            message: 'Mode:'
-                        }
-                    ])];
+                    return [3 /*break*/, 19];
+                case 8:
+                    shelljs_1.cd(path.resolve(__dirname, '..'));
+                    return [4 /*yield*/, inquirer_1.prompt([
+                            {
+                                name: 'mode',
+                                type: 'list',
+                                choices: [ClientTask.dev, ClientTask.dist, ClientTask.publish],
+                                message: 'Mode:'
+                            }
+                        ])];
                 case 9:
                     mode = (_d.sent()).mode;
-                    shelljs_1.cd(path.resolve(__dirname, '..'));
+                    if (!(mode === ClientTask.dev)) return [3 /*break*/, 11];
+                    return [4 /*yield*/, inquirer_1.prompt([
+                            {
+                                name: 'HMR',
+                                type: 'confirm'
+                            }
+                        ])];
+                case 10:
+                    HMR = (_d.sent()).HMR;
+                    if (HMR) {
+                        TaskHelper.execTask({
+                            env: {
+                                BUILD_MODE: mode,
+                                HMR: HMR.toString()
+                            },
+                            command: "webpack-dev-server --hot --progress --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + namespacePath + "/script/webpack.config.ts"
+                        });
+                        return [3 /*break*/, 19];
+                    }
+                    _d.label = 11;
+                case 11:
                     TaskHelper.execTask({
                         env: { BUILD_MODE: mode },
-                        command: (mode === ClientTask.dev ? 'webpack-dev-server' : 'webpack') + " --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + namespacePath + "/script/webpack.config.ts"
+                        command: "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + namespacePath + "/script/webpack.config.ts"
                     });
-                    return [3 /*break*/, 16];
-                case 10: return [4 /*yield*/, inquirer_1.prompt([
+                    return [3 /*break*/, 19];
+                case 12: return [4 /*yield*/, inquirer_1.prompt([
                         {
                             name: 'task',
                             type: 'list',
@@ -176,16 +198,16 @@ var ServerTask;
                             message: 'Task:'
                         }
                     ])];
-                case 11:
+                case 13:
                     task = (_d.sent()).task;
                     _b = task;
                     switch (_b) {
-                        case ServerTask.dist: return [3 /*break*/, 12];
-                        case ServerTask.dev: return [3 /*break*/, 13];
-                        case ServerTask.serve: return [3 /*break*/, 14];
+                        case ServerTask.dist: return [3 /*break*/, 14];
+                        case ServerTask.dev: return [3 /*break*/, 15];
+                        case ServerTask.serve: return [3 /*break*/, 17];
                     }
-                    return [3 /*break*/, 16];
-                case 12:
+                    return [3 /*break*/, 19];
+                case 14:
                     {
                         TaskHelper.execTask({
                             env: {
@@ -194,21 +216,26 @@ var ServerTask;
                             },
                             command: "tsc --outDir ./" + namespacePath + "/build --listEmittedFiles true ./" + namespacePath + "/src/serve.ts"
                         });
-                        return [3 /*break*/, 16];
+                        return [3 /*break*/, 19];
                     }
-                    _d.label = 13;
-                case 13:
-                    {
-                        TaskHelper.execTask({
-                            env: {
-                                BESPOKE_NAMESPACE: namespace
-                            },
-                            command: "ts-node ./" + namespacePath + "/src/serve.ts"
-                        });
-                        return [3 /*break*/, 16];
-                    }
-                    _d.label = 14;
-                case 14: return [4 /*yield*/, inquirer_1.prompt([
+                    _d.label = 15;
+                case 15: return [4 /*yield*/, inquirer_1.prompt([
+                        {
+                            name: 'HMR',
+                            type: 'confirm'
+                        }
+                    ])];
+                case 16:
+                    HMR = (_d.sent()).HMR;
+                    TaskHelper.execTask({
+                        env: {
+                            BESPOKE_NAMESPACE: namespace,
+                            BESPOKE_HMR: HMR.toString()
+                        },
+                        command: "ts-node ./" + namespacePath + "/src/serve.ts"
+                    });
+                    return [3 /*break*/, 19];
+                case 17: return [4 /*yield*/, inquirer_1.prompt([
                         {
                             name: 'withProxy',
                             type: 'confirm'
@@ -218,7 +245,7 @@ var ServerTask;
                             type: 'confirm'
                         }
                     ])];
-                case 15:
+                case 18:
                     _c = _d.sent(), withProxy = _c.withProxy, withLinker = _c.withLinker;
                     TaskHelper.execTask({
                         env: {
@@ -229,8 +256,8 @@ var ServerTask;
                         },
                         command: "node ./" + namespacePath + "/build/serve.js"
                     });
-                    return [3 /*break*/, 16];
-                case 16: return [2 /*return*/];
+                    return [3 /*break*/, 19];
+                case 19: return [2 /*return*/];
             }
         });
     });
