@@ -4,11 +4,11 @@ import setting from './setting'
 
 const {
     NODE_ENV,
+    BESPOKE_HMR,
     BESPOKE_NAMESPACE,
     BESPOKE_WITH_PROXY,
     BESPOKE_WITH_LINKER,
     OTREE_PORT,
-    OTREE_RPC,
     OTREE_PROXY,
     OTREE_SERVER,
     OTREE_NAMESPACE
@@ -18,6 +18,7 @@ export const elfSetting = {
     ...setting,
     inProductEnv: NODE_ENV === 'production',
     //region bespoke
+    bespokeHmr: BESPOKE_HMR === 'true',
     bespokeNamespace: BESPOKE_NAMESPACE,
     bespokeWithProxy: BESPOKE_WITH_PROXY === 'true',
     bespokeWithLinker: BESPOKE_WITH_LINKER === 'true',
