@@ -1,18 +1,23 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core} from 'bespoke-client-util'
-import {ICreateParams, IGameState, IPlayerState} from '../interface'
+import {Core, Lang} from 'bespoke-client-util'
+import {ICreateParams, IPlayerState, IGameState} from '../interface'
 import {FetchType} from '../config'
 
 export class Result extends Core.Result<ICreateParams, IGameState, IPlayerState, FetchType> {
+    lang = Lang.extractLang({
+        round: ['轮次', 'Round'],
+        profit: ['利润', 'Profit']
+    })
+
     render(): React.ReactNode {
-        const {props: {playerState: {profits}}} = this
-        return <div className={style.result}>
+        const {lang, props: {playerState: {profits}}} = this
+        return <section className={style.result}>
             <table className={style.resultTable}>
                 <tbody>
                 <tr>
-                    <td>轮次</td>
-                    <td>收益</td>
+                    <td>{lang.round}</td>
+                    <td>{lang.profit}</td>
                 </tr>
                 {
                     profits.map((n, i) => <tr key={i}>
@@ -22,6 +27,6 @@ export class Result extends Core.Result<ICreateParams, IGameState, IPlayerState,
                 }
                 </tbody>
             </table>
-        </div>
+        </section>
     }
 }

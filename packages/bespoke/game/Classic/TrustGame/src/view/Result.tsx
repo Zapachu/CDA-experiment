@@ -1,10 +1,10 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {Core} from 'bespoke-client-util'
-import {ICreateParams, IPlayerState} from '../interface'
+import {ICreateParams, IGameState, IPlayerState} from '../interface'
 import {FetchType} from '../config'
 
-export class Result extends Core.Result<ICreateParams, IPlayerState, FetchType> {
+export class Result extends Core.Result<ICreateParams, IGameState, IPlayerState, FetchType> {
     render(): React.ReactNode {
         const {props: {playerState: {profits}}} = this
         return <div className={style.result}>

@@ -12,7 +12,6 @@ import {
     RoundSwitching,
 } from 'bespoke-game-graphical-util'
 import Players from './Players'
-import Fishpond from './Fishpond'
 
 interface IPlayState {
     loading: boolean
@@ -25,14 +24,12 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         loading: ['加载中...', 'LOADING...'],
         matchPlayers: ['正在匹配玩家...', 'Matching other players...'],
         enterMarket: ['准备好了', 'Ready'],
-        shout: ['捕鱼', 'Catch Fish'],
+        shout: ['报价', 'Set price'],
         toNewRound: [n => `${n} 秒后进入下一轮`, n => `Market will enter into next round in ${n}s`],
-        invalidPrice: ['价格需在起拍价与心理价值之间', 'Price shout be between starting price and private price'],
-        tradeSuccess: ['交易成功！', 'Traded successfully'],
-        instruction: ['古诺竞争：两位参与成员，您选择的产量越高，市场价格越低，您选择的产量越低，市场价格越高', 'Cournot Competition: two participants, the higher you choose, the lower the price will be; the lower you choose, the higher the price will be'],
-        prepare: [n => `当前鱼塘中鱼的数量为${n}，你最多可捕鱼${Math.floor(n/2)}条，捕鱼数量越多，则价格越低；捕鱼数量越少，则价格越高`, n => `The number of fish in the fishpond currently is ${n}，you can catch at most ${Math.floor(n/2)} fish，the more fish you catch, the lower the price will be; the less fish you catch, the higher the price will be`],
-        conclusion: [(n, m) => `两边捕鱼完成，您的当前捕鱼数量为${n}，则剩下的产量为${m}，即每条鱼的价格为${m}`, (n, m) => `Fishing is over，you caught ${n} fish while ${m} fish are left in the fishpond，which means that price of each fish is ${m}`],
-        wait: ['请等待对方捕鱼', 'Please wait for the othe participant'],
+        invalidPrice: ['价格需在0与100之间', 'Price shout be between 0 and 100'],
+        instruction: ['伯川德竞争：每位成员代表一家公司报价，买方市场总是购买价格更低的同类产品，因此出价更高的公司会被淘汰', 'Betrand Competition: every participant represents their company to set a price, the buyer market always purchase the one at lower price, so companies that set higher prices will fail'],
+        prepare: ['接下来请各位参与者开始报价吧', 'Please set a price'],
+        conclusion: [(n, m) => `恭喜${n}号，成功卖出产品，最后的成交价格为${m}`, (n, m) => `Congratulations to number ${n}, you have successfully sold out your product, the strike price was ${m}`],
         next: ['下一轮', 'Next round'],
     })
 
@@ -59,7 +56,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         const {
             lang, props: {
                 gameState: {groups},
-                playerState: {groupIndex, positionIndex, quantities, profits}
+                playerState: {groupIndex, positionIndex, prices, profits},
             }, state: {loading, newRoundTimers}
         } = this
         if (loading) {
@@ -70,22 +67,26 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         }
         const {rounds, roundIndex} = groups[groupIndex],
             newRoundTimer = newRoundTimers[roundIndex],
-            {playerStatus} = rounds[roundIndex],
+            {playerStatus, playerPrice, dealerIndex} = rounds[roundIndex],
             curPlayerStatus = playerStatus[positionIndex]
         return <section className={style.play}>
-            <Stage>
+            <Stage dev={false}>
                 {
                     newRoundTimer ?
                         <RoundSwitching msg={lang.toNewRound(NEW_ROUND_TIMER - newRoundTimer)}/> :
                         <>
                             <g transform={`translate(${span(2.4)},${span(1.4)})`}>
                                 <Host
-                                    widthScale={1.3}
+                                    widthScale={1.4}
                                     msg={this.renderHostMessage()}
                                 />
                             </g>
-                            <Players playerStatus={curPlayerStatus} lastProfit={roundIndex > 0 ? profits[roundIndex-1] : 0} curQuantity={quantities[roundIndex] || 0} />
-                            <Fishpond playerStatus={curPlayerStatus} />
+                            <Players playerStatus={curPlayerStatus} 
+                                lastProfit={roundIndex > 0 ? profits[roundIndex-1] : 0} 
+                                playerPrice={playerPrice}
+                                position={positionIndex}
+                                dealerIndex={dealerIndex}
+                                curPrice={prices[roundIndex] || 0} />
                             {this.renderOperateWidget()}
                         </>
                 }
@@ -96,40 +97,35 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     renderHostMessage = () => {
         const {
             lang, props: {
-                game: {params: {quota}},
                 gameState: {groups},
-                playerState: {groupIndex, positionIndex, quantities}
+                playerState: {groupIndex, positionIndex}
             }
         } = this
         const {rounds, roundIndex} = groups[groupIndex],
-            {playerStatus, unitPrices} = rounds[roundIndex],
+            {playerStatus, playerPrice, dealerIndex} = rounds[roundIndex],
             curPlayerStatus = playerStatus[positionIndex]
         if(curPlayerStatus === PlayerStatus.outside) {
             return lang.instruction
         }
-        if(curPlayerStatus === PlayerStatus.prepared) {
-            return lang.prepare(quota)
+        if(dealerIndex !== null) {
+            return lang.conclusion(dealerIndex+1, playerPrice[dealerIndex])
         }
-        if(unitPrices[roundIndex] !== undefined) {
-            return lang.conclusion(quantities[roundIndex], unitPrices[roundIndex])
-        }
-        return lang.wait
+        return lang.prepare
     }
 
     shout() {
         const {
                 lang, props: {
                     frameEmitter,
-                    game: {params: {quota}},
                 },
                 state
             } = this
         this.setState({price: ''})
         const price = Number(state.price)
-        if (Number.isNaN(price) || price < 0 || price > Math.floor(quota/2)) {
+        if (Number.isNaN(price) || price <= 0 || price > 100) {
             Toast.warn(lang.invalidPrice)
         } else {
-            frameEmitter.emit(MoveType.shout, {quantity: +price})
+            frameEmitter.emit(MoveType.shout, {price: +price})
         }
     }
 
@@ -138,16 +134,16 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             lang, props: {
                 frameEmitter,
                 gameState: {groups},
-                playerState: {groupIndex, positionIndex, quantities, profits}
+                playerState: {groupIndex, positionIndex}
             }, state: {price}
         } = this
         const {rounds, roundIndex} = groups[groupIndex],
-            {playerStatus, unitPrices} = rounds[roundIndex]
+            {playerStatus, dealerIndex} = rounds[roundIndex]
         switch (playerStatus[positionIndex]) {
             case PlayerStatus.outside: {
                 return <foreignObject {...{
                     x: span(4.7),
-                    y: span(8)
+                    y: span(9)
                 }}>
                     <Button label={lang.enterMarket} onClick={() => frameEmitter.emit(MoveType.enterMarket)}/>
                 </foreignObject>
@@ -156,27 +152,23 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 return <>
                     <foreignObject {...{
                         x: span(5.5),
-                        y: span(8)
+                        y: span(8.6)
                     }}>
                         <Input value={price} onChange={price => this.setState({price})}/>
                     </foreignObject>
                     <foreignObject {...{
                         x: span(4.7),
-                        y: span(8.6)
+                        y: span(9.1)
                     }}>
                         <Button label={lang.shout} onClick={() => this.shout()}/>
                     </foreignObject>
                 </>
             }
             case PlayerStatus.shouted: {
-                if(unitPrices[roundIndex] === undefined) {
+                if(dealerIndex === null) {
                     return null
                 }
                 return <>
-                    <text fontSize={'20px'} transform={`translate(${span(3.5)},${span(8)})`}>
-                        {`您的收益是：每条鱼的价格${unitPrices[roundIndex]}*鱼量${quantities[roundIndex]}=`}
-                        <tspan fontSize={'24px'} fill={'#ffd466'}>{profits[roundIndex]}</tspan>
-                    </text>
                     <foreignObject {...{
                         x: span(4.7),
                         y: span(8.6)
