@@ -65,13 +65,13 @@ export function geneClientBuilder(
         qiNiu
     }: IBuildOption): webpack.Configuration {
     const {proto, entry, output} = resolvePaths(basePath, paths)
-    const buildMode = process.env.BUILD_MODE || 'dev'
+    const buildMode = process.env.BUILD_MODE || 'dev',
+        HMR = process.env.HMR === 'true'
     buildProtoDts(proto, buildMode === 'dev')
     return {
         devtool: buildMode === 'dev' ? 'cheap-module-eval-source-map' : false,
         devServer: {
-            hot: buildMode === 'dev',
-            contentBase: './dist',
+            host: '0.0.0.0',
             port: config.devPort.client,
             proxy: {
                 '*': `http://127.0.0.1:${config.devPort.server}`
@@ -83,7 +83,7 @@ export function geneClientBuilder(
         entry: {[namespace]: entry},
         output: {
             path: output,
-            filename: `[name]${buildMode === 'dev' ? '' : '.[hash:4]'}.js`,
+            filename: `[name]${HMR ? '' : '.[hash:4]'}.js`,
             publicPath: buildMode === 'publish' ? `${qiNiu.download.jsDomain}/${qiNiu.upload.path}/${namespace}` : `/${config.rootName}/${namespace}/static/`
         },
         resolve: {

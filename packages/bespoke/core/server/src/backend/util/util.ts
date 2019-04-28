@@ -67,14 +67,15 @@ export class Setting {
 
     static init(setting: IGameSetting) {
         this.staticPath = setting.staticPath
-        this._port = setting.port || (elfSetting.inProductEnv ? 0 : config.devPort.server)
+        this._port = setting.port || (elfSetting.bespokeHmr ? config.devPort.server : 0)
         this._rpcPort = setting.rpcPort || 0
         Log.init(setting.logPath || resolve(setting.staticPath, '../log'))
     }
 
     static getClientPath(): string {
         const {bespokeNamespace} = elfSetting
-        return elfSetting.inProductEnv ? JSON.parse(readFileSync(resolve(this.staticPath, `${bespokeNamespace}.json`)).toString())[`${bespokeNamespace}.js`] :
-            `http://localhost:${config.devPort.client}/${config.rootName}/${bespokeNamespace}/static/${bespokeNamespace}.js`
+        return elfSetting.bespokeHmr ?
+            `http://localhost:${config.devPort.client}/${config.rootName}/${bespokeNamespace}/static/${bespokeNamespace}.js` :
+            JSON.parse(readFileSync(resolve(this.staticPath, `${bespokeNamespace}.json`)).toString())[`${bespokeNamespace}.js`]
     }
 }
