@@ -109,6 +109,7 @@ enum ServerTask {
     ]))
     switch (side) {
         case Side.client: {
+            cd(path.resolve(__dirname, '..'))
             const {mode} = await prompt<{ mode: ClientTask }>([
                 {
                     name: 'mode',
@@ -117,10 +118,27 @@ enum ServerTask {
                     message: 'Mode:'
                 }
             ])
-            cd(path.resolve(__dirname, '..'))
+            if (mode === ClientTask.dev) {
+                const {HMR} = await prompt<{ HMR: boolean }>([
+                    {
+                        name: 'HMR',
+                        type: 'confirm'
+                    }
+                ])
+                if (HMR) {
+                    TaskHelper.execTask({
+                        env: {
+                            BUILD_MODE: mode,
+                            HMR: HMR.toString()
+                        },
+                        command: `webpack-dev-server --hot --progress --env.TS_NODE_PROJECT="tsconfig.json" --config ./${namespacePath}/script/webpack.config.ts`
+                    })
+                    break
+                }
+            }
             TaskHelper.execTask({
                 env: {BUILD_MODE: mode},
-                command: `${mode === ClientTask.dev ? 'webpack-dev-server' : 'webpack'} --env.TS_NODE_PROJECT="tsconfig.json" --config ./${namespacePath}/script/webpack.config.ts`
+                command: `webpack --env.TS_NODE_PROJECT="tsconfig.json" --config ./${namespacePath}/script/webpack.config.ts`
             })
             break
         }
@@ -145,9 +163,16 @@ enum ServerTask {
                     break
                 }
                 case ServerTask.dev: {
+                    const {HMR} = await prompt<{ HMR: boolean }>([
+                        {
+                            name: 'HMR',
+                            type: 'confirm'
+                        }
+                    ])
                     TaskHelper.execTask({
                         env: {
-                            BESPOKE_NAMESPACE: namespace
+                            BESPOKE_NAMESPACE: namespace,
+                            BESPOKE_HMR: HMR.toString()
                         },
                         command: `ts-node ./${namespacePath}/src/serve.ts`
                     })
