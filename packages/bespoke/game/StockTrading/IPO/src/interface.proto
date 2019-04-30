@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+message CreateParams {
+    string nextPhaseKey = 1;
+    int32 groupSize = 2;
+    int32 total = 3;
+    int32 privateMin = 4;
+    int32 privateMax = 5;
+    int32 startingBalance = 6;
+    int32 type = 7;
+}
+
+message MoveParams {
+    int32 price = 1;
+    int32 num = 2;
+}
+
+message PushParams {
+    int32 matchTimer = 1;
+    string matchMsg = 2;
+}
+
+message GameState {
+    message Group {
+        int32 playerNum = 1;
+        int32 strikePrice = 2;
+    }
+    repeated Group groups = 1;
+}
+
+message PlayerState {
+    int32 groupIndex = 1;
+    int32 positionIndex = 2;
+    int32 privateValue = 3;
+    int32 price = 4;
+    int32 bidNum = 5;
+    int32 actualNum = 6;
+    int32 playerStatus = 7;
+    int32 profit = 8;
+}
