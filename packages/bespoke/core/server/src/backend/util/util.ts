@@ -5,13 +5,22 @@ import {resolve} from 'path'
 import {readFileSync} from 'fs'
 import * as objHash from 'object-hash'
 
-export class Hash {
-    static hashObj(obj: any): string {
-        return objHash(obj, {algorithm: 'md5'})
+export class Token {
+    private static geneCheckCode(chars: string[]) {
+        return String.fromCharCode(chars.map(c => c.charCodeAt(0)).reduce((pre, cur) => pre + cur) % 26 + 97)
     }
 
-    static isHash(hash: string): boolean {
-        return !!hash.match(/^\w{32}$/)
+    static geneToken(obj: any): string {
+        const token = objHash(obj, {algorithm: 'md5'})
+        return this.geneCheckCode([...token]) + token
+    }
+
+    static checkToken(token: string): boolean {
+        if (elfSetting.bespokeWithLinker) {
+            return true
+        }
+        const [checkCode, ...chars] = token
+        return chars.length === 32 && checkCode === this.geneCheckCode(chars)
     }
 }
 
@@ -67,7 +76,7 @@ export class Setting {
 
     static init(setting: IGameSetting) {
         this.staticPath = setting.staticPath
-        this._port = setting.port || (elfSetting.bespokeHmr ? config.devPort.server : 0)
+        this._port = setting.port || (elfSetting.inProductEnv ? 0 : config.devPort.server)
         this._rpcPort = setting.rpcPort || 0
         Log.init(setting.logPath || resolve(setting.staticPath, '../log'))
     }

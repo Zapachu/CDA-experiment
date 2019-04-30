@@ -1,8 +1,8 @@
 import {config, baseEnum, IGameThumb} from 'bespoke-common'
-import {Request, Response} from 'express'
+import {Request, Response, NextFunction} from 'express'
 import * as passport from 'passport'
 import {elfSetting} from 'elf-setting'
-import {Log, RedisKey, redisClient, Hash, Setting} from '../util'
+import {Log, RedisKey, redisClient, Token, Setting} from '../util'
 import {GameModel, UserModel, UserDoc, MoveLogModel, SimulatePlayerModel} from '../model'
 import {AnyController, GameLogic} from '../service/GameLogic'
 import GameDAO from '../service/GameDAO'
@@ -19,7 +19,11 @@ export class UserCtrl {
         res.end(chunk + `<script type="text/javascript" src="${Setting.getClientPath()}"></script>`)
     }
 
-    static isTeacher(req, res: Response, next) {
+    static hasLogin(req, res: Response, next: NextFunction) {
+        req.user ? next() : res.redirect(`/${config.rootName}/login`)
+    }
+
+    static isTeacher(req, res: Response, next: NextFunction) {
         req.user && req.user.role === baseEnum.AcademusRole.teacher ? next() : res.redirect(`/${config.rootName}/login`)
     }
 
@@ -127,37 +131,6 @@ export class GameCtrl {
         }
     }
 
-    static async getActor(req, res) {
-        const {ResponseCode, Actor} = baseEnum
-        const {user, params: {gameId}, query: {token = '', hash}} = req, userId = user ? user._id.toString() : ''
-        const game = await GameDAO.getGame(gameId)
-        if (Hash.isHash(token)) {
-            return res.json({
-                code: ResponseCode.success,
-                game,
-                actor: {token, type: Actor.player}
-            })
-        }
-        if (!userId && !hash) {
-            return res.json({
-                code: ResponseCode.success,
-                game,
-                actor: {
-                    token: Hash.hashObj(Math.random()),
-                    type: Actor.player
-                }
-            })
-        }
-        res.json({
-            code: ResponseCode.success,
-            game,
-            actor: {
-                token: hash ? Hash.hashObj(`${userId}${hash}`) : userId,
-                type: userId === game.owner ? hash ? Actor.clientRobot : Actor.owner : Actor.player
-            }
-        })
-    }
-
     static async getAccessibleTemplates(req, res: Response) {
         const {mobile} = req.user
         const namespaces = UserService.getGameTemplateNamespaces(mobile)
@@ -242,7 +215,7 @@ export class GameCtrl {
 
     static async newSimulatePlayer(req, res) {
         const {params: {gameId}, body: {name}} = req
-        const token = Hash.hashObj(Math.random())
+        const token = Token.geneToken(Math.random())
         try {
             await new SimulatePlayerModel({gameId, token, name}).save()
             res.json({

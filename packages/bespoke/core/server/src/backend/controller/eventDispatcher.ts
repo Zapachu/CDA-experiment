@@ -1,4 +1,5 @@
 import {Server} from 'http'
+import * as socketIO from 'socket.io'
 import {EventHandler} from './eventHandler'
 import {EventIO, Log} from '../util'
 import {IConnection, IEventHandler} from 'bespoke-common'
@@ -27,10 +28,10 @@ export class EventDispatcher {
         })
     }
 
-    static startGameSocket(server: Server): Server {
-        EventIO.initSocketIOServer(server, this.subscribeOnConnection)
+    static startGameSocket(server: Server): socketIO.Server {
+        const socketIOServer = EventIO.initSocketIOServer(server, this.subscribeOnConnection)
         EventIO.initRobotIOServer(this.subscribeOnConnection)
-        return server
+        return socketIOServer
     }
 }
 

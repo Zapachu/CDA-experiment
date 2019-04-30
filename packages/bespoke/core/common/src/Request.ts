@@ -1,5 +1,5 @@
 import * as baseEnum from './baseEnum'
-import {IActor, IGameConfig, IGameThumb, IGameWithId, IMoveLog, ISimulatePlayer, IUserWithId} from './interface'
+import {IGameConfig, IGameThumb, IGameWithId, IMoveLog, ISimulatePlayer, IUserWithId} from './interface'
 import {config} from './config'
 import * as queryString from 'query-string'
 
@@ -79,10 +79,6 @@ export class Request {
 
     async joinGameWithCode(code: string): Promise<IHttpRes & { gameId?: string }> {
         return await this.post('/game/joinWithShareCode', null, null, {code})
-    }
-
-    async getActor(gameId: string, hash: string, token: string = ''): Promise<IHttpRes & { actor: IActor }> {
-        return await this.get('/game/actor/:gameId', {gameId}, {hash, token})
     }
 
     async getMoveLogs(gameId: string): Promise<IHttpRes & { moveLogs: IMoveLog<any, any>[] }> {

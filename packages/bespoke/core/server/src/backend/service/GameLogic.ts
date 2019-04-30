@@ -1,4 +1,4 @@
-import {elfPhaseId2PlayUrl, EventIO, Hash, Log} from '../util'
+import {elfPhaseId2PlayUrl, EventIO, Token, Log} from '../util'
 import {
     baseEnum,
     FrameEmitter,
@@ -55,7 +55,7 @@ export namespace GameLogic {
     export async function startNewRobotScheduler<ICreateParams, IGameState, IPlayerState>(gameId: string, key: string, pythonRobot: boolean): Promise<void> {
         const game = await GameDAO.getGame<ICreateParams>(gameId)
         const actor: IActor = {
-            token: Hash.hashObj(`${game.id}${key}`),
+            token: Token.geneToken(`${game.id}${key}`),
             type: baseEnum.Actor.serverRobot
         }
         const robotProxy = await (pythonRobot ? new PythonSchedulerProxy(game, actor) : new NodeRobotsScheduler(game, actor, template.Robot)).init()

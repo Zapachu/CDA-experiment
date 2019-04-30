@@ -33,6 +33,7 @@ declare interface IPlayState {
 
 @connCtx(rootContext)
 export class Play extends React.Component<TRootCtx & RouteComponentProps<{ gameId: string }>, IPlayState> {
+    token = queryString.parse(location.search).token as string
     lang = Lang.extractLang({
         Mask_WaitForGameToStart: ['等待实验开始', 'Waiting for experiment to Start'],
         Mask_GamePaused: ['实验已暂停', 'Experiment Paused']
@@ -43,25 +44,20 @@ export class Play extends React.Component<TRootCtx & RouteComponentProps<{ gameI
     }
 
     async componentDidMount() {
-        const {props: {history, match: {params: {gameId}}, location: {hash = '#', search}}} = this,
-            {token = ''} = queryString.parse(search)
-        const {game} = await Api.getGame(gameId),
-            {actor} = await Api.getActor(gameId, hash.replace('#', ''), token as string)
-        if (!token) {
-            history.push(`${history.location.pathname}?${queryString.stringify({token: actor.token})}`)
-        }
+        const {token, props: {match: {params: {gameId}}}} = this
+        const {game} = await Api.getGame(gameId)
         const socketClient = connect('/', {
             path: config.socketPath(game.namespace),
-            query: `gameId=${gameId}&token=${actor.token}&type=${actor.type}`
+            query: `gameId=${gameId}&token=${token}`
         })
         this.registerStateReducer(socketClient)
         this.setState(() => ({
             game,
-            actor,
             fetcher: new Fetcher<any>(game.namespace, game.id),
             socketClient,
             frameEmitter: new FrameEmitter(socketClient as any)
-        }), () => socketClient.emit(baseEnum.SocketEvent.online))
+        }), () =>
+            socketClient.emit(baseEnum.SocketEvent.online, (actor: IActor) => this.setState({actor})))
     }
 
     componentWillUnmount(): void {
