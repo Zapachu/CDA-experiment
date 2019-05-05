@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {IElfCreateProps} from 'elf-linker'
-import {FrameEmitter, IGame, TGameState, TPlayerState} from 'bespoke-common'
+import {FrameEmitter, IGameWithId, TGameState, TPlayerState} from 'bespoke-common'
 import {Fetcher} from '.'
 
 export interface IGameTemplate {
@@ -28,24 +28,24 @@ export namespace Core {
     }
 
     interface IInfoProps<ICreateParams> {
-        game: IGame<ICreateParams>,
+        game: IGameWithId<ICreateParams>,
     }
 
     export interface IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> extends Partial<ITravelState<IGameState, IPlayerState, MoveType, IMoveParams>> {
-        game: IGame<ICreateParams>,
+        game: IGameWithId<ICreateParams>,
         fetcher: Fetcher<FetchType>
         frameEmitter?: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
         playerState: TPlayerState<IPlayerState>
     }
 
     interface IPlay4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> extends Partial<ITravelState<IGameState, IPlayerState, MoveType, IMoveParams>> {
-        game: IGame<ICreateParams>,
+        game: IGameWithId<ICreateParams>,
         fetcher: Fetcher<FetchType>
         frameEmitter?: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
     }
 
     interface IResult4PlayerProps<ICreateParams, IGameState, IPlayerState, FetchType> {
-        game: IGame<ICreateParams>
+        game: IGameWithId<ICreateParams>
         fetcher: Fetcher<FetchType>
         gameState: TGameState<IGameState>,
         playerState: TPlayerState<IPlayerState>
@@ -60,7 +60,7 @@ export namespace Core {
     }
 
     interface IResult4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams, FetchType> {
-        game: IGame<ICreateParams>,
+        game: IGameWithId<ICreateParams>,
         fetcher: Fetcher<FetchType>
         travelStates: Array<ITravelState<IGameState, IPlayerState, MoveType, IMoveParams>>
     }

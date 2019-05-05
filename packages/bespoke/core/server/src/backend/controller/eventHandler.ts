@@ -2,7 +2,7 @@ import {baseEnum, IEventHandler, IConnection, TOnlineCallback, IMoveCallback} fr
 import {GameLogic} from '../service/GameLogic'
 
 export const EventHandler = {
-    [baseEnum.SocketEvent.online]: async (connection: IConnection, onlineCallback?: TOnlineCallback) => {
+    [baseEnum.SocketEvent.online]: async (connection: IConnection, onlineCallback: TOnlineCallback = () => null) => {
         const {game, actor} = connection,
             controller = await GameLogic.getGameController(game.id)
         onlineCallback(actor)
