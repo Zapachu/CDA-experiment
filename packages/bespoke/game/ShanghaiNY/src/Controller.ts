@@ -191,7 +191,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             return !!c1
           }
           case GameType.T2: {
-            return !!c1 && !!c2 && !c2.includes(undefined) && c2.every(c => !!c)
+            return !!c1 && !!c2 && !c2.includes(undefined) && c2.length===2
           }
         }
       }
