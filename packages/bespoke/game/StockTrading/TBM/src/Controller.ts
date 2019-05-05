@@ -1,7 +1,6 @@
 import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from "bespoke-server";
-import {ICreateParams, IGameState, IPlayerState, IPushParams, IMoveParams} from "./interface";
-import {MoveType, PushType, FetchType, NEW_ROUND_TIMER, PlayerStatus} from './config'
-import {GameState} from "./interface";
+import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from "./interface";
+import {ADD_ROBOT_TIMER, FetchType, MoveType, NEW_ROUND_TIMER, PlayerStatus, PushType} from './config'
 
 const getBestMatching = G => {
     const MATCHED = 'matched',
@@ -63,6 +62,21 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     }
                     groupIndex = gameState.groups.push(group) - 1
                 }
+
+                // TODO : test add robot
+                let addRobotTimer = 1
+                const addRobotTask = global.setInterval(async () => {
+                    if (addRobotTimer++ < ADD_ROBOT_TIMER) {
+                        return
+                    }
+                    global.clearInterval(addRobotTask)
+                    if (gameState.groups[groupIndex].playerNum < groupSize) {
+                        for (let num = 0; num < groupSize - gameState.groups[groupIndex].playerNum; num ++) {
+                            await this.startNewRobotScheduler(`Robot_${num}`, false)
+                        }
+                    }
+                }, 1000)
+
                 playerState.groupIndex = groupIndex
                 playerState.positionIndex = gameState.groups[groupIndex].playerNum++
                 playerState.role = positions[playerState.positionIndex].role
@@ -73,7 +87,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 const {rounds, roundIndex} = gameState.groups[groupIndex]
                 rounds[roundIndex].playerStatus[positionIndex] = PlayerStatus.prepared
                 if (rounds[roundIndex].playerStatus.every(s => s === PlayerStatus.prepared)) {
-
+                    // TODO : test robot bid
+                    this.broadcast(PushType.startBid, {roundIndex})
                 }
                 break
             }
