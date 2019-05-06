@@ -47,7 +47,10 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
         const role = i % 2
         return {
             role,
-            privatePrice: Array(round).fill(null).map(() => this.genRan([{L: buyerPriceStart, H: buyerPriceEnd}, {L: sellerPriceStart, H: sellerPriceEnd}][role]))
+            privatePrice: Array(round).fill(null).map(() => this.genRan([{
+                L: buyerPriceStart,
+                H: buyerPriceEnd
+            }, {L: sellerPriceStart, H: sellerPriceEnd}][role]))
         }
     }
 
@@ -77,14 +80,14 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
 
     done = () => {
         const {setParams, setSubmitable} = this.props
-        const {round, groupSize, positions, InitMoney} = this.state
-        setParams({round, groupSize, positions, InitMoney})
+        const {round, groupSize, waitingSeconds, positions, InitMoney} = this.state
+        setParams({round, groupSize, waitingSeconds, positions, InitMoney})
         this.setState({readonly: true})
         setSubmitable(true)
     }
 
     render() {
-        const {round, groupSize, buyerPriceStart, buyerPriceEnd, sellerPriceStart, sellerPriceEnd, InitMoney, positions, readonly} = this.state
+        const {round, groupSize, waitingSeconds, buyerPriceStart, buyerPriceEnd, sellerPriceStart, sellerPriceEnd, InitMoney, positions, readonly} = this.state
         return <div className={style.create}>
             <ul className={style.configFields}>
                 <li>
@@ -100,6 +103,11 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
                                 min={2}
                                 max={6}
                                 onChange={(e) => this.setState({groupSize: parseInt(e.target.value)})}/>
+                </li>
+                <li>
+                    <Label label='匹配等待时间'/>
+                    <RangeInput value={waitingSeconds}
+                                onChange={(e) => this.setState({waitingSeconds: parseInt(e.target.value)})}/>
                 </li>
                 <li>
                     <Label label='初始资金'/>
@@ -154,7 +162,7 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
                             <td>
                                 {
                                     v.privatePrice.map((v1, i1) =>
-                                        <li key={`pv-${i}-${i1}`} >
+                                        <li key={`pv-${i}-${i1}`}>
                                             <Label label={`第 ${i1 + 1} 轮`}/>
                                             <Input type='number' value={v1}
                                                    onChange={this.resetPrivatePrice.bind(this, i, i1)}/>

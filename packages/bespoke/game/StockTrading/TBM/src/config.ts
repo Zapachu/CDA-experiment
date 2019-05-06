@@ -24,7 +24,6 @@ export enum PlayerStatus {
 }
 
 export const NEW_ROUND_TIMER = 3
-export const ADD_ROBOT_TIMER = 10
 
 
 // role 0 : buyer 1: seller

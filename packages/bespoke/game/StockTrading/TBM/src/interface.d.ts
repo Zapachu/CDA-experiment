@@ -23,6 +23,9 @@ export interface ICreateParams {
     /** CreateParams InitMoney */
     InitMoney?: (number|null);
 
+    /** CreateParams waitingSeconds */
+    waitingSeconds?: (number|null);
+
     /** CreateParams positions */
     positions?: (CreateParams.IPosition[]|null);
 
@@ -59,6 +62,9 @@ export class CreateParams implements ICreateParams {
 
     /** CreateParams InitMoney. */
     public InitMoney: number;
+
+    /** CreateParams waitingSeconds. */
+    public waitingSeconds: number;
 
     /** CreateParams positions. */
     public positions: CreateParams.IPosition[];

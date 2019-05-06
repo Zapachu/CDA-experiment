@@ -1,6 +1,6 @@
 import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from "bespoke-server";
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from "./interface";
-import {ADD_ROBOT_TIMER, FetchType, MoveType, NEW_ROUND_TIMER, PlayerStatus, PushType} from './config'
+import {FetchType, MoveType, NEW_ROUND_TIMER, PlayerStatus, PushType} from './config'
 
 const getBestMatching = G => {
     const MATCHED = 'matched',
@@ -42,7 +42,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
     }
 
     protected async playerMoveReducer(actor: IActor, type: string, params: IMoveParams, cb: IMoveCallback): Promise<void> {
-        const {game: {params: {groupSize, round, positions}}} = this
+        const {game: {params: {groupSize, round, positions, waitingSeconds}}} = this
         const playerState = await this.stateManager.getPlayerState(actor),
             gameState = await this.stateManager.getGameState(),
             playerStates = await this.stateManager.getPlayerStates()
@@ -66,7 +66,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 // TODO : test add robot
                 let addRobotTimer = 1
                 const addRobotTask = global.setInterval(async () => {
-                    if (addRobotTimer++ < ADD_ROBOT_TIMER) {
+                    if (addRobotTimer++ < waitingSeconds) {
                         return
                     }
                     global.clearInterval(addRobotTask)
