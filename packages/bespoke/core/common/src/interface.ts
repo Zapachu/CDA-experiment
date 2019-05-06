@@ -58,7 +58,7 @@ export type TPlayerState<IPlayerState> = IPlayerState & {
     connectionId?: string
 }
 
-export type TOnlineCallback = (actor:IActor)=>void
+export type TOnlineCallback = (actor: IActor) => void
 
 export interface IMoveCallback {
     (...args: any[]): void
@@ -100,6 +100,7 @@ export interface IEventHandler {
 }
 
 export interface IGameSetting {
+    namespace: string
     staticPath: string
     logPath?: string
     port?: number

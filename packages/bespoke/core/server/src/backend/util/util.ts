@@ -52,6 +52,7 @@ export namespace Log {
 }
 
 export class Setting {
+    static namespace:string
     static staticPath: string
     private static _port: number
     private static _rpcPort: number
@@ -75,6 +76,7 @@ export class Setting {
     }
 
     static init(setting: IGameSetting) {
+        this.namespace = setting.namespace
         this.staticPath = setting.staticPath
         this._port = setting.port || (elfSetting.inProductEnv ? 0 : config.devPort.server)
         this._rpcPort = setting.rpcPort || 0
@@ -82,9 +84,9 @@ export class Setting {
     }
 
     static getClientPath(): string {
-        const {bespokeNamespace} = elfSetting
+        const {namespace} = this
         return elfSetting.bespokeHmr ?
-            `http://localhost:${config.devPort.client}/${config.rootName}/${bespokeNamespace}/static/${bespokeNamespace}.js` :
-            JSON.parse(readFileSync(resolve(this.staticPath, `${bespokeNamespace}.json`)).toString())[`${bespokeNamespace}.js`]
+            `http://localhost:${config.devPort.client}/${config.rootName}/${namespace}/static/${namespace}.js` :
+            JSON.parse(readFileSync(resolve(this.staticPath, `${namespace}.json`)).toString())[`${namespace}.js`]
     }
 }

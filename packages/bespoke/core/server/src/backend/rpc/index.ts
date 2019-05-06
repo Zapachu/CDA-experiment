@@ -14,11 +14,11 @@ export function serve() {
 }
 
 function registerPhases() {
-    const {proxyService: p, bespokeNamespace} = elfSetting,
+    const {proxyService: p} = elfSetting,
         domain = p.host.startsWith('http') ? p.host : `http://${p.host}:${p.port}`
     getGameService().registerPhases({
         phases: [{
-            namespace: bespokeNamespace,
+            namespace: Setting.namespace,
             jsUrl: `${domain}/${config.rootName}/static/bespoke-client-util.min.js;${domain}${Setting.getClientPath()}`,
             rpcPort: Setting.rpcPort
         }]

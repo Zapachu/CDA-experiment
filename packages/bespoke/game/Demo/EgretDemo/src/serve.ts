@@ -10,7 +10,7 @@ const egretRouter = Express.Router()
     .use('/egret/*', (req, res: Express.Response) => res.redirect(`/${config.rootName}/${namespace}/egret`))
 
 Server.start(
-    {staticPath: resolve(__dirname, '../dist')},
+    {namespace, staticPath: resolve(__dirname, '../dist')},
     {Controller},
     egretRouter
 )

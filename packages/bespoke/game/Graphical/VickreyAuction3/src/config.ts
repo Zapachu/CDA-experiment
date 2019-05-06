@@ -1,4 +1,4 @@
-export const namespace = 'VickreyAuction3'
+export const namespace = 'VickreyAuction'
 
 export enum MoveType {
     enterMarket = 'enterMarket',
