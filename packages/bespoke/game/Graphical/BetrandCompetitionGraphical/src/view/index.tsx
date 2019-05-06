@@ -1,13 +1,14 @@
 import {registerOnFramework} from 'bespoke-client-util'
+import {namespace} from '../config'
 import {Create} from './Create'
 import {CreateOnElf} from './CreateOnElf'
 import {Play} from './Play'
 import {Result} from './Result'
 
-registerOnFramework('TogetherBidMarket', {
-    localeNames: ['集合竞价', 'TogetherBidMarket'],
+registerOnFramework(namespace, {
+    localeNames: ['古诺竞争', 'Cournot Competition'],
     Create,
     CreateOnElf,
     Play,
-    Result,
+    Result
 })
