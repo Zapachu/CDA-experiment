@@ -1,62 +1,69 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {baseEnum, FrameEmitter, IGameWithId, ISimulatePlayer, TGameState} from 'bespoke-common'
+import {baseEnum, FrameEmitter, IGameWithId, ISimulatePlayer, TGameState, TPlayerState} from 'bespoke-common'
 import {Api, Lang, Button, ButtonProps} from 'bespoke-client-util'
 
 const {notStarted, started, paused, over} = baseEnum.GameStatus
 
-export const GameControlHeight = '12rem'
-
 declare interface IGameControlProps {
     game: IGameWithId<{}>
     gameState: TGameState<{}>
+    playerStates: { [key: string]: TPlayerState<{}> }
     frameEmitter: FrameEmitter<any, any, any, any>
     historyPush: (path: string) => void
 }
 
 export class GameControl extends React.Component<IGameControlProps> {
     lang = Lang.extractLang({
-        SwitchGameStatus_start: ['开始', 'START'],
-        SwitchGameStatus_pause: ['暂停', 'PAUSE'],
-        SwitchGameStatus_resume: ['恢复', 'RESUME'],
-        SwitchGameStatus_over: ['结束', 'OVER'],
-        GameOver: ['实验结束', 'GAME OVER']
+        gameTitle: ['实验名称', 'Game Name'],
+        gameStatus: ['实验状态', 'Game Status'],
+        notStarted: ['未开始', 'Not Started'],
+        started: ['进行中', 'Playing'],
+        paused: ['已暂停', 'Paused'],
+        over: ['已结束', 'Over'],
+        start: ['开始', 'START'],
+        pause: ['暂停', 'PAUSE'],
+        resume: ['恢复', 'RESUME'],
+        stop: ['结束', 'OVER'],
+        GameOver: ['实验结束', 'GAME OVER'],
+        onlinePlayers:['当前在线人数','Online Players'],
+        players:['实验成员','Players']
     })
     gameStatusMachine = {
         [notStarted]: [
             {
                 status: started,
-                label: this.lang.SwitchGameStatus_start
+                label: this.lang.start
             }
         ],
         [started]: [
             {
                 status: over,
-                label: this.lang.SwitchGameStatus_over,
+                label: this.lang.stop,
                 color: ButtonProps.Color.red,
                 width: ButtonProps.Width.small
             },
             {
                 status: paused,
-                label: this.lang.SwitchGameStatus_pause
+                label: this.lang.pause
             }
         ],
         [paused]: [
             {
                 status: over,
-                label: this.lang.SwitchGameStatus_over,
+                label: this.lang.stop,
                 color: ButtonProps.Color.red,
                 width: ButtonProps.Width.small
             },
             {
                 status: started,
-                label: this.lang.SwitchGameStatus_resume
+                label: this.lang.resume
             }
         ]
     }
 
     render() {
-        const {props: {historyPush, game, gameState, frameEmitter}} = this
+        const {lang, props: {historyPush, game, gameState, playerStates, frameEmitter}} = this
         if (!gameState) {
             return null
         }
@@ -65,14 +72,39 @@ export class GameControl extends React.Component<IGameControlProps> {
             color: ButtonProps.Color.blue,
             width: ButtonProps.Width.tiny
         }
-        return <section className={style.gameControl} style={{height: GameControlHeight}}>
-            <div className={style.statusSwitcher}>
+        return <section className={style.gameControl}>
+            <div className={style.headBar}>
+                <div className={style.gameStatus}>
+                    <label>{lang.gameStatus}</label>
+                    <span>{{
+                        [notStarted]: lang.notStarted,
+                        [started]: lang.start,
+                        [paused]: lang.paused,
+                        [over]: lang.over
+                    }[gameState.status]}</span>
+                </div>
+                <div className={style.gameTitle}>
+                    <label>{lang.gameTitle}</label>
+                    <span>{game.title}</span>
+                </div>
                 <div className={style.btnGroup}>
                     <Button {...btnProps} icon={ButtonProps.Icon.home} onClick={() => historyPush(`/dashboard`)}/>
                     <Button {...btnProps} icon={ButtonProps.Icon.parameter}
                             onClick={() => historyPush(`/${game.namespace}/configuration/${game.id}`)}/>
-                    <Button {...btnProps} icon={ButtonProps.Icon.share} onClick={() => historyPush(`/share/${game.id}`)}/>
+                    <Button {...btnProps} icon={ButtonProps.Icon.share}
+                            onClick={() => historyPush(`/share/${game.id}`)}/>
                 </div>
+            </div>
+            <section className={style.players}>
+                <SimulatePlayer gameId={game.id}/>
+                <section className={style.onlinePlayers}>
+                    <div className={style.onlinePlayersCount}>
+                        <label>{lang.onlinePlayers}</label>
+                        <span>{Object.values(playerStates).length}</span>
+                    </div>
+                </section>
+            </section>
+            <div className={style.statusSwitcher}>
                 <div className={style.switcherWrapper}>
                     {
                         (this.gameStatusMachine[gameState.status] || [])
@@ -92,7 +124,6 @@ export class GameControl extends React.Component<IGameControlProps> {
                     }
                 </div>
             </div>
-            <SimulatePlayer gameId={game.id}/>
         </section>
     }
 }
@@ -147,7 +178,7 @@ class SimulatePlayer extends React.Component<{ gameId: string }, ISimulatePlayer
                     <span onClick={() => this.addSimulatePlayer()}>{lang.Add}</span>
                 </div>
             </div>
-            <div className={style.players}>
+            <div className={style.playerNames}>
                 {
                     simulatePlayers.map(({token, name}) =>
                         <a key={token} href={`${window.location.origin}${window.location.pathname}?token=${token}`}
