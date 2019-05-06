@@ -9,6 +9,7 @@ interface ICreateState {
     buyerPriceEnd: number
     sellerPriceStart: number
     sellerPriceEnd: number
+    waitingSeconds: number
     InitMoney: number
     round: number
     groupSize: number
@@ -28,6 +29,7 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
         sellerPriceEnd: 100,
         InitMoney: 100,
         round: 3,
+        waitingSeconds: 10,
         groupSize: 2,
         positions: [{role: 0, privatePrice: [10, 40, 60]}, {role: 1, privatePrice: [30, 50, 60]}],
         readonly: false,
