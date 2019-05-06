@@ -1,10 +1,9 @@
 import * as React from 'react'
 import {Core, config} from 'bespoke-client-util'
 import {stringify} from 'querystring'
-import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
-import {FetchType, MoveType, PushType, namespace} from '../config'
+import {namespace} from '../config'
 
-type TProps = Core.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>
+type TProps = Core.IPlayProps<any, any, any, any, any, any, any, any>
 
 export function Play({game, playerState}: TProps) {
     return <iframe style={{
