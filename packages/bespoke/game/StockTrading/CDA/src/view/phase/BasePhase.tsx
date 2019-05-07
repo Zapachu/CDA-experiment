@@ -1,8 +1,6 @@
 import * as React from 'react'
-import * as style from './style.scss'
 import {FetchType, MoveType, PushType} from '../../config'
 import {
-    CreateParams,
     ICreateParams,
     IGameState,
     IMoveParams,
@@ -15,7 +13,7 @@ export namespace BasePhase {
 
     export class Create<S = {}> extends React.Component<BaseInfoProps & {
         fetcher: Fetcher<FetchType>
-        updateParams?: (newParams: Partial<CreateParams.Phase.IParams>) => void
+        updateParams?: (newParams: ICreateParams) => void
     }, S> {
 
         checkParams({lang, params: {}}): boolean {
@@ -28,14 +26,7 @@ export namespace BasePhase {
     }
 
     export interface BaseInfoProps {
-        params: CreateParams.Phase.IParams,
-        phases: Array<CreateParams.IPhase>
-    }
-
-    export class Info extends React.Component<BaseInfoProps> {
-        render() {
-            return <div className={style.blankMsg}>NO CONFIGURATION</div>
-        }
+        params: ICreateParams
     }
 
     export class Play<S = {}> extends React.Component<{
@@ -48,12 +39,5 @@ export namespace BasePhase {
         render() {
             return <MaskLoading/>
         }
-    }
-
-    export interface IPhaseTemplate {
-        name: string
-        Create?: new(...args) => Create
-        Info?: new(...args) => Info
-        Play: new(...args) => Play
     }
 }

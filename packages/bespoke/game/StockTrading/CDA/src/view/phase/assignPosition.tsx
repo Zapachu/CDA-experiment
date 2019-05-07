@@ -56,38 +56,6 @@ class Create extends BasePhase.Create {
     }
 }
 
-class Info extends Create {
-    render() {
-        const {lang, props: {params}} = this
-        return <section className={`${style.assignPosition} ${style.infoContent}`}>
-            <table className={style.positions}>
-                <tbody>
-                <tr>
-                    <th>&nbsp;</th>
-                    <th>{lang.Role}</th>
-                </tr>
-                {
-                    params.roles.map((role, positionIndex) =>
-                        <tr key={positionIndex}>
-                            <th>{positionIndex + 1}</th>
-                            <td>
-                                <div className={style.roleSwitcher}>
-                                    {
-                                        getEnumKeys(ROLE).map(key =>
-                                            <a key={key}
-                                               className={ROLE[key] === role ? style.active : ''}>{lang[key]}</a>
-                                        )
-                                    }
-                                </div>
-                            </td>
-                        </tr>)
-                }
-                </tbody>
-            </table>
-        </section>
-    }
-}
-
 interface IPlayState {
     seatNumber?: number
 }
@@ -111,7 +79,7 @@ class Play extends BasePhase.Play<IPlayState> {
         return positionIndex === undefined ?
             <MaskLoading label={lang.wait4position}/> :
             <section className={`${style.assignPosition} ${style.playContent}`}>
-                <p>{lang.toEnterMarket}<em>{lang[ROLE[game.params.phases[0].params.roles[positionIndex]]]}</em>
+                <p>{lang.toEnterMarket}<em>{lang[ROLE[game.params.roles[positionIndex]]]}</em>
                 </p>
                 {
                     status === PlayerStatus.wait4MarketOpen ?
@@ -142,4 +110,4 @@ class Play extends BasePhase.Play<IPlayState> {
     }
 }
 
-export default {Create, Play, Info}
+export default {Create, Play}

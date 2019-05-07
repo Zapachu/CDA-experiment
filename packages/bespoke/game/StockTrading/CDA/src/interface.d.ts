@@ -2,11 +2,20 @@ import * as $protobuf from "protobufjs";
 /** Properties of a CreateParams. */
 export interface ICreateParams {
 
-    /** CreateParams phases */
-    phases?: (CreateParams.IPhase[]|null);
-
     /** CreateParams nextPhaseKey */
     nextPhaseKey?: (string|null);
+
+    /** CreateParams roles */
+    roles?: (number[]|null);
+
+    /** CreateParams time2ReadInfo */
+    time2ReadInfo?: (number|null);
+
+    /** CreateParams durationOfEachPeriod */
+    durationOfEachPeriod?: (number|null);
+
+    /** CreateParams unitLists */
+    unitLists?: (string[]|null);
 }
 
 /** Represents a CreateParams. */
@@ -18,11 +27,20 @@ export class CreateParams implements ICreateParams {
      */
     constructor(properties?: ICreateParams);
 
-    /** CreateParams phases. */
-    public phases: CreateParams.IPhase[];
-
     /** CreateParams nextPhaseKey. */
     public nextPhaseKey: string;
+
+    /** CreateParams roles. */
+    public roles: number[];
+
+    /** CreateParams time2ReadInfo. */
+    public time2ReadInfo: number;
+
+    /** CreateParams durationOfEachPeriod. */
+    public durationOfEachPeriod: number;
+
+    /** CreateParams unitLists. */
+    public unitLists: string[];
 
     /**
      * Creates a new CreateParams instance using the specified properties.
@@ -95,227 +113,29 @@ export class CreateParams implements ICreateParams {
     public toJSON(): { [k: string]: any };
 }
 
-export namespace CreateParams {
-
-    /** Properties of a Phase. */
-    interface IPhase {
-
-        /** Phase templateName */
-        templateName?: (string|null);
-
-        /** Phase params */
-        params?: (CreateParams.Phase.IParams|null);
-    }
-
-    /** Represents a Phase. */
-    class Phase implements IPhase {
-
-        /**
-         * Constructs a new Phase.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: CreateParams.IPhase);
-
-        /** Phase templateName. */
-        public templateName: string;
-
-        /** Phase params. */
-        public params?: (CreateParams.Phase.IParams|null);
-
-        /**
-         * Creates a new Phase instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns Phase instance
-         */
-        public static create(properties?: CreateParams.IPhase): CreateParams.Phase;
-
-        /**
-         * Encodes the specified Phase message. Does not implicitly {@link CreateParams.Phase.verify|verify} messages.
-         * @param message Phase message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: CreateParams.IPhase, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Encodes the specified Phase message, length delimited. Does not implicitly {@link CreateParams.Phase.verify|verify} messages.
-         * @param message Phase message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: CreateParams.IPhase, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Decodes a Phase message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns Phase
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): CreateParams.Phase;
-
-        /**
-         * Decodes a Phase message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns Phase
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): CreateParams.Phase;
-
-        /**
-         * Verifies a Phase message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
-
-        /**
-         * Creates a Phase message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns Phase
-         */
-        public static fromObject(object: { [k: string]: any }): CreateParams.Phase;
-
-        /**
-         * Creates a plain object from a Phase message. Also converts values to other types if specified.
-         * @param message Phase
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: CreateParams.Phase, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-        /**
-         * Converts this Phase to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
-    }
-
-    namespace Phase {
-
-        /** Properties of a Params. */
-        interface IParams {
-
-            /** Params roles */
-            roles?: (number[]|null);
-
-            /** Params time2ReadInfo */
-            time2ReadInfo?: (number|null);
-
-            /** Params durationOfEachPeriod */
-            durationOfEachPeriod?: (number|null);
-
-            /** Params unitLists */
-            unitLists?: (string[]|null);
-        }
-
-        /** Represents a Params. */
-        class Params implements IParams {
-
-            /**
-             * Constructs a new Params.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: CreateParams.Phase.IParams);
-
-            /** Params roles. */
-            public roles: number[];
-
-            /** Params time2ReadInfo. */
-            public time2ReadInfo: number;
-
-            /** Params durationOfEachPeriod. */
-            public durationOfEachPeriod: number;
-
-            /** Params unitLists. */
-            public unitLists: string[];
-
-            /**
-             * Creates a new Params instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns Params instance
-             */
-            public static create(properties?: CreateParams.Phase.IParams): CreateParams.Phase.Params;
-
-            /**
-             * Encodes the specified Params message. Does not implicitly {@link CreateParams.Phase.Params.verify|verify} messages.
-             * @param message Params message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: CreateParams.Phase.IParams, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Encodes the specified Params message, length delimited. Does not implicitly {@link CreateParams.Phase.Params.verify|verify} messages.
-             * @param message Params message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encodeDelimited(message: CreateParams.Phase.IParams, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a Params message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns Params
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): CreateParams.Phase.Params;
-
-            /**
-             * Decodes a Params message from the specified reader or buffer, length delimited.
-             * @param reader Reader or buffer to decode from
-             * @returns Params
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): CreateParams.Phase.Params;
-
-            /**
-             * Verifies a Params message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-
-            /**
-             * Creates a Params message from a plain object. Also converts values to their respective internal types.
-             * @param object Plain object
-             * @returns Params
-             */
-            public static fromObject(object: { [k: string]: any }): CreateParams.Phase.Params;
-
-            /**
-             * Creates a plain object from a Params message. Also converts values to other types if specified.
-             * @param message Params
-             * @param [options] Conversion options
-             * @returns Plain object
-             */
-            public static toObject(message: CreateParams.Phase.Params, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-            /**
-             * Converts this Params to JSON.
-             * @returns JSON object
-             */
-            public toJSON(): { [k: string]: any };
-        }
-    }
-}
-
 /** Properties of a GameState. */
 export interface IGameState {
 
-    /** GameState gamePhaseIndex */
-    gamePhaseIndex?: (number|null);
+    /** GameState marketStage */
+    marketStage?: (number|null);
+
+    /** GameState orderId */
+    orderId?: (number|null);
+
+    /** GameState buyOrderIds */
+    buyOrderIds?: (number[]|null);
+
+    /** GameState sellOrderIds */
+    sellOrderIds?: (number[]|null);
+
+    /** GameState trades */
+    trades?: (GameState.ITrade[]|null);
+
+    /** GameState positionUnitIndex */
+    positionUnitIndex?: (number[]|null);
 
     /** GameState orders */
     orders?: (GameState.IOrder[]|null);
-
-    /** GameState phases */
-    phases?: (GameState.IGamePhaseState[]|null);
 
     /** GameState positionAssigned */
     positionAssigned?: (boolean|null);
@@ -330,14 +150,26 @@ export class GameState implements IGameState {
      */
     constructor(properties?: IGameState);
 
-    /** GameState gamePhaseIndex. */
-    public gamePhaseIndex: number;
+    /** GameState marketStage. */
+    public marketStage: number;
+
+    /** GameState orderId. */
+    public orderId: number;
+
+    /** GameState buyOrderIds. */
+    public buyOrderIds: number[];
+
+    /** GameState sellOrderIds. */
+    public sellOrderIds: number[];
+
+    /** GameState trades. */
+    public trades: GameState.ITrade[];
+
+    /** GameState positionUnitIndex. */
+    public positionUnitIndex: number[];
 
     /** GameState orders. */
     public orders: GameState.IOrder[];
-
-    /** GameState phases. */
-    public phases: GameState.IGamePhaseState[];
 
     /** GameState positionAssigned. */
     public positionAssigned: boolean;
@@ -523,223 +355,100 @@ export namespace GameState {
         public toJSON(): { [k: string]: any };
     }
 
-    /** Properties of a GamePhaseState. */
-    interface IGamePhaseState {
+    /** Properties of a Trade. */
+    interface ITrade {
 
-        /** GamePhaseState marketStage */
-        marketStage?: (number|null);
+        /** Trade reqId */
+        reqId?: (number|null);
 
-        /** GamePhaseState orderId */
-        orderId?: (number|null);
-
-        /** GamePhaseState buyOrderIds */
-        buyOrderIds?: (number[]|null);
-
-        /** GamePhaseState sellOrderIds */
-        sellOrderIds?: (number[]|null);
-
-        /** GamePhaseState trades */
-        trades?: (GameState.GamePhaseState.ITrade[]|null);
-
-        /** GamePhaseState positionUnitIndex */
-        positionUnitIndex?: (number[]|null);
+        /** Trade resId */
+        resId?: (number|null);
     }
 
-    /** Represents a GamePhaseState. */
-    class GamePhaseState implements IGamePhaseState {
+    /** Represents a Trade. */
+    class Trade implements ITrade {
 
         /**
-         * Constructs a new GamePhaseState.
+         * Constructs a new Trade.
          * @param [properties] Properties to set
          */
-        constructor(properties?: GameState.IGamePhaseState);
+        constructor(properties?: GameState.ITrade);
 
-        /** GamePhaseState marketStage. */
-        public marketStage: number;
+        /** Trade reqId. */
+        public reqId: number;
 
-        /** GamePhaseState orderId. */
-        public orderId: number;
-
-        /** GamePhaseState buyOrderIds. */
-        public buyOrderIds: number[];
-
-        /** GamePhaseState sellOrderIds. */
-        public sellOrderIds: number[];
-
-        /** GamePhaseState trades. */
-        public trades: GameState.GamePhaseState.ITrade[];
-
-        /** GamePhaseState positionUnitIndex. */
-        public positionUnitIndex: number[];
+        /** Trade resId. */
+        public resId: number;
 
         /**
-         * Creates a new GamePhaseState instance using the specified properties.
+         * Creates a new Trade instance using the specified properties.
          * @param [properties] Properties to set
-         * @returns GamePhaseState instance
+         * @returns Trade instance
          */
-        public static create(properties?: GameState.IGamePhaseState): GameState.GamePhaseState;
+        public static create(properties?: GameState.ITrade): GameState.Trade;
 
         /**
-         * Encodes the specified GamePhaseState message. Does not implicitly {@link GameState.GamePhaseState.verify|verify} messages.
-         * @param message GamePhaseState message or plain object to encode
+         * Encodes the specified Trade message. Does not implicitly {@link GameState.Trade.verify|verify} messages.
+         * @param message Trade message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encode(message: GameState.IGamePhaseState, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encode(message: GameState.ITrade, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Encodes the specified GamePhaseState message, length delimited. Does not implicitly {@link GameState.GamePhaseState.verify|verify} messages.
-         * @param message GamePhaseState message or plain object to encode
+         * Encodes the specified Trade message, length delimited. Does not implicitly {@link GameState.Trade.verify|verify} messages.
+         * @param message Trade message or plain object to encode
          * @param [writer] Writer to encode to
          * @returns Writer
          */
-        public static encodeDelimited(message: GameState.IGamePhaseState, writer?: $protobuf.Writer): $protobuf.Writer;
+        public static encodeDelimited(message: GameState.ITrade, writer?: $protobuf.Writer): $protobuf.Writer;
 
         /**
-         * Decodes a GamePhaseState message from the specified reader or buffer.
+         * Decodes a Trade message from the specified reader or buffer.
          * @param reader Reader or buffer to decode from
          * @param [length] Message length if known beforehand
-         * @returns GamePhaseState
+         * @returns Trade
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): GameState.GamePhaseState;
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): GameState.Trade;
 
         /**
-         * Decodes a GamePhaseState message from the specified reader or buffer, length delimited.
+         * Decodes a Trade message from the specified reader or buffer, length delimited.
          * @param reader Reader or buffer to decode from
-         * @returns GamePhaseState
+         * @returns Trade
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): GameState.GamePhaseState;
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): GameState.Trade;
 
         /**
-         * Verifies a GamePhaseState message.
+         * Verifies a Trade message.
          * @param message Plain object to verify
          * @returns `null` if valid, otherwise the reason why it is not
          */
         public static verify(message: { [k: string]: any }): (string|null);
 
         /**
-         * Creates a GamePhaseState message from a plain object. Also converts values to their respective internal types.
+         * Creates a Trade message from a plain object. Also converts values to their respective internal types.
          * @param object Plain object
-         * @returns GamePhaseState
+         * @returns Trade
          */
-        public static fromObject(object: { [k: string]: any }): GameState.GamePhaseState;
+        public static fromObject(object: { [k: string]: any }): GameState.Trade;
 
         /**
-         * Creates a plain object from a GamePhaseState message. Also converts values to other types if specified.
-         * @param message GamePhaseState
+         * Creates a plain object from a Trade message. Also converts values to other types if specified.
+         * @param message Trade
          * @param [options] Conversion options
          * @returns Plain object
          */
-        public static toObject(message: GameState.GamePhaseState, options?: $protobuf.IConversionOptions): { [k: string]: any };
+        public static toObject(message: GameState.Trade, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
         /**
-         * Converts this GamePhaseState to JSON.
+         * Converts this Trade to JSON.
          * @returns JSON object
          */
         public toJSON(): { [k: string]: any };
-    }
-
-    namespace GamePhaseState {
-
-        /** Properties of a Trade. */
-        interface ITrade {
-
-            /** Trade reqId */
-            reqId?: (number|null);
-
-            /** Trade resId */
-            resId?: (number|null);
-        }
-
-        /** Represents a Trade. */
-        class Trade implements ITrade {
-
-            /**
-             * Constructs a new Trade.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: GameState.GamePhaseState.ITrade);
-
-            /** Trade reqId. */
-            public reqId: number;
-
-            /** Trade resId. */
-            public resId: number;
-
-            /**
-             * Creates a new Trade instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns Trade instance
-             */
-            public static create(properties?: GameState.GamePhaseState.ITrade): GameState.GamePhaseState.Trade;
-
-            /**
-             * Encodes the specified Trade message. Does not implicitly {@link GameState.GamePhaseState.Trade.verify|verify} messages.
-             * @param message Trade message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: GameState.GamePhaseState.ITrade, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Encodes the specified Trade message, length delimited. Does not implicitly {@link GameState.GamePhaseState.Trade.verify|verify} messages.
-             * @param message Trade message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encodeDelimited(message: GameState.GamePhaseState.ITrade, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a Trade message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns Trade
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): GameState.GamePhaseState.Trade;
-
-            /**
-             * Decodes a Trade message from the specified reader or buffer, length delimited.
-             * @param reader Reader or buffer to decode from
-             * @returns Trade
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): GameState.GamePhaseState.Trade;
-
-            /**
-             * Verifies a Trade message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-
-            /**
-             * Creates a Trade message from a plain object. Also converts values to their respective internal types.
-             * @param object Plain object
-             * @returns Trade
-             */
-            public static fromObject(object: { [k: string]: any }): GameState.GamePhaseState.Trade;
-
-            /**
-             * Creates a plain object from a Trade message. Also converts values to other types if specified.
-             * @param message Trade
-             * @param [options] Conversion options
-             * @returns Plain object
-             */
-            public static toObject(message: GameState.GamePhaseState.Trade, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-            /**
-             * Converts this Trade to JSON.
-             * @returns JSON object
-             */
-            public toJSON(): { [k: string]: any };
-        }
     }
 }
 
@@ -755,14 +464,14 @@ export interface IPlayerState {
     /** PlayerState positionIndex */
     positionIndex?: (number|null);
 
-    /** PlayerState unitLists */
-    unitLists?: (string[]|null);
+    /** PlayerState unitList */
+    unitList?: (string|null);
 
     /** PlayerState point */
     point?: (number|null);
 
-    /** PlayerState phases */
-    phases?: (PlayerState.IPlayerPhaseState[]|null);
+    /** PlayerState tradedCount */
+    tradedCount?: (number|null);
 
     /** PlayerState seatNumber */
     seatNumber?: (number|null);
@@ -786,14 +495,14 @@ export class PlayerState implements IPlayerState {
     /** PlayerState positionIndex. */
     public positionIndex: number;
 
-    /** PlayerState unitLists. */
-    public unitLists: string[];
+    /** PlayerState unitList. */
+    public unitList: string;
 
     /** PlayerState point. */
     public point: number;
 
-    /** PlayerState phases. */
-    public phases: PlayerState.IPlayerPhaseState[];
+    /** PlayerState tradedCount. */
+    public tradedCount: number;
 
     /** PlayerState seatNumber. */
     public seatNumber: number;
@@ -869,105 +578,6 @@ export class PlayerState implements IPlayerState {
     public toJSON(): { [k: string]: any };
 }
 
-export namespace PlayerState {
-
-    /** Properties of a PlayerPhaseState. */
-    interface IPlayerPhaseState {
-
-        /** PlayerPhaseState periodProfit */
-        periodProfit?: (number|null);
-
-        /** PlayerPhaseState tradedCount */
-        tradedCount?: (number|null);
-    }
-
-    /** Represents a PlayerPhaseState. */
-    class PlayerPhaseState implements IPlayerPhaseState {
-
-        /**
-         * Constructs a new PlayerPhaseState.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: PlayerState.IPlayerPhaseState);
-
-        /** PlayerPhaseState periodProfit. */
-        public periodProfit: number;
-
-        /** PlayerPhaseState tradedCount. */
-        public tradedCount: number;
-
-        /**
-         * Creates a new PlayerPhaseState instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns PlayerPhaseState instance
-         */
-        public static create(properties?: PlayerState.IPlayerPhaseState): PlayerState.PlayerPhaseState;
-
-        /**
-         * Encodes the specified PlayerPhaseState message. Does not implicitly {@link PlayerState.PlayerPhaseState.verify|verify} messages.
-         * @param message PlayerPhaseState message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: PlayerState.IPlayerPhaseState, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Encodes the specified PlayerPhaseState message, length delimited. Does not implicitly {@link PlayerState.PlayerPhaseState.verify|verify} messages.
-         * @param message PlayerPhaseState message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: PlayerState.IPlayerPhaseState, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Decodes a PlayerPhaseState message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns PlayerPhaseState
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): PlayerState.PlayerPhaseState;
-
-        /**
-         * Decodes a PlayerPhaseState message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns PlayerPhaseState
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): PlayerState.PlayerPhaseState;
-
-        /**
-         * Verifies a PlayerPhaseState message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
-
-        /**
-         * Creates a PlayerPhaseState message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns PlayerPhaseState
-         */
-        public static fromObject(object: { [k: string]: any }): PlayerState.PlayerPhaseState;
-
-        /**
-         * Creates a plain object from a PlayerPhaseState message. Also converts values to other types if specified.
-         * @param message PlayerPhaseState
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: PlayerState.PlayerPhaseState, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-        /**
-         * Converts this PlayerPhaseState to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
-    }
-}
-
 /** Properties of a MoveParams. */
 export interface IMoveParams {
 
@@ -976,12 +586,6 @@ export interface IMoveParams {
 
     /** MoveParams unitIndex */
     unitIndex?: (number|null);
-
-    /** MoveParams gamePhaseIndex */
-    gamePhaseIndex?: (number|null);
-
-    /** MoveParams playerPhaseIndex */
-    playerPhaseIndex?: (number|null);
 
     /** MoveParams seatNumber */
     seatNumber?: (number|null);
@@ -1001,12 +605,6 @@ export class MoveParams implements IMoveParams {
 
     /** MoveParams unitIndex. */
     public unitIndex: number;
-
-    /** MoveParams gamePhaseIndex. */
-    public gamePhaseIndex: number;
-
-    /** MoveParams playerPhaseIndex. */
-    public playerPhaseIndex: number;
 
     /** MoveParams seatNumber. */
     public seatNumber: number;

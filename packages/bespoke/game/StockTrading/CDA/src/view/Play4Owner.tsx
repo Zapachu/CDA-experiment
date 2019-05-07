@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {Core, Lang, Button, MaskLoading, baseEnum} from 'bespoke-client-util'
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
-import {FetchType, MoveType, phaseNames, PlayerStatus, PushType, ROLE} from '../config'
+import {FetchType, MarketStage, MoveType, phaseNames, PlayerStatus, PushType, ROLE} from '../config'
 import {TradeChart} from './phase/mainGame'
 
 interface IPlay4OwnerState {
@@ -47,7 +47,7 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
 
     renderPlayerStatusTable() {
         const {lang, props: {game, playerStates}} = this,
-            {roles} = game.params.phases[0].params
+            {roles} = game.params
         return <table className={style.playerStatusTable}>
             <tbody>
             <tr>
@@ -58,7 +58,7 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
             </tr>
             {
                 Object.values(playerStates).sort(({positionIndex: p1}, {positionIndex: p2}) => p1 - p2)
-                    .map(({phases, positionIndex, seatNumber, status}, i) => <tr key={i}>
+                    .map(({positionIndex, seatNumber, status}, i) => <tr key={i}>
                         <td>{seatNumber || lang.unknown}</td>
                         <td>{positionIndex === undefined ? lang.unknown : positionIndex + 1}</td>
                         <td>{roles[positionIndex] === undefined ? lang.unknown : lang[ROLE[roles[positionIndex]]]}</td>
@@ -71,7 +71,7 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
 
     renderAssignPosition() {
         const {lang, props: {frameEmitter, gameState, playerStates, game}} = this
-        const totalPlayer = game.params.phases.find(ph => ph.templateName === phaseNames.assignPosition).params.roles.length
+        const totalPlayer = game.params.roles.length
         return <section className={style.assignPosition}>
             {
                 this.renderPlayerStatusTable()
@@ -93,10 +93,8 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
 
     renderMainGame() {
         const {lang, props: {token, type, params, game, gameState, playerStates}, state: {timer}} = this
-        const {gamePhaseIndex} = gameState
-        const {roles} = game.params.phases[0].params,
-            {time2ReadInfo, durationOfEachPeriod} = game.params.phases[gamePhaseIndex].params,
-            {trades, sellOrderIds, buyOrderIds} = gameState.phases[gamePhaseIndex]
+        const {roles, time2ReadInfo, durationOfEachPeriod} = game.params,
+            {trades, sellOrderIds, buyOrderIds} = gameState
         const orderDict: { [id: number]: GameState.IOrder } = {}
         gameState.orders.forEach(order => {
             orderDict[order.id] = order
@@ -140,18 +138,17 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
     }
 
     renderMarket() {
-        const {lang, props: {game, gameState: {gamePhaseIndex}}} = this
-        const {templateName} = game.params.phases[gamePhaseIndex]
-        switch (templateName) {
-            case phaseNames.assignPosition:
+        const {lang, props: {gameState}} = this
+        switch (gameState.marketStage) {
+            case MarketStage.assignPosition:
                 return this.renderAssignPosition()
-            case phaseNames.mainGame:
+            case MarketStage.leave:
+                return <div className={style.blankMsg}>{lang.marketClosed}</div>
+            default:
                 return <React.Fragment>
                     {this.renderPlayerStatusTable()}
                     {this.renderMainGame()}
                 </React.Fragment>
-            case phaseNames.marketResult:
-                return <div className={style.blankMsg}>{lang.marketClosed}</div>
         }
     }
 

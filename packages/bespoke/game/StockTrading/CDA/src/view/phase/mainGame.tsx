@@ -31,11 +31,6 @@ class Create extends BasePhase.Create {
         invalidInputSequences: ['输入序列有误', 'Invalid input sequences']
     })
 
-    get marketPositions(): Array<ROLE> {
-        const phase = this.props.phases.find(({templateName}) => templateName === phaseNames.assignPosition)
-        return phase ? phase.params.roles : []
-    }
-
     checkParams({params}) {
         if (!params.unitLists.length) {
             Toast.warn(this.lang.invalidInputSequences)
@@ -78,7 +73,7 @@ class Create extends BasePhase.Create {
                     <th>{lang.UnitList}</th>
                 </tr>
                 {
-                    this.marketPositions.map((role, positionIndex) =>
+                    this.props.params.roles.map((role, positionIndex) =>
                         <tr key={positionIndex}>
                             <th>{positionIndex + 1}</th>
                             <td>{lang[ROLE[role]]}</td>
@@ -101,55 +96,6 @@ class Create extends BasePhase.Create {
     }
 }
 
-class Info extends Create {
-    render() {
-        const {lang, props: {params}} = this
-        return <section className={`${style.mainGame} ${style.createContent}`}>
-            <ul className={style.baseFields}>
-                {
-                    ['durationOfEachPeriod', 'time2ReadInfo'].map(key =>
-                        <li key={key}>
-                            <Label label={lang[key]}/>
-                            <a>{params[key]}</a>
-                        </li>
-                    )
-                }
-            </ul>
-            <table className={style.positions}>
-                <tbody>
-                <tr>
-                    <th>&nbsp;</th>
-                    <th>{lang.Role}</th>
-                    <th>{lang.UnitList}</th>
-                </tr>
-                {
-                    this.marketPositions.map((role, positionIndex) =>
-                        <tr key={positionIndex}>
-                            <th>{positionIndex + 1}</th>
-                            <td>
-                                <div className={style.roleSwitcher}>
-                                    {
-                                        getEnumKeys(ROLE).map(key =>
-                                            <a key={key}
-                                               className={ROLE[key] === role ? style.active : ''}>{lang[key]}</a>
-                                        )
-                                    }
-                                </div>
-                            </td>
-                            <td className={style.unitListWrapper}>
-                                <UnitList {...{
-                                    unitList: params.unitLists[positionIndex],
-                                    editable: false
-                                }}/>
-                            </td>
-                        </tr>)
-                }
-                </tbody>
-            </table>
-        </section>
-    }
-}
-
 interface IPlayState {
     input: {
         price: number
@@ -159,11 +105,9 @@ interface IPlayState {
 
 class Play extends BasePhase.Play<IPlayState> {
     lang = Lang.extractLang({
-        period: ['时期', 'Period'],
         role: ['角色', 'Your Role'],
         timeLeft: ['剩余时间', 'Time Left'],
         profit: ['物品利润', 'Box Profit'],
-        totalProfit: ['市场总利润', 'Total profit in the market'],
         currentProfit: ['本期总利润', 'Profit in current period'],
         unitNumber: ['物品序号', 'Unit Number'],
         unitCost: ['物品成本', 'Unit Cost'],
@@ -208,8 +152,8 @@ class Play extends BasePhase.Play<IPlayState> {
         const {
             lang, props: {
                 game, frameEmitter,
-                gameState: {orders, phases: gameStatePhases, gamePhaseIndex},
-                playerState: {positionIndex, unitLists}
+                gameState: {orders, buyOrderIds, sellOrderIds, positionUnitIndex},
+                playerState: {positionIndex, unitList}
             },
             state: {input}
         } = this
@@ -218,24 +162,20 @@ class Play extends BasePhase.Play<IPlayState> {
         orders.forEach(order => {
             orderDict[order.id] = order
         })
-        const {buyOrderIds, sellOrderIds, positionUnitIndex} = gameStatePhases[gamePhaseIndex]
-        const role = game.params.phases[0].params[positionIndex]
-        const privateCost = Number(unitLists[gamePhaseIndex].split(' ')[positionUnitIndex[positionIndex]]),
+        const role = game.params.roles[positionIndex]
+        const privateCost = Number(unitList.split(' ')[positionUnitIndex[positionIndex]]),
             minSellOrder = orderDict[sellOrderIds[0]],
             maxBuyOrder = orderDict[buyOrderIds[0]]
         if (!privateCost) {
             return
         }
         if (role === ROLE.Seller && (price < privateCost || (minSellOrder && price >= minSellOrder.price))) {
-            frameEmitter.emit(MoveType.rejectOrder, {price})
             return Toast.warn(lang.invalidSellPrice)
         }
         if (role === ROLE.Buyer && (price > privateCost || (maxBuyOrder && price <= maxBuyOrder.price))) {
-            frameEmitter.emit(MoveType.rejectOrder, {price})
             return Toast.warn(lang.invalidSellPrice)
         }
         frameEmitter.emit(MoveType.submitOrder, {
-            gamePhaseIndex,
             unitIndex: positionUnitIndex[positionIndex],
             price
         })
@@ -244,9 +184,9 @@ class Play extends BasePhase.Play<IPlayState> {
     render() {
         const {
             lang, props: {
-                game,
-                gameState: {orders, phases: gameStatePhases, gamePhaseIndex},
-                playerState: {positionIndex, unitLists, phases: playerStatePhases}
+                game:{params:{roles, time2ReadInfo, durationOfEachPeriod}},
+                gameState: {orders, marketStage, buyOrderIds, sellOrderIds, trades, positionUnitIndex},
+                playerState: {positionIndex, unitList}
             }, state: {input, timer}
         } = this
         if (positionIndex === undefined) {
@@ -256,17 +196,14 @@ class Play extends BasePhase.Play<IPlayState> {
         orders.forEach(order => {
             orderDict[order.id] = order
         })
-        const role = game.params.phases[0].params.roles[positionIndex],
-            {time2ReadInfo, durationOfEachPeriod} = game.params.phases[gamePhaseIndex].params
-        const {marketStage, buyOrderIds, sellOrderIds, trades, positionUnitIndex} = gameStatePhases[gamePhaseIndex],
-            timeLeft = durationOfEachPeriod + time2ReadInfo - timer,
+        const role = roles[positionIndex]
+        const timeLeft = durationOfEachPeriod + time2ReadInfo - timer,
             time2NextPhase = durationOfEachPeriod + 2 * time2ReadInfo - timer
         const unitIndex = positionUnitIndex[positionIndex],
-            unitPrice = +(unitLists[gamePhaseIndex].split(' ')[unitIndex] || 0)
+            unitPrice = +(unitList.split(' ')[unitIndex] || 0)
         const [tradeCount, profit, tradeListFragment] = this.renderTradeList(orderDict, trades)
         return <section className={`${style.mainGame} ${style.playContent}`}>
             <ul className={style.header}>
-                <li>{lang.period} : <em>{gamePhaseIndex}/{game.params.phases.length - 2}</em></li>
                 <li>{lang.role} : <em>{lang[ROLE[role]]}</em></li>
                 <li>{lang.timeLeft} : <em>{timer < time2ReadInfo ? '   ' : timeLeft > 0 ? timeLeft : 0}</em>s</li>
             </ul>
@@ -290,8 +227,6 @@ class Play extends BasePhase.Play<IPlayState> {
                                     <h3 className={style.title}>{lang.personalInfo}</h3>
                                     <div className={style.infoText}>
                                         <ul>
-                                            <li>{lang.totalProfit}<em>{playerStatePhases.map(({periodProfit = 0}) => periodProfit).reduce((m, n) => m + n, 0)}</em>
-                                            </li>
                                             <li>{lang.currentProfit}<em>{profit}</em></li>
                                         </ul>
                                     </div>
@@ -398,16 +333,16 @@ class Play extends BasePhase.Play<IPlayState> {
         </table>
     }
 
-    renderTradeList(orderDict: { [id: number]: GameState.IOrder }, trades: Array<GameState.GamePhaseState.ITrade>): [number, number, React.ReactNode] {
+    renderTradeList(orderDict: { [id: number]: GameState.IOrder }, trades: Array<GameState.ITrade>): [number, number, React.ReactNode] {
         const {
                 lang, props: {
                     game,
-                    gameState: {gamePhaseIndex},
-                    playerState: {positionIndex, unitLists}
+                    gameState: {},
+                    playerState: {positionIndex, unitList}
                 }
             } = this,
-            role = game.params.phases[0].params.roles[positionIndex]
-        const unitPrices = unitLists[gamePhaseIndex].split(' ').map(price => +price)
+            role = game.params.roles[positionIndex]
+        const unitPrices = unitList.split(' ').map(price => +price)
         const myTrades: Array<{
             privateCost: number,
             price?: number
@@ -455,7 +390,7 @@ class Play extends BasePhase.Play<IPlayState> {
     }
 }
 
-export const TradeChart: React.SFC<{
+export const TradeChart: React.FC<{
     tradeList: Array<{
         price: number
     }>
@@ -544,4 +479,4 @@ export const TradeChart: React.SFC<{
     </section>
 }
 
-export default {Create, Info, Play}
+export default {Create, Play}

@@ -69,18 +69,14 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
     //region market
     //region getter
 
-    get position():ROLE {
-        const {roles} = this.game.params.phases[0].params,
+    get position(): ROLE {
+        const {roles} = this.game.params,
             {positionIndex} = this.playerState
         return roles[positionIndex]
     }
 
     get sleepTime(): number {
         return SLEEP_TIME * (0.75 + 0.5 * Math.random())
-    }
-
-    get gamePhaseState(): GameState.IGamePhaseState {
-        return this.gameState.phases[this.gameState.gamePhaseIndex]
     }
 
     get orderDict(): { [id: number]: GameState.IOrder } {
@@ -92,13 +88,13 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
     }
 
     get unitIndex(): number {
-        return this.gamePhaseState.positionUnitIndex[this.playerState.positionIndex]
+        return this.gameState.positionUnitIndex[this.playerState.positionIndex]
     }
 
     get unitPrice(): number {
         try {
-            const {gameState: {gamePhaseIndex}, playerState: {unitLists}} = this
-            return +(unitLists[gamePhaseIndex].split(' ')[this.unitIndex])
+            const {playerState: {unitList}} = this
+            return +(unitList.split(' ')[this.unitIndex])
         } catch (e) {
             return 0
         }
@@ -114,17 +110,16 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
     //endregion
 
     wakeUp(): void {
-        if (this.game.params.phases[this.gameState.gamePhaseIndex].templateName === phaseNames.mainGame &&
-            this.gamePhaseState.marketStage === MarketStage.trading && this.unitPrice) {
+        if (this.gameState.marketStage === MarketStage.trading && this.unitPrice) {
             redisClient.incr(RedisKey.robotActionSeq(this.game.id)).then(seq => this.submitOrder(seq))
             setTimeout(() => this.wakeUp(), this.sleepTime)
         }
     }
 
     respondNewOrder(newOrderId: number) {
-        const {orderDict, game, position:role, zipFreeField: {calcPrice}} = this,
+        const {orderDict, game, position: role, zipFreeField: {calcPrice}} = this,
             newOrder = orderDict[newOrderId],
-            {roles} = game.params.phases[0].params
+            {roles} = game.params
         const newOrderRole = roles[newOrder.positionIndex]
         if (newOrderRole === role &&
             ((role === ROLE.Buyer && calcPrice <= newOrder.price) ||
@@ -135,10 +130,10 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
     }
 
     respondNewTrade(resOrderId: number) {
-        const {orderDict, game, position:role} = this,
+        const {orderDict, game, position: role} = this,
             resOrder = orderDict[resOrderId],
-            {roles} = game.params.phases[0].params
-        const {reqId} = this.gamePhaseState.trades.find(({resId}) => resId === resOrderId),
+            {roles} = game.params
+        const {reqId} = this.gameState.trades.find(({resId}) => resId === resOrderId),
             {price: tradePrice} = orderDict[reqId]
         const resRole = roles[resOrder.positionIndex]
         if ((role === ROLE.Buyer && this.zipFreeField.calcPrice >= tradePrice) ||
@@ -150,7 +145,7 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
     }
 
     adjustProfitRate(adjustDirection: AdjustDirection, q: number): void {
-        const {position:role, unitPrice, unitIndex} = this
+        const {position: role, unitPrice, unitIndex} = this
         let prePrice = this.zipFreeField.calcPrice || unitPrice * (1 + this.zipFreeField.u)
         const {beta, r, Gamma} = this.zipFreeField
         const tmp = (adjustDirection === AdjustDirection.raise ? 0.05 : -0.05) * (role === ROLE.Seller ? 1 : -1),
@@ -201,8 +196,7 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
     submitOrder(seq: number): void {
         const {
             zipFreeField: {calcPrice},
-            gameState: {gamePhaseIndex},
-            gamePhaseState: {buyOrderIds, sellOrderIds},
+            gameState: {buyOrderIds, sellOrderIds},
             orderDict, unitIndex, unitPrice
         } = this
         const [wouldBeRejected = false, rejectPrice] = {
@@ -228,8 +222,7 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
         }
         this.frameEmitter.emit(MoveType.submitOrder, {
             price: calcPrice,
-            unitIndex,
-            gamePhaseIndex
+            unitIndex
         }, async (shoutResult: ShoutResult, marketBuyOrders, marketSellOrders) => {
             await new FreeStyleModel({
                 game: this.game.id,

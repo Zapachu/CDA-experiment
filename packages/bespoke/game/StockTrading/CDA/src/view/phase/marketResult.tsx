@@ -19,38 +19,8 @@ class Play extends BasePhase.Play {
     })
 
     render() {
-        const {lang, props: {game, frameEmitter, playerState}} = this,
-            phases = playerState.phases.slice(1, playerState.phases.length - 1)
-        let totalProfit = 0, totalCount = 0
-        phases.forEach(({periodProfit, tradedCount}) => {
-            totalProfit += periodProfit
-            totalCount += tradedCount
-        })
-        return <section className={style.marketResult}>
-            <label>{lang.title1}<em>{phases.length}</em>{lang.title2}</label>
-            <table className={style.profitTable}>
-                <tr>
-                    <td>{lang.period}</td>
-                    <td>{lang.tradedCount}</td>
-                    <td>{lang.profit}</td>
-                </tr>
-                {
-                    phases.map(({tradedCount, periodProfit}, i) =>
-                        <tr key={i}>
-                            <td>{i + 1}</td>
-                            <td>{tradedCount}</td>
-                            <td>{periodProfit}</td>
-                        </tr>
-                    )
-                }
-                <tr>
-                    <td>{lang.total}</td>
-                    <td>{totalCount}</td>
-                    <td>{totalProfit}</td>
-                </tr>
-            </table>
-            <label>{lang.footLabel1}<em>{totalProfit}</em>{lang.footLabel2}<em>{totalProfit.toFixed(2)}</em>{lang.footLabel3}
-            </label>
+        const {props: {game, frameEmitter}} = this
+        return <section>
             <PhaseOver {...{game, frameEmitter}}/>
         </section>
     }
@@ -58,7 +28,7 @@ class Play extends BasePhase.Play {
 
 export default {Play}
 
-export const PhaseOver: React.SFC<{
+export const PhaseOver: React.FC<{
     game: IGame<ICreateParams>,
     frameEmitter: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
 }> = ({game, frameEmitter}) => {

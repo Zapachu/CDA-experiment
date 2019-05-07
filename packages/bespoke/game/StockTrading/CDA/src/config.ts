@@ -19,10 +19,12 @@ export enum SheetType {
 }
 
 export enum MarketStage {
+    assignPosition,
     notOpen,
     readDescription,
     trading,
-    result
+    result,
+    leave
 }
 
 export enum PlayerStatus {

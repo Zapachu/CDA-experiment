@@ -1,18 +1,11 @@
 syntax = "proto3";
 
 message CreateParams {
-    message Phase {
-        message Params {
-            repeated int32 roles = 2;
-            int32 time2ReadInfo = 3;
-            int32 durationOfEachPeriod = 4;
-            repeated string unitLists = 5;
-        }
-        string templateName = 1;
-        Params params = 2;
-    }
-    repeated Phase phases = 1;
-    string nextPhaseKey = 2;
+    string nextPhaseKey = 1;
+    repeated int32 roles = 2;
+    int32 time2ReadInfo = 3;
+    int32 durationOfEachPeriod = 4;
+    repeated string unitLists = 5;
 }
 
 message GameState {
@@ -22,43 +15,33 @@ message GameState {
         int32 unitIndex = 3;
         float price = 4;
     }
-    message GamePhaseState {
-        message Trade {
-            int32 reqId = 1;
-            int32 resId = 2;
-        }
-        int32 marketStage = 1;
-        int32 orderId = 2;
-        repeated int32 buyOrderIds = 3;
-        repeated int32 sellOrderIds = 4;
-        repeated Trade trades = 5;
-        repeated int32 positionUnitIndex = 6;
+    message Trade {
+        int32 reqId = 1;
+        int32 resId = 2;
     }
-    int32 gamePhaseIndex = 1;
-    repeated Order orders = 2;
-    repeated GamePhaseState phases = 3;
-    bool positionAssigned = 4;
+    int32 marketStage = 1;
+    int32 orderId = 2;
+    repeated int32 buyOrderIds = 3;
+    repeated int32 sellOrderIds = 4;
+    repeated Trade trades = 5;
+    repeated int32 positionUnitIndex = 6;
+    repeated Order orders = 7;
+    bool positionAssigned = 8;
 }
 
 message PlayerState {
-    message PlayerPhaseState {
-        int32 periodProfit = 1;
-        int32 tradedCount = 2;
-    }
     string token = 1;
     int32 status = 3;
     int32 positionIndex = 4;
-    repeated string unitLists = 5;
+    string unitList = 5;
     float point = 9;
-    repeated PlayerPhaseState phases = 10;
+    int32 tradedCount = 12;
     int32 seatNumber = 11;
 }
 
 message MoveParams {
     float price = 1;
     int32 unitIndex = 6;
-    int32 gamePhaseIndex = 7;
-    int32 playerPhaseIndex = 8;
     int32 seatNumber = 9;
 }
 message PushParams {

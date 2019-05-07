@@ -26,9 +26,6 @@ export class Result4Owner extends Core.Result4Owner<ICreateParams, IGameState, I
         export: ['导出', 'Export'],
         unknown: ['???', '???'],
         [SheetType[SheetType.seatNumber]]: ['座位号', 'SeatNumber'],
-        [SheetType[SheetType.result]]: ['结果', 'Result'],
-        [SheetType[SheetType.log]]: ['日志', 'Log'],
-        [SheetType[SheetType.profit]]: ['收益', 'Profit'],
         [SheetType[SheetType.robotCalcLog]]: ['机器人计算日志', 'RobotCalcLog'],
         [SheetType[SheetType.robotSubmitLog]]: ['机器人报价日志', 'RobotSubmitLog']
     })
