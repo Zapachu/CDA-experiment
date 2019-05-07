@@ -47,7 +47,7 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
 
     renderPlayerStatusTable() {
         const {lang, props: {game, playerStates}} = this,
-            {positions} = game.params.phases[0].params
+            {roles} = game.params.phases[0].params
         return <table className={style.playerStatusTable}>
             <tbody>
             <tr>
@@ -61,7 +61,7 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
                     .map(({phases, positionIndex, seatNumber, status}, i) => <tr key={i}>
                         <td>{seatNumber || lang.unknown}</td>
                         <td>{positionIndex === undefined ? lang.unknown : positionIndex + 1}</td>
-                        <td>{positions[positionIndex] === undefined ? lang.unknown : lang[ROLE[positions[positionIndex].role]]}</td>
+                        <td>{roles[positionIndex] === undefined ? lang.unknown : lang[ROLE[roles[positionIndex]]]}</td>
                         <td>{status === PlayerStatus.wait4MarketOpen ? lang.wait4MarketOpen : ''}</td>
                     </tr>)
             }
@@ -71,7 +71,7 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
 
     renderAssignPosition() {
         const {lang, props: {frameEmitter, gameState, playerStates, game}} = this
-        const totalPlayer = game.params.phases.find(ph => ph.templateName === phaseNames.assignPosition).params.positions.length
+        const totalPlayer = game.params.phases.find(ph => ph.templateName === phaseNames.assignPosition).params.roles.length
         return <section className={style.assignPosition}>
             {
                 this.renderPlayerStatusTable()
@@ -94,7 +94,7 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
     renderMainGame() {
         const {lang, props: {token, type, params, game, gameState, playerStates}, state: {timer}} = this
         const {gamePhaseIndex} = gameState
-        const {positions} = game.params.phases[0].params,
+        const {roles} = game.params.phases[0].params,
             {time2ReadInfo, durationOfEachPeriod} = game.params.phases[gamePhaseIndex].params,
             {trades, sellOrderIds, buyOrderIds} = gameState.phases[gamePhaseIndex]
         const orderDict: { [id: number]: GameState.IOrder } = {}
@@ -108,7 +108,7 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
                     <ul><label>{lang.shoutInfo}</label>
                         {
                             type === MoveType.submitOrder ? <React.Fragment>
-                                <li>{lang[ROLE[positions[activePlayerState.positionIndex].role]]}：{activePlayerState.positionIndex + 1}</li>
+                                <li>{lang[ROLE[roles[activePlayerState.positionIndex]]]}：{activePlayerState.positionIndex + 1}</li>
                                 <li>{lang.unitIndex}：{params.unitIndex + 1}</li>
                                 <li>{lang.price}：{params.price}</li>
                             </React.Fragment> : null

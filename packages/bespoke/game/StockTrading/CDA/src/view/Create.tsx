@@ -12,36 +12,24 @@ export class Create extends Core.Create<ICreateParams, FetchType> {
         if (params.phases) {
             return
         }
-        const marketPositions = [
-            ...Array(6).fill(null).map(() => ({
-                interval: 1,
-                exchangeRate: 1,
-                k: 1,
-                role: ROLE.Seller
-            })),
-            ...Array(6).fill(null).map(() => ({
-                interval: 1,
-                exchangeRate: 1,
-                k: 1,
-                role: ROLE.Buyer
-            }))
+        const roles = [
+            ...Array(6).fill(null).map(() => ROLE.Seller),
+            ...Array(6).fill(null).map(() => ROLE.Buyer)
         ]
-        const phases = [{
+        const phases: Array<CreateParams.IPhase> = [{
             templateName: phaseNames.assignPosition,
             params: {
-                participationFee: 10,
-                positions: marketPositions
+                roles
             }
         }, {
             templateName: phaseNames.mainGame,
             params: {
                 durationOfEachPeriod: 180,
                 time2ReadInfo: 15,
-                unitLists: marketPositions.map(({role}) => role === ROLE.Buyer ?
+                unitLists: roles.map(role => role === ROLE.Buyer ?
                     '325 325 305 260 220' :
                     '185 185 235 260 270'
-                ),
-                startTime: marketPositions.map(() => 3)
+                )
             }
         }, {
             templateName: phaseNames.marketResult,

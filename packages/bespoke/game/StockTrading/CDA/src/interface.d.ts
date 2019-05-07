@@ -198,8 +198,8 @@ export namespace CreateParams {
         /** Properties of a Params. */
         interface IParams {
 
-            /** Params positions */
-            positions?: (CreateParams.Phase.Params.IPosition[]|null);
+            /** Params roles */
+            roles?: (number[]|null);
 
             /** Params time2ReadInfo */
             time2ReadInfo?: (number|null);
@@ -209,9 +209,6 @@ export namespace CreateParams {
 
             /** Params unitLists */
             unitLists?: (string[]|null);
-
-            /** Params startTime */
-            startTime?: (number[]|null);
         }
 
         /** Represents a Params. */
@@ -223,8 +220,8 @@ export namespace CreateParams {
              */
             constructor(properties?: CreateParams.Phase.IParams);
 
-            /** Params positions. */
-            public positions: CreateParams.Phase.Params.IPosition[];
+            /** Params roles. */
+            public roles: number[];
 
             /** Params time2ReadInfo. */
             public time2ReadInfo: number;
@@ -234,9 +231,6 @@ export namespace CreateParams {
 
             /** Params unitLists. */
             public unitLists: string[];
-
-            /** Params startTime. */
-            public startTime: number[];
 
             /**
              * Creates a new Params instance using the specified properties.
@@ -307,99 +301,6 @@ export namespace CreateParams {
              * @returns JSON object
              */
             public toJSON(): { [k: string]: any };
-        }
-
-        namespace Params {
-
-            /** Properties of a Position. */
-            interface IPosition {
-
-                /** Position role */
-                role?: (number|null);
-            }
-
-            /** Represents a Position. */
-            class Position implements IPosition {
-
-                /**
-                 * Constructs a new Position.
-                 * @param [properties] Properties to set
-                 */
-                constructor(properties?: CreateParams.Phase.Params.IPosition);
-
-                /** Position role. */
-                public role: number;
-
-                /**
-                 * Creates a new Position instance using the specified properties.
-                 * @param [properties] Properties to set
-                 * @returns Position instance
-                 */
-                public static create(properties?: CreateParams.Phase.Params.IPosition): CreateParams.Phase.Params.Position;
-
-                /**
-                 * Encodes the specified Position message. Does not implicitly {@link CreateParams.Phase.Params.Position.verify|verify} messages.
-                 * @param message Position message or plain object to encode
-                 * @param [writer] Writer to encode to
-                 * @returns Writer
-                 */
-                public static encode(message: CreateParams.Phase.Params.IPosition, writer?: $protobuf.Writer): $protobuf.Writer;
-
-                /**
-                 * Encodes the specified Position message, length delimited. Does not implicitly {@link CreateParams.Phase.Params.Position.verify|verify} messages.
-                 * @param message Position message or plain object to encode
-                 * @param [writer] Writer to encode to
-                 * @returns Writer
-                 */
-                public static encodeDelimited(message: CreateParams.Phase.Params.IPosition, writer?: $protobuf.Writer): $protobuf.Writer;
-
-                /**
-                 * Decodes a Position message from the specified reader or buffer.
-                 * @param reader Reader or buffer to decode from
-                 * @param [length] Message length if known beforehand
-                 * @returns Position
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): CreateParams.Phase.Params.Position;
-
-                /**
-                 * Decodes a Position message from the specified reader or buffer, length delimited.
-                 * @param reader Reader or buffer to decode from
-                 * @returns Position
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): CreateParams.Phase.Params.Position;
-
-                /**
-                 * Verifies a Position message.
-                 * @param message Plain object to verify
-                 * @returns `null` if valid, otherwise the reason why it is not
-                 */
-                public static verify(message: { [k: string]: any }): (string|null);
-
-                /**
-                 * Creates a Position message from a plain object. Also converts values to their respective internal types.
-                 * @param object Plain object
-                 * @returns Position
-                 */
-                public static fromObject(object: { [k: string]: any }): CreateParams.Phase.Params.Position;
-
-                /**
-                 * Creates a plain object from a Position message. Also converts values to other types if specified.
-                 * @param message Position
-                 * @param [options] Conversion options
-                 * @returns Plain object
-                 */
-                public static toObject(message: CreateParams.Phase.Params.Position, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-                /**
-                 * Converts this Position to JSON.
-                 * @returns JSON object
-                 */
-                public toJSON(): { [k: string]: any };
-            }
         }
     }
 }

@@ -23,15 +23,12 @@ class Create extends BasePhase.Create {
             </div>
             <ul className={style.positions}>
                 {
-                    params.positions.map(({role, ...extraConfig}, positionIndex) =>
+                    params.roles.map((role, positionIndex) =>
                         <li className={style.position} key={positionIndex}>
                             <span className={style.positionSeq}>{positionIndex + 1}</span>
                             <BtnGroup value={roleKeys.findIndex(key => role === ROLE[key])}
                                       options={roleKeys.map(key => lang[key])}
-                                      onChange={i => this.updatePosition(positionIndex, position => ({
-                                          ...position,
-                                          role: ROLE[roleKeys[i]]
-                                      }))}
+                                      onChange={i => this.updatePosition(positionIndex, ROLE[roleKeys[i]])}
                             />
                         </li>)
                 }
@@ -41,22 +38,21 @@ class Create extends BasePhase.Create {
 
     addPosition() {
         const {params, updateParams} = this.props
-        const positions = [...params.positions,
-            {...params.positions.slice().pop()}]
-        updateParams({positions})
+        const roles = [...params.roles, params.roles.slice().pop()]
+        updateParams({roles})
     }
 
     removePosition() {
         const {params, updateParams} = this.props
-        const positions = params.positions.slice(0, -1)
-        updateParams({positions})
+        const roles = params.roles.slice(0, -1)
+        updateParams({roles})
     }
 
-    updatePosition(index, fnUpdate) {
+    updatePosition(index, role: ROLE) {
         const {params, updateParams} = this.props
-        const positions = params.positions.slice()
-        positions[index] = fnUpdate(positions[index])
-        updateParams({positions})
+        const roles = params.roles.slice()
+        roles[index] = role
+        updateParams({roles})
     }
 }
 
@@ -71,7 +67,7 @@ class Info extends Create {
                     <th>{lang.Role}</th>
                 </tr>
                 {
-                    params.positions.map(({role, ...extraConfig}, positionIndex) =>
+                    params.roles.map((role, positionIndex) =>
                         <tr key={positionIndex}>
                             <th>{positionIndex + 1}</th>
                             <td>
@@ -115,7 +111,7 @@ class Play extends BasePhase.Play<IPlayState> {
         return positionIndex === undefined ?
             <MaskLoading label={lang.wait4position}/> :
             <section className={`${style.assignPosition} ${style.playContent}`}>
-                <p>{lang.toEnterMarket}<em>{lang[ROLE[game.params.phases[0].params.positions[positionIndex].role]]}</em>
+                <p>{lang.toEnterMarket}<em>{lang[ROLE[game.params.phases[0].params.roles[positionIndex]]]}</em>
                 </p>
                 {
                     status === PlayerStatus.wait4MarketOpen ?

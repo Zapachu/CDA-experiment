@@ -10,61 +10,10 @@ export enum AdjustDirection {
     lower
 }
 
-export enum TRADE {
-    success = 1
-}
-
-export enum TRADE_TYPE {
-    buyerFirst = 1,
-    sellerFirst = 2
-}
-
-export enum EVENT_TYPE {
-    rejected = 1,
-    entered,
-    traded,
-    cancelled
-}
-
-export interface EventParams {
-    orderId?: number,
-    period: number,
-    subject: number,
-    box: number,
-    role: ROLE,
-    valueCost: number,
-    eventType: EVENT_TYPE,
-    eventNum: number,
-    eventTime: Date,
-    eventEndTime?: Date,
-    maxBid: number,
-    minAsk: number,
-    matchEventNum?: number,
-    bidAsk: number,
-    trade?: TRADE,
-    tradeOrder?: number,
-    tradeTime?: Date,
-    tradeType?: TRADE_TYPE,
-    price?: number,
-    profit?: number,
-    partnerSubject?: number,
-    partnerBox?: number,
-    partnerShout?: number,
-    partnerProfit?: number,
-    partnerId?: number,
-}
-
-export const zipInterval = {
-    fast: 1000,
-    slow: 5000
-}
 export const orderNumberLimit = 10000
 
 export enum SheetType {
     seatNumber = 'seatNumber',
-    result = 'result',
-    log = 'log',
-    profit = 'profit',
     robotCalcLog = 'robotCalcLog',
     robotSubmitLog = 'robotSubmitLog',
 }
@@ -152,7 +101,6 @@ export enum MoveType {
     //player
     enterMarket = 'enterMarket',
     submitOrder = 'submitOrder',
-    rejectOrder = 'rejectOrder',
     cancelOrder = 'cancelOrder',
     //owner
     assignPosition = 'assignPosition',

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, ButtonProps, Label, Lang, MaskLoading, RangeInput, Toast, Input, Switch} from 'bespoke-client-util'
+import {Button, ButtonProps, Label, Lang, MaskLoading, RangeInput, Toast} from 'bespoke-client-util'
 import {BasePhase} from './BasePhase'
 import {CreateParams, GameState} from '../../interface'
 
@@ -31,9 +31,9 @@ class Create extends BasePhase.Create {
         invalidInputSequences: ['输入序列有误', 'Invalid input sequences']
     })
 
-    get marketPositions(): Array<CreateParams.Phase.Params.IPosition> {
+    get marketPositions(): Array<ROLE> {
         const phase = this.props.phases.find(({templateName}) => templateName === phaseNames.assignPosition)
-        return phase ? phase.params.positions : []
+        return phase ? phase.params.roles : []
     }
 
     checkParams({params}) {
@@ -78,7 +78,7 @@ class Create extends BasePhase.Create {
                     <th>{lang.UnitList}</th>
                 </tr>
                 {
-                    this.marketPositions.map(({role}, positionIndex) =>
+                    this.marketPositions.map((role, positionIndex) =>
                         <tr key={positionIndex}>
                             <th>{positionIndex + 1}</th>
                             <td>{lang[ROLE[role]]}</td>
@@ -123,7 +123,7 @@ class Info extends Create {
                     <th>{lang.UnitList}</th>
                 </tr>
                 {
-                    this.marketPositions.map(({role}, positionIndex) =>
+                    this.marketPositions.map((role, positionIndex) =>
                         <tr key={positionIndex}>
                             <th>{positionIndex + 1}</th>
                             <td>
@@ -219,8 +219,7 @@ class Play extends BasePhase.Play<IPlayState> {
             orderDict[order.id] = order
         })
         const {buyOrderIds, sellOrderIds, positionUnitIndex} = gameStatePhases[gamePhaseIndex]
-        const {positions} = game.params.phases[0].params,
-            {role} = positions[positionIndex]
+        const role = game.params.phases[0].params[positionIndex]
         const privateCost = Number(unitLists[gamePhaseIndex].split(' ')[positionUnitIndex[positionIndex]]),
             minSellOrder = orderDict[sellOrderIds[0]],
             maxBuyOrder = orderDict[buyOrderIds[0]]
@@ -257,8 +256,7 @@ class Play extends BasePhase.Play<IPlayState> {
         orders.forEach(order => {
             orderDict[order.id] = order
         })
-        const {positions} = game.params.phases[0].params,
-            {role} = positions[positionIndex],
+        const role = game.params.phases[0].params.roles[positionIndex],
             {time2ReadInfo, durationOfEachPeriod} = game.params.phases[gamePhaseIndex].params
         const {marketStage, buyOrderIds, sellOrderIds, trades, positionUnitIndex} = gameStatePhases[gamePhaseIndex],
             timeLeft = durationOfEachPeriod + time2ReadInfo - timer,
@@ -408,8 +406,7 @@ class Play extends BasePhase.Play<IPlayState> {
                     playerState: {positionIndex, unitLists}
                 }
             } = this,
-            {positions} = game.params.phases[0].params
-        const {role} = positions[positionIndex]
+            role = game.params.phases[0].params.roles[positionIndex]
         const unitPrices = unitLists[gamePhaseIndex].split(' ').map(price => +price)
         const myTrades: Array<{
             privateCost: number,
