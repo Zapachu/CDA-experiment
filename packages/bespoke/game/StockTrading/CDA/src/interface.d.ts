@@ -198,14 +198,8 @@ export namespace CreateParams {
         /** Properties of a Params. */
         interface IParams {
 
-            /** Params participationFee */
-            participationFee?: (number|null);
-
             /** Params positions */
             positions?: (CreateParams.Phase.Params.IPosition[]|null);
-
-            /** Params practicePhase */
-            practicePhase?: (boolean|null);
 
             /** Params time2ReadInfo */
             time2ReadInfo?: (number|null);
@@ -229,14 +223,8 @@ export namespace CreateParams {
              */
             constructor(properties?: CreateParams.Phase.IParams);
 
-            /** Params participationFee. */
-            public participationFee: number;
-
             /** Params positions. */
             public positions: CreateParams.Phase.Params.IPosition[];
-
-            /** Params practicePhase. */
-            public practicePhase: boolean;
 
             /** Params time2ReadInfo. */
             public time2ReadInfo: number;
@@ -328,18 +316,6 @@ export namespace CreateParams {
 
                 /** Position role */
                 role?: (number|null);
-
-                /** Position identity */
-                identity?: (number|null);
-
-                /** Position exchangeRate */
-                exchangeRate?: (number|null);
-
-                /** Position k */
-                k?: (number|null);
-
-                /** Position interval */
-                interval?: (number|null);
             }
 
             /** Represents a Position. */
@@ -353,18 +329,6 @@ export namespace CreateParams {
 
                 /** Position role. */
                 public role: number;
-
-                /** Position identity. */
-                public identity: number;
-
-                /** Position exchangeRate. */
-                public exchangeRate: number;
-
-                /** Position k. */
-                public k: number;
-
-                /** Position interval. */
-                public interval: number;
 
                 /**
                  * Creates a new Position instance using the specified properties.

@@ -5,9 +5,8 @@ import mainGame from './mainGame'
 import marketResult from './marketResult'
 
 export const localePhaseNames = {
-    [phaseNames.assignPosition]: ['分发角色', 'Assign Role'],
-    [phaseNames.mainGame]: ['主实验', 'Main Game'],
-    [phaseNames.marketResult]: ['市场结果', 'Market Result']
+    [phaseNames.assignPosition]: ['玩家角色', 'Player Role'],
+    [phaseNames.mainGame]: ['心理价格', 'Private Price']
 }
 
 export const phaseTemplates: Array<BasePhase.IPhaseTemplate> = [

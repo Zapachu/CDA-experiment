@@ -14,7 +14,7 @@ import {
     EVENT_TYPE,
     EventParams,
     FetchType,
-    IDENTITY, ISeatNumberRow,
+    ISeatNumberRow,
     MarketStage,
     MoveType,
     orderNumberLimit,
@@ -56,7 +56,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         await super.init()
         const {positions} = this.game.params.phases[0].params
         const player = [], robot = []
-        positions.forEach(({identity}, i) => (identity === IDENTITY.Player ? player : robot).push(i))
+        positions.forEach((_,i) => player.push(i))
         this.positionStack = {player, robot}
         robot.forEach((_, i) => setTimeout(async () =>
             await this.startNewRobotScheduler(`Robot_${i}`, false), Math.random() * 3000))
@@ -204,7 +204,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             case MoveType.rejectOrder: {
                 const {price} = params
                 const {positions} = this.game.params.phases.filter(ph => ph.templateName === phaseNames.assignPosition)[0].params,
-                    {role, identity} = positions[positionIndex]
+                    {role} = positions[positionIndex]
                 const unitIndex = gameState.phases[gamePhaseIndex].positionUnitIndex[positionIndex]
                 const units = this.game.params.phases[gamePhaseIndex].params.unitLists[positionIndex].split(' ')
                 this.insertMoveEvent({
@@ -212,7 +212,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     subject: positionIndex,
                     box: unitIndex,
                     role: role,
-                    traderType: identity,
                     valueCost: units[unitIndex],
                     eventType: EVENT_TYPE.rejected,
                     eventTime: dateFormat(Date.now(), 'HH:MM:ss:l'),
@@ -249,8 +248,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             gameState = await this.stateManager.getGameState(),
             playerStates = await this.stateManager.getPlayerStates(),
             {orders, gamePhaseIndex} = gameState,
-            {trades} = gameState.phases[gamePhaseIndex],
-            {practicePhase} = game.params.phases[gamePhaseIndex].params
+            {trades} = gameState.phases[gamePhaseIndex]
         for (let userId in playerStates) {
             const {phases, unitLists, positionIndex} = playerStates[userId],
                 playerPhaseState = phases[gamePhaseIndex],
@@ -283,18 +281,15 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 periodProfit += unitProfit
                 tradedCount++
             })
-            if (practicePhase) {
-                periodProfit = 0
-            }
             playerPhaseState.tradedCount = tradedCount
             playerPhaseState.periodProfit = Number(periodProfit.toFixed(2))
-            playerStates[userId].point = Number((playerStates[userId].point + periodProfit / Number(positions[positionIndex].exchangeRate || 1)).toFixed(2))
+            playerStates[userId].point = Number((playerStates[userId].point + periodProfit).toFixed(2))
         }
     }
 
     async shoutNewOrder(gamePhaseIndex: number, order: GameState.IOrder): Promise<ShoutResult> {
         const {positions} = this.game.params.phases.filter(ph => ph.templateName === phaseNames.assignPosition)[0].params,
-            {role, identity} = positions[order.positionIndex]
+            {role} = positions[order.positionIndex]
         const units = this.game.params.phases[gamePhaseIndex].params.unitLists[order.positionIndex].split(' ')
         const {phases, orders} = await this.stateManager.getGameState(),
             {buyOrderIds, sellOrderIds, trades, positionUnitIndex} = phases[gamePhaseIndex]
@@ -308,7 +303,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 subject: order.positionIndex,
                 box: order.unitIndex,
                 role: role,
-                traderType: identity,
                 valueCost: units[order.unitIndex],
                 eventType: EVENT_TYPE.rejected,
                 eventTime: dateFormat(Date.now(), 'HH:MM:ss:l'),
@@ -340,7 +334,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 subject: order.positionIndex,
                 box: order.unitIndex,
                 role: role,
-                traderType: identity,
                 valueCost: units[order.unitIndex],
                 eventType: EVENT_TYPE.traded,
                 eventTime: dateFormat(Date.now(), 'HH:MM:ss:l'),
@@ -369,7 +362,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 subject: order.positionIndex,
                 box: order.unitIndex,
                 role: role,
-                traderType: identity,
                 valueCost: units[order.unitIndex],
                 eventType: EVENT_TYPE.entered,
                 eventTime: dateFormat(Date.now(), 'HH:MM:ss:l'),
@@ -397,7 +389,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         subject: order.positionIndex,
                         box: order.unitIndex,
                         role: positions[order.positionIndex].role,
-                        traderType: positions[order.positionIndex].identity,
                         valueCost: units[order.unitIndex],
                         eventType: EVENT_TYPE.cancelled,
                         eventTime: dateFormat(Date.now(), 'HH:MM:ss:l'),
@@ -420,7 +411,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         subject: order.positionIndex,
                         box: order.unitIndex,
                         role: positions[order.positionIndex].role,
-                        traderType: positions[order.positionIndex].identity,
                         valueCost: units[order.unitIndex],
                         eventType: EVENT_TYPE.cancelled,
                         eventTime: dateFormat(Date.now(), 'HH:MM:ss:l'),
@@ -475,7 +465,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         subject: positionIndex,
                         box: u,
                         role: positions[positionIndex].role,
-                        traderType: positions[positionIndex].identity,
                         valueCost: unit
                     }
                 })
@@ -493,7 +482,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             {sort: {createAt: 1}}
         )
         events.map(e => e.data).forEach((data, i) => {
-            const {period, subject, box, role, valueCost, traderType, trade, partnerSubject, partnerBox, partnerShout, partnerProfit, tradeOrder, tradeTime, tradeType, price, bidAsk, profit, eventType, orderId, eventTime, maxBid, minAsk, partnerId} = data
+            const {period, subject, box, role, valueCost, trade, partnerSubject, partnerBox, partnerShout, partnerProfit, tradeOrder, tradeTime, tradeType, price, bidAsk, profit, eventType, orderId, eventTime, maxBid, minAsk, partnerId} = data
             //result
             if (trade) {
                 players[subject][period][box] = {...data}
@@ -523,7 +512,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         subject,
                         box,
                         role,
-                        traderType,
                         valueCost,
                         eventType,
                         eventNum: i,
@@ -540,7 +528,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         subject,
                         box,
                         role,
-                        traderType,
                         valueCost,
                         eventType,
                         eventNum: i,
@@ -583,7 +570,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         subject,
                         box,
                         role,
-                        traderType,
                         valueCost,
                         eventType,
                         eventNum: i,
@@ -613,13 +599,12 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         Object.values(players).forEach(period => {
             Object.values(period).forEach(box => {
                 Object.values(box).forEach(params => {
-                    const {period, subject, box, role, traderType, valueCost, trade, partnerSubject, partnerBox, partnerShout, partnerProfit, tradeOrder, tradeTime, tradeType, price, bidAsk, profit} = params as EventParams
+                    const {period, subject, box, role, valueCost, trade, partnerSubject, partnerBox, partnerShout, partnerProfit, tradeOrder, tradeTime, tradeType, price, bidAsk, profit} = params as EventParams
                     resultData.push([
                         period,
                         Number(subject) + 1,
                         Number(box) + 1,
                         role,
-                        traderType,
                         valueCost,
                         bidAsk || '',
                         trade || '',
@@ -639,13 +624,12 @@ export default class Controller extends BaseController<ICreateParams, IGameState
 
         const logData: Array<Array<any>> = [['Period', 'Subject', 'Box', 'Role: 0-seller,1-buyer', 'TraderType: 0-human,1-zip,2-gd', 'ValueCost', 'EventType: 1-rejected,2-entered,3-traded,4-cancelled', 'EventNum', 'EventTime', 'EventEndTime', 'MaxBid', 'MinAsk', 'MatchEventNum', 'BidAsk', 'Trade', 'TradeOrder', 'TradeTime', 'TradeType: 1-buyer_first,2-seller_first', 'Price', 'Profit', 'PartnerSubject', 'PartnerBox', 'PartnerShout', 'PartnerProfit']]
         logs.forEach(log => {
-            const {period, subject, box, role, traderType, valueCost, eventType, eventNum, eventTime, eventEndTime, maxBid, minAsk, matchEventNum, trade, partnerSubject, partnerBox, partnerShout, partnerProfit, tradeOrder, tradeTime, tradeType, price, bidAsk, profit} = log
+            const {period, subject, box, role, valueCost, eventType, eventNum, eventTime, eventEndTime, maxBid, minAsk, matchEventNum, trade, partnerSubject, partnerBox, partnerShout, partnerProfit, tradeOrder, tradeTime, tradeType, price, bidAsk, profit} = log
             logData.push([
                 period,
                 Number(subject) + 1,
                 Number(box) + 1,
                 role,
-                traderType,
                 valueCost,
                 eventType,
                 Number(eventNum) + 1,
@@ -668,7 +652,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             ])
         })
 
-        const profitData: Array<Array<any>> = [['Period', 'Subject', 'PeriodProfit', 'MarketProfit', 'ShowUpFee', 'ExchangeRate', 'Money']]
+        const profitData: Array<Array<any>> = [['Period', 'Subject', 'PeriodProfit', 'MarketProfit', 'ShowUpFee', 'Money']]
         Object.values(players).forEach(period => {
             Object.values(period).forEach(box => {
                 Object.values(box).forEach(params => {
@@ -679,8 +663,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         profit || 0,
                         playerProfits[subject],
                         '',
-                        positions[subject].exchangeRate,
-                        (playerProfits[subject] / Number(positions[subject].exchangeRate)).toFixed(2)
+                        playerProfits[subject].toFixed(2)
                     ])
                 })
             })

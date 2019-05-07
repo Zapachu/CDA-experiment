@@ -1,121 +1,41 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Lang, Label, Input, Button, ButtonProps, MaskLoading, BtnGroup, Toast} from 'bespoke-client-util'
-import {IDENTITY, MoveType, ROLE, RobotStartMode, PlayerStatus} from '../../config'
+import {Lang, Button, ButtonProps, MaskLoading, BtnGroup, Toast} from 'bespoke-client-util'
+import {MoveType, ROLE, PlayerStatus} from '../../config'
 import {BasePhase} from './BasePhase'
 import {getEnumKeys} from '../../util'
 
 class Create extends BasePhase.Create {
     lang = Lang.extractLang({
-        participationFee: ['出场费(￥)', 'Participation fee'],
-        Role: ['角色', 'Role'],
-        Identity: ['身份', 'Identity'],
-        Other: ['其它', 'Other'],
         Add: ['添加', 'Add'],
+        Remove: ['移除', 'Remove'],
         [ROLE[ROLE.Seller]]: ['卖家', 'Seller'],
-        [ROLE[ROLE.Buyer]]: ['买家', 'Buyer'],
-        robotStartMode: ['机器人启动模式', 'Robot start mode'],
-        exchangeRate: ['兑换比率(实验币/￥)', 'ExchangeRate(point/￥)'],
-        interval: ['睡眠时间(秒)', 'SleepTime(s)'],
-        [RobotStartMode[RobotStartMode.A]]: ['模式A', 'Mode A'],
-        [RobotStartMode[RobotStartMode.B]]: ['模式B', 'Mode B'],
-        [RobotStartMode[RobotStartMode.C]]: ['模式B', 'Mode C']
+        [ROLE[ROLE.Buyer]]: ['买家', 'Buyer']
     })
 
     render() {
-        const {lang, props: {params, updateParams}} = this
-        const roleKeys = getEnumKeys(ROLE),
-            identityKeys = getEnumKeys(IDENTITY)
+        const {lang, props: {params}} = this
+        const roleKeys = getEnumKeys(ROLE)
         return <section className={`${style.assignPosition} ${style.createContent}`}>
-            <ul className={style.baseFields}>
-                <li>
-                    <Label label={lang.participationFee}/>
-                    <Input {...{
-                        min: 0,
-                        value: params.participationFee,
-                        onChange: ({target: {value: participationFee}}) => updateParams({participationFee} as any)
-                    }}/>
-                </li>
-            </ul>
-            <table className={style.positions}>
-                <tbody>
-                <tr>
-                    <th>&nbsp;</th>
-                    <th>{lang.Role}</th>
-                    <th>{lang.Identity}</th>
-                    <th>{lang.Other}</th>
-                    <th onClick={() => this.addPosition()}><span>{lang.Add}</span></th>
-                </tr>
+            <div className={style.btnGroup}>
+                <a className={style.btnAdd} onClick={() => this.addPosition()}>{lang.Add}</a>
+                <a onClick={() => this.removePosition()}>{lang.Remove}</a>
+            </div>
+            <ul className={style.positions}>
                 {
-                    params.positions.map(({role, identity, ...extraConfig}, positionIndex) =>
-                        <tr key={positionIndex}>
-                            <th>{positionIndex + 1}</th>
-                            <td>
-                                <div className={style.centerWrapper}>
-                                    <BtnGroup value={roleKeys.findIndex(key => role === ROLE[key])}
-                                              options={roleKeys.map(key => lang[key])}
-                                              onChange={i => this.updatePosition(positionIndex, position => ({
-                                                  ...position,
-                                                  role: ROLE[roleKeys[i]]
-                                              }))}
-                                    />
-                                </div>
-                            </td>
-                            <td>
-                                <div className={style.centerWrapper}>
-                                    <BtnGroup value={identityKeys.findIndex(key => identity === IDENTITY[key])}
-                                              options={identityKeys}
-                                              onChange={i => this.updatePosition(positionIndex, position => ({
-                                                  ...position,
-                                                  identity: IDENTITY[identityKeys[i]]
-                                              }))}
-                                    />
-                                </div>
-                            </td>
-                            <td className={style.extraConfigWrapper}>
-                                {
-                                    (() => {
-                                        switch (identity) {
-                                            case IDENTITY.Player:
-                                                return <div>
-                                                    <label>{lang.exchangeRate} : </label>
-                                                    <input {...{
-                                                        type: 'number',
-                                                        value: extraConfig.exchangeRate,
-                                                        onChange: ({target: {value: exchangeRate}}) => this.updatePosition(positionIndex,
-                                                            position => ({...position, exchangeRate}))
-                                                    }}/>
-                                                </div>
-                                            case IDENTITY.GDRobot:
-                                                return <div>
-                                                    <label>K : </label>
-                                                    <input {...{
-                                                        type: 'number',
-                                                        value: extraConfig.k,
-                                                        onChange: ({target: {value: k}}) => this.updatePosition(positionIndex,
-                                                            position => ({...position, k}))
-                                                    }}/>
-                                                </div>
-                                            case IDENTITY.ZipRobot:
-                                                return <div>
-                                                    <label>{lang.interval} : </label>
-                                                    <input {...{
-                                                        type: 'number',
-                                                        value: extraConfig.interval,
-                                                        onChange: ({target: {value: interval}}) => this.updatePosition(positionIndex,
-                                                            position => ({...position, interval}))
-                                                    }}/>
-                                                    <label>s</label>
-                                                </div>
-                                        }
-                                    })()
-                                }
-                            </td>
-                            <td onClick={() => this.removePosition(positionIndex)}><span>❌</span></td>
-                        </tr>)
+                    params.positions.map(({role, ...extraConfig}, positionIndex) =>
+                        <li className={style.position} key={positionIndex}>
+                            <span className={style.positionSeq}>{positionIndex + 1}</span>
+                            <BtnGroup value={roleKeys.findIndex(key => role === ROLE[key])}
+                                      options={roleKeys.map(key => lang[key])}
+                                      onChange={i => this.updatePosition(positionIndex, position => ({
+                                          ...position,
+                                          role: ROLE[roleKeys[i]]
+                                      }))}
+                            />
+                        </li>)
                 }
-                </tbody>
-            </table>
+            </ul>
         </section>
     }
 
@@ -126,10 +46,9 @@ class Create extends BasePhase.Create {
         updateParams({positions})
     }
 
-    removePosition(index) {
+    removePosition() {
         const {params, updateParams} = this.props
-        const positions = params.positions.slice()
-        positions.splice(index, 1)
+        const positions = params.positions.slice(0, -1)
         updateParams({positions})
     }
 
@@ -145,22 +64,14 @@ class Info extends Create {
     render() {
         const {lang, props: {params}} = this
         return <section className={`${style.assignPosition} ${style.infoContent}`}>
-            <ul className={style.baseFields}>
-                <li>
-                    <Label label={lang.participationFee}/>
-                    <a>{params.participationFee}</a>
-                </li>
-            </ul>
             <table className={style.positions}>
                 <tbody>
                 <tr>
                     <th>&nbsp;</th>
                     <th>{lang.Role}</th>
-                    <th>{lang.Identity}</th>
-                    <th>{lang.Other}</th>
                 </tr>
                 {
-                    params.positions.map(({role, identity, ...extraConfig}, positionIndex) =>
+                    params.positions.map(({role, ...extraConfig}, positionIndex) =>
                         <tr key={positionIndex}>
                             <th>{positionIndex + 1}</th>
                             <td>
@@ -172,42 +83,6 @@ class Info extends Create {
                                         )
                                     }
                                 </div>
-                            </td>
-                            <td>
-                                <ul className={style.identitySelector}>
-                                    {
-                                        getEnumKeys(IDENTITY).map(key =>
-                                            <li key={key}
-                                                className={IDENTITY[key] === identity ? style.active : ''}>{key}</li>
-                                        )
-                                    }
-                                </ul>
-                            </td>
-                            <td className={style.extraConfigWrapper}>
-                                {
-                                    (() => {
-                                        switch (identity) {
-                                            case IDENTITY.Player:
-                                                return <div>
-                                                    <label>ExchangeRate : </label>
-                                                    <span>{extraConfig.exchangeRate}</span>
-                                                </div>
-                                            case IDENTITY.GDRobot:
-                                                return <div>
-                                                    <label>K : </label>
-                                                    <span>{extraConfig.k}</span>
-                                                </div>
-                                            case IDENTITY.ZipRobot:
-                                                return <div>
-                                                    <label>Interval : </label>
-                                                    <span>{extraConfig.interval}</span>
-                                                    <label>s</label>
-                                                </div>
-                                            default:
-                                                return null
-                                        }
-                                    })()
-                                }
                             </td>
                         </tr>)
                 }

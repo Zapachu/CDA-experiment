@@ -5,16 +5,10 @@ message CreateParams {
         message Params {
             message Position {
                 int32 role = 1;
-                int32 identity = 2;
-                float exchangeRate = 3;
-                int32 k = 4;
-                int32 interval = 5;
             }
             //assignPosition
-            float participationFee = 1;
             repeated Position positions = 2;
             //mainGame
-            bool practicePhase = 10;
             int32 time2ReadInfo = 3;
             int32 durationOfEachPeriod = 4;
             repeated string unitLists = 5;

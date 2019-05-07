@@ -5,18 +5,6 @@ export enum ROLE {
     Buyer
 }
 
-export enum IDENTITY {
-    Player,
-    ZipRobot,
-    GDRobot
-}
-
-export enum RobotStartMode {
-    A,
-    B,
-    C
-}
-
 export enum AdjustDirection {
     raise,
     lower
@@ -44,7 +32,6 @@ export interface EventParams {
     subject: number,
     box: number,
     role: ROLE,
-    traderType: IDENTITY,
     valueCost: number,
     eventType: EVENT_TYPE,
     eventNum: number,

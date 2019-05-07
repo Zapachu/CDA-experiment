@@ -17,16 +17,13 @@ export namespace BasePhase {
         fetcher: Fetcher<FetchType>
         updateParams?: (newParams: Partial<CreateParams.Phase.IParams>) => void
     }, S> {
-        constructor(public phases) {
-            super(phases)
-        }
 
         checkParams({lang, params: {}}): boolean {
             return true
         }
 
         render() {
-            return <div className={style.blankMsg}>NO PARAM TO CONFIG</div>
+            return null
         }
     }
 

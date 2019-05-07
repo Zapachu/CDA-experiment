@@ -4,7 +4,7 @@ import {Button, ButtonProps, Label, Lang, MaskLoading, RangeInput, Toast, Input,
 import {BasePhase} from './BasePhase'
 import {CreateParams, GameState} from '../../interface'
 
-import {IDENTITY, MarketStage, MoveType, phaseNames, PushType, ROLE} from '../../config'
+import {MarketStage, MoveType, phaseNames, PushType, ROLE} from '../../config'
 import {getEnumKeys} from '../../util'
 
 export function UnitList({
@@ -20,35 +20,16 @@ export function UnitList({
     </section>
 }
 
-interface ICreateState {
-    minStartTime: number
-    maxStartTime: number
-}
-
-class Create extends BasePhase.Create<ICreateState> {
+class Create extends BasePhase.Create {
     lang = Lang.extractLang({
-        practicePhase: ['练习环节', 'Practice Phase'],
         [ROLE[ROLE.Seller]]: ['卖家', 'Seller'],
         [ROLE[ROLE.Buyer]]: ['买家', 'Buyer'],
-        [IDENTITY[IDENTITY.Player]]: ['玩家', 'Player'],
-        [IDENTITY[IDENTITY.ZipRobot]]: ['ZipRobot', 'ZipRobot'],
-        [IDENTITY[IDENTITY.GDRobot]]: ['GDRobot', 'GDRobot'],
         Role: ['角色', 'Role'],
-        Identity: ['身份', 'Identity'],
         UnitList: ['输入序列', 'Input Sequences'],
-        Other: ['其它', 'Other'],
         durationOfEachPeriod: ['时期时长', 'Duration of a period'],
         time2ReadInfo: ['浏览信息时长', 'Time to read game info'],
-        robotStartTime: ['机器人启动时间', 'Robot start time'],
-        startTime: ['启动时间', 'Start time'],
-        generateRandomly: ['随机生成', 'Generate'],
         invalidInputSequences: ['输入序列有误', 'Invalid input sequences']
     })
-
-    state: ICreateState = {
-        minStartTime: 0,
-        maxStartTime: 10
-    }
 
     get marketPositions(): Array<CreateParams.Phase.Params.IPosition> {
         const phase = this.props.phases.find(({templateName}) => templateName === phaseNames.assignPosition)
@@ -64,20 +45,15 @@ class Create extends BasePhase.Create<ICreateState> {
     }
 
     render() {
-        const {lang, props: {params, updateParams}, state: {minStartTime, maxStartTime}} = this
+        const {lang, props: {params, updateParams}} = this
         return <section className={`${style.mainGame} ${style.createContent}`}>
             <ul className={style.baseFields}>
-                <li>
-                    <Label label={lang.practicePhase}/>
-                    <Switch checked={params.practicePhase}
-                            onChange={() => updateParams({practicePhase: !params.practicePhase})}/>
-                </li>
                 {
                     Object.entries({
                         time2ReadInfo: {
                             min: 10,
-                            max: 20,
-                            step: 5
+                            max: 30,
+                            step: 1
                         },
                         durationOfEachPeriod: {
                             min: 60,
@@ -93,37 +69,19 @@ class Create extends BasePhase.Create<ICreateState> {
                             }}/>
                         </li>)
                 }
-                <li className={style.robotStartTimeGenerator}>
-                    <Label label={lang.robotStartTime}/>
-                    <Input type='number' min={0} max={10} value={minStartTime}
-                           onChange={({target: {value}}) => this.setState({minStartTime: value as any})}/>
-                    ~
-                    <Input type='number' min={0} max={10} value={maxStartTime}
-                           onChange={({target: {value}}) => this.setState({maxStartTime: value as any})}/>
-                    <a className={style.btnGenerate} onClick={() => {
-                        updateParams({
-                            startTime: params.startTime.map(() =>
-                                ((+minStartTime + (maxStartTime - minStartTime) * Math.random()).toFixed(2) as any)
-                            )
-                        })
-                    }}>{lang.generateRandomly}</a>
-                </li>
             </ul>
             <table className={style.positions}>
                 <tbody>
                 <tr>
                     <th>&nbsp;</th>
                     <th>{lang.Role}</th>
-                    <th>{lang.Identity}</th>
                     <th>{lang.UnitList}</th>
-                    <th>{lang.Other}</th>
                 </tr>
                 {
-                    this.marketPositions.map(({role, identity}, positionIndex) =>
+                    this.marketPositions.map(({role}, positionIndex) =>
                         <tr key={positionIndex}>
                             <th>{positionIndex + 1}</th>
                             <td>{lang[ROLE[role]]}</td>
-                            <td>{lang[IDENTITY[identity]]}</td>
                             <td className={style.unitListWrapper}>
                                 <UnitList {...{
                                     unitList: params.unitLists[positionIndex],
@@ -134,28 +92,6 @@ class Create extends BasePhase.Create<ICreateState> {
                                         updateParams({unitLists})
                                     }
                                 }}/>
-                            </td>
-                            <td className={style.extraConfigWrapper}>
-                                {
-                                    (() => {
-                                        switch (identity) {
-                                            case IDENTITY.ZipRobot:
-                                                return <div>
-                                                    <label>{lang.startTime} : </label>
-                                                    <input
-                                                        type='number'
-                                                        value={params.startTime[positionIndex]}
-                                                        onChange={({target: {value}}) => {
-                                                            const startTime = params.startTime.slice()
-                                                            startTime[positionIndex] = value as any
-                                                            updateParams({startTime})
-                                                        }}
-                                                    />
-                                                    <label>s</label>
-                                                </div>
-                                        }
-                                    })()
-                                }
                             </td>
                         </tr>)
                 }
@@ -184,11 +120,10 @@ class Info extends Create {
                 <tr>
                     <th>&nbsp;</th>
                     <th>{lang.Role}</th>
-                    <th>{lang.Identity}</th>
                     <th>{lang.UnitList}</th>
                 </tr>
                 {
-                    this.marketPositions.map(({role, identity}, positionIndex) =>
+                    this.marketPositions.map(({role}, positionIndex) =>
                         <tr key={positionIndex}>
                             <th>{positionIndex + 1}</th>
                             <td>
@@ -201,7 +136,6 @@ class Info extends Create {
                                     }
                                 </div>
                             </td>
-                            <td>{lang[identity]}</td>
                             <td className={style.unitListWrapper}>
                                 <UnitList {...{
                                     unitList: params.unitLists[positionIndex],
@@ -231,8 +165,6 @@ class Play extends BasePhase.Play<IPlayState> {
         profit: ['物品利润', 'Box Profit'],
         totalProfit: ['市场总利润', 'Total profit in the market'],
         currentProfit: ['本期总利润', 'Profit in current period'],
-        participationFee: ['出场费(￥)', 'Participation fee'],
-        exchangeRate: ['兑换比率(实验币/￥)', 'Exchange rate'],
         unitNumber: ['物品序号', 'Unit Number'],
         unitCost: ['物品成本', 'Unit Cost'],
         unitValue: ['物品价值', 'Unit Value'],
@@ -325,8 +257,8 @@ class Play extends BasePhase.Play<IPlayState> {
         orders.forEach(order => {
             orderDict[order.id] = order
         })
-        const {participationFee, positions} = game.params.phases[0].params,
-            {role, exchangeRate} = positions[positionIndex],
+        const {positions} = game.params.phases[0].params,
+            {role} = positions[positionIndex],
             {time2ReadInfo, durationOfEachPeriod} = game.params.phases[gamePhaseIndex].params
         const {marketStage, buyOrderIds, sellOrderIds, trades, positionUnitIndex} = gameStatePhases[gamePhaseIndex],
             timeLeft = durationOfEachPeriod + time2ReadInfo - timer,
@@ -363,8 +295,6 @@ class Play extends BasePhase.Play<IPlayState> {
                                             <li>{lang.totalProfit}<em>{playerStatePhases.map(({periodProfit = 0}) => periodProfit).reduce((m, n) => m + n, 0)}</em>
                                             </li>
                                             <li>{lang.currentProfit}<em>{profit}</em></li>
-                                            <li>{lang.participationFee}<em>{participationFee}</em></li>
-                                            <li>{lang.exchangeRate}<em>{exchangeRate}</em></li>
                                         </ul>
                                     </div>
                                 </section>

@@ -11,10 +11,11 @@ import {
     RobotCalcLog,
     RobotSubmitLog,
     ROLE,
-    ShoutResult,
-    zipInterval
+    ShoutResult
 } from './config'
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
+
+const SLEEP_TIME = 3000
 
 interface IZipFreeField {
     beta: number
@@ -52,7 +53,7 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
             if (!this.zipActive) {
                 return
             }
-            if (this.position.interval === zipInterval.fast || this.playerState.positionIndex === this.orderDict[newOrderId].positionIndex) {
+            if (this.playerState.positionIndex === this.orderDict[newOrderId].positionIndex) {
                 this.respondNewOrder(newOrderId)
             }
         })
@@ -70,14 +71,12 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
 
     get position() {
         const {positions} = this.game.params.phases[0].params,
-            {positionIndex} = this.playerState,
-            position = {...positions[positionIndex]}
-        position.interval = 1000 * position.interval
-        return position
+            {positionIndex} = this.playerState
+        return positions[positionIndex]
     }
 
     get sleepTime(): number {
-        return this.position.interval * (0.75 + 0.5 * Math.random())
+        return SLEEP_TIME * (0.75 + 0.5 * Math.random())
     }
 
     get gamePhaseState(): GameState.IGamePhaseState {

@@ -11,14 +11,11 @@
   .phases {
     width: 100%;
     .phase {
-      margin: 1rem 1rem 2rem;
-      text-align: center;
+      margin-bottom: 1rem;
       animation: easyIn .2s linear;
       .phaseTitle {
-        color: rgba($color-black, .6);
         font-size: $fontSize-middle;
-        position: relative;
-        top: -.8 * $fontSize-middle;
+        color: rgba($color-black, .6);
         padding: 0 3rem;
       }
       .createWrapper {

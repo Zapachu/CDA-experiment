@@ -20,8 +20,7 @@ class Play extends BasePhase.Play {
 
     render() {
         const {lang, props: {game, frameEmitter, playerState}} = this,
-            phases = playerState.phases.slice(1, playerState.phases.length - 1),
-            {exchangeRate} = game.params.phases[0].params.positions[playerState.positionIndex]
+            phases = playerState.phases.slice(1, playerState.phases.length - 1)
         let totalProfit = 0, totalCount = 0
         phases.forEach(({periodProfit, tradedCount}) => {
             totalProfit += periodProfit
@@ -50,7 +49,7 @@ class Play extends BasePhase.Play {
                     <td>{totalProfit}</td>
                 </tr>
             </table>
-            <label>{lang.footLabel1}<em>{totalProfit}</em>{lang.footLabel2}<em>{(totalProfit / exchangeRate).toFixed(2)}</em>{lang.footLabel3}
+            <label>{lang.footLabel1}<em>{totalProfit}</em>{lang.footLabel2}<em>{totalProfit.toFixed(2)}</em>{lang.footLabel3}
             </label>
             <PhaseOver {...{game, frameEmitter}}/>
         </section>

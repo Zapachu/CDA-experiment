@@ -3,16 +3,10 @@ import * as style from './style.scss'
 import {phaseTemplates, localePhaseNames} from './phase'
 import {CreateParams, ICreateParams} from '../interface'
 import {Core, Lang} from 'bespoke-client-util'
-import {FetchType, IDENTITY, phaseNames, ROLE} from '../config'
+import {FetchType, phaseNames, ROLE} from '../config'
 import cloneDeep = require('lodash/cloneDeep')
 
 export class Create extends Core.Create<ICreateParams, FetchType> {
-    lang = Lang.extractLang({
-        gameType: ['实验类型', 'Game Type'],
-        clone: ['复制', 'CLONE'],
-        remove: ['移除', 'REMOVE']
-    })
-
     componentDidMount() {
         const {props: {params, setParams}} = this
         if (params.phases) {
@@ -20,14 +14,12 @@ export class Create extends Core.Create<ICreateParams, FetchType> {
         }
         const marketPositions = [
             ...Array(6).fill(null).map(() => ({
-                identity: IDENTITY.ZipRobot,
                 interval: 1,
                 exchangeRate: 1,
                 k: 1,
                 role: ROLE.Seller
             })),
             ...Array(6).fill(null).map(() => ({
-                identity: IDENTITY.ZipRobot,
                 interval: 1,
                 exchangeRate: 1,
                 k: 1,
@@ -66,31 +58,18 @@ export class Create extends Core.Create<ICreateParams, FetchType> {
         setParams(newParams)
     }
 
-    clonePhase(phaseIndex: number) {
-        const {props: {params, setParams}} = this,
-            newParams = cloneDeep(params),
-            {phases} = newParams
-        newParams.phases = [...phases.slice(0, phaseIndex), cloneDeep(phases[phaseIndex]), ...phases.slice(phaseIndex)]
-        setParams(newParams)
-    }
-
-    removePhase(phaseIndex: number) {
-        const {props: {params, setParams}} = this,
-            newParams = cloneDeep(params),
-            {phases} = newParams
-        newParams.phases = [...phases.slice(0, phaseIndex - 1), ...phases.slice(phaseIndex)]
-        setParams(newParams)
-    }
-
     render(): React.ReactNode {
-        const {lang, props: {fetcher, params: {phases = []}}} = this
+        const {props: {fetcher, params: {phases = []}}} = this
         return <section className={style.create}>
             <ul className={style.phases}>{
                 phases.map(({templateName, params}, i) => {
                     const {name, Create} = phaseTemplates.find(({name}) => name === templateName)
                     return <li className={style.phase} key={`${i}-${templateName}`}>
-                        <label
-                            className={style.phaseTitle}>{i + 1} - {Lang.extractLang({name: localePhaseNames[name]}).name}</label>
+                        {
+                            localePhaseNames[name] ? <label className={style.phaseTitle}>{
+                                Lang.extractLang({name: localePhaseNames[name]}).name
+                            }</label> : null
+                        }
                         <div className={style.createWrapper}>
                             <Create {...{
                                 params,
@@ -98,13 +77,6 @@ export class Create extends Core.Create<ICreateParams, FetchType> {
                                 fetcher,
                                 updateParams: newParams => this.updateCreateParams(i, newParams)
                             }}/>
-                            {
-                                name === phaseNames.mainGame ? <ul className={style.marketBtns}>
-                                    {i > 1 ? <li className={style.btnRemove}
-                                                 onClick={() => this.removePhase(i)}>{lang.remove}</li> : null}
-                                    <li onClick={() => this.clonePhase(i)}>{lang.clone}</li>
-                                </ul> : null
-                            }
                         </div>
                     </li>
                 })
