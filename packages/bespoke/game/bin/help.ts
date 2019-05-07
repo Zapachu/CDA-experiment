@@ -27,7 +27,7 @@ namespace TaskHelper {
     function appendLog({command, env}: Task) {
         const logs = getLogs().map(log => JSON.stringify(log))
         const newLog = JSON.stringify({command, env})
-        if (logs.includes(newLog)) {
+        if (logs[0] === newLog) {
             return
         }
         logs.unshift(newLog)

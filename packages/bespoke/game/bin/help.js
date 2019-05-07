@@ -60,7 +60,7 @@ var TaskHelper;
         var command = _a.command, env = _a.env;
         var logs = getLogs().map(function (log) { return JSON.stringify(log); });
         var newLog = JSON.stringify({ command: command, env: env });
-        if (logs.includes(newLog)) {
+        if (logs[0] === newLog) {
             return;
         }
         logs.unshift(newLog);

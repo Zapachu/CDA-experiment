@@ -1,0 +1,461 @@
+@import "~bespoke-client-util/lib/resource/public";
+
+$border: 1px solid rgba($color-black, .05);
+$height-tr: 2.4rem;
+@keyframes switchPlayContent {
+  from {
+    opacity: .5;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@mixin createTable {
+  width: 100%;
+  tr {
+    padding: 0 2rem;
+    height: 3rem;
+    text-align: center;
+    color: rgba($color-black, .8);
+    user-select: none;
+    th {
+      font-weight: normal;
+      &:nth-child(1){
+        width:4rem;
+      }
+      &:nth-child(2){
+        width:12rem;
+      }
+      &:nth-child(3){
+        width:16rem;
+      }
+    }
+    &:nth-child(odd) {
+      background-color: rgba($color-black, .04);
+    }
+  }
+}
+
+@mixin createBaseFields {
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    label {
+      min-width: 12rem;
+      text-align: right;
+    }
+    input {
+      margin: 0 .5rem;
+      width: 12rem;
+      border-bottom-color: rgba($color-black, .2);
+      transition: .2s all linear;
+      &:hover {
+        border-bottom-color: rgba($color-black, .5);
+      }
+    }
+    a {
+      width: 12rem;
+    }
+  }
+}
+
+.blankMsg {
+  @include blankMsg;
+}
+
+.unitList {
+  height: $fontSize-middle * 2;
+  display: flex;
+  align-items: center;
+  border-radius: .2rem;
+  border: $borderLine;
+  input {
+    margin: 0 .5rem;
+    outline: none;
+    width: 100%;
+    border-style: none;
+    cursor: pointer;
+    background: transparent;
+    transition: all .2s linear;
+    &:hover,&:focus{
+      color: $color-blue;
+    }
+  }
+}
+
+.assignPosition {
+  &.createContent, &.infoContent {
+    width: 100%;
+    .baseFields {
+      @include createBaseFields
+    }
+    .positions {
+      @include createTable;
+      tr td:last-child span{
+        font-size: .8rem;
+        cursor: pointer;
+        color: rgba($color-red, .5);
+        &:hover {
+          color: $color-red;
+        }
+      }
+      tr:first-child th:last-child span{
+        color: $color-blue;
+        &:before, &:after {
+          display: none;
+        }
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+      tr {
+        td {
+          .centerWrapper {
+            display: flex;
+            justify-content: center;
+          }
+          &.extraConfigWrapper {
+            label {
+              color: rgba($color-black, .5);
+            }
+            input {
+              text-align: center;
+              outline: none;
+              border: none;
+              border-bottom: 1px solid rgba($color-black, .8);
+              width: 2rem;
+            }
+          }
+        }
+      }
+    }
+  }
+  &.playContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    p {
+      margin: 2rem;
+      font-size: $fontSize-large;
+      em {
+        font-size: 2rem;
+        color: $color-red;
+        margin: 0 .5rem;
+      }
+    }
+    .seatNumberStage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: auto;
+      color: $color-black;
+
+      label {
+        font-size: $fontSize-large;
+      }
+
+      input {
+        width: 24rem;
+        margin: 1.5rem 0;
+        padding: 1rem 1.5rem;
+        border-style: none;
+        border-bottom: 1px solid;
+        outline: none;
+        font-size: 5rem;
+        text-align: center;
+      }
+    }
+  }
+}
+
+.mainGame {
+  &.createContent, &.infoContent {
+    width: 100%;
+    .baseFields {
+      @include createBaseFields;
+      .robotStartTimeGenerator{
+        input{
+          width: 3rem;
+        }
+        a{
+          width: 6rem;
+        }
+        .btnGenerate{
+          color: $color-blue;
+          opacity: .8;
+          cursor: pointer;
+          transition: $transition-normal;
+          &:hover{
+            opacity: 1;
+          }
+        }
+      }
+    }
+    .positions {
+      @include createTable;
+      tr {
+        td {
+          &.unitListWrapper {
+            width: 50%;
+          }
+          &.extraConfigWrapper {
+            width: 15%;
+            label {
+              color: rgba($color-black, .5);
+            }
+            input {
+              text-align: center;
+              outline: none;
+              border: none;
+              border-bottom: 1px solid rgba($color-black, .8);
+              width: 4rem;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  &.playContent {
+    margin: 2rem auto;
+    width: 95%;
+    animation: switchPlayContent .2s linear;
+
+    .title {
+      margin: 1rem 1.5rem;
+    }
+    @mixin panel {
+      background: white;
+      border-radius: $border-radius;
+      flex-basis: 24rem;
+      flex-grow: 1;
+      margin: 0 calcSlotWidth(1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-around;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba($color-black, .05);
+      li {
+        em {
+          min-width: 3rem;
+          text-align: center;
+          display: inline-block;
+          font-size: $fontSize-large;
+          color: $color-blue;
+        }
+      }
+    }
+    .body {
+      @mixin listTable {
+        text-align: center;
+        tr {
+          height: 2 * $fontSize-large;
+          cursor: pointer;
+          td {
+            color: rgba($color-black, .8);
+            padding: .5rem 1rem;
+            &:last-child {
+              text-align: left;
+            }
+          }
+          &:nth-child(odd) {
+            background: white;
+          }
+          &.active {
+            td {
+              color: $color-blue;
+              $border: 2px solid;
+              &:first-child {
+                border-left: $border;
+              }
+              &:last-child {
+                border-right: $border;
+              }
+            }
+          }
+        }
+      }
+
+      margin-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      .personalPanel {
+        @include panel;
+        .personalInfo {
+          @include secondarySection;
+          .infoText {
+            margin: 1rem 1rem;
+            padding: 1rem 2rem;
+            border-radius: 2px;
+            background-color: $color-background;
+            li {
+              display: flex;
+              justify-content: space-between;
+            }
+            em {
+              margin: 0 .5rem;
+              font-size: $fontSize-large;
+              color: $color-red;
+            }
+          }
+        }
+        .yourTrades {
+          @include secondarySection;
+          .tradeListWrapper {
+            margin: 1rem;
+            min-height: 12rem;
+            flex-grow: 1;
+            overflow: auto;
+            .tradeList {
+              width: 100%;
+              @include listTable;
+              table-layout: fixed;
+              tr td:last-child {
+                text-align: center;
+              }
+            }
+          }
+        }
+      }
+      .orderPanel {
+        @include panel;
+        .orderBook {
+          @include secondarySection;
+          .orderListWrapper {
+            margin: 1rem;
+            min-height: 16rem;
+            display: flex;
+            justify-content: space-between;
+            .orderList {
+              width: calc(50% - .2rem);
+              @include listTable;
+              tr {
+                td.btnCancelWrapper {
+                  padding: 0;
+                  .btnCancel {
+                    color: rgba($color-red, .7);
+                    transition: $transition-normal;
+                    &:hover {
+                      color: $color-red;
+                      text-decoration: underline;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        .orderSubmission {
+          @include secondarySection;
+          .curUnitInfo {
+            li {
+              margin-bottom: 1rem;
+              display: flex;
+              justify-content: space-around;
+              align-items: center;
+              em {
+                display: inline-block;
+                width: 5rem;
+                font-size: $fontSize-large;
+                color: $color-blue;
+              }
+            }
+          }
+          .marketWillOpen {
+            text-align: center;
+            margin: 2rem;
+            font-size: 1.5rem;
+            color: rgba($color-black, .8);
+            em {
+              font-size: 2.5rem;
+              color: $color-red;
+              margin: 0 .5rem;
+            }
+          }
+          .newOrder {
+            .orderInputWrapper {
+              display: flex;
+              justify-content: center;
+              input {
+                color: rgba($color-black, .8);
+                width: 9rem;
+                text-align: center;
+                outline: none;
+                font-size: 4rem;
+                border: none;
+                border-bottom: 1px solid rgba($color-black, .5);
+                &::-webkit-inner-spin-button {
+                  opacity: 1;
+                  padding: .5rem;
+                }
+              }
+            }
+            .submitBtnWrapper {
+              margin: 2rem 0 0;
+              display: flex;
+              justify-content: center;
+            }
+          }
+        }
+      }
+      .historyPanel {
+        @include panel;
+        .tradeHistory {
+          @include secondarySection;
+          .tradeChartWrapper {
+            margin: 1rem;
+          }
+        }
+      }
+    }
+    .result {
+      text-align: center;
+      p {
+        margin: 2rem;
+        font-size: $fontSize-large;
+        em {
+          font-size: 2rem;
+          color: $color-red;
+          margin: 0 .5rem;
+        }
+      }
+    }
+  }
+}
+
+.marketResult {
+  max-width: 48rem;
+  margin: auto;
+  em {
+    font-size: $fontSize-large;
+    color: $color-red;
+    margin: .5rem;
+  }
+  .profitTable {
+    margin: 1rem 1.5rem;
+    tr {
+      th, td {
+        text-align: center;
+        border: 1px solid;
+        padding: .5rem 1.5rem;
+      }
+    }
+  }
+}
+
+.phaseOver {
+  margin-top: 2rem;
+  font-size: $fontSize-middle;
+  .btnWrapper {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+  }
+}

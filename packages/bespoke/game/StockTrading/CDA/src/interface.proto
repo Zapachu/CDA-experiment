@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+message CreateParams {
+    message Phase {
+        message Params {
+            message Position {
+                int32 role = 1;
+                int32 identity = 2;
+                float exchangeRate = 3;
+                int32 k = 4;
+                int32 interval = 5;
+            }
+            //assignPosition
+            float participationFee = 1;
+            repeated Position positions = 2;
+            //mainGame
+            bool practicePhase = 10;
+            int32 time2ReadInfo = 3;
+            int32 durationOfEachPeriod = 4;
+            repeated string unitLists = 5;
+            repeated float startTime = 9;
+        }
+        string templateName = 1;
+        Params params = 2;
+    }
+    repeated Phase phases = 1;
+    string nextPhaseKey = 2;
+}
+
+message GameState {
+    message Order {
+        int32 id = 1;
+        int32 positionIndex = 2;
+        int32 unitIndex = 3;
+        float price = 4;
+    }
+    message GamePhaseState {
+        message Trade {
+            int32 reqId = 1;
+            int32 resId = 2;
+        }
+        int32 marketStage = 1;
+        int32 orderId = 2;
+        repeated int32 buyOrderIds = 3;
+        repeated int32 sellOrderIds = 4;
+        repeated Trade trades = 5;
+        repeated int32 positionUnitIndex = 6;
+    }
+    int32 gamePhaseIndex = 1;
+    repeated Order orders = 2;
+    repeated GamePhaseState phases = 3;
+    bool positionAssigned = 4;
+}
+
+message PlayerState {
+    message PlayerPhaseState {
+        int32 periodProfit = 1;
+        int32 tradedCount = 2;
+    }
+    string token = 1;
+    int32 status = 3;
+    int32 positionIndex = 4;
+    repeated string unitLists = 5;
+    float point = 9;
+    repeated PlayerPhaseState phases = 10;
+    int32 seatNumber = 11;
+}
+
+message MoveParams {
+    float price = 1;
+    int32 unitIndex = 6;
+    int32 gamePhaseIndex = 7;
+    int32 playerPhaseIndex = 8;
+    int32 seatNumber = 9;
+}
+message PushParams {
+    int32 newOrderId = 1;
+    int32 resOrderId = 2;
+    int32 periodCountDown = 3;
+}
