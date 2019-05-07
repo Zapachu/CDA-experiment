@@ -3,8 +3,9 @@ export const namespace = 'IPO'
 export enum MoveType {
     startSinglePlayer = 'startSinglePlayer',
     shout = 'shout',
-    getPosition = 'getPosition',
-    nextRound = 'nextRound'
+    startMultiPlayer = 'startMultiPlayer',
+    nextGame = 'nextGame',
+    replay = 'replay',
 }
 
 export enum PushType {
@@ -18,6 +19,7 @@ export enum FetchType {
 }
 
 export enum PlayerStatus {
+    intro,
     matching,
     prepared,
     shouted,
@@ -30,3 +32,11 @@ export enum IPOType {
 }
 
 export const MATCH_TIMER = 30
+export const minA = 30;
+export const maxA = 100;
+export const minB = .6;
+export const maxB = .7;
+export const startingMultiplier = 5000;
+export const minNPCNum = 1000;
+export const maxNPCNum = 3000;
+
