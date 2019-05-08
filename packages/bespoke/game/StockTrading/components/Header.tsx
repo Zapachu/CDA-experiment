@@ -21,7 +21,10 @@ export default class Header extends React.Component<IProps> {
             {
                 stages.map((item, idx) =>
                     <div key={`headerItem-${idx}`} className={style.item}
-                         style={{color: stage === item.name ? '#75ff6b' : '#fff'}}>
+                         style={{
+                             color: stage === item.name ? '#58c350' : '#fff',
+                             borderBottom: stage === item.name ? 'solid 1px #1d6318' : 'none'
+                         }}>
                         {item.text}
                     </div>
                 )

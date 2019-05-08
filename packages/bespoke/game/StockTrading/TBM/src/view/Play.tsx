@@ -1,5 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
+import * as dateFormat from 'dateformat'
 import Header from '../../../components/Header'
 import {Core, MaskLoading, Input, Label, Button, ButtonProps, Toast} from 'bespoke-client-util'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
@@ -88,32 +89,6 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         </div>
     }
 
-    dynamicResult = () => {
-        const {props: {playerState: {profits, prices, privatePrices}}} = this
-        return <table className={style.profits}>
-            <thead>
-            <tr>
-                <td>轮次</td>
-                <td>心理价值</td>
-                <td>出价</td>
-                <td>收益</td>
-            </tr>
-            </thead>
-            {
-                prices.filter((p) => p !== 0).map((v, i) =>
-                    <tbody key={`tb${i}`}>
-                    <tr>
-                        <td>{i + 1}</td>
-                        <td>{privatePrices[i]}</td>
-                        <td>{v}</td>
-                        <td>{profits[i]}</td>
-                    </tr>
-                    </tbody>
-                )
-            }
-        </table>
-    }
-
     render() {
         const {
             props: {
@@ -131,7 +106,32 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         const {rounds, roundIndex} = groups[groupIndex],
             newRoundTimer = newRoundTimers[roundIndex]
         return <section className={style.play}>
+
             <Header stage='tbm'/>
+
+
+            <table className={style.infoTable}>
+                <thead>
+                <tr>
+                    <td style={{color: '#58c350'}}>证券代码</td>
+                    <td style={{color: '#58c350'}}>证券简称</td>
+                    <td style={{color: '#58c350'}}>主承销商</td>
+                    <td style={{color: '#58c350'}}>初步询价起始日期</td>
+                    <td style={{color: '#58c350'}}>初步询价截止日期</td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>600050</td>
+                    <td>中国联通</td>
+                    <td>中国国际金融有限公司</td>
+                    <td>{dateFormat(Date.now(), 'yyyy/mm/dd')}</td>
+                    <td>{dateFormat(Date.now(), 'yyyy/mm/dd')}</td>
+                </tr>
+                </tbody>
+            </table>
+
+
             <div className={style.title}>集合竞价市场</div>
             {newRoundTimer ? <div>
                 <div>本轮结束剩余时间</div>
@@ -158,7 +158,6 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 <div className={style.highlight}>{privatePrices[groups[groupIndex].roundIndex]}</div>
             </div>
             {this.dynamicAction()}
-            {this.dynamicResult()}
         </section>
     }
 
