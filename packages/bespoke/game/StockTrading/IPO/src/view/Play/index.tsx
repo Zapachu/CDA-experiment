@@ -6,6 +6,7 @@ import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from 
 import MatchingStage from './MatchingStage'
 import PlayingStage from './PlayingStage'
 import IntroStage from './IntroStage'
+import Header from '../../../../components/Header'
 
 interface IPlayState {
     seatNumber: string
@@ -35,22 +36,24 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
 
     render(): React.ReactNode {
         const {props: {playerState: {playerStatus}}} = this
-        return <section className={style.play}>
-            {
-                (() => {
-                    switch (playerStatus) {
-                        case PlayerStatus.intro: {
-                          return <IntroStage {...this.props} />
-                        }
-                        case PlayerStatus.matching: {
-                          return <MatchingStage {...this.props} />
-                        }
-                        default: {
-                          return <PlayingStage {...this.props} />
-                        }
-                    }
-                })()
+        let content;
+        switch (playerStatus) {
+            case PlayerStatus.intro: {
+              content = <IntroStage {...this.props} />;
+              break;
             }
+            case PlayerStatus.matching: {
+              content = <MatchingStage {...this.props} />;
+              break;
+            }
+            default: {
+              content = <PlayingStage {...this.props} />;
+              break;
+            }
+        }
+        return <section className={style.play}>
+          <Header stage={'ipo'} />
+            {content}
         </section>
     }
 }

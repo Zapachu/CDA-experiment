@@ -12,7 +12,7 @@
     "sourceMap": true,
     "experimentalDecorators": true,
     "skipLibCheck": true,
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "resolveJsonModule": true,
     "jsx": "react"
   },

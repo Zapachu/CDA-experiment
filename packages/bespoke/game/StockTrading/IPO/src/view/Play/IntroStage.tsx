@@ -15,6 +15,7 @@ import {
   PlayerStatus,
   STOCKS
 } from "../../config";
+import Line from '../../../../components/Line'
 
 interface IPlayState {}
 
@@ -41,8 +42,8 @@ export default class IntroStage extends Core.Play<
   render() {
     const { frameEmitter } = this.props;
     return (
-      <section>
-        <div>Introduction</div>
+      <section className={style.introStage}>
+        <Line text={'交易规则介绍'} style={{marginBottom:'20px'}} />
         <Button
           width={ButtonProps.Width.small}
           label={"多人玩法"}
@@ -57,6 +58,7 @@ export default class IntroStage extends Core.Play<
             frameEmitter.emit(MoveType.startSinglePlayer);
           }}
         />
+        <Line color={Line.Color.White} style={{marginTop:'20px'}} />
       </section>
     );
   }

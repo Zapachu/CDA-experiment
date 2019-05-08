@@ -18,68 +18,11 @@
     }
   }
 
-  .choice {
-    font-size: 16px;
-    min-width: 300px;
-    .disabled {
-      pointer-events: none;
-      color: #b5b5b5;
-    }
-    .hidden {
-      display: none;
-    }
-  }
-  
-  .instruction {
-    font-size: 16px;
-    font-style: italic;
-    margin: 20px 0 10px 0;
-    color: rgb(66, 133, 244);
-  }
-
-  .blueWords {
-    color: rgb(66, 133, 244);
-  }
-
-  .newLine {
-    display: block;
-  }
-
-  .tipWrong {
-    color: red;
-    span {
-      color: red;
-    }
-  }
-
-  .resultLines {
-    font-size: 16px;
-    >p {
-      margin-bottom: 5px;
-    }
-  }
-
-  .seatStage {
+  .introStage {
     display: flex;
     flex-direction: column;
     align-items: center;
-  }
-  .testStage {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    .desc {
-      margin-bottom: 20px;
-    }
-    .testQuestion {
-      width: 80%;
-      min-width: 300px;
-    }
-  }
-  .endStage {
-    text-align: center;
-    p {
-      margin: 20px 0;
-    }
+    justify-content: center;
+    margin-top: 10vh;
   }
 }

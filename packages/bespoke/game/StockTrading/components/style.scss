@@ -13,3 +13,39 @@
     padding: 1rem 2rem;
   }
 }
+
+.line {
+  display: flex;
+  align-items: center;
+  color: green;
+  font-size: 20px;
+  >span {
+    flex: auto;
+    height: 1px;
+    width: 100px;
+  }
+  >p {
+    flex: none;
+    margin: 0 5px;
+  }
+  &.green {
+    >span {
+      &:first-child {
+        background: linear-gradient(to left, green, white);
+      }
+      &:last-child {
+        background: linear-gradient(to right, green, white);
+      }
+    }
+  }
+  &.white {
+    >span {
+      &:first-child {
+        background: linear-gradient(to left, white, gray);
+      }
+      &:last-child {
+        background: linear-gradient(to right, white, gray);
+      }
+    }
+  }
+}
