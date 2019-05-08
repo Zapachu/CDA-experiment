@@ -130,6 +130,9 @@ export interface IGameState {
 
     /** GameState positionUnitIndex */
     positionUnitIndex?: (number[]|null);
+
+    /** GameState roleIndex */
+    roleIndex?: (number|null);
 }
 
 /** Represents a GameState. */
@@ -161,6 +164,9 @@ export class GameState implements IGameState {
 
     /** GameState positionUnitIndex. */
     public positionUnitIndex: number[];
+
+    /** GameState roleIndex. */
+    public roleIndex: number;
 
     /**
      * Creates a new GameState instance using the specified properties.
@@ -241,8 +247,8 @@ export namespace GameState {
         /** Order id */
         id?: (number|null);
 
-        /** Order positionIndex */
-        positionIndex?: (number|null);
+        /** Order roleIndex */
+        roleIndex?: (number|null);
 
         /** Order unitIndex */
         unitIndex?: (number|null);
@@ -263,8 +269,8 @@ export namespace GameState {
         /** Order id. */
         public id: number;
 
-        /** Order positionIndex. */
-        public positionIndex: number;
+        /** Order roleIndex. */
+        public roleIndex: number;
 
         /** Order unitIndex. */
         public unitIndex: number;
@@ -443,8 +449,8 @@ export namespace GameState {
 /** Properties of a PlayerState. */
 export interface IPlayerState {
 
-    /** PlayerState positionIndex */
-    positionIndex?: (number|null);
+    /** PlayerState roleIndex */
+    roleIndex?: (number|null);
 
     /** PlayerState unitList */
     unitList?: (string|null);
@@ -465,8 +471,8 @@ export class PlayerState implements IPlayerState {
      */
     constructor(properties?: IPlayerState);
 
-    /** PlayerState positionIndex. */
-    public positionIndex: number;
+    /** PlayerState roleIndex. */
+    public roleIndex: number;
 
     /** PlayerState unitList. */
     public unitList: string;

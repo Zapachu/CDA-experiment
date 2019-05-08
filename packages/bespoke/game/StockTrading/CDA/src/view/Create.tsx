@@ -42,14 +42,14 @@ export const Create: Core.CreateSFC<ICreateParams, FetchType> = ({submitable, se
         </div>
         <ul className={style.roles}>
             {
-                params.roles.map((role, positionIndex) =>
-                    <li className={style.role} key={positionIndex}>
-                        <span className={style.positionSeq}>{positionIndex + 1}</span>
+                params.roles.map((role, roleIndex) =>
+                    <li className={style.role} key={roleIndex}>
+                        <span className={style.positionSeq}>{roleIndex + 1}</span>
                         <BtnGroup value={roleKeys.findIndex(key => role === ROLE[key])}
                                   options={roleKeys.map(key => lang[key])}
                                   onChange={i => {
                                       const roles = params.roles.slice()
-                                      roles[positionIndex] = ROLE[roleKeys[i]]
+                                      roles[roleIndex] = ROLE[roleKeys[i]]
                                       setParams({roles})
                                   }}
                         />
@@ -87,17 +87,17 @@ export const Create: Core.CreateSFC<ICreateParams, FetchType> = ({submitable, se
                 <th>{lang.UnitList}</th>
             </tr>
             {
-                params.roles.map((role, positionIndex) =>
-                    <tr key={positionIndex}>
-                        <th>{positionIndex + 1}</th>
+                params.roles.map((role, roleIndex) =>
+                    <tr key={roleIndex}>
+                        <th>{roleIndex + 1}</th>
                         <td>{lang[ROLE[role]]}</td>
                         <td>
                             <input {...{
                                 className: style.unitList,
-                                value: params.unitLists[positionIndex],
+                                value: params.unitLists[roleIndex],
                                 onChange: (({target: {value: newUnitList}}) => {
                                     const unitLists = params.unitLists.slice()
-                                    unitLists[positionIndex] = newUnitList.replace(/[^*\s0-9]/g, '').replace(/\s+/g, ' ')
+                                    unitLists[roleIndex] = newUnitList.replace(/[^*\s0-9]/g, '').replace(/\s+/g, ' ')
                                     setParams({unitLists})
                                 })
                             }}/>

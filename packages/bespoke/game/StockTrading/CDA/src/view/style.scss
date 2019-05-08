@@ -92,10 +92,6 @@
   }
 }
 
-.createOnElf {
-  margin: 1rem 1.5rem;
-}
-
 .player4Owner {
   display: flex;
   justify-content: center;
@@ -194,49 +190,6 @@
   }
 }
 
-.viewResult {
-  font-size: $fontSize-large;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-.resultContent {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  .keyFields {
-    li {
-      text-align: center;
-      margin: 1rem;
-
-      span {
-        color: $color-blue;
-        font-size: $fontSize-large;
-        display: inline-block;
-        width: 5rem;
-      }
-    }
-  }
-
-  .profitTable {
-    tr {
-      th, td {
-        text-align: center;
-        border: 1px solid;
-        padding: .5rem 1.5rem;
-      }
-    }
-  }
-}
-
-.result4OwnerContent {
-  em {
-    color: $color-red;
-    margin: 0 .5rem;
-  }
-}
-
 .result4Owner {
   margin: 1rem 2rem;
 
@@ -321,48 +274,11 @@ $height-tr: 2.4rem;
   }
 }
 
-.assignPosition {
-  &.playContent {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    p {
-      margin: 2rem;
-      font-size: $fontSize-large;
-
-      em {
-        font-size: 2rem;
-        color: $color-red;
-        margin: 0 .5rem;
-      }
-    }
-
-    .seatNumberStage {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin: auto;
-      color: $color-black;
-
-      label {
-        font-size: $fontSize-large;
-      }
-
-      input {
-        width: 24rem;
-        margin: 1.5rem 0;
-        padding: 1rem 1.5rem;
-        border-style: none;
-        border-bottom: 1px solid;
-        outline: none;
-        font-size: 5rem;
-        text-align: center;
-      }
-    }
-  }
+.matching{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-
 .mainGame {
   &.playContent {
     margin: 2rem auto;
@@ -612,39 +528,5 @@ $height-tr: 2.4rem;
         }
       }
     }
-  }
-}
-
-.marketResult {
-  max-width: 48rem;
-  margin: auto;
-
-  em {
-    font-size: $fontSize-large;
-    color: $color-red;
-    margin: .5rem;
-  }
-
-  .profitTable {
-    margin: 1rem 1.5rem;
-
-    tr {
-      th, td {
-        text-align: center;
-        border: 1px solid;
-        padding: .5rem 1.5rem;
-      }
-    }
-  }
-}
-
-.phaseOver {
-  margin-top: 2rem;
-  font-size: $fontSize-middle;
-
-  .btnWrapper {
-    margin-top: 2rem;
-    display: flex;
-    justify-content: center;
   }
 }

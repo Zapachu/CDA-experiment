@@ -50,10 +50,10 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
                 <td>{lang.role}</td>
             </tr>
             {
-                Object.values(playerStates).sort(({positionIndex: p1}, {positionIndex: p2}) => p1 - p2)
-                    .map(({positionIndex}, i) => <tr key={i}>
-                        <td>{positionIndex === undefined ? lang.unknown : positionIndex + 1}</td>
-                        <td>{roles[positionIndex] === undefined ? lang.unknown : lang[ROLE[roles[positionIndex]]]}</td>
+                Object.values(playerStates).sort(({roleIndex: p1}, {roleIndex: p2}) => p1 - p2)
+                    .map(({roleIndex}, i) => <tr key={i}>
+                        <td>{roleIndex === undefined ? lang.unknown : roleIndex + 1}</td>
+                        <td>{roles[roleIndex] === undefined ? lang.unknown : lang[ROLE[roles[roleIndex]]]}</td>
                     </tr>)
             }
             </tbody>
@@ -75,7 +75,7 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
                     <ul><label>{lang.shoutInfo}</label>
                         {
                             type === MoveType.submitOrder ? <React.Fragment>
-                                <li>{lang[ROLE[roles[activePlayerState.positionIndex]]]}：{activePlayerState.positionIndex + 1}</li>
+                                <li>{lang[ROLE[roles[activePlayerState.roleIndex]]]}：{activePlayerState.roleIndex + 1}</li>
                                 <li>{lang.unitIndex}：{params.unitIndex + 1}</li>
                                 <li>{lang.price}：{params.price}</li>
                             </React.Fragment> : null

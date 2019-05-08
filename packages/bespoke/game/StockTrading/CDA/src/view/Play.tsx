@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {Core, Lang, Button, ButtonProps, MaskLoading, Toast, IGame, FrameEmitter} from 'bespoke-client-util'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, GameState} from '../interface'
-import {FetchType, Stage, MoveType, PushType, ROLE} from '../config'
+import {FetchType, Stage, MoveType, PushType, ROLE, HOST_POSITION} from '../config'
 
 export const TradeChart: React.FC<{
     tradeList: Array<{
@@ -112,15 +112,31 @@ interface IStageProps {
     frameEmitter?: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
 }
 
-function Matching({game: {params: {roles}}, frameEmitter, playerState: {positionIndex}}: IStageProps) {
+function Matching({game: {params: {roles}}, frameEmitter, gameState: {roleIndex: gameRoleIndex}, playerState: {roleIndex}}: IStageProps) {
     const lang = Lang.extractLang({
-        openMarket: ['开放市场', 'Open Market']
+        playersInMarket: ['市场中玩家', 'Players in Market'],
+        openMarket: ['开放市场', 'Open Market'],
+        startRobot: ['启动机器人', 'Start Robot']
     })
-    return positionIndex === 0?
-        <Button {...{
-            label: lang.openMarket,
-            onClick: () => frameEmitter.emit(MoveType.openMarket)
-        }}/> : null
+    React.useEffect(() => {
+        frameEmitter.emit(MoveType.getRole)
+    }, [])
+    return <section className={style.matching}>
+        <div>{lang.playersInMarket}:{gameRoleIndex}</div>
+        {
+            roleIndex === HOST_POSITION ?
+                <div>
+                    <Button {...{
+                        label: lang.openMarket,
+                        onClick: () => frameEmitter.emit(MoveType.openMarket)
+                    }}/>
+                    <Button {...{
+                        label: lang.startRobot,
+                        onClick: () => frameEmitter.emit(MoveType.startRobot)
+                    }}/>
+                </div> : null
+        }
+    </section>
 }
 
 function Trading(props: IStageProps) {
@@ -128,7 +144,7 @@ function Trading(props: IStageProps) {
         frameEmitter,
         game: {params: {roles, prepareTime, tradeTime}},
         gameState: {orders, stage, buyOrderIds, sellOrderIds, trades, positionUnitIndex},
-        playerState: {positionIndex, unitList}
+        playerState: {roleIndex, unitList}
     } = props
     const lang = Lang.extractLang({
         position: ['位置', 'Position'],
@@ -163,7 +179,6 @@ function Trading(props: IStageProps) {
     const [timer, setTimer] = React.useState(0)
     React.useEffect(() => {
         frameEmitter.on(PushType.countDown, ({countDown}) => setTimer(countDown))
-        frameEmitter.emit(MoveType.enterMarket)
     }, [])
 
     function submitOrder() {
@@ -172,8 +187,8 @@ function Trading(props: IStageProps) {
         orders.forEach(order => {
             orderDict[order.id] = order
         })
-        const role = roles[positionIndex]
-        const privateCost = Number(unitList.split(' ')[positionUnitIndex[positionIndex]]),
+        const role = roles[roleIndex]
+        const privateCost = Number(unitList.split(' ')[positionUnitIndex[roleIndex]]),
             minSellOrder = orderDict[sellOrderIds[0]],
             maxBuyOrder = orderDict[buyOrderIds[0]]
         if (!privateCost) {
@@ -186,7 +201,7 @@ function Trading(props: IStageProps) {
             return Toast.warn(lang.invalidSellPrice)
         }
         frameEmitter.emit(MoveType.submitOrder, {
-            unitIndex: positionUnitIndex[positionIndex],
+            unitIndex: positionUnitIndex[roleIndex],
             price: _price
         })
     }
@@ -202,7 +217,7 @@ function Trading(props: IStageProps) {
             {
                 marketOrderIds.map((orderId, i) => {
                         const orderX = orderDict[orderId],
-                            isMine = orderX.positionIndex === positionIndex
+                            isMine = orderX.roleIndex === roleIndex
                         return <tr key={i} className={isMine ? style.active : ''}>
                             <td>{orderX.price}</td>
                             <td className={style.btnCancelWrapper}>
@@ -221,7 +236,7 @@ function Trading(props: IStageProps) {
     }
 
     function renderTradeList(orderDict: { [id: number]: GameState.IOrder }, trades: Array<GameState.ITrade>): [number, number, React.ReactNode] {
-        const role = roles[positionIndex]
+        const role = roles[roleIndex]
         const unitPrices = unitList.split(' ').map(price => +price)
         const myTrades: Array<{
             privateCost: number,
@@ -230,12 +245,12 @@ function Trading(props: IStageProps) {
         trades.forEach(({resId, reqId}) => {
             const reqOrder = orderDict[reqId],
                 resOrder = orderDict[resId]
-            switch (positionIndex) {
-                case reqOrder.positionIndex: {
+            switch (roleIndex) {
+                case reqOrder.roleIndex: {
                     myTrades[reqOrder.unitIndex].price = reqOrder.price
                     break
                 }
-                case resOrder.positionIndex: {
+                case resOrder.roleIndex: {
                     myTrades[resOrder.unitIndex].price = reqOrder.price
                     break
                 }
@@ -269,22 +284,22 @@ function Trading(props: IStageProps) {
         return [tradeCount, Number(profit.toFixed(2)), fragment]
     }
 
-    if (positionIndex === undefined) {
+    if (roleIndex === undefined) {
         return <MaskLoading label={lang.noPosition}/>
     }
     const orderDict: { [id: number]: GameState.IOrder } = {}
     orders.forEach(order => {
         orderDict[order.id] = order
     })
-    const role = roles[positionIndex]
+    const role = roles[roleIndex]
     const timeLeft = tradeTime + prepareTime - timer,
         time2NextPhase = tradeTime + 2 * prepareTime - timer
-    const unitIndex = positionUnitIndex[positionIndex],
+    const unitIndex = positionUnitIndex[roleIndex],
         unitPrice = +(unitList.split(' ')[unitIndex] || 0)
     const [tradeCount, profit, tradeListFragment] = renderTradeList(orderDict, trades)
     return <section className={`${style.mainGame} ${style.playContent}`}>
         <ul className={style.header}>
-            <li>{lang.position} : <em>{positionIndex + 1}</em></li>
+            <li>{lang.position} : <em>{roleIndex + 1}</em></li>
             <li>{lang.role} : <em>{lang[ROLE[role]]}</em></li>
             <li>{lang.timeLeft} : <em>{timer < prepareTime ? '   ' : timeLeft > 0 ? timeLeft : 0}</em>s</li>
         </ul>

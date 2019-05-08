@@ -25,27 +25,11 @@ import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushPa
 import {getEnumKeys} from './util'
 
 export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
-    private positionStack: {
-        player: Array<number>
-        robot: Array<number>
-    }
-
     getGame4Player() {
         return {
             ...this.game,
             unitLists: []
         }
-    }
-
-    async init() {
-        await super.init()
-        const {roles} = this.game.params
-        const player = [], robot = []
-        roles.forEach((_, i) => player.push(i))
-        this.positionStack = {player, robot}
-        robot.forEach((_, i) => setTimeout(async () =>
-            await this.startNewRobotScheduler(`Robot_${i}`, false), Math.random() * 3000))
-        return this
     }
 
     initGameState(): TGameState<IGameState> {
@@ -57,6 +41,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             buyOrderIds: [],
             sellOrderIds: [],
             trades: [],
+            roleIndex: 0,
             positionUnitIndex: this.game.params.roles.map(() => 0)
         } as IGameState)
         return gameState
@@ -71,19 +56,27 @@ export default class Controller extends BaseController<ICreateParams, IGameState
     protected async playerMoveReducer(actor: IActor, type: string, params: IMoveParams, cb: IMoveCallback): Promise<void> {
         const gameState = await this.stateManager.getGameState(),
             playerState = await this.stateManager.getPlayerState(actor),
-            {positionIndex} = playerState
+            {roleIndex} = playerState
         switch (type) {
-            case MoveType.enterMarket: {
-                if (playerState.positionIndex) {
+            case MoveType.getRole: {
+                if (playerState.roleIndex !== undefined) {
                     break
                 }
-                const positionIndex = this.positionStack.player.shift()
-                if (positionIndex === undefined) {
+                const roleIndex = gameState.roleIndex++
+                if (roleIndex >= this.game.params.roles.length) {
                     Log.d('角色已分配完')
                     break
                 }
-                playerState.positionIndex = positionIndex
-                playerState.unitList = this.game.params.unitLists[positionIndex]
+                playerState.roleIndex = roleIndex
+                playerState.unitList = this.game.params.unitLists[roleIndex]
+                break
+            }
+            case MoveType.startRobot:{
+                if (roleIndex >= this.game.params.roles.length) {
+                    Log.d('角色已分配完,无需启动新Robot')
+                    break
+                }
+                await this.startNewRobotScheduler(gameState.roleIndex)
                 break
             }
             case MoveType.openMarket: {
@@ -117,14 +110,14 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     buyOrders = buyOrderIds.map(id => orderDict[id].price).join(','),
                     sellOrders = sellOrderIds.map(id => orderDict[id].price).join(',')
                 let shoutResult: ShoutResult
-                if (unitIndex !== gameState.positionUnitIndex[positionIndex]) {
+                if (unitIndex !== gameState.positionUnitIndex[roleIndex]) {
                     Log.d('物品已成交，无法继续报价')
                     shoutResult = ShoutResult.shoutOnTradedUnit
                 } else {
                     const newOrder = {
                         id: ++gameState.orderId,
-                        positionIndex,
-                        unitIndex: gameState.positionUnitIndex[positionIndex],
+                        roleIndex,
+                        unitIndex: gameState.positionUnitIndex[roleIndex],
                         price
                     }
                     shoutResult = await this.shoutNewOrder(newOrder)
@@ -133,7 +126,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 break
             }
             case MoveType.cancelOrder: {
-                await this.cancelOrder(positionIndex)
+                await this.cancelOrder(roleIndex)
                 break
             }
         }
@@ -167,18 +160,18 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 const reqOrder = orderDict[reqId],
                     resOrder = orderDict[resId]
                 let myOrder: GameState.IOrder
-                switch (playerState.positionIndex) {
-                    case reqOrder.positionIndex:
+                switch (playerState.roleIndex) {
+                    case reqOrder.roleIndex:
                         myOrder = reqOrder
                         break
-                    case resOrder.positionIndex:
+                    case resOrder.roleIndex:
                         myOrder = resOrder
                         break
                     default:
                         return
                 }
                 const privateCost = +playerState.unitList.split(' ')[myOrder.unitIndex]
-                let unitProfit = roles[playerState.positionIndex] === ROLE.Buyer ?
+                let unitProfit = roles[playerState.roleIndex] === ROLE.Buyer ?
                     privateCost - reqOrder.price : reqOrder.price - privateCost
                 periodProfit += unitProfit
                 tradedCount++
@@ -189,7 +182,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
     }
 
     async shoutNewOrder(order: GameState.IOrder): Promise<ShoutResult> {
-        const role = this.game.params.roles[order.positionIndex]
+        const role = this.game.params.roles[order.roleIndex]
         const {buyOrderIds, sellOrderIds, trades, positionUnitIndex, orders} = await this.stateManager.getGameState()
         const marketRejected = role === ROLE.Seller ?
             sellOrderIds[0] && order.price >= orders.find(({id}) => id === sellOrderIds[0]).price :
@@ -197,7 +190,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         if (marketRejected) {
             return ShoutResult.marketReject
         } else {
-            await this.cancelOrder(order.positionIndex)
+            await this.cancelOrder(order.roleIndex)
             orders.push(order)
         }
         const tradeSuccess = role === ROLE.Seller ?
@@ -209,8 +202,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 reqId: pairOrderId,
                 resId: order.id
             })
-            positionUnitIndex[orders.find(({id}) => id === pairOrderId).positionIndex] += 1
-            positionUnitIndex[order.positionIndex] += 1
+            positionUnitIndex[orders.find(({id}) => id === pairOrderId).roleIndex] += 1
+            positionUnitIndex[order.roleIndex] += 1
             this.broadcast(PushType.newTrade, {resOrderId: order.id})
             return ShoutResult.tradeSuccess
         } else {
@@ -220,15 +213,15 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         }
     }
 
-    async cancelOrder(positionIndex: number) {
+    async cancelOrder(roleIndex: number) {
         const {buyOrderIds, sellOrderIds, orders} = await this.stateManager.getGameState()
         for (let i = 0; i < buyOrderIds.length; i++) {
-            if (orders.find(({id}) => id === buyOrderIds[i]).positionIndex === positionIndex) {
+            if (orders.find(({id}) => id === buyOrderIds[i]).roleIndex === roleIndex) {
                 return buyOrderIds.splice(i, 1)
             }
         }
         for (let i = 0; i < sellOrderIds.length; i++) {
-            if (orders.find(({id}) => id === sellOrderIds[i]).positionIndex === positionIndex) {
+            if (orders.find(({id}) => id === sellOrderIds[i]).roleIndex === roleIndex) {
                 return sellOrderIds.splice(i, 1)
             }
         }

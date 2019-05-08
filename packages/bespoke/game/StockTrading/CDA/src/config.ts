@@ -1,5 +1,7 @@
 export const namespace = 'StockTrading-CDA'
 
+export const HOST_POSITION = 0
+
 export enum ROLE {
     Seller,
     Buyer
@@ -76,12 +78,11 @@ export const RedisKey = {
 }
 
 export enum MoveType {
-    //player
-    enterMarket = 'enterMarket',
+    getRole = 'getRole',
+    startRobot = 'startRobot',
+    openMarket = 'openMarket',
     submitOrder = 'submitOrder',
     cancelOrder = 'cancelOrder',
-    //owner
-    openMarket = 'openMarket',
 }
 
 export enum PushType {

@@ -46,9 +46,9 @@ export class Result4Owner extends Core.Result4Owner<ICreateParams, IGameState, I
                             <td>{lang.point}</td>
                         </tr>
                         {
-                            Object.values(travelStates[travelStates.length - 1].playerStates).map(({positionIndex, point}, i) =>
+                            Object.values(travelStates[travelStates.length - 1].playerStates).map(({roleIndex, point}, i) =>
                                 <tr key={i}>
-                                    <td>{positionIndex === undefined ? lang.unknown : positionIndex + 1}</td>
+                                    <td>{roleIndex === undefined ? lang.unknown : roleIndex + 1}</td>
                                     <td>{point}</td>
                                 </tr>
                             )
