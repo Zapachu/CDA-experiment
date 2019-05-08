@@ -1,5 +1,5 @@
 import * as React from 'react'
-import * as style from '../style.scss'
+import * as style from './style.scss'
 
 interface IProps {
     stage: string
@@ -21,7 +21,7 @@ export default class Header extends React.Component<IProps> {
             {
                 stages.map((item, idx) =>
                     <div key={`headerItem-${idx}`} className={style.item}
-                         color={stage === item.name ? '75ff6b' : '#fff'}>
+                         style={{color: stage === item.name ? '#75ff6b' : '#fff'}}>
                         {item.text}
                     </div>
                 )
