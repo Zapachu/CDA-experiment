@@ -1,0 +1,15 @@
+/*header*/
+.header {
+  background: #202744;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 3rem;
+  .item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 .5rem;
+  }
+}

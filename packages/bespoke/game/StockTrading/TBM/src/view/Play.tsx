@@ -1,5 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
+import Header from '../../../components/Header'
 import {Core, MaskLoading, Input, Label, Button, ButtonProps, Toast} from 'bespoke-client-util'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import {FetchType, MoveType, PushType, NEW_ROUND_TIMER, PlayerStatus} from '../config'
@@ -130,6 +131,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         const {rounds, roundIndex} = groups[groupIndex],
             newRoundTimer = newRoundTimers[roundIndex]
         return <section className={style.play}>
+            <Header stage='tbm'/>
             <div className={style.title}>集合竞价市场</div>
             {newRoundTimer ? <div>
                 <div>本轮结束剩余时间</div>
