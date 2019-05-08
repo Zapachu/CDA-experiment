@@ -53,6 +53,7 @@
   align-items: center;
   flex-direction: column;
   width: 100%;
+  min-height: 100vh;
   background: radial-gradient(#293567, #151b35);
   .line {
     border-bottom: 1px solid rgba(49, 70, 89, 0.1);
