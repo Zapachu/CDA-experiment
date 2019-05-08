@@ -56,41 +56,15 @@
   min-height: 100vh;
   background: radial-gradient(#293567, #151b35);
   .line {
-    border-bottom: 1px solid rgba(49, 70, 89, 0.1);
     width: 95%;
-    font-size: 1.3rem;
     padding: .5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    color: #2e2e2e;
   }
   .highlight {
-    color: #4285f4;;
-  }
-  .title {
-    font-size: 2rem;
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1rem;
-  }
-  .profits {
-    margin-top: 3rem;
-    color: $color-black;
-    text-align: center;
-    td {
-      border: $borderLine;
-      width: 5rem;
-      height: 3rem;
-      a {
-        margin: 0 .3rem;
-      }
-      input {
-        width: 4rem;
-      }
-      &.readonly input {
-        border-bottom-color: transparent;
-      }
-    }
+    color: #58c350;
   }
 }
 
@@ -174,6 +148,7 @@
     }
   }
   .shoutBtn {
+    cursor: pointer;
     margin-top: 2rem;
     background: linear-gradient(#14533e, #1e2b49);
     border: solid 1px #58c350;
