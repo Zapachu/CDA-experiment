@@ -26,7 +26,8 @@ import {
   maxB,
   startingMultiplier,
   minNPCNum,
-  maxNPCNum
+  maxNPCNum,
+  STOCKS
 } from "./config";
 
 export default class Controller extends BaseController<
@@ -102,7 +103,7 @@ export default class Controller extends BaseController<
             return;
           }
           if (this.invalidParams(params, privateValue, min, startingPrice)) {
-            return;
+            return cb("invalid input");
           }
           playerState.playerStatus = PlayerStatus.shouted;
           curRound.price = params.price;
@@ -175,6 +176,10 @@ export default class Controller extends BaseController<
         } else {
           this.initSingle(playerState);
         }
+        cb(
+          null,
+          playerState.single.rounds[playerState.single.roundIndex].stockIndex
+        );
         break;
       }
       case MoveType.nextGame: {
@@ -219,10 +224,15 @@ export default class Controller extends BaseController<
     group: GameState.IGroup,
     groupPlayerStates: Array<TPlayerState<IPlayerState>>
   ) {
-    const { max, min, privateValue, startingPrice } = this.genInitParams();
+    const max = this._genPrivateMax();
+    const min = this._genPrivateMin(max);
+    const stockIndex = genRandomInt(0, STOCKS.length - 1);
     group.min = min;
     group.max = max;
+    group.stockIndex = stockIndex;
     groupPlayerStates.forEach(s => {
+      const privateValue = this._genPrivateValue(min, max);
+      const startingPrice = this._genStartingPrice(min);
       s.playerStatus = PlayerStatus.prepared;
       s.multi.privateValue = privateValue;
       s.multi.startingPrice = startingPrice;
@@ -234,12 +244,14 @@ export default class Controller extends BaseController<
     min: number;
     privateValue: number;
     startingPrice: number;
+    stockIndex: number;
   } {
     const max = this._genPrivateMax();
     const min = this._genPrivateMin(max);
     const privateValue = this._genPrivateValue(min, max);
     const startingPrice = this._genStartingPrice(min);
-    return { max, min, privateValue, startingPrice };
+    const stockIndex = genRandomInt(0, STOCKS.length - 1);
+    return { max, min, privateValue, startingPrice, stockIndex };
   }
 
   _genPrivateValue(min: number, max: number): number {

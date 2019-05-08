@@ -25,6 +25,7 @@ message GameState {
         float strikePrice = 2;
         float min = 3;
         float max = 4;
+        int32 stockIndex = 5;
     }
     repeated Group groups = 1;
 }
@@ -51,6 +52,7 @@ message PlayerState {
             float strikePrice = 10;
             float min = 11;
             float max = 12;
+            int32 stockIndex = 13;
         }
         int32 roundIndex = 1;
         repeated Round rounds = 2;

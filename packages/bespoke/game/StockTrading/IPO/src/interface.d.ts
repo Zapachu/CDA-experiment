@@ -417,6 +417,9 @@ export namespace GameState {
 
         /** Group max */
         max?: (number|null);
+
+        /** Group stockIndex */
+        stockIndex?: (number|null);
     }
 
     /** Represents a Group. */
@@ -439,6 +442,9 @@ export namespace GameState {
 
         /** Group max. */
         public max: number;
+
+        /** Group stockIndex. */
+        public stockIndex: number;
 
         /**
          * Creates a new Group instance using the specified properties.
@@ -875,6 +881,9 @@ export namespace PlayerState {
 
             /** Round max */
             max?: (number|null);
+
+            /** Round stockIndex */
+            stockIndex?: (number|null);
         }
 
         /** Represents a Round. */
@@ -912,6 +921,9 @@ export namespace PlayerState {
 
             /** Round max. */
             public max: number;
+
+            /** Round stockIndex. */
+            public stockIndex: number;
 
             /**
              * Creates a new Round instance using the specified properties.
