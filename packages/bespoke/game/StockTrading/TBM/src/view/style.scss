@@ -52,10 +52,8 @@
   justify-content: flex-start;
   align-items: center;
   flex-direction: column;
-  height: 100vh;
-  width: 100vw;
+  width: 100%;
   background: radial-gradient(#293567, #151b35);
-  //linear-gradient(to top, #4CAF50, #4CAF50 1px, transparent 1px)
   .line {
     border-bottom: 1px solid rgba(49, 70, 89, 0.1);
     width: 95%;
@@ -145,4 +143,17 @@
       }
     }
   }
+}
+
+/*workBox*/
+.workBox {
+  border-radius: 1rem;
+  margin-top: 4rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 20rem;
+  width: 20rem;
+  background: radial-gradient(#293567, #151b35);
+  border: solid 1px #5d5d5d;
 }

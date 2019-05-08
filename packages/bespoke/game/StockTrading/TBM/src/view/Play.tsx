@@ -131,6 +131,9 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 </tbody>
             </table>
 
+            <div className={style.workBox}>
+            </div>
+
 
             <div className={style.title}>集合竞价市场</div>
             {newRoundTimer ? <div>
