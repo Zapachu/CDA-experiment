@@ -472,9 +472,6 @@ export interface IPlayerState {
 
     /** PlayerState tradedCount */
     tradedCount?: (number|null);
-
-    /** PlayerState seatNumber */
-    seatNumber?: (number|null);
 }
 
 /** Represents a PlayerState. */
@@ -503,9 +500,6 @@ export class PlayerState implements IPlayerState {
 
     /** PlayerState tradedCount. */
     public tradedCount: number;
-
-    /** PlayerState seatNumber. */
-    public seatNumber: number;
 
     /**
      * Creates a new PlayerState instance using the specified properties.
@@ -586,9 +580,6 @@ export interface IMoveParams {
 
     /** MoveParams unitIndex */
     unitIndex?: (number|null);
-
-    /** MoveParams seatNumber */
-    seatNumber?: (number|null);
 }
 
 /** Represents a MoveParams. */
@@ -605,9 +596,6 @@ export class MoveParams implements IMoveParams {
 
     /** MoveParams unitIndex. */
     public unitIndex: number;
-
-    /** MoveParams seatNumber. */
-    public seatNumber: number;
 
     /**
      * Creates a new MoveParams instance using the specified properties.

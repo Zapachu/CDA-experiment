@@ -10,16 +10,13 @@ export enum AdjustDirection {
     lower
 }
 
-export const orderNumberLimit = 10000
-
 export enum SheetType {
-    seatNumber = 'seatNumber',
     robotCalcLog = 'robotCalcLog',
     robotSubmitLog = 'robotSubmitLog',
 }
 
 export enum MarketStage {
-    assignPosition,
+    assignRole,
     notOpen,
     readDescription,
     trading,
@@ -70,11 +67,6 @@ export interface RobotSubmitLog {
     marketSellOrders,
 }
 
-export interface ISeatNumberRow {
-    playerSeq,
-    seatNumber
-}
-
 export enum ShoutResult {
     shoutSuccess,
     tradeSuccess,
@@ -83,20 +75,12 @@ export enum ShoutResult {
 }
 
 export enum DBKey {
-    moveEvent = 'moveEvent',
     robotCalcLog = 'robotCalcLog',
     robotSubmitLog = 'robotSubmitLog',
-    seatNumber = 'seatNumber',
 }
 
 export const RedisKey = {
     robotActionSeq: (gameId: string) => `robotCalcSeq:${gameId}`
-}
-
-export const phaseNames = {
-    assignPosition: 'assignPosition',
-    mainGame: 'mainGame',
-    marketResult: 'marketResult',
 }
 
 export enum MoveType {

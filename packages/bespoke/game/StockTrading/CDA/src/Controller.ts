@@ -12,11 +12,9 @@ import nodeXlsx from 'node-xlsx'
 import {
     DBKey,
     FetchType,
-    ISeatNumberRow,
     MarketStage,
     MoveType,
-    orderNumberLimit,
-    phaseNames, PlayerStatus,
+    PlayerStatus,
     PushType,
     RobotCalcLog,
     RobotSubmitLog,
@@ -55,7 +53,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         const gameState = super.initGameState()
         Object.assign(gameState, {
             orders: [],
-            marketStage: MarketStage.assignPosition,
+            marketStage: MarketStage.assignRole,
             orderId: 0,
             buyOrderIds: [],
             sellOrderIds: [],
@@ -129,26 +127,10 @@ export default class Controller extends BaseController<ICreateParams, IGameState
     protected async playerMoveReducer(actor: IActor, type: string, params: IMoveParams, cb: IMoveCallback): Promise<void> {
         const gameState = await this.stateManager.getGameState(),
             playerState = await this.stateManager.getPlayerState(actor),
-            playerStates = await this.stateManager.getPlayerStates(),
             {positionIndex} = playerState
         switch (type) {
             case MoveType.enterMarket: {
-                const hasBeenOccupied = Object.values(playerStates).some(({seatNumber}) => seatNumber === params.seatNumber)
-                if (hasBeenOccupied) {
-                    cb(false)
-                    break
-                }
-                playerState.seatNumber = params.seatNumber
                 playerState.status = PlayerStatus.wait4MarketOpen
-                const data: ISeatNumberRow = {
-                    playerSeq: positionIndex + 1,
-                    seatNumber: params.seatNumber
-                }
-                await new FreeStyleModel({
-                    game: this.game.id,
-                    key: DBKey.seatNumber,
-                    data
-                }).save()
                 break
             }
             case MoveType.submitOrder: {
@@ -314,15 +296,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                                 data.push([seq, playerSeq, role, unitIndex + 1, ValueCost, price, buyOrders, sellOrders, `${shoutResult + 1}:${ShoutResult[shoutResult]}`, marketBuyOrders, marketSellOrders, timestamp]
                                     .map(v => typeof v === 'number' && v % 1 ? v.toFixed(2) : v)
                                 ))
-                        break
-                    }
-                    case SheetType.seatNumber: {
-                        data.push(['Subject', 'seatNumber'])
-                        const seatNumberRows: Array<{ data: ISeatNumberRow }> = await FreeStyleModel.find({
-                            game: this.game.id,
-                            key: DBKey.seatNumber
-                        }) as any
-                        seatNumberRows.forEach(({data: {seatNumber, playerSeq}}) => data.push([playerSeq, seatNumber]))
                         break
                     }
                 }

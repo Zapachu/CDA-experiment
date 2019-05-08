@@ -2,8 +2,8 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {Core, Lang, Button, MaskLoading, baseEnum} from 'bespoke-client-util'
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
-import {FetchType, MarketStage, MoveType, phaseNames, PlayerStatus, PushType, ROLE} from '../config'
-import {TradeChart} from './phase/mainGame'
+import {FetchType, MarketStage, MoveType, PlayerStatus, PushType, ROLE} from '../config'
+import {TradeChart} from './Play'
 
 interface IPlay4OwnerState {
     timer?: number
@@ -11,7 +11,6 @@ interface IPlay4OwnerState {
 
 export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, IPlay4OwnerState> {
     lang = Lang.extractLang({
-        seatNumber: ['座位号', 'SeatNumber'],
         gameHasNotStarted: ['实验尚未开始', 'Experiment has not started'],
         assignPosition: ['分发角色', 'ASSIGN POSITION'],
         openMarket: ['开放市场', 'Open Market'],
@@ -51,15 +50,13 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
         return <table className={style.playerStatusTable}>
             <tbody>
             <tr>
-                <td>{lang.seatNumber}</td>
                 <td>{lang.position}</td>
                 <td>{lang.role}</td>
                 <td>{lang.status}</td>
             </tr>
             {
                 Object.values(playerStates).sort(({positionIndex: p1}, {positionIndex: p2}) => p1 - p2)
-                    .map(({positionIndex, seatNumber, status}, i) => <tr key={i}>
-                        <td>{seatNumber || lang.unknown}</td>
+                    .map(({positionIndex, status}, i) => <tr key={i}>
                         <td>{positionIndex === undefined ? lang.unknown : positionIndex + 1}</td>
                         <td>{roles[positionIndex] === undefined ? lang.unknown : lang[ROLE[roles[positionIndex]]]}</td>
                         <td>{status === PlayerStatus.wait4MarketOpen ? lang.wait4MarketOpen : ''}</td>
@@ -140,7 +137,7 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
     renderMarket() {
         const {lang, props: {gameState}} = this
         switch (gameState.marketStage) {
-            case MarketStage.assignPosition:
+            case MarketStage.assignRole:
                 return this.renderAssignPosition()
             case MarketStage.leave:
                 return <div className={style.blankMsg}>{lang.marketClosed}</div>

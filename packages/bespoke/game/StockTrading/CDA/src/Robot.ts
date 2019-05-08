@@ -5,7 +5,6 @@ import {
     DBKey,
     MarketStage,
     MoveType,
-    phaseNames,
     PushType,
     RedisKey,
     RobotCalcLog,
@@ -31,7 +30,7 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
 
     async init(): Promise<BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>> {
         this.frameEmitter.on(PushType.assignedPosition, () => {
-            setTimeout(() => this.frameEmitter.emit(MoveType.enterMarket, {seatNumber: ~~(Math.random() * 10000)}), Math.random() * 3000)
+            setTimeout(() => this.frameEmitter.emit(MoveType.enterMarket), Math.random() * 3000)
         })
         this.frameEmitter.on(PushType.periodOpen, () => {
             this.zipActive = false

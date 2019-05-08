@@ -36,13 +36,11 @@ message PlayerState {
     string unitList = 5;
     float point = 9;
     int32 tradedCount = 12;
-    int32 seatNumber = 11;
 }
 
 message MoveParams {
     float price = 1;
     int32 unitIndex = 6;
-    int32 seatNumber = 9;
 }
 message PushParams {
     int32 newOrderId = 1;
