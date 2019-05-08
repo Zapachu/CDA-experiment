@@ -15,8 +15,8 @@ export const Create: Core.CreateSFC<ICreateParams, FetchType> = ({submitable, se
         [ROLE[ROLE.Buyer]]: ['买家', 'Buyer'],
         Role: ['角色', 'Role'],
         UnitList: ['输入序列', 'Input Sequences'],
-        durationOfEachPeriod: ['时期时长', 'Duration of a period'],
-        time2ReadInfo: ['浏览信息时长', 'Time to read game info'],
+        tradeTime: ['时期时长', 'Duration of a period'],
+        prepareTime: ['浏览信息时长', 'Time to read game info'],
         invalidInputSequences: ['输入序列有误', 'Invalid input sequences']
     })
 
@@ -24,8 +24,8 @@ export const Create: Core.CreateSFC<ICreateParams, FetchType> = ({submitable, se
         const roles = [...Array(6).fill(ROLE.Seller), ...Array(6).fill(ROLE.Buyer)]
         setParams({
             roles,
-            time2ReadInfo: 15,
-            durationOfEachPeriod: 180,
+            prepareTime: 15,
+            tradeTime: 180,
             unitLists: roles.map(role => role === ROLE.Buyer ? '325 325 305 260 220' : '185 185 235 260 270')
         })
     }, [])
@@ -59,12 +59,12 @@ export const Create: Core.CreateSFC<ICreateParams, FetchType> = ({submitable, se
         <ul className={style.baseFields}>
             {
                 Object.entries({
-                    time2ReadInfo: {
+                    prepareTime: {
                         min: 10,
                         max: 30,
                         step: 1
                     },
-                    durationOfEachPeriod: {
+                    tradeTime: {
                         min: 60,
                         max: 300,
                         step: 30

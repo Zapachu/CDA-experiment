@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {Core, Lang, Button, MaskLoading, baseEnum} from 'bespoke-client-util'
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
-import {FetchType, MarketStage, MoveType, PlayerStatus, PushType, ROLE} from '../config'
+import {FetchType, Stage, MoveType, PushType, ROLE} from '../config'
 import {TradeChart} from './Play'
 
 interface IPlay4OwnerState {
@@ -12,8 +12,6 @@ interface IPlay4OwnerState {
 export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, IPlay4OwnerState> {
     lang = Lang.extractLang({
         gameHasNotStarted: ['实验尚未开始', 'Experiment has not started'],
-        assignPosition: ['分发角色', 'ASSIGN POSITION'],
-        openMarket: ['开放市场', 'Open Market'],
         shoutInfo: ['报价信息', 'Shout Info'],
         price: ['价格', 'Price'],
         unitIndex: ['物品序号', 'UnitIndex'],
@@ -26,8 +24,6 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
         trading: ['交易中', 'Trading'],
         showResult: ['展示结果', 'Show result'],
         unknown: ['???', '???'],
-        status: ['状态', 'Status'],
-        wait4MarketOpen: ['等待市场开放', 'Waiting for market opening'],
         [ROLE[ROLE.Buyer]]: ['买家', 'Buyer'],
         [ROLE[ROLE.Seller]]: ['卖家', 'Seller']
     })
@@ -39,8 +35,8 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
         if (!frameEmitter) {
             return null
         }
-        frameEmitter.on(PushType.periodCountDown, ({periodCountDown}) => {
-            this.setState({timer: periodCountDown})
+        frameEmitter.on(PushType.countDown, ({countDown}) => {
+            this.setState({timer: countDown})
         })
     }
 
@@ -52,45 +48,21 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
             <tr>
                 <td>{lang.position}</td>
                 <td>{lang.role}</td>
-                <td>{lang.status}</td>
             </tr>
             {
                 Object.values(playerStates).sort(({positionIndex: p1}, {positionIndex: p2}) => p1 - p2)
-                    .map(({positionIndex, status}, i) => <tr key={i}>
+                    .map(({positionIndex}, i) => <tr key={i}>
                         <td>{positionIndex === undefined ? lang.unknown : positionIndex + 1}</td>
                         <td>{roles[positionIndex] === undefined ? lang.unknown : lang[ROLE[roles[positionIndex]]]}</td>
-                        <td>{status === PlayerStatus.wait4MarketOpen ? lang.wait4MarketOpen : ''}</td>
                     </tr>)
             }
             </tbody>
         </table>
     }
 
-    renderAssignPosition() {
-        const {lang, props: {frameEmitter, gameState, playerStates, game}} = this
-        const totalPlayer = game.params.roles.length
-        return <section className={style.assignPosition}>
-            {
-                this.renderPlayerStatusTable()
-            }
-            <div className={style.btnWrapper}>
-                <div className={style.inGameNum}>进入实验人数: {Object.keys(playerStates).length}/{totalPlayer}</div>
-                {
-                    gameState.positionAssigned ? <Button {...{
-                        label: lang.openMarket,
-                        onClick: () => frameEmitter.emit(MoveType.openMarket)
-                    }}/> : <Button {...{
-                        label: lang.assignPosition,
-                        onClick: () => frameEmitter.emit(MoveType.assignPosition)
-                    }}/>
-                }
-            </div>
-        </section>
-    }
-
     renderMainGame() {
         const {lang, props: {token, type, params, game, gameState, playerStates}, state: {timer}} = this
-        const {roles, time2ReadInfo, durationOfEachPeriod} = game.params,
+        const {roles, prepareTime, tradeTime} = game.params,
             {trades, sellOrderIds, buyOrderIds} = gameState
         const orderDict: { [id: number]: GameState.IOrder } = {}
         gameState.orders.forEach(order => {
@@ -118,11 +90,11 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
                 </div>
                 <div className={style.countdownLabel}>
                     {
-                        timer ? timer < time2ReadInfo ?
-                            <label>{lang.readingInfo}<em>{time2ReadInfo - timer}</em>s</label> :
-                            timer < ((+time2ReadInfo) + (+durationOfEachPeriod)) ?
-                                <label>{lang.trading}<em>{+durationOfEachPeriod + +time2ReadInfo - timer}</em>s</label> :
-                                <label>{lang.showResult}<em>{+durationOfEachPeriod + 2 * time2ReadInfo - timer}</em>s</label> : null
+                        timer ? timer < prepareTime ?
+                            <label>{lang.readingInfo}<em>{prepareTime - timer}</em>s</label> :
+                            timer < ((+prepareTime) + (+tradeTime)) ?
+                                <label>{lang.trading}<em>{+tradeTime + +prepareTime - timer}</em>s</label> :
+                                <label>{lang.showResult}<em>{+tradeTime + 2 * prepareTime - timer}</em>s</label> : null
                     }
                 </div>
             </div>
@@ -136,10 +108,8 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
 
     renderMarket() {
         const {lang, props: {gameState}} = this
-        switch (gameState.marketStage) {
-            case MarketStage.assignRole:
-                return this.renderAssignPosition()
-            case MarketStage.leave:
+        switch (gameState.stage) {
+            case Stage.leave:
                 return <div className={style.blankMsg}>{lang.marketClosed}</div>
             default:
                 return <React.Fragment>

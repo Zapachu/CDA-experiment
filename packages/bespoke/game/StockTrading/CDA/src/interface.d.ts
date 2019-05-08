@@ -2,17 +2,14 @@ import * as $protobuf from "protobufjs";
 /** Properties of a CreateParams. */
 export interface ICreateParams {
 
-    /** CreateParams nextPhaseKey */
-    nextPhaseKey?: (string|null);
-
     /** CreateParams roles */
     roles?: (number[]|null);
 
-    /** CreateParams time2ReadInfo */
-    time2ReadInfo?: (number|null);
+    /** CreateParams prepareTime */
+    prepareTime?: (number|null);
 
-    /** CreateParams durationOfEachPeriod */
-    durationOfEachPeriod?: (number|null);
+    /** CreateParams tradeTime */
+    tradeTime?: (number|null);
 
     /** CreateParams unitLists */
     unitLists?: (string[]|null);
@@ -27,17 +24,14 @@ export class CreateParams implements ICreateParams {
      */
     constructor(properties?: ICreateParams);
 
-    /** CreateParams nextPhaseKey. */
-    public nextPhaseKey: string;
-
     /** CreateParams roles. */
     public roles: number[];
 
-    /** CreateParams time2ReadInfo. */
-    public time2ReadInfo: number;
+    /** CreateParams prepareTime. */
+    public prepareTime: number;
 
-    /** CreateParams durationOfEachPeriod. */
-    public durationOfEachPeriod: number;
+    /** CreateParams tradeTime. */
+    public tradeTime: number;
 
     /** CreateParams unitLists. */
     public unitLists: string[];
@@ -116,11 +110,14 @@ export class CreateParams implements ICreateParams {
 /** Properties of a GameState. */
 export interface IGameState {
 
-    /** GameState marketStage */
-    marketStage?: (number|null);
+    /** GameState stage */
+    stage?: (number|null);
 
     /** GameState orderId */
     orderId?: (number|null);
+
+    /** GameState orders */
+    orders?: (GameState.IOrder[]|null);
 
     /** GameState buyOrderIds */
     buyOrderIds?: (number[]|null);
@@ -133,12 +130,6 @@ export interface IGameState {
 
     /** GameState positionUnitIndex */
     positionUnitIndex?: (number[]|null);
-
-    /** GameState orders */
-    orders?: (GameState.IOrder[]|null);
-
-    /** GameState positionAssigned */
-    positionAssigned?: (boolean|null);
 }
 
 /** Represents a GameState. */
@@ -150,11 +141,14 @@ export class GameState implements IGameState {
      */
     constructor(properties?: IGameState);
 
-    /** GameState marketStage. */
-    public marketStage: number;
+    /** GameState stage. */
+    public stage: number;
 
     /** GameState orderId. */
     public orderId: number;
+
+    /** GameState orders. */
+    public orders: GameState.IOrder[];
 
     /** GameState buyOrderIds. */
     public buyOrderIds: number[];
@@ -167,12 +161,6 @@ export class GameState implements IGameState {
 
     /** GameState positionUnitIndex. */
     public positionUnitIndex: number[];
-
-    /** GameState orders. */
-    public orders: GameState.IOrder[];
-
-    /** GameState positionAssigned. */
-    public positionAssigned: boolean;
 
     /**
      * Creates a new GameState instance using the specified properties.
@@ -455,23 +443,17 @@ export namespace GameState {
 /** Properties of a PlayerState. */
 export interface IPlayerState {
 
-    /** PlayerState token */
-    token?: (string|null);
-
-    /** PlayerState status */
-    status?: (number|null);
-
     /** PlayerState positionIndex */
     positionIndex?: (number|null);
 
     /** PlayerState unitList */
     unitList?: (string|null);
 
-    /** PlayerState point */
-    point?: (number|null);
-
     /** PlayerState tradedCount */
     tradedCount?: (number|null);
+
+    /** PlayerState point */
+    point?: (number|null);
 }
 
 /** Represents a PlayerState. */
@@ -483,23 +465,17 @@ export class PlayerState implements IPlayerState {
      */
     constructor(properties?: IPlayerState);
 
-    /** PlayerState token. */
-    public token: string;
-
-    /** PlayerState status. */
-    public status: number;
-
     /** PlayerState positionIndex. */
     public positionIndex: number;
 
     /** PlayerState unitList. */
     public unitList: string;
 
-    /** PlayerState point. */
-    public point: number;
-
     /** PlayerState tradedCount. */
     public tradedCount: number;
+
+    /** PlayerState point. */
+    public point: number;
 
     /**
      * Creates a new PlayerState instance using the specified properties.
@@ -575,11 +551,11 @@ export class PlayerState implements IPlayerState {
 /** Properties of a MoveParams. */
 export interface IMoveParams {
 
-    /** MoveParams price */
-    price?: (number|null);
-
     /** MoveParams unitIndex */
     unitIndex?: (number|null);
+
+    /** MoveParams price */
+    price?: (number|null);
 }
 
 /** Represents a MoveParams. */
@@ -591,11 +567,11 @@ export class MoveParams implements IMoveParams {
      */
     constructor(properties?: IMoveParams);
 
-    /** MoveParams price. */
-    public price: number;
-
     /** MoveParams unitIndex. */
     public unitIndex: number;
+
+    /** MoveParams price. */
+    public price: number;
 
     /**
      * Creates a new MoveParams instance using the specified properties.
@@ -671,14 +647,14 @@ export class MoveParams implements IMoveParams {
 /** Properties of a PushParams. */
 export interface IPushParams {
 
+    /** PushParams countDown */
+    countDown?: (number|null);
+
     /** PushParams newOrderId */
     newOrderId?: (number|null);
 
     /** PushParams resOrderId */
     resOrderId?: (number|null);
-
-    /** PushParams periodCountDown */
-    periodCountDown?: (number|null);
 }
 
 /** Represents a PushParams. */
@@ -690,14 +666,14 @@ export class PushParams implements IPushParams {
      */
     constructor(properties?: IPushParams);
 
+    /** PushParams countDown. */
+    public countDown: number;
+
     /** PushParams newOrderId. */
     public newOrderId: number;
 
     /** PushParams resOrderId. */
     public resOrderId: number;
-
-    /** PushParams periodCountDown. */
-    public periodCountDown: number;
 
     /**
      * Creates a new PushParams instance using the specified properties.

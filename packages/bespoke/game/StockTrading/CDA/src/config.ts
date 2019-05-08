@@ -15,20 +15,12 @@ export enum SheetType {
     robotSubmitLog = 'robotSubmitLog',
 }
 
-export enum MarketStage {
-    assignRole,
-    notOpen,
-    readDescription,
+export enum Stage {
+    matching,
+    prepare,
     trading,
     result,
     leave
-}
-
-export enum PlayerStatus {
-    wait4Position,
-    wait4MarketOpen,
-    trading,
-    left
 }
 
 export interface RobotCalcLog {
@@ -89,16 +81,12 @@ export enum MoveType {
     submitOrder = 'submitOrder',
     cancelOrder = 'cancelOrder',
     //owner
-    assignPosition = 'assignPosition',
     openMarket = 'openMarket',
-    //elf
-    sendBackPlayer = 'sendBackPlayer'
 }
 
 export enum PushType {
-    assignedPosition = 'assignedPosition',
-    periodCountDown = 'periodCountDown',
-    periodOpen = 'periodOpen',
+    countDown = 'countDown',
+    beginTrading = 'beginTrading',
     newOrder = 'newOrder',
     newTrade = 'newTrade'
 }

@@ -1,19 +1,109 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang, Button, ButtonProps, MaskLoading, Toast, FrameEmitter, IGame} from 'bespoke-client-util'
+import {Core, Lang, Button, ButtonProps, MaskLoading, Toast, IGame, FrameEmitter} from 'bespoke-client-util'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, GameState} from '../interface'
-import {FetchType, MarketStage, MoveType, PushType, ROLE, PlayerStatus} from '../config'
+import {FetchType, Stage, MoveType, PushType, ROLE} from '../config'
 
-export const Play: Core.PlaySFC<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> = props => {
-    switch (props.gameState.marketStage) {
-        case MarketStage.assignRole:
-            return <AssignRole {...props}/>
-        case MarketStage.leave:
-            return <Result {...props}/>
-        default:
-            return <MainGame {...props}/>
+export const TradeChart: React.FC<{
+    tradeList: Array<{
+        price: number
+    }>
+}> = ({tradeList}) => {
+    const COLOR = {
+        line: '#999',
+        point: '#E27B6A'
     }
+    const cellSize = 10, fontSize = 8, padding = 2 * fontSize,
+        minY = 100, maxY = 400,
+        maxX = tradeList.length > 30 ? tradeList.length : 30
+    const transX = x => padding + x * cellSize,
+        transY = y => maxY + padding - y
+    return <section>
+        <svg xmlns="http://www.w3.org/2000/svg"
+             viewBox={`0,0,${maxX * cellSize + 2 * padding},${maxY - minY + 2 * padding}`}>
+            {
+                Array(maxX + 1).fill('').map((_, i) =>
+                    <React.Fragment key={i}>
+                        <line {...{
+                            stroke: COLOR.line,
+                            strokeWidth: i % 5 === 0 ? .5 : .1,
+                            x1: transX(i),
+                            y1: transY(minY),
+                            x2: transX(i),
+                            y2: transY(maxY)
+                        }}/>
+                        {
+                            i && i % 5 === 0 ?
+                                <text {...{
+                                    fontSize,
+                                    fill: COLOR.line,
+                                    x: transX(i - .5 * fontSize / cellSize),
+                                    y: transY(minY - fontSize)
+                                }}>{i}</text> : null
+                        }
+                    </React.Fragment>
+                )
+            }
+            {
+                Array(~~((maxY - minY) / cellSize) + 1).fill('').map((_, i) =>
+                    <React.Fragment key={i}>
+                        <line {...{
+                            stroke: COLOR.line,
+                            strokeWidth: i % 5 === 0 ? .5 : .1,
+                            x1: transX(0),
+                            y1: transY(minY + i * cellSize),
+                            x2: transX(maxX),
+                            y2: transY(minY + i * cellSize)
+                        }}/>
+                        {
+                            i && i % 5 === 0 ?
+                                <text {...{
+                                    fontSize,
+                                    fill: COLOR.line,
+                                    x: transX(-2 * fontSize / cellSize),
+                                    y: transY(minY + (i - .5 * fontSize / cellSize) * cellSize)
+                                }}>{minY + i * cellSize}</text> : null
+                        }
+                    </React.Fragment>
+                )
+            }
+            {
+                tradeList.map(({price}, i) =>
+                    <React.Fragment key={i}>
+                        <circle {...{
+                            fill: COLOR.point,
+                            cx: transX(i + 1),
+                            cy: transY(price),
+                            r: 2
+                        }}/>
+                        {
+                            i ? <line {...{
+                                stroke: COLOR.point,
+                                strokeWidth: .5,
+                                x1: transX(i + 1),
+                                y1: transY(price),
+                                x2: transX(i),
+                                y2: transY(tradeList[i - 1].price)
+                            }}/> : null
+                        }
+                    </React.Fragment>
+                )
+            }
+        </svg>
+    </section>
 }
+
+export const Play: Core.PlaySFC<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> =
+    props => {
+        switch (props.gameState.stage) {
+            case Stage.matching:
+                return <Matching {...props}/>
+            case Stage.leave:
+                return <div>跳转至其它环节(TODO)</div> //TODO
+            default:
+                return <Trading {...props}/>
+        }
+    }
 
 interface IStageProps {
     game: IGame<ICreateParams>
@@ -22,39 +112,26 @@ interface IStageProps {
     frameEmitter?: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
 }
 
-const AssignRole: React.FC<IStageProps> = ({game, frameEmitter, playerState: {positionIndex, status}}) => {
+function Matching({game: {params: {roles}}, frameEmitter, playerState: {positionIndex}}: IStageProps) {
     const lang = Lang.extractLang({
-        wait4position: ['等待系统分配角色', 'Waiting for the system to assign your role'],
-        enterMarket: ['进入市场', 'Enter Market'],
-        toEnterMarket: ['您将进入某一市场，您的角色为：', 'You will enter a market, and your role is : '],
-        wait4MarketOpen: ['等待市场开放', 'Waiting for market opening'],
-        [ROLE[ROLE.Buyer]]: ['买家', 'Buyer'],
-        [ROLE[ROLE.Seller]]: ['卖家', 'Seller']
+        openMarket: ['开放市场', 'Open Market']
     })
-    return positionIndex === undefined ?
-        <MaskLoading label={lang.wait4position}/> :
-        <section className={`${style.assignPosition} ${style.playContent}`}>
-            <p>{lang.toEnterMarket}<em>{lang[ROLE[game.params.roles[positionIndex]]]}</em>
-            </p>
-            {
-                status === PlayerStatus.wait4MarketOpen ?
-                    <MaskLoading label={lang.wait4MarketOpen}/> :
-                    <section className={style.seatNumberStage}>
-                        <Button width={ButtonProps.Width.medium} label={lang.enterMarket} onClick={() => {
-                            frameEmitter.emit(MoveType.enterMarket)
-                        }}/>
-                    </section>
-            }
-        </section>
+    return positionIndex === 0?
+        <Button {...{
+            label: lang.openMarket,
+            onClick: () => frameEmitter.emit(MoveType.openMarket)
+        }}/> : null
 }
 
-const MainGame: React.FC<IStageProps> = ({
-                                             frameEmitter,
-                                             game: {params: {roles, time2ReadInfo, durationOfEachPeriod}},
-                                             gameState: {orders, marketStage, buyOrderIds, sellOrderIds, trades, positionUnitIndex},
-                                             playerState: {positionIndex, unitList}
-                                         }) => {
+function Trading(props: IStageProps) {
+    const {
+        frameEmitter,
+        game: {params: {roles, prepareTime, tradeTime}},
+        gameState: {orders, stage, buyOrderIds, sellOrderIds, trades, positionUnitIndex},
+        playerState: {positionIndex, unitList}
+    } = props
     const lang = Lang.extractLang({
+        position: ['位置', 'Position'],
         role: ['角色', 'Your Role'],
         timeLeft: ['剩余时间', 'Time Left'],
         profit: ['物品利润', 'Box Profit'],
@@ -62,7 +139,7 @@ const MainGame: React.FC<IStageProps> = ({
         unitNumber: ['物品序号', 'Unit Number'],
         unitCost: ['物品成本', 'Unit Cost'],
         unitValue: ['物品价值', 'Unit Value'],
-        wait4MarketOpen: ['等待市场开放', 'Waiting for market opening'],
+        openMarket: ['开放市场', 'Open Market'],
         marketWillOpen1: ['市场将在', 'Market will open in '],
         marketWillOpen2: [() => '秒后开放', n => `second${n > 1 ? 's' : ''}`],
         shout: ['报价', 'Shout'],
@@ -85,7 +162,8 @@ const MainGame: React.FC<IStageProps> = ({
     const [price, setPrice] = React.useState(0 as number | string)
     const [timer, setTimer] = React.useState(0)
     React.useEffect(() => {
-        frameEmitter.on(PushType.periodCountDown, ({periodCountDown}) => setTimer(periodCountDown))
+        frameEmitter.on(PushType.countDown, ({countDown}) => setTimer(countDown))
+        frameEmitter.emit(MoveType.enterMarket)
     }, [])
 
     function submitOrder() {
@@ -199,224 +277,109 @@ const MainGame: React.FC<IStageProps> = ({
         orderDict[order.id] = order
     })
     const role = roles[positionIndex]
-    const timeLeft = durationOfEachPeriod + time2ReadInfo - timer,
-        time2NextPhase = durationOfEachPeriod + 2 * time2ReadInfo - timer
+    const timeLeft = tradeTime + prepareTime - timer,
+        time2NextPhase = tradeTime + 2 * prepareTime - timer
     const unitIndex = positionUnitIndex[positionIndex],
         unitPrice = +(unitList.split(' ')[unitIndex] || 0)
     const [tradeCount, profit, tradeListFragment] = renderTradeList(orderDict, trades)
     return <section className={`${style.mainGame} ${style.playContent}`}>
         <ul className={style.header}>
+            <li>{lang.position} : <em>{positionIndex + 1}</em></li>
             <li>{lang.role} : <em>{lang[ROLE[role]]}</em></li>
-            <li>{lang.timeLeft} : <em>{timer < time2ReadInfo ? '   ' : timeLeft > 0 ? timeLeft : 0}</em>s</li>
+            <li>{lang.timeLeft} : <em>{timer < prepareTime ? '   ' : timeLeft > 0 ? timeLeft : 0}</em>s</li>
         </ul>
         {
-            marketStage === MarketStage.notOpen ? <MaskLoading label={lang.wait4MarketOpen}/> :
-                marketStage === MarketStage.result ?
-                    <section className={style.result}>
-                        <p>
-                            {lang.toEnterNextPhase1}
-                            <em>{tradeCount}</em>
-                            {lang.toEnterNextPhase2}
-                            <em>{profit}</em>
-                            {lang.toEnterNextPhase3}
-                            <em>{time2NextPhase}</em>
-                            {lang.toEnterNextPhase4}
-                        </p>
-                    </section> :
-                    <section className={style.body}>
-                        <div className={style.personalPanel}>
-                            <section className={style.personalInfo}>
-                                <h3 className={style.title}>{lang.personalInfo}</h3>
-                                <div className={style.infoText}>
-                                    <ul>
-                                        <li>{lang.currentProfit}<em>{profit}</em></li>
-                                    </ul>
-                                </div>
-                            </section>
-                            <section className={style.yourTrades}>
-                                <h3 className={style.title}>{lang.yourTrades}</h3>
-                                <div className={style.tradeListWrapper}>
-                                    {
-                                        tradeListFragment
-                                    }
-                                </div>
-                            </section>
-                        </div>
-                        <div className={style.orderPanel}>
-                            <section className={style.orderBook}>
-                                <h3 className={style.title}>{lang.orderBook}</h3>
-                                <div className={style.orderListWrapper}>
-                                    {
-                                        renderOrderList(orderDict, buyOrderIds, ROLE.Buyer)
-                                    }
-                                    {
-                                        renderOrderList(orderDict, sellOrderIds, ROLE.Seller)
-                                    }
-                                </div>
-                            </section>
-                            <section className={style.orderSubmission}>
-                                <h3 className={style.title}>{lang.currentAllocation}</h3>
-                                <ul className={style.curUnitInfo}>
-                                    <li>
-                                        <label>{lang.unitNumber}</label>
-                                        <em>{unitIndex + 1}</em>
-                                    </li>
-                                    <li>
-                                        <label>{role === ROLE.Buyer ? lang.unitValue : lang.unitCost}</label>
-                                        <em>{unitPrice}</em>
-                                    </li>
+            stage === Stage.result ?
+                <section className={style.result}>
+                    <p>
+                        {lang.toEnterNextPhase1}
+                        <em>{tradeCount}</em>
+                        {lang.toEnterNextPhase2}
+                        <em>{profit}</em>
+                        {lang.toEnterNextPhase3}
+                        <em>{time2NextPhase}</em>
+                        {lang.toEnterNextPhase4}
+                    </p>
+                </section> :
+                <section className={style.body}>
+                    <div className={style.personalPanel}>
+                        <section className={style.personalInfo}>
+                            <h3 className={style.title}>{lang.personalInfo}</h3>
+                            <div className={style.infoText}>
+                                <ul>
+                                    <li>{lang.currentProfit}<em>{profit}</em></li>
                                 </ul>
+                            </div>
+                        </section>
+                        <section className={style.yourTrades}>
+                            <h3 className={style.title}>{lang.yourTrades}</h3>
+                            <div className={style.tradeListWrapper}>
                                 {
-                                    marketStage === MarketStage.readDescription && time2ReadInfo > timer ?
-                                        <p className={style.marketWillOpen}>{lang.marketWillOpen1}
-                                            <em>{time2ReadInfo - timer}</em> {(lang.marketWillOpen2 as Function)(time2ReadInfo - timer)}
-                                        </p> :
-                                        <section className={style.newOrder}>
-                                            <div className={style.orderInputWrapper}>
-                                                <input {...{
-                                                    autoFocus: true,
-                                                    value: price || '',
-                                                    onChange: ({target: {value: price}}) => setPrice(price)
-                                                }}/>
-                                            </div>
-                                            <div className={style.submitBtnWrapper}>
-                                                <Button {...{
-                                                    label: lang.shout,
-                                                    type: ButtonProps.Type.primary,
-                                                    width: ButtonProps.Width.medium,
-                                                    onClick: () => submitOrder()
-                                                }}/>
-                                            </div>
-                                        </section>
+                                    tradeListFragment
                                 }
-                            </section>
-                        </div>
-                        <div className={style.historyPanel}>
-                            <div className={style.tradeHistory}>
-                                <h3 className={style.title}>{lang.tradeHistory}</h3>
-                                <div className={style.tradeChartWrapper}>
-                                    <TradeChart
-                                        tradeList={trades.map(({reqId}) => ({price: orderDict[reqId].price}))}/>
-                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <div className={style.orderPanel}>
+                        <section className={style.orderBook}>
+                            <h3 className={style.title}>{lang.orderBook}</h3>
+                            <div className={style.orderListWrapper}>
+                                {
+                                    renderOrderList(orderDict, buyOrderIds, ROLE.Buyer)
+                                }
+                                {
+                                    renderOrderList(orderDict, sellOrderIds, ROLE.Seller)
+                                }
+                            </div>
+                        </section>
+                        <section className={style.orderSubmission}>
+                            <h3 className={style.title}>{lang.currentAllocation}</h3>
+                            <ul className={style.curUnitInfo}>
+                                <li>
+                                    <label>{lang.unitNumber}</label>
+                                    <em>{unitIndex + 1}</em>
+                                </li>
+                                <li>
+                                    <label>{role === ROLE.Buyer ? lang.unitValue : lang.unitCost}</label>
+                                    <em>{unitPrice}</em>
+                                </li>
+                            </ul>
+                            {
+                                stage === Stage.prepare && prepareTime > timer ?
+                                    <p className={style.marketWillOpen}>{lang.marketWillOpen1}
+                                        <em>{prepareTime - timer}</em> {(lang.marketWillOpen2 as Function)(prepareTime - timer)}
+                                    </p> :
+                                    <section className={style.newOrder}>
+                                        <div className={style.orderInputWrapper}>
+                                            <input {...{
+                                                autoFocus: true,
+                                                value: price || '',
+                                                onChange: ({target: {value: price}}) => setPrice(price)
+                                            }}/>
+                                        </div>
+                                        <div className={style.submitBtnWrapper}>
+                                            <Button {...{
+                                                label: lang.shout,
+                                                type: ButtonProps.Type.primary,
+                                                width: ButtonProps.Width.medium,
+                                                onClick: () => submitOrder()
+                                            }}/>
+                                        </div>
+                                    </section>
+                            }
+                        </section>
+                    </div>
+                    <div className={style.historyPanel}>
+                        <div className={style.tradeHistory}>
+                            <h3 className={style.title}>{lang.tradeHistory}</h3>
+                            <div className={style.tradeChartWrapper}>
+                                <TradeChart
+                                    tradeList={trades.map(({reqId}) => ({price: orderDict[reqId].price}))}/>
                             </div>
                         </div>
-                    </section>
+                    </div>
+                </section>
         }
-    </section>
-}
-
-const Result: React.FC<IStageProps> = ({game, frameEmitter}) => {
-    const lang = Lang.extractLang({
-        title1: ['在 ', 'Here are your transactions and profits in last '],
-        title2: [' 期的市场实验中，您每期的交易及盈利情况如下：', ' periods :'],
-        period: ['时期', 'Peroid'],
-        tradedCount: ['交易单位', 'Traded Count'],
-        profit: ['利润', 'Profit'],
-        footLabel1: ['在该部分的实验中，您的收益为：', 'In this part of the game, your income is: '],
-        footLabel2: [' 实验币，可换算为', ' game currency, can be converted to RMB'],
-        footLabel3: [' 人民币', ''],
-        total: ['合计', 'Total']
-    })
-    return <section className={style.phaseOver}>
-        <p>您已完成该部分的实验，请在实验说明的结果记录表上填写您该部分的实验收益。</p>
-        <p>点击下方按钮，跳转到输入快速加入码页面，并耐心等待实验员发放下一部分实验的快速加入码。</p>
-        <div className={style.btnWrapper}>
-            <Button {...{
-                label: '进入实验下一部分',
-                onClick: () => game.params.nextPhaseKey ?
-                    frameEmitter.emit(MoveType.sendBackPlayer) :
-                    location.href = '/bespoke/join'
-            }}/>
-        </div>
-    </section>
-}
-
-export const TradeChart: React.FC<{
-    tradeList: Array<{
-        price: number
-    }>
-}> = ({tradeList}) => {
-    const COLOR = {
-        line: '#999',
-        point: '#E27B6A'
-    }
-    const cellSize = 10, fontSize = 8, padding = 2 * fontSize,
-        minY = 100, maxY = 400,
-        maxX = tradeList.length > 30 ? tradeList.length : 30
-    const transX = x => padding + x * cellSize,
-        transY = y => maxY + padding - y
-    return <section>
-        <svg xmlns="http://www.w3.org/2000/svg"
-             viewBox={`0,0,${maxX * cellSize + 2 * padding},${maxY - minY + 2 * padding}`}>
-            {
-                Array(maxX + 1).fill('').map((_, i) =>
-                    <React.Fragment key={i}>
-                        <line {...{
-                            stroke: COLOR.line,
-                            strokeWidth: i % 5 === 0 ? .5 : .1,
-                            x1: transX(i),
-                            y1: transY(minY),
-                            x2: transX(i),
-                            y2: transY(maxY)
-                        }}/>
-                        {
-                            i && i % 5 === 0 ?
-                                <text {...{
-                                    fontSize,
-                                    fill: COLOR.line,
-                                    x: transX(i - .5 * fontSize / cellSize),
-                                    y: transY(minY - fontSize)
-                                }}>{i}</text> : null
-                        }
-                    </React.Fragment>
-                )
-            }
-            {
-                Array(~~((maxY - minY) / cellSize) + 1).fill('').map((_, i) =>
-                    <React.Fragment key={i}>
-                        <line {...{
-                            stroke: COLOR.line,
-                            strokeWidth: i % 5 === 0 ? .5 : .1,
-                            x1: transX(0),
-                            y1: transY(minY + i * cellSize),
-                            x2: transX(maxX),
-                            y2: transY(minY + i * cellSize)
-                        }}/>
-                        {
-                            i && i % 5 === 0 ?
-                                <text {...{
-                                    fontSize,
-                                    fill: COLOR.line,
-                                    x: transX(-2 * fontSize / cellSize),
-                                    y: transY(minY + (i - .5 * fontSize / cellSize) * cellSize)
-                                }}>{minY + i * cellSize}</text> : null
-                        }
-                    </React.Fragment>
-                )
-            }
-            {
-                tradeList.map(({price}, i) =>
-                    <React.Fragment key={i}>
-                        <circle {...{
-                            fill: COLOR.point,
-                            cx: transX(i + 1),
-                            cy: transY(price),
-                            r: 2
-                        }}/>
-                        {
-                            i ? <line {...{
-                                stroke: COLOR.point,
-                                strokeWidth: .5,
-                                x1: transX(i + 1),
-                                y1: transY(price),
-                                x2: transX(i),
-                                y2: transY(tradeList[i - 1].price)
-                            }}/> : null
-                        }
-                    </React.Fragment>
-                )
-            }
-        </svg>
     </section>
 }
 

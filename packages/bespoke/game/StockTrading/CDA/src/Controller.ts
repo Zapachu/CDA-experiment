@@ -12,9 +12,8 @@ import nodeXlsx from 'node-xlsx'
 import {
     DBKey,
     FetchType,
-    MarketStage,
+    Stage,
     MoveType,
-    PlayerStatus,
     PushType,
     RobotCalcLog,
     RobotSubmitLog,
@@ -53,7 +52,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         const gameState = super.initGameState()
         Object.assign(gameState, {
             orders: [],
-            marketStage: MarketStage.assignRole,
+            stage: Stage.matching,
             orderId: 0,
             buyOrderIds: [],
             sellOrderIds: [],
@@ -69,68 +68,47 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         return playerState
     }
 
-    protected async teacherMoveReducer(actor: IActor, type: string, params: IMoveParams, cb?: IMoveCallback): Promise<void> {
-        const gameState = await this.stateManager.getGameState(),
-            playerStates = await this.stateManager.getPlayerStates()
-        switch (type) {
-            case MoveType.assignPosition: {
-                Object.values(playerStates).forEach(async playerState => {
-                    const positionIndex = (playerState.actor.type === baseEnum.Actor.serverRobot ?
-                        this.positionStack.robot : this.positionStack.player).pop()
-                    if (positionIndex === undefined) {
-                        return Log.d('角色已分配完')
-                    }
-                    playerState.positionIndex = positionIndex
-                    playerState.unitList = this.game.params.unitLists[positionIndex]
-                    this.push(playerState.actor, PushType.assignedPosition)
-                })
-                gameState.positionAssigned = true
-                break
-            }
-            case MoveType.openMarket: {
-                gameState.marketStage = MarketStage.notOpen
-                await this.startPeriod()
-                break
-            }
-        }
-    }
-
-    async startPeriod() {
-        const gameState = await this.stateManager.getGameState()
-        gameState.marketStage = MarketStage.readDescription
-        let periodCountDown = 0
-        this.broadcast(PushType.periodCountDown, {periodCountDown})
-        const timer = global.setInterval(async () => {
-            if (gameState.status !== baseEnum.GameStatus.started) {
-                return
-            }
-            const {durationOfEachPeriod, time2ReadInfo} = this.game.params
-            if (periodCountDown === Number(time2ReadInfo)) {
-                gameState.marketStage = MarketStage.trading
-                this.broadcast(PushType.periodOpen)
-            }
-            if (periodCountDown === Number(durationOfEachPeriod) + Number(time2ReadInfo)) {
-                gameState.marketStage = MarketStage.result
-                await this.calcPeriodProfit()
-            }
-            if (periodCountDown === Number(durationOfEachPeriod) + 2 * Number(time2ReadInfo)) {
-                global.clearInterval(timer)
-                gameState.marketStage = MarketStage.leave
-            }
-            await this.stateManager.syncState()
-            this.broadcast(PushType.periodCountDown, {
-                periodCountDown: periodCountDown++
-            })
-        }, 1000)
-    }
-
     protected async playerMoveReducer(actor: IActor, type: string, params: IMoveParams, cb: IMoveCallback): Promise<void> {
         const gameState = await this.stateManager.getGameState(),
             playerState = await this.stateManager.getPlayerState(actor),
             {positionIndex} = playerState
         switch (type) {
             case MoveType.enterMarket: {
-                playerState.status = PlayerStatus.wait4MarketOpen
+                if (playerState.positionIndex) {
+                    break
+                }
+                const positionIndex = this.positionStack.player.shift()
+                if (positionIndex === undefined) {
+                    Log.d('角色已分配完')
+                    break
+                }
+                playerState.positionIndex = positionIndex
+                playerState.unitList = this.game.params.unitLists[positionIndex]
+                break
+            }
+            case MoveType.openMarket: {
+                let countDown = 0
+                gameState.stage = Stage.prepare
+                const timer = global.setInterval(async () => {
+                    if (gameState.status !== baseEnum.GameStatus.started) {
+                        return
+                    }
+                    const {tradeTime, prepareTime} = this.game.params
+                    if (countDown === +prepareTime) {
+                        gameState.stage = Stage.trading
+                        this.broadcast(PushType.beginTrading)
+                    }
+                    if (countDown === tradeTime + prepareTime) {
+                        gameState.stage = Stage.result
+                        await this.calcProfit()
+                    }
+                    if (countDown === tradeTime + 2 * prepareTime) {
+                        global.clearInterval(timer)
+                        gameState.stage = Stage.leave
+                    }
+                    await this.stateManager.syncState()
+                    this.broadcast(PushType.countDown, {countDown: countDown++})
+                }, 1000)
                 break
             }
             case MoveType.submitOrder: {
@@ -158,12 +136,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 await this.cancelOrder(positionIndex)
                 break
             }
-            case MoveType.sendBackPlayer: {
-                this.sendBackPlayer(actor.token, {
-                    point: playerState.point.toString()
-                }, this.game.params.nextPhaseKey)
-                break
-            }
         }
     }
 
@@ -175,7 +147,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         return orderDict
     }
 
-    async calcPeriodProfit() {
+    async calcProfit() {
         const {game} = this,
             gameState = await this.stateManager.getGameState(),
             playerStates = await this.stateManager.getPlayerStates(),

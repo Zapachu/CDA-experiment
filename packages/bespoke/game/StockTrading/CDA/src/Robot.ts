@@ -3,7 +3,7 @@ import * as dateFormat from 'dateformat'
 import {
     AdjustDirection,
     DBKey,
-    MarketStage,
+    Stage,
     MoveType,
     PushType,
     RedisKey,
@@ -29,10 +29,8 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
     zipFreeField: IZipFreeField
 
     async init(): Promise<BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>> {
-        this.frameEmitter.on(PushType.assignedPosition, () => {
-            setTimeout(() => this.frameEmitter.emit(MoveType.enterMarket), Math.random() * 3000)
-        })
-        this.frameEmitter.on(PushType.periodOpen, () => {
+        setTimeout(() => this.frameEmitter.emit(MoveType.enterMarket), Math.random() * SLEEP_TIME)
+        this.frameEmitter.on(PushType.beginTrading, () => {
             this.zipActive = false
             setTimeout(() => {
                 const u = (this.position === ROLE.Seller ? 1 : -1) * (.05 + .3 * Math.random()),
@@ -109,7 +107,7 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
     //endregion
 
     wakeUp(): void {
-        if (this.gameState.marketStage === MarketStage.trading && this.unitPrice) {
+        if (this.gameState.stage === Stage.trading && this.unitPrice) {
             redisClient.incr(RedisKey.robotActionSeq(this.game.id)).then(seq => this.submitOrder(seq))
             setTimeout(() => this.wakeUp(), this.sleepTime)
         }

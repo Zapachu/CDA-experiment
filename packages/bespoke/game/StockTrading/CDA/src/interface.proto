@@ -1,11 +1,10 @@
 syntax = "proto3";
 
 message CreateParams {
-    string nextPhaseKey = 1;
-    repeated int32 roles = 2;
-    int32 time2ReadInfo = 3;
-    int32 durationOfEachPeriod = 4;
-    repeated string unitLists = 5;
+    repeated int32 roles = 1;
+    int32 prepareTime = 2;
+    int32 tradeTime = 3;
+    repeated string unitLists = 4;
 }
 
 message GameState {
@@ -19,31 +18,28 @@ message GameState {
         int32 reqId = 1;
         int32 resId = 2;
     }
-    int32 marketStage = 1;
+    int32 stage = 1;
     int32 orderId = 2;
-    repeated int32 buyOrderIds = 3;
-    repeated int32 sellOrderIds = 4;
-    repeated Trade trades = 5;
-    repeated int32 positionUnitIndex = 6;
-    repeated Order orders = 7;
-    bool positionAssigned = 8;
+    repeated Order orders = 3;
+    repeated int32 buyOrderIds = 4;
+    repeated int32 sellOrderIds = 5;
+    repeated Trade trades = 6;
+    repeated int32 positionUnitIndex = 7;
 }
 
 message PlayerState {
-    string token = 1;
-    int32 status = 3;
-    int32 positionIndex = 4;
-    string unitList = 5;
-    float point = 9;
-    int32 tradedCount = 12;
+    int32 positionIndex = 1;
+    string unitList = 2;
+    int32 tradedCount = 3;
+    float point = 4;
 }
 
 message MoveParams {
-    float price = 1;
-    int32 unitIndex = 6;
+    int32 unitIndex = 1;
+    float price = 2;
 }
 message PushParams {
-    int32 newOrderId = 1;
-    int32 resOrderId = 2;
-    int32 periodCountDown = 3;
+    int32 countDown = 1;
+    int32 newOrderId = 2;
+    int32 resOrderId = 3;
 }
