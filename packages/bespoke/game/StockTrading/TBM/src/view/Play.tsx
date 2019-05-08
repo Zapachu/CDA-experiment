@@ -12,6 +12,11 @@ interface IPlayState {
     newRoundTimers: Array<number>
 }
 
+const InfoBar = ({text, styles = {}}: { text: string, styles?: object }) => <div style={styles}
+                                                                                 className={style.infoBar}>
+    {text}
+</div>
+
 export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, IPlayState> {
     state = {
         price: '',
@@ -89,6 +94,31 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         </div>
     }
 
+    dynamicTip = () => {
+        const {
+            props: {
+                gameState: {groups},
+                playerState: {role, groupIndex, positionIndex}
+            }
+        } = this
+        const {rounds, roundIndex} = groups[groupIndex],
+            {playerStatus} = rounds[roundIndex]
+        const playerState = playerStatus[positionIndex]
+        if (playerState === PlayerStatus.outside) {
+            return '准备'
+        }
+        if (playerState === PlayerStatus.prepared) {
+            if (role === 0) {
+                return '买入'
+            }
+            return '卖出'
+        }
+        if (playerState === PlayerStatus.shouted) {
+            return '等待其他玩家'
+        }
+        return '正在进行'
+    }
+
     render() {
         const {
             props: {
@@ -132,8 +162,19 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             </table>
 
             <div className={style.workBox}>
+                <div className={style.tipText}>
+                    <span className={style.tipLine}> </span>
+                    <span className={style.tipContent}> {` ${this.dynamicTip()} `}</span>
+                    <span className={style.tipLine}> </span>
+                </div>
+
+                <div className={style.shoutBtn}>
+                    {`${this.dynamicTip()}`}
+                </div>
             </div>
 
+            <InfoBar text={`个人信息： 账户余额${privatePrices[groups[groupIndex].roundIndex]}万元`}/>
+            <InfoBar styles={{marginTop: '1rem'}} text={`拥有股票: 10000股`}/>
 
             <div className={style.title}>集合竞价市场</div>
             {newRoundTimer ? <div>
