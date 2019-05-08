@@ -53,13 +53,16 @@ export namespace GameLogic {
     const robotSchedulers = new Map<string, AnyRobotScheduler>()
 
     export async function startNewRobotScheduler<ICreateParams, IGameState, IPlayerState>(gameId: string, key: string, pythonRobot: boolean): Promise<void> {
-        const game = await GameDAO.getGame<ICreateParams>(gameId)
         const actor: IActor = {
-            token: Token.geneToken(`${game.id}${key}`),
+            token: Token.geneToken(`${gameId}${key}`),
             type: baseEnum.Actor.serverRobot
         }
+        if (robotSchedulers.has(actor.token)) {
+            return
+        }
+        const game = await GameDAO.getGame<ICreateParams>(gameId)
         const robotProxy = await (pythonRobot ? new PythonSchedulerProxy(game, actor) : new NodeRobotsScheduler(game, actor, template.Robot)).init()
-        robotSchedulers.set(robotProxy.id, robotProxy)
+        robotSchedulers.set(actor.token, robotProxy)
     }
 }
 
@@ -129,7 +132,7 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
     protected async teacherMoveReducer(actor: IActor, type: string, params: IMoveParams, cb: IMoveCallback): Promise<void> {
     }
 
-    async startNewRobotScheduler(key, pythonRobot: boolean) {
+    async startNewRobotScheduler(key, pythonRobot: boolean = false) {
         await GameLogic.startNewRobotScheduler(this.game.id, key, pythonRobot)
     }
 
