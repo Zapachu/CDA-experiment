@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as style from './style.scss'
 import * as dateFormat from 'dateformat'
 import Header from '../../../components/Header'
-import {Core, MaskLoading, Input, Label, Button, ButtonProps, Toast} from 'bespoke-client-util'
+import {Core, MaskLoading, Input, Label, Toast} from 'bespoke-client-util'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import {FetchType, MoveType, PushType, NEW_ROUND_TIMER, PlayerStatus} from '../config'
 
@@ -78,18 +78,13 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         }
         if (playerState === PlayerStatus.outside) {
             return <div>
-                <li>
-                    <Button width={ButtonProps.Width.large} label='准备' onClick={this.prepare.bind(this)}/>
-                </li>
+
             </div>
         }
         return <div>
             <li>
                 <Label label='输入您的价格'/>
                 <Input type='number' value={price} onChange={this.setVal.bind(this)}/>
-            </li>
-            <li>
-                <Button width={ButtonProps.Width.large} label='出价' onClick={this.shout.bind(this)}/>
             </li>
         </div>
     }
@@ -119,12 +114,34 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         return '正在进行'
     }
 
+    dynamicBtn = () => {
+        const {
+            props: {
+                gameState: {groups},
+                playerState: {groupIndex, positionIndex}
+            }
+        } = this
+        const {rounds, roundIndex} = groups[groupIndex],
+            {playerStatus} = rounds[roundIndex]
+        const playerState = playerStatus[positionIndex]
+        if (playerState === PlayerStatus.prepared) {
+            return this.shout()
+        }
+        if (playerState === PlayerStatus.shouted) {
+            return
+        }
+        if (playerState === PlayerStatus.outside) {
+            return this.prepare()
+        }
+        return
+    }
+
     render() {
         const {
             props: {
-                game: {params: {groupSize}},
+                game: {params: {}},
                 gameState: {groups},
-                playerState: {role, groupIndex, privatePrices}
+                playerState: {groupIndex, privatePrices}
             }, state: {loading, newRoundTimers}
         } = this
         if (loading) {
@@ -133,7 +150,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         if (groupIndex === undefined) {
             return <MaskLoading label='正在匹配玩家...'/>
         }
-        const {rounds, roundIndex} = groups[groupIndex],
+        const {roundIndex} = groups[groupIndex],
             newRoundTimer = newRoundTimers[roundIndex]
         return <section className={style.play}>
 
@@ -168,7 +185,9 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                     <span className={style.tipLine}> </span>
                 </div>
 
-                <div className={style.shoutBtn}>
+                {this.dynamicAction()}
+
+                <div className={style.shoutBtn} onClick={this.dynamicBtn.bind(this)}>
                     {`${this.dynamicTip()}`}
                 </div>
             </div>
@@ -176,32 +195,10 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             <InfoBar text={`个人信息： 账户余额${privatePrices[groups[groupIndex].roundIndex]}万元`}/>
             <InfoBar styles={{marginTop: '1rem'}} text={`拥有股票: 10000股`}/>
 
-            <div className={style.title}>集合竞价市场</div>
             {newRoundTimer ? <div>
                 <div>本轮结束剩余时间</div>
                 <div className={style.highlight}>{NEW_ROUND_TIMER - newRoundTimer}</div>
             </div> : null}
-            <div className={style.line}>
-                <div>游戏总人数</div>
-                <div className={style.highlight}>{groupSize}</div>
-            </div>
-            <div className={style.line}>
-                <div>游戏总轮数</div>
-                <div className={style.highlight}>{rounds.length}</div>
-            </div>
-            <div className={style.line}>
-                <div>正在进行轮次</div>
-                <div className={style.highlight}>{roundIndex + 1} </div>
-            </div>
-            <div className={style.line}>
-                <div>您的角色</div>
-                <div className={style.highlight}>{['买家', '卖家'][role]}</div>
-            </div>
-            <div className={style.line}>
-                <div>物品对于您的心理价值</div>
-                <div className={style.highlight}>{privatePrices[groups[groupIndex].roundIndex]}</div>
-            </div>
-            {this.dynamicAction()}
         </section>
     }
 
