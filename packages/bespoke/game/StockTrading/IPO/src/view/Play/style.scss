@@ -4,18 +4,11 @@
   width: calc(99vw - 2rem);
   margin: 2rem auto 0;
 
-  .display {
-    border-collapse: separate;
-    width: 100%;
-    max-width: 300px;
-    border: 1px solid;
-    margin: 1rem 0;
-    td {
-      text-align: center;
-    }
-    .data {
-      color: red;
-    }
+  .item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
   }
 
   .introStage {
@@ -24,5 +17,14 @@
     align-items: center;
     justify-content: center;
     margin-top: 10vh;
+  }
+
+  .playingStage {
+    // background-image: url("../../../../components/bj.svg");
+    .inputContainer {
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: center;
+    }
   }
 }

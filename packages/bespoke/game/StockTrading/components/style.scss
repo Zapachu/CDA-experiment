@@ -14,32 +14,120 @@
   }
 }
 
+.listItem {
+  display: flex;
+  justify-content: center;
+  > span {
+    position: relative;
+    .label {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+    }
+  }
+}
+
+.button {
+  display: flex;
+  justify-content: center;
+  > span {
+    position: relative;
+    cursor: pointer;
+    .label {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 16px;
+      &.green {
+        color: #9ee759;
+      }
+      &.blue {
+        color: #fff;
+      }
+    }
+  }
+}
+
+.input {
+  display: flex;
+  justify-content: center;
+  > .inputComp {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    border: 2px solid;
+    border-image: radial-gradient(closest-side, #67e968, white) 12;
+    input {
+      width: 80px;
+      height: 100%;
+      border: none;
+      outline: none;
+      color: #fff;
+      background-color: #222b50;
+      font-size: 17px;
+      text-align: center;
+    }
+    span {
+      width: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      background-color: #383d60;
+      height: 100%;
+      color: #fff;
+    }
+  }
+}
+
+.stockInfo {
+  border-collapse: separate;
+  width: 100%;
+  border: 1px solid;
+  border-image: radial-gradient(closest-side, #67e968, white) 40;
+  tr:first-child {
+    border-bottom: 1px solid;
+    border-image: radial-gradient(closest-side, white, gray) 40;
+  }
+  td {
+    text-align: center;
+    padding: 10px;
+  }
+}
+
 .line {
   display: flex;
   align-items: center;
-  color: green;
   font-size: 20px;
-  >span {
+  > span {
     flex: auto;
     height: 1px;
     width: 100px;
   }
-  >p {
+  > p {
     flex: none;
     margin: 0 5px;
+    color: #67e968;
   }
   &.green {
-    >span {
+    > span {
       &:first-child {
-        background: linear-gradient(to left, green, white);
+        background: linear-gradient(to left, #67e968, white);
       }
       &:last-child {
-        background: linear-gradient(to right, green, white);
+        background: linear-gradient(to right, #67e968, white);
       }
     }
   }
   &.white {
-    >span {
+    > span {
       &:first-child {
         background: linear-gradient(to left, white, gray);
       }
