@@ -156,5 +156,7 @@ class Main extends eui.UILayer {
             panel.verticalCenter = 0
             this.addChild(panel)
         }, this)
+
+        this.addChild(new Introduction())
     }
 }
