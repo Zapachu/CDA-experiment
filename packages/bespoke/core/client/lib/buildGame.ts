@@ -74,7 +74,10 @@ export function geneClientBuilder(
             host: '0.0.0.0',
             port: config.devPort.client,
             proxy: {
-                '*': `http://127.0.0.1:${config.devPort.server}`
+                [`/${config.rootName}`]: {
+                    target: `http://127.0.0.1:${config.devPort.server}`,
+                    ws: true
+                }
             }
         },
         mode: buildMode === 'dev' ? 'development' : 'production',

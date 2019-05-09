@@ -9,11 +9,11 @@ interface Task {
 }
 
 namespace TaskHelper {
-    export const groupName = 'RecentTask'
+    export const projectName = 'RecentTask'
     const logPath = path.resolve(__dirname, './help.log')
 
     export function getGroups(): Array<string> {
-        return fs.existsSync(logPath) ? [groupName] : []
+        return fs.existsSync(logPath) ? [projectName] : []
     }
 
     export function getLogs(): Array<Task> {
@@ -27,7 +27,7 @@ namespace TaskHelper {
     function appendLog({command, env}: Task) {
         const logs = getLogs().map(log => JSON.stringify(log))
         const newLog = JSON.stringify({command, env})
-        if (logs.includes(newLog)) {
+        if (logs[0] === newLog) {
             return
         }
         logs.unshift(newLog)
@@ -59,20 +59,18 @@ enum ServerTask {
 }
 
 (async function () {
-    let namespace: string
-    let namespacePath: string
-    const {group} = (await prompt<{ group: string }>([
+    let projectPath: string
+    const {project} = (await prompt<{ project: string }>([
         {
-            name: 'group',
+            name: 'project',
             type: 'list',
             choices: [
                 ...TaskHelper.getGroups(),
                 ...fs.readdirSync(path.resolve(__dirname, '../')).filter(name => name[0] < 'a')
-            ],
-            message: 'Group/NameSpace:'
+            ]
         }
     ]))
-    if (group === TaskHelper.groupName) {
+    if (project === TaskHelper.projectName) {
         const {taskLog} = (await prompt<{ taskLog: string }>([
             {
                 name: 'taskLog',
@@ -84,20 +82,18 @@ enum ServerTask {
         TaskHelper.execTask(JSON.parse(taskLog))
         return
     }
-    const namespaces = fs.readdirSync(path.resolve(__dirname, `../${group}/`)).filter(name => name[0] < 'a')
-    if (!namespaces.length) {
-        namespace = group
-        namespacePath = namespace
+    const subProjects = fs.readdirSync(path.resolve(__dirname, `../${project}/`)).filter(name => name[0] < 'a')
+    if (!subProjects.length) {
+        projectPath = project
     } else {
-        namespace = (await prompt<{ namespace: string }>([
+        const {subProject} = (await prompt<{ subProject: string }>([
             {
-                name: 'namespace',
+                name: 'subProject',
                 type: 'list',
-                choices: namespaces,
-                message: 'NameSpace:'
+                choices: subProjects
             }
-        ])).namespace
-        namespacePath = `${group}/${namespace}`
+        ]))
+        projectPath = `${project}/${subProject}`
     }
     const {side} = (await prompt<{ side: Side }>([
         {
@@ -131,14 +127,14 @@ enum ServerTask {
                             BUILD_MODE: mode,
                             HMR: HMR.toString()
                         },
-                        command: `webpack-dev-server --hot --progress --env.TS_NODE_PROJECT="tsconfig.json" --config ./${namespacePath}/script/webpack.config.ts`
+                        command: `webpack-dev-server --hot --progress --env.TS_NODE_PROJECT="tsconfig.json" --config ./${projectPath}/script/webpack.config.ts`
                     })
                     break
                 }
             }
             TaskHelper.execTask({
                 env: {BUILD_MODE: mode},
-                command: `webpack --env.TS_NODE_PROJECT="tsconfig.json" --config ./${namespacePath}/script/webpack.config.ts`
+                command: `webpack --env.TS_NODE_PROJECT="tsconfig.json" --config ./${projectPath}/script/webpack.config.ts`
             })
             break
         }
@@ -154,11 +150,7 @@ enum ServerTask {
             switch (task) {
                 case ServerTask.dist: {
                     TaskHelper.execTask({
-                        env: {
-                            namespacePath,
-                            namespace
-                        },
-                        command: `tsc --outDir ./${namespacePath}/build --listEmittedFiles true ./${namespacePath}/src/serve.ts`
+                        command: `tsc --outDir ./${projectPath}/build --listEmittedFiles true ./${projectPath}/src/serve.ts`
                     })
                     break
                 }
@@ -171,10 +163,9 @@ enum ServerTask {
                     ])
                     TaskHelper.execTask({
                         env: {
-                            BESPOKE_NAMESPACE: namespace,
                             BESPOKE_HMR: HMR.toString()
                         },
-                        command: `ts-node ./${namespacePath}/src/serve.ts`
+                        command: `ts-node ./${projectPath}/src/serve.ts`
                     })
                     break
                 }
@@ -191,12 +182,11 @@ enum ServerTask {
                     ])
                     TaskHelper.execTask({
                         env: {
-                            BESPOKE_NAMESPACE: namespace,
                             BESPOKE_WITH_PROXY: withProxy,
                             BESPOKE_WITH_LINKER: withLinker,
                             NODE_ENV: 'production'
                         },
-                        command: `node ./${namespacePath}/build/serve.js`
+                        command: `node ./${projectPath}/build/serve.js`
                     })
                     break
                 }

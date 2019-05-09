@@ -41,10 +41,10 @@ var inquirer_1 = require("inquirer");
 var shelljs_1 = require("shelljs");
 var TaskHelper;
 (function (TaskHelper) {
-    TaskHelper.groupName = 'RecentTask';
+    TaskHelper.projectName = 'RecentTask';
     var logPath = path.resolve(__dirname, './help.log');
     function getGroups() {
-        return fs.existsSync(logPath) ? [TaskHelper.groupName] : [];
+        return fs.existsSync(logPath) ? [TaskHelper.projectName] : [];
     }
     TaskHelper.getGroups = getGroups;
     function getLogs() {
@@ -60,7 +60,7 @@ var TaskHelper;
         var command = _a.command, env = _a.env;
         var logs = getLogs().map(function (log) { return JSON.stringify(log); });
         var newLog = JSON.stringify({ command: command, env: env });
-        if (logs.includes(newLog)) {
+        if (logs[0] === newLog) {
             return;
         }
         logs.unshift(newLog);
@@ -92,20 +92,19 @@ var ServerTask;
 })(ServerTask || (ServerTask = {}));
 (function () {
     return __awaiter(this, void 0, void 0, function () {
-        var namespace, namespacePath, group, taskLog, namespaces, side, _a, mode, HMR, task, _b, HMR, _c, withProxy, withLinker;
+        var projectPath, project, taskLog, subProjects, subProject, side, _a, mode, HMR, task, _b, HMR, _c, withProxy, withLinker;
         return __generator(this, function (_d) {
             switch (_d.label) {
                 case 0: return [4 /*yield*/, inquirer_1.prompt([
                         {
-                            name: 'group',
+                            name: 'project',
                             type: 'list',
-                            choices: TaskHelper.getGroups().concat(fs.readdirSync(path.resolve(__dirname, '../')).filter(function (name) { return name[0] < 'a'; })),
-                            message: 'Group/NameSpace:'
+                            choices: TaskHelper.getGroups().concat(fs.readdirSync(path.resolve(__dirname, '../')).filter(function (name) { return name[0] < 'a'; }))
                         }
                     ])];
                 case 1:
-                    group = (_d.sent()).group;
-                    if (!(group === TaskHelper.groupName)) return [3 /*break*/, 3];
+                    project = (_d.sent()).project;
+                    if (!(project === TaskHelper.projectName)) return [3 /*break*/, 3];
                     return [4 /*yield*/, inquirer_1.prompt([
                             {
                                 name: 'taskLog',
@@ -119,22 +118,20 @@ var ServerTask;
                     TaskHelper.execTask(JSON.parse(taskLog));
                     return [2 /*return*/];
                 case 3:
-                    namespaces = fs.readdirSync(path.resolve(__dirname, "../" + group + "/")).filter(function (name) { return name[0] < 'a'; });
-                    if (!!namespaces.length) return [3 /*break*/, 4];
-                    namespace = group;
-                    namespacePath = namespace;
+                    subProjects = fs.readdirSync(path.resolve(__dirname, "../" + project + "/")).filter(function (name) { return name[0] < 'a'; });
+                    if (!!subProjects.length) return [3 /*break*/, 4];
+                    projectPath = project;
                     return [3 /*break*/, 6];
                 case 4: return [4 /*yield*/, inquirer_1.prompt([
                         {
-                            name: 'namespace',
+                            name: 'subProject',
                             type: 'list',
-                            choices: namespaces,
-                            message: 'NameSpace:'
+                            choices: subProjects
                         }
                     ])];
                 case 5:
-                    namespace = (_d.sent()).namespace;
-                    namespacePath = group + "/" + namespace;
+                    subProject = (_d.sent()).subProject;
+                    projectPath = project + "/" + subProject;
                     _d.label = 6;
                 case 6: return [4 /*yield*/, inquirer_1.prompt([
                         {
@@ -179,7 +176,7 @@ var ServerTask;
                                 BUILD_MODE: mode,
                                 HMR: HMR.toString()
                             },
-                            command: "webpack-dev-server --hot --progress --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + namespacePath + "/script/webpack.config.ts"
+                            command: "webpack-dev-server --hot --progress --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + projectPath + "/script/webpack.config.ts"
                         });
                         return [3 /*break*/, 19];
                     }
@@ -187,7 +184,7 @@ var ServerTask;
                 case 11:
                     TaskHelper.execTask({
                         env: { BUILD_MODE: mode },
-                        command: "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + namespacePath + "/script/webpack.config.ts"
+                        command: "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + projectPath + "/script/webpack.config.ts"
                     });
                     return [3 /*break*/, 19];
                 case 12: return [4 /*yield*/, inquirer_1.prompt([
@@ -210,11 +207,7 @@ var ServerTask;
                 case 14:
                     {
                         TaskHelper.execTask({
-                            env: {
-                                namespacePath: namespacePath,
-                                namespace: namespace
-                            },
-                            command: "tsc --outDir ./" + namespacePath + "/build --listEmittedFiles true ./" + namespacePath + "/src/serve.ts"
+                            command: "tsc --outDir ./" + projectPath + "/build --listEmittedFiles true ./" + projectPath + "/src/serve.ts"
                         });
                         return [3 /*break*/, 19];
                     }
@@ -229,10 +222,9 @@ var ServerTask;
                     HMR = (_d.sent()).HMR;
                     TaskHelper.execTask({
                         env: {
-                            BESPOKE_NAMESPACE: namespace,
                             BESPOKE_HMR: HMR.toString()
                         },
-                        command: "ts-node ./" + namespacePath + "/src/serve.ts"
+                        command: "ts-node ./" + projectPath + "/src/serve.ts"
                     });
                     return [3 /*break*/, 19];
                 case 17: return [4 /*yield*/, inquirer_1.prompt([
@@ -249,12 +241,11 @@ var ServerTask;
                     _c = _d.sent(), withProxy = _c.withProxy, withLinker = _c.withLinker;
                     TaskHelper.execTask({
                         env: {
-                            BESPOKE_NAMESPACE: namespace,
                             BESPOKE_WITH_PROXY: withProxy,
                             BESPOKE_WITH_LINKER: withLinker,
                             NODE_ENV: 'production'
                         },
-                        command: "node ./" + namespacePath + "/build/serve.js"
+                        command: "node ./" + projectPath + "/build/serve.js"
                     });
                     return [3 /*break*/, 19];
                 case 19: return [2 /*return*/];

@@ -4,7 +4,7 @@ import {Lang} from 'bespoke-client-util'
 import {BrowserRouter, Switch, Route, RouteComponentProps} from 'react-router-dom'
 import {config} from 'bespoke-common'
 import {rootContext, TRootCtx} from './context'
-import {IGameTemplate, TRegisterGame} from 'bespoke-client-util'
+import {IGameTemplate, TRegisterGame, MaskLoading} from 'bespoke-client-util'
 import {Login} from './Login'
 import {Dashboard} from './Dashboard'
 import {Create} from './Create'
@@ -42,7 +42,7 @@ export const registerGame: TRegisterGame = (namespace: string, gameTemplate: IGa
         namespace,
         Create: Empty,
         Info: Empty,
-        Play4Owner: Empty,
+        Play4Owner: ()=><MaskLoading label={Lang.extractLang({label:['实验进行中','Playing...']}).label}/>,
         Result: Empty,
         Result4Owner: Empty,
         ...gameTemplate

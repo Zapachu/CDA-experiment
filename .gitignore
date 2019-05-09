@@ -63,11 +63,13 @@ typings/
 # IDEA
 .idea
 .vscode
+.wing
 
 # temp
 build
 dist
 log
+bin-debug
 
 # setting
 setting.ts

@@ -27,8 +27,12 @@ export class Info extends React.Component<TRootContext & RouteComponentProps<{ g
     }
 
     async componentDidMount() {
-        const {props: {match: {params: {gameId}}}} = this
+        const {props: {history, user, match: {params: {gameId}}}} = this
         const {game} = await Api.getBaseGame(gameId)
+        if (game.owner === user.id) {
+            history.push(`/play/${game.id}`)
+            return
+        }
         this.setState({
             loading: false,
             game

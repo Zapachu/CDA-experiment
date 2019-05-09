@@ -6,6 +6,7 @@ import * as connectRedis from 'connect-redis'
 import {csrf} from 'lusca'
 import * as Express from 'express'
 import * as expressSession from 'express-session'
+import * as socketIOSession from 'express-socket.io-session'
 import * as passport from 'passport'
 import * as errorHandler from 'errorhandler'
 import * as bodyParser from 'body-parser'
@@ -24,6 +25,8 @@ import {Strategy} from 'passport-local'
 import * as http from 'http'
 
 export class Server {
+    private static sessionMiddleware
+
     private static initMongo() {
         connectMongo(elfSetting.mongoUri, {
             ...elfSetting.mongoUser ? {user: elfSetting.mongoUser, pass: elfSetting.mongoPass} : {},
@@ -32,22 +35,32 @@ export class Server {
         }, err => err ? Log.e(err) : null)
     }
 
-    private static initExpress(): Express.Express {
-        const express = Express()
-        express.use(compression())
-        express.use(morgan('dev'))
-        express.use(bodyParser.json())
-        express.use(bodyParser.urlencoded({extended: true, limit: '30mb', parameterLimit: 30000}))
+    private static initSessionMiddleware() {
         const RedisStore = connectRedis(expressSession)
-        express.use(expressSession({
+        this.sessionMiddleware = expressSession({
             name: 'academy.sid',
             resave: true,
             saveUninitialized: true,
             secret: elfSetting.sessionSecret,
             store: new RedisStore({
+                ttl: 60 * 60 * 24 * 7,
                 client: redisClient as any
-            })
-        }))
+            }),
+            cookie: {
+                path: '/',
+                domain: elfSetting.inProductEnv ? 'ancademy.org' : '',
+                maxAge: 1000 * 60 * 60 * 24 * 7
+            }
+        })
+    }
+
+    private static initExpress(bespokeRouter: Express.Router): Express.Express {
+        const express = Express()
+        express.use(compression())
+        express.use(morgan('dev'))
+        express.use(bodyParser.json())
+        express.use(bodyParser.urlencoded({extended: true, limit: '30mb', parameterLimit: 30000}))
+        express.use(this.sessionMiddleware)
         express.use((req, res, next) => csrf({cookie: config.cookieKey.csrf})(req, res, next))
         express.use(passport.initialize())
         express.use(passport.session())
@@ -56,9 +69,10 @@ export class Server {
             next()
         })
         express.use(errorHandler())
-        express.use(`/${config.rootName}/${elfSetting.bespokeNamespace}/static`, Express.static(Setting.staticPath, {maxAge: '10d'}))
+        express.use(`/${config.rootName}/${Setting.namespace}/static`, Express.static(Setting.staticPath, {maxAge: '10d'}))
         express.use(`/${config.rootName}/static`, Express.static(path.join(__dirname, '../../dist/'), {maxAge: '10d'}))
-        express.use(`/${config.rootName}/${elfSetting.bespokeNamespace}`, namespaceRouter)
+        express.use(`/${config.rootName}/${Setting.namespace}`, bespokeRouter)
+        express.use(`/${config.rootName}/${Setting.namespace}`, namespaceRouter)
         express.use(`/${config.rootName}`, rootRouter)
         return express
     }
@@ -113,17 +127,18 @@ export class Server {
             })
     }
 
-    static start(gameSetting: IGameSetting, logicTemplate: ILogicTemplate): Express.Express {
+    static start(gameSetting: IGameSetting, logicTemplate: ILogicTemplate, bespokeRouter: Express.Router = Express.Router()) {
         Setting.init(gameSetting)
+        this.initSessionMiddleware()
         this.initMongo()
         this.initPassPort()
         QCloudSMS.init()
         GameLogic.init(logicTemplate)
-        const express = this.initExpress(),
+        const express = this.initExpress(bespokeRouter),
             server = express.listen(Setting.port)
-        EventDispatcher.startGameSocket(server)
+        EventDispatcher.startGameSocket(server).use(socketIOSession(this.sessionMiddleware))
         this.bindServerListener(server, () => {
-            Log.i(`CreateGame：http://localhost:${elfSetting.bespokeHmr ? config.devPort.client : Setting.port}/${config.rootName}/${elfSetting.bespokeNamespace}/create`)
+            Log.i(`CreateGame：http://localhost:${elfSetting.bespokeHmr ? config.devPort.client : Setting.port}/${config.rootName}/${Setting.namespace}/create`)
             if (!elfSetting.bespokeWithProxy) {
                 return
             }
@@ -132,7 +147,7 @@ export class Server {
             }
             const heartBeat2Proxy = () => {
                 getProxyService().registerGame({
-                        namespace: elfSetting.bespokeNamespace,
+                        namespace: Setting.namespace,
                         port: Setting.port.toString(),
                         rpcPort: Setting.rpcPort.toString()
                     },
@@ -141,6 +156,5 @@ export class Server {
             }
             setTimeout(() => heartBeat2Proxy(), .5 * config.gameRegisterInterval)
         })
-        return express
     }
 }

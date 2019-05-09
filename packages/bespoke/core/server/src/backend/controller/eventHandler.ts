@@ -1,10 +1,11 @@
-import {baseEnum, IEventHandler, IConnection, IMoveCallback} from 'bespoke-common'
+import {baseEnum, IEventHandler, IConnection, TOnlineCallback, IMoveCallback} from 'bespoke-common'
 import {GameLogic} from '../service/GameLogic'
 
 export const EventHandler = {
-    [baseEnum.SocketEvent.online]: async (connection: IConnection) => {
+    [baseEnum.SocketEvent.online]: async (connection: IConnection, onlineCallback: TOnlineCallback = () => null) => {
         const {game, actor} = connection,
             controller = await GameLogic.getGameController(game.id)
+        onlineCallback(actor)
         connection.join(game.id)
         controller.connections.set(actor.token, connection)
         if (actor.type === baseEnum.Actor.owner) {

@@ -36,7 +36,7 @@ class Server {
         }, err => err ? Log.e(err) : null)
     }
 
-    private static initSessionMiddleware(): any {
+    private static initSessionMiddleware() {
         const RedisStore = connectRedis(expressSession)
         this.sessionMiddleware = expressSession({
             name: 'academy.sid',

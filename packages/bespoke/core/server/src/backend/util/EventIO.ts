@@ -1,9 +1,10 @@
-import {baseEnum, config, IConnection, IConnectionNamespace, IGameWithId, IActor} from 'bespoke-common'
+import {baseEnum, config, IActor, IConnection, IConnectionNamespace, IGameWithId} from 'bespoke-common'
 import {Server} from 'http'
 import {EventEmitter} from 'events'
 import * as socketIO from 'socket.io'
-import {elfSetting} from 'elf-setting'
 import GameDAO from '../service/GameDAO'
+import {Token, Setting} from './util'
+import {Actor} from 'bespoke-common/build/baseEnum'
 
 export class EventIO {
     private static socketIOServer: socketIO.Server
@@ -19,13 +20,19 @@ export class EventIO {
         robotNsp && robotNsp.emit(event, ...args)
     }
 
-    static initSocketIOServer(server: Server, subscribeOnConnection: (clientConn: IConnection) => void) {
-        this.socketIOServer = socketIO(server, {path: config.socketPath(elfSetting.bespokeNamespace)})
+    static initSocketIOServer(server: Server, subscribeOnConnection: (clientConn: IConnection) => void): socketIO.Server {
+        this.socketIOServer = socketIO(server, {path: config.socketPath(Setting.namespace)})
         this.socketIOServer.on(baseEnum.SocketEvent.connection, async (connection: socketIO.Socket) => {
-            const {token, type, gameId} = connection.handshake.query
+            const {query: {token, gameId}, session: {passport: {user} = {user: undefined}}} = connection.handshake
             const game = await GameDAO.getGame(gameId)
-            subscribeOnConnection(Object.assign(connection, {actor: {token, type}, game}) as any)
+            const actor: IActor = Token.checkToken(token) ?
+                game.owner === user ? {type: Actor.clientRobot, token} : {type: Actor.player, token} :
+                game.owner === user ?
+                    {type: Actor.owner, token: Token.geneToken(user)} :
+                    {type: Actor.player, token: Token.geneToken(user)}
+            subscribeOnConnection(Object.assign(connection, {actor, game}) as any)
         })
+        return this.socketIOServer
     }
 
     static initRobotIOServer(subscribeOnConnection: (clientConn: IConnection) => void) {
