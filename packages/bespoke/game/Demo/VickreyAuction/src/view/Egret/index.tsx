@@ -18,7 +18,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         frameEmitter.emit(MoveType.getPosition, null, (positionIndex, privatePrices) => {
             gameData.init(game, frameEmitter, playerState.actor.token, positionIndex, privatePrices)
             loadThirdPartyLib(baseEnum.ThirdPartyLib.egret, () => {
-                this.startMain(egret)
+                this.startMain(window['egret'])
             })
         })
     }
