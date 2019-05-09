@@ -16,11 +16,14 @@ export class Token {
     }
 
     static checkToken(token: string): boolean {
-        if (elfSetting.bespokeWithLinker) {
+        const [checkCode, ...chars] = token
+        if(chars.length === 32 && checkCode === this.geneCheckCode(chars)){
             return true
         }
-        const [checkCode, ...chars] = token
-        return chars.length === 32 && checkCode === this.geneCheckCode(chars)
+        if (elfSetting.bespokeWithLinker) {
+            return token.length === 32
+        }
+        return false
     }
 }
 
