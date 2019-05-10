@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<e:Skin class="IntroductionSkin" width="1920" height="1080" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" xmlns:ns1="*" >
+	<w:Config id="16a9b87d146" ></w:Config>
+	<e:Image source="background_svg" x="0" y="0"/>
+	<e:Group y="628" horizontalCenter="0">
+		<e:Button id="btnStart" label="开始匹配" x="249.5" y="131.39" skinName="skins.ButtonSkin"/>
+		<ns1:ButtonGameMode id="btnSingle" x="0" y="0" enabled="true"/>
+		<ns1:ButtonGameMode id="btnMultiple" x="413.64" y="0"/>
+	</e:Group>
+</e:Skin>
