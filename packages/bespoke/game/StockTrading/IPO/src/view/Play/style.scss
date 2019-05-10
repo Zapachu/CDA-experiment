@@ -1,8 +1,8 @@
 @import "~bespoke-client-util/lib/resource/public";
 
 .play {
-  width: calc(99vw - 2rem);
-  margin: 2rem auto 0;
+  min-height: 100vh;
+  background: radial-gradient(#293567, #151b35);
 
   .item {
     display: flex;
@@ -20,11 +20,21 @@
   }
 
   .playingStage {
-    // background-image: url("../../../../components/bj.svg");
+    p,
+    td {
+      color: #dde1e9;
+    }
+    padding: 20px;
     .inputContainer {
       margin-bottom: 10px;
       display: flex;
       justify-content: center;
+    }
+    .modalIpo {
+      padding: 30px;
+      >p {
+        text-align: center;
+      }
     }
   }
 }

@@ -2,6 +2,7 @@ import * as React from "react";
 import * as style from "./style.scss";
 const GREEN_BIG_BTN = require("./green_big_btn.svg");
 const BLUE_BIG_BTN = require("./blue_big_btn.svg");
+const BLUE_SMALL_BTN = require("./blue_small_btn.svg");
 
 const Button: ButtonType = ({
   label,
@@ -15,6 +16,7 @@ const Button: ButtonType = ({
   if (size === Size.Small) {
     width = 100;
     if (color === Color.Blue) {
+      src = BLUE_SMALL_BTN;
     } else {
     }
   } else {
