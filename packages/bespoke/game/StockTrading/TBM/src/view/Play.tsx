@@ -275,8 +275,14 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 visible={showRule}
                 children={
                     <div className={style.modalContent}>
-                        <h3>交易规则回复</h3>
+                        <p>交易规则回复</p>
                         <p>...</p>
+                        <Button
+                            style={{ marginTop: "30px" }}
+                            label={"关闭"}
+                            color={Button.Color.Blue}
+                            onClick={this.showRule}
+                        />
                     </div>
                 }
             />
@@ -284,8 +290,14 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 visible={showTBMRule}
                 children={
                     <div className={style.modalContent}>
-                        <h3>集合竞价知识扩展</h3>
+                        <p>集合竞价知识扩展</p>
                         <p>...</p>
+                        <Button
+                            style={{ marginTop: "30px" }}
+                            label={"关闭"}
+                            color={Button.Color.Blue}
+                            onClick={this.showTBMRule}
+                        />
                     </div>
                 }
             />
