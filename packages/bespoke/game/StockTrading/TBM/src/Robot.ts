@@ -8,22 +8,18 @@ import {BaseRobot} from 'bespoke-server'
 import {MoveType, PushType} from './config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
 
-const sleep = (ms) => {
-    return new Promise(resolve => setTimeout(resolve, ms))
-}
-
 export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     async init() {
         // online and getPosition
 
-        await this.frameEmitter.emit(MoveType.getPosition)
+        setTimeout.bind(this, this.frameEmitter.emit(MoveType.getPosition), 1000)
 
         // for core's interception
-        await sleep(600)
-        await this.frameEmitter.emit(MoveType.prepare)
+        setTimeout.bind(this, this.frameEmitter.emit(MoveType.prepare), 2000)
 
         // shout stage
         this.frameEmitter.on(PushType.startBid, ({roundIndex}) => {
+            console.log('startBid', roundIndex)
             const privatePrice = this.playerState.privatePrices[roundIndex]
             const role = this.playerState.role
             const price = this.genPrice(role, privatePrice)

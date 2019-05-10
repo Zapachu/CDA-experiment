@@ -2,7 +2,13 @@ import * as React from 'react'
 import * as style from './style.scss'
 import * as dateFormat from 'dateformat'
 import Header from '../../../components/Header'
-import {Core, MaskLoading, Input, Label, Toast} from 'bespoke-client-util'
+import Line from '../../../components/Line'
+import Input from '../../../components/Input'
+import Button from '../../../components/Button'
+import StockInfo from '../../../components/StockInfo'
+import ListItem from '../../../components/ListItem'
+import Loading from '../../../components/Loading'
+import {Core, Toast} from 'bespoke-client-util'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import {FetchType, MoveType, PushType, NEW_ROUND_TIMER, PlayerStatus} from '../config'
 
@@ -12,10 +18,11 @@ interface IPlayState {
     newRoundTimers: Array<number>
 }
 
-const InfoBar = ({text, styles = {}}: { text: string, styles?: object }) => <div style={styles}
-                                                                                 className={style.infoBar}>
-    {text}
-</div>
+const InfoBar = ({text, styles = {}}: { text: string, styles?: object }) =>
+    <div style={styles}
+         className={style.infoBar}>
+        {text}
+    </div>
 
 export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, IPlayState> {
     state = {
@@ -38,6 +45,10 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     }
 
     setVal = (e) => this.setState({price: e.target.value})
+
+    onPlus = (value) => this.setState({price: (++value).toString()})
+
+    onMinus = (value) => this.setState({price: (--value).toString()})
 
     shout = () => {
         const {
@@ -71,10 +82,10 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             {playerStatus} = rounds[roundIndex]
         const playerState = playerStatus[positionIndex]
         if (playerState === PlayerStatus.shouted) {
-            return <MaskLoading label='您已出价，请等待其他玩家...'/>
+            return <Loading label='您已出价，请等待其他玩家...'/>
         }
         if (playerState === PlayerStatus.gameOver) {
-            return <MaskLoading label='所有轮次结束，等待老师结束实验...'/>
+            return <Loading label='所有轮次结束，等待老师结束实验...'/>
         }
         if (playerState === PlayerStatus.outside) {
             return <div>
@@ -83,8 +94,15 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         }
         return <div>
             <li>
-                <Label label='输入您的价格'/>
-                <Input type='number' value={price} onChange={this.setVal.bind(this)}/>
+                <Input
+                    value={price}
+                    onChange={this.setVal}
+                    onMinus={this.onMinus}
+                    onPlus={this.onPlus}
+                    placeholder={`报价`}
+                />
+                {/*<Label label='输入您的价格'/>*/}
+                {/*<Input type='number' value={price} onChange={this.setVal.bind(this)}/>*/}
             </li>
         </div>
     }
@@ -145,10 +163,10 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             }, state: {loading, newRoundTimers}
         } = this
         if (loading) {
-            return <MaskLoading label='加载中...'/>
+            return <Loading label='加载中...'/>
         }
         if (groupIndex === undefined) {
-            return <MaskLoading label='正在匹配玩家...'/>
+            return <Loading label='正在匹配玩家...'/>
         }
         const {roundIndex} = groups[groupIndex],
             newRoundTimer = newRoundTimers[roundIndex]
@@ -156,6 +174,13 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
 
             <Header stage='tbm'/>
 
+            {/*<StockInfo*/}
+            {/*    code={`600050`}*/}
+            {/*    name={`中国联通`}*/}
+            {/*    contractor={`中国国际金融有限公司`}*/}
+            {/*    startDate={dateFormat(Date.now(), 'yyyy/mm/dd')}*/}
+            {/*    endDate={dateFormat(Date.now(), 'yyyy/mm/dd')}*/}
+            {/*/>*/}
 
             <table className={style.infoTable}>
                 <thead>
@@ -191,6 +216,13 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                     {`${this.dynamicTip()}`}
                 </div>
             </div>
+
+
+            {/*<Line text={`个人信息： 账户余额${privatePrices[groups[groupIndex].roundIndex]}万元`}/>*/}
+            {/*<Line text={`拥有股票: 10000股`}/>*/}
+
+            {/*<ListItem children={`个人信息： 账户余额${privatePrices[groups[groupIndex].roundIndex]}万元`}/>*/}
+            {/*<ListItem children={`拥有股票: 10000股`}/>*/}
 
             <InfoBar text={`个人信息： 账户余额${privatePrices[groups[groupIndex].roundIndex]}万元`}/>
             <InfoBar styles={{marginTop: '1rem'}} text={`拥有股票: 10000股`}/>

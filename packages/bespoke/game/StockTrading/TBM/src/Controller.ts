@@ -81,6 +81,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 playerState.positionIndex = gameState.groups[groupIndex].playerNum++
                 playerState.role = positions[playerState.positionIndex].role
                 playerState.privatePrices = positions[playerState.positionIndex].privatePrice
+                this.push(actor, PushType.startBid)
                 break
             case MoveType.prepare: {
                 const {groupIndex, positionIndex} = playerState
