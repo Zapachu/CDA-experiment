@@ -15,12 +15,14 @@ import {
   IPlayerState,
   IPushParams
 } from "../../interface";
-import StockInfo from "../../../../components/StockInfo";
-import Input from "../../../../components/Input";
-import Button from "../../../../components/Button";
-import ListItem from "../../../../components/ListItem";
-import Line from "../../../../components/Line";
-import Modal from "../../../../components/Modal";
+import {
+  StockInfo,
+  Input,
+  Button,
+  ListItem,
+  Line,
+  Modal
+} from "../../../../components";
 
 enum ModalType {
   None,

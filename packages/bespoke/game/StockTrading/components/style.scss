@@ -14,6 +14,37 @@
   }
 }
 
+.matchModal {
+  padding: 30px;
+  > p {
+    text-align: center;
+  }
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin-bottom: 20px;
+    >li {
+      flex: 16%;
+      margin-bottom: 5px;
+    }
+    img {
+      width: 45px;
+    }
+  }
+  .timer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    img {
+      margin-right: 10px;
+    }
+    p {
+      color: #67e968;
+    }
+  }
+}
+
 .modal {
   position: fixed;
   top: 0;
@@ -35,6 +66,8 @@
     opacity: 0.8;
   }
   .window {
+    max-height: 80vh;
+    overflow: auto;
     position: relative;
     z-index: 1000;
     border: 1px solid;
