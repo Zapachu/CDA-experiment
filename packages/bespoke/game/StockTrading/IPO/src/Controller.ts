@@ -406,7 +406,7 @@ export default class Controller extends BaseController<
     marketState.strikePrice =
       strikePrice === undefined ? marketState.min : strikePrice;
     buyers
-      .filter(s => s.positionIndex !== undefined)
+      .filter(s => s.privateValue !== undefined)
       .forEach(s => {
         s.profit = formatDigits(
           (s.privateValue - marketState.strikePrice) * s.actualNum

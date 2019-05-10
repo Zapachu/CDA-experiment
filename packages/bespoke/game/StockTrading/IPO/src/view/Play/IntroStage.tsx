@@ -16,6 +16,7 @@ import {
   STOCKS
 } from "../../config";
 import Line from '../../../../components/Line'
+import PlayMode from '../../../../components/PlayMode'
 
 interface IPlayState {}
 
@@ -44,21 +45,14 @@ export default class IntroStage extends Core.Play<
     return (
       <section className={style.introStage}>
         <Line text={'交易规则介绍'} style={{marginBottom:'20px'}} />
-        <Button
-          width={ButtonProps.Width.small}
-          label={"多人玩法"}
-          onClick={() => {
-            frameEmitter.emit(MoveType.startMultiPlayer);
-          }}
-        />
-        <Button
-          width={ButtonProps.Width.small}
-          label={"单人玩法"}
-          onClick={() => {
+        <PlayMode onPlay={mode => {
+          if(mode === PlayMode.Single) {
             frameEmitter.emit(MoveType.startSinglePlayer);
-          }}
-        />
-        <Line color={Line.Color.White} style={{marginTop:'20px'}} />
+          }
+          if(mode === PlayMode.Multi) {
+            frameEmitter.emit(MoveType.startMultiPlayer);
+          }
+        }} />
       </section>
     );
   }
