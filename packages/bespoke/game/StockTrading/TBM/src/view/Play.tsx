@@ -85,7 +85,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             return <Loading label='您已出价，请等待其他玩家...'/>
         }
         if (playerState === PlayerStatus.gameOver) {
-            return <Loading label='所有轮次结束，等待老师结束实验...'/>
+            return <Loading label='所有轮次结束，等待结束...'/>
         }
         if (playerState === PlayerStatus.outside) {
             return <div>
@@ -154,6 +154,27 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         return
     }
 
+    dynamicBtnView = () => {
+        const {
+            props: {
+                gameState: {groups},
+                playerState: {groupIndex, positionIndex}
+            }
+        } = this
+        const {rounds, roundIndex} = groups[groupIndex],
+            {playerStatus} = rounds[roundIndex]
+        const playerState = playerStatus[positionIndex]
+        switch (playerState) {
+            case PlayerStatus.outside:
+            case PlayerStatus.prepared:
+                return <div className={style.shoutBtn} onClick={this.dynamicBtn.bind(this)}>
+                    {`${this.dynamicTip()}`}
+                </div>
+            default:
+                return null
+        }
+    }
+
     render() {
         const {
             props: {
@@ -211,10 +232,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 </div>
 
                 {this.dynamicAction()}
-
-                <div className={style.shoutBtn} onClick={this.dynamicBtn.bind(this)}>
-                    {`${this.dynamicTip()}`}
-                </div>
+                {this.dynamicBtnView()}
             </div>
 
 

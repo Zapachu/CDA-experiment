@@ -12,10 +12,8 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
     async init() {
         // online and getPosition
 
-        setTimeout.bind(this, this.frameEmitter.emit(MoveType.getPosition), 1000)
-
-        // for core's interception
-        setTimeout.bind(this, this.frameEmitter.emit(MoveType.prepare), 2000)
+        setTimeout(() => this.frameEmitter.emit(MoveType.getPosition), 2000)
+        setTimeout(() => this.frameEmitter.emit(MoveType.prepare), 4000)
 
         // shout stage
         this.frameEmitter.on(PushType.startBid, ({roundIndex}) => {
