@@ -44,7 +44,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         this.setState({loading: false})
     }
 
-    setVal = (e) => this.setState({price: e.target.value})
+    setVal = (value) => this.setState({price: value})
 
     onPlus = (value) => this.setState({price: (++value).toString()})
 
@@ -101,8 +101,6 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                     onPlus={this.onPlus}
                     placeholder={`报价`}
                 />
-                {/*<Label label='输入您的价格'/>*/}
-                {/*<Input type='number' value={price} onChange={this.setVal.bind(this)}/>*/}
             </li>
         </div>
     }
@@ -167,9 +165,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         switch (playerState) {
             case PlayerStatus.outside:
             case PlayerStatus.prepared:
-                return <div className={style.shoutBtn} onClick={this.dynamicBtn.bind(this)}>
-                    {`${this.dynamicTip()}`}
-                </div>
+                return <Button label={this.dynamicTip()} onClick={this.dynamicBtn} style={{marginTop: 36}}/>
             default:
                 return null
         }
@@ -226,9 +222,10 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
 
             <div className={style.workBox}>
                 <div className={style.tipText}>
-                    <span className={style.tipLine}> </span>
-                    <span className={style.tipContent}> {` ${this.dynamicTip()} `}</span>
-                    <span className={style.tipLine}> </span>
+                    <Line text={` ${this.dynamicTip()} `}/>
+                    {/*<span className={style.tipLine}> </span>*/}
+                    {/*<span className={style.tipContent}> {` ${this.dynamicTip()} `}</span>*/}
+                    {/*<span className={style.tipLine}> </span>*/}
                 </div>
 
                 {this.dynamicAction()}
