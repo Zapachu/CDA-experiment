@@ -100,7 +100,7 @@ export default class PlayingStage extends Core.Play<
     ];
     return (
       <>
-        <div style={{ position: "fixed", top: "20vh", right: "15vw" }}>
+        <div style={{ position: "fixed", top: "30vh", right: "15vw" }}>
           <Button
             label={"ipo知识扩展"}
             size={Button.Size.Small}
@@ -113,7 +113,7 @@ export default class PlayingStage extends Core.Play<
           style={{
             margin: "auto",
             width: "400px",
-            marginTop: "30px",
+            marginTop: "15vh",
             marginBottom: "20px"
           }}
         />
@@ -179,7 +179,7 @@ export default class PlayingStage extends Core.Play<
     const { price, num } = this.state;
     return (
       <>
-        <div style={{ position: "fixed", top: "25vh", right: "15vw" }}>
+        <div style={{ position: "fixed", top: "35vh", right: "15vw" }}>
           <Button
             label={"交易规则回顾"}
             size={Button.Size.Small}
@@ -187,7 +187,7 @@ export default class PlayingStage extends Core.Play<
             onClick={() => this.setState({ modalType: ModalType.Trade })}
           />
         </div>
-        <div style={{ position: "fixed", top: "32vh", right: "15vw" }}>
+        <div style={{ position: "fixed", top: "42vh", right: "15vw" }}>
           <Button
             label={"ipo知识扩展"}
             size={Button.Size.Small}
@@ -197,7 +197,7 @@ export default class PlayingStage extends Core.Play<
         </div>
         <StockInfo
           {...stock}
-          style={{ marginTop: "40px", marginBottom: "20px" }}
+          style={{ marginTop: "15vh", marginBottom: "20px" }}
         />
         <p style={{ marginBottom: "10px" }}>
           *私人信息: 你们公司对该股票的估值是
@@ -206,7 +206,7 @@ export default class PlayingStage extends Core.Play<
         <p style={{ marginBottom: "30px" }}>
           *市场信息: 该公司共发行了
           <span style={{ color: "orange" }}>{total}股</span>股票, 最低保留价格为
-          {marketState.min}
+          <span style={{ color: "orange" }}>{marketState.min}</span>
         </p>
         <div className={style.inputContainer}>
           <div>
@@ -323,7 +323,7 @@ export default class PlayingStage extends Core.Play<
           <>
             <StockInfo
               {...stock}
-              style={{ marginTop: "40px", marginBottom: "20px" }}
+              style={{ marginTop: "15vh", marginBottom: "20px" }}
             />
             <div>
               <p>waiting for others</p>
