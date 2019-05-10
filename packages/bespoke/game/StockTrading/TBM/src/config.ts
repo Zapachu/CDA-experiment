@@ -9,7 +9,8 @@ export enum MoveType {
 export enum PushType {
     dealTimer,
     startBid,
-    newRoundTimer
+    newRoundTimer,
+    nextRound
 }
 
 export enum FetchType {

@@ -132,6 +132,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         }
                         global.clearInterval(newRoundInterval)
                         groupState.roundIndex++
+                        this.broadcast(PushType.nextRound)
                         await this.stateManager.syncState()
                     }, 1000)
                 }

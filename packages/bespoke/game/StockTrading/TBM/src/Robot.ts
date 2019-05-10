@@ -8,11 +8,18 @@ import {BaseRobot} from 'bespoke-server'
 import {MoveType, PushType} from './config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
 
+const sleep = (ms) => {
+    return new Promise(resolve => setTimeout(resolve, ms))
+}
+
 export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     async init() {
         // online and getPosition
 
         await this.frameEmitter.emit(MoveType.getPosition)
+
+        // for core's interception
+        await sleep(600)
         await this.frameEmitter.emit(MoveType.prepare)
 
         // shout stage
@@ -21,6 +28,11 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
             const role = this.playerState.role
             const price = this.genPrice(role, privatePrice)
             this.frameEmitter.emit(MoveType.shout, {price})
+        })
+
+        // round switch
+        this.frameEmitter.on(PushType.nextRound, async () => {
+            await this.frameEmitter.emit(MoveType.prepare)
         })
         return this
     }
