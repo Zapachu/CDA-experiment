@@ -5,9 +5,8 @@ import Header from '../../../components/Header'
 import Line from '../../../components/Line'
 import Input from '../../../components/Input'
 import Button from '../../../components/Button'
-import StockInfo from '../../../components/StockInfo'
-import ListItem from '../../../components/ListItem'
 import Loading from '../../../components/Loading'
+import Modal from '../../../components/Modal'
 import {Core, Toast} from 'bespoke-client-util'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import {FetchType, MoveType, PushType, NEW_ROUND_TIMER, PlayerStatus} from '../config'
@@ -15,7 +14,9 @@ import {FetchType, MoveType, PushType, NEW_ROUND_TIMER, PlayerStatus} from '../c
 interface IPlayState {
     price: string
     loading: boolean
-    newRoundTimers: Array<number>
+    newRoundTimers: Array<number>,
+    showRule: boolean,
+    showTBMRule: boolean
 }
 
 const InfoBar = ({text, styles = {}}: { text: string, styles?: object }) =>
@@ -28,7 +29,9 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     state = {
         price: '',
         loading: true,
-        newRoundTimers: []
+        newRoundTimers: [],
+        showRule: false,
+        showTBMRule: false
     }
 
     async componentDidMount() {
@@ -171,13 +174,21 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         }
     }
 
+    showRule = () => {
+        this.setState({showRule: !this.state.showRule})
+    }
+
+    showTBMRule = () => {
+        this.setState({showRule: !this.state.showTBMRule})
+    }
+
     render() {
         const {
             props: {
                 game: {params: {}},
                 gameState: {groups},
                 playerState: {groupIndex, privatePrices}
-            }, state: {loading, newRoundTimers}
+            }, state: {loading, newRoundTimers, showRule, showTBMRule}
         } = this
         if (loading) {
             return <Loading label='加载中...'/>
@@ -246,6 +257,38 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 <div>本轮结束剩余时间</div>
                 <div className={style.highlight}>{NEW_ROUND_TIMER - newRoundTimer}</div>
             </div> : null}
+
+            <Button
+                style={{position: 'absolute', top: '30%', right: '10%'}}
+                onClick={this.showRule}
+                color={Button.Color.Blue}
+                label={`交易规则回顾`}
+            />
+            <Button
+                style={{position: 'absolute', top: '35%', right: '10%'}}
+                onClick={this.showTBMRule}
+                color={Button.Color.Blue}
+                label={`集合竞价知识扩展`}
+            />
+
+            <Modal
+                visible={showRule}
+                children={
+                    <div className={style.modalContent}>
+                        <h3>交易规则回复</h3>
+                        <p>...</p>
+                    </div>
+                }
+            />
+            <Modal
+                visible={showTBMRule}
+                children={
+                    <div className={style.modalContent}>
+                        <h3>集合竞价知识扩展</h3>
+                        <p>...</p>
+                    </div>
+                }
+            />
         </section>
     }
 
