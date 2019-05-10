@@ -1,14 +1,6 @@
 import * as React from "react";
 import * as style from "./style.scss";
-import {
-  Button,
-  ButtonProps,
-  Core,
-  Lang,
-  MaskLoading,
-  Toast,
-  Input
-} from "bespoke-client-util";
+import { Core, Lang, MaskLoading, Toast } from "bespoke-client-util";
 import {
   FetchType,
   MoveType,
@@ -23,6 +15,11 @@ import {
   IPlayerState,
   IPushParams
 } from "../../interface";
+import StockInfo from "../../../../components/StockInfo";
+import Input from "../../../../components/Input";
+import Button from "../../../../components/Button";
+import ListItem from "../../../../components/ListItem";
+import Line from "../../../../components/Line";
 
 interface IPlayState {
   price: number;
@@ -109,30 +106,6 @@ export default class PlayingStage extends Core.Play<
     roundIndex: [(m, n) => `第${m}/${n}轮`, (m, n) => `Round ${m}/${n}`]
   });
 
-  renderStock() {
-    const stock = STOCKS[this.state.stockIndex];
-    return (
-      <table>
-        <tbody>
-          <tr>
-            <td>证券代码</td>
-            <td>证券简称</td>
-            <td>主承销商</td>
-            <td>初步询价起始日期</td>
-            <td>初步询价截止日期</td>
-          </tr>
-          <tr>
-            <td>{stock.code}</td>
-            <td>{stock.name}</td>
-            <td>{stock.contractor}</td>
-            <td>{stock.startDate}</td>
-            <td>{stock.endDate}</td>
-          </tr>
-        </tbody>
-      </table>
-    );
-  }
-
   render() {
     const {
       lang,
@@ -144,7 +117,7 @@ export default class PlayingStage extends Core.Play<
           params: { total }
         }
       },
-      state: { price, num }
+      state: { price, num, stockIndex }
     } = this;
     let investorState;
     let marketState;
@@ -156,35 +129,72 @@ export default class PlayingStage extends Core.Play<
       investorState = multi;
       marketState = groups[multi.groupIndex];
     }
+    const stock = STOCKS[stockIndex];
     let content;
     switch (playerStatus) {
       case PlayerStatus.prepared: {
         content = (
           <>
-            {this.renderStock()}
-            <p>心里价值: {investorState.privateValue}</p>
-            <p>最低保留价格: {marketState.min}</p>
-            <p>初始资金: {investorState.startingPrice}</p>
-            <div>
-              <Input
-                value={price}
-                onChange={e => this.setState({ price: +e.target.value })}
-              />
-              <Input
-                value={num}
-                onChange={e => this.setState({ num: +e.target.value })}
-              />
-              <Button
-                width={ButtonProps.Width.small}
-                label={lang.confirm}
-                onClick={() => {
-                  if (!price || !num) return;
-                  frameEmitter.emit(MoveType.shout, { price, num }, err => {
-                    if (err) Toast.warn(err);
-                  });
-                }}
-              />
+            <StockInfo {...stock} style={{ margin: "40px 20px 20px 20px" }} />
+            <p style={{ marginBottom: "10px" }}>
+              *私人信息: 你们公司对该股票的估值是
+              <span style={{ color: "orange" }}>
+                {investorState.privateValue}
+              </span>
+            </p>
+            <p style={{ marginBottom: "30px" }}>
+              *市场信息: 该公司共发行了
+              <span style={{ color: "orange" }}>{total}股</span>股票,
+              最低保留价格为{marketState.min}
+            </p>
+            <div className={style.inputContainer}>
+              <div>
+                <Input
+                  value={price}
+                  onChange={val => this.setState({ price: +val })}
+                  placeholder={"价格"}
+                  onMinus={val => this.setState({ price: val - 1 })}
+                  onPlus={val => this.setState({ price: val + 1 })}
+                />
+                <p>
+                  可买
+                  {price
+                    ? Math.floor(investorState.startingPrice / price)
+                    : " "}
+                  股
+                </p>
+              </div>
             </div>
+            <div className={style.inputContainer}>
+              <div>
+                <Input
+                  value={num}
+                  onChange={val => this.setState({ num: +val })}
+                  placeholder={"数量"}
+                  onMinus={val => this.setState({ num: val - 1 })}
+                  onPlus={val => this.setState({ num: val + 1 })}
+                />
+                <p>
+                  总花费
+                  {price && num ? (price * num).toFixed(2) : " "}
+                </p>
+              </div>
+            </div>
+            <Button
+              label={"买入"}
+              style={{ marginBottom: "20px" }}
+              onClick={() => {
+                if (!price || !num) return;
+                frameEmitter.emit(MoveType.shout, { price, num }, err => {
+                  if (err) Toast.warn(err);
+                });
+              }}
+            />
+            <ListItem width={200}>
+              <p style={{ color: "orange" }} className={style.item}>
+                初始资金: {investorState.startingPrice}
+              </p>
+            </ListItem>
           </>
         );
         break;
@@ -192,7 +202,7 @@ export default class PlayingStage extends Core.Play<
       case PlayerStatus.shouted: {
         content = (
           <>
-            {this.renderStock()}
+            <StockInfo {...stock} />
             <div>
               <p>waiting for others</p>
             </div>
@@ -201,26 +211,84 @@ export default class PlayingStage extends Core.Play<
         break;
       }
       case PlayerStatus.result: {
+        const listData = [
+          { label: "股票的成交价格", value: marketState.strikePrice },
+          { label: "你们公司对股票的估值", value: investorState.privateValue },
+          {
+            label: "每股股票收益",
+            value: (
+              investorState.privateValue - marketState.strikePrice
+            ).toFixed(2)
+          },
+          { label: "你的购买数量", value: investorState.actualNum || 0 },
+          { label: "你的总收益为", value: investorState.profit || 0 },
+          { label: "你的初始账户资金", value: investorState.startingPrice },
+          {
+            label: "你的现有账户资金",
+            value: investorState.startingPrice + (investorState.profit || 0),
+            red: true
+          }
+        ];
         content = (
-          <div>
+          <>
+            <Line
+              text={"交易结果展示"}
+              style={{
+                margin: "auto",
+                width: "400px",
+                marginTop: "30px",
+                marginBottom: "20px"
+              }}
+            />
             <ul>
-              <li>股票的成交价格: ${marketState.strikePrice}</li>
-              <li>你们公司对股票的估值: ${investorState.privateValue}</li>
-              <li>
-                每股股票收益: $
-                {(investorState.privateValue - marketState.strikePrice).toFixed(
-                  2
-                )}
-              </li>
-              <li>你的购买数量: {investorState.actualNum || 0}</li>
-              <li>你的总收益为: ${investorState.profit || 0}</li>
-              <li>你的初始账户资金: ${investorState.startingPrice}</li>
-              <li>
-                你的现有账户资金: $
-                {investorState.startingPrice + (investorState.profit || 0)}
-              </li>
+              {listData.map(({ label, value, red }) => {
+                return (
+                  <li key={label} style={{ marginBottom: "10px" }}>
+                    <ListItem>
+                      <p className={style.item}>
+                        <span style={{ color: "#000" }}>{label}:&nbsp;</span>
+                        <span style={{ color: red ? "red" : "orange" }}>
+                          {value}
+                        </span>
+                      </p>
+                    </ListItem>
+                  </li>
+                );
+              })}
             </ul>
-            <Button
+            <Line
+              color={Line.Color.White}
+              style={{
+                margin: "auto",
+                width: "400px",
+                marginTop: "20px",
+                marginBottom: "20px"
+              }}
+            />
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <Button
+                label={"再玩一局"}
+                color={Button.Color.Blue}
+                style={{ marginRight: "20px" }}
+                onClick={() => {
+                  frameEmitter.emit(MoveType.replay, {}, (err, stockIndex) => {
+                    if (!err)
+                      this.setState({
+                        price: undefined,
+                        num: undefined,
+                        stockIndex
+                      });
+                  });
+                }}
+              />
+              <Button
+                label={"下一局"}
+                onClick={() => {
+                  frameEmitter.emit(MoveType.nextGame);
+                }}
+              />
+            </div>
+            {/* <Button
               width={ButtonProps.Width.small}
               label={"再玩一局"}
               onClick={() => {
@@ -240,18 +308,13 @@ export default class PlayingStage extends Core.Play<
               onClick={() => {
                 frameEmitter.emit(MoveType.nextGame);
               }}
-            />
-          </div>
+            /> */}
+          </>
         );
         break;
       }
     }
 
-    return (
-      <section>
-        <p>header</p>
-        {content}
-      </section>
-    );
+    return <section className={style.playingStage}>{content}</section>;
   }
 }

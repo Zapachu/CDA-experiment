@@ -58,7 +58,6 @@ export default class IntroStage extends Core.Play<
             frameEmitter.emit(MoveType.startSinglePlayer);
           }}
         />
-        <Line color={Line.Color.White} style={{marginTop:'20px'}} />
       </section>
     );
   }
