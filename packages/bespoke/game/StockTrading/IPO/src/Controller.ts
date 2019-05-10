@@ -218,6 +218,7 @@ export default class Controller extends BaseController<
       roundIndex: 0,
       rounds: [this.genInitParams()]
     };
+    // this._initRobots(groupSize - 1)
   }
 
   initMulti(

@@ -18,10 +18,9 @@ import {
   IPlayerState,
   IPushParams
 } from "../../interface";
-import MatchingStage from "./MatchingStage";
 import PlayingStage from "./PlayingStage";
 import IntroStage from "./IntroStage";
-import Header from "../../../../components/Header";
+import { Header } from "../../../../components";
 
 interface IPlayState {
   seatNumber: string;
@@ -78,12 +77,9 @@ export class Play extends Core.Play<
     } = this;
     let content;
     switch (playerStatus) {
-      case PlayerStatus.intro: {
-        content = <IntroStage {...this.props} />;
-        break;
-      }
+      case PlayerStatus.intro:
       case PlayerStatus.matching: {
-        content = <MatchingStage {...this.props} />;
+        content = <IntroStage {...this.props} />;
         break;
       }
       default: {
