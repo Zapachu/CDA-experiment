@@ -1,7 +1,7 @@
-type State = 'normal' | 'hover' | 'active'
+type ButtonGameModeState = 'normal' | 'hover' | 'active'
 
 class ButtonGameMode extends eui.Component implements eui.UIComponent {
-    private _state: State
+    private _state: ButtonGameModeState
 
     label: eui.Label
     subLabel: eui.Label
@@ -24,7 +24,7 @@ class ButtonGameMode extends eui.Component implements eui.UIComponent {
         return this
     }
 
-    set state(state: State) {
+    set state(state: ButtonGameModeState) {
         this.invalidateState()
         this._state = state
     }

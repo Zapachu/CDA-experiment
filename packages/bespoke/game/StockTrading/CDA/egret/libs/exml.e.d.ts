@@ -18,9 +18,7 @@ declare module skins{
 }
 declare class IntroductionSkin extends eui.Skin{
 }
-declare module skins{
-	class ItemRendererSkin extends eui.Skin{
-	}
+declare class MatchingPlayer extends eui.Skin{
 }
 declare module skins{
 	class PanelSkin extends eui.Skin{

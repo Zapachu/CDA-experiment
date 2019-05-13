@@ -1,7 +1,5 @@
 export const namespace = 'StockTrading-CDA'
 
-export const HOST_POSITION = 0
-
 export enum ROLE {
     Seller,
     Buyer
@@ -18,8 +16,9 @@ export enum SheetType {
 }
 
 export enum Stage {
+    notStart,
     matching,
-    prepare,
+    reading,
     trading,
     result,
     leave
@@ -79,8 +78,6 @@ export const RedisKey = {
 
 export enum MoveType {
     getRole = 'getRole',
-    startRobot = 'startRobot',
-    openMarket = 'openMarket',
     submitOrder = 'submitOrder',
     cancelOrder = 'cancelOrder',
 }
@@ -95,3 +92,10 @@ export enum PushType {
 export enum FetchType {
     exportXls = 'exportXls'
 }
+
+export enum PlayMode {
+    Single,
+    Multi
+}
+
+export const MATCH_TIME = 30

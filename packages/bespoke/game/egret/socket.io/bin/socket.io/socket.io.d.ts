@@ -5,7 +5,7 @@
 
 declare var io: SocketIOClientStatic;
 
-declare module 'socket.io-client' {
+declare module 'egret-socket.io' {
 	export = io;
 }
 

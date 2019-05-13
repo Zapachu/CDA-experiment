@@ -557,6 +557,9 @@ export class PlayerState implements IPlayerState {
 /** Properties of a MoveParams. */
 export interface IMoveParams {
 
+    /** MoveParams playMode */
+    playMode?: (number|null);
+
     /** MoveParams unitIndex */
     unitIndex?: (number|null);
 
@@ -572,6 +575,9 @@ export class MoveParams implements IMoveParams {
      * @param [properties] Properties to set
      */
     constructor(properties?: IMoveParams);
+
+    /** MoveParams playMode. */
+    public playMode: number;
 
     /** MoveParams unitIndex. */
     public unitIndex: number;
