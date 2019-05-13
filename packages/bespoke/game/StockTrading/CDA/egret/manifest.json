@@ -13,6 +13,7 @@
 		"bin-debug/Introduction.js",
 		"bin-debug/LoadingUI.js",
 		"bin-debug/Main.js",
+		"bin-debug/MatchingPlayer.js",
 		"bin-debug/Platform.js",
 		"bin-debug/ThemeAdapter.js",
 		"bin-debug/component/ButtonGameMode.js"

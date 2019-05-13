@@ -23,7 +23,7 @@
     },
     {
       "name": "socket.io",
-      "path": "../libsrc"
+      "path": "../../../egret/socket.io"
     }
   ]
 }

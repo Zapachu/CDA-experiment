@@ -19,7 +19,8 @@ import {
     RobotSubmitLog,
     ROLE,
     SheetType,
-    ShoutResult
+    ShoutResult,
+    MATCH_TIME
 } from './config'
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
 import {getEnumKeys} from './util'
@@ -36,7 +37,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         const gameState = super.initGameState()
         Object.assign(gameState, {
             orders: [],
-            stage: Stage.matching,
+            stage: Stage.notStart,
             orderId: 0,
             buyOrderIds: [],
             sellOrderIds: [],
@@ -69,39 +70,36 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 }
                 playerState.roleIndex = roleIndex
                 playerState.unitList = this.game.params.unitLists[roleIndex]
-                break
-            }
-            case MoveType.startRobot:{
-                if (roleIndex >= this.game.params.roles.length) {
-                    Log.d('角色已分配完,无需启动新Robot')
-                    break
+                if (gameState.stage === Stage.notStart) {
+                    gameState.stage = Stage.matching
+                    let countDown = 0
+                    const timer = global.setInterval(async () => {
+                        if (gameState.status !== baseEnum.GameStatus.started) {
+                            return
+                        }
+                        if (countDown === MATCH_TIME) {
+                            gameState.stage = Stage.reading
+                            Array(this.game.params.roles.length - gameState.roleIndex).fill(null).forEach(
+                                async (_, i) => await this.startNewRobotScheduler(i)
+                            )
+                        }
+                        const {tradeTime, prepareTime} = this.game.params
+                        if (countDown === prepareTime + MATCH_TIME) {
+                            gameState.stage = Stage.trading
+                            this.broadcast(PushType.beginTrading)
+                        }
+                        if (countDown === prepareTime + tradeTime + MATCH_TIME) {
+                            gameState.stage = Stage.result
+                            await this.calcProfit()
+                        }
+                        if (countDown === tradeTime + 2 * prepareTime + MATCH_TIME) {
+                            global.clearInterval(timer)
+                            gameState.stage = Stage.leave
+                        }
+                        await this.stateManager.syncState()
+                        this.broadcast(PushType.countDown, {countDown: countDown++})
+                    }, 1000)
                 }
-                await this.startNewRobotScheduler(gameState.roleIndex)
-                break
-            }
-            case MoveType.openMarket: {
-                let countDown = 0
-                gameState.stage = Stage.prepare
-                const timer = global.setInterval(async () => {
-                    if (gameState.status !== baseEnum.GameStatus.started) {
-                        return
-                    }
-                    const {tradeTime, prepareTime} = this.game.params
-                    if (countDown === +prepareTime) {
-                        gameState.stage = Stage.trading
-                        this.broadcast(PushType.beginTrading)
-                    }
-                    if (countDown === tradeTime + prepareTime) {
-                        gameState.stage = Stage.result
-                        await this.calcProfit()
-                    }
-                    if (countDown === tradeTime + 2 * prepareTime) {
-                        global.clearInterval(timer)
-                        gameState.stage = Stage.leave
-                    }
-                    await this.stateManager.syncState()
-                    this.broadcast(PushType.countDown, {countDown: countDown++})
-                }, 1000)
                 break
             }
             case MoveType.submitOrder: {

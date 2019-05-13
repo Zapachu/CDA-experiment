@@ -1,109 +1,9 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang, Button, ButtonProps, MaskLoading, Toast, IGame, FrameEmitter} from 'bespoke-client-util'
-import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, GameState} from '../interface'
-import {FetchType, Stage, MoveType, PushType, ROLE, HOST_POSITION} from '../config'
-
-export const TradeChart: React.FC<{
-    tradeList: Array<{
-        price: number
-    }>
-}> = ({tradeList}) => {
-    const COLOR = {
-        line: '#999',
-        point: '#E27B6A'
-    }
-    const cellSize = 10, fontSize = 8, padding = 2 * fontSize,
-        minY = 100, maxY = 400,
-        maxX = tradeList.length > 30 ? tradeList.length : 30
-    const transX = x => padding + x * cellSize,
-        transY = y => maxY + padding - y
-    return <section>
-        <svg xmlns="http://www.w3.org/2000/svg"
-             viewBox={`0,0,${maxX * cellSize + 2 * padding},${maxY - minY + 2 * padding}`}>
-            {
-                Array(maxX + 1).fill('').map((_, i) =>
-                    <React.Fragment key={i}>
-                        <line {...{
-                            stroke: COLOR.line,
-                            strokeWidth: i % 5 === 0 ? .5 : .1,
-                            x1: transX(i),
-                            y1: transY(minY),
-                            x2: transX(i),
-                            y2: transY(maxY)
-                        }}/>
-                        {
-                            i && i % 5 === 0 ?
-                                <text {...{
-                                    fontSize,
-                                    fill: COLOR.line,
-                                    x: transX(i - .5 * fontSize / cellSize),
-                                    y: transY(minY - fontSize)
-                                }}>{i}</text> : null
-                        }
-                    </React.Fragment>
-                )
-            }
-            {
-                Array(~~((maxY - minY) / cellSize) + 1).fill('').map((_, i) =>
-                    <React.Fragment key={i}>
-                        <line {...{
-                            stroke: COLOR.line,
-                            strokeWidth: i % 5 === 0 ? .5 : .1,
-                            x1: transX(0),
-                            y1: transY(minY + i * cellSize),
-                            x2: transX(maxX),
-                            y2: transY(minY + i * cellSize)
-                        }}/>
-                        {
-                            i && i % 5 === 0 ?
-                                <text {...{
-                                    fontSize,
-                                    fill: COLOR.line,
-                                    x: transX(-2 * fontSize / cellSize),
-                                    y: transY(minY + (i - .5 * fontSize / cellSize) * cellSize)
-                                }}>{minY + i * cellSize}</text> : null
-                        }
-                    </React.Fragment>
-                )
-            }
-            {
-                tradeList.map(({price}, i) =>
-                    <React.Fragment key={i}>
-                        <circle {...{
-                            fill: COLOR.point,
-                            cx: transX(i + 1),
-                            cy: transY(price),
-                            r: 2
-                        }}/>
-                        {
-                            i ? <line {...{
-                                stroke: COLOR.point,
-                                strokeWidth: .5,
-                                x1: transX(i + 1),
-                                y1: transY(price),
-                                x2: transX(i),
-                                y2: transY(tradeList[i - 1].price)
-                            }}/> : null
-                        }
-                    </React.Fragment>
-                )
-            }
-        </svg>
-    </section>
-}
-
-export const Play: Core.PlaySFC<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> =
-    props => {
-        switch (props.gameState.stage) {
-            case Stage.matching:
-                return <Matching {...props}/>
-            case Stage.leave:
-                return <div>跳转至其它环节(TODO)</div> //TODO
-            default:
-                return <Trading {...props}/>
-        }
-    }
+import {Button, ButtonProps, Core, FrameEmitter, IGame, Lang, MaskLoading, Toast} from 'bespoke-client-util'
+import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
+import {FetchType, MoveType, PushType, ROLE, Stage, MATCH_TIME} from '../config'
+import {PlayMode, Header, Line, MatchModal} from '../../../components'
 
 interface IStageProps {
     game: IGame<ICreateParams>
@@ -113,29 +13,20 @@ interface IStageProps {
 }
 
 function Matching({game: {params: {roles}}, frameEmitter, gameState: {roleIndex: gameRoleIndex}, playerState: {roleIndex}}: IStageProps) {
-    const lang = Lang.extractLang({
-        playersInMarket: ['市场中玩家', 'Players in Market'],
-        openMarket: ['开放市场', 'Open Market'],
-        startRobot: ['启动机器人', 'Start Robot']
-    })
+    const [timer, setTimer] = React.useState(0)
     React.useEffect(() => {
-        frameEmitter.emit(MoveType.getRole)
+        frameEmitter.on(PushType.countDown, ({countDown}) => setTimer(countDown))
     }, [])
     return <section className={style.matching}>
-        <div>{lang.playersInMarket}:{gameRoleIndex}</div>
-        {
-            roleIndex === HOST_POSITION ?
-                <div>
-                    <Button {...{
-                        label: lang.openMarket,
-                        onClick: () => frameEmitter.emit(MoveType.openMarket)
-                    }}/>
-                    <Button {...{
-                        label: lang.startRobot,
-                        onClick: () => frameEmitter.emit(MoveType.startRobot)
-                    }}/>
-                </div> : null
-        }
+        <Line text={'交易规则介绍'} style={{margin: '10vh 0 2rem'}}/>
+        <video className={style.introVideo}/>
+        <PlayMode onPlay={playMode => frameEmitter.emit(MoveType.getRole, {playMode})}/>
+        <MatchModal {...{
+            visible: roleIndex !== undefined,
+            totalNum: roles.length,
+            matchNum: gameRoleIndex,
+            timer: MATCH_TIME - timer
+        }}/>
     </section>
 }
 
@@ -178,7 +69,7 @@ function Trading(props: IStageProps) {
     const [price, setPrice] = React.useState(0 as number | string)
     const [timer, setTimer] = React.useState(0)
     React.useEffect(() => {
-        frameEmitter.on(PushType.countDown, ({countDown}) => setTimer(countDown))
+        frameEmitter.on(PushType.countDown, ({countDown}) => setTimer(countDown - MATCH_TIME))
     }, [])
 
     function submitOrder() {
@@ -360,7 +251,7 @@ function Trading(props: IStageProps) {
                                 </li>
                             </ul>
                             {
-                                stage === Stage.prepare && prepareTime > timer ?
+                                stage === Stage.reading && prepareTime > timer ?
                                     <p className={style.marketWillOpen}>{lang.marketWillOpen1}
                                         <em>{prepareTime - timer}</em> {(lang.marketWillOpen2 as Function)(prepareTime - timer)}
                                     </p> :
@@ -398,3 +289,107 @@ function Trading(props: IStageProps) {
     </section>
 }
 
+export const TradeChart: React.FC<{
+    tradeList: Array<{
+        price: number
+    }>
+}> = ({tradeList}) => {
+    const COLOR = {
+        line: '#999',
+        point: '#E27B6A'
+    }
+    const cellSize = 10, fontSize = 8, padding = 2 * fontSize,
+        minY = 100, maxY = 400,
+        maxX = tradeList.length > 30 ? tradeList.length : 30
+    const transX = x => padding + x * cellSize,
+        transY = y => maxY + padding - y
+    return <section>
+        <svg xmlns="http://www.w3.org/2000/svg"
+             viewBox={`0,0,${maxX * cellSize + 2 * padding},${maxY - minY + 2 * padding}`}>
+            {
+                Array(maxX + 1).fill('').map((_, i) =>
+                    <React.Fragment key={i}>
+                        <line {...{
+                            stroke: COLOR.line,
+                            strokeWidth: i % 5 === 0 ? .5 : .1,
+                            x1: transX(i),
+                            y1: transY(minY),
+                            x2: transX(i),
+                            y2: transY(maxY)
+                        }}/>
+                        {
+                            i && i % 5 === 0 ?
+                                <text {...{
+                                    fontSize,
+                                    fill: COLOR.line,
+                                    x: transX(i - .5 * fontSize / cellSize),
+                                    y: transY(minY - fontSize)
+                                }}>{i}</text> : null
+                        }
+                    </React.Fragment>
+                )
+            }
+            {
+                Array(~~((maxY - minY) / cellSize) + 1).fill('').map((_, i) =>
+                    <React.Fragment key={i}>
+                        <line {...{
+                            stroke: COLOR.line,
+                            strokeWidth: i % 5 === 0 ? .5 : .1,
+                            x1: transX(0),
+                            y1: transY(minY + i * cellSize),
+                            x2: transX(maxX),
+                            y2: transY(minY + i * cellSize)
+                        }}/>
+                        {
+                            i && i % 5 === 0 ?
+                                <text {...{
+                                    fontSize,
+                                    fill: COLOR.line,
+                                    x: transX(-2 * fontSize / cellSize),
+                                    y: transY(minY + (i - .5 * fontSize / cellSize) * cellSize)
+                                }}>{minY + i * cellSize}</text> : null
+                        }
+                    </React.Fragment>
+                )
+            }
+            {
+                tradeList.map(({price}, i) =>
+                    <React.Fragment key={i}>
+                        <circle {...{
+                            fill: COLOR.point,
+                            cx: transX(i + 1),
+                            cy: transY(price),
+                            r: 2
+                        }}/>
+                        {
+                            i ? <line {...{
+                                stroke: COLOR.point,
+                                strokeWidth: .5,
+                                x1: transX(i + 1),
+                                y1: transY(price),
+                                x2: transX(i),
+                                y2: transY(tradeList[i - 1].price)
+                            }}/> : null
+                        }
+                    </React.Fragment>
+                )
+            }
+        </svg>
+    </section>
+}
+
+export const Play: Core.PlaySFC<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> =
+    props => <section className={style.play}>
+        <Header stage={'tbm'}/>
+        {(() => {
+            switch (props.gameState.stage) {
+                case Stage.notStart:
+                case Stage.matching:
+                    return <Matching {...props}/>
+                case Stage.leave:
+                    return <div>跳转至其它环节(TODO)</div> //TODO
+                default:
+                    return <Trading {...props}/>
+            }
+        })()}
+    </section>
