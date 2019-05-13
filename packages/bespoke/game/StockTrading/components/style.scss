@@ -357,10 +357,18 @@
   tr:first-child {
     border-bottom: 1px solid;
     border-image: radial-gradient(closest-side, #dde1e9, gray) 40;
+    td {
+      color: #67e968;
+      border-bottom: 1px solid #383d60;
+    }
   }
   td {
     text-align: center;
-    padding: 10px;
+    padding: 20px;
+    border-right: 1px solid #383d60;
+    &:last-child {
+      border-right: none;
+    }
   }
 }
 

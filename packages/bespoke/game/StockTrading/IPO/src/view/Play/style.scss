@@ -40,5 +40,17 @@
         text-align: center;
       }
     }
+    .operation {
+      padding: 1px 8px 1px 8px;
+      border: 1px solid transparent;
+      border-radius: 30%;
+      background-color: #11234C;
+      color: #65749C;
+      font-size: 11px;
+      cursor: pointer;
+      &:first-child {
+        margin-right: 5px;
+      }
+    }
   }
 }

@@ -80,6 +80,13 @@ export default class PlayingStage extends Core.Play<
 
   lang = Lang.extractLang({});
 
+  inputNum = (multiplier: number, startingPrice: number) => {
+    const { price } = this.state;
+    const money = multiplier * startingPrice;
+    const num = Math.floor(money / price);
+    this.setState({ num });
+  };
+
   renderResult = (investorState, marketState) => {
     const { frameEmitter } = this.props;
     const listData = [
@@ -217,7 +224,7 @@ export default class PlayingStage extends Core.Play<
               onMinus={val => this.setState({ price: val - 1 })}
               onPlus={val => this.setState({ price: val + 1 })}
             />
-            <p>
+            <p style={{ fontSize: "12px", marginTop: "5px" }}>
               可买
               {price ? Math.floor(investorState.startingPrice / price) : " "}股
             </p>
@@ -232,9 +239,35 @@ export default class PlayingStage extends Core.Play<
               onMinus={val => this.setState({ num: val - 1 })}
               onPlus={val => this.setState({ num: val + 1 })}
             />
-            <p>
-              总花费
-              {price && num ? (price * num).toFixed(2) : " "}
+            <p
+              style={{
+                fontSize: "12px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginTop: "5px"
+              }}
+            >
+              <span>
+                总花费
+                {price && num ? (price * num).toFixed(2) : " "}
+              </span>
+              <span>
+                <span
+                  className={style.operation}
+                  onClick={() =>
+                    this.inputNum(0.5, investorState.startingPrice)
+                  }
+                >
+                  半仓
+                </span>
+                <span
+                  className={style.operation}
+                  onClick={() => this.inputNum(1, investorState.startingPrice)}
+                >
+                  全仓
+                </span>
+              </span>
             </p>
           </div>
         </div>
