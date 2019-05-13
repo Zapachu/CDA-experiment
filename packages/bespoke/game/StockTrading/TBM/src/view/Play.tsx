@@ -63,7 +63,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
 
     showRule = () => this.setState({showRule: !this.state.showRule})
 
-    showTBMRule = () => this.setState({showRule: !this.state.showTBMRule})
+    showTBMRule = () => this.setState({showTBMRule: !this.state.showTBMRule})
 
     shout = () => {
         const {
@@ -89,6 +89,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     dynamicAction = () => {
         const {
             props: {
+                game: {params: {InitMoney}},
                 gameState: {groups},
                 playerState: {groupIndex, positionIndex}
             }, state: {price, count}
@@ -113,22 +114,24 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                             placeholder={`价格`}
                         />
                     </li>
-                    <li>
-                        <a>可买 <span className={style.priceHighlight}>1000</span> 股</a>
+                    <li style={{marginTop: 12}}>
+                        <a>可买 <span className={style.priceHighlight}>
+                            {!isNaN(parseInt(price)) && parseInt(price) !== 0 ? InitMoney / Number(price) : 0}
+                        </span> 股</a>
                     </li>
-                    <li>
+                    <li style={{marginTop: 12}}>
                         <Input
-                            value={price}
+                            value={count}
                             onChange={this.setCountVal}
                             onMinus={this.onCountMinus}
                             onPlus={this.onCountPlus}
                             placeholder={`数量`}
                         />
                     </li>
-                    <li>
+                    <li style={{marginTop: 12}}>
                         <div className={style.feeInfo}>
                             <a className={style.feeNumber}>总花费<span className={style.priceHighlight}>
-                            {parseInt(count) * parseInt(price)}
+                            {count !== '' && price !== '' ? Number(count) * Number(price) : 0}
                         </span>
                             </a>
                             <a className={style.halfIn} onClick={this.halfIn}>半仓</a>
