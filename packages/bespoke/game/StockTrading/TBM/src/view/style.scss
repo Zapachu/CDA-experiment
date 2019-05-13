@@ -124,7 +124,7 @@
   justify-content: flex-start;
   align-items: center;
   flex-direction: column;
-  height: 20rem;
+  height: 22rem;
   width: 20rem;
   background: radial-gradient(#293567, #151b35);
   border: solid 1px #5d5d5d;
@@ -132,16 +132,6 @@
     height: 4rem;
     line-height: 4rem;
     text-align: center;
-    .tipLine {
-      display: inline-block;
-      width: 4rem;
-      height: 3px;
-      border-top: 1px solid #58c350;
-    }
-    .tipContent {
-      color: #58c350;
-      vertical-align: middle;
-    }
   }
   .shoutBtn {
     cursor: pointer;
@@ -170,7 +160,39 @@
 /*Modal content*/
 .modalContent {
   padding: 30px;
-  >p {
+  color: #fff !important;
+  > p {
     text-align: center;
+    color: #fff !important;
+  }
+}
+/*shout stage*/
+.shoutStage {
+  .priceHighlight {
+    color: orange;
+  }
+  .feeInfo {
+    position: relative;
+    .feeNumber {
+      position: absolute;
+      left: 0;
+      top: 2px;
+    }
+    .halfIn {
+      position: absolute;
+      right: 0px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      background: #19224d;
+      color: #7d85b3;
+    }
+    .allIn {
+      position: absolute;
+      right: 50px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      background: #19224d;
+      color: #7d85b3;
+    }
   }
 }
