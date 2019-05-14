@@ -209,14 +209,17 @@ export interface IPushParams {
     /** PushParams matchTimer */
     matchTimer?: (number|null);
 
-    /** PushParams matchMsg */
-    matchMsg?: (string|null);
-
-    /** PushParams groupIndex */
-    groupIndex?: (number|null);
-
     /** PushParams matchNum */
     matchNum?: (number|null);
+
+    /** PushParams min */
+    min?: (number|null);
+
+    /** PushParams max */
+    max?: (number|null);
+
+    /** PushParams startingPrice */
+    startingPrice?: (number|null);
 }
 
 /** Represents a PushParams. */
@@ -231,14 +234,17 @@ export class PushParams implements IPushParams {
     /** PushParams matchTimer. */
     public matchTimer: number;
 
-    /** PushParams matchMsg. */
-    public matchMsg: string;
-
-    /** PushParams groupIndex. */
-    public groupIndex: number;
-
     /** PushParams matchNum. */
     public matchNum: number;
+
+    /** PushParams min. */
+    public min: number;
+
+    /** PushParams max. */
+    public max: number;
+
+    /** PushParams startingPrice. */
+    public startingPrice: number;
 
     /**
      * Creates a new PushParams instance using the specified properties.
@@ -406,20 +412,17 @@ export namespace GameState {
     /** Properties of a Group. */
     interface IGroup {
 
-        /** Group players */
-        players?: (string[]|null);
+        /** Group playerNum */
+        playerNum?: (number|null);
 
-        /** Group strikePrice */
-        strikePrice?: (number|null);
+        /** Group rounds */
+        rounds?: (GameState.Group.IRound[]|null);
 
-        /** Group min */
-        min?: (number|null);
+        /** Group roundIndex */
+        roundIndex?: (number|null);
 
-        /** Group max */
-        max?: (number|null);
-
-        /** Group stockIndex */
-        stockIndex?: (number|null);
+        /** Group isMulti */
+        isMulti?: (boolean|null);
     }
 
     /** Represents a Group. */
@@ -431,20 +434,17 @@ export namespace GameState {
          */
         constructor(properties?: GameState.IGroup);
 
-        /** Group players. */
-        public players: string[];
+        /** Group playerNum. */
+        public playerNum: number;
 
-        /** Group strikePrice. */
-        public strikePrice: number;
+        /** Group rounds. */
+        public rounds: GameState.Group.IRound[];
 
-        /** Group min. */
-        public min: number;
+        /** Group roundIndex. */
+        public roundIndex: number;
 
-        /** Group max. */
-        public max: number;
-
-        /** Group stockIndex. */
-        public stockIndex: number;
+        /** Group isMulti. */
+        public isMulti: boolean;
 
         /**
          * Creates a new Group instance using the specified properties.
@@ -515,6 +515,117 @@ export namespace GameState {
          * @returns JSON object
          */
         public toJSON(): { [k: string]: any };
+    }
+
+    namespace Group {
+
+        /** Properties of a Round. */
+        interface IRound {
+
+            /** Round strikePrice */
+            strikePrice?: (number|null);
+
+            /** Round min */
+            min?: (number|null);
+
+            /** Round max */
+            max?: (number|null);
+
+            /** Round stockIndex */
+            stockIndex?: (number|null);
+        }
+
+        /** Represents a Round. */
+        class Round implements IRound {
+
+            /**
+             * Constructs a new Round.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: GameState.Group.IRound);
+
+            /** Round strikePrice. */
+            public strikePrice: number;
+
+            /** Round min. */
+            public min: number;
+
+            /** Round max. */
+            public max: number;
+
+            /** Round stockIndex. */
+            public stockIndex: number;
+
+            /**
+             * Creates a new Round instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Round instance
+             */
+            public static create(properties?: GameState.Group.IRound): GameState.Group.Round;
+
+            /**
+             * Encodes the specified Round message. Does not implicitly {@link GameState.Group.Round.verify|verify} messages.
+             * @param message Round message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: GameState.Group.IRound, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Encodes the specified Round message, length delimited. Does not implicitly {@link GameState.Group.Round.verify|verify} messages.
+             * @param message Round message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encodeDelimited(message: GameState.Group.IRound, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Round message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Round
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): GameState.Group.Round;
+
+            /**
+             * Decodes a Round message from the specified reader or buffer, length delimited.
+             * @param reader Reader or buffer to decode from
+             * @returns Round
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): GameState.Group.Round;
+
+            /**
+             * Verifies a Round message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+
+            /**
+             * Creates a Round message from a plain object. Also converts values to their respective internal types.
+             * @param object Plain object
+             * @returns Round
+             */
+            public static fromObject(object: { [k: string]: any }): GameState.Group.Round;
+
+            /**
+             * Creates a plain object from a Round message. Also converts values to other types if specified.
+             * @param message Round
+             * @param [options] Conversion options
+             * @returns Plain object
+             */
+            public static toObject(message: GameState.Group.Round, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+            /**
+             * Converts this Round to JSON.
+             * @returns JSON object
+             */
+            public toJSON(): { [k: string]: any };
+        }
     }
 }
 
@@ -628,9 +739,6 @@ export namespace PlayerState {
         /** Multi groupIndex */
         groupIndex?: (number|null);
 
-        /** Multi positionIndex */
-        positionIndex?: (number|null);
-
         /** Multi privateValue */
         privateValue?: (number|null);
 
@@ -661,9 +769,6 @@ export namespace PlayerState {
 
         /** Multi groupIndex. */
         public groupIndex: number;
-
-        /** Multi positionIndex. */
-        public positionIndex: number;
 
         /** Multi privateValue. */
         public privateValue: number;
@@ -757,8 +862,8 @@ export namespace PlayerState {
     /** Properties of a Single. */
     interface ISingle {
 
-        /** Single roundIndex */
-        roundIndex?: (number|null);
+        /** Single groupIndex */
+        groupIndex?: (number|null);
 
         /** Single rounds */
         rounds?: (PlayerState.Single.IRound[]|null);
@@ -773,8 +878,8 @@ export namespace PlayerState {
          */
         constructor(properties?: PlayerState.ISingle);
 
-        /** Single roundIndex. */
-        public roundIndex: number;
+        /** Single groupIndex. */
+        public groupIndex: number;
 
         /** Single rounds. */
         public rounds: PlayerState.Single.IRound[];
@@ -872,18 +977,6 @@ export namespace PlayerState {
 
             /** Round startingPrice */
             startingPrice?: (number|null);
-
-            /** Round strikePrice */
-            strikePrice?: (number|null);
-
-            /** Round min */
-            min?: (number|null);
-
-            /** Round max */
-            max?: (number|null);
-
-            /** Round stockIndex */
-            stockIndex?: (number|null);
         }
 
         /** Represents a Round. */
@@ -912,18 +1005,6 @@ export namespace PlayerState {
 
             /** Round startingPrice. */
             public startingPrice: number;
-
-            /** Round strikePrice. */
-            public strikePrice: number;
-
-            /** Round min. */
-            public min: number;
-
-            /** Round max. */
-            public max: number;
-
-            /** Round stockIndex. */
-            public stockIndex: number;
 
             /**
              * Creates a new Round instance using the specified properties.

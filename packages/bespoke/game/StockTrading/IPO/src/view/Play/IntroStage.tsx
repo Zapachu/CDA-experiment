@@ -15,7 +15,7 @@ import {
   PlayerStatus,
   MATCH_TIMER
 } from "../../config";
-import { Line, PlayMode, MatchModal } from "../../../../components";
+import { Line, PlayMode, MatchModal, Modal } from "../../../../components";
 
 interface IPlayState {
   matchTimer: number;
@@ -53,7 +53,7 @@ export default class IntroStage extends Core.Play<
   render() {
     const {
       frameEmitter,
-      playerState: { playerStatus },
+      playerState: { playerStatus, single, multi },
       game: {
         params: { groupSize }
       }
@@ -65,19 +65,27 @@ export default class IntroStage extends Core.Play<
         <PlayMode
           onPlay={mode => {
             if (mode === PlayMode.Single) {
-              frameEmitter.emit(MoveType.startSinglePlayer);
+              frameEmitter.emit(MoveType.startSingle);
             }
             if (mode === PlayMode.Multi) {
-              frameEmitter.emit(MoveType.startMultiPlayer);
+              frameEmitter.emit(MoveType.startMulti);
             }
           }}
         />
         <MatchModal
-          visible={playerStatus === PlayerStatus.matching}
+          visible={playerStatus === PlayerStatus.matching && !!multi}
           totalNum={groupSize}
           matchNum={matchNum}
           timer={MATCH_TIMER - matchTimer}
         />
+        <Modal
+          visible={playerStatus === PlayerStatus.matching && !!single}
+          width={300}
+        >
+          <p style={{ textAlign: "center", padding: "50px 0" }}>
+            加载算法交易者...
+          </p>
+        </Modal>
       </section>
     );
   }
