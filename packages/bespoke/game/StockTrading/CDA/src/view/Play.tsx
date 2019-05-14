@@ -14,13 +14,7 @@ import {
 import {FetchType, MATCH_TIME, MoveType, PushType, ROLE, Stage} from '../config'
 import {Button, Header, Input, Line, MatchModal, PlayMode} from '../../../components'
 
-interface IStageProps {
-    game: IGame<ICreateParams>
-    gameState?: IGameGroupState
-    playerState?: IPlayerGroupState
-    frameEmitter?: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
-}
-
+//region component
 function Border({background = `radial-gradient(at 50% 0%, #67e968 1rem, transparent 70%)`, borderRadius = '1rem', children, style}: {
     background?: string,
     borderRadius?: string,
@@ -42,6 +36,117 @@ function Border({background = `radial-gradient(at 50% 0%, #67e968 1rem, transpar
     </div>
 }
 
+function TradeChart({
+                        tradeList, color = {
+        scalePlate: '#999',
+        line: '#999',
+        title: '#999',
+        number: '#999',
+        point: '#E27B6A'
+    }
+                    }: {
+    tradeList: Array<{
+        price: number
+    }>,
+    color?: {
+        scalePlate: string
+        point: string,
+        line: string
+        title: string,
+        number: string
+    }
+}) {
+    const cellSize = 10, fontSize = 12, padding = 2 * fontSize,
+        minY = 100, maxY = 400,
+        maxX = tradeList.length > 30 ? tradeList.length : 30
+    const transX = x => padding + x * cellSize,
+        transY = y => maxY + padding - y
+    return <section>
+        <svg xmlns="http://www.w3.org/2000/svg"
+             viewBox={`0,0,${maxX * cellSize + 2 * padding},${maxY - minY + 2 * padding}`}>
+            {
+                Array(maxX + 1).fill('').map((_, i) =>
+                    <React.Fragment key={i}>
+                        <line {...{
+                            stroke: color.scalePlate,
+                            strokeWidth: i === 0 ? 1 : i % 5 === 0 ? .3 : .1,
+                            x1: transX(i),
+                            y1: transY(minY),
+                            x2: transX(i),
+                            y2: transY(maxY)
+                        }}/>
+                        {
+                            i && i % 5 === 0 ?
+                                <text {...{
+                                    fontSize,
+                                    fill: color.number,
+                                    x: transX(i - .5 * fontSize / cellSize),
+                                    y: transY(minY - fontSize)
+                                }}>{i}</text> : null
+                        }
+                    </React.Fragment>
+                )
+            }
+            {
+                Array(~~((maxY - minY) / cellSize) + 1).fill('').map((_, i) =>
+                    <React.Fragment key={i}>
+                        <line {...{
+                            stroke: color.scalePlate,
+                            strokeWidth: i === 0 ? 1 : i % 5 === 0 ? .3 : .1,
+                            x1: transX(0),
+                            y1: transY(minY + i * cellSize),
+                            x2: transX(maxX),
+                            y2: transY(minY + i * cellSize)
+                        }}/>
+                        {
+                            i && i % 5 === 0 ?
+                                <text {...{
+                                    fontSize,
+                                    fill: color.number,
+                                    x: transX(-2 * fontSize / cellSize),
+                                    y: transY(minY + (i - .5 * fontSize / cellSize) * cellSize)
+                                }}>{minY + i * cellSize}</text> : null
+                        }
+                    </React.Fragment>
+                )
+            }
+            {
+                tradeList.map(({price}, i) =>
+                    <React.Fragment key={i}>
+                        <circle {...{
+                            fill: color.point,
+                            cx: transX(i + 1),
+                            cy: transY(price),
+                            r: 3
+                        }}/>
+                        {
+                            i ? <line {...{
+                                stroke: color.point,
+                                strokeWidth: 1.5,
+                                x1: transX(i + 1),
+                                y1: transY(price),
+                                x2: transX(i),
+                                y2: transY(tradeList[i - 1].price)
+                            }}/> : null
+                        }
+                    </React.Fragment>
+                )
+            }
+        </svg>
+    </section>
+}
+
+//endregion
+
+//region stage
+interface IStageProps {
+    game: IGame<ICreateParams>
+    gameState?: IGameGroupState
+    playerState?: IPlayerGroupState
+    frameEmitter?: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
+    countDown?: number
+}
+
 function NotStart({frameEmitter}: { frameEmitter: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams> }) {
     return <section className={style.notStart}>
         <Line text={'交易规则介绍'} style={{margin: '10vh 0 2rem'}}/>
@@ -50,65 +155,51 @@ function NotStart({frameEmitter}: { frameEmitter: FrameEmitter<MoveType, PushTyp
     </section>
 }
 
-function Matching({game: {params: {roles}}, frameEmitter, gameState}: IStageProps) {
-    const [timer, setTimer] = React.useState(0)
-    React.useEffect(() => {
-        frameEmitter.on(PushType.countDown, ({countDown}) => setTimer(countDown))
-    }, [])
+function Matching({game: {params: {roles}}, frameEmitter, gameState, countDown}: IStageProps) {
     return <>
         <NotStart frameEmitter={frameEmitter}/>
         <MatchModal {...{
             visible: !!gameState,
             totalNum: roles.length,
             matchNum: gameState.roleIndex,
-            timer: MATCH_TIME - timer
+            timer: MATCH_TIME - countDown
         }}/>
     </>
 }
 
-function Trading(props: IStageProps) {
-    const {
-        frameEmitter,
-        game: {params: {roles, prepareTime, tradeTime}},
-        gameState: {orders, stage, buyOrderIds, sellOrderIds, trades, positionUnitIndex},
-        playerState: {roleIndex, unitList}
-    } = props
+function Trading({
+                     frameEmitter, countDown,
+                     game: {params: {roles, prepareTime, tradeTime}},
+                     gameState: {orders, stage, buyOrderIds, sellOrderIds, trades, positionUnitIndex},
+                     playerState: {roleIndex, unitList}
+                 }: IStageProps) {
     const lang = Lang.extractLang({
-        profit: ['物品利润', 'Box Profit'],
-        tradeCount: ['成交数量', 'Trade Count'],
-        totalProfit: ['总利润', 'Total Profit'],
-        unitNumber: ['物品序号', 'Unit Number'],
-        unitCost: ['物品成本', 'Unit Cost'],
-        unitValue: ['物品价值', 'Unit Value'],
-        shout4UnitPls: ['请为当前物品报价', 'Shout for this unit please'],
-        openMarket: ['开放市场', 'Open Market'],
-        marketWillOpen1: ['市场将在', 'Market will open in '],
-        marketWillOpen2: [() => '秒后开放', n => `second${n > 1 ? 's' : ''}`],
-        shout: ['报价', 'Shout'],
-        cancel: ['撤回', 'Cancel'],
-        toEnterNextPhase1: ['您成功交易了', 'You traded'],
-        toEnterNextPhase2: ['单位虚拟物品，共获得', ' goods in this market, and earned'],
-        toEnterNextPhase3: ['实验币的利润。', ' experimental currency.'],
-        [ROLE[ROLE.Buyer]]: ['买家', 'Buyer'],
-        [ROLE[ROLE.Seller]]: ['卖家', 'Seller'],
-        noPosition: ['未分配到市场角色', 'You got no market position'],
-        tradeCost: ['物品成本', 'Cost'],
-        tradeValue: ['物品价值', 'Value'],
-        tradePrice: ['成交价格', 'Price'],
-        invalidBuyPrice: ['订单价格需在市场最高买价与当前物品价值之间', 'Order price must be between your private value and the highest buy price in the market'],
-        invalidSellPrice: ['订单价格需在当前物品成本与市场最低卖价之间', 'Order price must be between the lowest buy price in the market and your private cost'],
-        sellOrders: ['卖家订单', 'SellOrders'],
-        buyOrders: ['买家订单', 'BuyOrders'],
-        yourTrades: ['交易记录', 'Your Trades'],
-        marketHistory: ['市场记录', 'Market History'],
-        onceAgain:['再来一次','Once Again'],
-        nextPhase:['下一环节','Next Phase'],
-    })
+            profit: ['物品利润', 'Box Profit'],
+            tradeCount: ['成交数量', 'Trade Count'],
+            totalProfit: ['总利润', 'Total Profit'],
+            unitNumber: ['物品序号', 'Unit Number'],
+            unitCost: ['物品成本', 'Unit Cost'],
+            unitValue: ['物品价值', 'Unit Value'],
+            shout4UnitPls: ['请为当前物品报价', 'Shout for this unit please'],
+            openMarket: ['开放市场', 'Open Market'],
+            marketWillOpen1: ['市场将在', 'Market will open in '],
+            marketWillOpen2: [() => '秒后开放', n => `second${n > 1 ? 's' : ''}`],
+            shout: ['报价', 'Shout'],
+            cancel: ['撤回', 'Cancel'],
+            [ROLE[ROLE.Buyer]]: ['买家', 'Buyer'],
+            [ROLE[ROLE.Seller]]: ['卖家', 'Seller'],
+            tradeCost: ['物品成本', 'Cost'],
+            tradeValue: ['物品价值', 'Value'],
+            tradePrice: ['成交价格', 'Price'],
+            invalidBuyPrice: ['订单价格需在市场最高买价与当前物品价值之间', 'Order price must be between your private value and the highest buy price in the market'],
+            invalidSellPrice: ['订单价格需在当前物品成本与市场最低卖价之间', 'Order price must be between the lowest buy price in the market and your private cost'],
+            sellOrders: ['卖家订单', 'SellOrders'],
+            buyOrders: ['买家订单', 'BuyOrders'],
+            yourTrades: ['交易记录', 'Your Trades'],
+            marketHistory: ['市场记录', 'Market History'],
+        }),
+        timer = countDown - MATCH_TIME
     const [price, setPrice] = React.useState(0 as number | string)
-    const [timer, setTimer] = React.useState(0)
-    React.useEffect(() => {
-        frameEmitter.on(PushType.countDown, ({countDown}) => setTimer(countDown - MATCH_TIME))
-    }, [])
 
     function submitOrder() {
         const _price = Number(price || 0)
@@ -214,9 +305,6 @@ function Trading(props: IStageProps) {
         return [tradeCount, Number(profit.toFixed(2)), fragment]
     }
 
-    if (roleIndex === undefined) {
-        return <MaskLoading label={lang.noPosition}/>
-    }
     const orderDict: { [id: number]: GameGroupState.IOrder } = {}
     orders.forEach(order => {
         orderDict[order.id] = order
@@ -232,21 +320,6 @@ function Trading(props: IStageProps) {
         margin: '2rem auto 1rem'
     }
     const mainPanelBorder = `linear-gradient(#ddd, transparent)`
-    if (stage === Stage.result) {
-        return <section className={style.result}>
-            <p>
-                {lang.toEnterNextPhase1}
-                <em>{tradeCount}</em>
-                {lang.toEnterNextPhase2}
-                <em>{profit}</em>
-                {lang.toEnterNextPhase3}
-            </p>
-            <div className={style.switchBtns}>
-                <Button label={lang.onceAgain} onClick={()=>frameEmitter.emit(MoveType.leaveGroup)}/>&nbsp;&nbsp;&nbsp;
-                <Button label={lang.nextPhase} onClick={()=>console.log('TODO')}/>
-            </div>
-        </section>
-    }
     return <section className={style.trading}>
         <div className={style.yourTradesWrapper}>
             <Line text={lang.yourTrades} style={titleLineStyle}/>
@@ -350,127 +423,65 @@ function Trading(props: IStageProps) {
     </section>
 }
 
-export const TradeChart: React.FC<{
-    tradeList: Array<{
-        price: number
-    }>,
-    color?: {
-        scalePlate: string
-        point: string,
-        line: string
-        title: string,
-        number: string
-    }
-}> = ({
-          tradeList, color = {
-        scalePlate: '#999',
-        line: '#999',
-        title: '#999',
-        number: '#999',
-        point: '#E27B6A',
-    }
-      }) => {
-    const cellSize = 10, fontSize = 12, padding = 2 * fontSize,
-        minY = 100, maxY = 400,
-        maxX = tradeList.length > 30 ? tradeList.length : 30
-    const transX = x => padding + x * cellSize,
-        transY = y => maxY + padding - y
-    return <section>
-        <svg xmlns="http://www.w3.org/2000/svg"
-             viewBox={`0,0,${maxX * cellSize + 2 * padding},${maxY - minY + 2 * padding}`}>
-            {
-                Array(maxX + 1).fill('').map((_, i) =>
-                    <React.Fragment key={i}>
-                        <line {...{
-                            stroke: color.scalePlate,
-                            strokeWidth: i === 0 ? 1 : i % 5 === 0 ? .3 : .1,
-                            x1: transX(i),
-                            y1: transY(minY),
-                            x2: transX(i),
-                            y2: transY(maxY)
-                        }}/>
-                        {
-                            i && i % 5 === 0 ?
-                                <text {...{
-                                    fontSize,
-                                    fill: color.number,
-                                    x: transX(i - .5 * fontSize / cellSize),
-                                    y: transY(minY - fontSize)
-                                }}>{i}</text> : null
-                        }
-                    </React.Fragment>
-                )
-            }
-            {
-                Array(~~((maxY - minY) / cellSize) + 1).fill('').map((_, i) =>
-                    <React.Fragment key={i}>
-                        <line {...{
-                            stroke: color.scalePlate,
-                            strokeWidth: i === 0 ? 1 : i % 5 === 0 ? .3 : .1,
-                            x1: transX(0),
-                            y1: transY(minY + i * cellSize),
-                            x2: transX(maxX),
-                            y2: transY(minY + i * cellSize)
-                        }}/>
-                        {
-                            i && i % 5 === 0 ?
-                                <text {...{
-                                    fontSize,
-                                    fill: color.number,
-                                    x: transX(-2 * fontSize / cellSize),
-                                    y: transY(minY + (i - .5 * fontSize / cellSize) * cellSize)
-                                }}>{minY + i * cellSize}</text> : null
-                        }
-                    </React.Fragment>
-                )
-            }
-            {
-                tradeList.map(({price}, i) =>
-                    <React.Fragment key={i}>
-                        <circle {...{
-                            fill: color.point,
-                            cx: transX(i + 1),
-                            cy: transY(price),
-                            r: 3
-                        }}/>
-                        {
-                            i ? <line {...{
-                                stroke: color.point,
-                                strokeWidth: 1.5,
-                                x1: transX(i + 1),
-                                y1: transY(price),
-                                x2: transX(i),
-                                y2: transY(tradeList[i - 1].price)
-                            }}/> : null
-                        }
-                    </React.Fragment>
-                )
-            }
-        </svg>
+function Result({playerState:{point, tradedCount}, frameEmitter}:IStageProps){
+    const lang = Lang.extractLang({
+            toEnterNextPhase1: ['您成功交易了', 'You traded'],
+            toEnterNextPhase2: ['单位虚拟物品，共获得', ' goods in this market, and earned'],
+            toEnterNextPhase3: ['实验币的利润。', ' experimental currency.'],
+            onceAgain: ['再来一次', 'Once Again'],
+            nextPhase: ['下一环节', 'Next Phase'],
+        })
+    return <section className={style.result}>
+        <p>
+            {lang.toEnterNextPhase1}
+            <em>{tradedCount}</em>
+            {lang.toEnterNextPhase2}
+            <em>{point}</em>
+            {lang.toEnterNextPhase3}
+        </p>
+        <div className={style.switchBtns}>
+            <Button label={lang.onceAgain}
+                    onClick={() => frameEmitter.emit(MoveType.leaveGroup)}/>&nbsp;&nbsp;&nbsp;
+            <Button label={lang.nextPhase} onClick={() => console.log('TODO')}/>
+        </div>
     </section>
 }
+//endregion
 
-export const Play: Core.PlaySFC<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> =
-    ({game, gameState, playerState, frameEmitter}) => <section className={style.play}>
-        <Header stage={'tbm'}/>
-        {(() => {
-            const {groupIndex} = playerState,
-                gameGroupState = gameState.groups[groupIndex],
-                playerGroupState = playerState.groups[groupIndex]
-            if(!gameGroupState){
-                return <NotStart frameEmitter={frameEmitter}/>
-            }
-            const stageProps = {
-                game,
-                gameState: gameGroupState,
-                playerState: playerGroupState,
-                frameEmitter
-            }
-            switch (stageProps.gameState.stage) {
-                case Stage.matching:
-                    return <Matching {...stageProps}/>
-                default:
-                    return <Trading {...stageProps}/>
-            }
-        })()}
+type TPlayProps = Core.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>
+
+function _Play({game, gameState, playerState, frameEmitter}: TPlayProps) {
+    const [countDown, setCountDown] = React.useState(0)
+    React.useEffect(() => {
+        frameEmitter.on(PushType.countDown, ({countDown}) => setCountDown(countDown))
+    }, [])
+    const {groupIndex} = playerState,
+        gameGroupState = gameState.groups[groupIndex],
+        playerGroupState = playerState.groups[groupIndex]
+    if (!gameGroupState) {
+        return <NotStart frameEmitter={frameEmitter}/>
+    }
+    const stageProps: IStageProps = {
+        game,
+        gameState: gameGroupState,
+        playerState: playerGroupState,
+        frameEmitter,
+        countDown
+    }
+    switch (stageProps.gameState.stage) {
+        case Stage.matching:
+            return <Matching {...stageProps}/>
+        case Stage.reading:
+        case Stage.trading:
+            return <Trading {...stageProps}/>
+        case Stage.result:
+            return <Result {...stageProps}/>
+    }
+}
+
+export function Play(props: TPlayProps) {
+    return <section className={style.play}>
+        <Header stage={'cbm'}/>
+        <_Play {...props}/>
     </section>
+}

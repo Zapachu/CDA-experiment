@@ -78,7 +78,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     }
                     gameState.groups.push({
                         orders: [],
-                        stage: Stage.notStart,
+                        stage: Stage.matching,
                         orderId: 0,
                         buyOrderIds: [],
                         sellOrderIds: [],
@@ -97,36 +97,36 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     unitList: this.game.params.unitLists[roleIndex]
                 }
                 playerState.groupIndex = groupIndex
-                if (gameGroupState.stage === Stage.notStart) {
-                    gameGroupState.stage = Stage.matching
-                    let countDown = 0
-                    const timer = global.setInterval(async () => {
-                        if (gameState.status !== baseEnum.GameStatus.started) {
-                            return
-                        }
-                        if (countDown === MATCH_TIME) {
-                            gameGroupState.stage = Stage.reading
-                            Array(this.game.params.roles.length - gameGroupState.roleIndex).fill(null).forEach(
-                                async (_, i) => await this.startNewRobotScheduler(`${groupIndex}_${i}`)
-                            )
-                        }
-                        const {tradeTime, prepareTime} = this.game.params
-                        if (countDown === prepareTime + MATCH_TIME) {
-                            gameGroupState.stage = Stage.trading
-                            this.groupBroadcast(groupIndex, PushType.beginTrading)
-                        }
-                        if (countDown === prepareTime + tradeTime + MATCH_TIME) {
-                            global.clearInterval(timer)
-                            gameGroupState.stage = Stage.result
-                            await this.calcProfit(groupIndex)
-                        }
-                        await this.stateManager.syncState()
-                        this.groupBroadcast(groupIndex, PushType.countDown, {countDown: countDown++})
-                    }, 1000)
+                if (roleIndex > 0) {
+                    break
                 }
+                let countDown = 0
+                const timer = global.setInterval(async () => {
+                    if (gameState.status !== baseEnum.GameStatus.started) {
+                        return
+                    }
+                    if (countDown === MATCH_TIME) {
+                        gameGroupState.stage = Stage.reading
+                        Array(this.game.params.roles.length - gameGroupState.roleIndex).fill(null).forEach(
+                            async (_, i) => await this.startNewRobotScheduler(`${groupIndex}_${i}`)
+                        )
+                    }
+                    const {tradeTime, prepareTime} = this.game.params
+                    if (countDown === prepareTime + MATCH_TIME) {
+                        gameGroupState.stage = Stage.trading
+                        this.groupBroadcast(groupIndex, PushType.beginTrading)
+                    }
+                    if (countDown === prepareTime + tradeTime + MATCH_TIME) {
+                        global.clearInterval(timer)
+                        await this.calcProfit(groupIndex)
+                        gameGroupState.stage = Stage.result
+                    }
+                    await this.stateManager.syncState()
+                    this.groupBroadcast(groupIndex, PushType.countDown, {countDown: countDown++})
+                }, 1000)
                 break
             }
-            case MoveType.leaveGroup:{
+            case MoveType.leaveGroup: {
                 playerState.groupIndex = undefined
                 break
             }

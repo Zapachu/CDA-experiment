@@ -16,7 +16,6 @@ export enum SheetType {
 }
 
 export enum Stage {
-    notStart,
     matching,
     reading,
     trading,

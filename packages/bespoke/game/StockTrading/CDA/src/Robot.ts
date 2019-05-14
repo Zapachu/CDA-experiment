@@ -38,7 +38,7 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
     zipFreeField: IZipFreeField
 
     async init(): Promise<BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>> {
-        setTimeout(() => this.frameEmitter.emit(MoveType.getGroup), Math.random() * SLEEP_TIME)
+        setTimeout(() => this.frameEmitter.emit(MoveType.getGroup), (Math.random() + .5) * SLEEP_TIME)
         this.frameEmitter.on(PushType.beginTrading, () => {
             this.zipActive = false
             setTimeout(() => {
