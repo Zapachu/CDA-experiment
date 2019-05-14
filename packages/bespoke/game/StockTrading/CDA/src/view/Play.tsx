@@ -170,8 +170,8 @@ function Matching({game: {params: {roles}}, frameEmitter, gameState, countDown}:
 function Trading({
                      frameEmitter, countDown,
                      game: {params: {roles, prepareTime, tradeTime}},
-                     gameState: {orders, stage, buyOrderIds, sellOrderIds, trades, positionUnitIndex},
-                     playerState: {roleIndex, unitList}
+                     gameState: {orders, stage, buyOrderIds, sellOrderIds, trades},
+                     playerState: {roleIndex, units}
                  }: IStageProps) {
     const lang = Lang.extractLang({
             profit: ['物品利润', 'Box Profit'],
@@ -179,8 +179,9 @@ function Trading({
             totalProfit: ['总利润', 'Total Profit'],
             unitNumber: ['物品序号', 'Unit Number'],
             unitCost: ['物品成本', 'Unit Cost'],
+            unitCount: ['物品数量', 'Unit Count'],
             unitValue: ['物品价值', 'Unit Value'],
-            shout4UnitPls: ['请为当前物品报价', 'Shout for this unit please'],
+            shout4UnitPls: ['请为当前物品报价：价格 * 数量', 'Shout for this unit please : price * count'],
             openMarket: ['开放市场', 'Open Market'],
             marketWillOpen1: ['市场将在', 'Market will open in '],
             marketWillOpen2: [() => '秒后开放', n => `second${n > 1 ? 's' : ''}`],
@@ -188,6 +189,7 @@ function Trading({
             cancel: ['撤回', 'Cancel'],
             [ROLE[ROLE.Buyer]]: ['买家', 'Buyer'],
             [ROLE[ROLE.Seller]]: ['卖家', 'Seller'],
+            tradeSeq:['订单序号','Trade Number'],
             tradeCost: ['物品成本', 'Cost'],
             tradeValue: ['物品价值', 'Value'],
             tradePrice: ['成交价格', 'Price'],
@@ -199,121 +201,15 @@ function Trading({
             marketHistory: ['市场记录', 'Market History'],
         }),
         timer = countDown - MATCH_TIME
-    const [price, setPrice] = React.useState(0 as number | string)
-
-    function submitOrder() {
-        const _price = Number(price || 0)
-        const orderDict: { [id: number]: GameGroupState.IOrder } = {}
-        orders.forEach(order => {
-            orderDict[order.id] = order
-        })
-        const role = roles[roleIndex]
-        const privateCost = Number(unitList.split(' ')[positionUnitIndex[roleIndex]]),
-            minSellOrder = orderDict[sellOrderIds[0]],
-            maxBuyOrder = orderDict[buyOrderIds[0]]
-        if (!privateCost) {
-            return
-        }
-        if (role === ROLE.Seller && (_price < privateCost || (minSellOrder && _price >= minSellOrder.price))) {
-            return Toast.warn(lang.invalidSellPrice)
-        }
-        if (role === ROLE.Buyer && (_price > privateCost || (maxBuyOrder && _price <= maxBuyOrder.price))) {
-            return Toast.warn(lang.invalidSellPrice)
-        }
-        frameEmitter.emit(MoveType.submitOrder, {
-            unitIndex: positionUnitIndex[roleIndex],
-            price: _price
-        })
-    }
-
-    function renderOrderList(orderDict: { [id: number]: GameGroupState.IOrder }, marketOrderIds: Array<number>, shoutRole) {
-        return <section className={style.orderList}>
-            <label>{shoutRole === ROLE.Seller ? lang.sellOrders : lang.buyOrders}</label>
-            <ul className={style.orderPrices}>
-                {
-                    marketOrderIds.map((orderId, i) => {
-                            const orderX = orderDict[orderId],
-                                isMine = orderX.roleIndex === roleIndex
-                            return <li key={orderId}>
-                                <Border key={orderId}
-                                        borderRadius='.25rem'
-                                        background={'radial-gradient(at 50% 0%, #aaa 1rem, transparent 70%)'}
-                                        style={{marginTop: '.5rem'}}>
-                                    <div className={style.orderPrice}>
-                                        <label>{orderX.price}</label>
-                                        {
-                                            i && isMine ?
-                                                <a className={style.btnCancel}
-                                                   onClick={() => frameEmitter.emit(MoveType.cancelOrder)}>×</a> : null
-                                        }
-                                    </div>
-                                </Border>
-                            </li>
-                        }
-                    )
-                }
-            </ul>
-        </section>
-    }
-
-    function renderTradeList(orderDict: { [id: number]: GameGroupState.IOrder }, trades: Array<GameGroupState.ITrade>): [number, number, React.ReactNode] {
-        const role = roles[roleIndex]
-        const unitPrices = unitList.split(' ').map(price => +price)
-        const myTrades: Array<{
-            privateCost: number,
-            price?: number
-        }> = unitPrices.map(privateCost => ({privateCost}))
-        trades.forEach(({resId, reqId}) => {
-            const reqOrder = orderDict[reqId],
-                resOrder = orderDict[resId]
-            switch (roleIndex) {
-                case reqOrder.roleIndex: {
-                    myTrades[reqOrder.unitIndex].price = reqOrder.price
-                    break
-                }
-                case resOrder.roleIndex: {
-                    myTrades[resOrder.unitIndex].price = reqOrder.price
-                    break
-                }
-            }
-        })
-        let profit = 0, tradeCount = 0
-        myTrades.forEach(({price, privateCost}) => {
-            profit += price ? (price - privateCost) * (role === ROLE.Seller ? 1 : -1) : 0
-            price ? tradeCount++ : null
-        })
-        const fragment = <table className={style.tradeList}>
-            <thead>
-            <tr>
-                <th>{lang.unitNumber}</th>
-                <th>{role === ROLE.Seller ? lang.tradePrice : lang.tradeValue}</th>
-                <th>{role === ROLE.Seller ? lang.tradeCost : lang.tradePrice}</th>
-                <th>{lang.profit}</th>
-            </tr>
-            </thead>
-            <tbody>
-            {
-                myTrades.map(({price, privateCost}, i) => <tr key={i}>
-                    <td>{i + 1}</td>
-                    <td>{role === ROLE.Seller ? price : privateCost}</td>
-                    <td>{role === ROLE.Seller ? privateCost : price}</td>
-                    <td>{price ? (price - privateCost) * (role === ROLE.Seller ? 1 : -1) : null}</td>
-                </tr>)
-            }
-            </tbody>
-        </table>
-        return [tradeCount, Number(profit.toFixed(2)), fragment]
-    }
-
+    const [price, setPrice] = React.useState('' as number | string)
+    const [count, setCount] = React.useState(1 as number | string)
+    const unitIndex = units.findIndex(({count}) => !!count)
     const orderDict: { [id: number]: GameGroupState.IOrder } = {}
     orders.forEach(order => {
         orderDict[order.id] = order
     })
     const role = roles[roleIndex]
     const timeLeft = tradeTime + prepareTime - timer
-    const unitIndex = positionUnitIndex[roleIndex],
-        unitPrice = +(unitList.split(' ')[unitIndex] || 0)
-    const [tradeCount, profit, tradeListFragment] = renderTradeList(orderDict, trades)
     const titleLineStyle: React.CSSProperties = {
         maxWidth: '24rem',
         fontSize: '1.2rem',
@@ -321,31 +217,10 @@ function Trading({
     }
     const mainPanelBorder = `linear-gradient(#ddd, transparent)`
     return <section className={style.trading}>
-        <div className={style.yourTradesWrapper}>
-            <Line text={lang.yourTrades} style={titleLineStyle}/>
-            <Border background={mainPanelBorder}>
-                <div className={style.yourTrades}>
-                    <div className={style.tradeListWrapper}>
-                        {
-                            tradeListFragment
-                        }
-                    </div>
-                    <Border style={{margin: 'auto'}}>
-                        <div className={style.summary}>
-                            <div>
-                                <label>{lang.tradeCount}</label>
-                                <em>{tradeCount}</em>
-                            </div>
-                            <div>
-                                <label>{lang.totalProfit}</label>
-                                <em>{profit}</em>
-                            </div>
-                        </div>
-                    </Border>
-                </div>
-            </Border>
-        </div>
-        <Border style={{flexBasis: '32rem'}} background={mainPanelBorder}>
+        {
+            renderTrade()
+        }
+        <Border style={{flexBasis: '40rem'}} background={mainPanelBorder}>
             <div className={style.orderPanel}>
                 <Line text={lang[ROLE[role]]} style={titleLineStyle}/>
                 <section className={style.orderBook}>
@@ -366,7 +241,11 @@ function Trading({
                             </div>
                             <div>
                                 <label>{role === ROLE.Buyer ? lang.unitValue : lang.unitCost}</label>
-                                <em>{unitPrice}</em>
+                                <em>{units[unitIndex].price}</em>
+                            </div>
+                            <div>
+                                <label>{lang.unitCount}</label>
+                                <em>{units[unitIndex].count}</em>
                             </div>
                         </div>
                     </Border>
@@ -379,11 +258,16 @@ function Trading({
                                 <div className={style.orderInputWrapper}>
                                     <label>{lang.shout4UnitPls}</label>
                                     <Input {...{
-                                        autoFocus: true,
                                         value: price || '',
                                         onChange: price => setPrice(price),
                                         onMinus: price => setPrice(price - 1),
                                         onPlus: price => setPrice(price + 1)
+                                    }}/>
+                                    <Input {...{
+                                        value: count || '',
+                                        onChange: count => setCount(count),
+                                        onMinus: count => setCount(count - 1),
+                                        onPlus: count => setCount(count + 1)
                                     }}/>
                                 </div>
                                 <div className={style.submitBtnWrapper}>
@@ -400,14 +284,103 @@ function Trading({
                 </section>
             </div>
         </Border>
-        <div className={style.marketHistoryWrapper}>
+        {
+            renderChart()
+        }
+    </section>
+
+    function submitOrder() {
+        const _price = Number(price || 0)
+        const orderDict: { [id: number]: GameGroupState.IOrder } = {}
+        orders.forEach(order => {
+            orderDict[order.id] = order
+        })
+        const role = roles[roleIndex]
+        const privateCost = units[unitIndex].price,
+            minSellOrder = orderDict[sellOrderIds[0]],
+            maxBuyOrder = orderDict[buyOrderIds[0]]
+        if (!privateCost) {
+            return
+        }
+        if (role === ROLE.Seller && (_price < privateCost || (minSellOrder && _price > minSellOrder.price))) {
+            return Toast.warn(lang.invalidSellPrice)
+        }
+        if (role === ROLE.Buyer && (_price > privateCost || (maxBuyOrder && _price < maxBuyOrder.price))) {
+            return Toast.warn(lang.invalidSellPrice)
+        }
+        frameEmitter.emit(MoveType.submitOrder, {
+            unitIndex,
+            price: _price,
+            count: +count
+        })
+    }
+
+    function renderTrade() {
+        let tradeCount = 0, totalProfit = 0
+        const role = roles[roleIndex]
+        return <div className={style.yourTradesWrapper}>
+            <Line text={lang.yourTrades} style={titleLineStyle}/>
+            <Border background={mainPanelBorder}>
+                <div className={style.yourTrades}>
+                    <div className={style.tradeListWrapper}>
+                        <table className={style.tradeList}>
+                            <thead>
+                            <tr>
+                                <th>{lang.tradeSeq}</th>
+                                <th>{role === ROLE.Seller ? lang.tradePrice : lang.tradeValue}</th>
+                                <th>{role === ROLE.Seller ? lang.tradeCost : lang.tradePrice}</th>
+                                <th>{lang.unitCount}</th>
+                                <th>{lang.profit}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {
+                                trades.map(({reqOrderId, resOrderId, count}, i) => {
+                                    const reqOrder = orderDict[reqOrderId],
+                                        resOrder = orderDict[resOrderId]
+                                    const privateCost = units[roleIndex === reqOrder.roleIndex ? reqOrder.roleIndex : resOrder.roleIndex].price,
+                                        price = reqOrder.price,
+                                        profit = Math.abs(privateCost - reqOrder.price) * count
+                                    tradeCount += count
+                                    totalProfit += profit
+                                    return <tr key={i}>
+                                        <td>{i + 1}</td>
+                                        <td>{role === ROLE.Seller ? price : privateCost}</td>
+                                        <td>{role === ROLE.Seller ? privateCost : price}</td>
+                                        <td>{count}</td>
+                                        <td>{profit}</td>
+                                    </tr>
+                                })
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                    <Border style={{margin: 'auto'}}>
+                        <div className={style.summary}>
+                            <div>
+                                <label>{lang.tradeCount}</label>
+                                <em>{tradeCount}</em>
+                            </div>
+                            <div>
+                                <label>{lang.totalProfit}</label>
+                                <em>{totalProfit}</em>
+                            </div>
+                        </div>
+                    </Border>
+                </div>
+            </Border>
+        </div>
+    }
+
+    function renderChart() {
+        return <div className={style.marketHistoryWrapper}>
             <Line text={lang.marketHistory} style={titleLineStyle}/>
             <Border background={mainPanelBorder}>
                 <div className={style.marketHistory}>
                     <h3 className={style.title}>{lang.tradeHistory}</h3>
                     <div className={style.tradeChartWrapper}>
                         <TradeChart
-                            tradeList={trades.map(({reqId}) => ({price: orderDict[reqId].price}))}
+                            tradeList={trades.map(({reqOrderId}) => ({price: orderDict[reqOrderId].price}))}
                             color={{
                                 scalePlate: '#fff',
                                 line: '#258df3',
@@ -420,17 +393,48 @@ function Trading({
                 </div>
             </Border>
         </div>
-    </section>
+    }
+
+    function renderOrderList(orderDict: { [id: number]: GameGroupState.IOrder }, marketOrderIds: Array<number>, shoutRole) {
+        return <section className={style.orderList}>
+            <label>{shoutRole === ROLE.Seller ? lang.sellOrders : lang.buyOrders}</label>
+            <ul className={style.orderPrices}>
+                {
+                    marketOrderIds.map((orderId, i) => {
+                            const orderX = orderDict[orderId],
+                                isMine = orderX.roleIndex === roleIndex
+                            return <li key={orderId}>
+                                <Border key={orderId}
+                                        borderRadius='.25rem'
+                                        background={'radial-gradient(at 50% 0%, #aaa 1rem, transparent 70%)'}
+                                        style={{marginTop: '.5rem'}}>
+                                    <div className={style.orderPrice}>
+                                        <label>{orderX.price}</label>*
+                                        <label>{orderX.count}</label>
+                                        {
+                                            i && isMine ?
+                                                <a className={style.btnCancel}
+                                                   onClick={() => frameEmitter.emit(MoveType.cancelOrder)}>×</a> : null
+                                        }
+                                    </div>
+                                </Border>
+                            </li>
+                        }
+                    )
+                }
+            </ul>
+        </section>
+    }
 }
 
-function Result({playerState:{point, tradedCount}, frameEmitter}:IStageProps){
+function Result({playerState: {point, tradedCount}, frameEmitter}: IStageProps) {
     const lang = Lang.extractLang({
-            toEnterNextPhase1: ['您成功交易了', 'You traded'],
-            toEnterNextPhase2: ['单位虚拟物品，共获得', ' goods in this market, and earned'],
-            toEnterNextPhase3: ['实验币的利润。', ' experimental currency.'],
-            onceAgain: ['再来一次', 'Once Again'],
-            nextPhase: ['下一环节', 'Next Phase'],
-        })
+        toEnterNextPhase1: ['您成功交易了', 'You traded'],
+        toEnterNextPhase2: ['单位虚拟物品，共获得', ' goods in this market, and earned'],
+        toEnterNextPhase3: ['实验币的利润。', ' experimental currency.'],
+        onceAgain: ['再来一次', 'Once Again'],
+        nextPhase: ['下一环节', 'Next Phase'],
+    })
     return <section className={style.result}>
         <p>
             {lang.toEnterNextPhase1}
@@ -446,6 +450,7 @@ function Result({playerState:{point, tradedCount}, frameEmitter}:IStageProps){
         </div>
     </section>
 }
+
 //endregion
 
 type TPlayProps = Core.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>

@@ -100,13 +100,13 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
     }
 
     get unitIndex(): number {
-        return this.gameGroupState.positionUnitIndex[this.playerGroupState.roleIndex]
+        return this.playerGroupState.units.findIndex(({count})=>!!count)
     }
 
     get unitPrice(): number {
         try {
-            const {playerGroupState: {unitList}} = this
-            return +(unitList.split(' ')[this.unitIndex])
+            const {playerGroupState: {units}} = this
+            return +(units[this.unitIndex].price)
         } catch (e) {
             return 0
         }
@@ -145,8 +145,8 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
         const {orderDict, game, role} = this,
             resOrder = orderDict[resOrderId],
             {roles} = game.params
-        const {reqId} = this.gameGroupState.trades.find(({resId}) => resId === resOrderId),
-            {price: tradePrice} = orderDict[reqId]
+        const {reqOrderId} = this.gameGroupState.trades.find(({resOrderId}) => resOrderId === resOrderId),
+            {price: tradePrice} = orderDict[reqOrderId]
         const resRole = roles[resOrder.roleIndex]
         if ((role === ROLE.Buyer && this.zipFreeField.calcPrice >= tradePrice) ||
             (role === ROLE.Seller && this.zipFreeField.calcPrice <= tradePrice)) {

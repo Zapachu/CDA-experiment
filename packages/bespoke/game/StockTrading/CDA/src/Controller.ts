@@ -33,7 +33,6 @@ import {
     IPushParams
 } from './interface'
 import {getEnumKeys} from './util'
-import {Actor} from "bespoke-common/build/baseEnum";
 
 export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
     getGame4Player() {
@@ -45,6 +44,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
 
     initGameState(): TGameState<IGameState> {
         const gameState = super.initGameState()
+        gameState.status = baseEnum.GameStatus.started
         gameState.groups = []
         return gameState
     }
@@ -67,13 +67,13 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     if (gameGroupState.roleIndex >= this.game.params.roles.length) {
                         return false
                     }
-                    if (actor.type === Actor.serverRobot) {
+                    if (actor.type === baseEnum.Actor.serverRobot) {
                         return true
                     }
                     return params.groupType === GroupType.Multi && gameGroupState.type === GroupType.Multi
                 })
                 if (groupIndex === -1) {
-                    if (actor.type === Actor.serverRobot) {
+                    if (actor.type === baseEnum.Actor.serverRobot) {
                         break
                     }
                     gameState.groups.push({
@@ -84,7 +84,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         sellOrderIds: [],
                         trades: [],
                         roleIndex: 0,
-                        positionUnitIndex: this.game.params.roles.map(() => 0),
                         type: params.groupType
                     })
                     groupIndex = gameState.groups.length - 1
@@ -94,7 +93,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 playerState.groups[groupIndex] = {
                     point: 0,
                     roleIndex,
-                    unitList: this.game.params.unitLists[roleIndex]
+                    units: this.game.params.units[roleIndex].units
                 }
                 playerState.groupIndex = groupIndex
                 if (roleIndex > 0) {
@@ -107,20 +106,20 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     }
                     if (countDown === MATCH_TIME) {
                         gameGroupState.stage = Stage.reading
-                        Array(this.game.params.roles.length - gameGroupState.roleIndex).fill(null).forEach(
-                            async (_, i) => await this.startNewRobotScheduler(`${groupIndex}_${i}`)
-                        )
+                        /*                        Array(this.game.params.roles.length - gameGroupState.roleIndex).fill(null).forEach(
+                                                    async (_, i) => await this.startNewRobotScheduler(`${groupIndex}_${i}`)
+                                                )*/
                     }
                     const {tradeTime, prepareTime} = this.game.params
                     if (countDown === prepareTime + MATCH_TIME) {
                         gameGroupState.stage = Stage.trading
                         this.groupBroadcast(groupIndex, PushType.beginTrading)
                     }
-                    if (countDown === prepareTime + tradeTime + MATCH_TIME) {
-                        global.clearInterval(timer)
-                        await this.calcProfit(groupIndex)
-                        gameGroupState.stage = Stage.result
-                    }
+                    /*                    if (countDown === prepareTime + tradeTime + MATCH_TIME) {
+                                            global.clearInterval(timer)
+                                            await this.calcProfit(groupIndex)
+                                            gameGroupState.stage = Stage.result
+                                        }*/
                     await this.stateManager.syncState()
                     this.groupBroadcast(groupIndex, PushType.countDown, {countDown: countDown++})
                 }, 1000)
@@ -135,20 +134,21 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     playerGroupState = playerState.groups[groupIndex],
                     gameGroupState = gameState.groups[groupIndex]
                 const {roleIndex} = playerGroupState
-                const {price, unitIndex} = params
+                const {price, unitIndex, count = 1} = params
                 const orderDict = this.getOrderDict(gameGroupState), {buyOrderIds, sellOrderIds} = gameGroupState,
                     buyOrders = buyOrderIds.map(id => orderDict[id].price).join(','),
                     sellOrders = sellOrderIds.map(id => orderDict[id].price).join(',')
                 let shoutResult: ShoutResult
-                if (unitIndex !== gameGroupState.positionUnitIndex[roleIndex]) {
+                if (count > playerGroupState.units[unitIndex].count) {
                     Log.d('物品已成交，无法继续报价')
                     shoutResult = ShoutResult.shoutOnTradedUnit
                 } else {
                     const newOrder = {
                         id: ++gameGroupState.orderId,
                         roleIndex,
-                        unitIndex: gameGroupState.positionUnitIndex[roleIndex],
-                        price
+                        unitIndex,
+                        price,
+                        count
                     }
                     shoutResult = await this.shoutNewOrder(groupIndex, newOrder)
                 }
@@ -179,7 +179,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         playerStates.forEach(playerState => {
             const playerGroupState = playerState.groups[groupIndex]
             const {roles} = game.params
-            if (!playerGroupState.unitList) {
+            if (!playerGroupState.units) {
                 return
             }
             let periodProfit = 0, tradedCount = 0
@@ -187,9 +187,9 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             orders.forEach(order => {
                 orderDict[order.id] = order
             })
-            trades.forEach(({reqId, resId}) => {
-                const reqOrder = orderDict[reqId],
-                    resOrder = orderDict[resId]
+            trades.forEach(({reqOrderId, resOrderId}) => {
+                const reqOrder = orderDict[reqOrderId],
+                    resOrder = orderDict[resOrderId]
                 let myOrder: GameGroupState.IOrder
                 switch (playerGroupState.roleIndex) {
                     case reqOrder.roleIndex:
@@ -201,7 +201,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     default:
                         return
                 }
-                const privateCost = +playerGroupState.unitList.split(' ')[myOrder.unitIndex]
+                const privateCost = +playerGroupState.units[myOrder.unitIndex].price
                 let unitProfit = roles[playerGroupState.roleIndex] === ROLE.Buyer ?
                     privateCost - reqOrder.price : reqOrder.price - privateCost
                 periodProfit += unitProfit
@@ -214,10 +214,12 @@ export default class Controller extends BaseController<ICreateParams, IGameState
 
     async shoutNewOrder(groupIndex: number, order: GameGroupState.IOrder): Promise<ShoutResult> {
         const role = this.game.params.roles[order.roleIndex]
-        const {buyOrderIds, sellOrderIds, trades, positionUnitIndex, orders} = (await this.stateManager.getGameState()).groups[groupIndex]
+        const groupPlayerStates = await this.getGroupPlayerStates(groupIndex)
+        const gameGroupState = (await this.stateManager.getGameState()).groups[groupIndex],
+            {buyOrderIds, sellOrderIds, trades, orders} = gameGroupState
         const marketRejected = role === ROLE.Seller ?
-            sellOrderIds[0] && order.price >= orders.find(({id}) => id === sellOrderIds[0]).price :
-            buyOrderIds[0] && order.price <= orders.find(({id}) => id === buyOrderIds[0]).price
+            sellOrderIds[0] && order.price > orders.find(({id}) => id === sellOrderIds[0]).price :
+            buyOrderIds[0] && order.price < orders.find(({id}) => id === buyOrderIds[0]).price
         if (marketRejected) {
             return ShoutResult.marketReject
         } else {
@@ -228,13 +230,38 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             buyOrderIds[0] && order.price <= orders.find(({id}) => id === buyOrderIds[0]).price :
             sellOrderIds[0] && order.price >= orders.find(({id}) => id === sellOrderIds[0]).price
         if (tradeSuccess) {
-            const pairOrderId = role === ROLE.Seller ? buyOrderIds.shift() : sellOrderIds.shift()
-            trades.push({
-                reqId: pairOrderId,
-                resId: order.id
-            })
-            positionUnitIndex[orders.find(({id}) => id === pairOrderId).roleIndex] += 1
-            positionUnitIndex[order.roleIndex] += 1
+            const pairOrderId = role === ROLE.Seller ? buyOrderIds.shift() : sellOrderIds.shift(),
+                pairOrder = orders.find(({id}) => id === pairOrderId),
+                trade: GameGroupState.ITrade = {
+                    reqOrderId: pairOrderId,
+                    resOrderId: order.id,
+                    count: order.count
+                }
+            if (pairOrder.count > order.count) {
+                const subOrder: GameGroupState.IOrder = {
+                    ...pairOrder,
+                    id: ++gameGroupState.orderId,
+                    count: pairOrder.count - order.count
+                }
+                orders.push(subOrder)
+                ;(role === ROLE.Buyer ? sellOrderIds : buyOrderIds).unshift(subOrder.id)
+                trade.subOrderId = subOrder.id
+            } else if (pairOrder.count < order.count) {
+                trade.count = pairOrder.count
+                const subOrder: GameGroupState.IOrder = {
+                    ...order,
+                    id: ++gameGroupState.orderId,
+                    count: order.count - pairOrder.count
+                }
+                orders.push(subOrder)
+                ;(role === ROLE.Seller ? sellOrderIds : buyOrderIds).unshift(subOrder.id)
+                trade.subOrderId = subOrder.id
+            }
+            trades.push(trade)
+            groupPlayerStates.find(({groups})=>groups[groupIndex].roleIndex === pairOrder.roleIndex)
+                .groups[groupIndex].units[pairOrder.unitIndex].count-=trade.count
+            groupPlayerStates.find(({groups})=>groups[groupIndex].roleIndex === order.roleIndex)
+                .groups[groupIndex].units[order.unitIndex].count-=trade.count
             this.groupBroadcast(groupIndex, PushType.newTrade, {resOrderId: order.id})
             return ShoutResult.tradeSuccess
         } else {

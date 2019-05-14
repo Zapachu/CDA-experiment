@@ -1,4 +1,100 @@
 import * as $protobuf from "protobufjs";
+/** Properties of an Unit. */
+export interface IUnit {
+
+    /** Unit price */
+    price?: (number|null);
+
+    /** Unit count */
+    count?: (number|null);
+}
+
+/** Represents an Unit. */
+export class Unit implements IUnit {
+
+    /**
+     * Constructs a new Unit.
+     * @param [properties] Properties to set
+     */
+    constructor(properties?: IUnit);
+
+    /** Unit price. */
+    public price: number;
+
+    /** Unit count. */
+    public count: number;
+
+    /**
+     * Creates a new Unit instance using the specified properties.
+     * @param [properties] Properties to set
+     * @returns Unit instance
+     */
+    public static create(properties?: IUnit): Unit;
+
+    /**
+     * Encodes the specified Unit message. Does not implicitly {@link Unit.verify|verify} messages.
+     * @param message Unit message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encode(message: IUnit, writer?: $protobuf.Writer): $protobuf.Writer;
+
+    /**
+     * Encodes the specified Unit message, length delimited. Does not implicitly {@link Unit.verify|verify} messages.
+     * @param message Unit message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encodeDelimited(message: IUnit, writer?: $protobuf.Writer): $protobuf.Writer;
+
+    /**
+     * Decodes an Unit message from the specified reader or buffer.
+     * @param reader Reader or buffer to decode from
+     * @param [length] Message length if known beforehand
+     * @returns Unit
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): Unit;
+
+    /**
+     * Decodes an Unit message from the specified reader or buffer, length delimited.
+     * @param reader Reader or buffer to decode from
+     * @returns Unit
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): Unit;
+
+    /**
+     * Verifies an Unit message.
+     * @param message Plain object to verify
+     * @returns `null` if valid, otherwise the reason why it is not
+     */
+    public static verify(message: { [k: string]: any }): (string|null);
+
+    /**
+     * Creates an Unit message from a plain object. Also converts values to their respective internal types.
+     * @param object Plain object
+     * @returns Unit
+     */
+    public static fromObject(object: { [k: string]: any }): Unit;
+
+    /**
+     * Creates a plain object from an Unit message. Also converts values to other types if specified.
+     * @param message Unit
+     * @param [options] Conversion options
+     * @returns Plain object
+     */
+    public static toObject(message: Unit, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+    /**
+     * Converts this Unit to JSON.
+     * @returns JSON object
+     */
+    public toJSON(): { [k: string]: any };
+}
+
 /** Properties of a CreateParams. */
 export interface ICreateParams {
 
@@ -11,8 +107,8 @@ export interface ICreateParams {
     /** CreateParams tradeTime */
     tradeTime?: (number|null);
 
-    /** CreateParams unitLists */
-    unitLists?: (string[]|null);
+    /** CreateParams units */
+    units?: (CreateParams.IUnits[]|null);
 }
 
 /** Represents a CreateParams. */
@@ -33,8 +129,8 @@ export class CreateParams implements ICreateParams {
     /** CreateParams tradeTime. */
     public tradeTime: number;
 
-    /** CreateParams unitLists. */
-    public unitLists: string[];
+    /** CreateParams units. */
+    public units: CreateParams.IUnits[];
 
     /**
      * Creates a new CreateParams instance using the specified properties.
@@ -107,6 +203,99 @@ export class CreateParams implements ICreateParams {
     public toJSON(): { [k: string]: any };
 }
 
+export namespace CreateParams {
+
+    /** Properties of an Units. */
+    interface IUnits {
+
+        /** Units units */
+        units?: (IUnit[]|null);
+    }
+
+    /** Represents an Units. */
+    class Units implements IUnits {
+
+        /**
+         * Constructs a new Units.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: CreateParams.IUnits);
+
+        /** Units units. */
+        public units: IUnit[];
+
+        /**
+         * Creates a new Units instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns Units instance
+         */
+        public static create(properties?: CreateParams.IUnits): CreateParams.Units;
+
+        /**
+         * Encodes the specified Units message. Does not implicitly {@link CreateParams.Units.verify|verify} messages.
+         * @param message Units message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: CreateParams.IUnits, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified Units message, length delimited. Does not implicitly {@link CreateParams.Units.verify|verify} messages.
+         * @param message Units message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: CreateParams.IUnits, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes an Units message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns Units
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): CreateParams.Units;
+
+        /**
+         * Decodes an Units message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns Units
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): CreateParams.Units;
+
+        /**
+         * Verifies an Units message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates an Units message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns Units
+         */
+        public static fromObject(object: { [k: string]: any }): CreateParams.Units;
+
+        /**
+         * Creates a plain object from an Units message. Also converts values to other types if specified.
+         * @param message Units
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: CreateParams.Units, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this Units to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+    }
+}
+
 /** Properties of a GameGroupState. */
 export interface IGameGroupState {
 
@@ -127,9 +316,6 @@ export interface IGameGroupState {
 
     /** GameGroupState trades */
     trades?: (GameGroupState.ITrade[]|null);
-
-    /** GameGroupState positionUnitIndex */
-    positionUnitIndex?: (number[]|null);
 
     /** GameGroupState roleIndex */
     roleIndex?: (number|null);
@@ -164,9 +350,6 @@ export class GameGroupState implements IGameGroupState {
 
     /** GameGroupState trades. */
     public trades: GameGroupState.ITrade[];
-
-    /** GameGroupState positionUnitIndex. */
-    public positionUnitIndex: number[];
 
     /** GameGroupState roleIndex. */
     public roleIndex: number;
@@ -261,6 +444,9 @@ export namespace GameGroupState {
 
         /** Order price */
         price?: (number|null);
+
+        /** Order count */
+        count?: (number|null);
     }
 
     /** Represents an Order. */
@@ -283,6 +469,9 @@ export namespace GameGroupState {
 
         /** Order price. */
         public price: number;
+
+        /** Order count. */
+        public count: number;
 
         /**
          * Creates a new Order instance using the specified properties.
@@ -358,11 +547,17 @@ export namespace GameGroupState {
     /** Properties of a Trade. */
     interface ITrade {
 
-        /** Trade reqId */
-        reqId?: (number|null);
+        /** Trade reqOrderId */
+        reqOrderId?: (number|null);
 
-        /** Trade resId */
-        resId?: (number|null);
+        /** Trade resOrderId */
+        resOrderId?: (number|null);
+
+        /** Trade count */
+        count?: (number|null);
+
+        /** Trade subOrderId */
+        subOrderId?: (number|null);
     }
 
     /** Represents a Trade. */
@@ -374,11 +569,17 @@ export namespace GameGroupState {
          */
         constructor(properties?: GameGroupState.ITrade);
 
-        /** Trade reqId. */
-        public reqId: number;
+        /** Trade reqOrderId. */
+        public reqOrderId: number;
 
-        /** Trade resId. */
-        public resId: number;
+        /** Trade resOrderId. */
+        public resOrderId: number;
+
+        /** Trade count. */
+        public count: number;
+
+        /** Trade subOrderId. */
+        public subOrderId: number;
 
         /**
          * Creates a new Trade instance using the specified properties.
@@ -548,8 +749,8 @@ export interface IPlayerGroupState {
     /** PlayerGroupState roleIndex */
     roleIndex?: (number|null);
 
-    /** PlayerGroupState unitList */
-    unitList?: (string|null);
+    /** PlayerGroupState units */
+    units?: (IUnit[]|null);
 
     /** PlayerGroupState tradedCount */
     tradedCount?: (number|null);
@@ -570,8 +771,8 @@ export class PlayerGroupState implements IPlayerGroupState {
     /** PlayerGroupState roleIndex. */
     public roleIndex: number;
 
-    /** PlayerGroupState unitList. */
-    public unitList: string;
+    /** PlayerGroupState units. */
+    public units: IUnit[];
 
     /** PlayerGroupState tradedCount. */
     public tradedCount: number;
@@ -757,6 +958,9 @@ export interface IMoveParams {
 
     /** MoveParams price */
     price?: (number|null);
+
+    /** MoveParams count */
+    count?: (number|null);
 }
 
 /** Represents a MoveParams. */
@@ -776,6 +980,9 @@ export class MoveParams implements IMoveParams {
 
     /** MoveParams price. */
     public price: number;
+
+    /** MoveParams count. */
+    public count: number;
 
     /**
      * Creates a new MoveParams instance using the specified properties.
