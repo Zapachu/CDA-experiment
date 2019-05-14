@@ -2,26 +2,36 @@ import * as React from 'react'
 import * as style from './style.scss'
 import * as dateFormat from 'dateformat'
 import Header from '../../../components/Header'
-import {Core, MaskLoading, Input, Label, Toast} from 'bespoke-client-util'
+import Line from '../../../components/Line'
+import Input from '../../../components/Input'
+import Button from '../../../components/Button'
+import Loading from '../../../components/Loading'
+import Modal from '../../../components/Modal'
+import {Core, Toast} from 'bespoke-client-util'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import {FetchType, MoveType, PushType, NEW_ROUND_TIMER, PlayerStatus} from '../config'
 
 interface IPlayState {
     price: string
     loading: boolean
-    newRoundTimers: Array<number>
+    newRoundTimers: Array<number>,
+    showRule: boolean,
+    showTBMRule: boolean
 }
 
-const InfoBar = ({text, styles = {}}: { text: string, styles?: object }) => <div style={styles}
-                                                                                 className={style.infoBar}>
-    {text}
-</div>
+const InfoBar = ({text, styles = {}}: { text: string, styles?: object }) =>
+    <div style={styles}
+         className={style.infoBar}>
+        {text}
+    </div>
 
 export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, IPlayState> {
     state = {
         price: '',
         loading: true,
-        newRoundTimers: []
+        newRoundTimers: [],
+        showRule: false,
+        showTBMRule: false
     }
 
     async componentDidMount() {
@@ -37,7 +47,11 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         this.setState({loading: false})
     }
 
-    setVal = (e) => this.setState({price: e.target.value})
+    setVal = (value) => this.setState({price: value})
+
+    onPlus = (value) => this.setState({price: (++value).toString()})
+
+    onMinus = (value) => this.setState({price: (--value).toString()})
 
     shout = () => {
         const {
@@ -71,10 +85,10 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             {playerStatus} = rounds[roundIndex]
         const playerState = playerStatus[positionIndex]
         if (playerState === PlayerStatus.shouted) {
-            return <MaskLoading label='您已出价，请等待其他玩家...'/>
+            return <Loading label='您已出价，请等待其他玩家...'/>
         }
         if (playerState === PlayerStatus.gameOver) {
-            return <MaskLoading label='所有轮次结束，等待老师结束实验...'/>
+            return <Loading label='所有轮次结束，等待结束...'/>
         }
         if (playerState === PlayerStatus.outside) {
             return <div>
@@ -83,8 +97,13 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         }
         return <div>
             <li>
-                <Label label='输入您的价格'/>
-                <Input type='number' value={price} onChange={this.setVal.bind(this)}/>
+                <Input
+                    value={price}
+                    onChange={this.setVal}
+                    onMinus={this.onMinus}
+                    onPlus={this.onPlus}
+                    placeholder={`报价`}
+                />
             </li>
         </div>
     }
@@ -136,19 +155,46 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         return
     }
 
+    dynamicBtnView = () => {
+        const {
+            props: {
+                gameState: {groups},
+                playerState: {groupIndex, positionIndex}
+            }
+        } = this
+        const {rounds, roundIndex} = groups[groupIndex],
+            {playerStatus} = rounds[roundIndex]
+        const playerState = playerStatus[positionIndex]
+        switch (playerState) {
+            case PlayerStatus.outside:
+            case PlayerStatus.prepared:
+                return <Button label={this.dynamicTip()} onClick={this.dynamicBtn} style={{marginTop: 36}}/>
+            default:
+                return null
+        }
+    }
+
+    showRule = () => {
+        this.setState({showRule: !this.state.showRule})
+    }
+
+    showTBMRule = () => {
+        this.setState({showRule: !this.state.showTBMRule})
+    }
+
     render() {
         const {
             props: {
                 game: {params: {}},
                 gameState: {groups},
                 playerState: {groupIndex, privatePrices}
-            }, state: {loading, newRoundTimers}
+            }, state: {loading, newRoundTimers, showRule, showTBMRule}
         } = this
         if (loading) {
-            return <MaskLoading label='加载中...'/>
+            return <Loading label='加载中...'/>
         }
         if (groupIndex === undefined) {
-            return <MaskLoading label='正在匹配玩家...'/>
+            return <Loading label='正在匹配玩家...'/>
         }
         const {roundIndex} = groups[groupIndex],
             newRoundTimer = newRoundTimers[roundIndex]
@@ -156,6 +202,13 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
 
             <Header stage='tbm'/>
 
+            {/*<StockInfo*/}
+            {/*    code={`600050`}*/}
+            {/*    name={`中国联通`}*/}
+            {/*    contractor={`中国国际金融有限公司`}*/}
+            {/*    startDate={dateFormat(Date.now(), 'yyyy/mm/dd')}*/}
+            {/*    endDate={dateFormat(Date.now(), 'yyyy/mm/dd')}*/}
+            {/*/>*/}
 
             <table className={style.infoTable}>
                 <thead>
@@ -180,17 +233,22 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
 
             <div className={style.workBox}>
                 <div className={style.tipText}>
-                    <span className={style.tipLine}> </span>
-                    <span className={style.tipContent}> {` ${this.dynamicTip()} `}</span>
-                    <span className={style.tipLine}> </span>
+                    <Line text={` ${this.dynamicTip()} `}/>
+                    {/*<span className={style.tipLine}> </span>*/}
+                    {/*<span className={style.tipContent}> {` ${this.dynamicTip()} `}</span>*/}
+                    {/*<span className={style.tipLine}> </span>*/}
                 </div>
 
                 {this.dynamicAction()}
-
-                <div className={style.shoutBtn} onClick={this.dynamicBtn.bind(this)}>
-                    {`${this.dynamicTip()}`}
-                </div>
+                {this.dynamicBtnView()}
             </div>
+
+
+            {/*<Line text={`个人信息： 账户余额${privatePrices[groups[groupIndex].roundIndex]}万元`}/>*/}
+            {/*<Line text={`拥有股票: 10000股`}/>*/}
+
+            {/*<ListItem children={`个人信息： 账户余额${privatePrices[groups[groupIndex].roundIndex]}万元`}/>*/}
+            {/*<ListItem children={`拥有股票: 10000股`}/>*/}
 
             <InfoBar text={`个人信息： 账户余额${privatePrices[groups[groupIndex].roundIndex]}万元`}/>
             <InfoBar styles={{marginTop: '1rem'}} text={`拥有股票: 10000股`}/>
@@ -199,6 +257,50 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 <div>本轮结束剩余时间</div>
                 <div className={style.highlight}>{NEW_ROUND_TIMER - newRoundTimer}</div>
             </div> : null}
+
+            <Button
+                style={{position: 'absolute', top: '30%', right: '10%'}}
+                onClick={this.showRule}
+                color={Button.Color.Blue}
+                label={`交易规则回顾`}
+            />
+            <Button
+                style={{position: 'absolute', top: '35%', right: '10%'}}
+                onClick={this.showTBMRule}
+                color={Button.Color.Blue}
+                label={`集合竞价知识扩展`}
+            />
+
+            <Modal
+                visible={showRule}
+                children={
+                    <div className={style.modalContent}>
+                        <p>交易规则回复</p>
+                        <p>...</p>
+                        <Button
+                            style={{ marginTop: "30px" }}
+                            label={"关闭"}
+                            color={Button.Color.Blue}
+                            onClick={this.showRule}
+                        />
+                    </div>
+                }
+            />
+            <Modal
+                visible={showTBMRule}
+                children={
+                    <div className={style.modalContent}>
+                        <p>集合竞价知识扩展</p>
+                        <p>...</p>
+                        <Button
+                            style={{ marginTop: "30px" }}
+                            label={"关闭"}
+                            color={Button.Color.Blue}
+                            onClick={this.showTBMRule}
+                        />
+                    </div>
+                }
+            />
         </section>
     }
 
