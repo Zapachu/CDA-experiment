@@ -107,32 +107,356 @@ export class CreateParams implements ICreateParams {
     public toJSON(): { [k: string]: any };
 }
 
+/** Properties of a GameGroupState. */
+export interface IGameGroupState {
+
+    /** GameGroupState stage */
+    stage?: (number|null);
+
+    /** GameGroupState orderId */
+    orderId?: (number|null);
+
+    /** GameGroupState orders */
+    orders?: (GameGroupState.IOrder[]|null);
+
+    /** GameGroupState buyOrderIds */
+    buyOrderIds?: (number[]|null);
+
+    /** GameGroupState sellOrderIds */
+    sellOrderIds?: (number[]|null);
+
+    /** GameGroupState trades */
+    trades?: (GameGroupState.ITrade[]|null);
+
+    /** GameGroupState positionUnitIndex */
+    positionUnitIndex?: (number[]|null);
+
+    /** GameGroupState roleIndex */
+    roleIndex?: (number|null);
+
+    /** GameGroupState type */
+    type?: (number|null);
+}
+
+/** Represents a GameGroupState. */
+export class GameGroupState implements IGameGroupState {
+
+    /**
+     * Constructs a new GameGroupState.
+     * @param [properties] Properties to set
+     */
+    constructor(properties?: IGameGroupState);
+
+    /** GameGroupState stage. */
+    public stage: number;
+
+    /** GameGroupState orderId. */
+    public orderId: number;
+
+    /** GameGroupState orders. */
+    public orders: GameGroupState.IOrder[];
+
+    /** GameGroupState buyOrderIds. */
+    public buyOrderIds: number[];
+
+    /** GameGroupState sellOrderIds. */
+    public sellOrderIds: number[];
+
+    /** GameGroupState trades. */
+    public trades: GameGroupState.ITrade[];
+
+    /** GameGroupState positionUnitIndex. */
+    public positionUnitIndex: number[];
+
+    /** GameGroupState roleIndex. */
+    public roleIndex: number;
+
+    /** GameGroupState type. */
+    public type: number;
+
+    /**
+     * Creates a new GameGroupState instance using the specified properties.
+     * @param [properties] Properties to set
+     * @returns GameGroupState instance
+     */
+    public static create(properties?: IGameGroupState): GameGroupState;
+
+    /**
+     * Encodes the specified GameGroupState message. Does not implicitly {@link GameGroupState.verify|verify} messages.
+     * @param message GameGroupState message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encode(message: IGameGroupState, writer?: $protobuf.Writer): $protobuf.Writer;
+
+    /**
+     * Encodes the specified GameGroupState message, length delimited. Does not implicitly {@link GameGroupState.verify|verify} messages.
+     * @param message GameGroupState message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encodeDelimited(message: IGameGroupState, writer?: $protobuf.Writer): $protobuf.Writer;
+
+    /**
+     * Decodes a GameGroupState message from the specified reader or buffer.
+     * @param reader Reader or buffer to decode from
+     * @param [length] Message length if known beforehand
+     * @returns GameGroupState
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): GameGroupState;
+
+    /**
+     * Decodes a GameGroupState message from the specified reader or buffer, length delimited.
+     * @param reader Reader or buffer to decode from
+     * @returns GameGroupState
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): GameGroupState;
+
+    /**
+     * Verifies a GameGroupState message.
+     * @param message Plain object to verify
+     * @returns `null` if valid, otherwise the reason why it is not
+     */
+    public static verify(message: { [k: string]: any }): (string|null);
+
+    /**
+     * Creates a GameGroupState message from a plain object. Also converts values to their respective internal types.
+     * @param object Plain object
+     * @returns GameGroupState
+     */
+    public static fromObject(object: { [k: string]: any }): GameGroupState;
+
+    /**
+     * Creates a plain object from a GameGroupState message. Also converts values to other types if specified.
+     * @param message GameGroupState
+     * @param [options] Conversion options
+     * @returns Plain object
+     */
+    public static toObject(message: GameGroupState, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+    /**
+     * Converts this GameGroupState to JSON.
+     * @returns JSON object
+     */
+    public toJSON(): { [k: string]: any };
+}
+
+export namespace GameGroupState {
+
+    /** Properties of an Order. */
+    interface IOrder {
+
+        /** Order id */
+        id?: (number|null);
+
+        /** Order roleIndex */
+        roleIndex?: (number|null);
+
+        /** Order unitIndex */
+        unitIndex?: (number|null);
+
+        /** Order price */
+        price?: (number|null);
+    }
+
+    /** Represents an Order. */
+    class Order implements IOrder {
+
+        /**
+         * Constructs a new Order.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: GameGroupState.IOrder);
+
+        /** Order id. */
+        public id: number;
+
+        /** Order roleIndex. */
+        public roleIndex: number;
+
+        /** Order unitIndex. */
+        public unitIndex: number;
+
+        /** Order price. */
+        public price: number;
+
+        /**
+         * Creates a new Order instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns Order instance
+         */
+        public static create(properties?: GameGroupState.IOrder): GameGroupState.Order;
+
+        /**
+         * Encodes the specified Order message. Does not implicitly {@link GameGroupState.Order.verify|verify} messages.
+         * @param message Order message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: GameGroupState.IOrder, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified Order message, length delimited. Does not implicitly {@link GameGroupState.Order.verify|verify} messages.
+         * @param message Order message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: GameGroupState.IOrder, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes an Order message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns Order
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): GameGroupState.Order;
+
+        /**
+         * Decodes an Order message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns Order
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): GameGroupState.Order;
+
+        /**
+         * Verifies an Order message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates an Order message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns Order
+         */
+        public static fromObject(object: { [k: string]: any }): GameGroupState.Order;
+
+        /**
+         * Creates a plain object from an Order message. Also converts values to other types if specified.
+         * @param message Order
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: GameGroupState.Order, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this Order to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+    }
+
+    /** Properties of a Trade. */
+    interface ITrade {
+
+        /** Trade reqId */
+        reqId?: (number|null);
+
+        /** Trade resId */
+        resId?: (number|null);
+    }
+
+    /** Represents a Trade. */
+    class Trade implements ITrade {
+
+        /**
+         * Constructs a new Trade.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: GameGroupState.ITrade);
+
+        /** Trade reqId. */
+        public reqId: number;
+
+        /** Trade resId. */
+        public resId: number;
+
+        /**
+         * Creates a new Trade instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns Trade instance
+         */
+        public static create(properties?: GameGroupState.ITrade): GameGroupState.Trade;
+
+        /**
+         * Encodes the specified Trade message. Does not implicitly {@link GameGroupState.Trade.verify|verify} messages.
+         * @param message Trade message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: GameGroupState.ITrade, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified Trade message, length delimited. Does not implicitly {@link GameGroupState.Trade.verify|verify} messages.
+         * @param message Trade message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: GameGroupState.ITrade, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a Trade message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns Trade
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): GameGroupState.Trade;
+
+        /**
+         * Decodes a Trade message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns Trade
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): GameGroupState.Trade;
+
+        /**
+         * Verifies a Trade message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a Trade message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns Trade
+         */
+        public static fromObject(object: { [k: string]: any }): GameGroupState.Trade;
+
+        /**
+         * Creates a plain object from a Trade message. Also converts values to other types if specified.
+         * @param message Trade
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: GameGroupState.Trade, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this Trade to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+    }
+}
+
 /** Properties of a GameState. */
 export interface IGameState {
 
-    /** GameState stage */
-    stage?: (number|null);
-
-    /** GameState orderId */
-    orderId?: (number|null);
-
-    /** GameState orders */
-    orders?: (GameState.IOrder[]|null);
-
-    /** GameState buyOrderIds */
-    buyOrderIds?: (number[]|null);
-
-    /** GameState sellOrderIds */
-    sellOrderIds?: (number[]|null);
-
-    /** GameState trades */
-    trades?: (GameState.ITrade[]|null);
-
-    /** GameState positionUnitIndex */
-    positionUnitIndex?: (number[]|null);
-
-    /** GameState roleIndex */
-    roleIndex?: (number|null);
+    /** GameState groups */
+    groups?: (IGameGroupState[]|null);
 }
 
 /** Represents a GameState. */
@@ -144,29 +468,8 @@ export class GameState implements IGameState {
      */
     constructor(properties?: IGameState);
 
-    /** GameState stage. */
-    public stage: number;
-
-    /** GameState orderId. */
-    public orderId: number;
-
-    /** GameState orders. */
-    public orders: GameState.IOrder[];
-
-    /** GameState buyOrderIds. */
-    public buyOrderIds: number[];
-
-    /** GameState sellOrderIds. */
-    public sellOrderIds: number[];
-
-    /** GameState trades. */
-    public trades: GameState.ITrade[];
-
-    /** GameState positionUnitIndex. */
-    public positionUnitIndex: number[];
-
-    /** GameState roleIndex. */
-    public roleIndex: number;
+    /** GameState groups. */
+    public groups: IGameGroupState[];
 
     /**
      * Creates a new GameState instance using the specified properties.
@@ -239,227 +542,122 @@ export class GameState implements IGameState {
     public toJSON(): { [k: string]: any };
 }
 
-export namespace GameState {
+/** Properties of a PlayerGroupState. */
+export interface IPlayerGroupState {
 
-    /** Properties of an Order. */
-    interface IOrder {
+    /** PlayerGroupState roleIndex */
+    roleIndex?: (number|null);
 
-        /** Order id */
-        id?: (number|null);
+    /** PlayerGroupState unitList */
+    unitList?: (string|null);
 
-        /** Order roleIndex */
-        roleIndex?: (number|null);
+    /** PlayerGroupState tradedCount */
+    tradedCount?: (number|null);
 
-        /** Order unitIndex */
-        unitIndex?: (number|null);
+    /** PlayerGroupState point */
+    point?: (number|null);
+}
 
-        /** Order price */
-        price?: (number|null);
-    }
+/** Represents a PlayerGroupState. */
+export class PlayerGroupState implements IPlayerGroupState {
 
-    /** Represents an Order. */
-    class Order implements IOrder {
+    /**
+     * Constructs a new PlayerGroupState.
+     * @param [properties] Properties to set
+     */
+    constructor(properties?: IPlayerGroupState);
 
-        /**
-         * Constructs a new Order.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: GameState.IOrder);
+    /** PlayerGroupState roleIndex. */
+    public roleIndex: number;
 
-        /** Order id. */
-        public id: number;
+    /** PlayerGroupState unitList. */
+    public unitList: string;
 
-        /** Order roleIndex. */
-        public roleIndex: number;
+    /** PlayerGroupState tradedCount. */
+    public tradedCount: number;
 
-        /** Order unitIndex. */
-        public unitIndex: number;
+    /** PlayerGroupState point. */
+    public point: number;
 
-        /** Order price. */
-        public price: number;
+    /**
+     * Creates a new PlayerGroupState instance using the specified properties.
+     * @param [properties] Properties to set
+     * @returns PlayerGroupState instance
+     */
+    public static create(properties?: IPlayerGroupState): PlayerGroupState;
 
-        /**
-         * Creates a new Order instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns Order instance
-         */
-        public static create(properties?: GameState.IOrder): GameState.Order;
+    /**
+     * Encodes the specified PlayerGroupState message. Does not implicitly {@link PlayerGroupState.verify|verify} messages.
+     * @param message PlayerGroupState message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encode(message: IPlayerGroupState, writer?: $protobuf.Writer): $protobuf.Writer;
 
-        /**
-         * Encodes the specified Order message. Does not implicitly {@link GameState.Order.verify|verify} messages.
-         * @param message Order message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: GameState.IOrder, writer?: $protobuf.Writer): $protobuf.Writer;
+    /**
+     * Encodes the specified PlayerGroupState message, length delimited. Does not implicitly {@link PlayerGroupState.verify|verify} messages.
+     * @param message PlayerGroupState message or plain object to encode
+     * @param [writer] Writer to encode to
+     * @returns Writer
+     */
+    public static encodeDelimited(message: IPlayerGroupState, writer?: $protobuf.Writer): $protobuf.Writer;
 
-        /**
-         * Encodes the specified Order message, length delimited. Does not implicitly {@link GameState.Order.verify|verify} messages.
-         * @param message Order message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: GameState.IOrder, writer?: $protobuf.Writer): $protobuf.Writer;
+    /**
+     * Decodes a PlayerGroupState message from the specified reader or buffer.
+     * @param reader Reader or buffer to decode from
+     * @param [length] Message length if known beforehand
+     * @returns PlayerGroupState
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): PlayerGroupState;
 
-        /**
-         * Decodes an Order message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns Order
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): GameState.Order;
+    /**
+     * Decodes a PlayerGroupState message from the specified reader or buffer, length delimited.
+     * @param reader Reader or buffer to decode from
+     * @returns PlayerGroupState
+     * @throws {Error} If the payload is not a reader or valid buffer
+     * @throws {$protobuf.util.ProtocolError} If required fields are missing
+     */
+    public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): PlayerGroupState;
 
-        /**
-         * Decodes an Order message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns Order
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): GameState.Order;
+    /**
+     * Verifies a PlayerGroupState message.
+     * @param message Plain object to verify
+     * @returns `null` if valid, otherwise the reason why it is not
+     */
+    public static verify(message: { [k: string]: any }): (string|null);
 
-        /**
-         * Verifies an Order message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
+    /**
+     * Creates a PlayerGroupState message from a plain object. Also converts values to their respective internal types.
+     * @param object Plain object
+     * @returns PlayerGroupState
+     */
+    public static fromObject(object: { [k: string]: any }): PlayerGroupState;
 
-        /**
-         * Creates an Order message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns Order
-         */
-        public static fromObject(object: { [k: string]: any }): GameState.Order;
+    /**
+     * Creates a plain object from a PlayerGroupState message. Also converts values to other types if specified.
+     * @param message PlayerGroupState
+     * @param [options] Conversion options
+     * @returns Plain object
+     */
+    public static toObject(message: PlayerGroupState, options?: $protobuf.IConversionOptions): { [k: string]: any };
 
-        /**
-         * Creates a plain object from an Order message. Also converts values to other types if specified.
-         * @param message Order
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: GameState.Order, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-        /**
-         * Converts this Order to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
-    }
-
-    /** Properties of a Trade. */
-    interface ITrade {
-
-        /** Trade reqId */
-        reqId?: (number|null);
-
-        /** Trade resId */
-        resId?: (number|null);
-    }
-
-    /** Represents a Trade. */
-    class Trade implements ITrade {
-
-        /**
-         * Constructs a new Trade.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: GameState.ITrade);
-
-        /** Trade reqId. */
-        public reqId: number;
-
-        /** Trade resId. */
-        public resId: number;
-
-        /**
-         * Creates a new Trade instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns Trade instance
-         */
-        public static create(properties?: GameState.ITrade): GameState.Trade;
-
-        /**
-         * Encodes the specified Trade message. Does not implicitly {@link GameState.Trade.verify|verify} messages.
-         * @param message Trade message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: GameState.ITrade, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Encodes the specified Trade message, length delimited. Does not implicitly {@link GameState.Trade.verify|verify} messages.
-         * @param message Trade message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: GameState.ITrade, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Decodes a Trade message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns Trade
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): GameState.Trade;
-
-        /**
-         * Decodes a Trade message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns Trade
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): GameState.Trade;
-
-        /**
-         * Verifies a Trade message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
-
-        /**
-         * Creates a Trade message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns Trade
-         */
-        public static fromObject(object: { [k: string]: any }): GameState.Trade;
-
-        /**
-         * Creates a plain object from a Trade message. Also converts values to other types if specified.
-         * @param message Trade
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: GameState.Trade, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-        /**
-         * Converts this Trade to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
-    }
+    /**
+     * Converts this PlayerGroupState to JSON.
+     * @returns JSON object
+     */
+    public toJSON(): { [k: string]: any };
 }
 
 /** Properties of a PlayerState. */
 export interface IPlayerState {
 
-    /** PlayerState roleIndex */
-    roleIndex?: (number|null);
+    /** PlayerState groups */
+    groups?: (IPlayerGroupState[]|null);
 
-    /** PlayerState unitList */
-    unitList?: (string|null);
-
-    /** PlayerState tradedCount */
-    tradedCount?: (number|null);
-
-    /** PlayerState point */
-    point?: (number|null);
+    /** PlayerState groupIndex */
+    groupIndex?: (number|null);
 }
 
 /** Represents a PlayerState. */
@@ -471,17 +669,11 @@ export class PlayerState implements IPlayerState {
      */
     constructor(properties?: IPlayerState);
 
-    /** PlayerState roleIndex. */
-    public roleIndex: number;
+    /** PlayerState groups. */
+    public groups: IPlayerGroupState[];
 
-    /** PlayerState unitList. */
-    public unitList: string;
-
-    /** PlayerState tradedCount. */
-    public tradedCount: number;
-
-    /** PlayerState point. */
-    public point: number;
+    /** PlayerState groupIndex. */
+    public groupIndex: number;
 
     /**
      * Creates a new PlayerState instance using the specified properties.
@@ -557,8 +749,8 @@ export class PlayerState implements IPlayerState {
 /** Properties of a MoveParams. */
 export interface IMoveParams {
 
-    /** MoveParams playMode */
-    playMode?: (number|null);
+    /** MoveParams groupType */
+    groupType?: (number|null);
 
     /** MoveParams unitIndex */
     unitIndex?: (number|null);
@@ -576,8 +768,8 @@ export class MoveParams implements IMoveParams {
      */
     constructor(properties?: IMoveParams);
 
-    /** MoveParams playMode. */
-    public playMode: number;
+    /** MoveParams groupType. */
+    public groupType: number;
 
     /** MoveParams unitIndex. */
     public unitIndex: number;

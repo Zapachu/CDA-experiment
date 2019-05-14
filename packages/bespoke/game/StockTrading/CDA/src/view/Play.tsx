@@ -1,14 +1,23 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {Core, FrameEmitter, IGame, Lang, MaskLoading, Toast} from 'bespoke-client-util'
-import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
-import {FetchType, MoveType, PushType, ROLE, Stage, MATCH_TIME} from '../config'
-import {PlayMode, Header, Line, MatchModal, Input, Button} from '../../../components'
+import {
+    GameGroupState,
+    ICreateParams,
+    IGameGroupState,
+    IGameState,
+    IMoveParams,
+    IPlayerGroupState,
+    IPlayerState,
+    IPushParams
+} from '../interface'
+import {FetchType, MATCH_TIME, MoveType, PushType, ROLE, Stage} from '../config'
+import {Button, Header, Input, Line, MatchModal, PlayMode} from '../../../components'
 
 interface IStageProps {
     game: IGame<ICreateParams>
-    gameState?: IGameState
-    playerState?: IPlayerState
+    gameState?: IGameGroupState
+    playerState?: IPlayerGroupState
     frameEmitter?: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
 }
 
@@ -33,22 +42,28 @@ function Border({background = `radial-gradient(at 50% 0%, #67e968 1rem, transpar
     </div>
 }
 
-function Matching({game: {params: {roles}}, frameEmitter, gameState: {roleIndex: gameRoleIndex}, playerState: {roleIndex}}: IStageProps) {
+function NotStart({frameEmitter}: { frameEmitter: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams> }) {
+    return <section className={style.notStart}>
+        <Line text={'交易规则介绍'} style={{margin: '10vh 0 2rem'}}/>
+        <video className={style.introVideo}/>
+        <PlayMode onPlay={groupType => frameEmitter.emit(MoveType.getGroup, {groupType})}/>
+    </section>
+}
+
+function Matching({game: {params: {roles}}, frameEmitter, gameState}: IStageProps) {
     const [timer, setTimer] = React.useState(0)
     React.useEffect(() => {
         frameEmitter.on(PushType.countDown, ({countDown}) => setTimer(countDown))
     }, [])
-    return <section className={style.matching}>
-        <Line text={'交易规则介绍'} style={{margin: '10vh 0 2rem'}}/>
-        <video className={style.introVideo}/>
-        <PlayMode onPlay={playMode => frameEmitter.emit(MoveType.getRole, {playMode})}/>
+    return <>
+        <NotStart frameEmitter={frameEmitter}/>
         <MatchModal {...{
-            visible: roleIndex !== undefined,
+            visible: !!gameState,
             totalNum: roles.length,
-            matchNum: gameRoleIndex,
+            matchNum: gameState.roleIndex,
             timer: MATCH_TIME - timer
         }}/>
-    </section>
+    </>
 }
 
 function Trading(props: IStageProps) {
@@ -71,10 +86,9 @@ function Trading(props: IStageProps) {
         marketWillOpen2: [() => '秒后开放', n => `second${n > 1 ? 's' : ''}`],
         shout: ['报价', 'Shout'],
         cancel: ['撤回', 'Cancel'],
-        toEnterNextPhase1: ['您在本期交易了', 'You traded'],
-        toEnterNextPhase2: ['单位虚拟物品，共获得', ' goods in this period, and earned'],
-        toEnterNextPhase3: ['实验币的利润。', ' experimental currency. You will enters the next page in'],
-        toEnterNextPhase4: ['秒后将进入下一实验页面', ' seconds'],
+        toEnterNextPhase1: ['您成功交易了', 'You traded'],
+        toEnterNextPhase2: ['单位虚拟物品，共获得', ' goods in this market, and earned'],
+        toEnterNextPhase3: ['实验币的利润。', ' experimental currency.'],
         [ROLE[ROLE.Buyer]]: ['买家', 'Buyer'],
         [ROLE[ROLE.Seller]]: ['卖家', 'Seller'],
         noPosition: ['未分配到市场角色', 'You got no market position'],
@@ -87,6 +101,8 @@ function Trading(props: IStageProps) {
         buyOrders: ['买家订单', 'BuyOrders'],
         yourTrades: ['交易记录', 'Your Trades'],
         marketHistory: ['市场记录', 'Market History'],
+        onceAgain:['再来一次','Once Again'],
+        nextPhase:['下一环节','Next Phase'],
     })
     const [price, setPrice] = React.useState(0 as number | string)
     const [timer, setTimer] = React.useState(0)
@@ -96,7 +112,7 @@ function Trading(props: IStageProps) {
 
     function submitOrder() {
         const _price = Number(price || 0)
-        const orderDict: { [id: number]: GameState.IOrder } = {}
+        const orderDict: { [id: number]: GameGroupState.IOrder } = {}
         orders.forEach(order => {
             orderDict[order.id] = order
         })
@@ -119,7 +135,7 @@ function Trading(props: IStageProps) {
         })
     }
 
-    function renderOrderList(orderDict: { [id: number]: GameState.IOrder }, marketOrderIds: Array<number>, shoutRole) {
+    function renderOrderList(orderDict: { [id: number]: GameGroupState.IOrder }, marketOrderIds: Array<number>, shoutRole) {
         return <section className={style.orderList}>
             <label>{shoutRole === ROLE.Seller ? lang.sellOrders : lang.buyOrders}</label>
             <ul className={style.orderPrices}>
@@ -127,7 +143,7 @@ function Trading(props: IStageProps) {
                     marketOrderIds.map((orderId, i) => {
                             const orderX = orderDict[orderId],
                                 isMine = orderX.roleIndex === roleIndex
-                            return <li>
+                            return <li key={orderId}>
                                 <Border key={orderId}
                                         borderRadius='.25rem'
                                         background={'radial-gradient(at 50% 0%, #aaa 1rem, transparent 70%)'}
@@ -149,7 +165,7 @@ function Trading(props: IStageProps) {
         </section>
     }
 
-    function renderTradeList(orderDict: { [id: number]: GameState.IOrder }, trades: Array<GameState.ITrade>): [number, number, React.ReactNode] {
+    function renderTradeList(orderDict: { [id: number]: GameGroupState.IOrder }, trades: Array<GameGroupState.ITrade>): [number, number, React.ReactNode] {
         const role = roles[roleIndex]
         const unitPrices = unitList.split(' ').map(price => +price)
         const myTrades: Array<{
@@ -201,13 +217,12 @@ function Trading(props: IStageProps) {
     if (roleIndex === undefined) {
         return <MaskLoading label={lang.noPosition}/>
     }
-    const orderDict: { [id: number]: GameState.IOrder } = {}
+    const orderDict: { [id: number]: GameGroupState.IOrder } = {}
     orders.forEach(order => {
         orderDict[order.id] = order
     })
     const role = roles[roleIndex]
-    const timeLeft = tradeTime + prepareTime - timer,
-        time2NextPhase = tradeTime + 2 * prepareTime - timer
+    const timeLeft = tradeTime + prepareTime - timer
     const unitIndex = positionUnitIndex[roleIndex],
         unitPrice = +(unitList.split(' ')[unitIndex] || 0)
     const [tradeCount, profit, tradeListFragment] = renderTradeList(orderDict, trades)
@@ -217,7 +232,7 @@ function Trading(props: IStageProps) {
         margin: '2rem auto 1rem'
     }
     const mainPanelBorder = `linear-gradient(#ddd, transparent)`
-    if(stage === Stage.result){
+    if (stage === Stage.result) {
         return <section className={style.result}>
             <p>
                 {lang.toEnterNextPhase1}
@@ -225,9 +240,11 @@ function Trading(props: IStageProps) {
                 {lang.toEnterNextPhase2}
                 <em>{profit}</em>
                 {lang.toEnterNextPhase3}
-                <em>{time2NextPhase}</em>
-                {lang.toEnterNextPhase4}
             </p>
+            <div className={style.switchBtns}>
+                <Button label={lang.onceAgain} onClick={()=>frameEmitter.emit(MoveType.leaveGroup)}/>&nbsp;&nbsp;&nbsp;
+                <Button label={lang.nextPhase} onClick={()=>console.log('TODO')}/>
+            </div>
         </section>
     }
     return <section className={style.trading}>
@@ -434,17 +451,26 @@ export const TradeChart: React.FC<{
 }
 
 export const Play: Core.PlaySFC<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> =
-    props => <section className={style.play}>
+    ({game, gameState, playerState, frameEmitter}) => <section className={style.play}>
         <Header stage={'tbm'}/>
         {(() => {
-            switch (props.gameState.stage) {
-                case Stage.notStart:
+            const {groupIndex} = playerState,
+                gameGroupState = gameState.groups[groupIndex],
+                playerGroupState = playerState.groups[groupIndex]
+            if(!gameGroupState){
+                return <NotStart frameEmitter={frameEmitter}/>
+            }
+            const stageProps = {
+                game,
+                gameState: gameGroupState,
+                playerState: playerGroupState,
+                frameEmitter
+            }
+            switch (stageProps.gameState.stage) {
                 case Stage.matching:
-                    return <Matching {...props}/>
-                case Stage.leave:
-                    return <div>跳转至其它环节(TODO)</div> //TODO
+                    return <Matching {...stageProps}/>
                 default:
-                    return <Trading {...props}/>
+                    return <Trading {...stageProps}/>
             }
         })()}
     </section>

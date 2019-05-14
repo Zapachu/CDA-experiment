@@ -20,8 +20,7 @@ export enum Stage {
     matching,
     reading,
     trading,
-    result,
-    leave
+    result
 }
 
 export interface RobotCalcLog {
@@ -77,7 +76,8 @@ export const RedisKey = {
 }
 
 export enum MoveType {
-    getRole = 'getRole',
+    getGroup = 'getGroup',
+    leaveGroup = 'newGroup',
     submitOrder = 'submitOrder',
     cancelOrder = 'cancelOrder',
 }
@@ -93,7 +93,7 @@ export enum FetchType {
     exportXls = 'exportXls'
 }
 
-export enum PlayMode {
+export enum GroupType {
     Single,
     Multi
 }

@@ -278,7 +278,7 @@ $color-red: #d6444e;
   background: url('./img/bg.svg');
   color: $color-light;
 
-  .matching {
+  .notStart {
     .introVideo {
       width: 36rem;
       height: 32rem;
@@ -488,6 +488,10 @@ $color-red: #d6444e;
         color: $color-red;
         margin: 0 .5rem;
       }
+    }
+    .switchBtns{
+      display: flex;
+      justify-content: center;
     }
   }
 }
