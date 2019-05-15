@@ -1,11 +1,12 @@
 export const namespace = "IPO";
 
 export enum MoveType {
-  startSinglePlayer = "startSinglePlayer",
   shout = "shout",
-  startMultiPlayer = "startMultiPlayer",
+  startMulti = "startMulti",
   nextGame = "nextGame",
-  replay = "replay"
+  replay = "replay",
+  startSingle = "startSingle",
+  joinRobot = "joinRobot"
 }
 
 export enum PushType {
