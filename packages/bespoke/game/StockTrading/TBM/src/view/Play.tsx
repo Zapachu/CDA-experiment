@@ -138,6 +138,9 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                             <a className={style.allIn} onClick={this.allIn}>全仓</a>
                         </div>
                     </li>
+                    <li style={{marginTop: 12}}>
+                        <Button label='出价' onClick={this.shout} color={Button.Color.Green}/>
+                    </li>
                 </div>
             default:
                 return null
