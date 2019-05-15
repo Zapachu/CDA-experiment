@@ -15,17 +15,51 @@ const stages = [
 
 export default class Header extends React.Component<IProps> {
     render(): React.ReactNode {
-
+        const lockSrc = require('./assets_lock.svg')
         const {stage} = this.props
         return <div className={style.header}>
             {
+                // stages.map((item, idx) =>
+                //     <div key={`headerItem-${idx}`} className={style.item}
+                //          style={{
+                //              color: stage === item.name ? '#58c350' : '#fff',
+                //              borderBottom: stage === item.name ? 'solid 1px #1d6318' : 'none'
+                //          }}>
+                //         {item.text}
+                //     </div>
+                // )
                 stages.map((item, idx) =>
-                    <div key={`headerItem-${idx}`} className={style.item}
+                    <div key={`headerItem${idx}`} className={style.item}
                          style={{
                              color: stage === item.name ? '#58c350' : '#fff',
-                             borderBottom: stage === item.name ? 'solid 1px #1d6318' : 'none'
+                             padding: stage === item.name ? '0' : '1rem 2rem',
+                             display: 'flex',
+                             flexDirection: 'column',
+                             height: '100%',
                          }}>
-                        {item.text}
+                        <div style={{
+                            flex: 1,
+                            marginTop: 12,
+                            color: idx > stages.findIndex(item => item.name === stage) ? '#999' : ''
+                        }}>
+                            {idx > stages.findIndex(item => item.name === stage) ?
+                                <img
+                                    alt=''
+                                    src={lockSrc}
+                                    style={{
+                                        width: 14,
+                                        marginRight: 4,
+                                        marginTop: -2
+                                    }}
+                                /> :
+                                null
+                            }
+                            {item.text}
+                        </div>
+                        {stage === item.name ? <div className={style.headerLine}>
+                            <span></span>
+                            <span></span>
+                        </div> : null}
                     </div>
                 )
             }

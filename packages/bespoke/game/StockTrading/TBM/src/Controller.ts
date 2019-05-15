@@ -63,7 +63,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     groupIndex = gameState.groups.push(group) - 1
                 }
 
-                // TODO : test add robot
                 let addRobotTimer = 1
                 const addRobotTask = global.setInterval(async () => {
                     if (addRobotTimer++ < waitingSeconds) {
@@ -81,18 +80,20 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 playerState.positionIndex = gameState.groups[groupIndex].playerNum++
                 playerState.role = positions[playerState.positionIndex].role
                 playerState.privatePrices = positions[playerState.positionIndex].privatePrice
-
-                // const {roundIndex} = gameState.groups[groupIndex]
-                // setTimeout.bind(() => this.push(actor, PushType.startBid, {roundIndex}), 2000)
                 break
             case MoveType.prepare: {
                 const {groupIndex, positionIndex} = playerState
                 const {rounds, roundIndex} = gameState.groups[groupIndex]
                 rounds[roundIndex].playerStatus[positionIndex] = PlayerStatus.prepared
                 if (rounds[roundIndex].playerStatus.every(s => s === PlayerStatus.prepared)) {
+                    for (let i in rounds[roundIndex].playerStatus) rounds[roundIndex].playerStatus[i] = PlayerStatus.startBid
                     this.broadcast(PushType.startBid, {roundIndex})
                 }
                 break
+            }
+            case MoveType.nextStage: {
+                break;
+                // todo connect to other stage
             }
             case MoveType.shout: {
                 const {groupIndex, positionIndex} = playerState,
