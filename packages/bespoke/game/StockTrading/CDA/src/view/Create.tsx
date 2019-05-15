@@ -21,7 +21,7 @@ export const Create: Core.CreateSFC<ICreateParams, FetchType> = ({submitable, se
     })
 
     React.useEffect(() => {
-        const roles = [...Array(1).fill(ROLE.Seller), ...Array(1).fill(ROLE.Buyer)]
+        const roles = [...Array(3).fill(ROLE.Seller), ...Array(3).fill(ROLE.Buyer)]
         setParams({
             roles,
             prepareTime: 15,

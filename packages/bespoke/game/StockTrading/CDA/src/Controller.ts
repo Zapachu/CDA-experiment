@@ -8,6 +8,7 @@ import {
     TGameState,
     TPlayerState
 } from 'bespoke-server'
+import cloneDeep = require('lodash/cloneDeep')
 import nodeXlsx from 'node-xlsx'
 import {
     DBKey,
@@ -93,33 +94,33 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 playerState.groups[groupIndex] = {
                     point: 0,
                     roleIndex,
-                    units: this.game.params.units[roleIndex].units
+                    units: cloneDeep(this.game.params.units[roleIndex].units)
                 }
                 playerState.groupIndex = groupIndex
                 if (roleIndex > 0) {
                     break
                 }
-                let countDown = 0
+                let countDown = 1
                 const timer = global.setInterval(async () => {
                     if (gameState.status !== baseEnum.GameStatus.started) {
                         return
                     }
                     if (countDown === MATCH_TIME) {
                         gameGroupState.stage = Stage.reading
-                        /*                        Array(this.game.params.roles.length - gameGroupState.roleIndex).fill(null).forEach(
-                                                    async (_, i) => await this.startNewRobotScheduler(`${groupIndex}_${i}`)
-                                                )*/
+                        Array(this.game.params.roles.length - gameGroupState.roleIndex).fill(null).forEach(
+                            async (_, i) => await this.startNewRobotScheduler(`${groupIndex}_${i}`)
+                        )
                     }
                     const {tradeTime, prepareTime} = this.game.params
                     if (countDown === prepareTime + MATCH_TIME) {
                         gameGroupState.stage = Stage.trading
                         this.groupBroadcast(groupIndex, PushType.beginTrading)
                     }
-                    /*                    if (countDown === prepareTime + tradeTime + MATCH_TIME) {
-                                            global.clearInterval(timer)
-                                            await this.calcProfit(groupIndex)
-                                            gameGroupState.stage = Stage.result
-                                        }*/
+                    if (countDown === prepareTime + tradeTime + MATCH_TIME) {
+                        global.clearInterval(timer)
+                        await this.calcProfit(groupIndex)
+                        gameGroupState.stage = Stage.result
+                    }
                     await this.stateManager.syncState()
                     this.groupBroadcast(groupIndex, PushType.countDown, {countDown: countDown++})
                 }, 1000)
@@ -134,7 +135,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     playerGroupState = playerState.groups[groupIndex],
                     gameGroupState = gameState.groups[groupIndex]
                 const {roleIndex} = playerGroupState
-                const {price, unitIndex, count = 1} = params
+                const {price, unitIndex, count} = params
                 const orderDict = this.getOrderDict(gameGroupState), {buyOrderIds, sellOrderIds} = gameGroupState,
                     buyOrders = buyOrderIds.map(id => orderDict[id].price).join(','),
                     sellOrders = sellOrderIds.map(id => orderDict[id].price).join(',')
@@ -253,15 +254,14 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     id: ++gameGroupState.orderId,
                     count: order.count - pairOrder.count
                 }
-                orders.push(subOrder)
-                ;(role === ROLE.Seller ? sellOrderIds : buyOrderIds).unshift(subOrder.id)
                 trade.subOrderId = subOrder.id
+                await this.shoutNewOrder(groupIndex, subOrder)
             }
             trades.push(trade)
-            groupPlayerStates.find(({groups})=>groups[groupIndex].roleIndex === pairOrder.roleIndex)
-                .groups[groupIndex].units[pairOrder.unitIndex].count-=trade.count
-            groupPlayerStates.find(({groups})=>groups[groupIndex].roleIndex === order.roleIndex)
-                .groups[groupIndex].units[order.unitIndex].count-=trade.count
+            groupPlayerStates.find(({groups}) => groups[groupIndex].roleIndex === pairOrder.roleIndex)
+                .groups[groupIndex].units[pairOrder.unitIndex].count -= trade.count
+            groupPlayerStates.find(({groups}) => groups[groupIndex].roleIndex === order.roleIndex)
+                .groups[groupIndex].units[order.unitIndex].count -= trade.count
             this.groupBroadcast(groupIndex, PushType.newTrade, {resOrderId: order.id})
             return ShoutResult.tradeSuccess
         } else {

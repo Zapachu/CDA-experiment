@@ -97,4 +97,4 @@ export enum GroupType {
     Multi
 }
 
-export const MATCH_TIME = 5
+export const MATCH_TIME = 30

@@ -29,7 +29,8 @@ function Border({background = `radial-gradient(at 50% 0%, #67e968 1rem, transpar
     }}>
         <div style={{
             borderRadius,
-            overflow: "hidden"
+            overflow: "hidden",
+            height: '100%'
         }}>
             {children}
         </div>
@@ -46,7 +47,8 @@ function TradeChart({
     }
                     }: {
     tradeList: Array<{
-        price: number
+        price: number,
+        count: number
     }>,
     color?: {
         scalePlate: string
@@ -111,18 +113,18 @@ function TradeChart({
                 )
             }
             {
-                tradeList.map(({price}, i) =>
+                tradeList.map(({price, count}, i) =>
                     <React.Fragment key={i}>
                         <circle {...{
                             fill: color.point,
                             cx: transX(i + 1),
                             cy: transY(price),
-                            r: 3
+                            r: count / 4 + 1.5
                         }}/>
                         {
                             i ? <line {...{
                                 stroke: color.point,
-                                strokeWidth: 1.5,
+                                strokeWidth: 1,
                                 x1: transX(i + 1),
                                 y1: transY(price),
                                 x2: transX(i),
@@ -181,6 +183,7 @@ function Trading({
             unitCost: ['物品成本', 'Unit Cost'],
             unitCount: ['物品数量', 'Unit Count'],
             unitValue: ['物品价值', 'Unit Value'],
+            allTraded: ['所有物品交易完成', 'All units have been traded'],
             shout4UnitPls: ['请为当前物品报价：价格 * 数量', 'Shout for this unit please : price * count'],
             openMarket: ['开放市场', 'Open Market'],
             marketWillOpen1: ['市场将在', 'Market will open in '],
@@ -189,12 +192,13 @@ function Trading({
             cancel: ['撤回', 'Cancel'],
             [ROLE[ROLE.Buyer]]: ['买家', 'Buyer'],
             [ROLE[ROLE.Seller]]: ['卖家', 'Seller'],
-            tradeSeq:['订单序号','Trade Number'],
+            tradeSeq: ['订单序号', 'Trade Number'],
             tradeCost: ['物品成本', 'Cost'],
             tradeValue: ['物品价值', 'Value'],
             tradePrice: ['成交价格', 'Price'],
             invalidBuyPrice: ['订单价格需在市场最高买价与当前物品价值之间', 'Order price must be between your private value and the highest buy price in the market'],
             invalidSellPrice: ['订单价格需在当前物品成本与市场最低卖价之间', 'Order price must be between the lowest buy price in the market and your private cost'],
+            invalidCount:['超出可交易物品数量','Exceed the number of tradable units'],
             sellOrders: ['卖家订单', 'SellOrders'],
             buyOrders: ['买家订单', 'BuyOrders'],
             yourTrades: ['交易记录', 'Your Trades'],
@@ -204,11 +208,14 @@ function Trading({
     const [price, setPrice] = React.useState('' as number | string)
     const [count, setCount] = React.useState(1 as number | string)
     const unitIndex = units.findIndex(({count}) => !!count)
-    const orderDict: { [id: number]: GameGroupState.IOrder } = {}
-    orders.forEach(order => {
-        orderDict[order.id] = order
-    })
     const role = roles[roleIndex]
+    const orderDict:{ [id: number]: GameGroupState.IOrder } = (()=>{
+        const orderDict: { [id: number]: GameGroupState.IOrder } = {}
+        orders.forEach(order => {
+            orderDict[order.id] = order
+        })
+        return orderDict
+    })()
     const timeLeft = tradeTime + prepareTime - timer
     const titleLineStyle: React.CSSProperties = {
         maxWidth: '24rem',
@@ -218,95 +225,30 @@ function Trading({
     const mainPanelBorder = `linear-gradient(#ddd, transparent)`
     return <section className={style.trading}>
         {
-            renderTrade()
+            renderTradePanel()
         }
-        <Border style={{flexBasis: '40rem'}} background={mainPanelBorder}>
-            <div className={style.orderPanel}>
-                <Line text={lang[ROLE[role]]} style={titleLineStyle}/>
-                <section className={style.orderBook}>
-                    {
-                        renderOrderList(orderDict, buyOrderIds, ROLE.Buyer)
-                    }
-                    {
-                        renderOrderList(orderDict, sellOrderIds, ROLE.Seller)
-                    }
-                </section>
-                <section className={style.orderSubmission}>
-                    <h3 className={style.title}>{lang.currentAllocation}</h3>
-                    <Border style={{margin: 'auto'}}>
-                        <div className={style.curUnitInfo}>
-                            <div>
-                                <label>{lang.unitNumber}</label>
-                                <em>{unitIndex + 1}</em>
-                            </div>
-                            <div>
-                                <label>{role === ROLE.Buyer ? lang.unitValue : lang.unitCost}</label>
-                                <em>{units[unitIndex].price}</em>
-                            </div>
-                            <div>
-                                <label>{lang.unitCount}</label>
-                                <em>{units[unitIndex].count}</em>
-                            </div>
-                        </div>
-                    </Border>
-                    {
-                        stage === Stage.reading && prepareTime > timer ?
-                            <p className={style.marketWillOpen}>{lang.marketWillOpen1}
-                                <em>{prepareTime - timer}</em> {(lang.marketWillOpen2 as Function)(prepareTime - timer)}
-                            </p> :
-                            <section className={style.newOrder}>
-                                <div className={style.orderInputWrapper}>
-                                    <label>{lang.shout4UnitPls}</label>
-                                    <Input {...{
-                                        value: price || '',
-                                        onChange: price => setPrice(price),
-                                        onMinus: price => setPrice(price - 1),
-                                        onPlus: price => setPrice(price + 1)
-                                    }}/>
-                                    <Input {...{
-                                        value: count || '',
-                                        onChange: count => setCount(count),
-                                        onMinus: count => setCount(count - 1),
-                                        onPlus: count => setCount(count + 1)
-                                    }}/>
-                                </div>
-                                <div className={style.submitBtnWrapper}>
-                                    <Button {...{
-                                        label: lang.shout,
-                                        onClick: () => submitOrder()
-                                    }}/>
-                                </div>
-                                <div
-                                    className={style.timeLeft}>{timer < prepareTime ? '   ' : timeLeft > 0 ? timeLeft : 0}s
-                                </div>
-                            </section>
-                    }
-                </section>
-            </div>
-        </Border>
         {
-            renderChart()
+            renderOrderPanel()
+        }
+        {
+            renderChartPanel()
         }
     </section>
 
     function submitOrder() {
         const _price = Number(price || 0)
-        const orderDict: { [id: number]: GameGroupState.IOrder } = {}
-        orders.forEach(order => {
-            orderDict[order.id] = order
-        })
-        const role = roles[roleIndex]
-        const privateCost = units[unitIndex].price,
+        const unit = units[unitIndex],
             minSellOrder = orderDict[sellOrderIds[0]],
             maxBuyOrder = orderDict[buyOrderIds[0]]
-        if (!privateCost) {
-            return
-        }
-        if (role === ROLE.Seller && (_price < privateCost || (minSellOrder && _price > minSellOrder.price))) {
+        if (role === ROLE.Seller && (_price < unit.price || (minSellOrder && _price > minSellOrder.price))) {
             return Toast.warn(lang.invalidSellPrice)
         }
-        if (role === ROLE.Buyer && (_price > privateCost || (maxBuyOrder && _price < maxBuyOrder.price))) {
+        if (role === ROLE.Buyer && (_price > unit.price || (maxBuyOrder && _price < maxBuyOrder.price))) {
             return Toast.warn(lang.invalidSellPrice)
+        }
+        if(count > unit.count){
+            setCount(unit.count)
+            return Toast.warn(lang.invalidCount)
         }
         frameEmitter.emit(MoveType.submitOrder, {
             unitIndex,
@@ -315,7 +257,78 @@ function Trading({
         })
     }
 
-    function renderTrade() {
+    function renderOrderPanel() {
+        return <Border style={{flexBasis: '40rem'}} background={mainPanelBorder}>
+            <div className={style.orderPanel}>
+                <Line text={lang[ROLE[role]]} style={titleLineStyle}/>
+                <section className={style.orderBook}>
+                    {
+                        renderOrderList(buyOrderIds, ROLE.Buyer)
+                    }
+                    {
+                        renderOrderList(sellOrderIds, ROLE.Seller)
+                    }
+                </section>
+                {
+                    unitIndex == -1 ?
+                        <div className={style.allTraded}>{lang.allTraded}</div> :
+                        <section className={style.orderSubmission}>
+                            <h3 className={style.title}>{lang.currentAllocation}</h3>
+                            <Border style={{margin: 'auto'}}>
+                                <div className={style.curUnitInfo}>
+                                    <div>
+                                        <label>{lang.unitNumber}</label>
+                                        <em>{unitIndex + 1}</em>
+                                    </div>
+                                    <div>
+                                        <label>{role === ROLE.Buyer ? lang.unitValue : lang.unitCost}</label>
+                                        <em>{units[unitIndex].price}</em>
+                                    </div>
+                                    <div>
+                                        <label>{lang.unitCount}</label>
+                                        <em>{units[unitIndex].count}</em>
+                                    </div>
+                                </div>
+                            </Border>
+                            {
+                                stage === Stage.reading && prepareTime > timer ?
+                                    <p className={style.marketWillOpen}>{lang.marketWillOpen1}
+                                        <em>{prepareTime - timer}</em> {(lang.marketWillOpen2 as Function)(prepareTime - timer)}
+                                    </p> :
+                                    <section className={style.newOrder}>
+                                        <div className={style.orderInputWrapper}>
+                                            <label>{lang.shout4UnitPls}</label>
+                                            <Input {...{
+                                                value: price || '',
+                                                onChange: price => setPrice(price),
+                                                onMinus: price => setPrice(price - 1),
+                                                onPlus: price => setPrice(price + 1)
+                                            }}/>
+                                            <Input {...{
+                                                value: count || '',
+                                                onChange: count => setCount(count),
+                                                onMinus: count => setCount(count - 1),
+                                                onPlus: count => setCount(count + 1)
+                                            }}/>
+                                        </div>
+                                        <div className={style.submitBtnWrapper}>
+                                            <Button {...{
+                                                label: lang.shout,
+                                                onClick: () => submitOrder()
+                                            }}/>
+                                        </div>
+                                        <div
+                                            className={style.timeLeft}>{timer < prepareTime ? '   ' : timeLeft > 0 ? timeLeft : 0}s
+                                        </div>
+                                    </section>
+                            }
+                        </section>
+                }
+            </div>
+        </Border>
+    }
+
+    function renderTradePanel() {
         let tradeCount = 0, totalProfit = 0
         const role = roles[roleIndex]
         return <div className={style.yourTradesWrapper}>
@@ -338,7 +351,10 @@ function Trading({
                                 trades.map(({reqOrderId, resOrderId, count}, i) => {
                                     const reqOrder = orderDict[reqOrderId],
                                         resOrder = orderDict[resOrderId]
-                                    const privateCost = units[roleIndex === reqOrder.roleIndex ? reqOrder.roleIndex : resOrder.roleIndex].price,
+                                    if (![reqOrder.roleIndex, resOrder.roleIndex].includes(roleIndex)) {
+                                        return null
+                                    }
+                                    const privateCost = units[roleIndex === reqOrder.roleIndex ? reqOrder.unitIndex : resOrder.unitIndex].price,
                                         price = reqOrder.price,
                                         profit = Math.abs(privateCost - reqOrder.price) * count
                                     tradeCount += count
@@ -372,21 +388,27 @@ function Trading({
         </div>
     }
 
-    function renderChart() {
+    function renderChartPanel() {
         return <div className={style.marketHistoryWrapper}>
             <Line text={lang.marketHistory} style={titleLineStyle}/>
             <Border background={mainPanelBorder}>
                 <div className={style.marketHistory}>
                     <h3 className={style.title}>{lang.tradeHistory}</h3>
-                    <div className={style.tradeChartWrapper}>
+                    <div style={{
+                        margin: '1rem',
+                        width: `${(~~(trades.length/24) + 2) * 12}rem`
+                    }}>
                         <TradeChart
-                            tradeList={trades.map(({reqOrderId}) => ({price: orderDict[reqOrderId].price}))}
+                            tradeList={trades.map(({reqOrderId}) => {
+                                const {price, count} = orderDict[reqOrderId]
+                                return {price, count}
+                            })}
                             color={{
                                 scalePlate: '#fff',
-                                line: '#258df3',
-                                point: '#258df3',
+                                line: '#f99460',
+                                point: '#f99460',
                                 title: '#aff85e',
-                                number: '#c18a71'
+                                number: '#f99460'
                             }}
                         />
                     </div>
@@ -395,7 +417,7 @@ function Trading({
         </div>
     }
 
-    function renderOrderList(orderDict: { [id: number]: GameGroupState.IOrder }, marketOrderIds: Array<number>, shoutRole) {
+    function renderOrderList(marketOrderIds: Array<number>, shoutRole) {
         return <section className={style.orderList}>
             <label>{shoutRole === ROLE.Seller ? lang.sellOrders : lang.buyOrders}</label>
             <ul className={style.orderPrices}>

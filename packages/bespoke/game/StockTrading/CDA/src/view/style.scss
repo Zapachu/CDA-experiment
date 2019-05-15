@@ -275,8 +275,9 @@ $color-red: #d6444e;
   position: absolute;
   width: 100%;
   min-height: 100%;
-  background: url('./img/bg.svg');
+  background: radial-gradient(at 50% 50%, $color-dark 10%, $color-dark2 80%);
   color: $color-light;
+  user-select: none;
 
   .notStart {
     .introVideo {
@@ -304,6 +305,7 @@ $color-red: #d6444e;
       flex-direction: column;
       background: linear-gradient($color-dark, $color-dark2);
       padding-bottom: 5rem;
+      height: 100%;
     }
 
     .yourTrades {
@@ -323,11 +325,11 @@ $color-red: #d6444e;
             height: 2rem;
 
             th {
+              width: 5rem;
               font-weight: normal;
             }
 
             td {
-              width: 5rem;
               color: $color-orange;
 
               &:first-child {
@@ -401,6 +403,12 @@ $color-red: #d6444e;
         }
       }
 
+      .allTraded{
+        padding: 1rem;
+        font-size: $fontSize-large;
+        text-align: center;
+        color: rgba($color-light, .6);
+      }
       .orderSubmission {
         @include secondarySection;
 
@@ -467,11 +475,6 @@ $color-red: #d6444e;
 
       .marketHistory {
         @include panel;
-
-        .tradeChartWrapper {
-          width: 24rem;
-          margin: 1rem;
-        }
       }
     }
   }

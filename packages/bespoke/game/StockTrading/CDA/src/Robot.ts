@@ -100,7 +100,7 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
     }
 
     get unitIndex(): number {
-        return this.playerGroupState.units.findIndex(({count})=>!!count)
+        return this.playerGroupState.units.findIndex(({count}) => !!count)
     }
 
     get unitPrice(): number {
@@ -234,7 +234,8 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
         }
         this.frameEmitter.emit(MoveType.submitOrder, {
             price: calcPrice,
-            unitIndex
+            unitIndex,
+            count: ~~(this.playerGroupState.units[unitIndex].count * (.7 * Math.random() + .3)) + 1
         }, async (shoutResult: ShoutResult, marketBuyOrders, marketSellOrders) => {
             await new FreeStyleModel({
                 game: this.game.id,
