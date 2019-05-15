@@ -37,10 +37,10 @@ export default class Header extends React.Component<IProps> {
                              height: '100%',
                          }}>
                         <div style={{flex: 1, marginTop: 12}}>{item.text}</div>
-                        <div className={style.headerLine}>
+                        {stage === item.name ? <div className={style.headerLine}>
                             <span></span>
                             <span></span>
-                        </div>
+                        </div> : null}
                     </div>
                 )
             }
