@@ -62,7 +62,7 @@ export namespace GameLogic {
         }
         const game = await GameDAO.getGame<ICreateParams>(gameId)
         const robotProxy = await (pythonRobot ? new PythonSchedulerProxy(game, actor) : new NodeRobotsScheduler(game, actor, template.Robot)).init()
-        robotSchedulers.set(actor.token, robotProxy)
+        robotSchedulers.set(actor.token, robotProxy.online())
     }
 }
 

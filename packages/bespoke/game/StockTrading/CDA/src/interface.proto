@@ -1,22 +1,33 @@
 syntax = "proto3";
 
+message Unit{
+    int32 price = 1;
+    int32 count = 2;
+}
+
 message CreateParams {
+    message Units{
+        repeated Unit units = 2;
+    }
     repeated int32 roles = 1;
     int32 prepareTime = 2;
     int32 tradeTime = 3;
-    repeated string unitLists = 4;
+    repeated Units units = 4;
 }
 
-message GameState {
+message GameGroupState {
     message Order {
         int32 id = 1;
         int32 roleIndex = 2;
         int32 unitIndex = 3;
         float price = 4;
+        int32 count = 5;
     }
     message Trade {
-        int32 reqId = 1;
-        int32 resId = 2;
+        int32 reqOrderId = 1;
+        int32 resOrderId = 2;
+        int32 count = 3;
+        int32 subOrderId = 4;
     }
     int32 stage = 1;
     int32 orderId = 2;
@@ -24,21 +35,28 @@ message GameState {
     repeated int32 buyOrderIds = 4;
     repeated int32 sellOrderIds = 5;
     repeated Trade trades = 6;
-    repeated int32 positionUnitIndex = 7;
     int32 roleIndex = 8;
+    int32 type = 9;
 }
-
-message PlayerState {
+message GameState {
+    repeated GameGroupState groups = 1;
+}
+message PlayerGroupState {
     int32 roleIndex = 1;
-    string unitList = 2;
+    repeated Unit units = 2;
     int32 tradedCount = 3;
     float point = 4;
 }
+message PlayerState {
+    repeated PlayerGroupState groups = 1;
+    int32 groupIndex = 2;
+}
 
 message MoveParams {
-    int32 playMode = 1;
+    int32 groupType = 1;
     int32 unitIndex = 2;
     float price = 3;
+    int32 count = 4;
 }
 message PushParams {
     int32 countDown = 1;

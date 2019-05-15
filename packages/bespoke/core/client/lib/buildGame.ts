@@ -96,7 +96,15 @@ export function geneClientBuilder(
             rules: [
                 {
                     test: /\.(ts|tsx)$/,
-                    use: 'ts-loader',
+                    use: [
+                        {
+                            loader: 'ts-loader',
+                            options: {
+                                transpileOnly: true,
+                                experimentalWatchApi: true,
+                            },
+                        },
+                    ],
                     exclude: /node_modules/
                 },
                 {

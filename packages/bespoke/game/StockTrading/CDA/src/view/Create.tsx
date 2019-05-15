@@ -21,12 +21,18 @@ export const Create: Core.CreateSFC<ICreateParams, FetchType> = ({submitable, se
     })
 
     React.useEffect(() => {
-        const roles = [...Array(6).fill(ROLE.Seller), ...Array(6).fill(ROLE.Buyer)]
+        const roles = [...Array(3).fill(ROLE.Seller), ...Array(3).fill(ROLE.Buyer)]
         setParams({
             roles,
             prepareTime: 15,
             tradeTime: 180,
-            unitLists: roles.map(role => role === ROLE.Buyer ? '325 325 305 260 220' : '185 185 235 260 270')
+            units: roles.map(role => ({
+                    units: (role === ROLE.Buyer ? [200, 200, 200, 200, 200] : [185, 185, 185, 185, 185]).map(price => ({
+                        price: +price,
+                        count: 10
+                    }))
+                })
+            )
         })
     }, [])
 
@@ -92,7 +98,7 @@ export const Create: Core.CreateSFC<ICreateParams, FetchType> = ({submitable, se
                         <th>{roleIndex + 1}</th>
                         <td>{lang[ROLE[role]]}</td>
                         <td>
-                            <input {...{
+{/*                            <input {...{
                                 className: style.unitList,
                                 value: params.unitLists[roleIndex],
                                 onChange: (({target: {value: newUnitList}}) => {
@@ -100,7 +106,7 @@ export const Create: Core.CreateSFC<ICreateParams, FetchType> = ({submitable, se
                                     unitLists[roleIndex] = newUnitList.replace(/[^*\s0-9]/g, '').replace(/\s+/g, ' ')
                                     setParams({unitLists})
                                 })
-                            }}/>
+                            }}/>*/}
                         </td>
                     </tr>)
             }
