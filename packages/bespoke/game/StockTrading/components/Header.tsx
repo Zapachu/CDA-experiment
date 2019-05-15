@@ -15,7 +15,7 @@ const stages = [
 
 export default class Header extends React.Component<IProps> {
     render(): React.ReactNode {
-
+        const lockSrc = require('./assets_lock.svg')
         const {stage} = this.props
         return <div className={style.header}>
             {
@@ -37,7 +37,25 @@ export default class Header extends React.Component<IProps> {
                              flexDirection: 'column',
                              height: '100%',
                          }}>
-                        <div style={{flex: 1, marginTop: 12}}>{item.text}</div>
+                        <div style={{
+                            flex: 1,
+                            marginTop: 12,
+                            color: idx > stages.findIndex(item => item.name === stage) ? '#999' : ''
+                        }}>
+                            {idx > stages.findIndex(item => item.name === stage) ?
+                                <img
+                                    alt=''
+                                    src={lockSrc}
+                                    style={{
+                                        width: 14,
+                                        marginRight: 4,
+                                        marginTop: -2
+                                    }}
+                                /> :
+                                null
+                            }
+                            {item.text}
+                        </div>
                         {stage === item.name ? <div className={style.headerLine}>
                             <span></span>
                             <span></span>
