@@ -230,14 +230,6 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         ];
         return (
             <>
-                <div style={{position: "fixed", top: "20vh", right: "15vw"}}>
-                    <Button
-                        label={"集合竞价知识扩展"}
-                        size={Button.Size.Small}
-                        color={Button.Color.Blue}
-                        onClick={() => this.setState({showTBMRule: true})}
-                    />
-                </div>
                 <Line
                     text={"交易结果展示"}
                     style={{margin: "auto", width: "400px", marginTop: "30px", marginBottom: "20px"}}
