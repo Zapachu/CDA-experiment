@@ -248,7 +248,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                             <li key={label} style={{marginBottom: "10px"}}>
                                 <ListItem>
                                     <p className={style.item}>
-                                        <span>{label}:&nbsp;</span>
+                                        <span style={{color: '#fff'}}>{label}:&nbsp;</span>
                                         <span style={{color: red ? "#F0676D" : "orange"}}>
                       {value}
                     </span>
