@@ -14,18 +14,24 @@ message MoveParams {
 
 message PushParams {
     int32 matchTimer = 1;
-    string matchMsg = 2;
-    int32 groupIndex = 3;
     int32 matchNum = 4;
+    float min = 5;
+    float max = 6;
+    float startingPrice = 7;
 }
 
 message GameState {
     message Group {
-        repeated string players = 1;
-        float strikePrice = 2;
-        float min = 3;
-        float max = 4;
-        int32 stockIndex = 5;
+        message Round {
+            float strikePrice = 2;
+            float min = 3;
+            float max = 4;
+            int32 stockIndex = 5;
+        }
+        int32 playerNum = 1;
+        repeated Round rounds = 2;
+        int32 roundIndex = 6;
+        bool isMulti = 7;
     }
     repeated Group groups = 1;
 }
@@ -33,7 +39,6 @@ message GameState {
 message PlayerState {
     message Multi {
         int32 groupIndex = 1;
-        int32 positionIndex = 2;
         float privateValue = 3;
         float price = 4;
         int32 bidNum = 5;
@@ -49,12 +54,8 @@ message PlayerState {
             int32 actualNum = 6;
             float profit = 8;
             float startingPrice = 9;
-            float strikePrice = 10;
-            float min = 11;
-            float max = 12;
-            int32 stockIndex = 13;
         }
-        int32 roundIndex = 1;
+        int32 groupIndex = 1;
         repeated Round rounds = 2;
     }
     Multi multi = 1;

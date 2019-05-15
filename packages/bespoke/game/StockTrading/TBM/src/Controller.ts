@@ -71,7 +71,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     }
                     global.clearInterval(addRobotTask)
                     if (gameState.groups[groupIndex].playerNum < groupSize) {
-                        for (let num = 0; num < groupSize - gameState.groups[groupIndex].playerNum; num ++) {
+                        for (let num = 0; num < groupSize - gameState.groups[groupIndex].playerNum; num++) {
                             await this.startNewRobotScheduler(`Robot_${num}`, false)
                         }
                     }
@@ -81,13 +81,15 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 playerState.positionIndex = gameState.groups[groupIndex].playerNum++
                 playerState.role = positions[playerState.positionIndex].role
                 playerState.privatePrices = positions[playerState.positionIndex].privatePrice
+
+                // const {roundIndex} = gameState.groups[groupIndex]
+                // setTimeout.bind(() => this.push(actor, PushType.startBid, {roundIndex}), 2000)
                 break
             case MoveType.prepare: {
                 const {groupIndex, positionIndex} = playerState
                 const {rounds, roundIndex} = gameState.groups[groupIndex]
                 rounds[roundIndex].playerStatus[positionIndex] = PlayerStatus.prepared
                 if (rounds[roundIndex].playerStatus.every(s => s === PlayerStatus.prepared)) {
-                    // TODO : test robot bid
                     this.broadcast(PushType.startBid, {roundIndex})
                 }
                 break
@@ -132,6 +134,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         }
                         global.clearInterval(newRoundInterval)
                         groupState.roundIndex++
+                        this.broadcast(PushType.nextRound)
                         await this.stateManager.syncState()
                     }, 1000)
                 }

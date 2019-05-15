@@ -13,7 +13,9 @@ import {
   IGameState,
   IMoveParams,
   IPlayerState,
-  IPushParams
+  IPushParams,
+  PlayerState,
+  GameState
 } from "../../interface";
 import {
   StockInfo,
@@ -23,6 +25,7 @@ import {
   Line,
   Modal
 } from "../../../../components";
+const LOADING = require("../../../../components/loading.png");
 
 enum ModalType {
   None,
@@ -33,7 +36,6 @@ enum ModalType {
 interface IPlayState {
   price: number;
   num: number;
-  stockIndex: number;
   modalType: ModalType;
 }
 
@@ -53,26 +55,34 @@ export default class PlayingStage extends Core.Play<
     this.state = this.initState(props);
   }
 
-  initState = props => {
+  initState = (
+    props: Core.IPlayProps<
+      ICreateParams,
+      IGameState,
+      IPlayerState,
+      MoveType,
+      PushType,
+      IMoveParams,
+      IPushParams,
+      FetchType
+    >
+  ) => {
     const {
       playerState: { multi, single },
       gameState: { groups }
     } = props;
     if (single) {
-      const { rounds, roundIndex } = single;
-      const curRound = rounds[roundIndex];
+      const { rounds, groupIndex } = single;
+      const curRound = rounds[groups[groupIndex].roundIndex];
       return {
         price: curRound.price,
         num: curRound.bidNum,
-        stockIndex: curRound.stockIndex,
         modalType: ModalType.None
       };
     } else {
-      const curGroup = groups[multi.groupIndex];
       return {
         price: multi.price,
         num: multi.bidNum,
-        stockIndex: curGroup.stockIndex,
         modalType: ModalType.None
       };
     }
@@ -80,7 +90,20 @@ export default class PlayingStage extends Core.Play<
 
   lang = Lang.extractLang({});
 
-  renderResult = (investorState, marketState) => {
+  inputNum = (multiplier: number, startingPrice: number) => {
+    const { price } = this.state;
+    if (!price) {
+      return;
+    }
+    const money = multiplier * startingPrice;
+    const num = Math.floor(money / price);
+    this.setState({ num });
+  };
+
+  renderResult = (
+    investorState: Partial<PlayerState.IMulti>,
+    marketState: Partial<GameState.Group.IRound>
+  ) => {
     const { frameEmitter } = this.props;
     const listData = [
       { label: "股票的成交价格", value: marketState.strikePrice },
@@ -100,7 +123,7 @@ export default class PlayingStage extends Core.Play<
     ];
     return (
       <>
-        <div style={{ position: "fixed", top: "20vh", right: "15vw" }}>
+        <div style={{ position: "fixed", top: "30vh", right: "15vw" }}>
           <Button
             label={"ipo知识扩展"}
             size={Button.Size.Small}
@@ -113,7 +136,7 @@ export default class PlayingStage extends Core.Play<
           style={{
             margin: "auto",
             width: "400px",
-            marginTop: "30px",
+            marginTop: "15vh",
             marginBottom: "20px"
           }}
         />
@@ -148,14 +171,7 @@ export default class PlayingStage extends Core.Play<
             color={Button.Color.Blue}
             style={{ marginRight: "20px" }}
             onClick={() => {
-              frameEmitter.emit(MoveType.replay, {}, (err, stockIndex) => {
-                if (!err)
-                  this.setState({
-                    price: undefined,
-                    num: undefined,
-                    stockIndex
-                  });
-              });
+              frameEmitter.emit(MoveType.replay);
             }}
           />
           <Button
@@ -169,7 +185,10 @@ export default class PlayingStage extends Core.Play<
     );
   };
 
-  renderPrepared = (stock, investorState, marketState) => {
+  renderPrepared = (
+    investorState: Partial<PlayerState.IMulti>,
+    marketState: Partial<GameState.Group.IRound>
+  ) => {
     const {
       frameEmitter,
       game: {
@@ -177,9 +196,10 @@ export default class PlayingStage extends Core.Play<
       }
     } = this.props;
     const { price, num } = this.state;
+    const stock = STOCKS[marketState.stockIndex];
     return (
       <>
-        <div style={{ position: "fixed", top: "25vh", right: "15vw" }}>
+        <div style={{ position: "fixed", top: "35vh", right: "15vw" }}>
           <Button
             label={"交易规则回顾"}
             size={Button.Size.Small}
@@ -187,7 +207,7 @@ export default class PlayingStage extends Core.Play<
             onClick={() => this.setState({ modalType: ModalType.Trade })}
           />
         </div>
-        <div style={{ position: "fixed", top: "32vh", right: "15vw" }}>
+        <div style={{ position: "fixed", top: "42vh", right: "15vw" }}>
           <Button
             label={"ipo知识扩展"}
             size={Button.Size.Small}
@@ -197,7 +217,7 @@ export default class PlayingStage extends Core.Play<
         </div>
         <StockInfo
           {...stock}
-          style={{ marginTop: "40px", marginBottom: "20px" }}
+          style={{ marginTop: "15vh", marginBottom: "20px" }}
         />
         <p style={{ marginBottom: "10px" }}>
           *私人信息: 你们公司对该股票的估值是
@@ -206,7 +226,7 @@ export default class PlayingStage extends Core.Play<
         <p style={{ marginBottom: "30px" }}>
           *市场信息: 该公司共发行了
           <span style={{ color: "orange" }}>{total}股</span>股票, 最低保留价格为
-          {marketState.min}
+          <span style={{ color: "orange" }}>{marketState.min}</span>
         </p>
         <div className={style.inputContainer}>
           <div>
@@ -217,7 +237,7 @@ export default class PlayingStage extends Core.Play<
               onMinus={val => this.setState({ price: val - 1 })}
               onPlus={val => this.setState({ price: val + 1 })}
             />
-            <p>
+            <p style={{ fontSize: "12px", marginTop: "5px" }}>
               可买
               {price ? Math.floor(investorState.startingPrice / price) : " "}股
             </p>
@@ -232,9 +252,35 @@ export default class PlayingStage extends Core.Play<
               onMinus={val => this.setState({ num: val - 1 })}
               onPlus={val => this.setState({ num: val + 1 })}
             />
-            <p>
-              总花费
-              {price && num ? (price * num).toFixed(2) : " "}
+            <p
+              style={{
+                fontSize: "12px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginTop: "5px"
+              }}
+            >
+              <span>
+                总花费
+                {price && num ? (price * num).toFixed(2) : " "}
+              </span>
+              <span>
+                <span
+                  className={style.operation}
+                  onClick={() =>
+                    this.inputNum(0.5, investorState.startingPrice)
+                  }
+                >
+                  半仓
+                </span>
+                <span
+                  className={style.operation}
+                  onClick={() => this.inputNum(1, investorState.startingPrice)}
+                >
+                  全仓
+                </span>
+              </span>
             </p>
           </div>
         </div>
@@ -244,7 +290,14 @@ export default class PlayingStage extends Core.Play<
           onClick={() => {
             if (!price || !num) return;
             frameEmitter.emit(MoveType.shout, { price, num }, err => {
-              if (err) Toast.warn(err);
+              if (err) {
+                Toast.warn(err);
+              } else {
+                this.setState({
+                  price: undefined,
+                  num: undefined
+                });
+              }
             });
           }}
         />
@@ -299,23 +352,25 @@ export default class PlayingStage extends Core.Play<
           params: { total }
         }
       },
-      state: { price, num, stockIndex, modalType }
+      state: { price, num, modalType }
     } = this;
-    let investorState;
-    let marketState;
+    let investorState: Partial<PlayerState.IMulti>;
+    let marketState: Partial<GameState.Group.IRound>;
     if (single) {
-      const { rounds, roundIndex } = single;
-      investorState = rounds[roundIndex];
-      marketState = rounds[roundIndex];
+      const { rounds: playerRounds, groupIndex } = single;
+      const { roundIndex, rounds: gameRounds } = groups[groupIndex];
+      investorState = playerRounds[roundIndex] || {};
+      marketState = gameRounds[roundIndex] || {};
     } else {
-      investorState = multi;
-      marketState = groups[multi.groupIndex];
+      const { roundIndex, rounds: gameRounds } = groups[multi.groupIndex];
+      investorState = multi || {};
+      marketState = gameRounds[roundIndex] || {};
     }
-    const stock = STOCKS[stockIndex];
+    const stock = STOCKS[marketState.stockIndex];
     let content;
     switch (playerStatus) {
       case PlayerStatus.prepared: {
-        content = this.renderPrepared(stock, investorState, marketState);
+        content = this.renderPrepared(investorState, marketState);
         break;
       }
       case PlayerStatus.shouted: {
@@ -323,10 +378,13 @@ export default class PlayingStage extends Core.Play<
           <>
             <StockInfo
               {...stock}
-              style={{ marginTop: "40px", marginBottom: "20px" }}
+              style={{ marginTop: "15vh", marginBottom: "100px" }}
             />
-            <div>
-              <p>waiting for others</p>
+            <div
+              style={{ width: "200px", margin: "auto", textAlign: "center" }}
+            >
+              <img src={LOADING} style={{ marginBottom: "20px" }} />
+              <p>等待其他玩家</p>
             </div>
           </>
         );

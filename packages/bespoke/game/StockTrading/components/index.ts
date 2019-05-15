@@ -7,3 +7,4 @@ export { default as MatchModal } from "./MatchModal";
 export { default as Modal } from "./Modal";
 export { default as PlayMode } from "./PlayMode";
 export { default as StockInfo } from "./StockInfo";
+export { default as Loading } from "./Loading";

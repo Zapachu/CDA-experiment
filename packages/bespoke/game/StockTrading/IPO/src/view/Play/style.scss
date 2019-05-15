@@ -27,9 +27,10 @@
     td {
       color: #dde1e9;
     }
-    padding: 20px;
+    max-width: 900px;
+    margin: auto;
     .inputContainer {
-      margin-bottom: 10px;
+      margin-bottom: 30px;
       display: flex;
       justify-content: center;
     }
@@ -37,6 +38,18 @@
       padding: 30px;
       > p {
         text-align: center;
+      }
+    }
+    .operation {
+      padding: 1px 8px 1px 8px;
+      border: 1px solid transparent;
+      border-radius: 30%;
+      background-color: #11234C;
+      color: #65749C;
+      font-size: 11px;
+      cursor: pointer;
+      &:first-child {
+        margin-right: 5px;
       }
     }
   }
