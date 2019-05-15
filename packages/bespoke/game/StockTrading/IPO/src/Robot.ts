@@ -42,7 +42,6 @@ export default class extends BaseRobot<
       this.frameEmitter.emit(MoveType.shout, { price, num: bidNum });
     });
     setTimeout(() => {
-      console.log('robot, emit join')
       this.frameEmitter.emit(MoveType.joinRobot);
     }, 1500);
     return this;
