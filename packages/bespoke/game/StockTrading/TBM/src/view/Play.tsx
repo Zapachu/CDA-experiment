@@ -59,7 +59,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
 
     allIn = () => this.setState({price: '100', count: '1000'})
 
-    halfIn = () => this.setState({price: '1000', count: '500'})
+    halfIn = () => this.setState({price: '100', count: '500'})
 
     showRule = () => this.setState({showRule: !this.state.showRule})
 
@@ -116,7 +116,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                     </li>
                     <li style={{marginTop: 12}}>
                         <a>可买 <span className={style.priceHighlight}>
-                            {!isNaN(parseInt(price)) && parseInt(price) !== 0 ? InitMoney / Number(price) : 0}
+                            {!isNaN(parseInt(price)) && parseInt(price) !== 0 ? Math.round(InitMoney / Number(price)) : 0}
                         </span> 股</a>
                     </li>
                     <li style={{marginTop: 12}}>
@@ -335,7 +335,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
 
             {this.renderStage()}
 
-            <InfoBar text={`个人信息： 账户余额${privatePrices[groups[groupIndex].roundIndex]}万元`}/>
+            <InfoBar text={`个人信息： 账户余额${privatePrices[groups[groupIndex].roundIndex] / 10000}万元`}/>
 
             <InfoBar styles={{marginTop: '1rem'}} text={`拥有股票: 10000股`}/>
 
