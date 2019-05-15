@@ -57,7 +57,11 @@ export abstract class RobotScheduler<ICreateParams, IGameState, IPlayerState, Mo
             stateChanges.forEach(change => applyChange(this.playerState, null, change))
             this.receivePlayerState()
         })
-        setTimeout(() => this.connection.emit(baseEnum.SocketEvent.online), Math.random() * 1000)
+        return this
+    }
+
+    online():RobotScheduler<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>{
+        this.connection.emit(baseEnum.SocketEvent.online)
         return this
     }
 

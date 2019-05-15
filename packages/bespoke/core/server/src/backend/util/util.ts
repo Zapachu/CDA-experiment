@@ -35,11 +35,11 @@ export function elfPhaseId2PlayUrl(namespace: string, phaseId: string): string {
 export namespace Log {
     let logger = colorConsole()
 
-    export const l = (...args) => logger.log(...args)
-    export const i = (...args) => logger.info(...args)
-    export const d = (...args) => logger.debug(...args)
-    export const w = (...args) => logger.warn(...args)
-    export const e = (...args) => logger.error(...args)
+    export const l = logger.log
+    export const i = logger.info
+    export const d = logger.debug
+    export const w = logger.warn
+    export const e = logger.error
 
     export function init(logPath: string) {
         if (elfSetting.inProductEnv) {
