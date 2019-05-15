@@ -1,16 +1,13 @@
 import * as React from "react";
 import * as style from "./style.scss";
+import { Core, Lang } from "bespoke-client-util";
 import {
-  Button,
-  ButtonProps,
-  MaskLoading,
-  Core,
-  Lang,
-  Toast,
-  Label,
-  Input
-} from "bespoke-client-util";
-import { FetchType, MoveType, PushType, PlayerStatus } from "../../config";
+  FetchType,
+  MoveType,
+  PushType,
+  PlayerStatus,
+  IPOType
+} from "../../config";
 import {
   ICreateParams,
   IGameState,
@@ -22,8 +19,7 @@ import PlayingStage from "./PlayingStage";
 import IntroStage from "./IntroStage";
 import { Header } from "../../../../components";
 
-interface IPlayState {
-}
+interface IPlayState {}
 
 export class Play extends Core.Play<
   ICreateParams,
@@ -40,10 +36,11 @@ export class Play extends Core.Play<
 
   render(): React.ReactNode {
     const {
-      props: {
-        playerState: { playerStatus }
+      playerState: { playerStatus },
+      game: {
+        params: { type }
       }
-    } = this;
+    } = this.props;
     let content;
     switch (playerStatus) {
       case PlayerStatus.intro:
@@ -56,9 +53,15 @@ export class Play extends Core.Play<
         break;
       }
     }
+    let stage;
+    if (type === IPOType.Median) {
+      stage = Header.Stage.IPO_Median;
+    } else {
+      stage = Header.Stage.IPO_Top;
+    }
     return (
       <section className={style.play}>
-        <Header stage={"ipo"} />
+        <Header stage={stage} />
         {content}
       </section>
     );
