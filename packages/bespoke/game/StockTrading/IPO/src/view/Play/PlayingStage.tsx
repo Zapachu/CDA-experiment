@@ -6,7 +6,8 @@ import {
   MoveType,
   PushType,
   PlayerStatus,
-  STOCKS
+  STOCKS,
+  SHOUT_TIMER
 } from "../../config";
 import {
   ICreateParams,
@@ -37,6 +38,7 @@ interface IPlayState {
   price: number;
   num: number;
   modalType: ModalType;
+  shoutTimer: number;
 }
 
 export default class PlayingStage extends Core.Play<
@@ -77,18 +79,34 @@ export default class PlayingStage extends Core.Play<
       return {
         price: curRound.price,
         num: curRound.bidNum,
-        modalType: ModalType.None
+        modalType: ModalType.None,
+        shoutTimer: null
       };
     } else {
       return {
         price: multi.price,
         num: multi.bidNum,
-        modalType: ModalType.None
+        modalType: ModalType.None,
+        shoutTimer: null
       };
     }
   };
 
   lang = Lang.extractLang({});
+
+  componentDidMount() {
+    const { frameEmitter } = this.props;
+    frameEmitter.on(PushType.shoutTimer, ({ shoutTimer }) => {
+      const {
+        playerState: { playerStatus }
+      } = this.props;
+      console.log("playerstatus, ", playerStatus);
+      if (playerStatus === PlayerStatus.prepared) {
+        console.log("shouttimer, ", shoutTimer);
+        this.setState({ shoutTimer });
+      }
+    });
+  }
 
   inputNum = (multiplier: number, startingPrice: number) => {
     const { price } = this.state;
@@ -171,6 +189,7 @@ export default class PlayingStage extends Core.Play<
             color={Button.Color.Blue}
             style={{ marginRight: "20px" }}
             onClick={() => {
+              this.setState({ shoutTimer: null });
               frameEmitter.emit(MoveType.replay);
             }}
           />
@@ -195,7 +214,7 @@ export default class PlayingStage extends Core.Play<
         params: { total }
       }
     } = this.props;
-    const { price, num } = this.state;
+    const { price, num, shoutTimer } = this.state;
     const stock = STOCKS[marketState.stockIndex];
     return (
       <>
@@ -239,7 +258,10 @@ export default class PlayingStage extends Core.Play<
             />
             <p style={{ fontSize: "12px", marginTop: "5px" }}>
               可买
-              {price ? Math.floor(investorState.startingPrice / price) : " "}股
+              <span style={{ color: "orange" }}>
+                {price ? Math.floor(investorState.startingPrice / price) : " "}
+              </span>
+              股
             </p>
           </div>
         </div>
@@ -263,7 +285,9 @@ export default class PlayingStage extends Core.Play<
             >
               <span>
                 总花费
-                {price && num ? (price * num).toFixed(2) : " "}
+                <span style={{ color: "orange" }}>
+                  {price && num ? (price * num).toFixed(2) : " "}
+                </span>
               </span>
               <span>
                 <span
@@ -286,7 +310,10 @@ export default class PlayingStage extends Core.Play<
         </div>
         <Button
           label={"买入"}
-          style={{ marginBottom: "20px", marginTop: "20px" }}
+          style={{
+            marginBottom: shoutTimer !== null ? "5px" : "30px",
+            marginTop: "20px"
+          }}
           onClick={() => {
             if (!price || !num) return;
             frameEmitter.emit(MoveType.shout, { price, num }, err => {
@@ -301,6 +328,11 @@ export default class PlayingStage extends Core.Play<
             });
           }}
         />
+        {shoutTimer !== null ? (
+          <p style={{ marginBottom: "20px", textAlign: "center" }}>
+            {SHOUT_TIMER - shoutTimer} S
+          </p>
+        ) : null}
         <ListItem width={200}>
           <p style={{ color: "orange" }} className={style.item}>
             初始资金: {investorState.startingPrice}

@@ -12,7 +12,8 @@ export enum MoveType {
 export enum PushType {
   matchTimer,
   matchMsg,
-  robotShout
+  robotShout,
+  shoutTimer
 }
 
 export enum FetchType {}
@@ -31,6 +32,7 @@ export enum IPOType {
 }
 
 export const MATCH_TIMER = 30;
+export const SHOUT_TIMER = 90;
 export const minA = 30;
 export const maxA = 100;
 export const minB = 0.6;

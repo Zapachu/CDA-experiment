@@ -18,6 +18,7 @@ message PushParams {
     float min = 5;
     float max = 6;
     float startingPrice = 7;
+    int32 shoutTimer = 8;
 }
 
 message GameState {
