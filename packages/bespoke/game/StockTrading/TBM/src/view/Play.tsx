@@ -68,14 +68,13 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     shout = () => {
         const {
             props: {
-                frameEmitter,
-                gameState: {groups},
-                playerState: {groupIndex, privatePrices}
+                game: {params: {InitMoney}},
+                frameEmitter
             }, state
         } = this
         this.setState({price: '', count: ''})
         const price = Number(state.price) * Number(state.count)
-        if (Number.isNaN(price) || price > privatePrices[groups[groupIndex].roundIndex]) {
+        if (Number.isNaN(price) || price > InitMoney) {
             Toast.warn('输入的值无效')
         } else {
             frameEmitter.emit(MoveType.shout, {price: +price})
@@ -138,7 +137,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                             <a className={style.allIn} onClick={this.allIn}>全仓</a>
                         </div>
                     </li>
-                    <li style={{marginTop: 12}}>
+                    <li style={{marginTop: 52}}>
                         <Button label='出价' onClick={this.shout} color={Button.Color.Green}/>
                     </li>
                 </div>
@@ -316,9 +315,9 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     render() {
         const {
             props: {
-                game: {params: {}},
+                game: {params: {InitMoney}},
                 gameState: {groups},
-                playerState: {groupIndex, privatePrices}
+                playerState: {groupIndex}
             }, state: {loading, newRoundTimers, showRule, showTBMRule}
         } = this
         if (loading) {
@@ -338,7 +337,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
 
             {this.renderStage()}
 
-            <InfoBar text={`个人信息： 账户余额${privatePrices[groups[groupIndex].roundIndex] / 10000}万元`}/>
+            <InfoBar text={`个人信息： 账户余额${InitMoney / 10000}万元`}/>
 
             <InfoBar styles={{marginTop: '1rem'}} text={`拥有股票: 10000股`}/>
 
