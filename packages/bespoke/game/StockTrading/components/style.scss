@@ -14,8 +14,30 @@
     height: 15px;
     line-height: 15px;
   }
+  .headerLine {
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    > span {
+      flex: auto;
+      height: 1px;
+      width: 100px;
+    }
+    > p {
+      flex: none;
+      margin: 0 5px;
+      color: #67e968 !important;
+    }
+    > span {
+      &:first-child {
+        background: linear-gradient(to left, #67e968, #383d60);
+      }
+      &:last-child {
+        background: linear-gradient(to right, #67e968, #383d60);
+      }
+    }
+  }
 }
-
 .loading {
   @keyframes lds-spin {
     0% {
@@ -164,12 +186,10 @@
   .lds-spin {
     width: 200px !important;
     height: 200px !important;
-    -webkit-transform: translate(-100px, -100px) scale(1)
-      translate(100px, 100px);
+    -webkit-transform: translate(-100px, -100px) scale(1) translate(100px, 100px);
     transform: translate(-100px, -100px) scale(1) translate(100px, 100px);
   }
 }
-
 .matchModal {
   padding: 30px;
   > p {
@@ -200,7 +220,6 @@
     }
   }
 }
-
 .modal {
   position: fixed;
   top: 0;
@@ -232,7 +251,6 @@
     background: radial-gradient(#293567, #151b35);
   }
 }
-
 .playMode {
   ul {
     display: flex;
@@ -277,7 +295,6 @@
     }
   }
 }
-
 .listItem {
   display: flex;
   justify-content: center;
@@ -292,7 +309,6 @@
     }
   }
 }
-
 .button {
   display: flex;
   justify-content: center;
@@ -318,7 +334,6 @@
     }
   }
 }
-
 .input {
   display: flex;
   justify-content: center;
@@ -350,7 +365,6 @@
     }
   }
 }
-
 .stockInfo {
   border-collapse: separate;
   width: 100%;
@@ -373,7 +387,6 @@
     }
   }
 }
-
 .line {
   display: flex;
   align-items: center;
@@ -409,8 +422,6 @@
     }
   }
 }
-
-
 /*Loading*/
 @keyframes bounce {
   0%, 100% {
@@ -420,7 +431,6 @@
     transform: scale(1.0);
   }
 }
-
 .loadingWrapper {
   display: flex;
   flex-direction: column;

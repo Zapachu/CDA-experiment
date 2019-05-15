@@ -19,13 +19,28 @@ export default class Header extends React.Component<IProps> {
         const {stage} = this.props
         return <div className={style.header}>
             {
+                // stages.map((item, idx) =>
+                //     <div key={`headerItem-${idx}`} className={style.item}
+                //          style={{
+                //              color: stage === item.name ? '#58c350' : '#fff',
+                //              borderBottom: stage === item.name ? 'solid 1px #1d6318' : 'none'
+                //          }}>
+                //         {item.text}
+                //     </div>
+                // )
                 stages.map((item, idx) =>
-                    <div key={`headerItem-${idx}`} className={style.item}
+                    <div key={`headerItem${idx}`} className={style.item}
                          style={{
                              color: stage === item.name ? '#58c350' : '#fff',
-                             borderBottom: stage === item.name ? 'solid 1px #1d6318' : 'none'
+                             display: 'flex',
+                             flexDirection: 'column',
+                             height: '100%'
                          }}>
-                        {item.text}
+                        <div style={{flex: 1}}>{item.text}</div>
+                        <div className={style.headerLine}>
+                            <span></span>
+                            <span></span>
+                        </div>
                     </div>
                 )
             }
