@@ -32,6 +32,7 @@ export default class Header extends React.Component<IProps> {
                     <div key={`headerItem${idx}`} className={style.item}
                          style={{
                              color: stage === item.name ? '#58c350' : '#fff',
+                             padding: stage === item.name ? '0' : '1rem 2rem',
                              display: 'flex',
                              flexDirection: 'column',
                              height: '100%',
