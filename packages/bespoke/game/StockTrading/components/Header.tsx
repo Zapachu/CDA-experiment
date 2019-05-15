@@ -34,9 +34,9 @@ export default class Header extends React.Component<IProps> {
                              color: stage === item.name ? '#58c350' : '#fff',
                              display: 'flex',
                              flexDirection: 'column',
-                             height: '100%'
+                             height: '100%',
                          }}>
-                        <div style={{flex: 1}}>{item.text}</div>
+                        <div style={{flex: 1, marginTop: 12}}>{item.text}</div>
                         <div className={style.headerLine}>
                             <span></span>
                             <span></span>
