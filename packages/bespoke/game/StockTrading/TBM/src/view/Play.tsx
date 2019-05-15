@@ -72,7 +72,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 frameEmitter
             }, state
         } = this
-        this.setState({price: '', count: ''})
+        // this.setState({price: '', count: ''})
         const price = Number(state.price) * Number(state.count)
         if (Number.isNaN(price) || price > InitMoney) {
             Toast.warn('输入的值无效')
@@ -323,7 +323,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             timeLeft = NEW_ROUND_TIMER - newRoundTimer
         return <section className={style.play}>
 
-            <Header stage='tbm'/>
+            <Header stage={Header.Stage.TBM}/>
 
             <Stock/>
 
