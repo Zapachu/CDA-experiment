@@ -512,7 +512,7 @@ function _Play({game, gameState, playerState, frameEmitter}: TPlayProps) {
 
 export function Play(props: TPlayProps) {
     return <section className={style.play}>
-        <Header stage={'cbm'}/>
+        {/* <Header stage={Header.Stage.CBM}/> */}
         <_Play {...props}/>
     </section>
 }

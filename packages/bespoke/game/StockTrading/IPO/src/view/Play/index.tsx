@@ -1,13 +1,7 @@
 import * as React from "react";
 import * as style from "./style.scss";
 import { Core, Lang } from "bespoke-client-util";
-import {
-  FetchType,
-  MoveType,
-  PushType,
-  PlayerStatus,
-  IPOType
-} from "../../config";
+import { FetchType, MoveType, PushType, PlayerStatus } from "../../config";
 import {
   ICreateParams,
   IGameState,
@@ -17,7 +11,6 @@ import {
 } from "../../interface";
 import PlayingStage from "./PlayingStage";
 import IntroStage from "./IntroStage";
-import { Header } from "../../../../components";
 
 interface IPlayState {}
 
@@ -36,10 +29,7 @@ export class Play extends Core.Play<
 
   render(): React.ReactNode {
     const {
-      playerState: { playerStatus },
-      game: {
-        params: { type }
-      }
+      playerState: { playerStatus }
     } = this.props;
     let content;
     switch (playerStatus) {
@@ -53,15 +43,9 @@ export class Play extends Core.Play<
         break;
       }
     }
-    let stage;
-    if (type === IPOType.Median) {
-      stage = Header.Stage.IPO_Median;
-    } else {
-      stage = Header.Stage.IPO_Top;
-    }
     return (
       <section className={style.play}>
-        <Header stage={stage} />
+        {/* <Header stage={stage} /> */}
         {content}
       </section>
     );

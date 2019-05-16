@@ -1,7 +1,9 @@
 @import "~bespoke-client-util/lib/resource/public";
 
 .play {
+  display: inline-block;
   min-height: 100vh;
+  width: 100vw;
   background: radial-gradient(#293567, #151b35);
 
   .item {

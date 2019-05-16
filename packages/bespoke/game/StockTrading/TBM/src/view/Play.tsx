@@ -331,7 +331,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             timeLeft = NEW_ROUND_TIMER - newRoundTimer
         return <section className={style.play}>
 
-            <Header stage='tbm'/>
+            {/* <Header stage={Header.Stage.TBM}/> */}
 
             <Stock/>
 
