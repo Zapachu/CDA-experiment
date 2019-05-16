@@ -21,7 +21,7 @@ import {
     Stage
 } from './config'
 
-const SLEEP_TIME = 3000
+const SLEEP_TIME = 1000 * Math.random() + 2000
 
 interface IZipFreeField {
     beta: number
@@ -36,11 +36,12 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
     zipFreeField: IZipFreeField
 
     async init(): Promise<BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>> {
-        setTimeout(() => this.frameEmitter.emit(MoveType.getGroup), (Math.random() + .5) * SLEEP_TIME)
+        setTimeout(() => this.frameEmitter.emit(MoveType.getGroup), SLEEP_TIME)
         this.frameEmitter.on(PushType.beginTrading, () => {
             this.zipActive = false
+            this.frameEmitter.emit(MoveType.setRole, {role: Math.random() > .5 ? ROLE.Seller : ROLE.Buyer})
             setTimeout(() => {
-                const u = (this.role === ROLE.Seller ? 1 : -1) * (.3 * Math.random() - .2),
+                const u = (this.role === ROLE.Seller ? 1 : -1) * (.2 * Math.random() - .1),
                     calcPrice = this.formatPrice(this.unitPrice * (1 + u))
                 this.zipActive = true
                 this.zipFreeField = {
@@ -110,8 +111,8 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
 
     wakeUp(): void {
         if (this.gameGroupState.stage === Stage.trading && (
-            (this.role === ROLE.Seller && this.playerGroupState.count>0)||
-            (this.role === ROLE.Buyer && this.playerGroupState.point>this.playerGroupState.count * this.unitPrice)
+            (this.role === ROLE.Seller && this.playerState.count > 0) ||
+            (this.role === ROLE.Buyer && this.playerState.point > this.playerState.count * this.unitPrice)
         )) {
             redisClient.incr(RedisKey.robotActionSeq(this.game.id)).then(seq => this.submitOrder(seq))
             setTimeout(() => this.wakeUp(), this.sleepTime)
@@ -211,7 +212,7 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
             sellOrders: sellOrderIds.map(id => orderDict[id].price).join(','),
             timestamp: dateFormat(Date.now(), 'HH:MM:ss:l')
         }
-        const maxCount = this.role === ROLE.Seller ? this.playerGroupState.count : ~~(this.playerGroupState.point / this.unitPrice)
+        const maxCount = this.role === ROLE.Seller ? this.playerState.count : ~~(this.playerState.point / this.unitPrice)
         this.frameEmitter.emit(MoveType.submitOrder, {
             price: calcPrice,
             count: ~~(maxCount * (.7 * Math.random() + .3)) + 1

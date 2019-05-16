@@ -60,7 +60,7 @@ export enum ShoutResult {
     shoutSuccess,
     tradeSuccess,
     marketReject,
-    shoutOnTradedUnit,
+    invalidCount,
 }
 
 export enum DBKey {
@@ -75,12 +75,14 @@ export const RedisKey = {
 export enum MoveType {
     getGroup = 'getGroup',
     leaveGroup = 'newGroup',
+    setRole = 'setRole',
     submitOrder = 'submitOrder',
-    cancelOrder = 'cancelOrder',
+    cancelOrder = 'cancelOrder'
 }
 
 export enum PushType {
     countDown = 'countDown',
+    gotGroup = 'gotGroup',
     beginTrading = 'beginTrading',
     newOrder = 'newOrder',
     newTrade = 'newTrade'
@@ -98,7 +100,7 @@ export enum GroupType {
 export const MATCH_TIME = 5
 
 export const MOCK = {
-    playerLimit: 20,
+    playerLimit: 18,
     price: 200,
     count: 100,
     point: 20000
@@ -142,18 +144,19 @@ export interface IGameState {
 
 export interface IPlayerGroupState {
     playerIndex: number
-    role: ROLE,
-    count: number
-    point: number
+    role?: ROLE
 }
 
 export interface IPlayerState {
     groups: IPlayerGroupState[]
     groupIndex: number
+    count: number
+    point: number
 }
 
 export type IMoveParams = Partial<{
     groupType: number
+    role: ROLE
     price: number
     count: number
 }>

@@ -53,6 +53,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
     async initPlayerState(actor: IActor): Promise<TPlayerState<IPlayerState>> {
         const playerState = await super.initPlayerState(actor)
         playerState.groups = []
+        playerState.count = ~~((Math.random() + .5) * MOCK.count)
+        playerState.point = ~~((Math.random() + .5) * MOCK.point)
         return playerState
     }
 
@@ -92,18 +94,11 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 }
                 const gameGroupState = gameState.groups[groupIndex],
                     playerIndex = gameGroupState.playerIndex++
-                playerState.groups[groupIndex] = Math.random() > .5 ? {
-                    playerIndex,
-                    role: ROLE.Buyer,
-                    point: MOCK.point,
-                    count: 0
-                } : {
-                    playerIndex,
-                    role: ROLE.Seller,
-                    point: 0,
-                    count: MOCK.count
+                playerState.groups[groupIndex] = {
+                    playerIndex
                 }
                 playerState.groupIndex = groupIndex
+
                 if (playerIndex > 0) {
                     break
                 }
@@ -124,8 +119,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         this.groupBroadcast(groupIndex, PushType.beginTrading)
                     }
                     if (countDown === prepareTime + tradeTime + MATCH_TIME) {
-                        /*                        global.clearInterval(timer)
-                                                gameGroupState.stage = Stage.result*/
+                        global.clearInterval(timer)
+                        gameGroupState.stage = Stage.result
                     }
                     await this.stateManager.syncState()
                     this.groupBroadcast(groupIndex, PushType.countDown, {countDown: countDown++})
@@ -134,6 +129,10 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             }
             case MoveType.leaveGroup: {
                 playerState.groupIndex = undefined
+                break
+            }
+            case MoveType.setRole: {
+                playerState.groups[playerState.groupIndex].role = params.role
                 break
             }
             case MoveType.submitOrder: {
@@ -146,11 +145,12 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     buyOrders = buyOrderIds.map(id => orderDict[id].price).join(','),
                     sellOrders = sellOrderIds.map(id => orderDict[id].price).join(',')
                 let shoutResult: ShoutResult
-                if ((playerGroupState.role === ROLE.Seller && count > playerGroupState.count) ||
-                    (playerGroupState.role === ROLE.Buyer && count * gameGroupState.marketPrice > playerGroupState.point)
+                if (count <= 0 ||
+                    (playerGroupState.role === ROLE.Seller && count > playerState.count) ||
+                    (playerGroupState.role === ROLE.Buyer && count * gameGroupState.marketPrice > playerState.point)
                 ) {
-                    Log.d('物品已成交，无法继续报价')
-                    shoutResult = ShoutResult.shoutOnTradedUnit
+                    Log.d('数量有误，无法继续报价')
+                    shoutResult = ShoutResult.invalidCount
                 } else {
                     const newOrder: IOrder = {
                         id: ++gameGroupState.orderId,
@@ -224,15 +224,15 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 await this.shoutNewOrder(groupIndex, subOrder)
             }
             trades.push(trade)
-            groupPlayerStates.forEach(({groups}) => {
-                const playerGroupState: IPlayerGroupState = groups[groupIndex]
-                if ([order.playerIndex, pairOrder.playerIndex].includes(playerGroupState.playerIndex)) {
-                    if (playerGroupState.role === ROLE.Seller) {
-                        playerGroupState.count -= trade.count
-                        playerGroupState.point += trade.count * gameGroupState.marketPrice
+            groupPlayerStates.forEach(playerState => {
+                const {playerIndex, role}: IPlayerGroupState = playerState.groups[groupIndex]
+                if ([order.playerIndex, pairOrder.playerIndex].includes(playerIndex)) {
+                    if (role === ROLE.Seller) {
+                        playerState.count -= trade.count
+                        playerState.point += trade.count * gameGroupState.marketPrice
                     } else {
-                        playerGroupState.count += trade.count
-                        playerGroupState.point -= trade.count * gameGroupState.marketPrice
+                        playerState.count += trade.count
+                        playerState.point -= trade.count * gameGroupState.marketPrice
                     }
                 }
             })
