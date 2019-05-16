@@ -1,5 +1,16 @@
 @import "~bespoke-client-util/lib/resource/public";
 
+@mixin aButton{
+  font-size: $fontSize-small;
+  transition: $transition-normal;
+  color: rgba($color-blue, .8);
+
+  &:hover {
+    color: $color-blue;
+    text-decoration: underline;
+  }
+}
+
 .blankMsg {
   @include blankMsg;
 }
@@ -9,44 +20,21 @@
   display: flex;
   flex-direction: column;
 
-  .btnGroup {
-    text-align: center;
-    color: $color-red;
-
-    .btnAdd {
-      color: $color-blue;
-      display: inline-block;
-      margin: 0 1rem .5rem;
-    }
-  }
-
-  .roles {
-    display: flex;
-    flex-wrap: wrap;
-
-    .role {
-      flex-basis: 33%;
-      display: flex;
-      height: 2.5rem;
-      align-items: center;
-      justify-content: center;
-
-      .positionSeq {
-        width: 3rem;
-      }
-
-      &:nth-child(odd) {
-        background-color: rgba($color-black, .04);
-      }
-    }
-  }
-
   .baseFields {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    .baseField{
+      display: flex;
+      align-items: center;
+      >span{
+        font-size: $fontSize-middle;
+        color: rgba($color-black,.6);
+      }
+    }
   }
 
   .positions {
+    margin-top: 2rem;
     width: 100%;
 
     tr {
@@ -58,17 +46,19 @@
 
       th {
         font-weight: normal;
+        padding: 0 1rem;
+      }
 
-        &:nth-child(1) {
-          width: 4rem;
-        }
+      .units {
+        display: flex;
+        flex-wrap: wrap;
 
-        &:nth-child(2) {
-          width: 12rem;
-        }
+        .unitPair {
+          margin: 0 4px;
 
-        &:nth-child(3) {
-          width: 16rem;
+          em {
+            font-size: $fontSize-middle;
+          }
         }
       }
 
@@ -76,18 +66,47 @@
         background-color: rgba($color-black, .04);
       }
     }
+  }
 
-    .unitList {
-      outline: none;
-      width: 100%;
-      border-style: none;
-      cursor: pointer;
-      background: transparent;
-      transition: all .2s linear;
+  .btnSwitch {
+    margin-top: 1rem;
+    text-align: center;
+    a{
+      @include aButton
+    }
+  }
 
-      &:hover, &:focus {
-        color: $color-blue;
+  .positionsEditorWrapper {
+    display: flex;
+    flex-direction: column;
+    color: rgba($color-black, .5);
+    .head{
+      display: flex;
+      align-items: center;
+      .title {
+        margin: 1rem;
+        font-size: $fontSize-middle;
       }
+      .tips{
+      }
+    }
+
+    .positionsEditor {
+      padding: 2rem;
+      min-height: 10rem;
+      color: $color-black;
+      font-size: $fontSize-small;
+      background: $color-background;
+      border-radius: 1rem;
+      outline: none;
+      resize: none;
+    }
+    .convert{
+      @include aButton;
+      flex-grow: 1;
+      text-align: center;
+      position: relative;
+      top: -2rem;
     }
   }
 }
@@ -375,11 +394,13 @@ $color-red: #d6444e;
           width: calc(50% - .2rem);
           table-layout: fixed;
           text-align: center;
-          .orderPrices{
+
+          .orderPrices {
             display: flex;
             flex-direction: column;
             align-items: center;
             margin-top: .5rem;
+
             .orderPrice {
               background: $color-dark2;
               display: flex;
@@ -388,12 +409,15 @@ $color-red: #d6444e;
               align-items: center;
               justify-content: space-between;
               padding: 0 1rem;
-              label{
+
+              label {
                 width: 4rem;
               }
+
               .btnCancel {
                 color: rgba($color-orange, .7);
                 transition: $transition-normal;
+
                 &:hover {
                   color: $color-red;
                 }
@@ -403,12 +427,13 @@ $color-red: #d6444e;
         }
       }
 
-      .allTraded{
+      .allTraded {
         padding: 1rem;
         font-size: $fontSize-large;
         text-align: center;
         color: rgba($color-light, .6);
       }
+
       .orderSubmission {
         @include secondarySection;
 
@@ -492,7 +517,8 @@ $color-red: #d6444e;
         margin: 0 .5rem;
       }
     }
-    .switchBtns{
+
+    .switchBtns {
       display: flex;
       justify-content: center;
     }
