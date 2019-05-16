@@ -98,11 +98,6 @@ export const Create: Core.CreateSFC<ICreateParams, FetchType> = ({submitable, se
                     <div className={style.head}>
                         <label className={style.title}>{lang.privatePrices}</label>
                         <p className={style.tips}>{`( S(Seller)/B(Buyer) price*count )`}</p>
-                        <a className={style.convert} onClick={() => {
-                            setParams({
-                                ...convertPositions()
-                            })
-                        }}>{lang.convert}</a>
                     </div>
                     <textarea autoFocus={true}
                               value={positions}
@@ -110,6 +105,11 @@ export const Create: Core.CreateSFC<ICreateParams, FetchType> = ({submitable, se
                               rows={positions.split('\n').length}
                               onChange={({target: {value}}) => setPositions(value)}
                     />
+                    <a className={style.convert} onClick={() => {
+                        setParams({
+                            ...convertPositions()
+                        })
+                    }}>{lang.convert}</a>
                 </div>
         }
     </section>

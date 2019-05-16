@@ -89,11 +89,6 @@
       }
       .tips{
       }
-      .convert{
-        @include aButton;
-        flex-grow: 1;
-        text-align: right;
-      }
     }
 
     .positionsEditor {
@@ -105,6 +100,13 @@
       border-radius: 1rem;
       outline: none;
       resize: none;
+    }
+    .convert{
+      @include aButton;
+      flex-grow: 1;
+      text-align: center;
+      position: relative;
+      top: -2rem;
     }
   }
 }
