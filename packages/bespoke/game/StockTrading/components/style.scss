@@ -384,7 +384,7 @@
     }
   }
 }
-.stockInfo {
+.tableInfo {
   border-collapse: separate;
   width: 100%;
   border: 1px solid;
@@ -481,5 +481,13 @@
     font-size: 12px;
     color: rgba(#fff, 0.8);
     user-select: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .tableInfo {
+    td {
+      padding: 2px;
+    }
   }
 }

@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as style from "./style.scss";
-import { Core, Lang, MaskLoading, Toast } from "bespoke-client-util";
+import { Core, Lang, Toast } from "bespoke-client-util";
 import {
   FetchType,
   MoveType,
@@ -19,7 +19,7 @@ import {
   GameState
 } from "../../interface";
 import {
-  StockInfo,
+  TableInfo,
   Input,
   Button,
   ListItem,
@@ -35,8 +35,8 @@ enum ModalType {
 }
 
 interface IPlayState {
-  price: number;
-  num: number;
+  price: string;
+  num: string;
   modalType: ModalType;
   shoutTimer: number;
 }
@@ -77,15 +77,15 @@ export default class PlayingStage extends Core.Play<
       const { rounds, groupIndex } = single;
       const curRound = rounds[groups[groupIndex].roundIndex];
       return {
-        price: curRound.price,
-        num: curRound.bidNum,
+        price: curRound.price && "" + curRound.price,
+        num: curRound.bidNum && "" + curRound.bidNum,
         modalType: ModalType.None,
         shoutTimer: null
       };
     } else {
       return {
-        price: multi.price,
-        num: multi.bidNum,
+        price: multi.price && "" + multi.price,
+        num: multi.bidNum && "" + multi.bidNum,
         modalType: ModalType.None,
         shoutTimer: null
       };
@@ -100,9 +100,7 @@ export default class PlayingStage extends Core.Play<
       const {
         playerState: { playerStatus }
       } = this.props;
-      console.log("playerstatus, ", playerStatus);
       if (playerStatus === PlayerStatus.prepared) {
-        console.log("shouttimer, ", shoutTimer);
         this.setState({ shoutTimer });
       }
     });
@@ -110,12 +108,12 @@ export default class PlayingStage extends Core.Play<
 
   inputNum = (multiplier: number, startingPrice: number) => {
     const { price } = this.state;
-    if (!price) {
+    if (!+price) {
       return;
     }
     const money = multiplier * startingPrice;
-    const num = Math.floor(money / price);
-    this.setState({ num });
+    const num = Math.floor(money / +price);
+    this.setState({ num: "" + num });
   };
 
   renderResult = (
@@ -123,32 +121,58 @@ export default class PlayingStage extends Core.Play<
     marketState: Partial<GameState.Group.IRound>
   ) => {
     const { frameEmitter } = this.props;
-    const listData = [
-      { label: "股票的成交价格", value: marketState.strikePrice },
-      { label: "你们公司对股票的估值", value: investorState.privateValue },
+    const dataList = [
+      {
+        label: "股票的成交价格",
+        value: (
+          <span style={{ color: "orange" }}>{marketState.strikePrice}</span>
+        )
+      },
+      {
+        label: "你们公司对股票的估值",
+        value: (
+          <span style={{ color: "orange" }}>{investorState.privateValue}</span>
+        )
+      },
       {
         label: "每股股票收益",
-        value: (investorState.privateValue - marketState.strikePrice).toFixed(2)
+        value: (
+          <span style={{ color: "orange" }}>
+            {(investorState.privateValue - marketState.strikePrice).toFixed(2)}
+          </span>
+        )
       },
-      { label: "你的购买数量", value: investorState.actualNum || 0 },
-      { label: "你的总收益为", value: investorState.profit || 0 },
-      { label: "你的初始账户资金", value: investorState.startingPrice },
+      {
+        label: "你的购买数量",
+        value: (
+          <span style={{ color: "orange" }}>
+            {investorState.actualNum || 0}
+          </span>
+        )
+      },
+      {
+        label: "你的总收益为",
+        value: (
+          <span style={{ color: "orange" }}>{investorState.profit || 0}</span>
+        )
+      },
+      {
+        label: "你的初始账户资金",
+        value: (
+          <span style={{ color: "orange" }}>{investorState.startingPrice}</span>
+        )
+      },
       {
         label: "你的现有账户资金",
-        value: investorState.startingPrice + (investorState.profit || 0),
-        red: true
+        value: (
+          <span style={{ color: "red" }}>
+            {investorState.startingPrice + (investorState.profit || 0)}
+          </span>
+        )
       }
     ];
     return (
       <>
-        <div style={{ position: "fixed", top: "30vh", right: "15vw" }}>
-          <Button
-            label={"ipo知识扩展"}
-            size={Button.Size.Small}
-            color={Button.Color.Blue}
-            onClick={() => this.setState({ modalType: ModalType.Ipo })}
-          />
-        </div>
         <Line
           text={"交易结果展示"}
           style={{
@@ -158,30 +182,13 @@ export default class PlayingStage extends Core.Play<
             marginBottom: "20px"
           }}
         />
-        <ul>
-          {listData.map(({ label, value, red }) => {
-            return (
-              <li key={label} style={{ marginBottom: "10px" }}>
-                <ListItem>
-                  <p className={style.item}>
-                    <span>{label}:&nbsp;</span>
-                    <span style={{ color: red ? "#F0676D" : "orange" }}>
-                      {value}
-                    </span>
-                  </p>
-                </ListItem>
-              </li>
-            );
-          })}
-        </ul>
-        <Line
-          color={Line.Color.White}
-          style={{
-            margin: "auto",
-            width: "400px",
-            marginTop: "20px",
-            marginBottom: "20px"
-          }}
+        <TableInfo dataList={dataList} style={{ margin: "30px auto" }} />
+        <Button
+          style={{ justifyContent: "flex-end", marginBottom: "50px" }}
+          label={"ipo知识扩展"}
+          size={Button.Size.Small}
+          color={Button.Color.Blue}
+          onClick={() => this.setState({ modalType: ModalType.Ipo })}
         />
         <div style={{ display: "flex", justifyContent: "center" }}>
           <Button
@@ -189,7 +196,11 @@ export default class PlayingStage extends Core.Play<
             color={Button.Color.Blue}
             style={{ marginRight: "20px" }}
             onClick={() => {
-              this.setState({ shoutTimer: null });
+              this.setState({
+                shoutTimer: null,
+                price: undefined,
+                num: undefined
+              });
               frameEmitter.emit(MoveType.replay);
             }}
           />
@@ -200,6 +211,15 @@ export default class PlayingStage extends Core.Play<
             }}
           />
         </div>
+        <Line
+          color={Line.Color.White}
+          style={{
+            margin: "auto",
+            width: "400px",
+            marginTop: "40px",
+            marginBottom: "20px"
+          }}
+        />
       </>
     );
   };
@@ -234,8 +254,14 @@ export default class PlayingStage extends Core.Play<
             onClick={() => this.setState({ modalType: ModalType.Ipo })}
           />
         </div>
-        <StockInfo
-          {...stock}
+        <TableInfo
+          dataList={[
+            { label: "证券代码", value: stock.code },
+            { label: "证券简称", value: stock.code },
+            { label: "主承销商	", value: stock.contractor },
+            { label: "初步询价起始日期	", value: stock.startDate },
+            { label: "初步询价截止日期", value: stock.endDate }
+          ]}
           style={{ marginTop: "15vh", marginBottom: "20px" }}
         />
         <p style={{ marginBottom: "10px" }}>
@@ -251,15 +277,17 @@ export default class PlayingStage extends Core.Play<
           <div>
             <Input
               value={price}
-              onChange={val => this.setState({ price: +val })}
+              onChange={val => this.setState({ price: "" + val })}
               placeholder={"价格"}
-              onMinus={val => this.setState({ price: val - 1 })}
-              onPlus={val => this.setState({ price: val + 1 })}
+              onMinus={val => this.setState({ price: "" + (+val - 1) })}
+              onPlus={val => this.setState({ price: "" + (+val + 1) })}
             />
             <p style={{ fontSize: "12px", marginTop: "5px" }}>
               可买
               <span style={{ color: "orange" }}>
-                {price ? Math.floor(investorState.startingPrice / price) : " "}
+                {+price
+                  ? Math.floor(investorState.startingPrice / +price)
+                  : " "}
               </span>
               股
             </p>
@@ -269,10 +297,10 @@ export default class PlayingStage extends Core.Play<
           <div>
             <Input
               value={num}
-              onChange={val => this.setState({ num: +val })}
+              onChange={val => this.setState({ num: "" + val })}
               placeholder={"数量"}
-              onMinus={val => this.setState({ num: val - 1 })}
-              onPlus={val => this.setState({ num: val + 1 })}
+              onMinus={val => this.setState({ num: "" + (+val - 1) })}
+              onPlus={val => this.setState({ num: "" + (+val + 1) })}
             />
             <p
               style={{
@@ -286,7 +314,7 @@ export default class PlayingStage extends Core.Play<
               <span>
                 总花费
                 <span style={{ color: "orange" }}>
-                  {price && num ? (price * num).toFixed(2) : " "}
+                  {+price && +num ? (+price * +num).toFixed(2) : " "}
                 </span>
               </span>
               <span>
@@ -315,17 +343,21 @@ export default class PlayingStage extends Core.Play<
             marginTop: "20px"
           }}
           onClick={() => {
-            if (!price || !num) return;
-            frameEmitter.emit(MoveType.shout, { price, num }, err => {
-              if (err) {
-                Toast.warn(err);
-              } else {
-                this.setState({
-                  price: undefined,
-                  num: undefined
-                });
+            if (!+price || !+num || num.includes(".")) return;
+            frameEmitter.emit(
+              MoveType.shout,
+              { price: +price, num: +num },
+              err => {
+                if (err) {
+                  Toast.warn(err);
+                } else {
+                  this.setState({
+                    price: undefined,
+                    num: undefined
+                  });
+                }
               }
-            });
+            );
           }}
         />
         {shoutTimer !== null ? (
@@ -408,8 +440,14 @@ export default class PlayingStage extends Core.Play<
       case PlayerStatus.shouted: {
         content = (
           <>
-            <StockInfo
-              {...stock}
+            <TableInfo
+              dataList={[
+                { label: "证券代码", value: stock.code },
+                { label: "证券简称", value: stock.code },
+                { label: "主承销商	", value: stock.contractor },
+                { label: "初步询价起始日期	", value: stock.startDate },
+                { label: "初步询价截止日期", value: stock.endDate }
+              ]}
               style={{ marginTop: "15vh", marginBottom: "100px" }}
             />
             <div
