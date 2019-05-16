@@ -18,7 +18,8 @@ import {
   Version,
   SheetType,
   MainStageIndex,
-  TestStageIndex
+  TestStageIndex,
+  Survey
 } from './config'
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
 
@@ -247,7 +248,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
       [Choice.Wait]: 0,
     }
 
-    const resultData: Array<Array<any>> = [['组', '座位号', '最终收益', '轮次', '第一阶段选择', '第二阶段选择(结果1)', '第二阶段选择(结果2)', '最终选择', '第一阶段有人选1', '组内最低选择', '该轮积分', '1', '2', '3', '4', '5']]
+    const resultData: Array<Array<any>> = [['组', '座位号', '最终收益', '轮次', '第一阶段选择', '第二阶段选择(结果1)', '第二阶段选择(结果2)', '最终选择', '第一阶段有人选1', '组内最低选择', '该轮积分', '专业', '年龄', '年级', '家庭住址', '性别']]
     const playersByGroup = Object.values(playerStates).sort((a, b) => a.groupIndex - b.groupIndex);
     playersByGroup.forEach(ps => {
       const curGroup = groups[ps.groupIndex];
@@ -260,7 +261,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
           if(curGroup.mins[curRound]) {
             row.push(curChoice.c?curChoice.c:curChoice.c1, gameType===GameType.T2?(curGroup.ones[curRound]?1:0):'-', curGroup.mins[curRound], ps.profits[curRound])
             if(ps.surveyAnswers.length && curRound===0) {
-              row.push(...ps.surveyAnswers)
+              row.push(...this._formatSurveyAnswers(ps.surveyAnswers))
             }
           }
         }
@@ -269,6 +270,16 @@ export default class Controller extends BaseController<ICreateParams, IGameState
       }
     })
     return resultData;
+  }
+
+  _formatSurveyAnswers(surveyAnswers: Array<string>): Array<string> {
+    return surveyAnswers.map((ans, i) => {
+      if([0, 2, 4].includes(i)) {
+        return '' + (Survey[i].options.indexOf(ans) + 1);
+      }else {
+        return ans;
+      }
+    })
   }
 
   async onGameOver() {
