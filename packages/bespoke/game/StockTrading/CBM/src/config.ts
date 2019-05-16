@@ -1,4 +1,4 @@
-export const namespace = 'StockTrading-CDA'
+export const namespace = 'StockTrading-CBM'
 
 export enum ROLE {
     Seller,

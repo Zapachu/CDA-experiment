@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<e:Skin class="ButtonGameModeSkin" width="300" height="100" currentState="normal" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing"   states="normal,hover,active" >
-	<w:Config id="16a9ba3f144" ></w:Config>
-	<e:Image source="intro_mode_default_svg" horizontalCenter="0" verticalCenter="0"/>
-	<e:Image horizontalCenter="0" verticalCenter="0" source="intro_mode_svg" alpha.normal="0" alpha.hover="0.7"/>
-	<e:Label id="label" anchorOffsetX="0" anchorOffsetY="0" text="" width="190" textColor="0xb7b7b7" fontFamily="Microsoft YaHei" horizontalCenter="18" verticalCenter="-20" size="24" height="30" verticalAlign="middle"/>
-	<e:Label id="subLabel" anchorOffsetX="0" anchorOffsetY="0" width="212" size="14" textColor="0xb7b7b7" fontFamily="Microsoft YaHei" text="" x="73" y="63" height="18"/>
-</e:Skin>
