@@ -33,80 +33,11 @@
     }
   }
 
-  .positions {
-    margin-top: 2rem;
-    width: 100%;
-
-    tr {
-      padding: 0 2rem;
-      height: 2rem;
-      text-align: center;
-      color: rgba($color-black, .8);
-      user-select: none;
-
-      th {
-        font-weight: normal;
-        padding: 0 1rem;
-      }
-
-      .units {
-        display: flex;
-        flex-wrap: wrap;
-
-        .unitPair {
-          margin: 0 4px;
-
-          em {
-            font-size: $fontSize-middle;
-          }
-        }
-      }
-
-      &:nth-child(odd) {
-        background-color: rgba($color-black, .04);
-      }
-    }
-  }
-
   .btnSwitch {
     margin-top: 1rem;
     text-align: center;
     a{
       @include aButton
-    }
-  }
-
-  .positionsEditorWrapper {
-    display: flex;
-    flex-direction: column;
-    color: rgba($color-black, .5);
-    .head{
-      display: flex;
-      align-items: center;
-      .title {
-        margin: 1rem;
-        font-size: $fontSize-middle;
-      }
-      .tips{
-      }
-    }
-
-    .positionsEditor {
-      padding: 2rem;
-      min-height: 10rem;
-      color: $color-black;
-      font-size: $fontSize-small;
-      background: $color-background;
-      border-radius: 1rem;
-      outline: none;
-      resize: none;
-    }
-    .convert{
-      @include aButton;
-      flex-grow: 1;
-      text-align: center;
-      position: relative;
-      top: -2rem;
     }
   }
 }

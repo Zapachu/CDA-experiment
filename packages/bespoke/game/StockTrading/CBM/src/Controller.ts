@@ -8,13 +8,22 @@ import {
     TGameState,
     TPlayerState
 } from 'bespoke-server'
-import cloneDeep = require('lodash/cloneDeep')
 import nodeXlsx from 'node-xlsx'
 import {
     DBKey,
     FetchType,
     GroupType,
+    ICreateParams,
+    IGameGroupState,
+    IGameState,
+    IMoveParams,
+    IOrder,
+    IPlayerGroupState,
+    IPlayerState,
+    IPushParams,
+    ITrade,
     MATCH_TIME,
+    MOCK,
     MoveType,
     PushType,
     RobotCalcLog,
@@ -22,13 +31,7 @@ import {
     ROLE,
     SheetType,
     ShoutResult,
-    Stage,
-    ICreateParams,
-    IGameGroupState,
-    IGameState,
-    IMoveParams,
-    IPlayerState,
-    IPushParams, IOrder, ITrade
+    Stage
 } from './config'
 import {getEnumKeys} from './util'
 
@@ -62,7 +65,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     break
                 }
                 let groupIndex = gameState.groups.findIndex(gameGroupState => {
-                    if (gameGroupState.roleIndex >= this.game.params.roles.length) {
+                    if (gameGroupState.playerIndex >= MOCK.playerLimit) {
                         return false
                     }
                     if (actor.type === baseEnum.Actor.serverRobot) {
@@ -81,21 +84,27 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         buyOrderIds: [],
                         sellOrderIds: [],
                         trades: [],
-                        roleIndex: 0,
-                        type: params.groupType
+                        playerIndex: 0,
+                        type: params.groupType,
+                        marketPrice: MOCK.price
                     })
                     groupIndex = gameState.groups.length - 1
                 }
                 const gameGroupState = gameState.groups[groupIndex],
-                    roleIndex = gameGroupState.roleIndex++
-                playerState.groups[groupIndex] = {
-                    roleIndex,
-                    units: cloneDeep(this.game.params.units[roleIndex].units),
+                    playerIndex = gameGroupState.playerIndex++
+                playerState.groups[groupIndex] = Math.random() > .5 ? {
+                    playerIndex,
+                    role: ROLE.Buyer,
+                    point: MOCK.point,
+                    count: 0
+                } : {
+                    playerIndex,
+                    role: ROLE.Seller,
                     point: 0,
-                    tradedCount:0
+                    count: MOCK.count
                 }
                 playerState.groupIndex = groupIndex
-                if (roleIndex > 0) {
+                if (playerIndex > 0) {
                     break
                 }
                 let countDown = 1
@@ -105,7 +114,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     }
                     if (countDown === MATCH_TIME) {
                         gameGroupState.stage = Stage.reading
-                        Array(this.game.params.roles.length - gameGroupState.roleIndex).fill(null).forEach(
+                        Array(MOCK.playerLimit - gameGroupState.playerIndex).fill(null).forEach(
                             async (_, i) => await this.startNewRobotScheduler(`${groupIndex}_${i}`)
                         )
                     }
@@ -115,9 +124,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         this.groupBroadcast(groupIndex, PushType.beginTrading)
                     }
                     if (countDown === prepareTime + tradeTime + MATCH_TIME) {
-                        global.clearInterval(timer)
-                        await this.calcProfit(groupIndex)
-                        gameGroupState.stage = Stage.result
+                        /*                        global.clearInterval(timer)
+                                                gameGroupState.stage = Stage.result*/
                     }
                     await this.stateManager.syncState()
                     this.groupBroadcast(groupIndex, PushType.countDown, {countDown: countDown++})
@@ -132,20 +140,22 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 const {groupIndex} = playerState,
                     playerGroupState = playerState.groups[groupIndex],
                     gameGroupState = gameState.groups[groupIndex]
-                const {roleIndex} = playerGroupState
-                const {price, unitIndex, count} = params
+                const {playerIndex} = playerGroupState
+                const {price, count} = params
                 const orderDict = this.getOrderDict(gameGroupState), {buyOrderIds, sellOrderIds} = gameGroupState,
                     buyOrders = buyOrderIds.map(id => orderDict[id].price).join(','),
                     sellOrders = sellOrderIds.map(id => orderDict[id].price).join(',')
                 let shoutResult: ShoutResult
-                if (count > playerGroupState.units[unitIndex].count) {
+                if ((playerGroupState.role === ROLE.Seller && count > playerGroupState.count) ||
+                    (playerGroupState.role === ROLE.Buyer && count * gameGroupState.marketPrice > playerGroupState.point)
+                ) {
                     Log.d('物品已成交，无法继续报价')
                     shoutResult = ShoutResult.shoutOnTradedUnit
                 } else {
-                    const newOrder = {
+                    const newOrder: IOrder = {
                         id: ++gameGroupState.orderId,
-                        roleIndex,
-                        unitIndex,
+                        playerIndex,
+                        role: playerGroupState.role,
                         price,
                         count
                     }
@@ -156,7 +166,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             }
             case MoveType.cancelOrder: {
                 const {groupIndex} = playerState
-                await this.cancelOrder(groupIndex, playerState.groups[groupIndex].roleIndex)
+                await this.cancelOrder(groupIndex, playerState.groups[groupIndex].playerIndex)
                 break
             }
         }
@@ -170,66 +180,24 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         return orderDict
     }
 
-    async calcProfit(groupIndex: number) {
-        const {game} = this,
-            gameState = await this.stateManager.getGameState(),
-            playerStates = await this.getGroupPlayerStates(groupIndex),
-            {orders, trades} = gameState.groups[groupIndex]
-        playerStates.forEach(playerState => {
-            const playerGroupState = playerState.groups[groupIndex]
-            const {roles} = game.params
-            if (!playerGroupState.units) {
-                return
-            }
-            let periodProfit = 0, tradedCount = 0
-            const orderDict: { [id: number]: IOrder } = {}
-            orders.forEach(order => {
-                orderDict[order.id] = order
-            })
-            trades.forEach(({reqOrderId, resOrderId}) => {
-                const reqOrder = orderDict[reqOrderId],
-                    resOrder = orderDict[resOrderId]
-                let myOrder: IOrder
-                switch (playerGroupState.roleIndex) {
-                    case reqOrder.roleIndex:
-                        myOrder = reqOrder
-                        break
-                    case resOrder.roleIndex:
-                        myOrder = resOrder
-                        break
-                    default:
-                        return
-                }
-                const privateCost = +playerGroupState.units[myOrder.unitIndex].price
-                let unitProfit = roles[playerGroupState.roleIndex] === ROLE.Buyer ?
-                    privateCost - reqOrder.price : reqOrder.price - privateCost
-                periodProfit += unitProfit
-                tradedCount++
-            })
-            playerGroupState.tradedCount = tradedCount
-            playerGroupState.point = Number(periodProfit.toFixed(2))
-        })
-    }
-
     async shoutNewOrder(groupIndex: number, order: IOrder): Promise<ShoutResult> {
-        const role = this.game.params.roles[order.roleIndex]
         const groupPlayerStates = await this.getGroupPlayerStates(groupIndex)
         const gameGroupState = (await this.stateManager.getGameState()).groups[groupIndex],
             {buyOrderIds, sellOrderIds, trades, orders} = gameGroupState
-        const marketRejected = role === ROLE.Seller ?
+        const marketRejected = order.role === ROLE.Seller ?
             sellOrderIds[0] && order.price > orders.find(({id}) => id === sellOrderIds[0]).price :
             buyOrderIds[0] && order.price < orders.find(({id}) => id === buyOrderIds[0]).price
         if (marketRejected) {
             return ShoutResult.marketReject
         } else {
-            await this.cancelOrder(groupIndex, order.roleIndex)
+            await this.cancelOrder(groupIndex, order.playerIndex)
             orders.push(order)
         }
-        const tradeSuccess = role === ROLE.Seller ?
+        const tradeSuccess = order.role === ROLE.Seller ?
             buyOrderIds[0] && order.price <= orders.find(({id}) => id === buyOrderIds[0]).price :
             sellOrderIds[0] && order.price >= orders.find(({id}) => id === sellOrderIds[0]).price
         if (tradeSuccess) {
-            const pairOrderId = role === ROLE.Seller ? buyOrderIds.shift() : sellOrderIds.shift(),
+            const pairOrderId = order.role === ROLE.Seller ? buyOrderIds.shift() : sellOrderIds.shift(),
                 pairOrder = orders.find(({id}) => id === pairOrderId),
                 trade: ITrade = {
                     reqOrderId: pairOrderId,
@@ -243,7 +211,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     count: pairOrder.count - order.count
                 }
                 orders.push(subOrder)
-                ;(role === ROLE.Buyer ? sellOrderIds : buyOrderIds).unshift(subOrder.id)
+                ;(order.role === ROLE.Buyer ? sellOrderIds : buyOrderIds).unshift(subOrder.id)
                 trade.subOrderId = subOrder.id
             } else if (pairOrder.count < order.count) {
                 trade.count = pairOrder.count
@@ -256,28 +224,37 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 await this.shoutNewOrder(groupIndex, subOrder)
             }
             trades.push(trade)
-            groupPlayerStates.find(({groups}) => groups[groupIndex].roleIndex === pairOrder.roleIndex)
-                .groups[groupIndex].units[pairOrder.unitIndex].count -= trade.count
-            groupPlayerStates.find(({groups}) => groups[groupIndex].roleIndex === order.roleIndex)
-                .groups[groupIndex].units[order.unitIndex].count -= trade.count
+            groupPlayerStates.forEach(({groups}) => {
+                const playerGroupState: IPlayerGroupState = groups[groupIndex]
+                if ([order.playerIndex, pairOrder.playerIndex].includes(playerGroupState.playerIndex)) {
+                    if (playerGroupState.role === ROLE.Seller) {
+                        playerGroupState.count -= trade.count
+                        playerGroupState.point += trade.count * gameGroupState.marketPrice
+                    } else {
+                        playerGroupState.count += trade.count
+                        playerGroupState.point -= trade.count * gameGroupState.marketPrice
+                    }
+                }
+            })
+            gameGroupState.marketPrice = pairOrder.price
             this.groupBroadcast(groupIndex, PushType.newTrade, {resOrderId: order.id})
             return ShoutResult.tradeSuccess
         } else {
-            (role === ROLE.Seller ? sellOrderIds : buyOrderIds).unshift(order.id)
+            (order.role === ROLE.Seller ? sellOrderIds : buyOrderIds).unshift(order.id)
             this.groupBroadcast(groupIndex, PushType.newOrder, {newOrderId: order.id})
             return ShoutResult.shoutSuccess
         }
     }
 
-    async cancelOrder(groupIndex: number, roleIndex: number) {
+    async cancelOrder(groupIndex: number, playerIndex: number) {
         const {buyOrderIds, sellOrderIds, orders} = (await this.stateManager.getGameState()).groups[groupIndex]
         for (let i = 0; i < buyOrderIds.length; i++) {
-            if (orders.find(({id}) => id === buyOrderIds[i]).roleIndex === roleIndex) {
+            if (orders.find(({id}) => id === buyOrderIds[i]).playerIndex === playerIndex) {
                 return buyOrderIds.splice(i, 1)
             }
         }
         for (let i = 0; i < sellOrderIds.length; i++) {
-            if (orders.find(({id}) => id === sellOrderIds[i]).roleIndex === roleIndex) {
+            if (orders.find(({id}) => id === sellOrderIds[i]).playerIndex === playerIndex) {
                 return sellOrderIds.splice(i, 1)
             }
         }
@@ -294,27 +271,27 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 let data = [], option = {}
                 switch (sheetType) {
                     case SheetType.robotCalcLog: {
-                        data.push(['seq', 'Subject', 'role', 'box', 'R', 'A', 'q', 'tau', 'beta', 'p', 'delta', 'r', 'LagGamma', 'Gamma', 'ValueCost', 'u', 'CalculatedPrice', 'Timestamp'])
+                        data.push(['seq', 'Subject', 'role', 'R', 'A', 'q', 'tau', 'beta', 'p', 'delta', 'r', 'LagGamma', 'Gamma', 'ValueCost', 'u', 'CalculatedPrice', 'Timestamp'])
                         const robotCalcLogs: Array<{ data: RobotCalcLog }> = await FreeStyleModel.find({
                             game: this.game.id,
                             key: DBKey.robotCalcLog
                         }) as any
                         robotCalcLogs.sort(({data: {seq: m}}, {data: {seq: n}}) => m - n)
-                            .forEach(({data: {seq, playerSeq, role, unitIndex, R, A, q, tau, beta, p, delta, r, LagGamma, Gamma, ValueCost, u, CalculatedPrice, timestamp}}) =>
-                                data.push([seq, playerSeq, role, unitIndex + 1, R, A, q, tau, beta, p, delta, r, LagGamma, Gamma, ValueCost, u, CalculatedPrice, timestamp]
+                            .forEach(({data: {seq, playerSeq, role, R, A, q, tau, beta, p, delta, r, LagGamma, Gamma, ValueCost, u, CalculatedPrice, timestamp}}) =>
+                                data.push([seq, playerSeq, role + 1, R, A, q, tau, beta, p, delta, r, LagGamma, Gamma, ValueCost, u, CalculatedPrice, timestamp]
                                     .map(v => typeof v === 'number' && v % 1 ? v.toFixed(2) : v)
                                 ))
                         break
                     }
                     case SheetType.robotSubmitLog: {
-                        data.push(['seq', 'Subject', 'role', 'box', 'ValueCost', 'Price', 'BuyOrders', 'SellOrders', `ShoutResult:${getEnumKeys(ShoutResult).join('/')}`, 'MarketBuyOrders', 'MarketSellOrders', 'Timestamp'])
+                        data.push(['seq', 'Subject', 'role', 'ValueCost', 'Price', 'BuyOrders', 'SellOrders', `ShoutResult:${getEnumKeys(ShoutResult).join('/')}`, 'MarketBuyOrders', 'MarketSellOrders', 'Timestamp'])
                         const robotSubmitLogs: Array<{ data: RobotSubmitLog }> = await FreeStyleModel.find({
                             game: this.game.id,
                             key: DBKey.robotSubmitLog
                         }) as any
                         robotSubmitLogs.sort(({data: {seq: m}}, {data: {seq: n}}) => m - n)
-                            .forEach(({data: {seq, playerSeq, role, unitIndex, ValueCost, price, buyOrders, sellOrders, shoutResult, marketBuyOrders, marketSellOrders, timestamp}}) =>
-                                data.push([seq, playerSeq, role, unitIndex + 1, ValueCost, price, buyOrders, sellOrders, `${shoutResult + 1}:${ShoutResult[shoutResult]}`, marketBuyOrders, marketSellOrders, timestamp]
+                            .forEach(({data: {seq, playerSeq, role, ValueCost, price, buyOrders, sellOrders, shoutResult, marketBuyOrders, marketSellOrders, timestamp}}) =>
+                                data.push([seq, playerSeq, role, ValueCost, price, buyOrders, sellOrders, `${shoutResult + 1}:${ShoutResult[shoutResult]}`, marketBuyOrders, marketSellOrders, timestamp]
                                     .map(v => typeof v === 'number' && v % 1 ? v.toFixed(2) : v)
                                 ))
                         break

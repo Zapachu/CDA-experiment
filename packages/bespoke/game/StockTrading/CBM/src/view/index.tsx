@@ -4,7 +4,7 @@ import {Create} from './Create'
 import {Play} from './Play'
 
 registerOnFramework(namespace, {
-    localeNames: ['连续双向拍卖', 'ContinuousDoubleAuction'],
+    localeNames: ['连续竞价', 'CBM'],
     Create,
     Play,
 })

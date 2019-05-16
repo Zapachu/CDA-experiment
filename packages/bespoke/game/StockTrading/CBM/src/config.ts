@@ -26,7 +26,6 @@ export interface RobotCalcLog {
     seq,
     playerSeq,
     role,
-    unitIndex,
     R,
     A,
     q,
@@ -47,7 +46,6 @@ export interface RobotSubmitLog {
     seq,
     playerSeq,
     role,
-    unitIndex,
     ValueCost,
     price,
     buyOrders,
@@ -97,22 +95,18 @@ export enum GroupType {
     Multi
 }
 
-export const MATCH_TIME = 30
+export const MATCH_TIME = 5
 
-export interface IUnit {
-    price: number
-    count: number
+export const MOCK = {
+    playerLimit: 20,
+    price: 200,
+    count: 100,
+    point: 20000
 }
 
 export interface ICreateParams {
-    roles: number[]
     prepareTime: number
     tradeTime: number
-    units: IUnits[]
-}
-
-export interface IUnits {
-    units: IUnit[]
 }
 
 export interface IGameGroupState {
@@ -122,14 +116,15 @@ export interface IGameGroupState {
     buyOrderIds: number[]
     sellOrderIds: number[]
     trades: ITrade[]
-    roleIndex: number
-    type: number
+    playerIndex: number
+    type: GroupType
+    marketPrice: number
 }
 
 export interface IOrder {
     id: number
-    roleIndex: number
-    unitIndex: number
+    playerIndex: number
+    role: ROLE
     price: number
     count: number
 }
@@ -146,9 +141,9 @@ export interface IGameState {
 }
 
 export interface IPlayerGroupState {
-    roleIndex: number
-    units: IUnit[]
-    tradedCount: number
+    playerIndex: number
+    role: ROLE,
+    count: number
     point: number
 }
 
@@ -159,7 +154,6 @@ export interface IPlayerState {
 
 export type IMoveParams = Partial<{
     groupType: number
-    unitIndex: number
     price: number
     count: number
 }>
