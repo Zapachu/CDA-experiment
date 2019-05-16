@@ -20,8 +20,8 @@ export type TRegisterGame = (namespace: string, gameTemplate: IGameTemplate) => 
 export namespace Core {
 
     interface ICreateProps<ICreateParams, FetchType> {
-        params: ICreateParams
-        setParams: (newParams: ICreateParams) => void
+        params: Partial<ICreateParams>
+        setParams: (newParams: Partial<ICreateParams>) => void
         fetcher?: Fetcher<FetchType>
         submitable?: boolean
         setSubmitable?: (submitable: boolean) => void
@@ -131,4 +131,3 @@ export namespace Core {
     export type CreateOnElfClass = (new(...args) => CreateOnElf<{}>)
     //endregion
 }
-//endregion
