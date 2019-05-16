@@ -98,3 +98,74 @@ export enum GroupType {
 }
 
 export const MATCH_TIME = 30
+
+export interface IUnit {
+    price: number
+    count: number
+}
+
+export interface ICreateParams {
+    roles: number[]
+    prepareTime: number
+    tradeTime: number
+    units: IUnits[]
+}
+
+export interface IUnits {
+    units: IUnit[]
+}
+
+export interface IGameGroupState {
+    stage: number
+    orderId: number
+    orders: IOrder[]
+    buyOrderIds: number[]
+    sellOrderIds: number[]
+    trades: ITrade[]
+    roleIndex: number
+    type: number
+}
+
+export interface IOrder {
+    id: number
+    roleIndex: number
+    unitIndex: number
+    price: number
+    count: number
+}
+
+export interface ITrade {
+    reqOrderId: number
+    resOrderId: number
+    count: number
+    subOrderId?: number
+}
+
+export interface IGameState {
+    groups: IGameGroupState[]
+}
+
+export interface IPlayerGroupState {
+    roleIndex: number
+    units: IUnit[]
+    tradedCount: number
+    point: number
+}
+
+export interface IPlayerState {
+    groups: IPlayerGroupState[]
+    groupIndex: number
+}
+
+export type IMoveParams = Partial<{
+    groupType: number
+    unitIndex: number
+    price: number
+    count: number
+}>
+
+export type IPushParams = Partial<{
+    countDown: number
+    newOrderId: number
+    resOrderId: number
+}>

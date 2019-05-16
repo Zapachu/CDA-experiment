@@ -22,17 +22,14 @@ import {
     ROLE,
     SheetType,
     ShoutResult,
-    Stage
-} from './config'
-import {
-    GameGroupState,
+    Stage,
     ICreateParams,
     IGameGroupState,
     IGameState,
     IMoveParams,
     IPlayerState,
-    IPushParams
-} from './interface'
+    IPushParams, IOrder, ITrade
+} from './config'
 import {getEnumKeys} from './util'
 
 export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
@@ -92,9 +89,10 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 const gameGroupState = gameState.groups[groupIndex],
                     roleIndex = gameGroupState.roleIndex++
                 playerState.groups[groupIndex] = {
-                    point: 0,
                     roleIndex,
-                    units: cloneDeep(this.game.params.units[roleIndex].units)
+                    units: cloneDeep(this.game.params.units[roleIndex].units),
+                    point: 0,
+                    tradedCount:0
                 }
                 playerState.groupIndex = groupIndex
                 if (roleIndex > 0) {
@@ -164,8 +162,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         }
     }
 
-    getOrderDict(gameState: IGameGroupState): { [id: number]: GameGroupState.IOrder } {
-        const orderDict: { [id: number]: GameGroupState.IOrder } = {}
+    getOrderDict(gameState: IGameGroupState): { [id: number]: IOrder } {
+        const orderDict: { [id: number]: IOrder } = {}
         gameState.orders.forEach(order => {
             orderDict[order.id] = order
         })
@@ -184,14 +182,14 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 return
             }
             let periodProfit = 0, tradedCount = 0
-            const orderDict: { [id: number]: GameGroupState.IOrder } = {}
+            const orderDict: { [id: number]: IOrder } = {}
             orders.forEach(order => {
                 orderDict[order.id] = order
             })
             trades.forEach(({reqOrderId, resOrderId}) => {
                 const reqOrder = orderDict[reqOrderId],
                     resOrder = orderDict[resOrderId]
-                let myOrder: GameGroupState.IOrder
+                let myOrder: IOrder
                 switch (playerGroupState.roleIndex) {
                     case reqOrder.roleIndex:
                         myOrder = reqOrder
@@ -213,7 +211,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         })
     }
 
-    async shoutNewOrder(groupIndex: number, order: GameGroupState.IOrder): Promise<ShoutResult> {
+    async shoutNewOrder(groupIndex: number, order: IOrder): Promise<ShoutResult> {
         const role = this.game.params.roles[order.roleIndex]
         const groupPlayerStates = await this.getGroupPlayerStates(groupIndex)
         const gameGroupState = (await this.stateManager.getGameState()).groups[groupIndex],
@@ -233,13 +231,13 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         if (tradeSuccess) {
             const pairOrderId = role === ROLE.Seller ? buyOrderIds.shift() : sellOrderIds.shift(),
                 pairOrder = orders.find(({id}) => id === pairOrderId),
-                trade: GameGroupState.ITrade = {
+                trade: ITrade = {
                     reqOrderId: pairOrderId,
                     resOrderId: order.id,
                     count: order.count
                 }
             if (pairOrder.count > order.count) {
-                const subOrder: GameGroupState.IOrder = {
+                const subOrder: IOrder = {
                     ...pairOrder,
                     id: ++gameGroupState.orderId,
                     count: pairOrder.count - order.count
@@ -249,7 +247,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 trade.subOrderId = subOrder.id
             } else if (pairOrder.count < order.count) {
                 trade.count = pairOrder.count
-                const subOrder: GameGroupState.IOrder = {
+                const subOrder: IOrder = {
                     ...order,
                     id: ++gameGroupState.orderId,
                     count: order.count - pairOrder.count

@@ -1,17 +1,16 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, FrameEmitter, IGame, Lang, MaskLoading, Toast} from 'bespoke-client-util'
+import {Core, FrameEmitter, IGame, Lang, Toast} from 'bespoke-client-util'
 import {
-    GameGroupState,
+    FetchType, MATCH_TIME, MoveType, PushType, ROLE, Stage,
     ICreateParams,
     IGameGroupState,
     IGameState,
     IMoveParams,
     IPlayerGroupState,
     IPlayerState,
-    IPushParams
-} from '../interface'
-import {FetchType, MATCH_TIME, MoveType, PushType, ROLE, Stage} from '../config'
+    IPushParams, IOrder
+} from '../config'
 import {Button, Header, Input, Line, MatchModal, PlayMode} from '../../../components'
 
 //region component
@@ -211,8 +210,8 @@ function Trading({
     const [count, setCount] = React.useState(1 as number | string)
     const unitIndex = units.findIndex(({count}) => !!count)
     const role = roles[roleIndex]
-    const orderDict: { [id: number]: GameGroupState.IOrder } = (() => {
-        const orderDict: { [id: number]: GameGroupState.IOrder } = {}
+    const orderDict: { [id: number]: IOrder } = (() => {
+        const orderDict: { [id: number]: IOrder } = {}
         orders.forEach(order => {
             orderDict[order.id] = order
         })

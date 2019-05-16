@@ -1,8 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {Core, Lang, Label, RangeInput} from 'bespoke-client-util'
-import {ICreateParams, CreateParams} from '../interface'
-import {FetchType, ROLE} from '../config'
+import {FetchType, ROLE, ICreateParams, IUnits} from '../config'
 
 const POSITION_EXAMPLE = `B 280*10 280*10 280*10 280*10 280*10 280*10 280*10 280*10
 S 240*10 240*10 240*10 240*10 240*10 240*10 240*10 240*10
@@ -114,9 +113,9 @@ export const Create: Core.CreateSFC<ICreateParams, FetchType> = ({submitable, se
         }
     </section>
 
-    function convertPositions(): ICreateParams {
+    function convertPositions(): Partial<ICreateParams> {
         const roles: ROLE[] = [],
-            units: CreateParams.IUnits[] = []
+            units: IUnits[] = []
         positions.split('\n').filter(r => r).forEach(row => {
             const [roleStr, ...unitStrs] = row.split(' ').filter(s => s)
             roles.push(roleStr === 'S' ? ROLE.Seller : ROLE.Buyer)

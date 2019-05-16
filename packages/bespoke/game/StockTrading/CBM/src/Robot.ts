@@ -10,18 +10,15 @@ import {
     RobotCalcLog,
     RobotSubmitLog,
     ROLE,
-    ShoutResult
-} from './config'
-import {
+    ShoutResult,
     ICreateParams,
     IGameState,
     IMoveParams,
     IPlayerState,
     IPushParams,
-    GameGroupState,
     IGameGroupState,
-    IPlayerGroupState
-} from './interface'
+    IPlayerGroupState, IOrder
+} from './config'
 
 const SLEEP_TIME = 3000
 
@@ -91,8 +88,8 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
         return SLEEP_TIME * (0.75 + 0.5 * Math.random())
     }
 
-    get orderDict(): { [id: number]: GameGroupState.IOrder } {
-        const orderDict: { [id: number]: GameGroupState.IOrder } = {}
+    get orderDict(): { [id: number]: IOrder } {
+        const orderDict: { [id: number]: IOrder } = {}
         this.gameGroupState.orders.forEach(order => {
             orderDict[order.id] = order
         })
