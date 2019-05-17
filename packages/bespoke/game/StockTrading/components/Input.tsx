@@ -7,6 +7,7 @@ const Input: React.SFC<PropType> = ({
   onChange,
   onPlus,
   onMinus,
+  disabled = false,
   style: propStyle
 }) => {
   return (
@@ -17,6 +18,7 @@ const Input: React.SFC<PropType> = ({
           value={value}
           onChange={e => onChange(e.target.value, e)}
           placeholder={placeholder}
+          disabled={disabled}
         />
         {onPlus ? <span onClick={() => onPlus(+value || 0)}>+</span> : null}
       </div>
@@ -26,8 +28,9 @@ const Input: React.SFC<PropType> = ({
 
 interface PropType {
   value: number | string;
+  disabled?: boolean;
   placeholder?: string;
-  onChange: (val: number | string, event: React.ChangeEvent) => void;
+  onChange?: (val: number | string, event: React.ChangeEvent) => void;
   onPlus?: (val: number) => void;
   onMinus?: (val: number) => void;
   style?: object;

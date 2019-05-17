@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import Header from '../../../components/Header'
+// import Header from '../../../components/Header'
 import Line from '../../../components/Line'
 import Input from '../../../components/Input'
 import Button from '../../../components/Button'
@@ -323,7 +323,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             timeLeft = NEW_ROUND_TIMER - newRoundTimer
         return <section className={style.play}>
 
-            <Header stage={Header.Stage.TBM}/>
+            {/*<Header stage={}/>*/}
 
             <Stock/>
 

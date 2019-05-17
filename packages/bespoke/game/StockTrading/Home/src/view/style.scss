@@ -1,0 +1,76 @@
+@import "~bespoke-client-util/lib/resource/public";
+
+@mixin aButton {
+  font-size: $fontSize-small;
+  transition: $transition-normal;
+  color: rgba($color-blue, 0.8);
+
+  &:hover {
+    color: $color-blue;
+    text-decoration: underline;
+  }
+}
+
+.create {
+  margin-top: 2rem;
+  text-align: center;
+  .playUrlLabel {
+    font-size: $fontSize-large;
+    color: rgba($color-black, 0.8);
+    display: inline-block;
+  }
+  .playUrl {
+    margin: 1rem;
+    label {
+      width: 5rem;
+    }
+    li {
+      height: 3rem;
+      display: flex;
+      align-items: center;
+      input {
+        flex-grow: 1;
+        padding-left: 1rem;
+        outline: none;
+        border: {
+          style: solid;
+          width: 1px;
+          color: transparent transparent $color-black;
+        }
+      }
+      a {
+        margin-left: 1rem;
+        text-decoration: underline;
+        color: $color-blue;
+      }
+    }
+  }
+  .btnSwitch {
+    margin-top: 1rem;
+    text-align: center;
+    a {
+      @include aButton;
+    }
+  }
+}
+
+.play {
+  background: radial-gradient(#293567, #151b35);
+  min-height: 100vh;
+  .home {
+    padding-top: 10vh;
+  }
+  .intro {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(#212d54, #192041);
+    padding: 30px 0px;
+    margin: 30px 0px;
+    .arrow {
+      display: block;
+      width: 60px;
+      margin: 0px 5px;
+    }
+  }
+}

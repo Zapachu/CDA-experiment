@@ -176,7 +176,9 @@ function Trading({
                      playerState: {roleIndex, units}
                  }: IStageProps) {
     const lang = Lang.extractLang({
-            profit: ['物品利润', 'Box Profit'],
+            price: ['价格', 'Price'],
+            count: ['数量', 'Count'],
+            profit: ['利润', 'Profit'],
             tradeCount: ['成交数量', 'Trade Count'],
             totalProfit: ['总利润', 'Total Profit'],
             unitNumber: ['物品序号', 'Unit Number'],
@@ -198,7 +200,7 @@ function Trading({
             tradePrice: ['成交价格', 'Price'],
             invalidBuyPrice: ['订单价格需在市场最高买价与当前物品价值之间', 'Order price must be between your private value and the highest buy price in the market'],
             invalidSellPrice: ['订单价格需在当前物品成本与市场最低卖价之间', 'Order price must be between the lowest buy price in the market and your private cost'],
-            invalidCount:['超出可交易物品数量','Exceed the number of tradable units'],
+            invalidCount: ['超出可交易物品数量', 'Exceed the number of tradable units'],
             sellOrders: ['卖家订单', 'SellOrders'],
             buyOrders: ['买家订单', 'BuyOrders'],
             yourTrades: ['交易记录', 'Your Trades'],
@@ -209,7 +211,7 @@ function Trading({
     const [count, setCount] = React.useState(1 as number | string)
     const unitIndex = units.findIndex(({count}) => !!count)
     const role = roles[roleIndex]
-    const orderDict:{ [id: number]: GameGroupState.IOrder } = (()=>{
+    const orderDict: { [id: number]: GameGroupState.IOrder } = (() => {
         const orderDict: { [id: number]: GameGroupState.IOrder } = {}
         orders.forEach(order => {
             orderDict[order.id] = order
@@ -246,7 +248,7 @@ function Trading({
         if (role === ROLE.Buyer && (_price > unit.price || (maxBuyOrder && _price < maxBuyOrder.price))) {
             return Toast.warn(lang.invalidSellPrice)
         }
-        if(count > unit.count){
+        if (count > unit.count) {
             setCount(unit.count)
             return Toast.warn(lang.invalidCount)
         }
@@ -300,12 +302,14 @@ function Trading({
                                             <label>{lang.shout4UnitPls}</label>
                                             <Input {...{
                                                 value: price || '',
+                                                placeholder: lang.price,
                                                 onChange: price => setPrice(price),
                                                 onMinus: price => setPrice(price - 1),
                                                 onPlus: price => setPrice(price + 1)
                                             }}/>
                                             <Input {...{
                                                 value: count || '',
+                                                placeholder: lang.count,
                                                 onChange: count => setCount(count),
                                                 onMinus: count => setCount(count - 1),
                                                 onPlus: count => setCount(count + 1)
@@ -396,7 +400,7 @@ function Trading({
                     <h3 className={style.title}>{lang.tradeHistory}</h3>
                     <div style={{
                         margin: '1rem',
-                        width: `${(~~(trades.length/24) + 2) * 12}rem`
+                        width: `${(~~(trades.length / 24) + 2) * 12}rem`
                     }}>
                         <TradeChart
                             tradeList={trades.map(({reqOrderId}) => {
@@ -508,7 +512,7 @@ function _Play({game, gameState, playerState, frameEmitter}: TPlayProps) {
 
 export function Play(props: TPlayProps) {
     return <section className={style.play}>
-        <Header stage={'cbm'}/>
+        {/* <Header stage={Header.Stage.CBM}/> */}
         <_Play {...props}/>
     </section>
 }

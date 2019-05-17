@@ -6,5 +6,5 @@ export { default as ListItem } from "./ListItem";
 export { default as MatchModal } from "./MatchModal";
 export { default as Modal } from "./Modal";
 export { default as PlayMode } from "./PlayMode";
-export { default as StockInfo } from "./StockInfo";
+export { default as TableInfo } from "./TableInfo";
 export { default as Loading } from "./Loading";

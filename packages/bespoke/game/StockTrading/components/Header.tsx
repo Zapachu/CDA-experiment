@@ -2,23 +2,7 @@ import * as React from "react";
 import * as style from "./style.scss";
 const LOCK = require("./lock.svg");
 
-interface IProps {
-  stage: string;
-}
-
-interface StateType {
-  sub: boolean;
-}
-
 export default class Header extends React.Component<IProps, StateType> {
-  static Stage = {
-    Home: "home",
-    IPO_Median: "ipo_median",
-    IPO_Top: "ipo_top",
-    TBM: "tbm",
-    CBM: "cbm"
-  };
-
   constructor(props) {
     super(props);
     this.state = {
@@ -26,43 +10,50 @@ export default class Header extends React.Component<IProps, StateType> {
     };
   }
 
-  getStatus = (stage: string, item): string => {
+  getStatus = (item): string => {
+    const { currentStage, unlockedStage } = this.props;
     const { sub } = this.state;
-    if ((item.subStages && item.name.includes(stage)) || stage === item.name) {
-      return sub ? "" : "active";
+    if (
+      (item.subStages && item.name.includes(currentStage)) ||
+      currentStage === item.name
+    ) {
+      return item.subStages && sub ? "" : "active";
     }
     if (
-      (item.subStages && item.name.every(name => ORDER[stage] < ORDER[name])) ||
-      ORDER[stage] < ORDER[item.name]
+      (item.subStages && item.name.every(name => name > unlockedStage)) ||
+      item.name > unlockedStage
     ) {
       return "locked";
     }
     return "";
   };
 
-  getSubStatus = (stage: string, item): string => {
-    if (stage === item.name) {
+  getSubStatus = (item): string => {
+    const { currentStage, unlockedStage } = this.props;
+    if (item.name === currentStage) {
       return "active";
     }
-    if (ORDER[stage] < ORDER[item.name]) {
+    if (item.name > unlockedStage) {
       return "locked";
     }
     return "";
   };
 
   render(): React.ReactNode {
-    const { stage } = this.props;
     const { sub } = this.state;
+    const { onClick } = this.props;
     return (
       <div className={style.header}>
         {STAGES.map((item, i) => {
-          const status = this.getStatus(stage, item);
+          const status = this.getStatus(item);
           return (
             <div
               key={`headerItem-${i}`}
               className={status ? style[status] : ""}
               onClick={
-                item.subStages ? () => this.setState({ sub: !sub }) : () => {}
+                item.subStages
+                  ? () => this.setState({ sub: !sub })
+                  : () => onClick(item.name as Stage)
               }
             >
               {status === "locked" ? (
@@ -73,11 +64,12 @@ export default class Header extends React.Component<IProps, StateType> {
               {sub && item.subStages ? (
                 <ul className={style.sub}>
                   {item.subStages.map((item, i) => {
-                    const subStatus = this.getSubStatus(stage, item);
+                    const subStatus = this.getSubStatus(item);
                     return (
                       <li
                         key={`subItem-${i}`}
                         className={subStatus ? style[subStatus] : ""}
+                        onClick={() => onClick(item.name)}
                       >
                         {subStatus === "locked" ? (
                           <img src={LOCK} className={style.lockImg} />
@@ -96,24 +88,34 @@ export default class Header extends React.Component<IProps, StateType> {
   }
 }
 
-const ORDER = {
-  [Header.Stage.Home]: 0,
-  [Header.Stage.IPO_Median]: 1,
-  [Header.Stage.IPO_Top]: 2,
-  [Header.Stage.TBM]: 3,
-  [Header.Stage.CBM]: 4
-};
+interface IProps {
+  currentStage: Stage;
+  unlockedStage: Stage;
+  onClick: (stage: Stage) => void;
+}
+
+interface StateType {
+  sub: boolean;
+}
+
+enum Stage {
+  Home = 0,
+  IPO_Median,
+  IPO_Top,
+  TBM,
+  CBM
+}
 
 const STAGES = [
-  { name: Header.Stage.Home, text: "首页" },
+  { name: Stage.Home, text: "首页" },
   {
-    name: [Header.Stage.IPO_Median, Header.Stage.IPO_Top],
+    name: [Stage.IPO_Median, Stage.IPO_Top],
     text: "IPO发售",
     subStages: [
-      { name: Header.Stage.IPO_Median, text: "中位数定价" },
-      { name: Header.Stage.IPO_Top, text: "最高价前K个" }
+      { name: Stage.IPO_Median, text: "中位数定价" },
+      { name: Stage.IPO_Top, text: "最高价前K个" }
     ]
   },
-  { name: Header.Stage.TBM, text: "集合竞价" },
-  { name: Header.Stage.CBM, text: "连续竞价" }
+  { name: Stage.TBM, text: "集合竞价" },
+  { name: Stage.CBM, text: "连续竞价" }
 ];
