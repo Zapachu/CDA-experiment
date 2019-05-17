@@ -6,7 +6,6 @@ import {
   MoveType,
   PushType,
   PlayerStatus,
-  STOCKS,
   SHOUT_TIMER
 } from "../../config";
 import {
@@ -24,7 +23,8 @@ import {
   Button,
   ListItem,
   Line,
-  Modal
+  Modal,
+  StockInfo
 } from "../../../../components";
 const LOADING = require("../../../../components/loading.png");
 
@@ -235,7 +235,6 @@ export default class PlayingStage extends Core.Play<
       }
     } = this.props;
     const { price, num, shoutTimer } = this.state;
-    const stock = STOCKS[marketState.stockIndex];
     return (
       <>
         <div style={{ position: "fixed", top: "35vh", right: "15vw" }}>
@@ -254,14 +253,8 @@ export default class PlayingStage extends Core.Play<
             onClick={() => this.setState({ modalType: ModalType.Ipo })}
           />
         </div>
-        <TableInfo
-          dataList={[
-            { label: "证券代码", value: stock.code },
-            { label: "证券简称", value: stock.code },
-            { label: "主承销商	", value: stock.contractor },
-            { label: "初步询价起始日期	", value: stock.startDate },
-            { label: "初步询价截止日期", value: stock.endDate }
-          ]}
+        <StockInfo
+          stockIndex={marketState.stockIndex}
           style={{ marginTop: "15vh", marginBottom: "20px" }}
         />
         <p style={{ marginBottom: "10px" }}>
@@ -409,14 +402,10 @@ export default class PlayingStage extends Core.Play<
     const {
       lang,
       props: {
-        frameEmitter,
         playerState: { playerStatus, single, multi },
-        gameState: { groups },
-        game: {
-          params: { total }
-        }
+        gameState: { groups }
       },
-      state: { price, num, modalType }
+      state: { modalType }
     } = this;
     let investorState: Partial<PlayerState.IMulti>;
     let marketState: Partial<GameState.Group.IRound>;
@@ -430,7 +419,6 @@ export default class PlayingStage extends Core.Play<
       investorState = multi || {};
       marketState = gameRounds[roundIndex] || {};
     }
-    const stock = STOCKS[marketState.stockIndex];
     let content;
     switch (playerStatus) {
       case PlayerStatus.prepared: {
@@ -440,14 +428,8 @@ export default class PlayingStage extends Core.Play<
       case PlayerStatus.shouted: {
         content = (
           <>
-            <TableInfo
-              dataList={[
-                { label: "证券代码", value: stock.code },
-                { label: "证券简称", value: stock.code },
-                { label: "主承销商	", value: stock.contractor },
-                { label: "初步询价起始日期	", value: stock.startDate },
-                { label: "初步询价截止日期", value: stock.endDate }
-              ]}
+            <StockInfo
+              stockIndex={marketState.stockIndex}
               style={{ marginTop: "15vh", marginBottom: "100px" }}
             />
             <div

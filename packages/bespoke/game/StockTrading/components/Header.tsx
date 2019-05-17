@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as style from "./style.scss";
+import { Stage } from "./constants";
 const LOCK = require("./lock.svg");
 
 export default class Header extends React.Component<IProps, StateType> {
@@ -96,14 +97,6 @@ interface IProps {
 
 interface StateType {
   sub: boolean;
-}
-
-enum Stage {
-  Home = 0,
-  IPO_Median,
-  IPO_Top,
-  TBM,
-  CBM
 }
 
 const STAGES = [
