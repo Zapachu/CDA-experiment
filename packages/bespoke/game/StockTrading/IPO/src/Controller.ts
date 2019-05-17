@@ -25,8 +25,7 @@ import {
   maxA,
   maxB,
   startingMultiplier,
-  minNPCNum,
-  maxNPCNum,
+  SHOUT_TIMER,
   STOCKS
 } from "./config";
 
@@ -41,6 +40,7 @@ export default class Controller extends BaseController<
   FetchType
 > {
   private matchIntervals: { [groupIndex: string]: NodeJS.Timer } = {};
+  private shoutIntervals: { [groupIndex: string]: NodeJS.Timer } = {};
 
   initGameState(): TGameState<IGameState> {
     const gameState = super.initGameState();
@@ -69,7 +69,7 @@ export default class Controller extends BaseController<
         if (playerState.playerStatus !== PlayerStatus.intro) {
           break;
         }
-        this._createGroupAndInitRobots(gameState, playerState);
+        this.createGroupAndInitRobots(gameState, playerState);
         break;
       }
       case MoveType.startMulti: {
@@ -186,7 +186,11 @@ export default class Controller extends BaseController<
           group.roundIndex++;
           this._initState(group, groupPlayerStates);
         } else {
-          this._createGroupAndInitRobots(gameState, playerState);
+          this.createGroupAndInitRobots(gameState, playerState);
+          console.log(
+            "replay, ",
+            this.shoutIntervals[playerState.single.groupIndex]
+          );
         }
         break;
       }
@@ -196,7 +200,7 @@ export default class Controller extends BaseController<
     }
   }
 
-  _createGroupAndInitRobots(
+  createGroupAndInitRobots(
     gameState: TGameState<IGameState>,
     playerState: TPlayerState<IPlayerState>
   ) {
@@ -280,6 +284,9 @@ export default class Controller extends BaseController<
     gameRound.min = min;
     gameRound.max = max;
     gameRound.stockIndex = stockIndex;
+    if (isMulti) {
+      this.startShoutTicking(group, groupPlayerStates[0].multi.groupIndex);
+    }
     groupPlayerStates.forEach((s, i) => {
       const privateValue = this._genPrivateValue(min, max);
       const startingPrice = this._genStartingPrice(min);
@@ -325,6 +332,39 @@ export default class Controller extends BaseController<
       return formatDigits((int + 1) * 10000);
     }
     return formatDigits(original);
+  }
+
+  startShoutTicking(group: GameState.IGroup, groupIndex: number) {
+    global.setTimeout(() => {
+      const shoutIntervals = this.shoutIntervals;
+      let shoutTimer = 1;
+      shoutIntervals[groupIndex] = global.setInterval(async () => {
+        const playerStates = await this.stateManager.getPlayerStates();
+        const groupPlayerStates = Object.values(playerStates).filter(
+          s => s.multi && s.multi.groupIndex === groupIndex
+        );
+        groupPlayerStates.forEach(s => {
+          this.push(s.actor, PushType.shoutTimer, {
+            shoutTimer
+          });
+        });
+        if (
+          groupPlayerStates.every(s => s.playerStatus !== PlayerStatus.prepared)
+        ) {
+          global.clearInterval(shoutIntervals[groupIndex]);
+          delete shoutIntervals[groupIndex];
+          return;
+        }
+        if (shoutTimer++ < SHOUT_TIMER) {
+          return;
+        }
+        global.clearInterval(shoutIntervals[groupIndex]);
+        console.log("auto, ", shoutIntervals[groupIndex]);
+        delete shoutIntervals[groupIndex];
+        this._autoProcessProfits(group, groupPlayerStates);
+        await this.stateManager.syncState();
+      }, 1000);
+    }, 0);
   }
 
   startMatchTicking(group: GameState.IGroup, groupIndex: number) {
@@ -377,7 +417,7 @@ export default class Controller extends BaseController<
     if (numberOfShares <= total) {
       marketState.strikePrice = marketState.min;
       sortedPlayerStates
-        .filter(s => s.privateValue !== undefined)
+        // .filter(s => s.privateValue !== undefined)
         .forEach(s => {
           s.actualNum = s.bidNum;
           s.profit = formatDigits(
@@ -405,7 +445,7 @@ export default class Controller extends BaseController<
     // 买家总数小于发行股数
     if (buyerTotal <= total) {
       buyers
-        .filter(s => s.privateValue !== undefined)
+        // .filter(s => s.privateValue !== undefined)
         .forEach(s => {
           s.actualNum = s.bidNum;
           s.profit = formatDigits(
@@ -422,7 +462,7 @@ export default class Controller extends BaseController<
         buyers[buyerIndex].actualNum++;
       }
       buyers
-        .filter(s => s.privateValue !== undefined)
+        // .filter(s => s.privateValue !== undefined)
         .forEach(s => {
           s.profit = formatDigits(
             (s.privateValue - marketState.strikePrice) * s.actualNum
@@ -453,7 +493,7 @@ export default class Controller extends BaseController<
     marketState.strikePrice =
       strikePrice === undefined ? marketState.min : strikePrice;
     buyers
-      .filter(s => s.privateValue !== undefined)
+      // .filter(s => s.privateValue !== undefined)
       .forEach(s => {
         s.profit = formatDigits(
           (s.privateValue - marketState.strikePrice) * s.actualNum
@@ -472,6 +512,31 @@ export default class Controller extends BaseController<
     if (type === IPOType.TopK) {
       this._processTopKProfits(marketState, sortedPlayerStates);
     }
+  }
+
+  _autoProcessProfits(
+    group: GameState.IGroup,
+    groupPlayerStates: Array<TPlayerState<IPlayerState>>
+  ) {
+    const investorStates = groupPlayerStates
+      .filter(s => {
+        if (s.playerStatus === PlayerStatus.prepared) {
+          s.multi.price = 0;
+          s.multi.bidNum = 0;
+          s.multi.actualNum = 0;
+          s.multi.profit = 0;
+          return false;
+        }
+        return true;
+      })
+      .map(s => s.multi);
+    const marketState = group.rounds[group.roundIndex];
+
+    this.processProfits(
+      investorStates as Array<InvestorState>,
+      marketState as MarketState
+    );
+    groupPlayerStates.forEach(s => (s.playerStatus = PlayerStatus.result));
   }
 
   findBuyerIndex(num: number, array: Array<number>): number {

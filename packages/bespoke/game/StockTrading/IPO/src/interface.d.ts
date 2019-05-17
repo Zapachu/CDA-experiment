@@ -220,6 +220,9 @@ export interface IPushParams {
 
     /** PushParams startingPrice */
     startingPrice?: (number|null);
+
+    /** PushParams shoutTimer */
+    shoutTimer?: (number|null);
 }
 
 /** Represents a PushParams. */
@@ -245,6 +248,9 @@ export class PushParams implements IPushParams {
 
     /** PushParams startingPrice. */
     public startingPrice: number;
+
+    /** PushParams shoutTimer. */
+    public shoutTimer: number;
 
     /**
      * Creates a new PushParams instance using the specified properties.

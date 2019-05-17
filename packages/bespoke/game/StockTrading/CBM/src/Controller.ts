@@ -229,10 +229,10 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 if ([order.playerIndex, pairOrder.playerIndex].includes(playerIndex)) {
                     if (role === ROLE.Seller) {
                         playerState.count -= trade.count
-                        playerState.point += trade.count * gameGroupState.marketPrice
+                        playerState.point += trade.count * pairOrder.price
                     } else {
                         playerState.count += trade.count
-                        playerState.point -= trade.count * gameGroupState.marketPrice
+                        playerState.point -= trade.count * pairOrder.price
                     }
                 }
             })

@@ -1,7 +1,9 @@
 @import "~bespoke-client-util/lib/resource/public";
 
 .play {
+  display: inline-block;
   min-height: 100vh;
+  width: 100vw;
   background: radial-gradient(#293567, #151b35);
 
   .item {
@@ -27,7 +29,7 @@
     td {
       color: #dde1e9;
     }
-    max-width: 900px;
+    max-width: 800px;
     margin: auto;
     .inputContainer {
       margin-bottom: 30px;

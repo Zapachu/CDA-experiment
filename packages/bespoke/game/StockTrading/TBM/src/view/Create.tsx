@@ -24,14 +24,14 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
 
     state: ICreateState = {
         buyerPriceStart: 0,
-        buyerPriceEnd: 100,
+        buyerPriceEnd: 100000,
         sellerPriceStart: 0,
-        sellerPriceEnd: 100,
-        InitMoney: 100,
-        round: 3,
+        sellerPriceEnd: 100000,
+        InitMoney: 100000,
+        round: 1,
         waitingSeconds: 10,
         groupSize: 2,
-        positions: [{role: 0, privatePrice: [10, 40, 60]}, {role: 1, privatePrice: [30, 50, 60]}],
+        positions: [{role: 0, privatePrice: [100]}, {role: 1, privatePrice: [90]}],
         readonly: false,
     }
 
@@ -94,7 +94,7 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
                     <Label label='轮次'/>
                     <RangeInput value={round}
                                 min={1}
-                                max={10}
+                                max={1}
                                 onChange={(e) => this.setState({round: parseInt(e.target.value)})}/>
                 </li>
                 <li>
@@ -112,6 +112,8 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
                 <li>
                     <Label label='初始资金'/>
                     <RangeInput value={InitMoney}
+                                min={100000}
+                                max={1000000}
                                 onChange={(e) => this.setState({InitMoney: parseInt(e.target.value)})}/>
                 </li>
                 <li>
