@@ -1,4 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<e:Skin class="MatchingPlayer"   width="70"  height="87" xmlns:e="http://ns.egret.com/eui"  states="in,out" >
-	<e:Image source="match_player_in_svg" x="0" y="0" source.out="match_player_out_svg"/>
-</e:Skin>
