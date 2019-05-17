@@ -4,7 +4,7 @@ import {
   IMoveCallback,
   TPlayerState
 } from "bespoke-server";
-import { MoveType, PushType, FetchType, Stage } from "./config";
+import { MoveType, PushType, FetchType } from "./config";
 import {
   ICreateParams,
   IGameState,
@@ -12,6 +12,7 @@ import {
   IMoveParams,
   IPushParams
 } from "./interface";
+import { Stage } from "../../components/constants";
 
 export default class Controller extends BaseController<
   ICreateParams,
