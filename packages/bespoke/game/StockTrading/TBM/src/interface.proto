@@ -5,25 +5,27 @@ message CreateParams {
         int32 role = 1;
         repeated int32 privatePrice = 2;
     }
-    int32 round = 1;
-    int32 groupSize = 2;
-    int32 buyerPriceStart = 3;
-    int32 buyerPriceEnd = 4;
-    int32 sellerPriceStart = 5;
-    int32 sellerPriceEnd = 6;
-    int32 InitMoney = 7;
-    int32 waitingSeconds = 8;
-    repeated Position positions = 9;
-    string nextPhaseKey = 10;
+    int32 groupSize = 1;
+    int32 buyerPriceStart = 2;
+    int32 buyerPriceEnd = 3;
+    int32 sellerPriceStart = 4;
+    int32 sellerPriceEnd = 5;
+    int32 InitMoney = 6;
+    int32 waitingSeconds = 7;
+    repeated Position positions = 8;
+    string nextPhaseKey = 9;
 }
 
 message MoveParams {
     int32 price = 1;
+    int32 num = 2;
 }
 
 message PushParams {
     int32 roundIndex = 1;
     int32 newRoundTimer = 2;
+    int32 matchTimer = 3;
+    int32 matchNum = 4;
 }
 
 message GameState {
@@ -39,15 +41,32 @@ message GameState {
         repeated Round rounds = 2;
         int32 playerNum = 3;
         repeated Result results = 4;
+        bool isMulti = 5;
     }
     repeated Group groups = 1;
 }
 
 message PlayerState {
-    int32 groupIndex = 1;
-    int32 positionIndex = 2;
-    repeated int32 privatePrices = 3;
-    repeated int32 prices = 4;
-    repeated int32 profits = 5;
-    int32 role = 6;
+    message Multi {
+        float privateValue = 1;
+        float price = 2;
+        int32 bidNum = 3;
+        float profit = 4;
+        float startingPrice = 5;
+    }
+    message Single {
+        message Round {
+            float privateValue = 1;
+            float price = 2;
+            int32 bidNum = 3;
+            float profit = 4;
+            float startingPrice = 5;
+        }
+        int32 groupIndex = 1;
+        repeated Round rounds = 2;
+    }
+    int32 role = 1;
+    Multi multi = 2;
+    Single single = 3;
+    int32 playerStatus = 4;
 }

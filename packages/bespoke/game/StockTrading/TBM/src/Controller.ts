@@ -34,19 +34,19 @@ export default class Controller extends BaseController<ICreateParams, IGameState
     }
 
     async initPlayerState(actor: IActor): Promise<TPlayerState<IPlayerState>> {
-        const {game: {params: {round}}} = this
         const playerState = await super.initPlayerState(actor)
-        playerState.prices = Array(round).fill(null)
-        playerState.profits = Array(round).fill(0)
+        playerState.playerStatus = PlayerStatus.intro
         return playerState
     }
 
     protected async playerMoveReducer(actor: IActor, type: string, params: IMoveParams, cb: IMoveCallback): Promise<void> {
-        const {game: {params: {groupSize, round, positions, waitingSeconds}}} = this
+        const {game: {params: {groupSize, positions, waitingSeconds}}} = this
         const playerState = await this.stateManager.getPlayerState(actor),
             gameState = await this.stateManager.getGameState(),
             playerStates = await this.stateManager.getPlayerStates()
         switch (type) {
+            case MoveType.startSingle:
+
             case MoveType.getPosition:
                 if (playerState.groupIndex !== undefined) {
                     break
@@ -66,6 +66,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 let addRobotTimer = 1
                 const addRobotTask = global.setInterval(async () => {
                     if (addRobotTimer++ < waitingSeconds) {
+                        await this.broadcast(PushType.matchingTimer, {addRobotTimer})
                         return
                     }
                     global.clearInterval(addRobotTask)

@@ -4,14 +4,18 @@ export enum MoveType {
     shout = 'shout',
     prepare = 'prepare',
     getPosition = 'getPosition',
-    nextStage = 'nextStage'
+    nextStage = 'nextStage',
+    startSingle = 'startSingle',
+    startMulti = 'startMulti'
+
 }
 
 export enum PushType {
     dealTimer,
     startBid,
     newRoundTimer,
-    nextRound
+    nextRound,
+    matchingTimer
 }
 
 export enum FetchType {
@@ -19,7 +23,9 @@ export enum FetchType {
 }
 
 export enum PlayerStatus {
+    intro,
     outside,
+    matching,
     prepared,
     startBid,
     shouted,

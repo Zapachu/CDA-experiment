@@ -11,7 +11,6 @@ interface ICreateState {
     sellerPriceEnd: number
     waitingSeconds: number
     InitMoney: number
-    round: number
     groupSize: number
     positions: Array<{
         role: number
@@ -28,10 +27,9 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
         sellerPriceStart: 0,
         sellerPriceEnd: 100000,
         InitMoney: 100000,
-        round: 1,
         waitingSeconds: 10,
         groupSize: 2,
-        positions: [{role: 0, privatePrice: [100]}, {role: 1, privatePrice: [90]}],
+        positions: [{role: 0, privatePrice: [10000]}, {role: 1, privatePrice: [9000]}],
         readonly: false,
     }
 
@@ -43,14 +41,15 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
     genRan = ({L, H}) => ~~(Math.random() * (H - L)) + L
 
     genPosition = (i) => {
-        const {buyerPriceStart, buyerPriceEnd, sellerPriceStart, sellerPriceEnd, round} = this.state
+        const {buyerPriceStart, buyerPriceEnd, sellerPriceStart, sellerPriceEnd} = this.state
         const role = i % 2
         return {
             role,
-            privatePrice: Array(round).fill(null).map(() => this.genRan([{
-                L: buyerPriceStart,
-                H: buyerPriceEnd
-            }, {L: sellerPriceStart, H: sellerPriceEnd}][role]))
+            privatePrice: this.genRan(
+                [
+                    {L: buyerPriceStart, H: buyerPriceEnd},
+                    {L: sellerPriceStart, H: sellerPriceEnd}
+                ][role])
         }
     }
 
@@ -80,23 +79,16 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
 
     done = () => {
         const {setParams, setSubmitable} = this.props
-        const {round, groupSize, waitingSeconds, positions, InitMoney} = this.state
-        setParams({round, groupSize, waitingSeconds, positions, InitMoney})
+        const {groupSize, waitingSeconds, positions, InitMoney} = this.state
+        setParams({groupSize, waitingSeconds, positions, InitMoney})
         this.setState({readonly: true})
         setSubmitable(true)
     }
 
     render() {
-        const {round, groupSize, waitingSeconds, buyerPriceStart, buyerPriceEnd, sellerPriceStart, sellerPriceEnd, InitMoney, positions, readonly} = this.state
+        const {groupSize, waitingSeconds, buyerPriceStart, buyerPriceEnd, sellerPriceStart, sellerPriceEnd, InitMoney, positions, readonly} = this.state
         return <div className={style.create}>
             <ul className={style.configFields}>
-                <li>
-                    <Label label='轮次'/>
-                    <RangeInput value={round}
-                                min={1}
-                                max={1}
-                                onChange={(e) => this.setState({round: parseInt(e.target.value)})}/>
-                </li>
                 <li>
                     <Label label='每组人数'/>
                     <RangeInput value={groupSize}
