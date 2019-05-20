@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import Header from '../../../components/Header'
+// import Header from '../../../components/Header'
 import Line from '../../../components/Line'
 import Input from '../../../components/Input'
 import Button from '../../../components/Button'
@@ -72,7 +72,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 frameEmitter
             }, state
         } = this
-        this.setState({price: '', count: ''})
+        // this.setState({price: '', count: ''})
         const price = Number(state.price) * Number(state.count)
         if (Number.isNaN(price) || price > InitMoney) {
             Toast.warn('输入的值无效')
@@ -230,14 +230,6 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         ];
         return (
             <>
-                <div style={{position: "fixed", top: "20vh", right: "15vw"}}>
-                    <Button
-                        label={"集合竞价知识扩展"}
-                        size={Button.Size.Small}
-                        color={Button.Color.Blue}
-                        onClick={() => this.setState({showTBMRule: true})}
-                    />
-                </div>
                 <Line
                     text={"交易结果展示"}
                     style={{margin: "auto", width: "400px", marginTop: "30px", marginBottom: "20px"}}
@@ -248,7 +240,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                             <li key={label} style={{marginBottom: "10px"}}>
                                 <ListItem>
                                     <p className={style.item}>
-                                        <span>{label}:&nbsp;</span>
+                                        <span style={{color: '#fff'}}>{label}:&nbsp;</span>
                                         <span style={{color: red ? "#F0676D" : "orange"}}>
                       {value}
                     </span>
@@ -331,7 +323,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             timeLeft = NEW_ROUND_TIMER - newRoundTimer
         return <section className={style.play}>
 
-            {/* <Header stage={Header.Stage.TBM}/> */}
+            {/*<Header stage={}/>*/}
 
             <Stock/>
 
