@@ -25,7 +25,7 @@ type TProps = Core.IPlayProps<
 >;
 
 export function Play({
-  playerState: { currentStage, unlockedStage },
+  playerState: { currentStage, unlockedStage, actor },
   game: {
     params: { playUrls }
   },
@@ -43,7 +43,7 @@ export function Play({
       ) : (
         <iframe
           style={{ width: "100vw", height: "100vh", border: "none" }}
-          src={playUrls[currentStage - 1]}
+          src={`${playUrls[currentStage - 1]}?token=${actor.token}`}
         />
       )}
     </div>
