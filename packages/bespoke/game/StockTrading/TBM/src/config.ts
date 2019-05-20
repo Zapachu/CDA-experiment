@@ -11,6 +11,8 @@ export enum MoveType {
 }
 
 export enum PushType {
+    matchTimer,
+    shoutTimer,
     dealTimer,
     startBid,
     newRoundTimer,
@@ -29,6 +31,7 @@ export enum PlayerStatus {
     prepared,
     startBid,
     shouted,
+    result,
     gameOver,
 }
 

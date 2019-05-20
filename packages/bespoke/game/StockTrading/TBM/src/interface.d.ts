@@ -344,6 +344,9 @@ export interface IPushParams {
     /** PushParams matchTimer */
     matchTimer?: (number|null);
 
+    /** PushParams shoutTimer */
+    shoutTimer?: (number|null);
+
     /** PushParams matchNum */
     matchNum?: (number|null);
 }
@@ -365,6 +368,9 @@ export class PushParams implements IPushParams {
 
     /** PushParams matchTimer. */
     public matchTimer: number;
+
+    /** PushParams shoutTimer. */
+    public shoutTimer: number;
 
     /** PushParams matchNum. */
     public matchNum: number;
@@ -961,8 +967,8 @@ export namespace PlayerState {
         /** Multi profit */
         profit?: (number|null);
 
-        /** Multi startingPrice */
-        startingPrice?: (number|null);
+        /** Multi groupIndex */
+        groupIndex?: (number|null);
     }
 
     /** Represents a Multi. */
@@ -986,8 +992,8 @@ export namespace PlayerState {
         /** Multi profit. */
         public profit: number;
 
-        /** Multi startingPrice. */
-        public startingPrice: number;
+        /** Multi groupIndex. */
+        public groupIndex: number;
 
         /**
          * Creates a new Multi instance using the specified properties.
@@ -1172,9 +1178,6 @@ export namespace PlayerState {
 
             /** Round profit */
             profit?: (number|null);
-
-            /** Round startingPrice */
-            startingPrice?: (number|null);
         }
 
         /** Represents a Round. */
@@ -1197,9 +1200,6 @@ export namespace PlayerState {
 
             /** Round profit. */
             public profit: number;
-
-            /** Round startingPrice. */
-            public startingPrice: number;
 
             /**
              * Creates a new Round instance using the specified properties.

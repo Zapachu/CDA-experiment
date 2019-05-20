@@ -25,7 +25,8 @@ message PushParams {
     int32 roundIndex = 1;
     int32 newRoundTimer = 2;
     int32 matchTimer = 3;
-    int32 matchNum = 4;
+    int32 shoutTimer = 4;
+    int32 matchNum = 5;
 }
 
 message GameState {
@@ -52,7 +53,7 @@ message PlayerState {
         float price = 2;
         int32 bidNum = 3;
         float profit = 4;
-        float startingPrice = 5;
+        int32 groupIndex = 5;
     }
     message Single {
         message Round {
@@ -60,7 +61,6 @@ message PlayerState {
             float price = 2;
             int32 bidNum = 3;
             float profit = 4;
-            float startingPrice = 5;
         }
         int32 groupIndex = 1;
         repeated Round rounds = 2;
@@ -69,4 +69,5 @@ message PlayerState {
     Multi multi = 2;
     Single single = 3;
     int32 playerStatus = 4;
+    int32 positionIndex = 5;
 }
