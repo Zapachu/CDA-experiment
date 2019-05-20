@@ -6,7 +6,8 @@ export enum MoveType {
     getPosition = 'getPosition',
     nextStage = 'nextStage',
     startSingle = 'startSingle',
-    startMulti = 'startMulti'
+    startMulti = 'startMulti',
+    joinRobot = 'joinRobot',
 
 }
 
@@ -36,6 +37,7 @@ export enum PlayerStatus {
 }
 
 export const NEW_ROUND_TIMER = 3
+export const SHOUT_TIMER = 60
 
 
 // role 0 : buyer 1: seller

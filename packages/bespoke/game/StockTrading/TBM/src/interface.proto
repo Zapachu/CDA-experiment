@@ -3,7 +3,7 @@ syntax = "proto3";
 message CreateParams {
     message Position {
         int32 role = 1;
-        repeated int32 privatePrice = 2;
+        int32 privatePrice = 2;
     }
     int32 groupSize = 1;
     int32 buyerPriceStart = 2;
@@ -62,8 +62,8 @@ message PlayerState {
             int32 bidNum = 3;
             float profit = 4;
         }
-        int32 groupIndex = 1;
         repeated Round rounds = 2;
+        int32 groupIndex = 5;
     }
     int32 role = 1;
     Multi multi = 2;

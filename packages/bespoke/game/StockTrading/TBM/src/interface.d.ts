@@ -146,7 +146,7 @@ export namespace CreateParams {
         role?: (number|null);
 
         /** Position privatePrice */
-        privatePrice?: (number[]|null);
+        privatePrice?: (number|null);
     }
 
     /** Represents a Position. */
@@ -162,7 +162,7 @@ export namespace CreateParams {
         public role: number;
 
         /** Position privatePrice. */
-        public privatePrice: number[];
+        public privatePrice: number;
 
         /**
          * Creates a new Position instance using the specified properties.
@@ -856,6 +856,9 @@ export interface IPlayerState {
 
     /** PlayerState playerStatus */
     playerStatus?: (number|null);
+
+    /** PlayerState positionIndex */
+    positionIndex?: (number|null);
 }
 
 /** Represents a PlayerState. */
@@ -878,6 +881,9 @@ export class PlayerState implements IPlayerState {
 
     /** PlayerState playerStatus. */
     public playerStatus: number;
+
+    /** PlayerState positionIndex. */
+    public positionIndex: number;
 
     /**
      * Creates a new PlayerState instance using the specified properties.
@@ -1069,11 +1075,11 @@ export namespace PlayerState {
     /** Properties of a Single. */
     interface ISingle {
 
-        /** Single groupIndex */
-        groupIndex?: (number|null);
-
         /** Single rounds */
         rounds?: (PlayerState.Single.IRound[]|null);
+
+        /** Single groupIndex */
+        groupIndex?: (number|null);
     }
 
     /** Represents a Single. */
@@ -1085,11 +1091,11 @@ export namespace PlayerState {
          */
         constructor(properties?: PlayerState.ISingle);
 
-        /** Single groupIndex. */
-        public groupIndex: number;
-
         /** Single rounds. */
         public rounds: PlayerState.Single.IRound[];
+
+        /** Single groupIndex. */
+        public groupIndex: number;
 
         /**
          * Creates a new Single instance using the specified properties.
