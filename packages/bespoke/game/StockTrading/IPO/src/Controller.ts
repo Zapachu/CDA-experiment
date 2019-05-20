@@ -25,9 +25,9 @@ import {
   maxA,
   maxB,
   startingMultiplier,
-  SHOUT_TIMER,
-  STOCKS
+  SHOUT_TIMER
 } from "./config";
+import { STOCKS } from "../../components/constants";
 
 export default class Controller extends BaseController<
   ICreateParams,
@@ -187,10 +187,6 @@ export default class Controller extends BaseController<
           this._initState(group, groupPlayerStates);
         } else {
           this.createGroupAndInitRobots(gameState, playerState);
-          console.log(
-            "replay, ",
-            this.shoutIntervals[playerState.single.groupIndex]
-          );
         }
         break;
       }
@@ -359,7 +355,6 @@ export default class Controller extends BaseController<
           return;
         }
         global.clearInterval(shoutIntervals[groupIndex]);
-        console.log("auto, ", shoutIntervals[groupIndex]);
         delete shoutIntervals[groupIndex];
         this._autoProcessProfits(group, groupPlayerStates);
         await this.stateManager.syncState();
@@ -384,9 +379,6 @@ export default class Controller extends BaseController<
           });
         });
         if (group.playerNum === groupSize) {
-          // groupPlayerStates.forEach(s => {
-          //   this.push(s.actor, PushType.matchMsg, { matchMsg: "匹配成功" });
-          // });
           global.clearInterval(matchIntervals[groupIndex]);
           delete matchIntervals[groupIndex];
           this._initState(group, groupPlayerStates);
