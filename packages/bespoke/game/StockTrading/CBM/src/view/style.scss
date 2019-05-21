@@ -353,26 +353,6 @@ $color-red: #d6444e;
         }
       }
 
-      .roleSelectorWrapper{
-        text-align: center;
-        label{
-          display: inline-block;
-          font-size: $fontSize-large;
-          margin: 2rem;
-        }
-        .roleSelector{
-          display: flex;
-          justify-content: center;
-        }
-      }
-
-      .allTraded {
-        padding: 1rem;
-        font-size: $fontSize-large;
-        text-align: center;
-        color: rgba($color-light, .6);
-      }
-
       .orderSubmission {
         @include secondarySection;
 

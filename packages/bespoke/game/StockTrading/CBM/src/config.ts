@@ -73,9 +73,8 @@ export const RedisKey = {
 }
 
 export enum MoveType {
-    getPeriod = 'getPeriod',
-    leavePeriod = 'newPeriod',
-    setRole = 'setRole',
+    getGroup = 'getGroup',
+    leaveGroup = 'leaveGroup',
     submitOrder = 'submitOrder',
     cancelOrder = 'cancelOrder'
 }
@@ -91,12 +90,13 @@ export enum FetchType {
     exportXls = 'exportXls'
 }
 
-export enum PeriodType {
+export enum GroupType {
     Single,
     Multi
 }
 
 export const MATCH_TIME = 5
+export const PERIOD = 6
 
 export const MOCK = {
     playerLimit: 18,
@@ -108,18 +108,6 @@ export const MOCK = {
 export interface ICreateParams {
     prepareTime: number
     tradeTime: number
-}
-
-export interface IGamePeriodState {
-    stage: number
-    orderId: number
-    orders: IOrder[]
-    buyOrderIds: number[]
-    sellOrderIds: number[]
-    trades: ITrade[]
-    playerIndex: number
-    type: PeriodType
-    marketPrice: number
 }
 
 export interface IOrder {
@@ -137,24 +125,40 @@ export interface ITrade {
     subOrderId?: number
 }
 
-export interface IGameState {
-    periods: IGamePeriodState[]
+export interface IGamePeriodState {
+    stage: number
+    orderId: number
+    orders: IOrder[]
+    buyOrderIds: number[]
+    sellOrderIds: number[]
+    trades: ITrade[]
+    marketPrice: number
 }
 
-export interface IPlayerPeriodState {
+export interface IGameGroupState {
+    type: GroupType
     playerIndex: number
-    role?: ROLE
+    periodIndex: number
+}
+
+export interface IGameState {
+    periods: IGamePeriodState[]
+    groups: Array<IGameGroupState>
+}
+
+export interface IPlayerGroupState {
+    playerIndex: number
 }
 
 export interface IPlayerState {
-    periods: IPlayerPeriodState[]
-    periodIndex: number
+    groups: Array<IPlayerGroupState>
+    groupIndex: number
     count: number
     point: number
 }
 
 export type IMoveParams = Partial<{
-    periodType: number
+    groupType: number
     role: ROLE
     price: number
     count: number

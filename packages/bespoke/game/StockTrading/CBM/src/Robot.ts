@@ -8,7 +8,7 @@ import {
     IGameState,
     IMoveParams,
     IOrder,
-    IPlayerPeriodState,
+    IPlayerGroupState,
     IPlayerState,
     IPushParams,
     MoveType,
@@ -34,12 +34,12 @@ interface IZipFreeField {
 export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     zipActive: boolean
     zipFreeField: IZipFreeField
+    role = Math.random() > .5 ? ROLE.Seller : ROLE.Buyer
 
     async init(): Promise<BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>> {
-        setTimeout(() => this.frameEmitter.emit(MoveType.getPeriod), SLEEP_TIME)
+        setTimeout(() => this.frameEmitter.emit(MoveType.getGroup), SLEEP_TIME)
         this.frameEmitter.on(PushType.beginTrading, () => {
             this.zipActive = false
-            this.frameEmitter.emit(MoveType.setRole, {role: Math.random() > .5 ? ROLE.Seller : ROLE.Buyer})
             setTimeout(() => {
                 const u = (this.role === ROLE.Seller ? 1 : -1) * (.2 * Math.random() - .1),
                     calcPrice = this.formatPrice(this.unitPrice * (1 + u))
@@ -58,7 +58,7 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
             if (!this.zipActive) {
                 return
             }
-            if (this.playerPeriodState.playerIndex === this.orderDict[newOrderId].playerIndex) {
+            if (this.playerGroupState.playerIndex === this.orderDict[newOrderId].playerIndex) {
                 this.respondNewOrder(newOrderId)
             }
         })
@@ -73,15 +73,12 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
 
     //region getter
     get gamePeriodState(): IGamePeriodState {
-        return this.gameState.periods[this.playerState.periodIndex]
+        const {periodIndex} = this.gameState.groups[this.playerState.groupIndex]
+        return this.gameState.periods[periodIndex]
     }
 
-    get playerPeriodState(): IPlayerPeriodState {
-        return this.playerState.periods[this.playerState.periodIndex]
-    }
-
-    get role(): ROLE {
-        return this.playerPeriodState.role
+    get playerGroupState(): IPlayerGroupState {
+        return this.playerState.groups[this.playerState.groupIndex]
     }
 
     get sleepTime(): number {
@@ -160,7 +157,7 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
             redisClient.incr(RedisKey.robotActionSeq(this.game.id)).then(async seq => {
                 const data: RobotCalcLog = {
                     seq,
-                    playerSeq: this.playerPeriodState.playerIndex + 1,
+                    playerSeq: this.playerGroupState.playerIndex + 1,
                     role: ROLE[this.role],
                     R,
                     A,
@@ -204,7 +201,7 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
         this.zipFreeField.u = calcPrice / this.unitPrice - 1
         const data: Partial<RobotSubmitLog> = {
             seq,
-            playerSeq: this.playerPeriodState.playerIndex + 1,
+            playerSeq: this.playerGroupState.playerIndex + 1,
             role: ROLE[this.role],
             ValueCost: unitPrice,
             price: calcPrice,
@@ -215,7 +212,8 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
         const maxCount = this.role === ROLE.Seller ? this.playerState.count : ~~(this.playerState.point / this.unitPrice)
         this.frameEmitter.emit(MoveType.submitOrder, {
             price: calcPrice,
-            count: ~~(maxCount * (.7 * Math.random() + .3)) + 1
+            count: ~~(maxCount * (.7 * Math.random() + .3)) + 1,
+            role: this.role
         }, async (shoutResult: ShoutResult, marketBuyOrders, marketSellOrders) => {
             await new FreeStyleModel({
                 game: this.game.id,
