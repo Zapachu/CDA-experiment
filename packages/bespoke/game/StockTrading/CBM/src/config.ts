@@ -73,8 +73,8 @@ export const RedisKey = {
 }
 
 export enum MoveType {
-    getGroup = 'getGroup',
-    leaveGroup = 'newGroup',
+    getPeriod = 'getPeriod',
+    leavePeriod = 'newPeriod',
     setRole = 'setRole',
     submitOrder = 'submitOrder',
     cancelOrder = 'cancelOrder'
@@ -82,7 +82,6 @@ export enum MoveType {
 
 export enum PushType {
     countDown = 'countDown',
-    gotGroup = 'gotGroup',
     beginTrading = 'beginTrading',
     newOrder = 'newOrder',
     newTrade = 'newTrade'
@@ -92,7 +91,7 @@ export enum FetchType {
     exportXls = 'exportXls'
 }
 
-export enum GroupType {
+export enum PeriodType {
     Single,
     Multi
 }
@@ -111,7 +110,7 @@ export interface ICreateParams {
     tradeTime: number
 }
 
-export interface IGameGroupState {
+export interface IGamePeriodState {
     stage: number
     orderId: number
     orders: IOrder[]
@@ -119,7 +118,7 @@ export interface IGameGroupState {
     sellOrderIds: number[]
     trades: ITrade[]
     playerIndex: number
-    type: GroupType
+    type: PeriodType
     marketPrice: number
 }
 
@@ -139,23 +138,23 @@ export interface ITrade {
 }
 
 export interface IGameState {
-    groups: IGameGroupState[]
+    periods: IGamePeriodState[]
 }
 
-export interface IPlayerGroupState {
+export interface IPlayerPeriodState {
     playerIndex: number
     role?: ROLE
 }
 
 export interface IPlayerState {
-    groups: IPlayerGroupState[]
-    groupIndex: number
+    periods: IPlayerPeriodState[]
+    periodIndex: number
     count: number
     point: number
 }
 
 export type IMoveParams = Partial<{
-    groupType: number
+    periodType: number
     role: ROLE
     price: number
     count: number
