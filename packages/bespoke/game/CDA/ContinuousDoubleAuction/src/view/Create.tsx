@@ -3,7 +3,7 @@ import * as style from './style.scss'
 import {phaseTemplates, localePhaseNames} from './phase'
 import {CreateParams, ICreateParams} from '../interface'
 import {Core, Lang} from 'bespoke-client-util'
-import {FetchType, IDENTITY, phaseNames, ROLE} from '../config'
+import {FetchType, IDENTITY, phaseNames, ROLE, ReactionType} from '../config'
 import cloneDeep = require('lodash/cloneDeep')
 
 export class Create extends Core.Create<ICreateParams, FetchType> {
@@ -24,14 +24,16 @@ export class Create extends Core.Create<ICreateParams, FetchType> {
                 interval: 1,
                 exchangeRate: 1,
                 k: 1,
-                role: ROLE.Seller
+                role: ROLE.Seller,
+                reactionType:ReactionType.TradeAndOrder
             })),
             ...Array(6).fill(null).map(() => ({
                 identity: IDENTITY.ZipRobot,
                 interval: 1,
                 exchangeRate: 1,
                 k: 1,
-                role: ROLE.Buyer
+                role: ROLE.Buyer,
+                reactionType:ReactionType.TradeAndOrder
             }))
         ]
         const phases = [{

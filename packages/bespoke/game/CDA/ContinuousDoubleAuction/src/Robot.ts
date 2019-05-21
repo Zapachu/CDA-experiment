@@ -12,9 +12,9 @@ import {
     RobotSubmitLog,
     ROLE,
     ShoutResult,
-    zipInterval
+    ReactionType
 } from './config'
-import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
+import {GameState, ICreateParams, CreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
 
 interface IZipFreeField {
     beta: number
@@ -52,7 +52,7 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
             if (!this.zipActive) {
                 return
             }
-            if (this.position.interval === zipInterval.fast || this.playerState.positionIndex === this.orderDict[newOrderId].positionIndex) {
+            if (this.position.reactionType === ReactionType.TradeAndOrder || this.playerState.positionIndex === this.orderDict[newOrderId].positionIndex) {
                 this.respondNewOrder(newOrderId)
             }
         })
@@ -68,7 +68,7 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
     //region market
     //region getter
 
-    get position() {
+    get position():CreateParams.Phase.Params.IPosition {
         const {positions} = this.game.params.phases[0].params,
             {positionIndex} = this.playerState,
             position = {...positions[positionIndex]}
