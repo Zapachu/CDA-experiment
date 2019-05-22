@@ -12,13 +12,13 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
     async init() {
         // online and getPosition
 
-        setTimeout(() => this.frameEmitter.emit(MoveType.getPosition), 2000)
+        setTimeout(() => this.frameEmitter.emit(MoveType.joinRobot), 2000)
         setTimeout(() => this.frameEmitter.emit(MoveType.prepare), 4000)
 
         // shout stage
         this.frameEmitter.on(PushType.startBid, ({roundIndex}) => {
             console.log('startBid', roundIndex)
-            const privatePrice = this.playerState.privatePrices[roundIndex]
+            const privatePrice = this.playerState.multi.privateValue
             const role = this.playerState.role
             const price = this.genPrice(role, privatePrice)
             this.frameEmitter.emit(MoveType.shout, {price})

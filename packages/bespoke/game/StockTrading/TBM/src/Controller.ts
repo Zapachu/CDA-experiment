@@ -1,5 +1,5 @@
-import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from "bespoke-server";
-import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from "./interface";
+import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from "bespoke-server"
+import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from "./interface"
 import {FetchType, MoveType, PlayerStatus, PushType, SHOUT_TIMER} from './config'
 
 const getBestMatching = G => {
@@ -60,7 +60,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
 
     async initRobots(groupIndex: number, amount: number) {
         for (let i = 0; i < amount; i++) {
-            await this.startNewRobotScheduler(`Robot_G${groupIndex}_${i}`, false);
+            await this.startNewRobotScheduler(`Robot_G${groupIndex}_${i}`, false)
         }
     }
 
@@ -72,9 +72,9 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             isMulti: false,
             rounds: [{}]
         };
-        const groupIndex = gameState.groups.push(group) - 1;
-        this.joinPlayer(playerState, group, groupIndex);
-        await this.initRobots(groupIndex, groupSize - 1);
+        const groupIndex = gameState.groups.push(group) - 1
+        this.joinPlayer(playerState, group, groupIndex)
+        await this.initRobots(groupIndex, groupSize - 1)
     }
 
     processProfits(playerStates: Array<IPlayerState>, group: GameState.IGroup, groupPlayerStates: Array<TPlayerState<IPlayerState>>) {
@@ -132,30 +132,38 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 delete shoutIntervals[groupIndex]
                 this.autoProcessProfits(group, groupPlayerStates)
                 await this.stateManager.syncState()
-            }, 1000);
-        }, 0);
+            }, 1000)
+        }, 0)
     }
 
-    initState(group: GameState.IGroup, groupPlayerStates: Array<TPlayerState<IPlayerState>>) {
-        const { roundIndex, isMulti, rounds } = group;
+    initState(group: GameState.IGroup, groupPlayerStates: Array<TPlayerState<IPlayerState>>, positions: Array<IPosition>) {
+        const {roundIndex, isMulti} = group
         if (isMulti) {
             this.startShoutTicking(group, groupPlayerStates[0].multi.groupIndex)
         }
-        groupPlayerStates.forEach((s) => {
+        groupPlayerStates.forEach((s, i) => {
+            s.role = positions[s.positionIndex].role
             if (isMulti) {
-                s.multi.privateValue
+                s.multi.privateValue = positions[s.positionIndex].privatePrice
             } else {
-
+                let playerRound = s.single.rounds[roundIndex]
+                if (!playerRound) {
+                    playerRound = s.single.rounds[roundIndex] = {}
+                }
+                playerRound.privateValue = positions[s.positionIndex].privatePrice
             }
             s.playerStatus = PlayerStatus.prepared
+            setTimeout(() => {
+                this.push(s.actor, PushType.robotShout)
+            }, 600 * (i + 1))
         })
     }
 
     startMatchTicking(group: GameState.IGroup, groupIndex: number) {
-        const {groupSize, waitingSeconds} = this.game.params
+        const {groupSize, waitingSeconds, positions} = this.game.params
         global.setTimeout(() => {
             const matchIntervals = this.matchIntervals
-            let matchTimer = 1;
+            let matchTimer = 1
             matchIntervals[groupIndex] = global.setInterval(async () => {
                 const playerStates = await this.stateManager.getPlayerStates()
                 const groupPlayerStates = Object.values(playerStates).filter(s => s.multi && s.multi.groupIndex === groupIndex)
@@ -165,7 +173,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 if (group.playerNum === groupSize) {
                     global.clearInterval(matchIntervals[groupIndex])
                     delete matchIntervals[groupIndex]
-                    this.initState(group, groupPlayerStates)
+                    this.initState(group, groupPlayerStates, positions as Array<IPosition>)
                     await this.stateManager.syncState()
                     return
                 }
@@ -227,7 +235,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         group.isMulti ? s.multi && s.multi.groupIndex === groupIndex
                             : s.single && s.single.groupIndex === groupIndex
                     )
-                    this.initState(group, groupPlayerStates)
+                    this.initState(group, groupPlayerStates, positions as Array<IPosition>)
                 }
             }
             // case MoveType.prepare: {
@@ -241,7 +249,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             //     break
             // }
             case MoveType.nextStage: {
-                break;
+                break
                 // todo connect to other stage
             }
             case MoveType.shout: {
@@ -284,4 +292,10 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             }
         }
     }
+}
+
+
+interface IPosition {
+    role: number
+    privatePrice: number
 }

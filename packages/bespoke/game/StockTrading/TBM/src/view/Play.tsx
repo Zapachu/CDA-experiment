@@ -219,12 +219,10 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             case PlayerStatus.intro:
             case PlayerStatus.matching:
                 return <IntroStage {...this.props}/>
-            case PlayerStatus.outside:
             case PlayerStatus.prepared:
-            case PlayerStatus.startBid:
             case PlayerStatus.shouted:
                 return this.renderPlay()
-            case PlayerStatus.gameOver:
+            case PlayerStatus.result:
                 return this.renderResult()
 
         }
