@@ -12,6 +12,7 @@ import nodeXlsx from 'node-xlsx'
 import {
     DBKey,
     FetchType,
+    GroupStage,
     GroupType,
     ICreateParams,
     IGamePeriodState,
@@ -20,17 +21,18 @@ import {
     IOrder,
     IPlayerState,
     IPushParams,
-    ITrade, MATCH_TIME,
+    ITrade,
+    MATCH_TIME,
     MOCK,
     MoveType,
+    PERIOD,
     PushType,
     RobotCalcLog,
     RobotSubmitLog,
     ROLE,
     SheetType,
     ShoutResult,
-    Stage,
-    PERIOD
+    PeriodStage
 } from './config'
 import {getEnumKeys} from './util'
 
@@ -53,8 +55,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
     async initPlayerState(actor: IActor): Promise<TPlayerState<IPlayerState>> {
         const playerState = await super.initPlayerState(actor)
         playerState.groups = []
-        playerState.count = ~~((Math.random() + .5) * MOCK.count)
-        playerState.point = ~~((Math.random() + .5) * MOCK.point)
         return playerState
     }
 
@@ -81,60 +81,74 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     }
                     gameState.groups.push({
                         type: params.groupType,
+                        stage: GroupStage.matching,
                         playerIndex: 0,
                         periodIndex: gameState.periods.length
                     })
                     gameState.periods.push(...(Array(PERIOD).fill(null).map(() => ({
                         orders: [],
-                        stage: Stage.matching,
-                        orderId: 0,
+                        stage: PeriodStage.reading,
                         buyOrderIds: [],
                         sellOrderIds: [],
                         trades: [],
                         playerIndex: 0,
-                        type: params.groupType,
-                        marketPrice: MOCK.price
+                        type: params.groupType
                     }))))
                     groupIndex = gameState.groups.length - 1
                 }
                 const gameGroupState = gameState.groups[groupIndex],
                     playerIndex = gameGroupState.playerIndex++
-                playerState.groups[groupIndex] = {playerIndex}
+                playerState.groups[groupIndex] = {
+                    playerIndex,
+                    count: ~~((Math.random() + .5) * MOCK.count),
+                    point: ~~((Math.random() + .5) * MOCK.point)
+                }
                 playerState.groupIndex = groupIndex
                 if (playerIndex > 0) {
                     break
                 }
-                let countDown = 1
+                let countDown = -MATCH_TIME
                 const timer = global.setInterval(async () => {
                     if (gameState.status !== baseEnum.GameStatus.started) {
                         return
                     }
-                    if (countDown === MATCH_TIME) {
-                        Array(MOCK.playerLimit - gameGroupState.playerIndex).fill(null).forEach(
-                            async (_, i) => await this.startNewRobotScheduler(`${groupIndex}_${i}`)
-                        )
-                    }
-                    const {tradeTime, prepareTime} = this.game.params,
-                        periodCountDown = countDown % (prepareTime + tradeTime + MATCH_TIME)
                     const {periodIndex} = gameGroupState
                     const gamePeriodState = gameState.periods[periodIndex]
-                    if (periodCountDown === MATCH_TIME) {
-                        gamePeriodState.stage = Stage.reading
-                    }
-                    if (periodCountDown === prepareTime + MATCH_TIME) {
-                        gamePeriodState.stage = Stage.trading
-                        this.periodBroadcast(periodIndex, PushType.beginTrading)
-                    }
-                    if (periodCountDown === 0) {
-                        gamePeriodState.stage = Stage.result
-                        if (gameGroupState.periodIndex < PERIOD - 1) {
-                            gameGroupState.periodIndex++
-                        } else {
-                            global.clearInterval(timer)
+                    const {tradeTime, prepareTime} = this.game.params,
+                        periodCountDown = countDown % (prepareTime + tradeTime + prepareTime)
+                    switch (true) {
+                        case countDown === 0: {
+                            Array(MOCK.playerLimit - gameGroupState.playerIndex).fill(null).forEach(
+                                async (_, i) => await this.startNewRobotScheduler(`${groupIndex}_${i}`)
+                            )
+                            gameGroupState.stage = GroupStage.trading
+
+                            break
+                        }
+                        case countDown > 0 : {
+                            switch (periodCountDown) {
+                                case prepareTime: {
+                                    gamePeriodState.stage = PeriodStage.trading
+                                    this.periodBroadcast(periodIndex, PushType.beginTrading)
+                                    break
+                                }
+                                case prepareTime + tradeTime: {
+                                    gamePeriodState.stage = PeriodStage.result
+                                    break
+                                }
+                                case 0: {
+                                    if (gameGroupState.periodIndex % PERIOD < PERIOD - 1) {
+                                        gameGroupState.periodIndex++
+                                    } else {
+                                        global.clearInterval(timer)
+                                    }
+                                    break
+                                }
+                            }
                         }
                     }
                     await this.stateManager.syncState()
-                    this.periodBroadcast(periodIndex, PushType.countDown, {countDown: periodCountDown})
+                    this.periodBroadcast(periodIndex, PushType.countDown, {countDown: countDown > 0 ? periodCountDown : countDown})
                     countDown++
                 }, 1000)
                 break
@@ -156,14 +170,14 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     sellOrders = sellOrderIds.map(id => orderDict[id].price).join(',')
                 let shoutResult: ShoutResult
                 if (count <= 0 ||
-                    (params.role === ROLE.Seller && count > playerState.count) ||
-                    (params.role === ROLE.Buyer && count * gamePeriodState.marketPrice > playerState.point)
+                    (params.role === ROLE.Seller && count > playerGroupState.count) ||
+                    (params.role === ROLE.Buyer && count * price > playerGroupState.point)
                 ) {
                     Log.d('数量有误，无法继续报价')
                     shoutResult = ShoutResult.invalidCount
                 } else {
                     const newOrder: IOrder = {
-                        id: ++gamePeriodState.orderId,
+                        id:gamePeriodState.orders.length,
                         playerIndex,
                         role: params.role,
                         price,
@@ -219,7 +233,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             if (pairOrder.count > order.count) {
                 const subOrder: IOrder = {
                     ...pairOrder,
-                    id: ++gamePeriodState.orderId,
+                    id: orders.length,
                     count: pairOrder.count - order.count
                 }
                 orders.push(subOrder)
@@ -229,7 +243,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 trade.count = pairOrder.count
                 const subOrder: IOrder = {
                     ...order,
-                    id: ++gamePeriodState.orderId,
+                    id: orders.length,
                     count: order.count - pairOrder.count
                 }
                 trade.subOrderId = subOrder.id
@@ -237,26 +251,25 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             }
             trades.push(trade)
             periodPlayerStates.forEach(playerState => {
-                const {playerIndex} = playerState.groups[playerState.groupIndex]
+                const playerGroupState = playerState.groups[playerState.groupIndex]
                 let playerRole: ROLE
-                if (order.playerIndex === playerIndex) {
+                if (order.playerIndex === playerGroupState.playerIndex) {
                     playerRole = order.role
                 }
-                if (pairOrder.playerIndex === playerIndex) {
+                if (pairOrder.playerIndex === playerGroupState.playerIndex) {
                     playerRole = order.role
                 }
                 if (playerRole === undefined) {
                     return
                 }
                 if (playerRole === ROLE.Seller) {
-                    playerState.count -= trade.count
-                    playerState.point += trade.count * pairOrder.price
+                    playerGroupState.count -= trade.count
+                    playerGroupState.point += trade.count * pairOrder.price
                 } else {
-                    playerState.count += trade.count
-                    playerState.point -= trade.count * pairOrder.price
+                    playerGroupState.count += trade.count
+                    playerGroupState.point -= trade.count * pairOrder.price
                 }
             })
-            gamePeriodState.marketPrice = pairOrder.price
             this.periodBroadcast(periodIndex, PushType.newTrade, {resOrderId: order.id})
             return ShoutResult.tradeSuccess
         } else {

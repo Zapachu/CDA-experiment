@@ -1,27 +1,24 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, FrameEmitter, IGame, Lang, Toast} from 'bespoke-client-util'
+import {Core, FrameEmitter, Lang, Toast} from 'bespoke-client-util'
 import {
     FetchType,
+    GroupStage,
     ICreateParams,
-    IGameGroupState,
-    IGamePeriodState,
     IGameState,
     IMoveParams,
     IOrder,
-    IPlayerGroupState,
     IPlayerState,
     IPushParams,
     MATCH_TIME,
     MOCK,
     MoveType,
+    PeriodStage,
     PushType,
-    ROLE,
-    Stage
+    ROLE
 } from '../config'
 import {Button, Input, Line, MatchModal, PlayMode} from '../../../components'
 
-//region component
 function Border({background = `radial-gradient(at 50% 0%, #67e968 1rem, transparent 70%)`, borderRadius = '1rem', children, style}: {
     background?: string,
     borderRadius?: string,
@@ -145,19 +142,6 @@ function TradeChart({
     </section>
 }
 
-//endregion
-
-//region stage
-interface IStageProps {
-    game: IGame<ICreateParams>
-    gameGroupState?: IGameGroupState
-    gamePeriodState?: IGamePeriodState
-    playerGroupState?: IPlayerGroupState
-    playerState?: IPlayerState
-    frameEmitter?: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
-    countDown?: number
-}
-
 function NotStart({frameEmitter}: { frameEmitter: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams> }) {
     return <section className={style.notStart}>
         <Line text={'交易规则介绍'} style={{margin: '10vh 0 2rem'}}/>
@@ -166,70 +150,100 @@ function NotStart({frameEmitter}: { frameEmitter: FrameEmitter<MoveType, PushTyp
     </section>
 }
 
-function Matching({frameEmitter, gameGroupState, countDown}: IStageProps) {
-    return <>
-        <NotStart frameEmitter={frameEmitter}/>
-        <MatchModal {...{
-            visible: !!gameGroupState,
-            totalNum: MOCK.playerLimit,
-            matchNum: gameGroupState.playerIndex,
-            timer: MATCH_TIME - countDown
-        }}/>
-    </>
+function Result({count, point}: { count: number, point: number }) {
+    const lang = Lang.extractLang({
+        toEnterNextPhase1: ['您当前持有股票', 'You have'],
+        toEnterNextPhase2: ['，资金', ' stocks, and '],
+        toEnterNextPhase3: ['', ' experimental currency'],
+        onceAgain: ['再来一次', 'Once Again'],
+        nextPhase: ['下一环节', 'Next Phase']
+    })
+    return <section className={style.result}>
+        <p>
+            {lang.toEnterNextPhase1}
+            <em>{count}</em>
+            {lang.toEnterNextPhase2}
+            <em>{point}</em>
+            {lang.toEnterNextPhase3}
+        </p>
+        <div className={style.switchBtns}>
+        </div>
+    </section>
 }
 
-function Trading({
-                     frameEmitter, countDown,
-                     game: {params: {prepareTime, tradeTime}},
-                     gamePeriodState: {orders, stage, buyOrderIds, sellOrderIds, trades, marketPrice},
-                     playerGroupState,
-                     playerState
-                 }: IStageProps) {
+type TPlayProps = Core.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>
+
+function _Play({game: {params: {prepareTime, tradeTime}}, gameState, playerState, frameEmitter}: TPlayProps) {
+    const STYLE = {
+        titleLineStyle: {
+            maxWidth: '24rem',
+            fontSize: '1.2rem',
+            margin: '2rem auto 1rem'
+        },
+        mainPanelBorder: `linear-gradient(#ddd, transparent)`
+    }
     const lang = Lang.extractLang({
-            price: ['价格', 'Price'],
-            count: ['数量', 'Count'],
-            point: ['余额', 'Point'],
-            profit: ['利润', 'Profit'],
-            tradeCount: ['成交数量', 'Trade Count'],
-            marketPrice: ['市场价格', 'Market Price'],
-            buyCountLimit: ['可买入', 'You can buy'],
-            sellCountLimit: ['已持有', 'You are holding'],
-            shout4UnitPls: ['请为当前物品报价：价格 * 数量', 'Shout for this unit please : price * count'],
-            openMarket: ['开放市场', 'Open Market'],
-            marketWillOpen1: ['市场将在', 'Market will open in '],
-            marketWillOpen2: [() => '秒后开放', n => `second${n > 1 ? 's' : ''}`],
-            shout: ['报价', 'Shout'],
-            cancel: ['撤回', 'Cancel'],
-            Buy: ['买入', 'Buy'],
-            Sell: ['卖出', 'Sell'],
-            tradeSeq: ['订单序号', 'Trade Number'],
-            tradePrice: ['成交价格', 'Price'],
-            invalidBuyPrice: ['订单价格需在市场最高买价与当前物品价值之间', 'Order price must be between your private value and the highest buy price in the market'],
-            invalidSellPrice: ['订单价格需在当前物品成本与市场最低卖价之间', 'Order price must be between the lowest buy price in the market and your private cost'],
-            invalidCount: ['超出可交易物品数量', 'Exceed the number of tradable units'],
-            sellOrders: ['卖家订单', 'SellOrders'],
-            buyOrders: ['买家订单', 'BuyOrders'],
-            yourTrades: ['交易记录', 'Your Trades'],
-            marketHistory: ['市场记录', 'Market History'],
-            asset: ['资产', 'Asset']
-        }),
-        timer = countDown - MATCH_TIME
+        price: ['价格', 'Price'],
+        count: ['数量', 'Count'],
+        point: ['余额', 'Point'],
+        profit: ['利润', 'Profit'],
+        tradeCount: ['成交数量', 'Trade Count'],
+        buyCountLimit: ['可买入', 'You can buy'],
+        sellCountLimit: ['已持有', 'You are holding'],
+        shout4UnitPls: ['请为当前物品报价：价格 * 数量', 'Shout for this unit please : price * count'],
+        openMarket: ['开放市场', 'Open Market'],
+        marketWillOpen1: ['市场将在', 'Market will open in '],
+        marketWillOpen2: [() => '秒后开放', n => `second${n > 1 ? 's' : ''}`],
+        shout: ['报价', 'Shout'],
+        cancel: ['撤回', 'Cancel'],
+        Buy: ['买入', 'Buy'],
+        Sell: ['卖出', 'Sell'],
+        tradeSeq: ['订单序号', 'Trade Number'],
+        tradePrice: ['成交价格', 'Price'],
+        invalidBuyPrice: ['订单价格需在市场最高买价与当前物品价值之间', 'Order price must be between your private value and the highest buy price in the market'],
+        invalidSellPrice: ['订单价格需在当前物品成本与市场最低卖价之间', 'Order price must be between the lowest buy price in the market and your private cost'],
+        invalidCount: ['超出可交易物品数量', 'Exceed the number of tradable units'],
+        sellOrders: ['卖家订单', 'SellOrders'],
+        buyOrders: ['买家订单', 'BuyOrders'],
+        yourTrades: ['交易记录', 'Your Trades'],
+        marketHistory: ['市场记录', 'Market History'],
+        asset: ['资产', 'Asset']
+    })
+    const [countDown, setCountDown] = React.useState(-MATCH_TIME)
     const [price, setPrice] = React.useState('' as number | string)
     const [count, setCount] = React.useState(1 as number | string)
-    const orderDict: { [id: number]: IOrder } = (() => {
-        const orderDict: { [id: number]: IOrder } = {}
-        orders.forEach(order => {
-            orderDict[order.id] = order
-        })
-        return orderDict
-    })()
-    const timeLeft = tradeTime + prepareTime - timer
-    const titleLineStyle: React.CSSProperties = {
-        maxWidth: '24rem',
-        fontSize: '1.2rem',
-        margin: '2rem auto 1rem'
+    React.useEffect(() => {
+        frameEmitter.on(PushType.countDown, ({countDown}) => setCountDown(countDown))
+    }, [])
+    const {groupIndex} = playerState
+    if (groupIndex === undefined) {
+        return <NotStart {...{frameEmitter}}/>
     }
-    const mainPanelBorder = `linear-gradient(#ddd, transparent)`
+    const gameGroupState = gameState.groups[groupIndex]
+    if (gameGroupState.stage === GroupStage.matching) {
+        return <>
+            <NotStart {...{frameEmitter}}/>
+            <MatchModal {...{
+                visible: true,
+                totalNum: MOCK.playerLimit,
+                matchNum: gameGroupState.playerIndex,
+                timer: -countDown
+            }}/>
+        </>
+    }
+    const gamePeriodState = gameState.periods[gameGroupState.periodIndex]
+    const playerGroupState = playerState.groups[groupIndex]
+    if (gamePeriodState.stage === PeriodStage.result) {
+        return <Result count={playerGroupState.count} point={playerGroupState.point}/>
+    }
+    const {buyOrderIds, sellOrderIds, trades} = gamePeriodState,
+        orderDict: { [id: number]: IOrder } = (() => {
+            const orderDict: { [id: number]: IOrder } = {}
+            gamePeriodState.orders.forEach(order => {
+                orderDict[order.id] = order
+            })
+            return orderDict
+        })()
     return <section className={style.trading}>
         {
             renderTradePanel()
@@ -252,9 +266,8 @@ function Trading({
         if (role === ROLE.Buyer && maxBuyOrder && _price < maxBuyOrder.price) {
             return Toast.warn(lang.invalidBuyPrice)
         }
-        const countLimit = role === ROLE.Seller ? playerState.count : ~~(playerState.point / marketPrice)
-        if (count <= 0 || count > countLimit) {
-            setCount(countLimit)
+        if (count <= 0 || (role === ROLE.Buyer && _price * +count>playerGroupState.point) || (role === ROLE.Buyer && count>playerGroupState.count)) {
+            setCount(0)
             return Toast.warn(lang.invalidCount)
         }
         frameEmitter.emit(MoveType.submitOrder, {
@@ -265,7 +278,8 @@ function Trading({
     }
 
     function renderOrderPanel() {
-        return <Border style={{flexBasis: '40rem'}} background={mainPanelBorder}>
+        const timeLeft = tradeTime + prepareTime - countDown
+        return <Border style={{flexBasis: '40rem'}} background={STYLE.mainPanelBorder}>
             <div className={style.orderPanel}>
                 <section className={style.orderBook}>
                     {
@@ -277,19 +291,8 @@ function Trading({
                 </section>
                 {
                     <section className={style.orderSubmission}>
-                        <Border style={{margin: 'auto'}}>
-                            <div className={style.curUnitInfo}>
-                                <div>
-                                    <label>{lang.marketPrice}</label>
-                                    <em>{marketPrice}</em>
-                                </div>
-                            </div>
-                        </Border>
                         {
-                            stage === Stage.reading && prepareTime > timer ?
-                                <p className={style.marketWillOpen}>{lang.marketWillOpen1}
-                                    <em>{prepareTime - timer}</em> {(lang.marketWillOpen2 as Function)(prepareTime - timer)}
-                                </p> :
+                            gamePeriodState.stage === PeriodStage.trading ?
                                 <section className={style.newOrder}>
                                     <div className={style.orderInputWrapper}>
                                         <label>{lang.shout4UnitPls}</label>
@@ -319,9 +322,12 @@ function Trading({
                                         }}/>
                                     </div>
                                     <div
-                                        className={style.timeLeft}>{timer < prepareTime ? '   ' : timeLeft > 0 ? timeLeft : 0}s
+                                        className={style.timeLeft}>{countDown < prepareTime ? '   ' : timeLeft > 0 ? timeLeft : 0}s
                                     </div>
-                                </section>
+                                </section> : prepareTime > countDown ?
+                                <p className={style.marketWillOpen}>{lang.marketWillOpen1}
+                                    <em>{prepareTime - countDown}</em> {(lang.marketWillOpen2 as Function)(prepareTime - countDown)}
+                                </p> : null
                         }
                     </section>
                 }
@@ -331,15 +337,15 @@ function Trading({
 
     function renderAsset() {
         return <section className={style.asset}>
-            <Line text={lang.asset} style={titleLineStyle}/>
+            <Line text={lang.asset} style={STYLE.titleLineStyle}/>
             <div className={style.summary}>
                 <div>
                     <label>{lang.count}</label>
-                    <em>{playerState.count}</em>
+                    <em>{playerGroupState.count}</em>
                 </div>
                 <div>
                     <label>{lang.point}</label>
-                    <em>{playerState.point}</em>
+                    <em>{playerGroupState.point}</em>
                 </div>
             </div>
         </section>
@@ -351,8 +357,8 @@ function Trading({
             {
                 renderAsset()
             }
-            <Line text={lang.yourTrades} style={titleLineStyle}/>
-            <Border background={mainPanelBorder}>
+            <Line text={lang.yourTrades} style={STYLE.titleLineStyle}/>
+            <Border background={STYLE.mainPanelBorder}>
                 <div className={style.yourTrades}>
                     <table className={style.tradeList}>
                         <thead>
@@ -388,8 +394,8 @@ function Trading({
 
     function renderChartPanel() {
         return <div className={style.marketHistoryWrapper}>
-            <Line text={lang.marketHistory} style={titleLineStyle}/>
-            <Border background={mainPanelBorder}>
+            <Line text={lang.marketHistory} style={STYLE.titleLineStyle}/>
+            <Border background={STYLE.mainPanelBorder}>
                 <div className={style.marketHistory}>
                     <div style={{
                         margin: '1rem',
@@ -443,66 +449,6 @@ function Trading({
                 }
             </ul>
         </section>
-    }
-}
-
-function Result({playerState: {point, count}, frameEmitter}: IStageProps) {
-    const lang = Lang.extractLang({
-        toEnterNextPhase1: ['您成功交易了', 'You traded'],
-        toEnterNextPhase2: ['单位虚拟物品，共获得', ' goods in this market, and earned'],
-        toEnterNextPhase3: ['实验币的利润。', ' experimental currency.'],
-        onceAgain: ['再来一次', 'Once Again'],
-        nextPhase: ['下一环节', 'Next Phase']
-    })
-    return <section className={style.result}>
-        <p>
-            {lang.toEnterNextPhase1}
-            <em>{count}</em>
-            {lang.toEnterNextPhase2}
-            <em>{point}</em>
-            {lang.toEnterNextPhase3}
-        </p>
-        <div className={style.switchBtns}>
-            <Button label={lang.onceAgain}
-                    onClick={() => frameEmitter.emit(MoveType.leaveGroup)}/>&nbsp;&nbsp;&nbsp;
-            <Button label={lang.nextPhase} onClick={() => console.log('TODO')}/>
-        </div>
-    </section>
-}
-
-//endregion
-
-type TPlayProps = Core.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>
-
-function _Play({game, gameState, playerState, frameEmitter}: TPlayProps) {
-    const [countDown, setCountDown] = React.useState(0)
-    React.useEffect(() => {
-        frameEmitter.on(PushType.countDown, ({countDown}) => setCountDown(countDown))
-    }, [])
-    const {groups, groupIndex} = playerState
-    if (groupIndex === undefined) {
-        return <NotStart frameEmitter={frameEmitter}/>
-    }
-    const gameGroupState = gameState.groups[groupIndex],
-        gamePeriodState = gameState.periods[gameGroupState.periodIndex],
-        playerGroupState = groups[groupIndex]
-    const stageProps: IStageProps = {
-        game,
-        gamePeriodState,
-        gameGroupState,
-        playerGroupState,
-        playerState,
-        frameEmitter,
-        countDown
-    }
-    switch (stageProps.gamePeriodState.stage) {
-        case Stage.matching:
-            return <Matching {...stageProps}/>
-        case Stage.reading:
-        case Stage.trading:
-            return <Trading {...stageProps}/>
-        case Stage.result:
-            return <Result {...stageProps}/>
     }
 }
 

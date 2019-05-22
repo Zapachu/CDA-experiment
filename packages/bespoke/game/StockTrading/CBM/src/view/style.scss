@@ -309,6 +309,7 @@ $color-red: #d6444e;
 
     .orderPanel {
       @include panel;
+      min-height: 80vh;
 
       .orderBook {
         margin: 2rem 0;
@@ -355,24 +356,6 @@ $color-red: #d6444e;
 
       .orderSubmission {
         @include secondarySection;
-
-        .curUnitInfo {
-          margin: auto;
-          display: flex;
-          background-color: $color-dark2;
-
-          div {
-            padding: 1rem;
-
-            em {
-              display: inline-block;
-              width: 4rem;
-              font-size: $fontSize-large;
-              color: $color-orange;
-              text-align: center;
-            }
-          }
-        }
 
         .marketWillOpen {
           text-align: center;

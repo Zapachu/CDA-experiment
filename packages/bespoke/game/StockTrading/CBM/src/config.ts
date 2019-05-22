@@ -15,8 +15,13 @@ export enum SheetType {
     robotSubmitLog = 'robotSubmitLog',
 }
 
-export enum Stage {
+export enum GroupStage {
     matching,
+    trading,
+    over
+}
+
+export enum PeriodStage {
     reading,
     trading,
     result
@@ -99,7 +104,7 @@ export const MATCH_TIME = 5
 export const PERIOD = 6
 
 export const MOCK = {
-    playerLimit: 18,
+    playerLimit: 12,
     price: 200,
     count: 100,
     point: 20000
@@ -126,17 +131,16 @@ export interface ITrade {
 }
 
 export interface IGamePeriodState {
-    stage: number
-    orderId: number
+    stage: PeriodStage
     orders: IOrder[]
     buyOrderIds: number[]
     sellOrderIds: number[]
     trades: ITrade[]
-    marketPrice: number
 }
 
 export interface IGameGroupState {
     type: GroupType
+    stage:GroupStage
     playerIndex: number
     periodIndex: number
 }
@@ -148,13 +152,13 @@ export interface IGameState {
 
 export interface IPlayerGroupState {
     playerIndex: number
+    count: number
+    point: number
 }
 
 export interface IPlayerState {
     groups: Array<IPlayerGroupState>
     groupIndex: number
-    count: number
-    point: number
 }
 
 export type IMoveParams = Partial<{
