@@ -17,5 +17,9 @@
   },
   "include": [
     "."
+  ],
+  "exclude": [
+    "**/egret/**",
+    "build"
   ]
 }

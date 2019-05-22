@@ -1,21 +1,16 @@
 @import "~bespoke-client-util/lib/resource/public";
 
 .play {
-  width: calc(99vw - 2rem);
-  margin: 2rem auto 0;
+  display: inline-block;
+  min-height: 100vh;
+  width: 100vw;
+  background: radial-gradient(#293567, #151b35);
 
-  .display {
-    border-collapse: separate;
-    width: 100%;
-    max-width: 300px;
-    border: 1px solid;
-    margin: 1rem 0;
-    td {
-      text-align: center;
-    }
-    .data {
-      color: red;
-    }
+  .item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
   }
 
   .introStage {
@@ -24,5 +19,40 @@
     align-items: center;
     justify-content: center;
     margin-top: 10vh;
+    p {
+      color: #dde1e9;
+    }
+  }
+
+  .playingStage {
+    p,
+    td {
+      color: #dde1e9;
+    }
+    max-width: 800px;
+    margin: auto;
+    .inputContainer {
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: center;
+    }
+    .modalIpo {
+      padding: 30px;
+      > p {
+        text-align: center;
+      }
+    }
+    .operation {
+      padding: 1px 8px 1px 8px;
+      border: 1px solid transparent;
+      border-radius: 30%;
+      background-color: #11234C;
+      color: #65749C;
+      font-size: 11px;
+      cursor: pointer;
+      &:first-child {
+        margin-right: 5px;
+      }
+    }
   }
 }

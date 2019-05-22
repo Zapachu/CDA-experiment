@@ -340,6 +340,9 @@ export namespace CreateParams {
 
                 /** Position interval */
                 interval?: (number|null);
+
+                /** Position reactionType */
+                reactionType?: (number|null);
             }
 
             /** Represents a Position. */
@@ -365,6 +368,9 @@ export namespace CreateParams {
 
                 /** Position interval. */
                 public interval: number;
+
+                /** Position reactionType. */
+                public reactionType: number;
 
                 /**
                  * Creates a new Position instance using the specified properties.

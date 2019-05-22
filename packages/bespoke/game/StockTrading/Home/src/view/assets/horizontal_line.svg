@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="85px" height="17px" viewBox="0 0 85 17" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
+    <title>直线 3 copy 2</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <radialGradient cx="92.6137841%" cy="16.7693492%" fx="92.6137841%" fy="16.7693492%" r="330.676637%" gradientTransform="translate(0.926138,0.167693),scale(0.378205,1.000000),rotate(159.566493),translate(-0.926138,-0.167693)" id="radialGradient-1">
+            <stop stop-color="#80FF61" offset="0%"></stop>
+            <stop stop-color="#20284D" stop-opacity="0" offset="100%"></stop>
+        </radialGradient>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="首页" transform="translate(-678.000000, -619.000000)" fill="url(#radialGradient-1)" fill-rule="nonzero">
+            <path id="直线-3-copy-2" d="M700.961967,636.266544 L741.985935,622.560671 L742.873744,622.26406 L742.626636,623.1669 L741.222137,628.298424 L756.665681,614.964071 L735.438988,617.328809 L740.536991,619.975894 L741.517432,620.484978 L740.487903,620.885604 L700.961967,636.266544 Z M739.095728,620.354303 L733.517482,617.457857 L732.056798,616.699412 L733.692533,616.517184 L758.157724,613.791665 L759.760487,613.613111 L758.539848,614.667042 L740.633344,630.127978 L739.391023,631.20063 L739.824317,629.617532 L741.415003,623.80575 L681.795042,643.724437 L681.455281,642.78424 L739.095728,620.354303 Z"></path>
+        </g>
+    </g>
+</svg>

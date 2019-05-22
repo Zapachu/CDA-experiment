@@ -25,10 +25,9 @@ import {
   maxA,
   maxB,
   startingMultiplier,
-  minNPCNum,
-  maxNPCNum,
-  STOCKS
+  SHOUT_TIMER
 } from "./config";
+import { STOCKS } from "../../components/constants";
 
 export default class Controller extends BaseController<
   ICreateParams,
@@ -41,6 +40,7 @@ export default class Controller extends BaseController<
   FetchType
 > {
   private matchIntervals: { [groupIndex: string]: NodeJS.Timer } = {};
+  private shoutIntervals: { [groupIndex: string]: NodeJS.Timer } = {};
 
   initGameState(): TGameState<IGameState> {
     const gameState = super.initGameState();
@@ -65,102 +65,112 @@ export default class Controller extends BaseController<
       gameState = await this.stateManager.getGameState(),
       playerStates = await this.stateManager.getPlayerStates();
     switch (type) {
-      case MoveType.startMultiPlayer: {
-        if (playerState.playerStatus === PlayerStatus.matching) {
+      case MoveType.startSingle: {
+        if (playerState.playerStatus !== PlayerStatus.intro) {
+          break;
+        }
+        this.createGroupAndInitRobots(gameState, playerState);
+        break;
+      }
+      case MoveType.startMulti: {
+        if (playerState.playerStatus !== PlayerStatus.intro) {
           break;
         }
         let groupIndex = gameState.groups.findIndex(
-          ({ players }) => players && players.length < groupSize
+          ({ playerNum, isMulti }) => playerNum < groupSize && isMulti
         );
         if (groupIndex === -1) {
           const group: GameState.IGroup = {
-            players: []
+            playerNum: 0,
+            roundIndex: 0,
+            isMulti: true,
+            rounds: [{}]
           };
           groupIndex = gameState.groups.push(group) - 1;
           this.startMatchTicking(group, groupIndex);
         }
-        const group = gameState.groups[groupIndex];
-        const positionIndex = group.players.push(playerState.actor.token) - 1;
-        playerState.multi = {
-          groupIndex,
-          positionIndex
-        };
-        playerState.playerStatus = PlayerStatus.matching;
+        this._joinPlayer(playerState, gameState.groups[groupIndex], groupIndex);
         break;
       }
-      case MoveType.startSinglePlayer: {
-        this.initSingle(playerState);
+      case MoveType.joinRobot: {
+        let groupIndex = gameState.groups.findIndex(
+          ({ playerNum }) => playerNum < groupSize
+        );
+        if (groupIndex === -1) {
+          break;
+        }
+        const group = gameState.groups[groupIndex];
+        this._joinPlayer(playerState, group, groupIndex);
+        if (group.playerNum === groupSize) {
+          const groupPlayerStates = Object.values(playerStates).filter(s =>
+            group.isMulti
+              ? s.multi && s.multi.groupIndex === groupIndex
+              : s.single && s.single.groupIndex === groupIndex
+          );
+          this._initState(group, groupPlayerStates);
+        }
         break;
       }
       case MoveType.shout: {
+        const playerStatus = playerState.playerStatus;
+        if (playerStatus === PlayerStatus.shouted) {
+          return;
+        }
+        let group: GameState.IGroup;
+        let groupIndex: number;
         // 单人
         if (playerState.single) {
-          const playerStatus = playerState.playerStatus;
-          const { roundIndex, rounds } = playerState.single;
-          const curRound = rounds[roundIndex];
-          const { privateValue, min, max, startingPrice } = curRound;
-          if (playerStatus === PlayerStatus.shouted) {
-            return;
-          }
+          const { rounds: playerRounds } = playerState.single;
+          groupIndex = playerState.single.groupIndex;
+          group = gameState.groups[groupIndex];
+          const { roundIndex, rounds: gameRounds } = group;
+          const { min } = gameRounds[roundIndex];
+          const { privateValue, startingPrice } = playerRounds[roundIndex];
           if (this.invalidParams(params, privateValue, min, startingPrice)) {
             return cb("invalid input");
           }
           playerState.playerStatus = PlayerStatus.shouted;
-          curRound.price = params.price;
-          curRound.bidNum = params.num;
-          const NPCs = this.simulateNPCs(groupSize - 1, min, max);
-          setTimeout(async () => {
-            this.processProfits(
-              [curRound as InvestorState, ...NPCs],
-              curRound as MarketState
-            );
-            playerState.playerStatus = PlayerStatus.result;
-            await this.stateManager.syncState();
-          }, 2000);
+          playerRounds[roundIndex].price = params.price;
+          playerRounds[roundIndex].bidNum = params.num;
         } else {
           // 多人
-          const playerStatus = playerState.playerStatus;
-          const { privateValue, startingPrice, groupIndex } = playerState.multi;
-          const group = gameState.groups[groupIndex];
-          const { min, max } = group;
-          if (playerStatus === PlayerStatus.shouted) {
-            return;
-          }
+          const { privateValue, startingPrice } = playerState.multi;
+          groupIndex = playerState.multi.groupIndex;
+          group = gameState.groups[groupIndex];
+          const { roundIndex, rounds: gameRounds } = group;
+          const { min } = gameRounds[roundIndex];
           if (this.invalidParams(params, privateValue, min, startingPrice)) {
-            return;
+            return cb("invalid input");
           }
           playerState.playerStatus = PlayerStatus.shouted;
           playerState.multi.price = params.price;
           playerState.multi.bidNum = params.num;
-          const groupPlayerStates = Object.values(playerStates).filter(
-            s => s.multi && s.multi.groupIndex === groupIndex
-          );
-          if (
-            !groupPlayerStates.every(
-              s => s.playerStatus === PlayerStatus.shouted
-            )
-          ) {
-            return;
-          }
-          const NPCs = this.simulateNPCs(
-            groupSize - groupPlayerStates.length,
-            min,
-            max
-          );
-          setTimeout(async () => {
-            this.processProfits(
-              [
-                ...(groupPlayerStates.map(s => s.multi) as Array<
-                  InvestorState
-                >),
-                ...NPCs
-              ],
-              group as MarketState
-            );
-            playerState.playerStatus = PlayerStatus.result;
-            await this.stateManager.syncState();
-          }, 2000);
         }
+        const groupPlayerStates = Object.values(playerStates).filter(s =>
+          group.isMulti
+            ? s.multi && s.multi.groupIndex === groupIndex
+            : s.single && s.single.groupIndex === groupIndex
+        );
+        if (
+          !groupPlayerStates.every(s => s.playerStatus === PlayerStatus.shouted)
+        ) {
+          return;
+        }
+        const investorStates = groupPlayerStates.map(s =>
+          group.isMulti ? s.multi : s.single.rounds[group.roundIndex]
+        );
+        const marketState = group.rounds[group.roundIndex];
+
+        setTimeout(async () => {
+          this.processProfits(
+            investorStates as Array<InvestorState>,
+            marketState as MarketState
+          );
+          groupPlayerStates.forEach(
+            s => (s.playerStatus = PlayerStatus.result)
+          );
+          await this.stateManager.syncState();
+        }, 2000);
         break;
       }
       case MoveType.replay: {
@@ -168,18 +178,16 @@ export default class Controller extends BaseController<
           return;
         }
         if (playerState.single) {
-          playerState.single.roundIndex++;
-          playerState.single.rounds[
-            playerState.single.roundIndex
-          ] = this.genInitParams();
-          playerState.playerStatus = PlayerStatus.prepared;
+          const { groupIndex } = playerState.single;
+          const group = gameState.groups[groupIndex];
+          const groupPlayerStates = Object.values(playerStates).filter(
+            s => s.single && s.single.groupIndex === groupIndex
+          );
+          group.roundIndex++;
+          this._initState(group, groupPlayerStates);
         } else {
-          this.initSingle(playerState);
+          this.createGroupAndInitRobots(gameState, playerState);
         }
-        cb(
-          null,
-          playerState.single.rounds[playerState.single.roundIndex].stockIndex
-        );
         break;
       }
       case MoveType.nextGame: {
@@ -188,15 +196,54 @@ export default class Controller extends BaseController<
     }
   }
 
-  simulateNPCs(amount: number, min: number, max: number): Array<InvestorState> {
-    return Array(amount)
-      .fill("")
-      .map(_ => {
-        const price = formatDigits(genRandomInt(min * 100, max * 100) / 100);
-        const num = genRandomInt(minNPCNum / 100, maxNPCNum / 100) * 100;
-        return { price, bidNum: num };
-      });
+  createGroupAndInitRobots(
+    gameState: TGameState<IGameState>,
+    playerState: TPlayerState<IPlayerState>
+  ) {
+    const { groupSize } = this.game.params;
+    const group: GameState.IGroup = {
+      playerNum: 0,
+      roundIndex: 0,
+      isMulti: false,
+      rounds: [{}]
+    };
+    const groupIndex = gameState.groups.push(group) - 1;
+    this._joinPlayer(playerState, group, groupIndex);
+    this._initRobots(groupIndex, groupSize - 1);
   }
+
+  _joinPlayer(
+    playerState: TPlayerState<IPlayerState>,
+    group: GameState.IGroup,
+    groupIndex: number
+  ) {
+    const { groupSize } = this.game.params;
+    if (group.playerNum === groupSize) {
+      return;
+    }
+    group.playerNum++;
+    if (group.isMulti) {
+      playerState.multi = {
+        groupIndex
+      };
+    } else {
+      playerState.single = {
+        groupIndex,
+        rounds: [{}]
+      };
+    }
+    playerState.playerStatus = PlayerStatus.matching;
+  }
+
+  // simulateNPCs(amount: number, min: number, max: number): Array<InvestorState> {
+  //   return Array(amount)
+  //     .fill("")
+  //     .map(_ => {
+  //       const price = formatDigits(genRandomInt(min * 100, max * 100) / 100);
+  //       const num = genRandomInt(minNPCNum / 100, maxNPCNum / 100) * 100;
+  //       return { price, bidNum: num };
+  //     });
+  // }
 
   invalidParams(
     params: IMoveParams,
@@ -212,46 +259,53 @@ export default class Controller extends BaseController<
     );
   }
 
-  initSingle(playerState: TPlayerState<IPlayerState>) {
-    playerState.playerStatus = PlayerStatus.prepared;
-    playerState.single = {
-      roundIndex: 0,
-      rounds: [this.genInitParams()]
-    };
+  _initRobots(groupIndex: number, amount: number) {
+    for (let i = 0; i < amount; i++) {
+      this.startNewRobotScheduler(`Robot_G${groupIndex}_${i}`, false);
+    }
   }
 
-  initMulti(
+  _initState(
     group: GameState.IGroup,
     groupPlayerStates: Array<TPlayerState<IPlayerState>>
   ) {
     const max = this._genPrivateMax();
     const min = this._genPrivateMin(max);
     const stockIndex = genRandomInt(0, STOCKS.length - 1);
-    group.min = min;
-    group.max = max;
-    group.stockIndex = stockIndex;
-    groupPlayerStates.forEach(s => {
+    const { roundIndex, isMulti, rounds } = group;
+    let gameRound = rounds[roundIndex];
+    if (!gameRound) {
+      gameRound = rounds[roundIndex] = {};
+    }
+    gameRound.min = min;
+    gameRound.max = max;
+    gameRound.stockIndex = stockIndex;
+    if (isMulti) {
+      this.startShoutTicking(group, groupPlayerStates[0].multi.groupIndex);
+    }
+    groupPlayerStates.forEach((s, i) => {
       const privateValue = this._genPrivateValue(min, max);
       const startingPrice = this._genStartingPrice(min);
+      if (isMulti) {
+        s.multi.privateValue = privateValue;
+        s.multi.startingPrice = startingPrice;
+      } else {
+        let playerRound = s.single.rounds[roundIndex];
+        if (!playerRound) {
+          playerRound = s.single.rounds[roundIndex] = {};
+        }
+        playerRound.privateValue = privateValue;
+        playerRound.startingPrice = startingPrice;
+      }
       s.playerStatus = PlayerStatus.prepared;
-      s.multi.privateValue = privateValue;
-      s.multi.startingPrice = startingPrice;
+      setTimeout(() => {
+        this.push(s.actor, PushType.robotShout, {
+          min: gameRound.min,
+          max: privateValue,
+          startingPrice
+        });
+      }, 600 * (i + 1));
     });
-  }
-
-  genInitParams(): {
-    max: number;
-    min: number;
-    privateValue: number;
-    startingPrice: number;
-    stockIndex: number;
-  } {
-    const max = this._genPrivateMax();
-    const min = this._genPrivateMin(max);
-    const privateValue = this._genPrivateValue(min, max);
-    const startingPrice = this._genStartingPrice(min);
-    const stockIndex = genRandomInt(0, STOCKS.length - 1);
-    return { max, min, privateValue, startingPrice, stockIndex };
   }
 
   _genPrivateValue(min: number, max: number): number {
@@ -276,6 +330,38 @@ export default class Controller extends BaseController<
     return formatDigits(original);
   }
 
+  startShoutTicking(group: GameState.IGroup, groupIndex: number) {
+    global.setTimeout(() => {
+      const shoutIntervals = this.shoutIntervals;
+      let shoutTimer = 1;
+      shoutIntervals[groupIndex] = global.setInterval(async () => {
+        const playerStates = await this.stateManager.getPlayerStates();
+        const groupPlayerStates = Object.values(playerStates).filter(
+          s => s.multi && s.multi.groupIndex === groupIndex
+        );
+        groupPlayerStates.forEach(s => {
+          this.push(s.actor, PushType.shoutTimer, {
+            shoutTimer
+          });
+        });
+        if (
+          groupPlayerStates.every(s => s.playerStatus !== PlayerStatus.prepared)
+        ) {
+          global.clearInterval(shoutIntervals[groupIndex]);
+          delete shoutIntervals[groupIndex];
+          return;
+        }
+        if (shoutTimer++ < SHOUT_TIMER) {
+          return;
+        }
+        global.clearInterval(shoutIntervals[groupIndex]);
+        delete shoutIntervals[groupIndex];
+        this._autoProcessProfits(group, groupPlayerStates);
+        await this.stateManager.syncState();
+      }, 1000);
+    }, 0);
+  }
+
   startMatchTicking(group: GameState.IGroup, groupIndex: number) {
     const { groupSize } = this.game.params;
     global.setTimeout(() => {
@@ -292,13 +378,10 @@ export default class Controller extends BaseController<
             matchNum: groupPlayerStates.length
           });
         });
-        if (group.players.length === groupSize) {
-          groupPlayerStates.forEach(s => {
-            this.push(s.actor, PushType.matchMsg, { matchMsg: "匹配成功" });
-          });
+        if (group.playerNum === groupSize) {
           global.clearInterval(matchIntervals[groupIndex]);
           delete matchIntervals[groupIndex];
-          this.initMulti(group, groupPlayerStates);
+          this._initState(group, groupPlayerStates);
           await this.stateManager.syncState();
           return;
         }
@@ -307,11 +390,7 @@ export default class Controller extends BaseController<
         }
         global.clearInterval(matchIntervals[groupIndex]);
         delete matchIntervals[groupIndex];
-        if (group.players.length > 1) {
-          this.initMulti(group, groupPlayerStates);
-        } else {
-          this.initSingle(groupPlayerStates[0]);
-        }
+        this._initRobots(groupIndex, groupSize - group.playerNum);
         await this.stateManager.syncState();
       }, 1000);
     }, 0);
@@ -330,7 +409,7 @@ export default class Controller extends BaseController<
     if (numberOfShares <= total) {
       marketState.strikePrice = marketState.min;
       sortedPlayerStates
-        .filter(s => s.privateValue !== undefined)
+        // .filter(s => s.privateValue !== undefined)
         .forEach(s => {
           s.actualNum = s.bidNum;
           s.profit = formatDigits(
@@ -358,7 +437,7 @@ export default class Controller extends BaseController<
     // 买家总数小于发行股数
     if (buyerTotal <= total) {
       buyers
-        .filter(s => s.privateValue !== undefined)
+        // .filter(s => s.privateValue !== undefined)
         .forEach(s => {
           s.actualNum = s.bidNum;
           s.profit = formatDigits(
@@ -375,7 +454,7 @@ export default class Controller extends BaseController<
         buyers[buyerIndex].actualNum++;
       }
       buyers
-        .filter(s => s.privateValue !== undefined)
+        // .filter(s => s.privateValue !== undefined)
         .forEach(s => {
           s.profit = formatDigits(
             (s.privateValue - marketState.strikePrice) * s.actualNum
@@ -406,7 +485,7 @@ export default class Controller extends BaseController<
     marketState.strikePrice =
       strikePrice === undefined ? marketState.min : strikePrice;
     buyers
-      .filter(s => s.positionIndex !== undefined)
+      // .filter(s => s.privateValue !== undefined)
       .forEach(s => {
         s.profit = formatDigits(
           (s.privateValue - marketState.strikePrice) * s.actualNum
@@ -425,6 +504,31 @@ export default class Controller extends BaseController<
     if (type === IPOType.TopK) {
       this._processTopKProfits(marketState, sortedPlayerStates);
     }
+  }
+
+  _autoProcessProfits(
+    group: GameState.IGroup,
+    groupPlayerStates: Array<TPlayerState<IPlayerState>>
+  ) {
+    const investorStates = groupPlayerStates
+      .filter(s => {
+        if (s.playerStatus === PlayerStatus.prepared) {
+          s.multi.price = 0;
+          s.multi.bidNum = 0;
+          s.multi.actualNum = 0;
+          s.multi.profit = 0;
+          return false;
+        }
+        return true;
+      })
+      .map(s => s.multi);
+    const marketState = group.rounds[group.roundIndex];
+
+    this.processProfits(
+      investorStates as Array<InvestorState>,
+      marketState as MarketState
+    );
+    groupPlayerStates.forEach(s => (s.playerStatus = PlayerStatus.result));
   }
 
   findBuyerIndex(num: number, array: Array<number>): number {
@@ -447,16 +551,16 @@ export default class Controller extends BaseController<
   }
 }
 
-function genRandomInt(min: number, max: number): number {
+export function genRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function formatDigits(num: number): number {
+export function formatDigits(num: number): number {
   return +num.toFixed(2);
 }
 
 interface InvestorState {
-  privateValue?: number;
+  privateValue: number;
   price: number;
   bidNum: number;
   actualNum?: number;

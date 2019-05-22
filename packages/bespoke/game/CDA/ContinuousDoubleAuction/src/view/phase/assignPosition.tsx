@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {Lang, Label, Input, Button, ButtonProps, MaskLoading, BtnGroup, Toast} from 'bespoke-client-util'
-import {IDENTITY, MoveType, ROLE, RobotStartMode, PlayerStatus} from '../../config'
+import {IDENTITY, MoveType, ROLE, PlayerStatus, ReactionType} from '../../config'
 import {BasePhase} from './BasePhase'
 import {getEnumKeys} from '../../util'
 
@@ -17,15 +17,14 @@ class Create extends BasePhase.Create {
         robotStartMode: ['机器人启动模式', 'Robot start mode'],
         exchangeRate: ['兑换比率(实验币/￥)', 'ExchangeRate(point/￥)'],
         interval: ['睡眠时间(秒)', 'SleepTime(s)'],
-        [RobotStartMode[RobotStartMode.A]]: ['模式A', 'Mode A'],
-        [RobotStartMode[RobotStartMode.B]]: ['模式B', 'Mode B'],
-        [RobotStartMode[RobotStartMode.C]]: ['模式B', 'Mode C']
+        reactionType:['响应模式','Reaction Type']
     })
 
     render() {
         const {lang, props: {params, updateParams}} = this
         const roleKeys = getEnumKeys(ROLE),
-            identityKeys = getEnumKeys(IDENTITY)
+            identityKeys = getEnumKeys(IDENTITY),
+            reactionTypeKeys = getEnumKeys(ReactionType)
         return <section className={`${style.assignPosition} ${style.createContent}`}>
             <ul className={style.baseFields}>
                 <li>
@@ -97,7 +96,7 @@ class Create extends BasePhase.Create {
                                                     }}/>
                                                 </div>
                                             case IDENTITY.ZipRobot:
-                                                return <div>
+                                                return <div style={{display:'flex', alignItems:'center', justifyContent:'center'}}>
                                                     <label>{lang.interval} : </label>
                                                     <input {...{
                                                         type: 'number',
@@ -105,7 +104,15 @@ class Create extends BasePhase.Create {
                                                         onChange: ({target: {value: interval}}) => this.updatePosition(positionIndex,
                                                             position => ({...position, interval}))
                                                     }}/>
-                                                    <label>s</label>
+                                                    <label>s</label>&nbsp;
+                                                    <label>{lang.reactionType} : </label>
+                                                    <BtnGroup value={reactionTypeKeys.findIndex(key => extraConfig.reactionType === ReactionType[key])}
+                                                              options={reactionTypeKeys}
+                                                              onChange={i => this.updatePosition(positionIndex, position => ({
+                                                                  ...position,
+                                                                  reactionType: ReactionType[reactionTypeKeys[i]]
+                                                              }))}
+                                                    />
                                                 </div>
                                         }
                                     })()

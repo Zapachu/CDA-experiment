@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200px" height="56px" viewBox="0 0 200 56" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
+    <title>下一局</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="42.2768298%" y1="11.8185619%" x2="42.2768298%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#12543D" offset="0%"></stop>
+            <stop stop-color="#1F274B" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="中位数定价2" transform="translate(-742.000000, -823.000000)" fill="url(#linearGradient-1)" fill-rule="nonzero" stroke="#3CD655">
+            <rect id="下一局" x="742.5" y="823.5" width="199" height="55" rx="8"></rect>
+        </g>
+    </g>
+</svg>

@@ -1,33 +1,44 @@
 import * as React from "react";
 import * as style from "./style.scss";
-import {
-  Button,
-  ButtonProps,
-  Core,
-  Lang,
-  MaskLoading,
-  Toast,
-  Input
-} from "bespoke-client-util";
+import { Core, Lang, Toast } from "bespoke-client-util";
 import {
   FetchType,
   MoveType,
   PushType,
   PlayerStatus,
-  STOCKS
+  SHOUT_TIMER
 } from "../../config";
 import {
   ICreateParams,
   IGameState,
   IMoveParams,
   IPlayerState,
-  IPushParams
+  IPushParams,
+  PlayerState,
+  GameState
 } from "../../interface";
+import {
+  TableInfo,
+  Input,
+  Button,
+  ListItem,
+  Line,
+  Modal,
+  StockInfo
+} from "../../../../components";
+const LOADING = require("../../../../components/loading.png");
+
+enum ModalType {
+  None,
+  Ipo,
+  Trade
+}
 
 interface IPlayState {
-  price: number;
-  num: number;
-  stockIndex: number;
+  price: string;
+  num: string;
+  modalType: ModalType;
+  shoutTimer: number;
 }
 
 export default class PlayingStage extends Core.Play<
@@ -46,211 +57,403 @@ export default class PlayingStage extends Core.Play<
     this.state = this.initState(props);
   }
 
-  initState = props => {
+  initState = (
+    props: Core.IPlayProps<
+      ICreateParams,
+      IGameState,
+      IPlayerState,
+      MoveType,
+      PushType,
+      IMoveParams,
+      IPushParams,
+      FetchType
+    >
+  ) => {
     const {
       playerState: { multi, single },
       gameState: { groups }
     } = props;
     if (single) {
-      const { rounds, roundIndex } = single;
-      const curRound = rounds[roundIndex];
+      const { rounds, groupIndex } = single;
+      const curRound = rounds[groups[groupIndex].roundIndex];
       return {
-        price: curRound.price,
-        num: curRound.bidNum,
-        stockIndex: curRound.stockIndex
+        price: curRound.price && "" + curRound.price,
+        num: curRound.bidNum && "" + curRound.bidNum,
+        modalType: ModalType.None,
+        shoutTimer: null
       };
     } else {
-      const curGroup = groups[multi.groupIndex];
       return {
-        price: multi.price,
-        num: multi.bidNum,
-        stockIndex: curGroup.stockIndex
+        price: multi.price && "" + multi.price,
+        num: multi.bidNum && "" + multi.bidNum,
+        modalType: ModalType.None,
+        shoutTimer: null
       };
     }
   };
 
-  lang = Lang.extractLang({
-    confirm: ["确定", "Confirm"],
-    inputSeatNumberPls: ["请输入座位号", "Input your seat number please"],
-    submit: ["提交", "Submit"],
-    invalidSeatNumber: [
-      "座位号有误或已被占用",
-      "Your seat number is invalid or has been occupied"
-    ],
-    chooseInFirstAction: ["在第一阶段选择", "In the first action chose "],
-    chooseInSecondActionLeft: [
-      "等待, 如果第一阶段有人选1, 则选",
-      "Wait, if someone has chosen 1 in the first action, choose "
-    ],
-    chooseInSecondActionRight: [
-      "; 如果第一阶段没有人选1, 则选",
-      "; if on one has chosen 1 in the first action, choose "
-    ],
-    yourFirstChoiceLeft: ["你在第", "Your choice in round "],
-    yourFirstChoiceRight: ["轮的选择为:", " is:"],
-    lowestChocieLeft: ["第", "The lowest choice of the group in round "],
-    lowestChocieRight: ["轮的组内最低选择为:", " is:"],
-    profitLeft: ["你在第", "Your profit in round "],
-    profitRight: ["轮的积分为:", " is:"],
-    totalProfitLeft: ["截止第", "Until round "],
-    totalProfitRight: ["轮，你的积分为:", " your total profit is:"],
-    inFirstAction: ["在第一阶段中,", "In the first action,"],
-    chose1: ["有人选1", "someone has chosen 1"],
-    notChose1: ["没有人选1", "no one has chosen 1"],
-    yourSecondChoice: [
-      "你在第二阶段的选择为:",
-      "Your choice in the second action is:"
-    ],
-    wait4Others2Choose: ["等待其他玩家选择", "Waiting for others to choose"],
-    wait4Others2Next: [
-      "等待其他玩家进入下一轮",
-      "Waiting for others to enter the next round"
-    ],
-    roundIndex: [(m, n) => `第${m}/${n}轮`, (m, n) => `Round ${m}/${n}`]
-  });
+  lang = Lang.extractLang({});
 
-  renderStock() {
-    const stock = STOCKS[this.state.stockIndex];
-    return (
-      <table>
-        <tbody>
-          <tr>
-            <td>证券代码</td>
-            <td>证券简称</td>
-            <td>主承销商</td>
-            <td>初步询价起始日期</td>
-            <td>初步询价截止日期</td>
-          </tr>
-          <tr>
-            <td>{stock.code}</td>
-            <td>{stock.name}</td>
-            <td>{stock.contractor}</td>
-            <td>{stock.startDate}</td>
-            <td>{stock.endDate}</td>
-          </tr>
-        </tbody>
-      </table>
-    );
+  componentDidMount() {
+    const { frameEmitter } = this.props;
+    frameEmitter.on(PushType.shoutTimer, ({ shoutTimer }) => {
+      const {
+        playerState: { playerStatus }
+      } = this.props;
+      if (playerStatus === PlayerStatus.prepared) {
+        this.setState({ shoutTimer });
+      }
+    });
   }
+
+  inputNum = (multiplier: number, startingPrice: number) => {
+    const { price } = this.state;
+    if (!+price) {
+      return;
+    }
+    const money = multiplier * startingPrice;
+    const num = Math.floor(money / +price);
+    this.setState({ num: "" + num });
+  };
+
+  renderResult = (
+    investorState: Partial<PlayerState.IMulti>,
+    marketState: Partial<GameState.Group.IRound>
+  ) => {
+    const { frameEmitter } = this.props;
+    const dataList = [
+      {
+        label: "股票的成交价格",
+        value: (
+          <span style={{ color: "orange" }}>{marketState.strikePrice}</span>
+        )
+      },
+      {
+        label: "你们公司对股票的估值",
+        value: (
+          <span style={{ color: "orange" }}>{investorState.privateValue}</span>
+        )
+      },
+      {
+        label: "每股股票收益",
+        value: (
+          <span style={{ color: "orange" }}>
+            {(investorState.privateValue - marketState.strikePrice).toFixed(2)}
+          </span>
+        )
+      },
+      {
+        label: "你的购买数量",
+        value: (
+          <span style={{ color: "orange" }}>
+            {investorState.actualNum || 0}
+          </span>
+        )
+      },
+      {
+        label: "你的总收益为",
+        value: (
+          <span style={{ color: "orange" }}>{investorState.profit || 0}</span>
+        )
+      },
+      {
+        label: "你的初始账户资金",
+        value: (
+          <span style={{ color: "orange" }}>{investorState.startingPrice}</span>
+        )
+      },
+      {
+        label: "你的现有账户资金",
+        value: (
+          <span style={{ color: "red" }}>
+            {investorState.startingPrice + (investorState.profit || 0)}
+          </span>
+        )
+      }
+    ];
+    return (
+      <>
+        <Line
+          text={"交易结果展示"}
+          style={{
+            margin: "auto",
+            width: "400px",
+            marginTop: "15vh",
+            marginBottom: "20px"
+          }}
+        />
+        <TableInfo dataList={dataList} style={{ margin: "30px auto" }} />
+        <Button
+          style={{ justifyContent: "flex-end", marginBottom: "50px" }}
+          label={"ipo知识扩展"}
+          size={Button.Size.Small}
+          color={Button.Color.Blue}
+          onClick={() => this.setState({ modalType: ModalType.Ipo })}
+        />
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <Button
+            label={"再玩一局"}
+            color={Button.Color.Blue}
+            style={{ marginRight: "20px" }}
+            onClick={() => {
+              this.setState({
+                shoutTimer: null,
+                price: undefined,
+                num: undefined
+              });
+              frameEmitter.emit(MoveType.replay);
+            }}
+          />
+          <Button
+            label={"下一局"}
+            onClick={() => {
+              frameEmitter.emit(MoveType.nextGame);
+            }}
+          />
+        </div>
+        <Line
+          color={Line.Color.White}
+          style={{
+            margin: "auto",
+            width: "400px",
+            marginTop: "40px",
+            marginBottom: "20px"
+          }}
+        />
+      </>
+    );
+  };
+
+  renderPrepared = (
+    investorState: Partial<PlayerState.IMulti>,
+    marketState: Partial<GameState.Group.IRound>
+  ) => {
+    const {
+      frameEmitter,
+      game: {
+        params: { total }
+      }
+    } = this.props;
+    const { price, num, shoutTimer } = this.state;
+    return (
+      <>
+        <div style={{ position: "fixed", top: "35vh", right: "15vw" }}>
+          <Button
+            label={"交易规则回顾"}
+            size={Button.Size.Small}
+            color={Button.Color.Blue}
+            onClick={() => this.setState({ modalType: ModalType.Trade })}
+          />
+        </div>
+        <div style={{ position: "fixed", top: "42vh", right: "15vw" }}>
+          <Button
+            label={"ipo知识扩展"}
+            size={Button.Size.Small}
+            color={Button.Color.Blue}
+            onClick={() => this.setState({ modalType: ModalType.Ipo })}
+          />
+        </div>
+        <StockInfo
+          stockIndex={marketState.stockIndex}
+          style={{ marginTop: "15vh", marginBottom: "20px" }}
+        />
+        <p style={{ marginBottom: "10px" }}>
+          *私人信息: 你们公司对该股票的估值是
+          <span style={{ color: "orange" }}>{investorState.privateValue}</span>
+        </p>
+        <p style={{ marginBottom: "30px" }}>
+          *市场信息: 该公司共发行了
+          <span style={{ color: "orange" }}>{total}股</span>股票, 最低保留价格为
+          <span style={{ color: "orange" }}>{marketState.min}</span>
+        </p>
+        <div className={style.inputContainer}>
+          <div>
+            <Input
+              value={price}
+              onChange={val => this.setState({ price: "" + val })}
+              placeholder={"价格"}
+              onMinus={val => this.setState({ price: "" + (+val - 1) })}
+              onPlus={val => this.setState({ price: "" + (+val + 1) })}
+            />
+            <p style={{ fontSize: "12px", marginTop: "5px" }}>
+              可买
+              <span style={{ color: "orange" }}>
+                {+price
+                  ? Math.floor(investorState.startingPrice / +price)
+                  : " "}
+              </span>
+              股
+            </p>
+          </div>
+        </div>
+        <div className={style.inputContainer}>
+          <div>
+            <Input
+              value={num}
+              onChange={val => this.setState({ num: "" + val })}
+              placeholder={"数量"}
+              onMinus={val => this.setState({ num: "" + (+val - 1) })}
+              onPlus={val => this.setState({ num: "" + (+val + 1) })}
+            />
+            <p
+              style={{
+                fontSize: "12px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginTop: "5px"
+              }}
+            >
+              <span>
+                总花费
+                <span style={{ color: "orange" }}>
+                  {+price && +num ? (+price * +num).toFixed(2) : " "}
+                </span>
+              </span>
+              <span>
+                <span
+                  className={style.operation}
+                  onClick={() =>
+                    this.inputNum(0.5, investorState.startingPrice)
+                  }
+                >
+                  半仓
+                </span>
+                <span
+                  className={style.operation}
+                  onClick={() => this.inputNum(1, investorState.startingPrice)}
+                >
+                  全仓
+                </span>
+              </span>
+            </p>
+          </div>
+        </div>
+        <Button
+          label={"买入"}
+          style={{
+            marginBottom: shoutTimer !== null ? "5px" : "30px",
+            marginTop: "20px"
+          }}
+          onClick={() => {
+            if (!+price || !+num || num.includes(".")) return;
+            frameEmitter.emit(
+              MoveType.shout,
+              { price: +price, num: +num },
+              err => {
+                if (err) {
+                  Toast.warn(err);
+                } else {
+                  this.setState({
+                    price: undefined,
+                    num: undefined
+                  });
+                }
+              }
+            );
+          }}
+        />
+        {shoutTimer !== null ? (
+          <p style={{ marginBottom: "20px", textAlign: "center" }}>
+            {SHOUT_TIMER - shoutTimer} S
+          </p>
+        ) : null}
+        <ListItem width={200}>
+          <p style={{ color: "orange" }} className={style.item}>
+            初始资金: {investorState.startingPrice}
+          </p>
+        </ListItem>
+      </>
+    );
+  };
+
+  renderModal = (modalType: ModalType) => {
+    switch (modalType) {
+      case ModalType.Ipo: {
+        return (
+          <div className={style.modalIpo}>
+            <p>ipo知识扩展</p>
+            <Button
+              style={{ marginTop: "30px" }}
+              label={"关闭"}
+              color={Button.Color.Blue}
+              onClick={() => this.setState({ modalType: ModalType.None })}
+            />
+          </div>
+        );
+      }
+      case ModalType.Trade: {
+        return (
+          <div className={style.modalIpo}>
+            <p>交易规则回顾</p>
+            <Button
+              style={{ marginTop: "30px" }}
+              label={"关闭"}
+              color={Button.Color.Blue}
+              onClick={() => this.setState({ modalType: ModalType.None })}
+            />
+          </div>
+        );
+      }
+    }
+  };
 
   render() {
     const {
       lang,
       props: {
-        frameEmitter,
         playerState: { playerStatus, single, multi },
-        gameState: { groups },
-        game: {
-          params: { total }
-        }
+        gameState: { groups }
       },
-      state: { price, num }
+      state: { modalType }
     } = this;
-    let investorState;
-    let marketState;
+    let investorState: Partial<PlayerState.IMulti>;
+    let marketState: Partial<GameState.Group.IRound>;
     if (single) {
-      const { rounds, roundIndex } = single;
-      investorState = rounds[roundIndex];
-      marketState = rounds[roundIndex];
+      const { rounds: playerRounds, groupIndex } = single;
+      const { roundIndex, rounds: gameRounds } = groups[groupIndex];
+      investorState = playerRounds[roundIndex] || {};
+      marketState = gameRounds[roundIndex] || {};
     } else {
-      investorState = multi;
-      marketState = groups[multi.groupIndex];
+      const { roundIndex, rounds: gameRounds } = groups[multi.groupIndex];
+      investorState = multi || {};
+      marketState = gameRounds[roundIndex] || {};
     }
     let content;
     switch (playerStatus) {
       case PlayerStatus.prepared: {
-        content = (
-          <>
-            {this.renderStock()}
-            <p>心里价值: {investorState.privateValue}</p>
-            <p>最低保留价格: {marketState.min}</p>
-            <p>初始资金: {investorState.startingPrice}</p>
-            <div>
-              <Input
-                value={price}
-                onChange={e => this.setState({ price: +e.target.value })}
-              />
-              <Input
-                value={num}
-                onChange={e => this.setState({ num: +e.target.value })}
-              />
-              <Button
-                width={ButtonProps.Width.small}
-                label={lang.confirm}
-                onClick={() => {
-                  if (!price || !num) return;
-                  frameEmitter.emit(MoveType.shout, { price, num }, err => {
-                    if (err) Toast.warn(err);
-                  });
-                }}
-              />
-            </div>
-          </>
-        );
+        content = this.renderPrepared(investorState, marketState);
         break;
       }
       case PlayerStatus.shouted: {
         content = (
           <>
-            {this.renderStock()}
-            <div>
-              <p>waiting for others</p>
+            <StockInfo
+              stockIndex={marketState.stockIndex}
+              style={{ marginTop: "15vh", marginBottom: "100px" }}
+            />
+            <div
+              style={{ width: "200px", margin: "auto", textAlign: "center" }}
+            >
+              <img src={LOADING} style={{ marginBottom: "20px" }} />
+              <p>等待其他玩家</p>
             </div>
           </>
         );
         break;
       }
       case PlayerStatus.result: {
-        content = (
-          <div>
-            <ul>
-              <li>股票的成交价格: ${marketState.strikePrice}</li>
-              <li>你们公司对股票的估值: ${investorState.privateValue}</li>
-              <li>
-                每股股票收益: $
-                {(investorState.privateValue - marketState.strikePrice).toFixed(
-                  2
-                )}
-              </li>
-              <li>你的购买数量: {investorState.actualNum || 0}</li>
-              <li>你的总收益为: ${investorState.profit || 0}</li>
-              <li>你的初始账户资金: ${investorState.startingPrice}</li>
-              <li>
-                你的现有账户资金: $
-                {investorState.startingPrice + (investorState.profit || 0)}
-              </li>
-            </ul>
-            <Button
-              width={ButtonProps.Width.small}
-              label={"再玩一局"}
-              onClick={() => {
-                frameEmitter.emit(MoveType.replay, {}, (err, stockIndex) => {
-                  if (!err)
-                    this.setState({
-                      price: undefined,
-                      num: undefined,
-                      stockIndex
-                    });
-                });
-              }}
-            />
-            <Button
-              width={ButtonProps.Width.small}
-              label={"下一局"}
-              onClick={() => {
-                frameEmitter.emit(MoveType.nextGame);
-              }}
-            />
-          </div>
-        );
+        content = this.renderResult(investorState, marketState);
         break;
       }
     }
 
     return (
-      <section>
-        <p>header</p>
+      <section className={style.playingStage}>
         {content}
+        <Modal visible={modalType !== ModalType.None}>
+          {this.renderModal(modalType)}
+        </Modal>
       </section>
     );
   }

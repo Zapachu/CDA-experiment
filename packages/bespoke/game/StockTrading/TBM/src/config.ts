@@ -3,13 +3,15 @@ export const namespace = 'TBM'
 export enum MoveType {
     shout = 'shout',
     prepare = 'prepare',
-    getPosition = 'getPosition'
+    getPosition = 'getPosition',
+    nextStage = 'nextStage'
 }
 
 export enum PushType {
     dealTimer,
     startBid,
-    newRoundTimer
+    newRoundTimer,
+    nextRound
 }
 
 export enum FetchType {
@@ -19,6 +21,7 @@ export enum FetchType {
 export enum PlayerStatus {
     outside,
     prepared,
+    startBid,
     shouted,
     gameOver,
 }

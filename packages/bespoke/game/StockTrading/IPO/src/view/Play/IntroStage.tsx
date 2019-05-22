@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as style from "./style.scss";
-import { Lang, Button, ButtonProps, Core } from "bespoke-client-util";
+import { Lang, Core } from "bespoke-client-util";
 import {
   ICreateParams,
   IGameState,
@@ -13,11 +13,14 @@ import {
   MoveType,
   PushType,
   PlayerStatus,
-  STOCKS
+  MATCH_TIMER
 } from "../../config";
-import Line from '../../../../components/Line'
+import { Line, PlayMode, MatchModal, Modal } from "../../../../components";
 
-interface IPlayState {}
+interface IPlayState {
+  matchTimer: number;
+  matchNum: number;
+}
 
 export default class IntroStage extends Core.Play<
   ICreateParams,
@@ -30,35 +33,59 @@ export default class IntroStage extends Core.Play<
   FetchType,
   IPlayState
 > {
-  lang = Lang.extractLang({
-    lowest: ["组内最低的选择", "Lowest choice in the group"],
-    choose1: ["选1", "Choose 1"],
-    choose2: ["选2", "Choose 2"],
-    chooseWait: ["等待", "Wait"],
-    yourChoice: ["你的选择", "Your choice"],
-    noShow: ["不可能出现", "Will not happen"]
-  });
+  constructor(props) {
+    super(props);
+    this.state = {
+      matchTimer: null,
+      matchNum: null
+    };
+  }
+
+  lang = Lang.extractLang({});
+
+  componentDidMount() {
+    const { frameEmitter } = this.props;
+    frameEmitter.on(PushType.matchTimer, ({ matchTimer, matchNum }) => {
+      this.setState({ matchTimer, matchNum });
+    });
+  }
 
   render() {
-    const { frameEmitter } = this.props;
+    const {
+      frameEmitter,
+      playerState: { playerStatus, single, multi },
+      game: {
+        params: { groupSize }
+      }
+    } = this.props;
+    const { matchTimer, matchNum } = this.state;
     return (
       <section className={style.introStage}>
-        <Line text={'交易规则介绍'} style={{marginBottom:'20px'}} />
-        <Button
-          width={ButtonProps.Width.small}
-          label={"多人玩法"}
-          onClick={() => {
-            frameEmitter.emit(MoveType.startMultiPlayer);
+        <Line text={"交易规则介绍"} style={{ marginBottom: "20px" }} />
+        <PlayMode
+          onPlay={mode => {
+            if (mode === PlayMode.Single) {
+              frameEmitter.emit(MoveType.startSingle);
+            }
+            if (mode === PlayMode.Multi) {
+              frameEmitter.emit(MoveType.startMulti);
+            }
           }}
         />
-        <Button
-          width={ButtonProps.Width.small}
-          label={"单人玩法"}
-          onClick={() => {
-            frameEmitter.emit(MoveType.startSinglePlayer);
-          }}
+        <MatchModal
+          visible={playerStatus === PlayerStatus.matching && !!multi}
+          totalNum={groupSize}
+          matchNum={matchNum}
+          timer={MATCH_TIMER - matchTimer}
         />
-        <Line color={Line.Color.White} style={{marginTop:'20px'}} />
+        <Modal
+          visible={playerStatus === PlayerStatus.matching && !!single}
+          width={300}
+        >
+          <p style={{ textAlign: "center", padding: "50px 0" }}>
+            加载算法交易者...
+          </p>
+        </Modal>
       </section>
     );
   }
