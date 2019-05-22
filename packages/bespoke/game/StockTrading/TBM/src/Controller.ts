@@ -48,8 +48,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         if (group.playerNum === groupSize) {
             return
         }
-        group.playerNum++
-        playerState.positionIndex = group.playerNum
+        playerState.positionIndex = group.playerNum++
         if (group.isMulti) {
             playerState.multi = {groupIndex}
         } else {
@@ -143,7 +142,11 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         }
         console.log(positions)
         groupPlayerStates.forEach((s, i) => {
+            console.log(s)
+            console.log(s.role)
+            console.log(positions[1].role)
             s.role = positions[s.positionIndex].role
+            console.log(s.positionIndex)
             if (isMulti) {
                 s.multi.privateValue = positions[s.positionIndex].privatePrice
             } else {
