@@ -141,6 +141,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         if (isMulti) {
             this.startShoutTicking(group, groupPlayerStates[0].multi.groupIndex)
         }
+        console.log(positions)
         groupPlayerStates.forEach((s, i) => {
             s.role = positions[s.positionIndex].role
             if (isMulti) {

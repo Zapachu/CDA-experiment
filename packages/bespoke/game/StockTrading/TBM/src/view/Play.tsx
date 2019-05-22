@@ -121,9 +121,6 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                             <a className={style.allIn} onClick={this.allIn}>全仓</a>
                         </div>
                     </li>
-                    <li style={{marginTop: 52}}>
-                        <Button label='出价' onClick={this.shout} color={Button.Color.Green}/>
-                    </li>
                 </div>
             default:
                 return null
@@ -197,13 +194,38 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     }
 
     renderPlay = () => {
-        return <div className={style.workBox}>
-            <div className={style.tipText}>
-                <Line text={` ${this.dynamicTip()} `}/>
+        const {
+            props: {
+                game: {params: {InitMoney}},
+                playerState: {}
+            }
+        } = this
+        return <>
+            <Stock/>
+            <Button
+                style={{position: 'absolute', top: '30%', right: '10%'}}
+                onClick={this.showRule}
+                color={Button.Color.Blue}
+                label={`交易规则回顾`}
+            />
+            <Button
+                style={{position: 'absolute', top: '35%', right: '10%'}}
+                onClick={this.showTBMRule}
+                color={Button.Color.Blue}
+                label={`集合竞价知识扩展`}
+            />
+            <div className={style.workBox}>
+                <div className={style.tipText}>
+                    <Line text={` ${this.dynamicTip()} `}/>
+                </div>
+                {this.dynamicAction()}
+                {this.dynamicBtnView()}
             </div>
-            {this.dynamicAction()}
-            {this.dynamicBtnView()}
-        </div>
+
+            <InfoBar text={`个人信息： 账户余额${InitMoney / 10000}万元`}/>
+
+            <InfoBar styles={{marginTop: '1rem'}} text={`拥有股票: 10000股`}/>
+        </>
     }
 
     renderStage = () => {
@@ -229,27 +251,13 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     }
 
     render() {
-        const {
-            props: {
-                game: {params: {InitMoney}},
-                playerState: {positionIndex}
-            }, state: {loading, showRule, showTBMRule}
-        } = this
+        const {state: {loading, showRule, showTBMRule}} = this
         if (loading) {
             return <Loading label='加载中...'/>
         }
-        if (positionIndex === undefined) {
-            return <Loading label='正在匹配玩家...'/>
-        }
         return <section className={style.play}>
 
-            <Stock/>
-
             {this.renderStage()}
-
-            <InfoBar text={`个人信息： 账户余额${InitMoney / 10000}万元`}/>
-
-            <InfoBar styles={{marginTop: '1rem'}} text={`拥有股票: 10000股`}/>
 
             <Button
                 style={{position: 'absolute', top: '30%', right: '10%'}}
