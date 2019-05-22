@@ -9,6 +9,7 @@ message CreateParams {
                 float exchangeRate = 3;
                 int32 k = 4;
                 int32 interval = 5;
+                int32 reactionType = 6;
             }
             //assignPosition
             float participationFee = 1;

@@ -11,12 +11,6 @@ export enum IDENTITY {
     GDRobot
 }
 
-export enum RobotStartMode {
-    A,
-    B,
-    C
-}
-
 export enum AdjustDirection {
     raise,
     lower
@@ -67,10 +61,6 @@ export interface EventParams {
     partnerId?: number,
 }
 
-export const zipInterval = {
-    fast: 1000,
-    slow: 5000
-}
 export const orderNumberLimit = 10000
 
 export enum SheetType {
@@ -184,4 +174,9 @@ export enum PushType {
 
 export enum FetchType {
     exportXls = 'exportXls'
+}
+
+export enum ReactionType {
+    TradeAndOrder,
+    TradeOnly
 }

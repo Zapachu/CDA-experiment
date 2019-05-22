@@ -15,8 +15,13 @@ export enum SheetType {
     robotSubmitLog = 'robotSubmitLog',
 }
 
-export enum Stage {
+export enum GroupStage {
     matching,
+    trading,
+    over
+}
+
+export enum PeriodStage {
     reading,
     trading,
     result
@@ -74,15 +79,13 @@ export const RedisKey = {
 
 export enum MoveType {
     getGroup = 'getGroup',
-    leaveGroup = 'newGroup',
-    setRole = 'setRole',
+    leaveGroup = 'leaveGroup',
     submitOrder = 'submitOrder',
     cancelOrder = 'cancelOrder'
 }
 
 export enum PushType {
     countDown = 'countDown',
-    gotGroup = 'gotGroup',
     beginTrading = 'beginTrading',
     newOrder = 'newOrder',
     newTrade = 'newTrade'
@@ -98,9 +101,10 @@ export enum GroupType {
 }
 
 export const MATCH_TIME = 5
+export const PERIOD = 6
 
 export const MOCK = {
-    playerLimit: 18,
+    playerLimit: 12,
     price: 200,
     count: 100,
     point: 20000
@@ -109,18 +113,6 @@ export const MOCK = {
 export interface ICreateParams {
     prepareTime: number
     tradeTime: number
-}
-
-export interface IGameGroupState {
-    stage: number
-    orderId: number
-    orders: IOrder[]
-    buyOrderIds: number[]
-    sellOrderIds: number[]
-    trades: ITrade[]
-    playerIndex: number
-    type: GroupType
-    marketPrice: number
 }
 
 export interface IOrder {
@@ -138,20 +130,35 @@ export interface ITrade {
     subOrderId?: number
 }
 
+export interface IGamePeriodState {
+    stage: PeriodStage
+    orders: IOrder[]
+    buyOrderIds: number[]
+    sellOrderIds: number[]
+    trades: ITrade[]
+}
+
+export interface IGameGroupState {
+    type: GroupType
+    stage:GroupStage
+    playerIndex: number
+    periodIndex: number
+}
+
 export interface IGameState {
-    groups: IGameGroupState[]
+    periods: IGamePeriodState[]
+    groups: Array<IGameGroupState>
 }
 
 export interface IPlayerGroupState {
     playerIndex: number
-    role?: ROLE
+    count: number
+    point: number
 }
 
 export interface IPlayerState {
-    groups: IPlayerGroupState[]
+    groups: Array<IPlayerGroupState>
     groupIndex: number
-    count: number
-    point: number
 }
 
 export type IMoveParams = Partial<{
