@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as style from "./style.scss";
+import * as BABYLON from "babylonjs";
 import { Core } from "bespoke-client-util";
 import {
   ICreateParams,
@@ -9,7 +10,7 @@ import {
   IPushParams
 } from "../interface";
 import { FetchType, MoveType, PushType } from "../config";
-import { Header, Button, Input } from "../../../components";
+import { Header, Button, Input, Hall3D } from "../../../components";
 const SLOPED_LINE = require("./assets/sloped_line.svg");
 const HORIZONTAL_LINE = require("./assets/horizontal_line.svg");
 
@@ -39,7 +40,8 @@ export function Play({
         onClick={stage => frameEmitter.emit(MoveType.switchStage, { stage })}
       />
       {currentStage === 0 ? (
-        renderHomePage(frameEmitter, unlockedStage)
+        // renderHomePage(frameEmitter, unlockedStage)
+        <Hall3D />
       ) : (
         <iframe
           style={{ width: "100vw", height: "100vh", border: "none" }}
