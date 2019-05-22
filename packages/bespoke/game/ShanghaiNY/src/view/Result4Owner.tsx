@@ -78,7 +78,7 @@ export class Result4Owner extends Core.Result4Owner<ICreateParams, IGameState, I
                             <td>{lang.point}</td>
                         </tr>
                         {
-                            Object.values(travelStates[travelStates.length - 1].playerStates).map(({seatNumber, finalProfit}, i) =>
+                            Object.values(travelStates[travelStates.length - 1].playerStates).sort((a, b) => Number(a.seatNumber) - Number(b.seatNumber)).map(({seatNumber, finalProfit}, i) =>
                                 <tr key={i}>
                                     <td>{seatNumber === undefined ? lang.unknown : seatNumber}</td>
                                     <td>{isNaN(finalProfit*s+participationFee)?'-':(finalProfit*s+participationFee).toFixed(2)}</td>
