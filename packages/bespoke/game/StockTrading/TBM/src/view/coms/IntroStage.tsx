@@ -1,21 +1,20 @@
-import * as React from "react";
-import * as style from "./style.scss";
-import {Lang, Core} from "bespoke-client-util";
+import * as React from "react"
+import * as style from "./style.scss"
+import {Lang, Core} from "bespoke-client-util"
 import {
     ICreateParams,
     IGameState,
     IMoveParams,
     IPlayerState,
     IPushParams
-} from "../../interface";
+} from "../../interface"
 import {
     FetchType,
     MoveType,
     PushType,
-    PlayerStatus,
-    MATCH_TIMER
-} from "../../config";
-import {Line, PlayMode, MatchModal, Modal} from "../../../../components";
+    PlayerStatus
+} from "../../config"
+import {Line, PlayMode, MatchModal, Modal} from "../../../../components"
 
 interface IPlayState {
     matchTimer: number;
@@ -53,7 +52,7 @@ export default class IntroStage extends Core.Play<ICreateParams,
             frameEmitter,
             playerState: {playerStatus, single, multi},
             game: {
-                params: {groupSize}
+                params: {groupSize, waitingSeconds}
             }
         } = this.props;
         const {matchTimer, matchNum} = this.state;
@@ -74,7 +73,7 @@ export default class IntroStage extends Core.Play<ICreateParams,
                     visible={playerStatus === PlayerStatus.matching && !!multi}
                     totalNum={groupSize}
                     matchNum={matchNum}
-                    timer={MATCH_TIMER - matchTimer}
+                    timer={waitingSeconds - matchTimer}
                 />
                 <Modal
                     visible={playerStatus === PlayerStatus.matching && !!single}

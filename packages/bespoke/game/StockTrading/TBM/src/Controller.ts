@@ -49,6 +49,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             return
         }
         group.playerNum++
+        playerState.positionIndex = group.playerNum
         if (group.isMulti) {
             playerState.multi = {groupIndex}
         } else {
@@ -228,7 +229,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     )
                     this.initState(group, groupPlayerStates)
                 }
-                break
             }
             // case MoveType.prepare: {
             //     const {groupIndex, positionIndex} = playerState
