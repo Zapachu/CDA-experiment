@@ -1,6 +1,5 @@
 import * as React from 'react'
 import * as style from './style.scss'
-// import Header from '../../../components/Header'
 import Line from '../../../components/Line'
 import Input from '../../../components/Input'
 import Button from '../../../components/Button'
@@ -8,16 +7,15 @@ import Loading from '../../../components/Loading'
 import Modal from '../../../components/Modal'
 import Stock from './coms/Stock'
 import InfoBar from './coms/InfoBar'
+import IntroStage from './coms/IntroStage'
 import {Core, Toast} from 'bespoke-client-util'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
-import {FetchType, MoveType, PushType, NEW_ROUND_TIMER, PlayerStatus} from '../config'
-import {ListItem} from "../../../components";
+import {FetchType, MoveType, PushType, PlayerStatus} from '../config'
 
 interface IPlayState {
     price: string
     count: string
     loading: boolean
-    newRoundTimers: Array<number>,
     showRule: boolean,
     showTBMRule: boolean
 }
@@ -27,20 +25,12 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         price: '',
         count: '',
         loading: true,
-        newRoundTimers: [],
         showRule: false,
         showTBMRule: false
     }
 
     async componentDidMount() {
         const {props: {frameEmitter}} = this
-        frameEmitter.on(PushType.newRoundTimer, ({roundIndex, newRoundTimer}) => {
-            this.setState(state => {
-                const newRoundTimers = state.newRoundTimers.slice()
-                newRoundTimers[roundIndex] = newRoundTimer
-                return {newRoundTimers}
-            })
-        })
         frameEmitter.emit(MoveType.getPosition)
         this.setState({loading: false})
     }
@@ -89,15 +79,11 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         const {
             props: {
                 game: {params: {InitMoney}},
-                gameState: {groups},
-                playerState: {groupIndex, positionIndex}
+                playerState: {playerStatus}
             }, state: {price, count}
         } = this
-        const {rounds, roundIndex} = groups[groupIndex],
-            {playerStatus} = rounds[roundIndex]
-        const playerState = playerStatus[positionIndex]
 
-        switch (playerState) {
+        switch (playerStatus) {
             case PlayerStatus.prepared:
                 return <Loading label='正在匹配玩家...'/>
             case PlayerStatus.shouted:
@@ -148,62 +134,37 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
 
     dynamicTip = () => {
         const {
-            props: {
-                gameState: {groups},
-                playerState: {role, groupIndex, positionIndex}
-            }
+            props: {playerState: {role, playerStatus}}
         } = this
-        const {rounds, roundIndex} = groups[groupIndex],
-            {playerStatus} = rounds[roundIndex]
-        const playerState = playerStatus[positionIndex]
-        if (playerState === PlayerStatus.outside) {
-            return '准备'
+        switch (playerStatus) {
+            case PlayerStatus.prepared:
+                switch (role) {
+                    case 0:
+                        return '买入'
+                    case 1:
+                        return '卖出'
+                }
+                break
+            case PlayerStatus.shouted:
+                return '等待其他玩家'
+            default:
+                return 'Playing'
         }
-        if (playerState === PlayerStatus.prepared) {
-            if (role === 0) {
-                return '买入'
-            }
-            return '卖出'
-        }
-        if (playerState === PlayerStatus.shouted) {
-            return '等待其他玩家'
-        }
-        return '正在进行'
     }
 
     dynamicBtnAction = () => {
-        const {
-            props: {
-                gameState: {groups},
-                playerState: {groupIndex, positionIndex}
-            }
-        } = this
-        const {rounds, roundIndex} = groups[groupIndex],
-            {playerStatus} = rounds[roundIndex]
-        const playerState = playerStatus[positionIndex]
-        if (playerState === PlayerStatus.prepared) {
-            return this.shout()
+        const {props: {playerState: {playerStatus}}} = this
+        switch (playerStatus) {
+            case PlayerStatus.prepared:
+                return this.shout()
+            case PlayerStatus.shouted:
+                return
         }
-        if (playerState === PlayerStatus.shouted) {
-            return
-        }
-        if (playerState === PlayerStatus.outside) {
-            return this.prepare()
-        }
-        return
     }
 
     dynamicBtnView = () => {
-        const {
-            props: {
-                gameState: {groups},
-                playerState: {groupIndex, positionIndex}
-            }
-        } = this
-        const {rounds, roundIndex} = groups[groupIndex],
-            {playerStatus} = rounds[roundIndex]
-        const playerState = playerStatus[positionIndex]
-        switch (playerState) {
+        const {props: {playerState: {playerStatus}}} = this
+        switch (playerStatus) {
             case PlayerStatus.outside:
             case PlayerStatus.prepared:
                 return <Button label={this.dynamicTip()} onClick={this.dynamicBtnAction} style={{marginTop: 36}}/>
@@ -213,60 +174,26 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     }
 
     renderResult = () => {
-        const {
-            frameEmitter,
-            game: {params: {InitMoney}},
-            gameState: {groups},
-            playerState: {profits, groupIndex}
-        } = this.props
-        const {roundIndex} = groups[groupIndex]
-        const {price, count} = this.state
-        const listData = [
-            {label: "股票的成交价格", value: Number(price) * Number(count)},
-            {label: "你的购买数量", value: Number(count) || 0},
-            {label: "你的总收益为", value: profits[roundIndex] - InitMoney || 0},
-            {label: "你的初始账户资金", value: InitMoney},
-            {label: "你的现有账户资金", value: profits[roundIndex], red: true}
-        ];
+        // const {
+        //     frameEmitter,
+        //     game: {params: {InitMoney}},
+        //     gameState: {groups},
+        // } = this.props
+        // const {roundIndex} = groups[groupIndex]
+        // const {price, count} = this.state
+        // const listData = [
+        //     {label: "股票的成交价格", value: Number(price) * Number(count)},
+        //     {label: "你的购买数量", value: Number(count) || 0},
+        //     {label: "你的总收益为", value: profits[roundIndex] - InitMoney || 0},
+        //     {label: "你的初始账户资金", value: InitMoney},
+        //     {label: "你的现有账户资金", value: profits[roundIndex], red: true}
+        // ];
         return (
             <>
                 <Line
                     text={"交易结果展示"}
                     style={{margin: "auto", width: "400px", marginTop: "30px", marginBottom: "20px"}}
                 />
-                <ul>
-                    {listData.map(({label, value, red}) => {
-                        return (
-                            <li key={label} style={{marginBottom: "10px"}}>
-                                <ListItem>
-                                    <p className={style.item}>
-                                        <span style={{color: '#fff'}}>{label}:&nbsp;</span>
-                                        <span style={{color: red ? "#F0676D" : "orange"}}>
-                      {value}
-                    </span>
-                                    </p>
-                                </ListItem>
-                            </li>
-                        );
-                    })}
-                </ul>
-                <Line
-                    color={Line.Color.White}
-                    style={{
-                        margin: "auto",
-                        width: "400px",
-                        marginTop: "20px",
-                        marginBottom: "20px"
-                    }}
-                />
-                <div style={{display: "flex", justifyContent: "center"}}>
-                    <Button
-                        label={"下一阶段"}
-                        onClick={() => {
-                            frameEmitter.emit(MoveType.nextStage);
-                        }}
-                    />
-                </div>
             </>
         );
     }
@@ -284,21 +211,18 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     renderStage = () => {
         const {
             props: {
-                gameState: {groups},
-                playerState: {groupIndex, positionIndex}
+                playerState: {playerStatus}
             }
         } = this
-        const {rounds, roundIndex} = groups[groupIndex],
-            {playerStatus} = rounds[roundIndex]
-        const playerState = playerStatus[positionIndex]
 
-        switch (playerState) {
-            case PlayerStatus.outside:
+        switch (playerStatus) {
+            case PlayerStatus.intro:
+            case PlayerStatus.matching:
+                return <IntroStage {...this.props}/>
             case PlayerStatus.prepared:
-            case PlayerStatus.startBid:
             case PlayerStatus.shouted:
                 return this.renderPlay()
-            case PlayerStatus.gameOver:
+            case PlayerStatus.result:
                 return this.renderResult()
 
         }
@@ -308,22 +232,16 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         const {
             props: {
                 game: {params: {InitMoney}},
-                gameState: {groups},
-                playerState: {groupIndex}
-            }, state: {loading, newRoundTimers, showRule, showTBMRule}
+                playerState: {positionIndex}
+            }, state: {loading, showRule, showTBMRule}
         } = this
         if (loading) {
             return <Loading label='加载中...'/>
         }
-        if (groupIndex === undefined) {
+        if (positionIndex === undefined) {
             return <Loading label='正在匹配玩家...'/>
         }
-        const {roundIndex} = groups[groupIndex],
-            newRoundTimer = newRoundTimers[roundIndex],
-            timeLeft = NEW_ROUND_TIMER - newRoundTimer
         return <section className={style.play}>
-
-            {/*<Header stage={}/>*/}
 
             <Stock/>
 
@@ -332,8 +250,6 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             <InfoBar text={`个人信息： 账户余额${InitMoney / 10000}万元`}/>
 
             <InfoBar styles={{marginTop: '1rem'}} text={`拥有股票: 10000股`}/>
-
-            {newRoundTimer ? <InfoBar styles={{marginTop: '1rem'}} text={`结束剩余时间 ${timeLeft}`}/> : null}
 
             <Button
                 style={{position: 'absolute', top: '30%', right: '10%'}}
