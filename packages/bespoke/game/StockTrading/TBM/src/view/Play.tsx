@@ -84,11 +84,9 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         } = this
 
         switch (playerStatus) {
-            case PlayerStatus.prepared:
-                return <Loading label='正在匹配玩家...'/>
             case PlayerStatus.shouted:
                 return <Loading label='您已出价，请等待其他玩家...'/>
-            case PlayerStatus.startBid:
+            case PlayerStatus.prepared:
                 return <div className={style.shoutStage}>
                     <li>
                         <Input
@@ -224,6 +222,8 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 return this.renderPlay()
             case PlayerStatus.result:
                 return this.renderResult()
+            default:
+                return
 
         }
     }
