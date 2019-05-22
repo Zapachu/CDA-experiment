@@ -18,7 +18,7 @@ export enum PushType {
     startBid,
     newRoundTimer,
     nextRound,
-    matchingTimer
+    robotShout,
 }
 
 export enum FetchType {
