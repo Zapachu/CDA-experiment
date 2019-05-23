@@ -4,6 +4,7 @@ import {colorConsole, dailyfile} from 'tracer'
 import {resolve} from 'path'
 import {readFileSync} from 'fs'
 import * as objHash from 'object-hash'
+import {NetworkInterfaceInfo, networkInterfaces} from 'os'
 
 export class Token {
     private static geneCheckCode(chars: string[]) {
@@ -17,19 +18,23 @@ export class Token {
 
     static checkToken(token: string): boolean {
         const [checkCode, ...chars] = token
-        if(chars.length === 32 && checkCode === this.geneCheckCode(chars)){
+        if (chars.length === 32 && checkCode === this.geneCheckCode(chars)) {
             return true
         }
         if (elfSetting.bespokeWithLinker) {
             return token.length === 32
         }
+        Log.w(`Invalid Token: ${token}`)
         return false
     }
 }
 
-export function elfPhaseId2PlayUrl(namespace: string, phaseId: string): string {
+export function gameId2PlayUrl(namespace: string, gameId: string, key?: string): string {
     const {proxyService: {host, port}} = elfSetting
-    return `${host.startsWith('http') ? host : `http://${host}:${port}`}/${config.rootName}/${namespace}/play/${phaseId}`
+    const query = key ? `?token=${Token.geneToken(key)}` : ''
+    const domain = elfSetting.bespokeWithProxy ? host.startsWith('http') ? host : `http://${host}:${port}` :
+        `http://${Setting.ip}:${elfSetting.bespokeHmr ? config.devPort.client : Setting.port}`
+    return `${domain}/${config.rootName}/${namespace}/play/${gameId}${query}`
 }
 
 export namespace Log {
@@ -55,10 +60,15 @@ export namespace Log {
 }
 
 export class Setting {
-    static namespace:string
+    static namespace: string
     static staticPath: string
+    private static _ip: string
     private static _port: number
     private static _rpcPort: number
+
+    static get ip() {
+        return this._ip
+    }
 
     static get port() {
         return this._port
@@ -84,6 +94,13 @@ export class Setting {
         this._port = setting.port || (elfSetting.inProductEnv ? 0 : config.devPort.server)
         this._rpcPort = setting.rpcPort || 0
         Log.init(setting.logPath || resolve(setting.staticPath, '../log'))
+        Object.values<NetworkInterfaceInfo[]>(networkInterfaces()).forEach(infos => {
+            infos.forEach(({family, internal, address}) => {
+                if (family === 'IPv4' && !internal) {
+                    this._ip = address
+                }
+            })
+        })
     }
 
     static getClientPath(): string {

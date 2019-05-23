@@ -23,13 +23,13 @@ export class EventIO {
     static initSocketIOServer(server: Server, subscribeOnConnection: (clientConn: IConnection) => void): socketIO.Server {
         this.socketIOServer = socketIO(server, {path: config.socketPath(Setting.namespace)})
         this.socketIOServer.on(baseEnum.SocketEvent.connection, async (connection: socketIO.Socket) => {
-            const {query: {token, gameId}, session: {passport: {user} = {user: undefined}}} = connection.handshake
+            const {query: {token, gameId}, session: {passport: {user} = {user: undefined}}, sessionID} = connection.handshake
             const game = await GameDAO.getGame(gameId)
             const actor: IActor = Token.checkToken(token) ?
                 game.owner === user ? {type: Actor.clientRobot, token} : {type: Actor.player, token} :
                 game.owner === user ?
                     {type: Actor.owner, token: Token.geneToken(user)} :
-                    {type: Actor.player, token: Token.geneToken(user)}
+                    {type: Actor.player, token: Token.geneToken(user || sessionID)}
             subscribeOnConnection(Object.assign(connection, {actor, game}) as any)
         })
         return this.socketIOServer
