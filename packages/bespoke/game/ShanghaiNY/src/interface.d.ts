@@ -419,8 +419,8 @@ export interface IPlayerState {
     /** PlayerState roundIndex */
     roundIndex?: (number|null);
 
-    /** PlayerState userId */
-    userId?: (string|null);
+    /** PlayerState mobile */
+    mobile?: (string|null);
 }
 
 /** Represents a PlayerState. */
@@ -462,8 +462,8 @@ export class PlayerState implements IPlayerState {
     /** PlayerState roundIndex. */
     public roundIndex: number;
 
-    /** PlayerState userId. */
-    public userId: string;
+    /** PlayerState mobile. */
+    public mobile: string;
 
     /**
      * Creates a new PlayerState instance using the specified properties.
