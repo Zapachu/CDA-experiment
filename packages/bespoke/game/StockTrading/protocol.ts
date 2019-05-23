@@ -21,6 +21,19 @@ export namespace CreateGame {
     }
 }
 
+export namespace PhaseDone{
+    export const name = 'StockTrade:PhaseDone'
+
+    export interface IReq {
+        playUrl: string
+        onceMore: boolean
+    }
+
+    export interface IRes {
+        lobbyUrl: string
+    }
+}
+
 export namespace Example{
     export function handle(){
         RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(CreateGame.name(Phase.CBM), async ({keys}) => {

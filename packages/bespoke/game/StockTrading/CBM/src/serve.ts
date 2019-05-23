@@ -3,7 +3,7 @@ import {namespace} from './config'
 import {Server, RedisCall, gameId2PlayUrl} from 'bespoke-server'
 import Controller from './Controller'
 import Robot from './Robot'
-import {ICreateParams} from './config'
+import {ICreateParams, CONFIG} from './config'
 import {CreateGame, Phase} from '../../protocol'
 
 Server.start(
@@ -16,8 +16,8 @@ RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(CreateGame.name(Phase.CBM), a
         title: `${Phase.CBM}:${Math.random()}`,
         desc: '',
         params: {
-            prepareTime: 15,
-            tradeTime: 180
+            prepareTime: CONFIG.prepareTime,
+            tradeTime: CONFIG.tradeTime
         }
     })
     return {playUrls: keys.map(key => gameId2PlayUrl(namespace, gameId, key))}
