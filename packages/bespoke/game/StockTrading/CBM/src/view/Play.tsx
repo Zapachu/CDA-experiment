@@ -1,9 +1,9 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, FrameEmitter, Lang, Toast} from 'bespoke-client-util'
+import {Core, Lang, Toast} from 'bespoke-client-util'
 import {
     FetchType,
-    GroupStage,
+    GameStage,
     ICreateParams,
     IGameState,
     IMoveParams,
@@ -11,11 +11,11 @@ import {
     IPlayerState,
     IPushParams,
     MATCH_TIME,
-    MOCK,
     MoveType,
     PeriodStage,
     PushType,
-    ROLE
+    ROLE,
+    CONFIG
 } from '../config'
 import {Button, Input, Line, MatchModal, PlayMode} from '../../../components'
 
@@ -142,14 +142,6 @@ function TradeChart({
     </section>
 }
 
-function NotStart({frameEmitter}: { frameEmitter: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams> }) {
-    return <section className={style.notStart}>
-        <Line text={'交易规则介绍'} style={{margin: '10vh 0 2rem'}}/>
-        <video className={style.introVideo}/>
-        <PlayMode onPlay={groupType => frameEmitter.emit(MoveType.getGroup, {groupType})}/>
-    </section>
-}
-
 function Result({count, point}: { count: number, point: number }) {
     const lang = Lang.extractLang({
         toEnterNextPhase1: ['您当前持有股票', 'You have'],
@@ -173,7 +165,7 @@ function Result({count, point}: { count: number, point: number }) {
 
 type TPlayProps = Core.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>
 
-function _Play({game: {params: {prepareTime, tradeTime}}, gameState, playerState, frameEmitter}: TPlayProps) {
+function _Play({gameState, playerState, frameEmitter}: TPlayProps) {
     const STYLE = {
         titleLineStyle: {
             maxWidth: '24rem',
@@ -209,32 +201,27 @@ function _Play({game: {params: {prepareTime, tradeTime}}, gameState, playerState
         marketHistory: ['市场记录', 'Market History'],
         asset: ['资产', 'Asset']
     })
+    const {prepareTime, tradeTime, playerLimit} = CONFIG
     const [countDown, setCountDown] = React.useState(-MATCH_TIME)
     const [price, setPrice] = React.useState('' as number | string)
     const [count, setCount] = React.useState(1 as number | string)
     React.useEffect(() => {
         frameEmitter.on(PushType.countDown, ({countDown}) => setCountDown(countDown))
+        frameEmitter.emit(MoveType.getIndex)
     }, [])
-    const {groupIndex} = playerState
-    if (groupIndex === undefined) {
-        return <NotStart {...{frameEmitter}}/>
-    }
-    const gameGroupState = gameState.groups[groupIndex]
-    if (gameGroupState.stage === GroupStage.matching) {
+    if (gameState.stage === GameStage.matching) {
         return <>
-            <NotStart {...{frameEmitter}}/>
             <MatchModal {...{
                 visible: true,
-                totalNum: MOCK.playerLimit,
-                matchNum: gameGroupState.playerIndex,
+                totalNum: playerLimit,
+                matchNum: gameState.playerIndex,
                 timer: -countDown
             }}/>
         </>
     }
-    const gamePeriodState = gameState.periods[gameGroupState.periodIndex]
-    const playerGroupState = playerState.groups[groupIndex]
+    const gamePeriodState = gameState.periods[gameState.periodIndex]
     if (gamePeriodState.stage === PeriodStage.result) {
-        return <Result count={playerGroupState.count} point={playerGroupState.point}/>
+        return <Result count={playerState.count} point={playerState.point}/>
     }
     const {buyOrderIds, sellOrderIds, trades} = gamePeriodState,
         orderDict: { [id: number]: IOrder } = (() => {
@@ -266,7 +253,7 @@ function _Play({game: {params: {prepareTime, tradeTime}}, gameState, playerState
         if (role === ROLE.Buyer && maxBuyOrder && _price < maxBuyOrder.price) {
             return Toast.warn(lang.invalidBuyPrice)
         }
-        if (count <= 0 || (role === ROLE.Buyer && _price * +count>playerGroupState.point) || (role === ROLE.Buyer && count>playerGroupState.count)) {
+        if (count <= 0 || (role === ROLE.Buyer && _price * +count > playerState.point) || (role === ROLE.Buyer && count > playerState.count)) {
             setCount(0)
             return Toast.warn(lang.invalidCount)
         }
@@ -341,11 +328,11 @@ function _Play({game: {params: {prepareTime, tradeTime}}, gameState, playerState
             <div className={style.summary}>
                 <div>
                     <label>{lang.count}</label>
-                    <em>{playerGroupState.count}</em>
+                    <em>{playerState.count}</em>
                 </div>
                 <div>
                     <label>{lang.point}</label>
-                    <em>{playerGroupState.point}</em>
+                    <em>{playerState.point}</em>
                 </div>
             </div>
         </section>
@@ -373,7 +360,7 @@ function _Play({game: {params: {prepareTime, tradeTime}}, gameState, playerState
                             trades.map(({reqOrderId, resOrderId, count}, i) => {
                                 const reqOrder = orderDict[reqOrderId],
                                     resOrder = orderDict[resOrderId]
-                                if (![reqOrder.playerIndex, resOrder.playerIndex].includes(playerGroupState.playerIndex)) {
+                                if (![reqOrder.playerIndex, resOrder.playerIndex].includes(playerState.playerIndex)) {
                                     return null
                                 }
                                 const price = reqOrder.price
@@ -427,7 +414,7 @@ function _Play({game: {params: {prepareTime, tradeTime}}, gameState, playerState
                 {
                     marketOrderIds.map((orderId, i) => {
                             const orderX = orderDict[orderId],
-                                isMine = orderX.playerIndex === playerGroupState.playerIndex
+                                isMine = orderX.playerIndex === playerState.playerIndex
                             return <li key={orderId}>
                                 <Border key={orderId}
                                         borderRadius='.25rem'

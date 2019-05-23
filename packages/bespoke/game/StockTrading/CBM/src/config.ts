@@ -15,7 +15,7 @@ export enum SheetType {
     robotSubmitLog = 'robotSubmitLog',
 }
 
-export enum GroupStage {
+export enum GameStage {
     matching,
     trading,
     over
@@ -78,8 +78,7 @@ export const RedisKey = {
 }
 
 export enum MoveType {
-    getGroup = 'getGroup',
-    leaveGroup = 'leaveGroup',
+    getIndex = 'getIndex',
     submitOrder = 'submitOrder',
     cancelOrder = 'cancelOrder'
 }
@@ -95,24 +94,22 @@ export enum FetchType {
     exportXls = 'exportXls'
 }
 
-export enum GroupType {
-    Single,
-    Multi
-}
-
 export const MATCH_TIME = 5
 export const PERIOD = 6
 
 export const MOCK = {
-    playerLimit: 12,
     price: 200,
     count: 100,
     point: 20000
 }
 
+export const CONFIG = {
+    playerLimit: 12,
+    prepareTime: 30,
+    tradeTime: 180
+}
+
 export interface ICreateParams {
-    prepareTime: number
-    tradeTime: number
 }
 
 export interface IOrder {
@@ -138,31 +135,20 @@ export interface IGamePeriodState {
     trades: ITrade[]
 }
 
-export interface IGameGroupState {
-    type: GroupType
-    stage:GroupStage
+export interface IGameState {
+    periods: IGamePeriodState[]
+    stage: GameStage
     playerIndex: number
     periodIndex: number
 }
 
-export interface IGameState {
-    periods: IGamePeriodState[]
-    groups: Array<IGameGroupState>
-}
-
-export interface IPlayerGroupState {
+export interface IPlayerState {
     playerIndex: number
     count: number
     point: number
 }
 
-export interface IPlayerState {
-    groups: Array<IPlayerGroupState>
-    groupIndex: number
-}
-
 export type IMoveParams = Partial<{
-    groupType: number
     role: ROLE
     price: number
     count: number
