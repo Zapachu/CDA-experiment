@@ -1,4 +1,4 @@
-import {elfPhaseId2PlayUrl, EventIO, Token, Log} from '../util'
+import {gameId2PlayUrl, EventIO, Token, Log} from '../util'
 import {
     baseEnum,
     FrameEmitter,
@@ -166,7 +166,7 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
             return Log.w('Bespoke单独部署，game未关联至Elf group')
         }
         getGameService().setPhaseResult({
-            playUrl: elfPhaseId2PlayUrl(this.game.namespace, this.game.id),
+            playUrl: gameId2PlayUrl(this.game.namespace, this.game.id),
             playerToken,
             elfGameId: this.game.elfGameId,
             phaseResult
@@ -178,7 +178,7 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
             return Log.w('Bespoke单独部署，game未关联至Elf group')
         }
         getGameService().sendBackPlayer({
-            playUrl: elfPhaseId2PlayUrl(this.game.namespace, this.game.id),
+            playUrl: gameId2PlayUrl(this.game.namespace, this.game.id),
             playerToken,
             nextPhaseKey,
             elfGameId: this.game.elfGameId,

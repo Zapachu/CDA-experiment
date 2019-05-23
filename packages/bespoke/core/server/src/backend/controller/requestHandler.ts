@@ -144,17 +144,13 @@ export class GameCtrl {
 
     static async newGame(req, res) {
         const {namespace, game} = req.body, owner = req.user
-        try {
-            const newGame = await new GameModel({...game, owner, namespace}).save()
-            res.json({
-                code: baseEnum.ResponseCode.success,
-                gameId: newGame.id
-            })
-        } catch (e) {
-            res.json({
-                code: baseEnum.ResponseCode.serverError
-            })
-        }
+        const gameId = await GameDAO.newGame(namespace, owner, game)
+        res.json(gameId ? {
+            code: baseEnum.ResponseCode.success,
+            gameId
+        } : {
+            code: baseEnum.ResponseCode.serverError
+        })
     }
 
     static async getNamespace(req, res) {
