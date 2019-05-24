@@ -2,6 +2,9 @@ import * as $protobuf from "protobufjs";
 /** Properties of a CreateParams. */
 export interface ICreateParams {
 
+    /** CreateParams round */
+    round?: (number|null);
+
     /** CreateParams groupSize */
     groupSize?: (number|null);
 
@@ -38,6 +41,9 @@ export class CreateParams implements ICreateParams {
      * @param [properties] Properties to set
      */
     constructor(properties?: ICreateParams);
+
+    /** CreateParams round. */
+    public round: number;
 
     /** CreateParams groupSize. */
     public groupSize: number;
@@ -344,11 +350,14 @@ export interface IPushParams {
     /** PushParams matchTimer */
     matchTimer?: (number|null);
 
-    /** PushParams shoutTimer */
-    shoutTimer?: (number|null);
-
     /** PushParams matchNum */
     matchNum?: (number|null);
+
+    /** PushParams privatePrice */
+    privatePrice?: (number|null);
+
+    /** PushParams role */
+    role?: (number|null);
 }
 
 /** Represents a PushParams. */
@@ -369,11 +378,14 @@ export class PushParams implements IPushParams {
     /** PushParams matchTimer. */
     public matchTimer: number;
 
-    /** PushParams shoutTimer. */
-    public shoutTimer: number;
-
     /** PushParams matchNum. */
     public matchNum: number;
+
+    /** PushParams privatePrice. */
+    public privatePrice: number;
+
+    /** PushParams role. */
+    public role: number;
 
     /**
      * Creates a new PushParams instance using the specified properties.
@@ -544,17 +556,11 @@ export namespace GameState {
         /** Group roundIndex */
         roundIndex?: (number|null);
 
-        /** Group rounds */
-        rounds?: (GameState.Group.IRound[]|null);
-
         /** Group playerNum */
         playerNum?: (number|null);
 
         /** Group results */
         results?: (GameState.Group.IResult[]|null);
-
-        /** Group isMulti */
-        isMulti?: (boolean|null);
     }
 
     /** Represents a Group. */
@@ -569,17 +575,11 @@ export namespace GameState {
         /** Group roundIndex. */
         public roundIndex: number;
 
-        /** Group rounds. */
-        public rounds: GameState.Group.IRound[];
-
         /** Group playerNum. */
         public playerNum: number;
 
         /** Group results. */
         public results: GameState.Group.IResult[];
-
-        /** Group isMulti. */
-        public isMulti: boolean;
 
         /**
          * Creates a new Group instance using the specified properties.
@@ -653,96 +653,6 @@ export namespace GameState {
     }
 
     namespace Group {
-
-        /** Properties of a Round. */
-        interface IRound {
-
-            /** Round playerStatus */
-            playerStatus?: (number[]|null);
-        }
-
-        /** Represents a Round. */
-        class Round implements IRound {
-
-            /**
-             * Constructs a new Round.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: GameState.Group.IRound);
-
-            /** Round playerStatus. */
-            public playerStatus: number[];
-
-            /**
-             * Creates a new Round instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns Round instance
-             */
-            public static create(properties?: GameState.Group.IRound): GameState.Group.Round;
-
-            /**
-             * Encodes the specified Round message. Does not implicitly {@link GameState.Group.Round.verify|verify} messages.
-             * @param message Round message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: GameState.Group.IRound, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Encodes the specified Round message, length delimited. Does not implicitly {@link GameState.Group.Round.verify|verify} messages.
-             * @param message Round message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encodeDelimited(message: GameState.Group.IRound, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a Round message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns Round
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): GameState.Group.Round;
-
-            /**
-             * Decodes a Round message from the specified reader or buffer, length delimited.
-             * @param reader Reader or buffer to decode from
-             * @returns Round
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): GameState.Group.Round;
-
-            /**
-             * Verifies a Round message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-
-            /**
-             * Creates a Round message from a plain object. Also converts values to their respective internal types.
-             * @param object Plain object
-             * @returns Round
-             */
-            public static fromObject(object: { [k: string]: any }): GameState.Group.Round;
-
-            /**
-             * Creates a plain object from a Round message. Also converts values to other types if specified.
-             * @param message Round
-             * @param [options] Conversion options
-             * @returns Plain object
-             */
-            public static toObject(message: GameState.Group.Round, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-            /**
-             * Converts this Round to JSON.
-             * @returns JSON object
-             */
-            public toJSON(): { [k: string]: any };
-        }
 
         /** Properties of a Result. */
         interface IResult {
@@ -845,20 +755,29 @@ export namespace GameState {
 /** Properties of a PlayerState. */
 export interface IPlayerState {
 
+    /** PlayerState groupIndex */
+    groupIndex?: (number|null);
+
+    /** PlayerState positionIndex */
+    positionIndex?: (number|null);
+
+    /** PlayerState privatePrice */
+    privatePrice?: (number|null);
+
+    /** PlayerState price */
+    price?: (number|null);
+
+    /** PlayerState profit */
+    profit?: (number|null);
+
     /** PlayerState role */
     role?: (number|null);
-
-    /** PlayerState multi */
-    multi?: (PlayerState.IMulti|null);
-
-    /** PlayerState single */
-    single?: (PlayerState.ISingle|null);
 
     /** PlayerState playerStatus */
     playerStatus?: (number|null);
 
-    /** PlayerState positionIndex */
-    positionIndex?: (number|null);
+    /** PlayerState bidNum */
+    bidNum?: (number|null);
 }
 
 /** Represents a PlayerState. */
@@ -870,20 +789,29 @@ export class PlayerState implements IPlayerState {
      */
     constructor(properties?: IPlayerState);
 
+    /** PlayerState groupIndex. */
+    public groupIndex: number;
+
+    /** PlayerState positionIndex. */
+    public positionIndex: number;
+
+    /** PlayerState privatePrice. */
+    public privatePrice: number;
+
+    /** PlayerState price. */
+    public price: number;
+
+    /** PlayerState profit. */
+    public profit: number;
+
     /** PlayerState role. */
     public role: number;
-
-    /** PlayerState multi. */
-    public multi?: (PlayerState.IMulti|null);
-
-    /** PlayerState single. */
-    public single?: (PlayerState.ISingle|null);
 
     /** PlayerState playerStatus. */
     public playerStatus: number;
 
-    /** PlayerState positionIndex. */
-    public positionIndex: number;
+    /** PlayerState bidNum. */
+    public bidNum: number;
 
     /**
      * Creates a new PlayerState instance using the specified properties.
@@ -954,328 +882,4 @@ export class PlayerState implements IPlayerState {
      * @returns JSON object
      */
     public toJSON(): { [k: string]: any };
-}
-
-export namespace PlayerState {
-
-    /** Properties of a Multi. */
-    interface IMulti {
-
-        /** Multi privateValue */
-        privateValue?: (number|null);
-
-        /** Multi price */
-        price?: (number|null);
-
-        /** Multi bidNum */
-        bidNum?: (number|null);
-
-        /** Multi profit */
-        profit?: (number|null);
-
-        /** Multi groupIndex */
-        groupIndex?: (number|null);
-    }
-
-    /** Represents a Multi. */
-    class Multi implements IMulti {
-
-        /**
-         * Constructs a new Multi.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: PlayerState.IMulti);
-
-        /** Multi privateValue. */
-        public privateValue: number;
-
-        /** Multi price. */
-        public price: number;
-
-        /** Multi bidNum. */
-        public bidNum: number;
-
-        /** Multi profit. */
-        public profit: number;
-
-        /** Multi groupIndex. */
-        public groupIndex: number;
-
-        /**
-         * Creates a new Multi instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns Multi instance
-         */
-        public static create(properties?: PlayerState.IMulti): PlayerState.Multi;
-
-        /**
-         * Encodes the specified Multi message. Does not implicitly {@link PlayerState.Multi.verify|verify} messages.
-         * @param message Multi message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: PlayerState.IMulti, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Encodes the specified Multi message, length delimited. Does not implicitly {@link PlayerState.Multi.verify|verify} messages.
-         * @param message Multi message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: PlayerState.IMulti, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Decodes a Multi message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns Multi
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): PlayerState.Multi;
-
-        /**
-         * Decodes a Multi message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns Multi
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): PlayerState.Multi;
-
-        /**
-         * Verifies a Multi message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
-
-        /**
-         * Creates a Multi message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns Multi
-         */
-        public static fromObject(object: { [k: string]: any }): PlayerState.Multi;
-
-        /**
-         * Creates a plain object from a Multi message. Also converts values to other types if specified.
-         * @param message Multi
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: PlayerState.Multi, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-        /**
-         * Converts this Multi to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
-    }
-
-    /** Properties of a Single. */
-    interface ISingle {
-
-        /** Single rounds */
-        rounds?: (PlayerState.Single.IRound[]|null);
-
-        /** Single groupIndex */
-        groupIndex?: (number|null);
-    }
-
-    /** Represents a Single. */
-    class Single implements ISingle {
-
-        /**
-         * Constructs a new Single.
-         * @param [properties] Properties to set
-         */
-        constructor(properties?: PlayerState.ISingle);
-
-        /** Single rounds. */
-        public rounds: PlayerState.Single.IRound[];
-
-        /** Single groupIndex. */
-        public groupIndex: number;
-
-        /**
-         * Creates a new Single instance using the specified properties.
-         * @param [properties] Properties to set
-         * @returns Single instance
-         */
-        public static create(properties?: PlayerState.ISingle): PlayerState.Single;
-
-        /**
-         * Encodes the specified Single message. Does not implicitly {@link PlayerState.Single.verify|verify} messages.
-         * @param message Single message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encode(message: PlayerState.ISingle, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Encodes the specified Single message, length delimited. Does not implicitly {@link PlayerState.Single.verify|verify} messages.
-         * @param message Single message or plain object to encode
-         * @param [writer] Writer to encode to
-         * @returns Writer
-         */
-        public static encodeDelimited(message: PlayerState.ISingle, writer?: $protobuf.Writer): $protobuf.Writer;
-
-        /**
-         * Decodes a Single message from the specified reader or buffer.
-         * @param reader Reader or buffer to decode from
-         * @param [length] Message length if known beforehand
-         * @returns Single
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): PlayerState.Single;
-
-        /**
-         * Decodes a Single message from the specified reader or buffer, length delimited.
-         * @param reader Reader or buffer to decode from
-         * @returns Single
-         * @throws {Error} If the payload is not a reader or valid buffer
-         * @throws {$protobuf.util.ProtocolError} If required fields are missing
-         */
-        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): PlayerState.Single;
-
-        /**
-         * Verifies a Single message.
-         * @param message Plain object to verify
-         * @returns `null` if valid, otherwise the reason why it is not
-         */
-        public static verify(message: { [k: string]: any }): (string|null);
-
-        /**
-         * Creates a Single message from a plain object. Also converts values to their respective internal types.
-         * @param object Plain object
-         * @returns Single
-         */
-        public static fromObject(object: { [k: string]: any }): PlayerState.Single;
-
-        /**
-         * Creates a plain object from a Single message. Also converts values to other types if specified.
-         * @param message Single
-         * @param [options] Conversion options
-         * @returns Plain object
-         */
-        public static toObject(message: PlayerState.Single, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-        /**
-         * Converts this Single to JSON.
-         * @returns JSON object
-         */
-        public toJSON(): { [k: string]: any };
-    }
-
-    namespace Single {
-
-        /** Properties of a Round. */
-        interface IRound {
-
-            /** Round privateValue */
-            privateValue?: (number|null);
-
-            /** Round price */
-            price?: (number|null);
-
-            /** Round bidNum */
-            bidNum?: (number|null);
-
-            /** Round profit */
-            profit?: (number|null);
-        }
-
-        /** Represents a Round. */
-        class Round implements IRound {
-
-            /**
-             * Constructs a new Round.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: PlayerState.Single.IRound);
-
-            /** Round privateValue. */
-            public privateValue: number;
-
-            /** Round price. */
-            public price: number;
-
-            /** Round bidNum. */
-            public bidNum: number;
-
-            /** Round profit. */
-            public profit: number;
-
-            /**
-             * Creates a new Round instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns Round instance
-             */
-            public static create(properties?: PlayerState.Single.IRound): PlayerState.Single.Round;
-
-            /**
-             * Encodes the specified Round message. Does not implicitly {@link PlayerState.Single.Round.verify|verify} messages.
-             * @param message Round message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: PlayerState.Single.IRound, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Encodes the specified Round message, length delimited. Does not implicitly {@link PlayerState.Single.Round.verify|verify} messages.
-             * @param message Round message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encodeDelimited(message: PlayerState.Single.IRound, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a Round message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns Round
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): PlayerState.Single.Round;
-
-            /**
-             * Decodes a Round message from the specified reader or buffer, length delimited.
-             * @param reader Reader or buffer to decode from
-             * @returns Round
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): PlayerState.Single.Round;
-
-            /**
-             * Verifies a Round message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-
-            /**
-             * Creates a Round message from a plain object. Also converts values to their respective internal types.
-             * @param object Plain object
-             * @returns Round
-             */
-            public static fromObject(object: { [k: string]: any }): PlayerState.Single.Round;
-
-            /**
-             * Creates a plain object from a Round message. Also converts values to other types if specified.
-             * @param message Round
-             * @param [options] Conversion options
-             * @returns Plain object
-             */
-            public static toObject(message: PlayerState.Single.Round, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-            /**
-             * Converts this Round to JSON.
-             * @returns JSON object
-             */
-            public toJSON(): { [k: string]: any };
-        }
-    }
 }
