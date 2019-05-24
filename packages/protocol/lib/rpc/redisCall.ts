@@ -37,8 +37,8 @@ export namespace RedisCall {
         const redis = getRedisClient()
         const key = geneReqKey(), reqPack: IReqPack<IReq> = {method, params, key}
         redis.rpush(getServiceKey(method), JSON.stringify(reqPack))
-        const [, resText] = await redis.blpop(key, 0 as any)
-        return resText ? JSON.parse(resText) : null
+        const res = await redis.blpop(key, 1 as any)
+        return res ? JSON.parse(res[1]) : null
     }
 }
 
