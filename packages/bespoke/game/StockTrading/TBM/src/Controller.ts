@@ -1,6 +1,16 @@
-import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from "bespoke-server"
+import {
+    BaseController,
+    baseEnum,
+    gameId2PlayUrl,
+    IActor,
+    IMoveCallback,
+    RedisCall,
+    TGameState,
+    TPlayerState
+} from "bespoke-server"
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from "./interface"
-import {FetchType, MoveType, OUT_TIME, PlayerStatus, PushType} from './config'
+import {FetchType, MoveType, OUT_TIME, PlayerStatus, PushType, namespace} from './config'
+import {PhaseDone} from "../../protocol"
 
 const getBestMatching = G => {
     const MATCHED = 'matched',
@@ -29,6 +39,7 @@ const getBestMatching = G => {
 export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
     initGameState(): TGameState<IGameState> {
         const gameState = super.initGameState()
+        gameState.status = baseEnum.GameStatus.started
         gameState.groups = []
         return gameState
     }
@@ -166,8 +177,13 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 break
             }
             case MoveType.nextStage: {
+                const {onceMore} = params
+                const res = await RedisCall.call<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, {
+                    playUrl: gameId2PlayUrl(namespace, this.game.id, actor.token),
+                    onceMore
+                })
+                res ? cb(res.lobbyUrl) : null
                 break;
-                // todo connect to other stage
             }
             case MoveType.shout: {
                 const {groupIndex} = playerState,

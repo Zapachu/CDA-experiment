@@ -214,9 +214,17 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 />
                 <div style={{display: "flex", justifyContent: "center"}}>
                     <Button
+                        label={"再玩一局"}
+                        color={Button.Color.Blue}
+                        style={{marginRight: "20px"}}
+                        onClick={() => {
+                            frameEmitter.emit(MoveType.nextStage, {onceMore: true})
+                        }}
+                    />
+                    <Button
                         label={"下一阶段"}
                         onClick={() => {
-                            frameEmitter.emit(MoveType.nextStage);
+                            frameEmitter.emit(MoveType.nextStage, {onceMore: false})
                         }}
                     />
                 </div>
