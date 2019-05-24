@@ -35,52 +35,55 @@ $color-red: #d6444e;
       height: 100%;
     }
 
-    .yourTrades {
-      @include panel;
 
-      .tradeList {
-        table-layout: fixed;
-        text-align: center;
-        margin: 1rem;
-        flex-grow: 1;
-        overflow: auto;
+    .tradePanel {
+      .yourTrades {
+        @include panel;
 
-        tr {
-          height: 2rem;
+        .tradeList {
+          table-layout: fixed;
+          text-align: center;
+          margin: 1rem;
+          flex-grow: 1;
+          overflow: auto;
 
-          th {
-            width: 5rem;
-            font-weight: normal;
-          }
+          tr {
+            height: 2rem;
 
-          td {
-            color: $color-orange;
-
-            &:first-child {
-              color: $color-light;
+            th {
+              width: 5rem;
+              font-weight: normal;
             }
 
-            &:last-child {
-              color: $color-red;
+            td {
+              color: $color-orange;
+
+              &:first-child {
+                color: $color-light;
+              }
+
+              &:last-child {
+                color: $color-red;
+              }
             }
           }
         }
       }
-    }
 
-    .summary {
-      margin: 1rem;
-      display: flex;
+      .summary {
+        margin: 1rem;
+        display: flex;
 
-      div {
-        padding: 1rem;
+        div {
+          padding: 1rem;
 
-        em {
-          display: inline-block;
-          width: 6rem;
-          font-size: $fontSize-large;
-          color: $color-orange;
-          text-align: center;
+          em {
+            display: inline-block;
+            width: 6rem;
+            font-size: $fontSize-large;
+            color: $color-orange;
+            text-align: center;
+          }
         }
       }
     }
@@ -100,31 +103,35 @@ $color-red: #d6444e;
           table-layout: fixed;
           text-align: center;
 
-          .orderPrices {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: .5rem;
+          .orderTable {
+            margin: auto;
 
-            .orderPrice {
-              background: $color-dark2;
-              display: flex;
-              width: 5rem;
+            tr {
               height: 2rem;
-              align-items: center;
-              justify-content: space-between;
-              padding: 0 1rem;
 
-              label {
+              th {
+                font-weight: normal;
                 width: 4rem;
+
+                &:last-child {
+                  width: 1rem;
+                }
               }
 
-              .btnCancel {
-                color: rgba($color-orange, .7);
-                transition: $transition-normal;
+              td {
+                color: $color-red;
 
-                &:hover {
-                  color: $color-red;
+                &.count {
+                  color: $color-orange;
+                }
+
+                .btnCancel {
+                  color: $color-light;
+                  transition: $transition-normal;
+
+                  &:hover {
+                    color: $color-red;
+                  }
                 }
               }
             }
@@ -156,8 +163,12 @@ $color-red: #d6444e;
 
             label {
               margin: 1rem;
-              font-size: .8rem;
-              opacity: .4;
+
+              em {
+                margin: 1rem;
+                font-size: $fontSize-large;
+                color: $color-orange;
+              }
             }
           }
 
@@ -184,10 +195,26 @@ $color-red: #d6444e;
     }
   }
 
-  .result {
+  .resultWrapper {
     text-align: center;
 
-    p {
+    .result {
+      .resultTitle {
+        margin: 2rem;
+        font-size: $fontSize-large;
+      }
+
+      .resultTable {
+        margin: auto;
+
+        td {
+          padding: 1rem 2rem;
+          border: 1px solid;
+        }
+      }
+    }
+
+    .toNextPeriod {
       margin: 2rem;
       font-size: $fontSize-large;
 
@@ -198,7 +225,8 @@ $color-red: #d6444e;
       }
     }
 
-    .switchBtns {
+    .switchBtns{
+      margin: 2rem;
       display: flex;
       justify-content: center;
     }
