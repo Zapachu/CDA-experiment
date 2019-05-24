@@ -349,6 +349,12 @@ export interface IPushParams {
 
     /** PushParams matchNum */
     matchNum?: (number|null);
+
+    /** PushParams privateValue */
+    privateValue?: (number|null);
+
+    /** PushParams role */
+    role?: (number|null);
 }
 
 /** Represents a PushParams. */
@@ -374,6 +380,12 @@ export class PushParams implements IPushParams {
 
     /** PushParams matchNum. */
     public matchNum: number;
+
+    /** PushParams privateValue. */
+    public privateValue: number;
+
+    /** PushParams role. */
+    public role: number;
 
     /**
      * Creates a new PushParams instance using the specified properties.

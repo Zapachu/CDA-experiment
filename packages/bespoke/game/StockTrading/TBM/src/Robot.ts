@@ -10,17 +10,13 @@ import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from 
 
 export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     async init() {
-        // online and getPosition
 
         setTimeout(() => this.frameEmitter.emit(MoveType.joinRobot), 2000)
-        setTimeout(() => this.frameEmitter.emit(MoveType.prepare), 4000)
 
         // shout stage
-        this.frameEmitter.on(PushType.robotShout, () => {
-            const privatePrice = this.playerState.multi.privateValue
-            const role = this.playerState.role
-            const price = this.genPrice(role, privatePrice)
-            this.frameEmitter.emit(MoveType.shout, {price})
+        this.frameEmitter.on(PushType.robotShout, ({role, privateValue}) => {
+            const price = this.genPrice(role, privateValue)
+            this.frameEmitter.emit(MoveType.shout, {price, num: 1})
         })
 
         // round switch

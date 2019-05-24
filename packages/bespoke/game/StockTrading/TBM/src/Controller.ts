@@ -77,20 +77,40 @@ export default class Controller extends BaseController<ICreateParams, IGameState
     }
 
     processProfits(playerStates: Array<IPlayerState>, group: GameState.IGroup, groupPlayerStates: Array<TPlayerState<IPlayerState>>) {
-        const buyerStates = playerStates.filter(s => s.role === 0).map(s => s)
-        const sellerStates = playerStates.filter(s => s.role === 1).map(s => s)
-        const intentionG = buyerStates.map(({multi: {price: buyPrice, bidNum: buyBidNum}}) =>
-            sellerStates.map(({multi: {price: sellerPrice, bidNum: sellerBidNum}}) =>
-                buyBidNum * buyPrice >= sellerBidNum * sellerPrice))
-        group.results = []
-        getBestMatching(intentionG)
-            .forEach(async ([buyerIndex, sellerIndex]) => {
-                group.results.push({
-                    buyerPosition: buyerStates[buyerIndex].positionIndex,
-                    sellerPosition: sellerStates[sellerIndex].positionIndex
+        const {roundIndex, isMulti} = group
+        if (isMulti) {
+            const buyerStates = playerStates.filter(s => s.role === 0).map(s => s)
+            const sellerStates = playerStates.filter(s => s.role === 1).map(s => s)
+            const intentionG = buyerStates.map(({multi: {price: buyPrice, bidNum: buyBidNum}}) =>
+                sellerStates.map(({multi: {price: sellerPrice, bidNum: sellerBidNum}}) =>
+                    buyBidNum * buyPrice >= sellerBidNum * sellerPrice))
+            group.results = []
+            getBestMatching(intentionG)
+                .forEach(async ([buyerIndex, sellerIndex]) => {
+                    group.results.push({
+                        buyerPosition: buyerStates[buyerIndex].positionIndex,
+                        sellerPosition: sellerStates[sellerIndex].positionIndex
+                    })
                 })
-            })
-        groupPlayerStates.map(p => p.multi.profit = p.multi.privateValue - p.multi.price * p.multi.bidNum)
+            groupPlayerStates.map(p => p.multi.profit = p.multi.privateValue - p.multi.price * p.multi.bidNum)
+        } else {
+            const buyerStates = playerStates.filter(s => s.role === 0).map(s => s)
+            const sellerStates = playerStates.filter(s => s.role === 1).map(s => s)
+            const intentionG = buyerStates.map(({single: {rounds: buyerRounds}}) =>
+                sellerStates.map(({single: {rounds: sellerRounds}}) =>
+                    buyerRounds[roundIndex].price * buyerRounds[roundIndex].bidNum >=
+                    sellerRounds[roundIndex].price * sellerRounds[roundIndex].bidNum))
+            group.results = []
+            console.log(intentionG)
+            getBestMatching(intentionG)
+                .forEach(async ([buyerIndex, sellerIndex]) => {
+                    group.results.push({
+                        buyerPosition: buyerStates[buyerIndex].positionIndex,
+                        sellerPosition: sellerStates[sellerIndex].positionIndex
+                    })
+                })
+            groupPlayerStates.map(p => p.multi.profit = p.multi.privateValue - p.multi.price * p.multi.bidNum)
+        }
     }
 
     autoProcessProfits(group: GameState.IGroup, groupPlayerStates: Array<TPlayerState<IPlayerState>>) {
@@ -140,14 +160,10 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         if (isMulti) {
             this.startShoutTicking(group, groupPlayerStates[0].multi.groupIndex)
         }
-        console.log(positions)
-        groupPlayerStates.forEach((s, i) => {
-            console.log(s)
-            console.log(s.role)
-            console.log(positions[1].role)
+        groupPlayerStates.forEach(async (s, i) => {
             s.role = positions[s.positionIndex].role
-            console.log(s.positionIndex)
             if (isMulti) {
+                s.multi.privateValue = positions[s.positionIndex].privatePrice
                 s.multi.privateValue = positions[s.positionIndex].privatePrice
             } else {
                 let playerRound = s.single.rounds[roundIndex]
@@ -157,8 +173,14 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 playerRound.privateValue = positions[s.positionIndex].privatePrice
             }
             s.playerStatus = PlayerStatus.prepared
-            setTimeout(() => {
-                this.push(s.actor, PushType.robotShout)
+            await setTimeout(() => {
+                this.push(
+                    s.actor,
+                    PushType.robotShout,
+                    {
+                        role: s.role,
+                        privateValue: isMulti ? s.multi.privateValue : s.single.rounds[roundIndex].privateValue
+                    })
             }, 600 * (i + 1))
         })
     }
@@ -257,20 +279,23 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 // todo connect to other stage
             }
             case MoveType.shout: {
-                const group = gameState.groups[playerState.single.groupIndex]
-                const {roundIndex} = group
+                const playerStatus = playerState.playerStatus
+                if (playerStatus === PlayerStatus.shouted) {
+                    return
+                }
+                let group: GameState.IGroup
                 let groupIndex: number
-                if (playerState.playerStatus === PlayerStatus.shouted) {
-                    break
-                }
                 if (playerState.single) {
+                    const { rounds: playerRounds } = playerState.single
                     groupIndex = playerState.single.groupIndex
+                    group = gameState.groups[groupIndex]
+                    const { roundIndex} = group
                     playerState.playerStatus = PlayerStatus.shouted
-                    playerState.single.rounds[roundIndex].price = params.price
-                    playerState.single.rounds[roundIndex].bidNum = params.num
-                }
-                if (playerState.multi) {
+                    playerRounds[roundIndex].price = params.price
+                    playerRounds[roundIndex].bidNum = params.num
+                } else {
                     groupIndex = playerState.multi.groupIndex
+                    group = gameState.groups[groupIndex]
                     playerState.playerStatus = PlayerStatus.shouted
                     playerState.multi.price = params.price
                     playerState.multi.bidNum = params.num

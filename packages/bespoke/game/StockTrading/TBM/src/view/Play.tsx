@@ -67,7 +67,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         if (Number.isNaN(price) || price > InitMoney) {
             Toast.warn('输入的值无效')
         } else {
-            frameEmitter.emit(MoveType.shout, {price: +price})
+            frameEmitter.emit(MoveType.shout, {price: +price, num: Number(state.count)})
         }
     }
 
