@@ -1,6 +1,6 @@
 import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from "bespoke-server"
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from "./interface"
-import {FetchType, MoveType, NEW_ROUND_TIMER, OUT_TIME, PlayerStatus, PushType} from './config'
+import {FetchType, MoveType, OUT_TIME, PlayerStatus, PushType} from './config'
 
 const getBestMatching = G => {
     const MATCHED = 'matched',
@@ -64,6 +64,18 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 playerState.role = positions[playerState.positionIndex].role
                 playerState.privatePrice = positions[playerState.positionIndex].privatePrice
                 playerState.playerStatus = PlayerStatus.matching
+                const groupPlayerStates = Object.values(playerStates).filter(s => s.groupIndex === groupIndex)
+                if (groupPlayerStates.length === groupSize && groupPlayerStates.every(p => p.playerStatus === PlayerStatus.matching)) {
+                    groupPlayerStates.map((p, i) => {
+                        p.playerStatus = PlayerStatus.prepared
+                        setTimeout(() => {
+                            this.push(p.actor, PushType.startBid, {
+                                role: p.role,
+                                privatePrice: p.privatePrice,
+                            })
+                        }, 1000 * i)
+                    })
+                }
                 break
             }
             case MoveType.startSingle: {
@@ -80,7 +92,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 }
 
                 if (gameState.groups[groupIndex].playerNum < groupSize) {
-                    for (let num = 0; num < groupSize - gameState.groups[groupIndex].playerNum; num++) {
+                    for (let num = 0; num < groupSize - 1; num++) {
                         await this.startNewRobotScheduler(`Robot_${num}`, false)
                     }
                 }
@@ -91,8 +103,15 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 playerState.playerStatus = PlayerStatus.matching
                 const groupPlayerStates = Object.values(playerStates).filter(s => s.groupIndex === groupIndex)
                 if (groupPlayerStates.length === groupSize && groupPlayerStates.every(p => p.playerStatus === PlayerStatus.matching)) {
-                    groupPlayerStates.map(p => p.playerStatus = PlayerStatus.prepared)
-                    this.broadcast(PushType.startBid)
+                    groupPlayerStates.map((p, i) => {
+                        p.playerStatus = PlayerStatus.prepared
+                        setTimeout(() => {
+                            this.push(p.actor, PushType.startBid, {
+                                role: p.role,
+                                privatePrice: p.privatePrice,
+                            })
+                        }, 1000 * i)
+                    })
                 }
                 break
             }
@@ -134,8 +153,15 @@ export default class Controller extends BaseController<ICreateParams, IGameState
 
                 const groupPlayerStates = Object.values(playerStates).filter(s => s.groupIndex === groupIndex)
                 if (groupPlayerStates.length === groupSize && groupPlayerStates.every(p => p.playerStatus === PlayerStatus.matching)) {
-                    groupPlayerStates.map(p => p.playerStatus = PlayerStatus.prepared)
-                    this.broadcast(PushType.startBid)
+                    groupPlayerStates.map((p, i) => {
+                        p.playerStatus = PlayerStatus.prepared
+                        setTimeout(() => {
+                            this.push(p.actor, PushType.startBid, {
+                                role: p.role,
+                                privatePrice: p.privatePrice,
+                            })
+                        }, 1000 * i)
+                    })
                 }
                 break
             }
@@ -164,9 +190,10 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                                 sellerPosition: sellerStates[sellerIndex].positionIndex
                             })
                         })
-                    groupPlayerStates.map(p => p.profit = p.privatePrice - p.price * p.bidNum)
-                    await this.stateManager.syncState()
-                    groupPlayerStates.map(p => p.playerStatus = PlayerStatus.result)
+                    groupPlayerStates.map(p => {
+                        p.profit = p.privatePrice - p.price * p.bidNum
+                        p.playerStatus = PlayerStatus.result
+                    })
                     await this.stateManager.syncState()
                     return
                 }

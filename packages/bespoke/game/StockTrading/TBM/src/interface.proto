@@ -27,6 +27,8 @@ message PushParams {
     int32 newRoundTimer = 2;
     int32 matchTimer = 3;
     int32 matchNum = 4;
+    int32 privatePrice = 5;
+    int32 role = 6;
 }
 
 message GameState {
