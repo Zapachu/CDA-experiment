@@ -7,6 +7,7 @@ import Loading from '../../../components/Loading'
 import Modal from '../../../components/Modal'
 import Stock from './coms/Stock'
 import InfoBar from './coms/InfoBar'
+import ListItem from '../../../components/ListItem'
 import IntroStage from './coms/IntroStage'
 import {Core, Toast} from 'bespoke-client-util'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
@@ -30,8 +31,6 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     }
 
     async componentDidMount() {
-        const {props: {frameEmitter}} = this
-        frameEmitter.emit(MoveType.getPosition)
         this.setState({loading: false})
     }
 
@@ -169,26 +168,58 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     }
 
     renderResult = () => {
-        // const {
-        //     frameEmitter,
-        //     game: {params: {InitMoney}},
-        //     gameState: {groups},
-        // } = this.props
-        // const {roundIndex} = groups[groupIndex]
-        // const {price, count} = this.state
-        // const listData = [
-        //     {label: "股票的成交价格", value: Number(price) * Number(count)},
-        //     {label: "你的购买数量", value: Number(count) || 0},
-        //     {label: "你的总收益为", value: profits[roundIndex] - InitMoney || 0},
-        //     {label: "你的初始账户资金", value: InitMoney},
-        //     {label: "你的现有账户资金", value: profits[roundIndex], red: true}
-        // ];
+        const {
+            frameEmitter,
+            game: {params: {InitMoney}},
+            playerState: {profit}
+        } = this.props
+        const {price, count} = this.state
+        const listData = [
+            {label: "股票的成交价格", value: Number(price) * Number(count)},
+            {label: "你的购买数量", value: Number(count) || 0},
+            {label: "你的总收益为", value: profit - InitMoney || 0},
+            {label: "你的初始账户资金", value: InitMoney},
+            {label: "你的现有账户资金", value: profit, red: true}
+        ];
         return (
             <>
                 <Line
                     text={"交易结果展示"}
                     style={{margin: "auto", width: "400px", marginTop: "30px", marginBottom: "20px"}}
                 />
+                <ul>
+                    {listData.map(({label, value, red}) => {
+                        return (
+                            <li key={label} style={{marginBottom: "10px"}}>
+                                <ListItem>
+                                    <p className={style.item}>
+                                        <span style={{color: '#fff'}}>{label}:&nbsp;</span>
+                                        <span style={{color: red ? "#F0676D" : "orange"}}>
+                      {value}
+                    </span>
+                                    </p>
+                                </ListItem>
+                            </li>
+                        );
+                    })}
+                </ul>
+                <Line
+                    color={Line.Color.White}
+                    style={{
+                        margin: "auto",
+                        width: "400px",
+                        marginTop: "20px",
+                        marginBottom: "20px"
+                    }}
+                />
+                <div style={{display: "flex", justifyContent: "center"}}>
+                    <Button
+                        label={"下一阶段"}
+                        onClick={() => {
+                            frameEmitter.emit(MoveType.nextStage);
+                        }}
+                    />
+                </div>
             </>
         );
     }

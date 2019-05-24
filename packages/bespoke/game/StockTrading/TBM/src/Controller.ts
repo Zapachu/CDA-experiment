@@ -1,6 +1,6 @@
 import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from "bespoke-server"
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from "./interface"
-import {FetchType, MoveType, PlayerStatus, PushType, SHOUT_TIMER} from './config'
+import {FetchType, MoveType, NEW_ROUND_TIMER, OUT_TIME, PlayerStatus, PushType} from './config'
 
 const getBestMatching = G => {
     const MATCHED = 'matched',
@@ -27,10 +27,6 @@ const getBestMatching = G => {
 }
 
 export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
-
-    private matchIntervals: { [groupIndex: string]: NodeJS.Timer } = {}
-    private shoutIntervals: { [groupIndex: string]: NodeJS.Timer } = {}
-
     initGameState(): TGameState<IGameState> {
         const gameState = super.initGameState()
         gameState.groups = []
@@ -39,292 +35,142 @@ export default class Controller extends BaseController<ICreateParams, IGameState
 
     async initPlayerState(actor: IActor): Promise<TPlayerState<IPlayerState>> {
         const playerState = await super.initPlayerState(actor)
+        playerState.price = null
+        playerState.profit = 0
         playerState.playerStatus = PlayerStatus.intro
         return playerState
     }
 
-    joinPlayer(playerState: TPlayerState<IPlayerState>, group: GameState.IGroup, groupIndex: number) {
-        const {groupSize} = this.game.params
-        if (group.playerNum === groupSize) {
-            return
-        }
-        playerState.positionIndex = group.playerNum++
-        if (group.isMulti) {
-            playerState.multi = {groupIndex}
-        } else {
-            playerState.single = {groupIndex, rounds: [{}]}
-        }
-        playerState.playerStatus = PlayerStatus.matching
-    }
-
-    async initRobots(groupIndex: number, amount: number) {
-        for (let i = 0; i < amount; i++) {
-            await this.startNewRobotScheduler(`Robot_G${groupIndex}_${i}`, false)
-        }
-    }
-
-    async createGroupAndInitRobot(gameState: TGameState<IGameState>, playerState: TPlayerState<IPlayerState>) {
-        const {groupSize} = this.game.params
-        const group: GameState.IGroup = {
-            playerNum: 0,
-            roundIndex: 0,
-            isMulti: false,
-            rounds: [{}]
-        };
-        const groupIndex = gameState.groups.push(group) - 1
-        this.joinPlayer(playerState, group, groupIndex)
-        await this.initRobots(groupIndex, groupSize - 1)
-    }
-
-    processProfits(playerStates: Array<IPlayerState>, group: GameState.IGroup, groupPlayerStates: Array<TPlayerState<IPlayerState>>) {
-        const {roundIndex, isMulti} = group
-        if (isMulti) {
-            const buyerStates = playerStates.filter(s => s.role === 0).map(s => s)
-            const sellerStates = playerStates.filter(s => s.role === 1).map(s => s)
-            const intentionG = buyerStates.map(({multi: {price: buyPrice, bidNum: buyBidNum}}) =>
-                sellerStates.map(({multi: {price: sellerPrice, bidNum: sellerBidNum}}) =>
-                    buyBidNum * buyPrice >= sellerBidNum * sellerPrice))
-            group.results = []
-            getBestMatching(intentionG)
-                .forEach(async ([buyerIndex, sellerIndex]) => {
-                    group.results.push({
-                        buyerPosition: buyerStates[buyerIndex].positionIndex,
-                        sellerPosition: sellerStates[sellerIndex].positionIndex
-                    })
-                })
-            groupPlayerStates.map(p => p.multi.profit = p.multi.privateValue - p.multi.price * p.multi.bidNum)
-        } else {
-            const buyerStates = playerStates.filter(s => s.role === 0).map(s => s)
-            const sellerStates = playerStates.filter(s => s.role === 1).map(s => s)
-            const intentionG = buyerStates.map(({single: {rounds: buyerRounds}}) =>
-                sellerStates.map(({single: {rounds: sellerRounds}}) =>
-                    buyerRounds[roundIndex].price * buyerRounds[roundIndex].bidNum >=
-                    sellerRounds[roundIndex].price * sellerRounds[roundIndex].bidNum))
-            group.results = []
-            console.log(intentionG)
-            getBestMatching(intentionG)
-                .forEach(async ([buyerIndex, sellerIndex]) => {
-                    group.results.push({
-                        buyerPosition: buyerStates[buyerIndex].positionIndex,
-                        sellerPosition: sellerStates[sellerIndex].positionIndex
-                    })
-                })
-            groupPlayerStates.map(p => p.multi.profit = p.multi.privateValue - p.multi.price * p.multi.bidNum)
-        }
-    }
-
-    autoProcessProfits(group: GameState.IGroup, groupPlayerStates: Array<TPlayerState<IPlayerState>>) {
-        const investorStates = groupPlayerStates.filter(s => {
-            if (s.playerStatus === PlayerStatus.prepared) {
-                s.multi.price = 0
-                s.multi.bidNum = 0
-                s.multi.profit = 0
-                return false
-            }
-            return true
-        }).map(s => s)
-        this.processProfits(investorStates as Array<IPlayerState>, group as GameState.IGroup, groupPlayerStates as Array<TPlayerState<IPlayerState>>)
-        groupPlayerStates.forEach(s => (s.playerStatus = PlayerStatus.result))
-    }
-
-    startShoutTicking(group: GameState.IGroup, groupIndex: number) {
-        global.setTimeout(() => {
-            const shoutIntervals = this.shoutIntervals
-            let shoutTimer = 1
-            shoutIntervals[groupIndex] = global.setInterval(async () => {
-                const playerStates = await this.stateManager.getPlayerStates()
-                const groupPlayerStates = Object.values(playerStates).filter(
-                    s => s.multi && s.multi.groupIndex === groupIndex
-                )
-                groupPlayerStates.forEach(s => {
-                    this.push(s.actor, PushType.shoutTimer, {shoutTimer})
-                })
-                if (groupPlayerStates.every(s => s.playerStatus !== PlayerStatus.prepared)) {
-                    global.clearInterval(shoutIntervals[groupIndex])
-                    delete shoutIntervals[groupIndex]
-                    return
-                }
-                if (shoutTimer++ < SHOUT_TIMER) {
-                    return
-                }
-                global.clearInterval(shoutIntervals[groupIndex])
-                delete shoutIntervals[groupIndex]
-                this.autoProcessProfits(group, groupPlayerStates)
-                await this.stateManager.syncState()
-            }, 1000)
-        }, 0)
-    }
-
-    initState(group: GameState.IGroup, groupPlayerStates: Array<TPlayerState<IPlayerState>>, positions: Array<IPosition>) {
-        const {roundIndex, isMulti} = group
-        if (isMulti) {
-            this.startShoutTicking(group, groupPlayerStates[0].multi.groupIndex)
-        }
-        groupPlayerStates.forEach(async (s, i) => {
-            s.role = positions[s.positionIndex].role
-            if (isMulti) {
-                s.multi.privateValue = positions[s.positionIndex].privatePrice
-                s.multi.privateValue = positions[s.positionIndex].privatePrice
-            } else {
-                let playerRound = s.single.rounds[roundIndex]
-                if (!playerRound) {
-                    playerRound = s.single.rounds[roundIndex] = {}
-                }
-                playerRound.privateValue = positions[s.positionIndex].privatePrice
-            }
-            s.playerStatus = PlayerStatus.prepared
-            await setTimeout(() => {
-                this.push(
-                    s.actor,
-                    PushType.robotShout,
-                    {
-                        role: s.role,
-                        privateValue: isMulti ? s.multi.privateValue : s.single.rounds[roundIndex].privateValue
-                    })
-            }, 600 * (i + 1))
-        })
-    }
-
-    startMatchTicking(group: GameState.IGroup, groupIndex: number) {
-        const {groupSize, waitingSeconds, positions} = this.game.params
-        global.setTimeout(() => {
-            const matchIntervals = this.matchIntervals
-            let matchTimer = 1
-            matchIntervals[groupIndex] = global.setInterval(async () => {
-                const playerStates = await this.stateManager.getPlayerStates()
-                const groupPlayerStates = Object.values(playerStates).filter(s => s.multi && s.multi.groupIndex === groupIndex)
-                groupPlayerStates.forEach(s => {
-                    this.push(s.actor, PushType.matchTimer, {matchTimer, matchNum: groupPlayerStates.length})
-                })
-                if (group.playerNum === groupSize) {
-                    global.clearInterval(matchIntervals[groupIndex])
-                    delete matchIntervals[groupIndex]
-                    this.initState(group, groupPlayerStates, positions as Array<IPosition>)
-                    await this.stateManager.syncState()
-                    return
-                }
-                if (matchTimer++ < waitingSeconds) {
-                    return
-                }
-                global.clearInterval(matchIntervals[groupIndex])
-                delete matchIntervals[groupIndex]
-                await this.initRobots(groupIndex, groupSize - group.playerNum)
-                await this.stateManager.syncState()
-            }, 1000)
-        }, 0)
-    }
-
     protected async playerMoveReducer(actor: IActor, type: string, params: IMoveParams, cb: IMoveCallback): Promise<void> {
-        const {game: {params: {groupSize, positions}}} = this
+        const {game: {params: {groupSize, positions, waitingSeconds}}} = this
         const playerState = await this.stateManager.getPlayerState(actor),
             gameState = await this.stateManager.getGameState(),
             playerStates = await this.stateManager.getPlayerStates()
         switch (type) {
-            case MoveType.startSingle: {
-                if (playerState.playerStatus !== PlayerStatus.intro) {
+            case MoveType.joinRobot: {
+                if (playerState.groupIndex !== undefined) {
                     break
                 }
-                await this.createGroupAndInitRobot(gameState, playerState)
+                let groupIndex = gameState.groups.findIndex(({playerNum}) => playerNum < groupSize)
+                if (groupIndex === -1) {
+                    const group: GameState.IGroup = {
+                        roundIndex: 0,
+                        playerNum: 0,
+                    }
+                    groupIndex = gameState.groups.push(group) - 1
+                }
+                playerState.groupIndex = groupIndex
+                playerState.positionIndex = gameState.groups[groupIndex].playerNum++
+                playerState.role = positions[playerState.positionIndex].role
+                playerState.privatePrice = positions[playerState.positionIndex].privatePrice
+                playerState.playerStatus = PlayerStatus.matching
+                break
+            }
+            case MoveType.startSingle: {
+                if (playerState.groupIndex !== undefined) {
+                    break
+                }
+                let groupIndex = gameState.groups.findIndex(({playerNum}) => playerNum < groupSize)
+                if (groupIndex === -1) {
+                    const group: GameState.IGroup = {
+                        roundIndex: 0,
+                        playerNum: 0,
+                    }
+                    groupIndex = gameState.groups.push(group) - 1
+                }
+
+                if (gameState.groups[groupIndex].playerNum < groupSize) {
+                    for (let num = 0; num < groupSize - gameState.groups[groupIndex].playerNum; num++) {
+                        await this.startNewRobotScheduler(`Robot_${num}`, false)
+                    }
+                }
+                playerState.groupIndex = groupIndex
+                playerState.positionIndex = gameState.groups[groupIndex].playerNum++
+                playerState.role = positions[playerState.positionIndex].role
+                playerState.privatePrice = positions[playerState.positionIndex].privatePrice
+                playerState.playerStatus = PlayerStatus.matching
+                const groupPlayerStates = Object.values(playerStates).filter(s => s.groupIndex === groupIndex)
+                if (groupPlayerStates.length === groupSize && groupPlayerStates.every(p => p.playerStatus === PlayerStatus.matching)) {
+                    groupPlayerStates.map(p => p.playerStatus = PlayerStatus.prepared)
+                    this.broadcast(PushType.startBid)
+                }
                 break
             }
             case MoveType.startMulti: {
-                if (playerState.playerStatus !== PlayerStatus.intro) {
+                if (playerState.groupIndex !== undefined) {
                     break
                 }
-                let groupIndex = gameState.groups.findIndex(({playerNum, isMulti}) => playerNum < groupSize && isMulti)
-                if (groupIndex === -1) {
-                    const group: GameState.IGroup = {
-                        playerNum: 0,
-                        roundIndex: 0,
-                        isMulti: true,
-                        rounds: [{}]
-                    }
-                    groupIndex = gameState.groups.push(group) - 1
-                    playerState.multi = {groupIndex: groupIndex}
-                    playerState.positionIndex = gameState.groups[groupIndex].playerNum++
-                    playerState.role = positions[playerState.positionIndex].role
-                    playerState.multi.privateValue = positions[playerState.positionIndex].privatePrice
-                    this.startMatchTicking(group, groupIndex)
-                }
-                this.joinPlayer(playerState, gameState.groups[groupIndex], groupIndex)
-                break
-            }
-            case MoveType.joinRobot: {
                 let groupIndex = gameState.groups.findIndex(({playerNum}) => playerNum < groupSize)
                 if (groupIndex === -1) {
-                    break
+                    const group: GameState.IGroup = {
+                        roundIndex: 0,
+                        playerNum: 0,
+                    }
+                    groupIndex = gameState.groups.push(group) - 1
                 }
-                const group = gameState.groups[groupIndex]
-                this.joinPlayer(playerState, group, groupIndex)
-                if (group.playerNum === groupSize) {
-                    const groupPlayerStates = Object.values(playerStates).filter(s =>
-                        group.isMulti ? s.multi && s.multi.groupIndex === groupIndex
-                            : s.single && s.single.groupIndex === groupIndex
-                    )
-                    this.initState(group, groupPlayerStates, positions as Array<IPosition>)
+
+                let addRobotTimer = 1
+                const addRobotTask = global.setInterval(async () => {
+                    const {groupIndex} = playerState
+                    if (addRobotTimer++ < waitingSeconds + OUT_TIME) {
+                        this.push(playerState.actor, PushType.matchTimer, {
+                            matchTimer: addRobotTimer,
+                            matchNum: gameState.groups[groupIndex].playerNum
+                        })
+                        return
+                    }
+                    global.clearInterval(addRobotTask)
+                    if (gameState.groups[groupIndex].playerNum < groupSize) {
+                        for (let num = 0; num < groupSize - gameState.groups[groupIndex].playerNum; num++) {
+                            await this.startNewRobotScheduler(`Robot_${num}`, false)
+                        }
+                    }
+                }, 1000)
+                playerState.groupIndex = groupIndex
+                playerState.positionIndex = gameState.groups[groupIndex].playerNum++
+                playerState.role = positions[playerState.positionIndex].role
+                playerState.privatePrice = positions[playerState.positionIndex].privatePrice
+                playerState.playerStatus = PlayerStatus.matching
+
+                const groupPlayerStates = Object.values(playerStates).filter(s => s.groupIndex === groupIndex)
+                if (groupPlayerStates.length === groupSize && groupPlayerStates.every(p => p.playerStatus === PlayerStatus.matching)) {
+                    groupPlayerStates.map(p => p.playerStatus = PlayerStatus.prepared)
+                    this.broadcast(PushType.startBid)
                 }
-            }
-            // case MoveType.prepare: {
-            //     const {groupIndex, positionIndex} = playerState
-            //     const {rounds, roundIndex} = gameState.groups[groupIndex]
-            //     rounds[roundIndex].playerStatus[positionIndex] = PlayerStatus.prepared
-            //     if (rounds[roundIndex].playerStatus.every(s => s === PlayerStatus.prepared)) {
-            //         for (let i in rounds[roundIndex].playerStatus) rounds[roundIndex].playerStatus[i] = PlayerStatus.startBid
-            //         this.broadcast(PushType.startBid, {roundIndex})
-            //     }
-            //     break
-            // }
-            case MoveType.nextStage: {
                 break
+            }
+            case MoveType.nextStage: {
+                break;
                 // todo connect to other stage
             }
             case MoveType.shout: {
-                const playerStatus = playerState.playerStatus
-                if (playerStatus === PlayerStatus.shouted) {
-                    return
-                }
-                let group: GameState.IGroup
-                let groupIndex: number
-                if (playerState.single) {
-                    const { rounds: playerRounds } = playerState.single
-                    groupIndex = playerState.single.groupIndex
-                    group = gameState.groups[groupIndex]
-                    const { roundIndex} = group
-                    playerState.playerStatus = PlayerStatus.shouted
-                    playerRounds[roundIndex].price = params.price
-                    playerRounds[roundIndex].bidNum = params.num
-                } else {
-                    groupIndex = playerState.multi.groupIndex
-                    group = gameState.groups[groupIndex]
-                    playerState.playerStatus = PlayerStatus.shouted
-                    playerState.multi.price = params.price
-                    playerState.multi.bidNum = params.num
-                }
-                const groupPlayerStates = Object.values(playerStates).filter(s =>
-                    group.isMulti ? s.multi && s.multi.groupIndex === groupIndex
-                        : s.single && s.single.groupIndex === groupIndex
-                )
-                if (!groupPlayerStates.every(s => s.playerStatus === PlayerStatus.shouted)) {
-                    return
-                }
-                const investorStates = groupPlayerStates.map(s => group.isMulti ? s.multi : s.single.rounds[group.roundIndex])
-                setTimeout(async () => {
-                    this.processProfits(
-                        investorStates as Array<IPlayerState>,
-                        group as GameState.IGroup,
-                        groupPlayerStates as Array<TPlayerState<IPlayerState>>
-                    )
-                    groupPlayerStates.forEach(s => (s.playerStatus = PlayerStatus.result))
+                const {groupIndex} = playerState,
+                    groupState = gameState.groups[groupIndex],
+                    groupPlayerStates = Object.values(playerStates).filter(s => s.groupIndex === groupIndex)
+                playerState.playerStatus = PlayerStatus.shouted
+                playerState.price = params.price
+                playerState.bidNum = params.num
+                if (groupPlayerStates.length === groupSize && groupPlayerStates.every(p => p.playerStatus === PlayerStatus.shouted)) {
+                    const buyerStates = groupPlayerStates.filter(s => s.role === 0)
+                    const sellerStates = groupPlayerStates.filter(s => s.role === 1)
+                    const intentionG = buyerStates.map(({price: buyPrice, bidNum: buyNum}) =>
+                        sellerStates.map(({price: sellerPrice, bidNum: sellNum}) =>
+                            buyPrice * buyNum >= sellerPrice * sellNum))
+                    groupState.results = []
+                    getBestMatching(intentionG)
+                        .forEach(async ([buyerIndex, sellerIndex]) => {
+                            groupState.results.push({
+                                buyerPosition: buyerStates[buyerIndex].positionIndex,
+                                sellerPosition: sellerStates[sellerIndex].positionIndex
+                            })
+                        })
+                    groupPlayerStates.map(p => p.profit = p.privatePrice - p.price * p.bidNum)
                     await this.stateManager.syncState()
-                }, 2000)
-                break
+                    groupPlayerStates.map(p => p.playerStatus = PlayerStatus.result)
+                    await this.stateManager.syncState()
+                    return
+                }
             }
         }
     }
-}
-
-
-interface IPosition {
-    role: number
-    privatePrice: number
 }
