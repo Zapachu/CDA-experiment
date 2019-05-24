@@ -46,7 +46,7 @@ message PlayerState {
   float finalProfit = 8;
   repeated string surveyAnswers = 9;
   int32 roundIndex = 10;
-  string userId = 11;
+  string mobile = 11;
 }
 
 message MoveParams {

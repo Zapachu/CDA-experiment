@@ -75,4 +75,6 @@ bin-debug
 setting.ts
 settings.ts
 
+package-lock.json
+
 dump.rdb

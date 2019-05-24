@@ -29,8 +29,8 @@ interface Test {
   desc: Array<Word>,
   questions: Array<{
     title: Array<Word>,
-    options: Array<string>,
-    answer: string
+    options: Array<string | {label: string, value: string}> | Function,
+    answer: string | Function
   }>
 }
 
@@ -81,12 +81,13 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
   }
 
   answer = (val: string, i: number) => {
-    const {props: {playerState:{stageIndex}}, state: {answers, tips}} = this
+    const {props: {playerState:{stageIndex}, game:{params:{d}}}, state: {answers, tips}} = this
     const newAnswers = [...answers];
     newAnswers[i] = val;
     const answer = this.Test[stageIndex].questions[i].answer;
+    const answerVal = typeof answer === 'function' ? answer(d) : answer;
     const newTips = [...tips];
-    newTips[i] = val === answer ? Tip.Correct : Tip.Wrong;
+    newTips[i] = val === answerVal ? Tip.Correct : Tip.Wrong;
     this.setState({answers: newAnswers, tips: newTips});
   }
 
@@ -203,9 +204,9 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
         <ul>
           {curTest.questions.map(({title, options}, i) => <li key={i}>
             <p className={tips[i]===Tip.Wrong?style.tipWrong:''}>{this.joinWords(title)} {tips[i] === Tip.Wrong ? <span>{lang.wrong}</span> : null}</p>
-            <Radio options={options===null
-                                  ?[{label:(displayData.p11-d).toFixed(2),value:'a'},{label:(displayData.p21-d).toFixed(2),value:'b'},{label:displayData.p22.toFixed(2),value:'c'}]
-                                  :options}
+            <Radio options={typeof options === 'function'
+              ? options(displayData, d)
+              : options}
                         value={answers[i] || ''}
                         onChange={e => this.answer(e as string, i)}
             />

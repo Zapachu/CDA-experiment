@@ -18,7 +18,8 @@ import {
   Version,
   SheetType,
   MainStageIndex,
-  TestStageIndex
+  TestStageIndex,
+  Survey
 } from './config'
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
 
@@ -247,20 +248,20 @@ export default class Controller extends BaseController<ICreateParams, IGameState
       [Choice.Wait]: 0,
     }
 
-    const resultData: Array<Array<any>> = [['组', '座位号', '最终收益', '轮次', '第一阶段选择', '第二阶段选择(结果1)', '第二阶段选择(结果2)', '最终选择', '第一阶段有人选1', '组内最低选择', '该轮积分', '专业', '年龄', '年级', '家庭住址', '性别']]
+    const resultData: Array<Array<any>> = [['组', '座位号', '手机号', '最终收益', '轮次', '第一阶段选择', '第二阶段选择(结果1)', '第二阶段选择(结果2)', '最终选择', '第一阶段有人选1', '组内最低选择', '该轮积分', '专业', '年龄', '年级', '家庭住址', '性别']]
     const playersByGroup = Object.values(playerStates).sort((a, b) => a.groupIndex - b.groupIndex);
     playersByGroup.forEach(ps => {
       const curGroup = groups[ps.groupIndex];
       let curRound = 0;
       while(curRound < rounds) {
-        const row = curRound===0 ? [ps.groupIndex+1, ps.seatNumber||'-', participationFee+(ps.finalProfit*s||0), curRound+1] : ['', '', '', curRound+1];
+        const row = curRound===0 ? [ps.groupIndex+1, ps.seatNumber||'-', ps.mobile||'-', participationFee+(ps.finalProfit*s||0), curRound+1] : ['', '', '', '', curRound+1];
         const curChoice = ps.choices[curRound];
         if(curChoice) {
           row.push(choiceTerms[curChoice.c1], curChoice.c1===Choice.Wait?choiceTerms[curChoice.c2[0]]:0, curChoice.c1===Choice.Wait?choiceTerms[curChoice.c2[1]]:0)
           if(curGroup.mins[curRound]) {
             row.push(curChoice.c?curChoice.c:curChoice.c1, gameType===GameType.T2?(curGroup.ones[curRound]?1:0):'-', curGroup.mins[curRound], ps.profits[curRound])
             if(ps.surveyAnswers.length && curRound===0) {
-              row.push(...ps.surveyAnswers)
+              row.push(...this._formatSurveyAnswers(ps.surveyAnswers))
             }
           }
         }
@@ -269,6 +270,16 @@ export default class Controller extends BaseController<ICreateParams, IGameState
       }
     })
     return resultData;
+  }
+
+  _formatSurveyAnswers(surveyAnswers: Array<string>): Array<string> {
+    return surveyAnswers.map((ans, i) => {
+      if([0, 2, 4].includes(i)) {
+        return '' + (Survey[i].options.indexOf(ans) + 1);
+      }else {
+        return ans;
+      }
+    })
   }
 
   async onGameOver() {
@@ -330,12 +341,12 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             res.setHeader('Content-Disposition', 'attachment; filename=' + `${encodeURI(name)}.xlsx`)
             return res.end(buffer, 'binary')
         }
-        case FetchType.getUserId: {
+        case FetchType.getUserMobile: {
           const {token, actorType} = req.query;
-          const userId = req.user._id;
+          const {_id: userId, mobile} = req.user;
           if(this.game.owner.toString() !== userId.toString()) {
             const playerState = await this.stateManager.getPlayerState({type: actorType, token});
-            playerState.userId = userId;
+            playerState.mobile = mobile || '-';
           }
           return res.end();
       }

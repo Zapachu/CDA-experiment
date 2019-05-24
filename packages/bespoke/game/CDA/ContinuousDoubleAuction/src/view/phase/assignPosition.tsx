@@ -106,7 +106,7 @@ class Create extends BasePhase.Create {
                                                     }}/>
                                                     <label>s</label>&nbsp;
                                                     <label>{lang.reactionType} : </label>
-                                                    <BtnGroup value={reactionTypeKeys.findIndex(key => role === ReactionType[key])}
+                                                    <BtnGroup value={reactionTypeKeys.findIndex(key => extraConfig.reactionType === ReactionType[key])}
                                                               options={reactionTypeKeys}
                                                               onChange={i => this.updatePosition(positionIndex, position => ({
                                                                   ...position,
