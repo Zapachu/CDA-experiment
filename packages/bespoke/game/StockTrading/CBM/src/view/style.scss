@@ -1,218 +1,5 @@
 @import "~bespoke-client-util/lib/resource/public";
 
-@mixin aButton{
-  font-size: $fontSize-small;
-  transition: $transition-normal;
-  color: rgba($color-blue, .8);
-
-  &:hover {
-    color: $color-blue;
-    text-decoration: underline;
-  }
-}
-
-.blankMsg {
-  @include blankMsg;
-}
-
-.create {
-  margin: 1.5rem;
-  display: flex;
-  flex-direction: column;
-
-  .baseFields {
-    display: flex;
-    flex-direction: column;
-    .baseField{
-      display: flex;
-      align-items: center;
-      >span{
-        font-size: $fontSize-middle;
-        color: rgba($color-black,.6);
-      }
-    }
-  }
-
-  .btnSwitch {
-    margin-top: 1rem;
-    text-align: center;
-    a{
-      @include aButton
-    }
-  }
-}
-
-.player4Owner {
-  display: flex;
-  justify-content: center;
-
-  .playerStatusTable {
-    tr {
-      td {
-        min-width: 5rem;
-        padding: .5rem;
-        text-align: center;
-      }
-
-      &:nth-child(even) {
-        background: rgba($color-black, .05);
-      }
-    }
-  }
-
-  .assignPosition {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    .btnWrapper {
-      margin-top: 1rem;
-
-      .inGameNum {
-        display: flex;
-        justify-content: center;
-      }
-    }
-  }
-
-  .mainGame {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-    .timer {
-      color: rgba($color-black, .8);
-
-      em {
-        font-size: $fontSize-large;
-        color: $color-blue;
-        margin: .5rem;
-      }
-    }
-
-    .marketInfo {
-      display: flex;
-      align-items: center;
-      width: 40rem;
-
-      .orderList {
-        width: 75%;
-
-        ul {
-          display: flex;
-          align-items: center;
-          justify-content: left;
-
-          label {
-            color: rgba($color-black, .8);
-            margin: .5rem .8rem;
-          }
-
-          li {
-            padding: 0 .5rem;
-            border-left: 1px solid rgba($color-black, .6);
-          }
-        }
-      }
-
-      .countdownLabel {
-        @extend .timer;
-      }
-    }
-
-    .chartPanel {
-      width: 80%;
-      max-width: 32rem;
-      margin: 0 auto;
-
-      .marketName {
-        @extend .timer;
-        display: block;
-        text-align: center;
-      }
-
-      .chartWrapper {
-        width: 100%;
-      }
-    }
-  }
-}
-
-.result4Owner {
-  margin: 1rem 2rem;
-
-  .timeLine {
-    margin: 1rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    label {
-      font-size: .8 * $fontSize-small;
-      color: rgba($color-black, .8);
-    }
-
-    input {
-      margin: .5rem;
-      min-width: 24rem;
-    }
-
-    .paramsLabel {
-      display: inline-block;
-      height: 1rem;
-      font-size: .8 * $fontSize-small;
-      color: rgba($color-black, .8);
-    }
-  }
-
-  .resultWrapper {
-    display: flex;
-
-    .resultTable {
-      tr {
-        td {
-          min-width: 5rem;
-          padding: .5rem;
-          text-align: center;
-        }
-
-        &:nth-child(even) {
-          background: rgba($color-black, .05);
-        }
-      }
-    }
-
-    .exportWrapper {
-      margin-left: 2rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      border-left: 1px solid rgba($color-black, .1);
-
-      label {
-        margin: .5rem;
-        font-size: .8 * $fontSize-small;
-        color: rgba($color-black, .8);
-      }
-
-      a {
-        display: inline-block;
-        margin: .5rem;
-        font-size: $fontSize-middle;
-        color: $color-blue;
-        text-align: center;
-        transition: $transition-normal;
-
-        &:hover {
-          text-decoration: underline;
-        }
-      }
-    }
-  }
-}
-
 $border: 1px solid rgba($color-black, .05);
 $height-tr: 2.4rem;
 $color-green: #43be42;
@@ -228,16 +15,6 @@ $color-red: #d6444e;
   background: radial-gradient(at 50% 50%, $color-dark 10%, $color-dark2 80%);
   color: $color-light;
   user-select: none;
-
-  .notStart {
-    .introVideo {
-      width: 36rem;
-      height: 32rem;
-      border: 1px solid;
-      display: block;
-      margin: 2rem auto;
-    }
-  }
 
   .trading {
     margin: 2rem auto;
@@ -258,51 +35,55 @@ $color-red: #d6444e;
       height: 100%;
     }
 
-    .yourTrades {
-      @include panel;
 
-      .tradeList {
-        table-layout: fixed;
-        text-align: center;
-        margin: 1rem;
-        flex-grow: 1;
-        overflow: auto;
+    .tradePanel {
+      .yourTrades {
+        @include panel;
 
-        tr {
-          height: 2rem;
+        .tradeList {
+          table-layout: fixed;
+          text-align: center;
+          margin: 1rem;
+          flex-grow: 1;
+          overflow: auto;
 
-          th {
-            width: 5rem;
-            font-weight: normal;
-          }
+          tr {
+            height: 2rem;
 
-          td {
-            color: $color-orange;
-
-            &:first-child {
-              color: $color-light;
+            th {
+              width: 5rem;
+              font-weight: normal;
             }
 
-            &:last-child {
-              color: $color-red;
+            td {
+              color: $color-orange;
+
+              &:first-child {
+                color: $color-light;
+              }
+
+              &:last-child {
+                color: $color-red;
+              }
             }
           }
         }
       }
-    }
-    .summary {
-      margin: 1rem;
-      display: flex;
 
-      div {
-        padding: 1rem;
+      .summary {
+        margin: 1rem;
+        display: flex;
 
-        em {
-          display: inline-block;
-          width: 6rem;
-          font-size: $fontSize-large;
-          color: $color-orange;
-          text-align: center;
+        div {
+          padding: 1rem;
+
+          em {
+            display: inline-block;
+            width: 6rem;
+            font-size: $fontSize-large;
+            color: $color-orange;
+            text-align: center;
+          }
         }
       }
     }
@@ -322,31 +103,35 @@ $color-red: #d6444e;
           table-layout: fixed;
           text-align: center;
 
-          .orderPrices {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: .5rem;
+          .orderTable {
+            margin: auto;
 
-            .orderPrice {
-              background: $color-dark2;
-              display: flex;
-              width: 5rem;
+            tr {
               height: 2rem;
-              align-items: center;
-              justify-content: space-between;
-              padding: 0 1rem;
 
-              label {
+              th {
+                font-weight: normal;
                 width: 4rem;
+
+                &:last-child {
+                  width: 1rem;
+                }
               }
 
-              .btnCancel {
-                color: rgba($color-orange, .7);
-                transition: $transition-normal;
+              td {
+                color: $color-red;
 
-                &:hover {
-                  color: $color-red;
+                &.count {
+                  color: $color-orange;
+                }
+
+                .btnCancel {
+                  color: $color-light;
+                  transition: $transition-normal;
+
+                  &:hover {
+                    color: $color-red;
+                  }
                 }
               }
             }
@@ -378,8 +163,12 @@ $color-red: #d6444e;
 
             label {
               margin: 1rem;
-              font-size: .8rem;
-              opacity: .4;
+
+              em {
+                margin: 1rem;
+                font-size: $fontSize-large;
+                color: $color-orange;
+              }
             }
           }
 
@@ -406,10 +195,26 @@ $color-red: #d6444e;
     }
   }
 
-  .result {
+  .resultWrapper {
     text-align: center;
 
-    p {
+    .result {
+      .resultTitle {
+        margin: 2rem;
+        font-size: $fontSize-large;
+      }
+
+      .resultTable {
+        margin: auto;
+
+        td {
+          padding: 1rem 2rem;
+          border: 1px solid;
+        }
+      }
+    }
+
+    .toNextPeriod {
       margin: 2rem;
       font-size: $fontSize-large;
 
@@ -420,7 +225,8 @@ $color-red: #d6444e;
       }
     }
 
-    .switchBtns {
+    .switchBtns{
+      margin: 2rem;
       display: flex;
       justify-content: center;
     }

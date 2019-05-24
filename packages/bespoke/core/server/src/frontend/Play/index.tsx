@@ -58,7 +58,13 @@ export class Play extends React.Component<TRootCtx & RouteComponentProps<{ gameI
             socketClient,
             frameEmitter: new FrameEmitter(socketClient as any)
         }), () =>
-            socketClient.emit(baseEnum.SocketEvent.online, (actor: IActor) => this.setState({actor})))
+            socketClient.emit(baseEnum.SocketEvent.online, (actor: IActor) => {
+                if(token && (actor.token !== token)){
+                    location.href = `${location.origin}${location.pathname}?token=${actor.token}`
+                }else{
+                    this.setState({actor})
+                }
+            }))
     }
 
     componentWillUnmount(): void {

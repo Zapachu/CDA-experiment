@@ -14,10 +14,11 @@ import * as compression from 'compression'
 import * as morgan from 'morgan'
 import {elfSetting} from 'elf-setting'
 import {Log, redisClient, Setting, QCloudSMS} from './util'
-import {baseEnum, config, IGameSetting} from 'bespoke-common'
+import {baseEnum, config, IGameSetting, IGameConfig} from 'bespoke-common'
 import {EventDispatcher} from './controller/eventDispatcher'
 import {rootRouter, namespaceRouter} from './controller/requestRouter'
 import {GameLogic, ILogicTemplate} from './service/GameLogic'
+import GameDAO from './service/GameDAO'
 import {serve as serveRPC, getProxyService} from './rpc'
 import {AddressInfo} from 'net'
 import {UserDoc, UserModel} from './model'
@@ -138,7 +139,7 @@ export class Server {
             server = express.listen(Setting.port)
         EventDispatcher.startGameSocket(server).use(socketIOSession(this.sessionMiddleware))
         this.bindServerListener(server, () => {
-            Log.i(`CreateGame：http://localhost:${elfSetting.bespokeHmr ? config.devPort.client : Setting.port}/${config.rootName}/${Setting.namespace}/create`)
+            Log.i(`CreateGame：http://${Setting.ip}:${elfSetting.bespokeHmr ? config.devPort.client : Setting.port}/${config.rootName}/${Setting.namespace}/create`)
             if (!elfSetting.bespokeWithProxy) {
                 return
             }
@@ -156,5 +157,14 @@ export class Server {
             }
             setTimeout(() => heartBeat2Proxy(), .5 * config.gameRegisterInterval)
         })
+    }
+
+    static async newGame<ICreateParams>(namespace: string, gameConfig: IGameConfig<ICreateParams>): Promise<string> {
+        const [mobile] = elfSetting.adminMobileNumbers
+        if (!mobile) {
+            Log.e('未配置管理员账号，无法创建实验')
+        }
+        const {id: owner} = await UserModel.findOne({mobile})
+        return await GameDAO.newGame(namespace, owner, gameConfig)
     }
 }
