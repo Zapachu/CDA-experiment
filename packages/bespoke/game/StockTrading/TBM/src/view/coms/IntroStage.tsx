@@ -38,7 +38,7 @@ export default class IntroStage extends Core.Play<ICreateParams,
         };
     }
 
-    lang = Lang.extractLang({});
+    lang = Lang.extractLang({})
 
     componentDidMount() {
         const {frameEmitter} = this.props;
@@ -50,9 +50,9 @@ export default class IntroStage extends Core.Play<ICreateParams,
     render() {
         const {
             frameEmitter,
-            playerState: {playerStatus, single, multi},
+            playerState: {playerStatus},
             game: {
-                params: {groupSize, waitingSeconds}
+                params: {groupSize}
             }
         } = this.props;
         const {matchTimer, matchNum} = this.state;
@@ -70,19 +70,11 @@ export default class IntroStage extends Core.Play<ICreateParams,
                     }}
                 />
                 <MatchModal
-                    visible={playerStatus === PlayerStatus.matching && !!multi}
+                    visible={playerStatus === PlayerStatus.matching}
                     totalNum={groupSize}
                     matchNum={matchNum}
-                    timer={waitingSeconds - matchTimer}
+                    timer={matchTimer}
                 />
-                <Modal
-                    visible={playerStatus === PlayerStatus.matching && !!single}
-                    width={300}
-                >
-                    <p style={{textAlign: "center", padding: "50px 0"}}>
-                        加载算法交易者...
-                    </p>
-                </Modal>
             </section>
         );
     }

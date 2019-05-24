@@ -14,7 +14,7 @@ interface ICreateState {
     groupSize: number
     positions: Array<{
         role: number
-        privatePrice: Array<number>
+        privatePrice: number
     }>
     readonly: boolean
 }
@@ -29,7 +29,7 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
         InitMoney: 100000,
         waitingSeconds: 10,
         groupSize: 2,
-        positions: [{role: 0, privatePrice: [10000]}, {role: 1, privatePrice: [9000]}],
+        positions: [{role: 0, privatePrice: 10000}, {role: 1, privatePrice: 9000}],
         readonly: false,
     }
 
@@ -65,9 +65,9 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
         this.setState({positions})
     }
 
-    resetPrivatePrice = (i, i1, e) => {
+    resetPrivatePrice = (i, e) => {
         const {positions} = this.state
-        positions[i].privatePrice[i1] = parseInt(e.target.value)
+        positions[i].privatePrice = parseInt(e.target.value)
         this.setState({positions})
     }
 
@@ -154,15 +154,10 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
                                    onClick={this.resetRole.bind(this, i)}>Seller</a>
                             </td>
                             <td>
-                                {
-                                    v.privatePrice.map((v1, i1) =>
-                                        <li key={`pv-${i}-${i1}`}>
-                                            <Label label={`第 ${i1 + 1} 轮`}/>
-                                            <Input type='number' value={v1}
-                                                   onChange={this.resetPrivatePrice.bind(this, i, i1)}/>
-                                        </li>
-                                    )
-                                }
+                                <li>
+                                    <Input type='number' value={v.privatePrice}
+                                           onChange={this.resetPrivatePrice.bind(this, i)}/>
+                                </li>
                             </td>
                         </tr>
                         </tbody>

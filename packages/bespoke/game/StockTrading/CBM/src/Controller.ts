@@ -1,19 +1,18 @@
 import {
     BaseController,
     baseEnum,
-    FreeStyleModel,
     IActor,
     IMoveCallback,
     Log,
     TGameState,
-    TPlayerState
+    TPlayerState,
+    RedisCall,
+    gameId2PlayUrl
 } from 'bespoke-server'
-import nodeXlsx from 'node-xlsx'
 import {
-    DBKey,
+    CONFIG,
     FetchType,
-    GroupStage,
-    GroupType,
+    GameType,
     ICreateParams,
     IGamePeriodState,
     IGameState,
@@ -22,39 +21,46 @@ import {
     IPlayerState,
     IPushParams,
     ITrade,
-    MATCH_TIME,
-    MOCK,
     MoveType,
     PERIOD,
+    PeriodStage,
     PushType,
-    RobotCalcLog,
-    RobotSubmitLog,
     ROLE,
-    SheetType,
-    ShoutResult,
-    PeriodStage
+    PrivatePriceRegion, namespace
 } from './config'
-import {getEnumKeys} from './util'
+import {CreateGame, PhaseDone} from '../../protocol'
+import {getBalanceIndex, getEnumKeys, random} from './util'
 
 export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
-    getGame4Player() {
-        return {
-            ...this.game,
-            unitLists: []
-        }
-    }
 
     initGameState(): TGameState<IGameState> {
         const gameState = super.initGameState()
         gameState.status = baseEnum.GameStatus.started
-        gameState.periods = []
-        gameState.groups = []
+        gameState.type = ~~(Math.random() * getEnumKeys(GameType).length)
+        gameState.playerIndex = 0
+        gameState.periods = (Array(PERIOD).fill(null).map(() => ({
+            stage: PeriodStage.reading,
+            orders: [],
+            buyOrderIds: [],
+            sellOrderIds: [],
+            trades: [],
+            closingPrice: 50
+        } as IGamePeriodState)))
+        gameState.periodIndex = 0
+        gameState.initialAsset = {
+            count: 100 + ~~(Math.random() * 50),
+            point: 3e4 + ~~(Math.random() * 1e4)
+        }
         return gameState
     }
 
     async initPlayerState(actor: IActor): Promise<TPlayerState<IPlayerState>> {
         const playerState = await super.initPlayerState(actor)
-        playerState.groups = []
+        const {initialAsset: {point, count}, type} = await this.stateManager.getGameState()
+        playerState.count = count
+        playerState.point = point
+        const [[min, max]] = PrivatePriceRegion[type]
+        playerState.privatePrices = [random(min, max)]
         return playerState
     }
 
@@ -62,159 +68,118 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         const gameState = await this.stateManager.getGameState(),
             playerState = await this.stateManager.getPlayerState(actor)
         switch (type) {
-            case MoveType.getGroup: {
-                if (playerState.groupIndex !== undefined) {
+            case MoveType.getIndex: {
+                if (playerState.playerIndex !== undefined) {
                     break
                 }
-                let groupIndex = gameState.groups.findIndex(gameGroupState => {
-                    if (gameGroupState.playerIndex >= MOCK.playerLimit) {
-                        return false
-                    }
-                    if (actor.type === baseEnum.Actor.serverRobot) {
-                        return true
-                    }
-                    return params.groupType === GroupType.Multi && gameGroupState.type === GroupType.Multi
-                })
-                if (groupIndex === -1) {
-                    if (actor.type === baseEnum.Actor.serverRobot) {
-                        break
-                    }
-                    gameState.groups.push({
-                        type: params.groupType,
-                        stage: GroupStage.matching,
-                        playerIndex: 0,
-                        periodIndex: gameState.periods.length
-                    })
-                    gameState.periods.push(...(Array(PERIOD).fill(null).map(() => ({
-                        orders: [],
-                        stage: PeriodStage.reading,
-                        buyOrderIds: [],
-                        sellOrderIds: [],
-                        trades: [],
-                        playerIndex: 0,
-                        type: params.groupType
-                    }))))
-                    groupIndex = gameState.groups.length - 1
-                }
-                const gameGroupState = gameState.groups[groupIndex],
-                    playerIndex = gameGroupState.playerIndex++
-                playerState.groups[groupIndex] = {
-                    playerIndex,
-                    count: ~~((Math.random() + .5) * MOCK.count),
-                    point: ~~((Math.random() + .5) * MOCK.point)
-                }
-                playerState.groupIndex = groupIndex
-                if (playerIndex > 0) {
+                playerState.playerIndex = gameState.playerIndex++
+                if (playerState.playerIndex > 0) {
                     break
                 }
-                let countDown = -MATCH_TIME
+                let countDown = 1
                 const timer = global.setInterval(async () => {
                     if (gameState.status !== baseEnum.GameStatus.started) {
                         return
                     }
-                    const {periodIndex} = gameGroupState
+                    const {periodIndex} = gameState
                     const gamePeriodState = gameState.periods[periodIndex]
-                    const {tradeTime, prepareTime} = this.game.params,
-                        periodCountDown = countDown % (prepareTime + tradeTime + prepareTime)
-                    switch (true) {
-                        case countDown === 0: {
-                            Array(MOCK.playerLimit - gameGroupState.playerIndex).fill(null).forEach(
-                                async (_, i) => await this.startNewRobotScheduler(`${groupIndex}_${i}`)
-                            )
-                            gameGroupState.stage = GroupStage.trading
-
+                    const {prepareTime, tradeTime, resultTime} = CONFIG,
+                        periodCountDown = countDown % (prepareTime + tradeTime + resultTime)
+                    Array(CreateGame.playerLimit - gameState.playerIndex).fill(null).forEach(
+                        async (_, i) => await this.startNewRobotScheduler(`$Robot_${i}`)
+                    )
+                    const playerStates = await this.getActivePlayerStates()
+                    switch (periodCountDown) {
+                        case prepareTime: {
+                            gamePeriodState.stage = PeriodStage.trading
+                            this.broadcast(PushType.beginTrading)
                             break
                         }
-                        case countDown > 0 : {
-                            switch (periodCountDown) {
-                                case prepareTime: {
-                                    gamePeriodState.stage = PeriodStage.trading
-                                    this.periodBroadcast(periodIndex, PushType.beginTrading)
-                                    break
-                                }
-                                case prepareTime + tradeTime: {
-                                    gamePeriodState.stage = PeriodStage.result
-                                    break
-                                }
-                                case 0: {
-                                    if (gameGroupState.periodIndex % PERIOD < PERIOD - 1) {
-                                        gameGroupState.periodIndex++
-                                    } else {
-                                        global.clearInterval(timer)
-                                    }
-                                    break
-                                }
+                        case prepareTime + tradeTime: {
+                            gamePeriodState.stage = PeriodStage.result
+                            const {periodIndex} = gameState
+                            if (![PERIOD - 1, (PERIOD / 2 - 1)].includes(periodIndex)) {
+                                break
                             }
+                            const countArr = [], priceArr = []
+                            playerStates.sort((p1, p2) => p1.count - p2.count)
+                                .forEach(({count, privatePrices}) => {
+                                    countArr.push(count)
+                                    priceArr.push(privatePrices[periodIndex])
+                                })
+                            gamePeriodState.balancePrice = priceArr[getBalanceIndex(countArr)]
+                            break
+                        }
+                        case 0: {
+                            if (gameState.periodIndex === PERIOD - 1) {
+                                global.clearInterval(timer)
+                                break
+                            }
+                            const periodIndex = ++gameState.periodIndex
+                            const [min, max] = PrivatePriceRegion[gameState.type][periodIndex],
+                                periodTrend = min - PrivatePriceRegion[gameState.type][periodIndex - 1][0],
+                                privatePrices = playerStates.map(() => random(min, max))
+                                    .sort((m, n) => (m - n) * periodTrend)
+                            playerStates.sort((p1, p2) => p1.count - p2.count)
+                                .forEach((playerState, i) => {
+                                    playerState.privatePrices[gameState.periodIndex] = privatePrices[i]
+                                })
                         }
                     }
                     await this.stateManager.syncState()
-                    this.periodBroadcast(periodIndex, PushType.countDown, {countDown: countDown > 0 ? periodCountDown : countDown})
+                    this.broadcast(PushType.countDown, {countDown: countDown > 0 ? periodCountDown : countDown})
                     countDown++
                 }, 1000)
                 break
             }
-            case MoveType.leaveGroup: {
-                playerState.groupIndex = undefined
-                break
-            }
             case MoveType.submitOrder: {
-                const {groupIndex} = playerState,
-                    playerGroupState = playerState.groups[groupIndex],
-                    gameGroupState = gameState.groups[groupIndex],
-                    {periodIndex} = gameGroupState,
+                const {periodIndex} = gameState,
                     gamePeriodState = gameState.periods[periodIndex]
-                const {playerIndex} = playerGroupState
+                const {playerIndex} = playerState
                 const {price, count} = params
-                const orderDict = this.getOrderDict(gamePeriodState), {buyOrderIds, sellOrderIds} = gamePeriodState,
-                    buyOrders = buyOrderIds.map(id => orderDict[id].price).join(','),
-                    sellOrders = sellOrderIds.map(id => orderDict[id].price).join(',')
-                let shoutResult: ShoutResult
                 if (count <= 0 ||
-                    (params.role === ROLE.Seller && count > playerGroupState.count) ||
-                    (params.role === ROLE.Buyer && count * price > playerGroupState.point)
+                    (params.role === ROLE.Seller && count > playerState.count) ||
+                    (params.role === ROLE.Buyer && count * price > playerState.point)
                 ) {
                     Log.d('数量有误，无法继续报价')
-                    shoutResult = ShoutResult.invalidCount
                 } else {
                     const newOrder: IOrder = {
-                        id:gamePeriodState.orders.length,
+                        id: gamePeriodState.orders.length,
                         playerIndex,
                         role: params.role,
                         price,
                         count
                     }
-                    shoutResult = await this.shoutNewOrder(periodIndex, newOrder)
+                    await this.shoutNewOrder(periodIndex, newOrder)
                 }
-                cb(shoutResult, buyOrders, sellOrders)
                 break
             }
             case MoveType.cancelOrder: {
-                const {groupIndex} = playerState,
-                    gameGroupState = gameState.groups[groupIndex],
-                    {periodIndex} = gameGroupState
-                await this.cancelOrder(periodIndex, playerState.groups[groupIndex].playerIndex)
+                const {periodIndex} = gameState
+                await this.cancelOrder(periodIndex, playerState.playerIndex)
+                break
+            }
+            case MoveType.exitGame: {
+                const {onceMore} = params
+                const res = await RedisCall.call<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, {
+                    playUrl: gameId2PlayUrl(namespace, this.game.id, actor.token),
+                    onceMore
+                })
+                res ? cb(res.lobbyUrl) : null
                 break
             }
         }
     }
 
-    getOrderDict(gameState: IGamePeriodState): { [id: number]: IOrder } {
-        const orderDict: { [id: number]: IOrder } = {}
-        gameState.orders.forEach(order => {
-            orderDict[order.id] = order
-        })
-        return orderDict
-    }
-
-    async shoutNewOrder(periodIndex: number, order: IOrder): Promise<ShoutResult> {
-        const periodPlayerStates = await this.getPeriodPlayerStates(periodIndex)
+    async shoutNewOrder(periodIndex: number, order: IOrder): Promise<void> {
+        const playerStates = await this.getActivePlayerStates()
         const gamePeriodState = (await this.stateManager.getGameState()).periods[periodIndex],
             {buyOrderIds, sellOrderIds, trades, orders} = gamePeriodState
         const marketRejected = order.role === ROLE.Seller ?
             sellOrderIds[0] && order.price > orders.find(({id}) => id === sellOrderIds[0]).price :
             buyOrderIds[0] && order.price < orders.find(({id}) => id === buyOrderIds[0]).price
         if (marketRejected) {
-            return ShoutResult.marketReject
+            return
         } else {
             await this.cancelOrder(periodIndex, order.playerIndex)
             orders.push(order)
@@ -222,61 +187,52 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         const tradeSuccess = order.role === ROLE.Seller ?
             buyOrderIds[0] && order.price <= orders.find(({id}) => id === buyOrderIds[0]).price :
             sellOrderIds[0] && order.price >= orders.find(({id}) => id === sellOrderIds[0]).price
-        if (tradeSuccess) {
-            const pairOrderId = order.role === ROLE.Seller ? buyOrderIds.shift() : sellOrderIds.shift(),
-                pairOrder = orders.find(({id}) => id === pairOrderId),
-                trade: ITrade = {
-                    reqOrderId: pairOrderId,
-                    resOrderId: order.id,
-                    count: order.count
-                }
-            if (pairOrder.count > order.count) {
-                const subOrder: IOrder = {
-                    ...pairOrder,
-                    id: orders.length,
-                    count: pairOrder.count - order.count
-                }
-                orders.push(subOrder)
-                ;(order.role === ROLE.Buyer ? sellOrderIds : buyOrderIds).unshift(subOrder.id)
-                trade.subOrderId = subOrder.id
-            } else if (pairOrder.count < order.count) {
-                trade.count = pairOrder.count
-                const subOrder: IOrder = {
-                    ...order,
-                    id: orders.length,
-                    count: order.count - pairOrder.count
-                }
-                trade.subOrderId = subOrder.id
-                await this.shoutNewOrder(periodIndex, subOrder)
-            }
-            trades.push(trade)
-            periodPlayerStates.forEach(playerState => {
-                const playerGroupState = playerState.groups[playerState.groupIndex]
-                let playerRole: ROLE
-                if (order.playerIndex === playerGroupState.playerIndex) {
-                    playerRole = order.role
-                }
-                if (pairOrder.playerIndex === playerGroupState.playerIndex) {
-                    playerRole = order.role
-                }
-                if (playerRole === undefined) {
-                    return
-                }
-                if (playerRole === ROLE.Seller) {
-                    playerGroupState.count -= trade.count
-                    playerGroupState.point += trade.count * pairOrder.price
-                } else {
-                    playerGroupState.count += trade.count
-                    playerGroupState.point -= trade.count * pairOrder.price
-                }
-            })
-            this.periodBroadcast(periodIndex, PushType.newTrade, {resOrderId: order.id})
-            return ShoutResult.tradeSuccess
-        } else {
+        if (!tradeSuccess) {
             (order.role === ROLE.Seller ? sellOrderIds : buyOrderIds).unshift(order.id)
-            this.periodBroadcast(periodIndex, PushType.newOrder, {newOrderId: order.id})
-            return ShoutResult.shoutSuccess
+            return
         }
+        const pairOrderId = order.role === ROLE.Seller ? buyOrderIds.shift() : sellOrderIds.shift(),
+            pairOrder = orders.find(({id}) => id === pairOrderId),
+            trade: ITrade = {
+                reqOrderId: pairOrderId,
+                resOrderId: order.id,
+                count: order.count
+            }
+        if (pairOrder.count > order.count) {
+            const subOrder: IOrder = {
+                ...pairOrder,
+                id: orders.length,
+                count: pairOrder.count - order.count
+            }
+            orders.push(subOrder)
+            ;(order.role === ROLE.Buyer ? sellOrderIds : buyOrderIds).unshift(subOrder.id)
+            trade.subOrderId = subOrder.id
+        } else if (pairOrder.count < order.count) {
+            trade.count = pairOrder.count
+            const subOrder: IOrder = {
+                ...order,
+                id: orders.length,
+                count: order.count - pairOrder.count
+            }
+            trade.subOrderId = subOrder.id
+            await this.shoutNewOrder(periodIndex, subOrder)
+        }
+        trades.push(trade)
+        gamePeriodState.closingPrice = pairOrder.price
+        playerStates.forEach(playerState => {
+            const playerRole = playerState.playerIndex === order.playerIndex ? order.role :
+                playerState.playerIndex === pairOrder.playerIndex ? pairOrder.role : null
+            switch (playerRole) {
+                case ROLE.Buyer:
+                    playerState.count += trade.count
+                    playerState.point -= trade.count * pairOrder.price
+                    break
+                case ROLE.Seller:
+                    playerState.count -= trade.count
+                    playerState.point += trade.count * pairOrder.price
+                    break
+            }
+        })
     }
 
     async cancelOrder(periodIndex: number, playerIndex: number) {
@@ -293,60 +249,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         }
     }
 
-    async handleFetch(req, res) {
-        const {query: {type, sheetType}} = req
-        switch (type) {
-            case FetchType.exportXls: {
-                if (req.user.id !== this.game.owner) {
-                    return res.end('Invalid Request')
-                }
-                const name = SheetType[sheetType]
-                let data = [], option = {}
-                switch (sheetType) {
-                    case SheetType.robotCalcLog: {
-                        data.push(['seq', 'Subject', 'role', 'R', 'A', 'q', 'tau', 'beta', 'p', 'delta', 'r', 'LagGamma', 'Gamma', 'ValueCost', 'u', 'CalculatedPrice', 'Timestamp'])
-                        const robotCalcLogs: Array<{ data: RobotCalcLog }> = await FreeStyleModel.find({
-                            game: this.game.id,
-                            key: DBKey.robotCalcLog
-                        }) as any
-                        robotCalcLogs.sort(({data: {seq: m}}, {data: {seq: n}}) => m - n)
-                            .forEach(({data: {seq, playerSeq, role, R, A, q, tau, beta, p, delta, r, LagGamma, Gamma, ValueCost, u, CalculatedPrice, timestamp}}) =>
-                                data.push([seq, playerSeq, role + 1, R, A, q, tau, beta, p, delta, r, LagGamma, Gamma, ValueCost, u, CalculatedPrice, timestamp]
-                                    .map(v => typeof v === 'number' && v % 1 ? v.toFixed(2) : v)
-                                ))
-                        break
-                    }
-                    case SheetType.robotSubmitLog: {
-                        data.push(['seq', 'Subject', 'role', 'ValueCost', 'Price', 'BuyOrders', 'SellOrders', `ShoutResult:${getEnumKeys(ShoutResult).join('/')}`, 'MarketBuyOrders', 'MarketSellOrders', 'Timestamp'])
-                        const robotSubmitLogs: Array<{ data: RobotSubmitLog }> = await FreeStyleModel.find({
-                            game: this.game.id,
-                            key: DBKey.robotSubmitLog
-                        }) as any
-                        robotSubmitLogs.sort(({data: {seq: m}}, {data: {seq: n}}) => m - n)
-                            .forEach(({data: {seq, playerSeq, role, ValueCost, price, buyOrders, sellOrders, shoutResult, marketBuyOrders, marketSellOrders, timestamp}}) =>
-                                data.push([seq, playerSeq, role, ValueCost, price, buyOrders, sellOrders, `${shoutResult + 1}:${ShoutResult[shoutResult]}`, marketBuyOrders, marketSellOrders, timestamp]
-                                    .map(v => typeof v === 'number' && v % 1 ? v.toFixed(2) : v)
-                                ))
-                        break
-                    }
-                }
-                let buffer = nodeXlsx.build([{name, data}], option)
-                res.setHeader('Content-Type', 'application/vnd.openxmlformats')
-                res.setHeader('Content-Disposition', 'attachment; filename=' + `${encodeURI(name)}.xlsx`)
-                return res.end(buffer, 'binary')
-            }
-        }
-    }
-
-    async getPeriodPlayerStates(periodIndex: number) {
-        const {groups} = await this.stateManager.getGameState()
-        const groupIndex = groups.findIndex(g => g.periodIndex === periodIndex)
-        return Object.values(await this.stateManager.getPlayerStates()).filter(p => p.groupIndex === groupIndex)
-    }
-
-    periodBroadcast(periodIndex: number, type: PushType, params?: IPushParams) {
-        this.getPeriodPlayerStates(periodIndex).then(playerStates =>
-            this.push(playerStates.map(({actor}) => actor), type, params)
-        )
+    async getActivePlayerStates(): Promise<TPlayerState<IPlayerState>[]> {
+        const playerStates = await this.stateManager.getPlayerStates()
+        return Object.values(playerStates).filter(({playerIndex}) => playerIndex !== undefined)
     }
 }

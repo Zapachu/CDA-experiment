@@ -1,4 +1,4 @@
-import {elfPhaseId2PlayUrl} from '../../util'
+import {gameId2PlayUrl} from '../../util'
 import {GameModel} from '../../model'
 import {IGame} from 'bespoke-common'
 import {Server} from 'grpc'
@@ -14,7 +14,7 @@ export function setPhaseService(server: Server) {
             elfGameId,
             namespace,
             params: JSON.parse(param)
-        }).save().then(({id}) => callback(null, {playUrl: elfPhaseId2PlayUrl(namespace, id)}))
+        }).save().then(({id}) => callback(null, {playUrl: gameId2PlayUrl(namespace, id)}))
     }
 
     P.setPhaseService(server, {newPhase})
