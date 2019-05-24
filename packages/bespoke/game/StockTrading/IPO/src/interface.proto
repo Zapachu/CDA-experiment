@@ -10,6 +10,7 @@ message CreateParams {
 message MoveParams {
     float price = 1;
     int32 num = 2;
+    bool onceMore = 3;
 }
 
 message PushParams {

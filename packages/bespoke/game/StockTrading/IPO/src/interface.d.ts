@@ -115,6 +115,9 @@ export interface IMoveParams {
 
     /** MoveParams num */
     num?: (number|null);
+
+    /** MoveParams onceMore */
+    onceMore?: (boolean|null);
 }
 
 /** Represents a MoveParams. */
@@ -131,6 +134,9 @@ export class MoveParams implements IMoveParams {
 
     /** MoveParams num. */
     public num: number;
+
+    /** MoveParams onceMore. */
+    public onceMore: boolean;
 
     /**
      * Creates a new MoveParams instance using the specified properties.

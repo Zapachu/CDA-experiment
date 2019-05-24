@@ -3,7 +3,10 @@ import {
   IActor,
   IMoveCallback,
   TGameState,
-  TPlayerState
+  TPlayerState,
+  baseEnum,
+  RedisCall,
+  gameId2PlayUrl
 } from "bespoke-server";
 import {
   GameState,
@@ -25,9 +28,11 @@ import {
   maxA,
   maxB,
   startingMultiplier,
-  SHOUT_TIMER
+  SHOUT_TIMER,
+  namespace
 } from "./config";
 import { STOCKS } from "../../components/constants";
+import {PhaseDone} from '../../protocol'
 
 export default class Controller extends BaseController<
   ICreateParams,
@@ -44,6 +49,7 @@ export default class Controller extends BaseController<
 
   initGameState(): TGameState<IGameState> {
     const gameState = super.initGameState();
+    gameState.status = baseEnum.GameStatus.started
     gameState.groups = [];
     return gameState;
   }
@@ -191,6 +197,12 @@ export default class Controller extends BaseController<
         break;
       }
       case MoveType.nextGame: {
+        const {onceMore} = params
+        const res = await RedisCall.call<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, {
+          playUrl: gameId2PlayUrl(namespace, this.game.id, actor.token),
+          onceMore
+        })
+        res ? cb(res.lobbyUrl) : null
         break;
       }
     }
