@@ -155,7 +155,7 @@ function Result({count, point, closingPrice, balancePrice}: { count: number, poi
         <table className={style.resultTable}>
             <thead>
             <tr>
-                <td>{lang.closingPrice}</td>
+                <td>{balancePrice ? lang.balancePrice : lang.closingPrice}</td>
                 <td>{lang.stock}</td>
                 <td>{lang.money}</td>
                 <td>{lang.totalAsset}</td>
@@ -236,7 +236,7 @@ function _Play({gameState, playerState, frameEmitter}: TPlayProps) {
                     closingPrice={gamePeriodState.closingPrice}
                     balancePrice={gamePeriodState.balancePrice}/>
             {
-                true || gameState.periodIndex === PERIOD - 1 ? <section className={style.switchBtns}>
+                gameState.periodIndex === PERIOD - 1 ? <section className={style.switchBtns}>
                     <Button label={lang.onceMore}
                             onClick={() => exitGame(true)}/>&nbsp;
                     <Button label={lang.nextPhase} onClick={() => exitGame()}/>

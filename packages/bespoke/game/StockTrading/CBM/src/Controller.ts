@@ -85,9 +85,9 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     const gamePeriodState = gameState.periods[periodIndex]
                     const {prepareTime, tradeTime, resultTime} = CONFIG,
                         periodCountDown = countDown % (prepareTime + tradeTime + resultTime)
-                    /*                    Array(CreateGame.playerLimit - gameState.playerIndex).fill(null).forEach(
-                                            async (_, i) => await this.startNewRobotScheduler(`$Robot_${i}`)
-                                        )*/
+                    Array(CreateGame.playerLimit - gameState.playerIndex).fill(null).forEach(
+                        async (_, i) => await this.startNewRobotScheduler(`$Robot_${i}`)
+                    )
                     const playerStates = await this.getActivePlayerStates()
                     switch (periodCountDown) {
                         case prepareTime: {
