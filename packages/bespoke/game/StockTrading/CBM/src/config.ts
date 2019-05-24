@@ -5,108 +5,33 @@ export enum ROLE {
     Buyer
 }
 
-export enum AdjustDirection {
-    raise,
-    lower
-}
-
-export enum SheetType {
-    robotCalcLog = 'robotCalcLog',
-    robotSubmitLog = 'robotSubmitLog',
-}
-
-export enum GameStage {
-    matching,
-    trading,
-    over
-}
-
 export enum PeriodStage {
     reading,
     trading,
     result
 }
 
-export interface RobotCalcLog {
-    seq,
-    playerSeq,
-    role,
-    R,
-    A,
-    q,
-    tau,
-    beta,
-    p,
-    delta,
-    r,
-    LagGamma,
-    Gamma,
-    ValueCost,
-    u,
-    CalculatedPrice,
-    timestamp
-}
-
-export interface RobotSubmitLog {
-    seq,
-    playerSeq,
-    role,
-    ValueCost,
-    price,
-    buyOrders,
-    sellOrders,
-    timestamp,
-    shoutResult: ShoutResult,
-    marketBuyOrders,
-    marketSellOrders,
-}
-
-export enum ShoutResult {
-    shoutSuccess,
-    tradeSuccess,
-    marketReject,
-    invalidCount,
-}
-
-export enum DBKey {
-    robotCalcLog = 'robotCalcLog',
-    robotSubmitLog = 'robotSubmitLog',
-}
-
-export const RedisKey = {
-    robotActionSeq: (gameId: string) => `robotCalcSeq:${gameId}`
-}
-
 export enum MoveType {
     getIndex = 'getIndex',
     submitOrder = 'submitOrder',
-    cancelOrder = 'cancelOrder'
+    cancelOrder = 'cancelOrder',
+    exitGame = 'exitGame'
 }
 
 export enum PushType {
     countDown = 'countDown',
-    beginTrading = 'beginTrading',
-    newOrder = 'newOrder',
-    newTrade = 'newTrade'
+    beginTrading = 'beginTrading'
 }
 
 export enum FetchType {
-    exportXls = 'exportXls'
 }
 
-export const MATCH_TIME = 5
 export const PERIOD = 6
 
-export const MOCK = {
-    price: 200,
-    count: 100,
-    point: 20000
-}
-
 export const CONFIG = {
-    playerLimit: 12,
     prepareTime: 30,
-    tradeTime: 180
+    tradeTime: 180,
+    resultTime: 30
 }
 
 export interface ICreateParams {
@@ -127,23 +52,44 @@ export interface ITrade {
     subOrderId?: number
 }
 
+export enum GameType {
+    rise,
+    fall,
+    riseFall,
+    fallRise
+}
+
+export const PrivatePriceRegion: { [key: number]: [number, number][] } = {
+    [GameType.rise]: [[25, 75], [30, 80], [35, 85], [40, 90], [45, 95], [50, 100]],
+    [GameType.fall]: [[50, 100], [45, 95], [40, 90], [35, 85], [30, 80], [25, 75]],
+    [GameType.riseFall]: [[25, 75], [30, 80], [35, 85], [35, 85], [30, 80], [25, 75]],
+    [GameType.fallRise]: [[35, 85], [30, 80], [25, 75], [25, 75], [30, 80], [35, 85]]
+}
+
 export interface IGamePeriodState {
     stage: PeriodStage
     orders: IOrder[]
     buyOrderIds: number[]
     sellOrderIds: number[]
     trades: ITrade[]
+    closingPrice: number
+    balancePrice: number
 }
 
 export interface IGameState {
+    type: GameType
     periods: IGamePeriodState[]
-    stage: GameStage
-    playerIndex: number
     periodIndex: number
+    playerIndex: number
+    initialAsset: {
+        count: number
+        point: number
+    }
 }
 
 export interface IPlayerState {
     playerIndex: number
+    privatePrices: number[]
     count: number
     point: number
 }
@@ -152,6 +98,7 @@ export type IMoveParams = Partial<{
     role: ROLE
     price: number
     count: number
+    onceMore: boolean
 }>
 
 export type IPushParams = Partial<{

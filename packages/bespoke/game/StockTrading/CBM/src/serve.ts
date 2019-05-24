@@ -13,7 +13,7 @@ Server.start(
 
 RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(CreateGame.name(Phase.CBM), async ({keys}) => {
     const gameId = await Server.newGame<ICreateParams>(namespace, {
-        title: `${Phase.CBM}:${Math.random()}`,
+        title: `${Phase.CBM}:${new Date().toUTCString()}`,
         desc: '',
         params: {
             prepareTime: CONFIG.prepareTime,
