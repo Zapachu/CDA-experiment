@@ -48,6 +48,8 @@ export default class IntroStage extends Core.Play<
     frameEmitter.on(PushType.matchTimer, ({ matchTimer, matchNum }) => {
       this.setState({ matchTimer, matchNum });
     });
+    //TODO 由Match系统匹配玩家，Game内仅处理单轮的业务逻辑(临时方案，待移除此Game内match相关代码)
+    frameEmitter.emit(MoveType.startMulti)
   }
 
   render() {

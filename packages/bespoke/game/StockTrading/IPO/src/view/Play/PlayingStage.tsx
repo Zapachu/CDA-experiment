@@ -116,6 +116,10 @@ export default class PlayingStage extends Core.Play<
     this.setState({ num: "" + num });
   };
 
+  exitGame(onceMore?: boolean) {
+    this.props.frameEmitter.emit(MoveType.nextGame, {onceMore}, lobbyUrl => location.href = lobbyUrl)
+  }
+
   renderResult = (
     investorState: Partial<PlayerState.IMulti>,
     marketState: Partial<GameState.Group.IRound>
@@ -201,13 +205,13 @@ export default class PlayingStage extends Core.Play<
                 price: undefined,
                 num: undefined
               });
-              frameEmitter.emit(MoveType.replay);
+              this.exitGame(true)
             }}
           />
           <Button
             label={"下一局"}
             onClick={() => {
-              frameEmitter.emit(MoveType.nextGame);
+              this.exitGame()
             }}
           />
         </div>
