@@ -202,13 +202,13 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
         <Display data={displayData} />
         <p className={style.desc}>{this.joinWords(curTest.desc)}</p>
         <ul>
-          {curTest.questions.map(({title, options}, i) => <li key={i}>
+          {curTest.questions.map(({title, options}, i) => <li key={i} style={{paddingBottom:'20px'}}>
             <p className={tips[i]===Tip.Wrong?style.tipWrong:''}>{this.joinWords(title)} {tips[i] === Tip.Wrong ? <span>{lang.wrong}</span> : null}</p>
             <Radio options={typeof options === 'function'
               ? options(displayData, d)
               : options}
-                        value={answers[i] || ''}
-                        onChange={e => this.answer(e as string, i)}
+                   value={answers[i] || ''}
+                   onChange={e => this.answer(e as string, i)}
             />
           </li>)}
         </ul>
