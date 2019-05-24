@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+      "module": "commonjs",
+      "esModuleInterop": true,
+      "target": "es5",
+      // "strict": true,
+      "noUnusedLocals": true,
+      "moduleResolution": "node",
+      "sourceMap": true,
+      "lib": ["es7", "es2017.object"],
+      "outDir": "build",
+      "baseUrl": ".",
+      "paths": {
+      },
+      "experimentalDecorators": true
+    },
+  }
+  
