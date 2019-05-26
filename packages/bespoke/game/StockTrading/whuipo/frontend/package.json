@@ -7,10 +7,14 @@
     "precommit": "npm run lint"
   },
   "dependencies": {
+    "@types/socket.io-client": "^1.4.32",
+    "antd": "^3.18.2",
     "babylonjs": "^4.0.3",
+    "babylonjs-gui": "^4.0.3",
     "dva": "^2.4.1",
     "react": "^16.2.0",
-    "react-dom": "^16.2.0"
+    "react-dom": "^16.2.0",
+    "socket.io-client": "^2.2.0"
   },
   "devDependencies": {
     "babel-plugin-dva-hmr": "^0.3.2",
