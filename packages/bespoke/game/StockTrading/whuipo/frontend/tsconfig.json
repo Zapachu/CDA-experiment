@@ -15,7 +15,10 @@
     "jsx": "react",
     "esModuleInterop": true,
   },
-  "include": [
-    "."
-  ],
+  // "include": [
+  //   "."
+  // ],
+  "exclude": [
+    "node_modules"
+  ]
 }

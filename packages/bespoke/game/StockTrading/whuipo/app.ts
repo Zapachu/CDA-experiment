@@ -178,7 +178,7 @@ let server = http.createServer(app);
 
 const io = socket(server)
 io.adapter(socketRedis({ host: settings.redishost, port: settings.redisport }))
-io.path(settings.socketPath)
+// io.path(settings.socketPath)
 io.use(socketSession(sessionMiddleWare, {
   autoSave: true
 }))

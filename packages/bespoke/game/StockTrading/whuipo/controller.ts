@@ -2,17 +2,17 @@ import Socket from 'socket.io'
 import passport from 'passport'
 import { Request, Response, NextFunction } from 'express'
 import socketEmitter from 'socket.io-emitter'
+import {RedisCall} from 'bespoke-server'
+import path from 'path'
 
 import { User } from './models'
 import { UserDoc } from './interfaces'
 import settings from './settings'
-import {Phase, reqPlayerUrl} from '../protocol'
+import {Phase, CreateGame, PhaseDone} from '../protocol'
 import { ResCode, serverSocketListenEvents, clientSocketListenEvnets, UserGameStatus } from './enums'
-// import {} from '../protocol'
 
 const ioEmitter = socketEmitter({ host: settings.redishost, port: settings.redisport })
-const a = ioEmitter
-console.log(a)
+
 passport.serializeUser(function (user: UserDoc, done) {
     done(null, user._id);
 });
@@ -52,30 +52,105 @@ const removeUserSocket = (uid, socketId) => {
     return arr
 }
 
-const matchRoomLimit = 15
-const waittingTime = 30 // 秒
-const matchRoom = [] // uids
+const matchRoomLimit = 10
+const waittingTime = 10 // 秒
+const matchRoomOfGame: {[gamePhase: number]: string[]} = {
+}
+const matchRoomTimerOfGame = {}
 
-const joinMatchRoom = (uid) => {
+
+const initRoom = (gamePhase: Phase) => {
+    const arr = []
+    matchRoomOfGame[gamePhase] = arr
+    let i = 0
+    const timerId = setInterval(async () => {
+        console.log(`${gamePhase} 房间 正在匹配中, 已等待${i}s`)
+        if (i === waittingTime) {
+            clearRoom(gamePhase)
+            await emitMatchSuccess(gamePhase, arr)
+            return
+        }
+        i++
+    }, 1000)
+    matchRoomTimerOfGame[gamePhase] = timerId
+    return arr
+}
+
+const joinMatchRoom = (gamePhase: Phase, uid) => {
+    let matchRoom = matchRoomOfGame[gamePhase]
+    if (!matchRoom || matchRoom.length === 0) {
+        matchRoom = initRoom(gamePhase)
+    }
     matchRoom.push(uid)
 }
-const leaveRoom = (uid) => {
+const leaveRoom = (gamePhase: Phase, uid) => {
+    console.log(gamePhase, 'leave room')
+    const matchRoom = matchRoomOfGame[gamePhase] || []
     const findIndex = matchRoom.findIndex(i => i === uid)
+    let flag = false
     if (findIndex > -1) {
         matchRoom.splice(findIndex, 1)
+        flag = true
     }
+    if (matchRoom.length === 0) {
+        clearRoom(gamePhase)
+    }
+    return flag
 }
 
-const emitMatchSuccess = async (uids = []) => {
-    const playerUrls = await reqPlayerUrl(uids)
-    uids.forEach((uid, index) => {
+const clearRoom = (gamePhase: Phase) => {
+    const timerId = matchRoomTimerOfGame[gamePhase]
+    if (timerId) {
+        clearInterval(timerId)
+        matchRoomTimerOfGame[gamePhase] = null
+    }
+    matchRoomOfGame[gamePhase] = []
+}
+
+const emitMatchSuccess = async (gamePhase: Phase, uids = []) => {
+    const {playUrls: playerUrls} = await RedisCall.call<CreateGame.IReq, CreateGame.IRes>(CreateGame.name(gamePhase), {
+        keys: uids
+    })
+    console.log(playerUrls, 'urls')
+    uids.forEach(async (uid, index) => {
         const arr = userSocketMap[uid] || []
         const playerUrl = playerUrls[index]
         arr.forEach(socketId => {
             ioEmitter.to(socketId).emit(clientSocketListenEvnets.startGame, {playerUrl })
         })
+        await User.updateOne({
+            _id: uid
+        }, {
+            $set: {
+                status: UserGameStatus.started,
+                playerUrl
+            }
+        })
     })
 }
+
+const gamePhaseOrder = {
+    [Phase.CBM]: 1,
+    [Phase.IPO_Median]: 2,
+    [Phase.IPO_TopK]: 2,
+    [Phase.TBM]: 3
+}
+
+RedisCall.handle<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, async ({playUrl, onceMore}) => {
+    console.log('redis handle phase done', playUrl, onceMore)
+    const user = await User.findOne({playerUrl: playUrl})
+    console.log(!!user)
+    if (user) {
+        const lastUserUnlockOrder = gamePhaseOrder[user.unblockGamePhase] || -1
+        const orderOfNowGame = gamePhaseOrder[user.nowJoinedGame]
+        if (orderOfNowGame > lastUserUnlockOrder) {
+            user.unblockGamePhase = user.nowJoinedGame
+        }
+        user.status = onceMore ? UserGameStatus.beforeStart : UserGameStatus.end
+        await user.save()
+    }
+    return {lobbyUrl: settings.lobbyUrl}
+})
 export default class RouterController {
     @catchError
     static async isLogined(req: Request, res: Response, next: NextFunction) {
@@ -96,7 +171,8 @@ export default class RouterController {
 
     @catchError
     static async renderIndex(req: Request, res: Response, next: NextFunction) {
-        res.send('index html todo')
+        // res.send('index html todo')
+        res.sendfile(path.resolve(__dirname, './dist/index.html'))
     }
 
     @catchError
@@ -120,36 +196,43 @@ export function handleSocketPassportFailed(data, msg, error, cb) {
 
 export function handleSocketInit(ioServer: Socket.Server) {
     ioServer.on('connection', function (socket) {
-        console.log('connect123', socket.handshake.session, socket.request.user)
+        console.log('connected')
         const user = socket.request.user
         if (socket.request.isAuthenticated()) {
             pushUserSocket(user._id, socket.id)
         }
         socket.on(serverSocketListenEvents.reqStartGame, async function (msg) {
             try {
-                console.log('message: ');
+                console.log('req Start msg: ');
                 console.log(msg)
-                socket.send('hi')
                 if (!socket.request.isAuthenticated()) {
                     console.log('没有登陆')
                     return
                 }
-                if (user.status === UserGameStatus.beforeStart) {
+                if ([UserGameStatus.beforeStart, UserGameStatus.end].includes(user.status)) {
                     const user = await User.findById(socket.request.user._id)
-                    const {isGroupMode, gameType} = msg
+                    const {isGroupMode, gamePhase} = msg
+                    const orderOfPhase = gamePhaseOrder[gamePhase]
+                    const unblockPhaseLimit = gamePhaseOrder[user.unblockGamePhase]
+                    if (orderOfPhase > unblockPhaseLimit + 1) {
+                        return
+                    }
                     if (isGroupMode) {
-                        joinMatchRoom(user._id)
-                        user.nowJoinedGame = gameType
+                        joinMatchRoom(gamePhase, user._id)
+                        const matchRoom = matchRoomOfGame[gamePhase]
+                        user.nowJoinedGame = gamePhase
                         user.status = UserGameStatus.waittingMatch
                         await user.save()
+                        socket.emit(clientSocketListenEvnets.startMatch) // TODO
                         if (matchRoom.length === matchRoomLimit) {
-                            await emitMatchSuccess(matchRoom)
+                            await emitMatchSuccess(gamePhase, matchRoom)
+                            await clearRoom(gamePhase)
                         }
                     } else {
-                        user.nowJoinedGame = gameType
-                        user.status = UserGameStatus.started
+                        user.nowJoinedGame = gamePhase
+                        // user.status = UserGameStatus.started
                         await user.save()
-                        await emitMatchSuccess([user._id])
+                        await emitMatchSuccess(gamePhase, [user._id])
                     }
                 }
             } catch (e) {
@@ -157,7 +240,25 @@ export function handleSocketInit(ioServer: Socket.Server) {
             }
 
         });
-        socket.on('disconnect',async function (socket) {
+        socket.on(serverSocketListenEvents.leaveMatchRoom, async function () {
+            console.log(' req leave room')
+            try {
+                if (socket.request.isAuthenticated()) {
+                    const uid = socket.request.user._id
+                    const user = await User.findById(uid)
+                    if (user.status === UserGameStatus.waittingMatch) {
+                        leaveRoom(user.nowJoinedGame, user._id)
+                        user.status = UserGameStatus.beforeStart
+                        await user.save()
+                    }
+                   
+                }
+            } catch (e) {
+                console.error(e)
+            }
+           
+        })
+        socket.on('disconnect',async function () {
             console.log('dis connect')
             try {
                 if (socket.request.isAuthenticated()) {
@@ -167,7 +268,7 @@ export function handleSocketInit(ioServer: Socket.Server) {
                     if (userSockets.length === 0) {
                         const user = await User.findById(uid)
                         if (user.status === UserGameStatus.waittingMatch) {
-                            leaveRoom(user._id)
+                            leaveRoom(user.nowJoinedGame, user._id)
                             user.status = UserGameStatus.beforeStart
                             await user.save()
                         }

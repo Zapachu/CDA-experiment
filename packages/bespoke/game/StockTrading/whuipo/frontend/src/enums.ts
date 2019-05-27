@@ -6,6 +6,7 @@ export interface UserDoc {
     status: UserGameStatus,
     nowJoinedGame?: GameTypes,
     playerUrl?: string,
+    unblockGamePhase?: GameTypes
 }
 
 export enum UserGameStatus {
@@ -16,9 +17,10 @@ export enum UserGameStatus {
 }
 
 export enum GameTypes {
-    tbm,
-    cbm,
-    ipo
+    IPO_Median,
+    IPO_TopK,
+    TBM,
+    CBM
 }
 
 export enum ResCode {
@@ -27,9 +29,11 @@ export enum ResCode {
 }
 
 export enum serverSocketListenEvents {
-    reqStartGame = 'reqStartGame'
+    reqStartGame = 'reqStartGame',
+    leaveMatchRoom = 'leaveMatchRoom'
 }
 
 export enum clientSocketListenEvnets {
-    startGame = 'startGame'
+    startMatch = 'startMatch',
+    startGame = 'startGame',
 }

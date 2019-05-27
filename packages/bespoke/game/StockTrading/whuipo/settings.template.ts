@@ -10,5 +10,5 @@ export default {
     sessionSecret: process.env.SESSION_SECRET || 'sessionsecret',
 
     rootname: '',
-    socketPath: '/socket'
+    lobbyUrl: 'http://www.badiu.com' // 游戏大厅地址
 }

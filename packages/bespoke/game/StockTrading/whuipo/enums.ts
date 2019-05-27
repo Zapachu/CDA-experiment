@@ -5,21 +5,17 @@ export enum UserGameStatus {
     end
 }
 
-export enum GameTypes {
-    tbm,
-    cbm,
-    ipo
-}
-
 export enum ResCode {
     success = 0,
     unexpectError = -1
 }
 
 export enum serverSocketListenEvents {
-    reqStartGame = 'reqStartGame'
+    reqStartGame = 'reqStartGame',
+    leaveMatchRoom = 'leaveMatchRoom'
 }
 
 export enum clientSocketListenEvnets {
+    startMatch = 'startMatch',
     startGame = 'startGame',
 }

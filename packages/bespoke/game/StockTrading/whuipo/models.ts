@@ -11,6 +11,7 @@ const UserSchema = new Schema({
   status: {type: Number, default: UserGameStatus.beforeStart},
   nowJoinedGame: Number,
   playerUrl: String,
+  unblockGamePhase: Number
 });
 
 UserSchema.pre<UserDoc>('save', function (next) {

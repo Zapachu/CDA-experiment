@@ -1,4 +1,5 @@
 {
+    "entry": "src/index.js",
     "proxy": {
         "/api": {
             "target": "http://192.168.56.1:3020",
@@ -9,5 +10,27 @@
             "changeOrigin": true,
             "ws": true
         }
+    },
+    "env": {
+      "development": {
+        "define": {
+          "APP_TYPE": "development"
+        }
+      },
+      "production": {
+        "disableDynamicImport": false,
+        "outputPath": "dist",
+        "publicPath": "/static",
+        "define": {
+          "APP_TYPE": "production"
+        },
+        "commons": [{
+            "name": "index",
+            "finename": "common-code.js",
+            "minChunks": 2,
+            "children": true,
+            "async": true
+        }]
+      }
     }
 }
