@@ -1,13 +1,14 @@
 import { Schema, model } from 'mongoose';
 // const { ObjectId } = Schema.Types;
 import { UserDoc } from './interfaces';
-
+import {UserGameStatus} from './enums'
+ 
 const UserSchema = new Schema({
   createAt: Date,
   updateAt: Date,
 
   unionId: { type: String, unique: true },
-  status: Number,
+  status: {type: Number, default: UserGameStatus.beforeStart},
   nowJoinedGame: Number,
   playerUrl: String,
 });

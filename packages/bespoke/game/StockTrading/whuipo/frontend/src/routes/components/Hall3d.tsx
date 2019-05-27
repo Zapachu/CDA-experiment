@@ -138,6 +138,7 @@ class Hall3D extends React.Component<Props, State> {
   gameIntroInstance: {
     [gameStep: string]: BABYLON.Mesh
   }
+  io: SocketIO
   constructor(props) {
     super(props)
     this.hoverMaskInstance = {}
@@ -153,12 +154,12 @@ class Hall3D extends React.Component<Props, State> {
   }
   componentDidMount () {
     this.reqInitInfo()
-    this.connectSocket()
   }
   reqInitInfo () {
     reqInitInfo().then(res => {
       console.log(res)
       if (res.code === ResCode.success) {
+        this.connectSocket()
         const user: UserDoc = res.user
         const {status, playerUrl, nowJoinedGame} = user
         if (!!nowJoinedGame) {
@@ -199,7 +200,8 @@ class Hall3D extends React.Component<Props, State> {
       })
     }
     return <Modal visible={showPreStartModal} onCancel={handleClose}>
-      test
+      <Button>单人模式</Button>
+      <Button onClick={}>多人模式</Button>
     </Modal>
   }
   handlePointerOver (gameStep: GameSteps) {
@@ -449,7 +451,7 @@ class Hall3D extends React.Component<Props, State> {
     }, 0);
   }
   handleSceneMount ({ engine, scene, canvas }) {
-    // _showWorldAxis(scene, 1);
+    _showWorldAxis(scene, 1);
     const camera = new BABYLON.ArcRotateCamera(
       "Camera",
       0, 0, 5,
@@ -497,7 +499,7 @@ class Hall3D extends React.Component<Props, State> {
   }
   connectSocket () {
     const io = socket.connect('/')
-    io.on('connect', function () {
+    io.on('connect', function (socket) {
         console.log('inner')
         io.emit(serverSocketListenEvents.reqStartGame, {
             isGroupMode: false,

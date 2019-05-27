@@ -11,9 +11,13 @@ import http from 'http';
 import morgan from 'morgan'
 import socket from 'socket.io'
 import passport from 'passport'
+import socketRedis from 'socket.io-redis'
+import socketSession from 'express-socket.io-session'
+import socketPassport from 'passport.socketio'
+import cookieParser from 'cookie-parser'
 
 import router from './router'
-import {handleSocketInit} from './controller'
+import { handleSocketInit, handleSocketPassportFailed, handleSocketPassportSuccess } from './controller'
 
 import settings from './settings'
 
@@ -100,7 +104,7 @@ const redisClient = new Redis({
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.use(compression());
-
+// app.use(cookieParser())
 // uncomment after placing your favicon in /public
 app.use(morgan('dev'));
 app.use(bodyParser.json());
@@ -113,22 +117,24 @@ app.use(
 );
 // app.use(validator());
 
+const sessionStore = new RedisStore({
+  client: redisClient as any,
+  ttl: 60 * 24 * 60 * 30 // expire time in seconds
+})
 let sessionSet = {
-  name: 'whuipo.sid',
+  name: settings.sessionId || 'whuipo.sid',
   resave: true,
   saveUninitialized: true,
   secret: settings.sessionSecret,
-  store: new RedisStore({
-    client: redisClient as any,
-    ttl: 60 * 24 * 60 * 30 // expire time in seconds
-  }),
+  store: sessionStore,
   cookie: {
     path: '/',
-    domain: process.env.NODE_ENV !== 'production'　?  null :  'ancademy.org', // TODO
+    domain: process.env.NODE_ENV !== 'production' ? null : 'ancademy.org', // TODO
     maxAge: 1000 * 60 * 24 * 7 // 24 hours
   }
 };
-app.use(session(sessionSet));
+const sessionMiddleWare = session(sessionSet)
+app.use(sessionMiddleWare);
 
 /**csrf whitelist*/
 // const csrfExclude = [];
@@ -157,7 +163,7 @@ app.use(
 
 
 //routes
-app.use(settings.rootname || '/', router);
+app.use(path.join(settings.rootname || '/', 'api'), router);
 
 /**
  * Get port from environment and store in Express.
@@ -171,6 +177,19 @@ app.set('port', port);
 let server = http.createServer(app);
 
 const io = socket(server)
+io.adapter(socketRedis({ host: settings.redishost, port: settings.redisport }))
+io.path(settings.socketPath)
+io.use(socketSession(sessionMiddleWare, {
+  autoSave: true
+}))
+io.use(socketPassport.authorize({
+  cookieParser: cookieParser,
+  key: settings.sessionId || 'whuipo.sid',
+  secret: settings.sessionSecret,
+  store: sessionStore,
+  success: handleSocketPassportSuccess,
+  fail: handleSocketPassportFailed
+}))
 handleSocketInit(io)
 /**
  * Listen on provided port, on all network interfaces.
