@@ -57,3 +57,12 @@ export namespace Example{
         })
     }
 }
+
+export function reqPlayerUrl (keys){
+    return RedisCall.call<CreateGame.IReq, CreateGame.IRes>(CreateGame.name(Phase.CBM), {
+        keys
+    }).then(({playUrls}) => {
+        Log.d(playUrls)
+        return playUrls
+    })
+}
