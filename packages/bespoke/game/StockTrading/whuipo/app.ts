@@ -163,7 +163,7 @@ app.use(
 
 
 //routes
-app.use(path.join(settings.rootname || '/', 'api'), router);
+app.use(settings.rootname || '/', router);
 
 /**
  * Get port from environment and store in Express.
