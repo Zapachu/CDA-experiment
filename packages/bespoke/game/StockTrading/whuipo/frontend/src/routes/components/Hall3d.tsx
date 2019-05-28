@@ -1,6 +1,5 @@
 import * as React from "react";
 import * as BABYLON from "babylonjs";
-import * as GUI from 'babylonjs-gui'
 import { Button, Modal, Spin } from 'antd'
 import {reqInitInfo} from '../../services/index'
 import socket from 'socket.io-client'
@@ -9,9 +8,6 @@ import {serverSocketListenEvents, clientSocketListenEvnets, ResCode, UserDoc, Us
 import BabylonScene from "./BabylonScene";
 import PANO from "./pano.png";
 import Detail from './detail.png'
-import LeftImg from './left.png'
-import centerImg from './center.png'
-import rightImg from './right.png'
 import Arrow from './arrow.png'
 
 import 'antd/dist/antd.css';
@@ -21,15 +17,6 @@ const zLargeDistance = 500
 
 const cardWidth = 120
 const cardHeight = cardWidth * (347 / 620)
-
-const getRelativePageX = (x) => {
-  const clientX = document.body.clientHeight
-  return x / clientX
-}
-const getRelativePageY = (y) => {
-  const clientY = document.body.clientHeight
-  return y / clientY
-}
 
 const redirect = (url) => {
   if (APP_TYPE === 'production') {
@@ -72,7 +59,6 @@ const GameRenderConfigs = {
     },
     introRotateY: - Math.PI / 4,
     introContent: 'ipo ipo test',
-    btnImg: LeftImg,
     btnPosition: {
       x: -200,
       y: -80,
@@ -97,7 +83,6 @@ const GameRenderConfigs = {
     },
     introRotateY: 0,
     introContent: 'ipo ipo test',
-    btnImg: centerImg,
     btnPosition: {
       x: 0,
       y: -80,
@@ -123,7 +108,6 @@ const GameRenderConfigs = {
     },
     introRotateY: Math.PI / 4,
     introContent: 'ipo ipo test',
-    btnImg: rightImg,
     btnPosition: {
       x: 200,
       y: -80,
@@ -397,8 +381,8 @@ class Hall3D extends React.Component<Props, State> {
     return myGround
   }
   renderGameStepBtn (gameStep: GameSteps) {
-    const {btnImg, btnPosition} = GameRenderConfigs[gameStep]
-    console.log('render step', btnPosition, btnImg, Detail)
+    const {btnPosition} = GameRenderConfigs[gameStep]
+    console.log('render step', btnPosition, Detail)
     const myGround = BABYLON.MeshBuilder.CreateGround(`btn${gameStep}`, { width: 80, height: 30, subdivisions: 4 }, this.scene);
     const myMaterial = new BABYLON.StandardMaterial(`btnMat${gameStep}`, this.scene)
     const texture = new BABYLON.Texture(Arrow, this.scene)
@@ -598,7 +582,6 @@ class Hall3D extends React.Component<Props, State> {
     const {isDetailView, isInitView} = this.state
     return (
       <div>
-        {/* <img src={Arrow}/> */}
         {
           isInitView && <div className={style.loading}>
             <Spin/>

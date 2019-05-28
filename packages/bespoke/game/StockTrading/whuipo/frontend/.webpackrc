@@ -32,5 +32,10 @@
             "async": true
         }]
       }
-    }
+    },
+    "html": {
+      "template": "./public/index.ejs"
+    },
+    "publicPath": "",
+    "hash": true
 }
