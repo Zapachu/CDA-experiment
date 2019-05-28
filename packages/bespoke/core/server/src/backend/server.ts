@@ -13,7 +13,7 @@ import * as bodyParser from 'body-parser'
 import * as compression from 'compression'
 import * as morgan from 'morgan'
 import {elfSetting} from 'elf-setting'
-import {Log, redisClient, RedisKey, Setting, QCloudSMS} from './util'
+import {Log, redisClient, RedisKey, Setting, QCloudSMS, heartBeat} from './util'
 import {baseEnum, config, IGameSetting, IGameConfig} from 'bespoke-common'
 import {EventDispatcher} from './controller/eventDispatcher'
 import {rootRouter, namespaceRouter} from './controller/requestRouter'
@@ -140,23 +140,14 @@ export class Server {
         EventDispatcher.startGameSocket(server).use(socketIOSession(this.sessionMiddleware))
         this.bindServerListener(server, () => {
             Log.i(`CreateGame：http://${Setting.ip}:${elfSetting.bespokeHmr ? config.devPort.client : Setting.port}/${config.rootName}/${Setting.namespace}/create`)
-            if (!elfSetting.bespokeWithProxy) {
-                return
-            }
+            heartBeat(async () => await redisClient.setex(
+                RedisKey.gameServer(Setting.namespace),
+                config.heartBeatSeconds + 1,
+                `${Setting.ip}:${Setting.port}`
+            ))
             if (elfSetting.bespokeWithLinker) {
                 serveRPC()
             }
-            const heartBeat2Proxy = () => {
-                redisClient.setex(RedisKey.gameServer(Setting.namespace), config.gameRegisterInterval+1, `${Setting.ip}:${Setting.port}`).catch(e => Log.e(e))
-                /*                getProxyService().registerGame({
-                                        namespace: Setting.namespace,
-                                        port: Setting.port.toString(),
-                                        rpcPort: Setting.rpcPort.toString()
-                                    },
-                                    err => err ? Log.w(`注册至代理失败，${config.gameRegisterInterval}秒后重试`) : null)*/
-                setTimeout(() => heartBeat2Proxy(), config.gameRegisterInterval * 1e3)
-            }
-            setTimeout(() => heartBeat2Proxy(), config.gameRegisterInterval)
         })
     }
 

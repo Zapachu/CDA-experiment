@@ -43,12 +43,7 @@ export default {
     linkerServiceUri: '127.0.0.1:54000',
     //endregion
     //region bespoke
-    proxyService: {
-        host: 'http://127.0.0.1',//https://bespoke.ancademy.org
-        port: 4001,
-        rpcHost: '127.0.0.1',
-        rpcPort: 54001
-    },
+    proxyOrigin:'http://127.0.0.1',
     adminMobileNumbers: ['13000000000'],
     pythonRobotUri: '127.0.0.1:54001',
     //endregion
