@@ -147,17 +147,16 @@ export class Server {
                 serveRPC()
             }
             const heartBeat2Proxy = () => {
-                Log.l('register to proxy')
-                redisClient.setex(RedisKey.gameServer(Setting.namespace), config.gameRegisterInterval, `${Setting.ip}:${Setting.port}`).catch(e => Log.e(e))
+                redisClient.setex(RedisKey.gameServer(Setting.namespace), config.gameRegisterInterval+1, `${Setting.ip}:${Setting.port}`).catch(e => Log.e(e))
                 /*                getProxyService().registerGame({
                                         namespace: Setting.namespace,
                                         port: Setting.port.toString(),
                                         rpcPort: Setting.rpcPort.toString()
                                     },
                                     err => err ? Log.w(`注册至代理失败，${config.gameRegisterInterval}秒后重试`) : null)*/
-                setTimeout(() => heartBeat2Proxy(), config.gameRegisterInterval)
+                setTimeout(() => heartBeat2Proxy(), config.gameRegisterInterval * 1e3)
             }
-            setTimeout(() => heartBeat2Proxy(), .5 * config.gameRegisterInterval)
+            setTimeout(() => heartBeat2Proxy(), config.gameRegisterInterval)
         })
     }
 
