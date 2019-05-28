@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "start": "ESLINT=none roadhog server",
-    "build": "webpack --config webpack.build.js",
+    "build": "webpack --config webpack.build.js && cp -rf dist ../build/whuipo/",
     "lint": "eslint --ext .js src test",
     "precommit": "npm run lint"
   },
