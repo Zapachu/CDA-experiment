@@ -10,5 +10,6 @@ export default {
     sessionSecret: process.env.SESSION_SECRET || 'sessionsecret',
 
     rootname: '',
-    lobbyUrl: 'http://www.badiu.com' // 游戏大厅地址
+    lobbyUrl: 'https://www.microexperiment.cn',
+    domain: 'microexperiment.cn'
 }

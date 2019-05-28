@@ -129,7 +129,7 @@ let sessionSet = {
   store: sessionStore,
   cookie: {
     path: '/',
-    domain: process.env.NODE_ENV !== 'production' ? null : 'ancademy.org', // TODO
+    domain: process.env.NODE_ENV !== 'production' ? null : settings.domain, // TODO
     maxAge: 1000 * 60 * 24 * 7 // 24 hours
   }
 };
