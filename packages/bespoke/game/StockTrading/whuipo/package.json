@@ -4,7 +4,8 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon --watch './**/*.ts' --ignore './**/*.spec.ts' --exec 'ts-node' app.ts"
+    "start": "nodemon --watch './**/*.ts' --ignore './**/*.spec.ts' --exec 'ts-node' app.ts",
+    "build": "rm -rf build && tsc"
   },
   "dependencies": {
     "@types/ioredis": "^4.0.10",

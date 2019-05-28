@@ -11,8 +11,11 @@
       "outDir": "build",
       "baseUrl": ".",
       "paths": {
+        "*": ["v5/types/*", "node_modules/*"]
       },
-      "experimentalDecorators": true
+      "experimentalDecorators": true,
+      "skipLibCheck": true
     },
+    "exclude": ["./dist", "./frontend"]
   }
   
