@@ -1,6 +1,6 @@
 import { Document } from 'mongoose'
-import {GameTypes, UserGameStatus} from './enums'
-
+import {UserGameStatus} from './enums'
+import {Phase} from '../protocol'
 interface IDocument extends Document {
     updateAt: number;
     createAt: number;
@@ -9,6 +9,7 @@ interface IDocument extends Document {
 export interface UserDoc extends IDocument {
     unionId: string,
     status: UserGameStatus,
-    nowJoinedGame?: GameTypes,
+    nowJoinedGame?: Phase,
     playerUrl?: string,
+    unblockGamePhase?: Phase
 }
