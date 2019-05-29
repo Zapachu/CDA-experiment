@@ -1,9 +1,12 @@
 import * as React from "react";
 import * as BABYLON from "babylonjs";
 import { Button, Modal, Spin } from 'antd'
-import {reqInitInfo} from '../../services/index'
 import socket from 'socket.io-client'
+import 'pepjs'
+
+import {reqInitInfo} from '../../services/index'
 import {serverSocketListenEvents, clientSocketListenEvnets, ResCode, UserDoc, UserGameStatus, GameTypes} from '../../enums'
+import Line2d from './line2d'
 
 import BabylonScene from "./BabylonScene";
 import PANO from "./pano.png";
@@ -163,6 +166,7 @@ class Hall3D extends React.Component<Props, State> {
 
   }
   componentDidMount () {
+    console.log(APP_TYPE, 'apptype')
     this.reqInitInfo()
   }
   reqInitInfo () {
@@ -319,7 +323,6 @@ class Hall3D extends React.Component<Props, State> {
     materialGround.emissiveColor = new BABYLON.Color3(1, 1, 1)
     ground.material = materialGround;
 
-
     var textureContext = textureGround.getContext();
     var img = new Image();
     img.src = Detail;
@@ -383,12 +386,12 @@ class Hall3D extends React.Component<Props, State> {
   renderGameStepBtn (gameStep: GameSteps) {
     const {btnPosition} = GameRenderConfigs[gameStep]
     console.log('render step', btnPosition, Detail)
-    const myGround = BABYLON.MeshBuilder.CreateGround(`btn${gameStep}`, { width: 80, height: 30, subdivisions: 4 }, this.scene);
+    const myGround = BABYLON.MeshBuilder.CreateGround(`btn${gameStep}`, { width: 80, height: 30}, this.scene);
     const myMaterial = new BABYLON.StandardMaterial(`btnMat${gameStep}`, this.scene)
     const texture = new BABYLON.Texture(Arrow, this.scene)
     texture.hasAlpha = true
     myMaterial.emissiveTexture = texture
-    // myMaterial.alpha = 0.8
+    myMaterial.alpha = 0.8
     myGround.material = myMaterial
     myGround.position.x = btnPosition.x
     myGround.position.y = btnPosition.y
@@ -532,6 +535,27 @@ class Hall3D extends React.Component<Props, State> {
       scene
     );
 
+    const path = [ 	
+      new BABYLON.Vector3(-20, 0, 0),
+          new BABYLON.Vector3(-10, 10, 0),
+          new BABYLON.Vector3(0, 0, 0),
+    ]
+    const path2 = [ 	
+        new BABYLON.Vector3(-20, -10, 0),
+          new BABYLON.Vector3(-10, 0, 0),
+          new BABYLON.Vector3(0, -10, 0),
+    ]
+    Line2d('testline', {
+      path,
+      width: 2,
+      color: [0, 0, 1, 1]
+    }, this.scene)
+    Line2d('testline2', {
+      path: path2,
+      width: 2,
+      color: [0, 0, 1, 1]
+    }, this.scene)
+
     setTimeout(() => {
       this.initView()
     }, 500)
@@ -556,7 +580,8 @@ class Hall3D extends React.Component<Props, State> {
     });
   }
   connectSocket () {
-    const io = socket.connect('/')
+    let socketUrl = APP_TYPE === 'production' ? 'localhost:3020' : '192.168.0.135:3020'
+    const io = socket.connect(socketUrl)
     this.io = io
     io.on('connect', (socket) => {
         console.log('io connected')
@@ -582,6 +607,7 @@ class Hall3D extends React.Component<Props, State> {
     const {isDetailView, isInitView} = this.state
     return (
       <div>
+        {/* <img src={Arrow}/> */}
         {
           isInitView && <div className={style.loading}>
             <Spin/>

@@ -1,23 +1,41 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
+const ProgressBarPlugin = require('progress-bar-webpack-plugin');
+const webpack = require('webpack')
+
+const mode = process.env.mode
+console.log(mode)
+const plugins = [
+    new CleanWebpackPlugin(),
+    new HtmlWebpackPlugin({
+    title: 'ipo',
+    template: './public/index.html'
+}),
+new ProgressBarPlugin({
+    format: '  build [:bar] :percent (:elapsed seconds)',
+    clear: false,
+    width: 60
+}),
+new webpack.DefinePlugin({
+    APP_DEV_MODE: mode
+})]
 
 module.exports = {
     entry: './src/index.js',
     output: {
         filename: '[name].[hash].js',
-        path: path.resolve(__dirname, './dist'),
+        path: mode === 'development' ? path.resolve(__dirname, '../dist') : path.resolve(__dirname, './dist'),
         publicPath: '/static/'
     },
-    plugins: [
-        new CleanWebpackPlugin(),
-        new HtmlWebpackPlugin({
-            title: 'ipo',
-            template: './public/index.html'
-        })
-    ],
+    plugins: plugins,
     resolve: {
         extensions: [".ts", ".tsx", ".js"]
+    },
+    optimization: {
+        splitChunks: {
+            chunks: 'all'
+        }
     },
     module: {
         rules: [
@@ -29,7 +47,8 @@ module.exports = {
                         loader: "ts-loader",
                         options: {
                             transpileOnly: true,
-                            logInfoToStdOut: true
+                            logInfoToStdOut: true,
+                            experimentalWatchApi: true
                         }
                     }
                 ]
