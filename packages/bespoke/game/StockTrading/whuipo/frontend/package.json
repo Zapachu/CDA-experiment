@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "start": "ESLINT=none roadhog server",
-    "build": "cross-env mode=production webpack --config webpackConfig.js && cp -rf dist ../build/whuipo/",
+    "build": "cross-env mode=production webpack --config webpackConfig.js && cp -rf dist ../build/",
     "lint": "eslint --ext .js src test",
     "precommit": "npm run lint"
   },
