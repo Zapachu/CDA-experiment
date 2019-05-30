@@ -11,5 +11,7 @@ export default {
 
     rootname: '',
     lobbyUrl: 'https://www.microexperiment.cn',
-    domain: 'microexperiment.cn'
+    domain: 'microexperiment.cn',
+    tokenSecret: '',
+    tokenAesKey: ''
 }

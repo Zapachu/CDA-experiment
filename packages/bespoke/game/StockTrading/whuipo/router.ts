@@ -5,11 +5,11 @@ import Controllers from './controller'
 const {isLogined} = Controllers
 
 const rootRouter = Router()
-rootRouter.use(isLogined)
-rootRouter.get('/', Controllers.renderIndex)
+rootRouter.get('/', isLogined, Controllers.renderIndex)
+rootRouter.get('/signIn', Controllers.renderSignIn)
 
 const apiRouter = Router()
 apiRouter.get('/initInfo', Controllers.getInitInfo)
-rootRouter.use('/api', apiRouter)
+rootRouter.use('/api', isLogined, apiRouter)
 
 export default rootRouter

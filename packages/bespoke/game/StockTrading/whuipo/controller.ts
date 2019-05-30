@@ -10,6 +10,7 @@ import { UserDoc } from './interfaces'
 import settings from './settings'
 import {Phase, CreateGame, PhaseDone} from '../protocol'
 import { ResCode, serverSocketListenEvents, clientSocketListenEvnets, UserGameStatus } from './enums'
+import XJWT from './XJWT';
 
 const ioEmitter = socketEmitter({ host: settings.redishost, port: settings.redisport })
 
@@ -154,25 +155,40 @@ RedisCall.handle<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, async ({playUrl
 export default class RouterController {
     @catchError
     static async isLogined(req: Request, res: Response, next: NextFunction) {
-        if (!req.isAuthenticated()) {
-            const key = req.sessionID
-            let user = await User.findOne({ unionId: key })
-            if (!user) {
-                user = new User({
-                    unionId: key
-                })
-                await user.save()
+        const token = req.query.token;
+        const {isValid, payload} = XJWT.decode(token);
+        if(isValid) {
+            console.log('isLogined, succeeded')
+            if (!req.isAuthenticated()) {
+                const key = payload.id
+                let user = await User.findOne({ unionId: key })
+                if (!user) {
+                    user = new User({
+                        unionId: key
+                    })
+                    await user.save()
+                }
+                await cbToPromise(req.logIn.bind(req))(user)
             }
-
-            await cbToPromise(req.logIn.bind(req))(user)
+            next()
+        } else {
+            console.log('isLogined, failed')
+            if (req.isAuthenticated()) {
+                req.logOut();
+            }
+            res.redirect(`${settings.rootname}/signIn`);
         }
-        next()
     }
 
     @catchError
     static async renderIndex(req: Request, res: Response, next: NextFunction) {
         // res.send('index html todo')
         res.sendfile(path.resolve(__dirname, './dist/index.html'))
+    }
+
+    @catchError
+    static async renderSignIn(req: Request, res: Response, next: NextFunction) {
+        res.send('index sign in todo')
     }
 
     @catchError
