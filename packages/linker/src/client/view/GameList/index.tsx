@@ -40,7 +40,7 @@ export const GameList: FunctionComponent<RouteComponentProps & { user: IUserWith
         ]}/>
         <List
             grid={{gutter: 24, xl: 4, md: 3, sm: 2, xs: 1}}
-            dataSource={[{}].concat(gameList)}
+            dataSource={[{} as any].concat(gameList)}
             renderItem={({id, title, desc, published}) => <ListItem key={id}>
                 <section
                     className={style.gameItem}
