@@ -16,7 +16,7 @@ import {
     PushType,
     ROLE
 } from '../config'
-import {Button, Input, Line} from '../../../components'
+import {Button, Input, Line} from "bespoke-game-stock-trading-component"
 
 function Border({background = `radial-gradient(at 50% 0%, #67e968 1rem, transparent 70%)`, borderRadius = '1rem', children, style}: {
     background?: string,

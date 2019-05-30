@@ -8,5 +8,5 @@ export { default as Modal } from "./Modal";
 export { default as PlayMode } from "./PlayMode";
 export { default as TableInfo } from "./TableInfo";
 export { default as Loading } from "./Loading";
-export { default as StockInfo } from "./Stockinfo";
+export { default as StockInfo } from "./StockInfo";
 export { default as Hall3D } from "./Hall3D";
