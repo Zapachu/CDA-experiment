@@ -10,7 +10,7 @@ import {
 } from "bespoke-server"
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from "./interface"
 import {FetchType, MoveType, OUT_TIME, PlayerStatus, PushType, namespace} from './config'
-import {PhaseDone} from "bespoke-game-stock-trading-config"
+import {PhaseDone} from "../../protocol"
 
 const getBestMatching = G => {
     const MATCHED = 'matched',

@@ -14,8 +14,6 @@
     "bespoke-client-util": "^1.0.0",
     "bespoke-common": "^1.0.0",
     "bespoke-game-graphical-util": "^1.0.0",
-    "bespoke-game-stock-trading-config": "^1.0.0",
-    "bespoke-game-stock-trading-component": "^1.0.0",
     "bespoke-server": "^1.0.0",
     "elf-setting": "^1.0.0"
   }
