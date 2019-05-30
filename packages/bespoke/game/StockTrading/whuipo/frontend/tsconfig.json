@@ -14,6 +14,10 @@
     "resolveJsonModule": true,
     "jsx": "react",
     "esModuleInterop": true,
+    "baseUrl": "./",
+    "paths": {
+      "component/*" : ["../../components/*"]
+    }
   },
   // "include": [
   //   "."

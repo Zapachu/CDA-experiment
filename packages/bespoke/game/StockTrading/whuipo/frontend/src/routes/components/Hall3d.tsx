@@ -1,9 +1,7 @@
 import * as React from "react";
 import * as BABYLON from "babylonjs";
-import { Button, Modal, Spin } from 'antd'
-import Modal2 from '../../../../../components/Modal'
 import socket from 'socket.io-client'
-import 'pepjs'
+import {Modal, Button, Loading, MatchModal} from 'component/index'
 
 import {reqInitInfo} from '../../services/index'
 import {serverSocketListenEvents, clientSocketListenEvnets, ResCode, UserDoc, UserGameStatus, GameTypes} from '../../enums'
@@ -14,7 +12,6 @@ import Detail from './detail.png'
 import PANO from './pano.jpg'
 
 
-import 'antd/dist/antd.css';
 import style from './style.less'
 
 const zLargeDistance = 500
@@ -22,14 +19,15 @@ const zLargeDistance = 500
 const cardWidth = 120
 const cardHeight = cardWidth * (347 / 620)
 
+
 const redirect = (url) => {
   // if (APP_TYPE === 'production') {
     location.href = url
     return
   // } 
-  const obj = new URL(url)
-  obj.host = '192.168.56.1:8081'
-  location.href = obj.toString()
+  // const obj = new URL(url)
+  // obj.host = '192.168.56.1:8081'
+  // location.href = obj.toString()
 }
 
 enum GameSteps { left, center, right }
@@ -136,7 +134,8 @@ interface State {
   showPreStartModal: boolean
   modalContentType?: ModalContentTypes,
   isInitView: boolean,
-  focusGameType?: GameTypes
+  focusGameType?: GameTypes,
+  matchTimer?: number
 }
 
 class Hall3D extends React.Component<Props, State> {
@@ -152,6 +151,7 @@ class Hall3D extends React.Component<Props, State> {
     [gameStep: string]: BABYLON.Mesh
   }
   io: SocketIOClient.Socket
+  matchTimer: NodeJS.Timer
   constructor(props) {
     super(props)
     this.hoverMaskInstance = {}
@@ -211,8 +211,11 @@ class Hall3D extends React.Component<Props, State> {
     }, 2000);
   }
   renderModal () {
-    const {showPreStartModal, modalContentType, focusGameStep, focusGameType} = this.state
+    const {showPreStartModal, modalContentType, focusGameStep, focusGameType, matchTimer} = this.state
     const handleClose = async () => {
+      if (this.matchTimer) {
+        clearInterval(this.matchTimer)
+      }
       this.setState({
         showPreStartModal: false
       })
@@ -226,41 +229,41 @@ class Hall3D extends React.Component<Props, State> {
         modalContentType: ModalContentTypes.preMatch
       })
     }
-    return <Modal visible={showPreStartModal} onCancel={handleClose}>
-       {
-          modalContentType === ModalContentTypes.selectSubGameType && 
-          <div>
-              <Button onClick={_ => this.setState({focusGameType: GameTypes.IPO_Median, modalContentType: ModalContentTypes.selectMode})}>IPO_Median</Button>
-              <Button onClick={_ => this.setState({focusGameType: GameTypes.IPO_TopK, modalContentType: ModalContentTypes.selectMode})}>IPO_TopK</Button>
-          </div>
-        }
+    if (modalContentType === ModalContentTypes.waittingMatch) {
+      return <MatchModal visible={true} totalNum={4} matchNum={matchTimer % 4 + 1} timer={matchTimer}></MatchModal>
+    }
+    return <Modal visible={showPreStartModal}>
+       <div className={style.modalContent}>
         {
-          modalContentType === ModalContentTypes.selectMode && 
-          <div>
-              <Button onClick={_ => handleSelectGameMode(false)}>单人模式</Button>
-              <Button onClick={_ => handleSelectGameMode(true)}>多人模式</Button>
+            modalContentType === ModalContentTypes.selectSubGameType && 
+            <div className={style.selectSubGame}>
+                <Button onClick={_ => this.setState({focusGameType: GameTypes.IPO_Median, modalContentType: ModalContentTypes.selectMode})} label="IPO_Median"></Button>
+                <Button onClick={_ => this.setState({focusGameType: GameTypes.IPO_TopK, modalContentType: ModalContentTypes.selectMode})} label="IPO_TopK"></Button>
+            </div>
+          }
+          {
+            modalContentType === ModalContentTypes.selectMode && 
+            <div>
+                <Button onClick={_ => handleSelectGameMode(false)} label="单人模式"></Button>
+                <Button onClick={_ => handleSelectGameMode(true)} label="多人模式"></Button>
+            </div>
+          }
+          {
+            modalContentType === ModalContentTypes.preMatch &&
+            <div>
+              <Loading label="处理中"/>
+            </div>
+          }
+          {
+            modalContentType === ModalContentTypes.matchSuccess &&
+            <div className={style.matchSuccess}>
+              玩家匹配成功！
+            </div>
+          }
+          <div className={style.bottom}>
+            <Button onClick={handleClose} label="关闭"></Button>
           </div>
-        }
-         {
-          modalContentType === ModalContentTypes.preMatch &&
-          <div>
-            <Spin/>
-            <div>处理中....</div>
-          </div>
-        }
-        {
-          modalContentType === ModalContentTypes.waittingMatch &&
-          <div>
-            <Spin/>
-            <div>匹配中....</div>
-          </div>
-        }
-        {
-          modalContentType === ModalContentTypes.matchSuccess &&
-          <div>
-            玩家匹配成功！
-          </div>
-        }
+       </div>
     </Modal>
   }
   handlePointerOver (gameStep: GameSteps) {
@@ -590,7 +593,6 @@ class Hall3D extends React.Component<Props, State> {
     });
   }
   connectSocket () {
-    // let socketUrl = APP_TYPE === 'production' ? 'localhost:3020' : '192.168.0.135:3020'
     const io = socket.connect('/')
     this.io = io
     io.on('connect', (socket) => {
@@ -599,10 +601,19 @@ class Hall3D extends React.Component<Props, State> {
     io.on(clientSocketListenEvnets.startMatch, () => {
       console.log('recive startmatch')
       this.setState({
-        modalContentType: ModalContentTypes.waittingMatch
+        modalContentType: ModalContentTypes.waittingMatch,
+        matchTimer: 0
       })
+      this.matchTimer = setInterval(() => {
+        this.setState({
+          matchTimer: this.state.matchTimer + 1
+        })
+      }, 1000)
     })
     io.on(clientSocketListenEvnets.startGame, ({playerUrl}) => {
+      if (this.matchTimer) {
+          clearInterval(this.matchTimer)
+      }
         console.log('recive start game', playerUrl)
         this.setState({
           modalContentType: ModalContentTypes.matchSuccess
@@ -620,12 +631,12 @@ class Hall3D extends React.Component<Props, State> {
         {/* <img src={Arrow}/> */}
         {
           isInitView && <div className={style.loading}>
-            <Spin/>
+            <Loading label="加载中"/>
           </div>
         }
         {
           isDetailView && <div className={style.actionBtns}>
-            <Button onClick={this.handleCancelOverview.bind(this)}>返回</Button>
+            <Button onClick={this.handleCancelOverview.bind(this)} label="返回"></Button>
           </div>
         }
         {this.renderModal()}
