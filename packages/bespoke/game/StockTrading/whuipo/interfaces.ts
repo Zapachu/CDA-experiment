@@ -1,6 +1,6 @@
 import { Document } from 'mongoose'
 import {UserGameStatus} from './enums'
-import {Phase} from '../protocol'
+import {Phase} from 'bespoke-game-stock-trading-config'
 interface IDocument extends Document {
     updateAt: number;
     createAt: number;
