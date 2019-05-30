@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as BABYLON from "babylonjs";
 import { Button, Modal, Spin } from 'antd'
-// import Modal2 from '../../../../../components/Modal'
+import Modal2 from '../../../../../components/Modal'
 import socket from 'socket.io-client'
 import 'pepjs'
 
@@ -23,10 +23,10 @@ const cardWidth = 120
 const cardHeight = cardWidth * (347 / 620)
 
 const redirect = (url) => {
-  if (APP_TYPE === 'production') {
+  // if (APP_TYPE === 'production') {
     location.href = url
     return
-  } 
+  // } 
   const obj = new URL(url)
   obj.host = '192.168.56.1:8081'
   location.href = obj.toString()
