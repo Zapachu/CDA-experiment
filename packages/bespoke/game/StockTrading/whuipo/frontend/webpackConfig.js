@@ -37,6 +37,10 @@ module.exports = {
     //         chunks: 'all'
     //     }
     // },
+    externals: {
+        babylonjs: 'BABYLON',
+        // antd: 'antd'
+    },
     module: {
         rules: [
             {
@@ -100,6 +104,19 @@ module.exports = {
                 exclude: /node_modules/,
                 use: [
                     'file-loader'
+                ]
+            },
+            {
+                test: /\.(sass|scss)$/,
+                use: [
+                    'style-loader',
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            modules: true
+                        }
+                    },
+                    'sass-loader'
                 ]
             }
         ]
