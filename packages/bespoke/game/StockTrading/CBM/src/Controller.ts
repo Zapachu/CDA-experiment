@@ -28,7 +28,7 @@ import {
     ROLE,
     PrivatePriceRegion, namespace
 } from './config'
-import {CreateGame, PhaseDone} from '../../protocol'
+import {CreateGame, PhaseDone} from 'bespoke-game-stock-trading-config'
 import {getBalanceIndex, getEnumKeys, random} from './util'
 
 export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
