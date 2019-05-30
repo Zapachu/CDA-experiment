@@ -10,7 +10,7 @@ const plugins = [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
     title: 'ipo',
-    template: './public/index.html'
+    template: './public/build.html'
 }),
 new ProgressBarPlugin({
     format: '  build [:bar] :percent (:elapsed seconds)',
@@ -32,11 +32,11 @@ module.exports = {
     resolve: {
         extensions: [".ts", ".tsx", ".js"]
     },
-    optimization: {
-        splitChunks: {
-            chunks: 'all'
-        }
-    },
+    // optimization: {
+    //     splitChunks: {
+    //         chunks: 'all'
+    //     }
+    // },
     module: {
         rules: [
             {
@@ -68,9 +68,9 @@ module.exports = {
                     'style-loader',
                     {
                         loader: 'css-loader',
-                        options: {
-                            modules: true
-                        }
+                        // options: {
+                        //     modules: true
+                        // }
                     },
                 ]
             },

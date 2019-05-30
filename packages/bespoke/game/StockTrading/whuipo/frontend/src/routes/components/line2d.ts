@@ -1,5 +1,5 @@
 export default function line2D (name, options, scene) {
-		var light = new BABYLON.DirectionalLight("direct", new BABYLON.Vector3(0, 0, 1), scene);
+		// var light = new BABYLON.DirectionalLight("direct", new BABYLON.Vector3(0, 0, 1), scene);
 		//Arrays for vertex positions and indices
 		let positions = [];
 		let indices = [];
@@ -28,7 +28,6 @@ export default function line2D (name, options, scene) {
 		let angle = 0;
 		
 		let nbPoints = path.length;
-		console.log('lenght1')
 
 		let line = BABYLON.Vector3.Zero();
 		let nextLine = BABYLON.Vector3.Zero();
@@ -111,7 +110,6 @@ export default function line2D (name, options, scene) {
 
 		if(standardUV) {
 			for(let p = 0; p < positions.length; p += 3) {
-				console.log('length 3')
 				uvs.push((positions[p] - minX)/(maxX - minX), (positions[p + 1] - minY)/(maxY - minY))
 			}
 		}
@@ -144,7 +142,6 @@ export default function line2D (name, options, scene) {
 			uvs[2 * indices[4] + 1] = 0;
 		
 			for(let i = path.length; i < indices.length; i += path.length) {
-				console.log('length4')
 				flip = (flip + 1) % 2;
 				v0 = innerData[0];
 				v1 = innerData[1].subtract(v0);
@@ -168,7 +165,6 @@ export default function line2D (name, options, scene) {
 		
 		BABYLON.VertexData.ComputeNormals(positions, indices, normals);
 		BABYLON.VertexData._ComputeSides(BABYLON.Mesh.DOUBLESIDE, positions, indices, normals, uvs);  	
-		console.log(uvs)		
 		//Create a custom mesh  
 		let customMesh = new BABYLON.Mesh(name, scene);
 
