@@ -226,7 +226,7 @@ class Hall3D extends React.Component<Props, State> {
         modalContentType: ModalContentTypes.preMatch
       })
     }
-    return <Modal visible={showPreStartModal}>
+    return <Modal visible={showPreStartModal} onCancel={handleClose}>
        {
           modalContentType === ModalContentTypes.selectSubGameType && 
           <div>
