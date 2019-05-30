@@ -8,6 +8,24 @@ $color-dark: #2a3564;
 $color-dark2: #212a51;
 $color-orange: #f99460;
 $color-red: #d6444e;
+
+.label {
+  display: inline-block;
+  margin: 1rem;
+
+  em {
+    margin: 1rem;
+    font-size: $fontSize-large;
+    color: $color-orange;
+  }
+}
+
+.subLabel {
+  display: block;
+  text-align: center;
+  opacity: .6;
+}
+
 .play {
   position: absolute;
   width: 100%;
@@ -31,12 +49,13 @@ $color-red: #d6444e;
       display: flex;
       flex-direction: column;
       background: linear-gradient($color-dark, $color-dark2);
-      padding-bottom: 5rem;
+      padding-bottom: 3rem;
       height: 100%;
     }
 
 
     .tradePanel {
+      flex-basis: 24rem;
       .yourTrades {
         @include panel;
 
@@ -71,11 +90,13 @@ $color-red: #d6444e;
       }
 
       .summary {
-        margin: 1rem;
         display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
 
         div {
-          padding: 1rem;
+          flex-basis: 45%;
+          margin-top: 1.5rem;
 
           em {
             display: inline-block;
@@ -156,32 +177,18 @@ $color-red: #d6444e;
         }
 
         .newOrder {
+          text-align: center;
+
           .orderInputWrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
-
-            label {
-              margin: 1rem;
-
-              em {
-                margin: 1rem;
-                font-size: $fontSize-large;
-                color: $color-orange;
-              }
-            }
           }
 
           .submitBtnWrapper {
             margin: 2rem 0;
             display: flex;
             justify-content: center;
-          }
-
-          .timeLeft {
-            display: flex;
-            justify-content: center;
-            opacity: .6;
           }
         }
       }
@@ -225,7 +232,7 @@ $color-red: #d6444e;
       }
     }
 
-    .switchBtns{
+    .switchBtns {
       margin: 2rem;
       display: flex;
       justify-content: center;

@@ -29,8 +29,8 @@ export enum FetchType {
 export const PERIOD = 6
 
 export const CONFIG = {
-    prepareTime: 30,
-    tradeTime: 180,
+    prepareTime: 5,
+    tradeTime: 18000,
     resultTime: 30
 }
 
@@ -43,6 +43,7 @@ export interface IOrder {
     role: ROLE
     price: number
     count: number
+    guarantee: boolean
 }
 
 export interface ITrade {
@@ -87,17 +88,27 @@ export interface IGameState {
     }
 }
 
+export enum Identity {
+    retailPlayer,
+    moneyGuarantor,
+    stockGuarantor
+}
+
 export interface IPlayerState {
     playerIndex: number
+    identity: Identity
     privatePrices: number[]
     count: number
     point: number
+    guaranteeCount: number
+    guaranteePoint: number
 }
 
 export type IMoveParams = Partial<{
     role: ROLE
     price: number
     count: number
+    guarantee: boolean
     onceMore: boolean
 }>
 

@@ -3,10 +3,13 @@ export default {
     mongouser: '',
     mongopass: '',
 
+    sessionId: 'whuipo.sid',
     cookieSecret: 'academy',
     redishost: process.env.REDIS || 'localhost',
     redisport: 6379,
     sessionSecret: process.env.SESSION_SECRET || 'sessionsecret',
 
     rootname: '',
+    lobbyUrl: 'https://www.microexperiment.cn',
+    domain: 'microexperiment.cn'
 }

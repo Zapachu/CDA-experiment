@@ -25,8 +25,8 @@ import {
   Line,
   Modal,
   StockInfo
-} from "../../../../components";
-const LOADING = require("../../../../components/loading.png");
+} from "bespoke-game-stock-trading-component";
+const LOADING = require("bespoke-game-stock-trading-component/lib/loading.png");
 
 enum ModalType {
   None,
