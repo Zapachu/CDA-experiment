@@ -43,7 +43,7 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
             [Identity.retailPlayer]: Math.random() > .5 ? ROLE.Seller : ROLE.Buyer
         }[this.playerState.identity]
         const price = privatePrice + ~~(Math.random() * 10 * (role === ROLE.Seller ? 1 : -1))
-        const maxCount = role === ROLE.Seller ? this.playerState.count : this.playerState.point / privatePrice
+        const maxCount = role === ROLE.Seller ? this.playerState.count : this.playerState.money / privatePrice
         if (maxCount < 1) {
             return
         }
