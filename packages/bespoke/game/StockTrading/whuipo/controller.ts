@@ -8,7 +8,7 @@ import path from 'path'
 import { User } from './models'
 import { UserDoc } from './interfaces'
 import settings from './settings'
-import {Phase, CreateGame, PhaseDone} from '../protocol'
+import {Phase, CreateGame, PhaseDone} from 'bespoke-game-stock-trading-config'
 import { ResCode, serverSocketListenEvents, clientSocketListenEvnets, UserGameStatus } from './enums'
 
 const ioEmitter = socketEmitter({ host: settings.redishost, port: settings.redisport })

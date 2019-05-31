@@ -1,8 +1,8 @@
 {
   "private": true,
   "scripts": {
-    "start": "cross-env mode=development webpack --watch --config webpackConfig.js",
-    "build": "cross-env mode=production webpack --config webpackConfig.js && cp -rf dist ../build/whuipo/",
+    "start": "cross-env mode=development webpack --watch --config webpackConfig.js --mode development ",
+    "build": "cross-env mode=production webpack --config webpackConfig.js --mode=production && cp -rf dist ../build/",
     "lint": "eslint --ext .js src test",
     "precommit": "npm run lint"
   },

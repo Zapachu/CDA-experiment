@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as BABYLON from "babylonjs";
 import socket from 'socket.io-client'
-import {Modal, Button, Loading, MatchModal} from 'component/index'
+import {Modal, Button, Loading, MatchModal} from 'bespoke-game-stock-trading-component'
 
 import {reqInitInfo} from '../../services/index'
 import {serverSocketListenEvents, clientSocketListenEvnets, ResCode, UserDoc, UserGameStatus, GameTypes} from '../../enums'
@@ -167,7 +167,6 @@ class Hall3D extends React.Component<Props, State> {
 
   }
   componentDidMount () {
-    console.log(APP_TYPE, 'apptype')
     this.reqInitInfo()
   }
   reqInitInfo () {
