@@ -22,7 +22,9 @@ export enum MoveType {
 
 export enum PushType {
     countDown = 'countDown',
-    beginTrading = 'beginTrading'
+    beginTrading = 'beginTrading',
+    closeOutWarning = 'closeOutWarning',
+    closeOut = 'closeOut'
 }
 
 export enum FetchType {
@@ -112,8 +114,8 @@ export type IMoveParams = Partial<{
     count: number
     guarantee: boolean
     onceMore: boolean
-    moneyRepay:number
-    countRepay:number
+    moneyRepay: number
+    countRepay: number
 }>
 
 export type IPushParams = Partial<{

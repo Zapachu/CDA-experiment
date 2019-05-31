@@ -17,7 +17,7 @@ import {
     PushType,
     ROLE
 } from '../config'
-import {Button, Input, Line, Tabs} from 'bespoke-game-stock-trading-component'
+import {Button, Input, Line, Modal, Tabs} from 'bespoke-game-stock-trading-component'
 
 function Border({background = `radial-gradient(at 50% 0%, #67e968 1rem, transparent 70%)`, borderRadius = '1rem', children, style}: {
     background?: string,
@@ -229,7 +229,9 @@ function _Play({gameState, playerState, frameEmitter}: TPlayProps) {
         asset: ['资产', 'Asset'],
         onceMore: ['再来一次', 'Once More'],
         nextPhase: ['下一环节', 'Next Phase'],
-        priceCountTips: ['价格 * 数量 ：', 'price * count : ']
+        priceCountTips: ['价格 * 数量 ：', 'price * count : '],
+        closeOutWarning: ['资产低于担保金额130%将被平仓', 'Your count will be closed out when assets is below 130% of guarantee money'],
+        closedOut: ['资产低于担保金额130%，已被平仓', 'Your count has been closed out since assets is below 130% of guarantee money']
     })
     const {prepareTime, tradeTime, resultTime} = CONFIG
     const [countDown, setCountDown] = React.useState(0)
@@ -237,9 +239,12 @@ function _Play({gameState, playerState, frameEmitter}: TPlayProps) {
     const [countRepay, setCountRepay] = React.useState('' as number | string)
     const [price, setPrice] = React.useState('' as number | string)
     const [count, setCount] = React.useState('' as number | string)
+    const [showChartModal, setShowChartModal] = React.useState(false)
     const [orderTabIndex, setOrderTabIndex] = React.useState(0)
     React.useEffect(() => {
         frameEmitter.on(PushType.countDown, ({countDown}) => setCountDown(countDown))
+        frameEmitter.on(PushType.closeOutWarning, () => Toast.warn(lang.closeOutWarning))
+        frameEmitter.on(PushType.closeOut, () => Toast.warn(lang.closedOut))
         frameEmitter.emit(MoveType.getIndex)
     }, [])
     const gamePeriodState = gameState.periods[gameState.periodIndex]
@@ -307,7 +312,7 @@ function _Play({gameState, playerState, frameEmitter}: TPlayProps) {
     }
 
     function repayMoney() {
-        if (moneyRepay <= 0 || moneyRepay > playerState.money) {
+        if (moneyRepay <= 0 || moneyRepay > playerState.money || countRepay > playerState.guaranteeMoney) {
             Toast.warn(lang.invalidMoney)
             return
         }
@@ -315,7 +320,7 @@ function _Play({gameState, playerState, frameEmitter}: TPlayProps) {
     }
 
     function repayCount() {
-        if (countRepay <= 0 || countRepay > playerState.count) {
+        if (countRepay <= 0 || countRepay > playerState.count || countRepay > playerState.guaranteeCount) {
             Toast.warn(lang.invalidCount)
             return
         }
@@ -503,29 +508,32 @@ function _Play({gameState, playerState, frameEmitter}: TPlayProps) {
     }
 
     function renderChartPanel() {
+        const chart = <div className={style.marketHistory} onClick={() => setShowChartModal(!showChartModal)}>
+            <TradeChart
+                tradeList={trades.map(({reqOrderId}) => {
+                    const {price, count} = orderDict[reqOrderId]
+                    return {price, count}
+                })}
+                color={{
+                    scalePlate: '#fff',
+                    line: '#f99460',
+                    point: '#f99460',
+                    title: '#aff85e',
+                    number: '#f99460'
+                }}
+            />
+        </div>
         return <div className={style.marketHistoryWrapper}>
             <Line text={lang.marketHistory} style={STYLE.titleLineStyle}/>
             <Border background={STYLE.mainPanelBorder}>
-                <div className={style.marketHistory}>
-                    <div style={{
-                        margin: '1rem',
-                        width: `${(~~(trades.length / 24) + 2) * 12}rem`
-                    }}>
-                        <TradeChart
-                            tradeList={trades.map(({reqOrderId}) => {
-                                const {price, count} = orderDict[reqOrderId]
-                                return {price, count}
-                            })}
-                            color={{
-                                scalePlate: '#fff',
-                                line: '#f99460',
-                                point: '#f99460',
-                                title: '#aff85e',
-                                number: '#f99460'
-                            }}
-                        />
-                    </div>
-                </div>
+                {
+                    chart
+                }
+                <Modal visible={showChartModal}>
+                    {
+                        chart
+                    }
+                </Modal>
             </Border>
         </div>
     }

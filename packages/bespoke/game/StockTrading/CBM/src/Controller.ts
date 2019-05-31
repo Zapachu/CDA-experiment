@@ -128,6 +128,17 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                                     priceArr.push(privatePrices[periodIndex])
                                 })
                             gamePeriodState.balancePrice = priceArr[getBalanceIndex(countArr)]
+                            playerStates.forEach(async playerState => {
+                                const asset = gamePeriodState.balancePrice * (playerState.count - playerState.guaranteeCount) + playerState.money
+                                if (asset < playerState.guaranteeMoney * 1.3) {
+                                    await this.guaranteeWithMoneyRobot(playerState.playerIndex, -playerState.guaranteeMoney)
+                                    this.push(playerState.actor, PushType.closeOut)
+                                    return
+                                }
+                                if (asset < playerState.guaranteeMoney * 1.5) {
+                                    this.push(playerState.actor, PushType.closeOutWarning)
+                                }
+                            })
                             break
                         }
                         case 0: {
@@ -158,15 +169,10 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 if (params.guarantee) {
                     switch (params.role) {
                         case ROLE.Seller:
-                            playerState.count += params.count
-                            playerState.guaranteeCount += params.count
-                            playerStates.find(({identity}) => identity === Identity.stockGuarantor).count -= params.count
+                            await this.guaranteeWithCountRobot(playerState.playerIndex, params.count)
                             break
                         case ROLE.Buyer:
-                            const point = params.count * params.price
-                            playerState.money += point
-                            playerState.guaranteeMoney += point
-                            playerStates.find(({identity}) => identity === Identity.moneyGuarantor).money -= point
+                            await this.guaranteeWithMoneyRobot(playerState.playerIndex, params.count * params.price)
                             break
                     }
                 }
@@ -195,13 +201,13 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 await this.cancelOrder(periodIndex, playerState.playerIndex)
                 break
             }
-            case MoveType.repayMoney:{
+            case MoveType.repayMoney: {
                 playerState.money -= params.moneyRepay
                 playerState.guaranteeMoney -= params.moneyRepay
                 playerStates.find(({identity}) => identity === Identity.moneyGuarantor).money += params.moneyRepay
                 break
             }
-            case MoveType.repayCount:{
+            case MoveType.repayCount: {
                 playerState.count -= params.countRepay
                 playerState.guaranteeCount -= params.countRepay
                 playerStates.find(({identity}) => identity === Identity.stockGuarantor).count += params.countRepay
@@ -216,6 +222,31 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 res ? cb(res.lobbyUrl) : null
                 break
             }
+        }
+    }
+
+    async guaranteeWithCountRobot(playerIndex: number, count: number) {
+        const playerStates = await this.getActivePlayerStates(),
+            playerState = playerStates.find(s => s.playerIndex === playerIndex)
+        playerState.count += count
+        playerState.guaranteeCount += count
+        playerStates.find(({identity}) => identity === Identity.stockGuarantor).count -= count
+    }
+
+    async guaranteeWithMoneyRobot(playerIndex: number, money: number) {
+        const playerStates = await this.getActivePlayerStates(),
+            playerState = playerStates.find(s => s.playerIndex === playerIndex)
+        playerState.money += money
+        playerState.guaranteeMoney += money
+        const moneyRobot = playerStates.find(({identity}) => identity === Identity.moneyGuarantor)
+        moneyRobot.money -= money
+        if (playerState.money < 0) {
+            const {periodIndex, periods} = await this.stateManager.getGameState()
+            const {balancePrice} = periods[periodIndex]
+            const count = Math.ceil(-playerState.money / balancePrice)
+            playerState.count -= count
+            playerState.money += count * balancePrice
+            moneyRobot.count += count
         }
     }
 
@@ -289,10 +320,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             const targetOrder = orders.find(({id}) => id === buyOrderIds[i])
             if (targetOrder.playerIndex === playerIndex) {
                 if (targetOrder.guarantee) {
-                    const [playerState] = await this.getActivePlayerStates(playerIndex)
-                    const point = targetOrder.count * targetOrder.price
-                    playerState.money -= point
-                    playerState.guaranteeMoney -= point
+                    await this.guaranteeWithMoneyRobot(playerIndex, -targetOrder.count * targetOrder.price)
                 }
                 buyOrderIds.splice(i, 1)
                 return
@@ -302,9 +330,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             const targetOrder = orders.find(({id}) => id === sellOrderIds[i])
             if (targetOrder.playerIndex === playerIndex) {
                 if (targetOrder.guarantee) {
-                    const [playerState] = await this.getActivePlayerStates(playerIndex)
-                    playerState.count -= targetOrder.count
-                    playerState.guaranteeCount -= targetOrder.count
+                    await this.guaranteeWithCountRobot(playerIndex, -targetOrder.count)
                 }
                 sellOrderIds.splice(i, 1)
                 return
