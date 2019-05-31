@@ -54,6 +54,7 @@ message MoveParams {
   int32 c1 = 2;
   repeated int32 c2 = 3;
   repeated string surveys = 4;
+  int32 nextRoundIndex = 5;
 }
 
 message PushParams {
