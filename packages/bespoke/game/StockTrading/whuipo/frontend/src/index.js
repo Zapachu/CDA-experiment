@@ -1,6 +1,8 @@
+/* global APP_DEV_MODE */
 import dva from 'dva';
 import './index.less';
 
+window.APP_TYPE = APP_DEV_MODE
 // 1. Initialize
 const app = dva();
 

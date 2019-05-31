@@ -21,13 +21,13 @@ const cardHeight = cardWidth * (347 / 620)
 
 
 const redirect = (url) => {
-  // if (APP_TYPE === 'production') {
+  if (APP_TYPE === 'production') {
     location.href = url
     return
-  // } 
-  // const obj = new URL(url)
-  // obj.host = '192.168.56.1:8081'
-  // location.href = obj.toString()
+  } 
+  const obj = new URL(url)
+  obj.host = '192.168.56.1:8081'
+  location.href = obj.toString()
 }
 
 enum GameSteps { left, center, right }
@@ -229,7 +229,7 @@ class Hall3D extends React.Component<Props, State> {
       })
     }
     if (modalContentType === ModalContentTypes.waittingMatch) {
-      return <MatchModal visible={true} totalNum={4} matchNum={matchTimer % 4 + 1} timer={matchTimer}></MatchModal>
+      return <MatchModal visible={true} totalNum={4} matchNum={matchTimer % 5} timer={matchTimer}></MatchModal>
     }
     return <Modal visible={showPreStartModal}>
        <div className={style.modalContent}>
@@ -242,7 +242,7 @@ class Hall3D extends React.Component<Props, State> {
           }
           {
             modalContentType === ModalContentTypes.selectMode && 
-            <div>
+            <div className={style.selectGameMode}>
                 <Button onClick={_ => handleSelectGameMode(false)} label="单人模式"></Button>
                 <Button onClick={_ => handleSelectGameMode(true)} label="多人模式"></Button>
             </div>
