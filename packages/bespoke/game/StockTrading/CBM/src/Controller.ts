@@ -52,7 +52,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         gameState.periodIndex = 0
         gameState.initialAsset = {
             count: 100 + ~~(Math.random() * 50),
-            point: 3e4 + ~~(Math.random() * 1e4)
+            money: 3e4 + ~~(Math.random() * 1e4)
         }
         return gameState
     }
@@ -62,7 +62,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         const {type} = await this.stateManager.getGameState()
         const [[min, max]] = PrivatePriceRegion[type]
         playerState.privatePrices = [random(min, max)]
-        playerState.guaranteePoint = 0
+        playerState.guaranteeMoney = 0
         playerState.guaranteeCount = 0
         return playerState
     }
@@ -81,17 +81,17 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     case actor.type === Actor.serverRobot && playerStates.every(({identity}) => identity != Identity.moneyGuarantor):
                         playerState.identity = Identity.moneyGuarantor
                         playerState.count = 0
-                        playerState.point = gameState.initialAsset.point * CreateGame.playerLimit
+                        playerState.money = gameState.initialAsset.money * CreateGame.playerLimit
                         break
                     case actor.type === Actor.serverRobot && playerStates.every(({identity}) => identity != Identity.stockGuarantor):
                         playerState.identity = Identity.stockGuarantor
                         playerState.count = gameState.initialAsset.count * CreateGame.playerLimit
-                        playerState.point = 0
+                        playerState.money = 0
                         break
                     default:
                         playerState.identity = Identity.retailPlayer
                         playerState.count = gameState.initialAsset.count
-                        playerState.point = gameState.initialAsset.point
+                        playerState.money = gameState.initialAsset.money
                 }
                 if (playerState.playerIndex > 0) {
                     break
@@ -164,9 +164,9 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                             break
                         case ROLE.Buyer:
                             const point = params.count * params.price
-                            playerState.point += point
-                            playerState.guaranteePoint += point
-                            playerStates.find(({identity}) => identity === Identity.moneyGuarantor).point -= point
+                            playerState.money += point
+                            playerState.guaranteeMoney += point
+                            playerStates.find(({identity}) => identity === Identity.moneyGuarantor).money -= point
                             break
                     }
                 }
@@ -174,7 +174,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 const {price, count} = params
                 if (count <= 0 ||
                     (params.role === ROLE.Seller && count > playerState.count) ||
-                    (params.role === ROLE.Buyer && count * price > playerState.point)
+                    (params.role === ROLE.Buyer && count * price > playerState.money)
                 ) {
                     Log.d('数量有误，无法继续报价')
                 } else {
@@ -193,6 +193,18 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             case MoveType.cancelOrder: {
                 const {periodIndex} = gameState
                 await this.cancelOrder(periodIndex, playerState.playerIndex)
+                break
+            }
+            case MoveType.repayMoney:{
+                playerState.money -= params.moneyRepay
+                playerState.guaranteeMoney -= params.moneyRepay
+                playerStates.find(({identity}) => identity === Identity.moneyGuarantor).money += params.moneyRepay
+                break
+            }
+            case MoveType.repayCount:{
+                playerState.count -= params.countRepay
+                playerState.guaranteeCount -= params.countRepay
+                playerStates.find(({identity}) => identity === Identity.stockGuarantor).count += params.countRepay
                 break
             }
             case MoveType.exitGame: {
@@ -261,11 +273,11 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             switch (playerRole) {
                 case ROLE.Buyer:
                     playerState.count += trade.count
-                    playerState.point -= trade.count * pairOrder.price
+                    playerState.money -= trade.count * pairOrder.price
                     break
                 case ROLE.Seller:
                     playerState.count -= trade.count
-                    playerState.point += trade.count * pairOrder.price
+                    playerState.money += trade.count * pairOrder.price
                     break
             }
         })
@@ -279,8 +291,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 if (targetOrder.guarantee) {
                     const [playerState] = await this.getActivePlayerStates(playerIndex)
                     const point = targetOrder.count * targetOrder.price
-                    playerState.point -= point
-                    playerState.guaranteePoint -= point
+                    playerState.money -= point
+                    playerState.guaranteeMoney -= point
                 }
                 buyOrderIds.splice(i, 1)
                 return

@@ -195,8 +195,9 @@ function _Play({gameState, playerState, frameEmitter}: TPlayProps) {
         stock: ['股票', 'Stock'],
         count: ['数量', 'Count'],
         point: ['余额', 'Point'],
+        money: ['金额', 'Money'],
         guaranteeCount: ['担保股票', 'GuaranteeCount'],
-        guaranteePoint: ['担保金额','GuaranteePoint'],
+        guaranteeMoney: ['担保金额', 'GuaranteeMoney'],
         profit: ['利润', 'Profit'],
         tradeCount: ['成交数量', 'Trade Count'],
         valuation: ['当前股票估值', 'Stock Valuation'],
@@ -210,16 +211,17 @@ function _Play({gameState, playerState, frameEmitter}: TPlayProps) {
         cancel: ['撤回', 'Cancel'],
         buy: ['买入', 'Buy'],
         sell: ['卖出', 'Sell'],
-        repay:['还款还券','Repay'],
+        repay: ['还款还券', 'Repay'],
         guaranteeBuy: ['担保买入', 'Guarantee Buy'],
         guaranteeSell: ['担保卖出', 'NGuarantee Sell'],
-        repayStock:['还款','Repay Money'],
-        repayMoney:['还券','Repay Stock'],
+        repayMoney: ['还款', 'Repay Money'],
+        repayStock: ['还券', 'Repay Stock'],
         tradeSeq: ['订单序号', 'Trade Number'],
         tradePrice: ['成交价格', 'Price'],
         invalidBuyPrice: ['订单价格需高于市场当前最高买价', 'Order price must be lower than the highest buy price in the market'],
         invalidSellPrice: ['订单价格需低于市场当前最低卖价', 'Order price must be higher than the lowest buy price in the market'],
         invalidCount: ['超出可交易物品数量', 'Exceed the number of tradable units'],
+        invalidMoney: ['金额有误，请检查', 'Invalid Money'],
         sellOrders: ['卖家订单', 'SellOrders'],
         buyOrders: ['买家订单', 'BuyOrders'],
         yourTrades: ['交易记录', 'Your Trades'],
@@ -231,6 +233,8 @@ function _Play({gameState, playerState, frameEmitter}: TPlayProps) {
     })
     const {prepareTime, tradeTime, resultTime} = CONFIG
     const [countDown, setCountDown] = React.useState(0)
+    const [moneyRepay, setMoneyRepay] = React.useState('' as number | string)
+    const [countRepay, setCountRepay] = React.useState('' as number | string)
     const [price, setPrice] = React.useState('' as number | string)
     const [count, setCount] = React.useState('' as number | string)
     const [orderTabIndex, setOrderTabIndex] = React.useState(0)
@@ -242,7 +246,7 @@ function _Play({gameState, playerState, frameEmitter}: TPlayProps) {
     if (gamePeriodState.stage === PeriodStage.result) {
         return <section className={style.resultWrapper}>
             <Result count={playerState.count}
-                    point={playerState.point}
+                    point={playerState.money}
                     closingPrice={gamePeriodState.closingPrice}
                     balancePrice={gamePeriodState.balancePrice}/>
             {
@@ -289,7 +293,7 @@ function _Play({gameState, playerState, frameEmitter}: TPlayProps) {
             return Toast.warn(lang.invalidBuyPrice)
         }
         if (count <= 0 ||
-            (role === ROLE.Buyer && _price * +count > playerState.point - playerState.guaranteePoint) ||
+            (role === ROLE.Buyer && _price * +count > playerState.money - playerState.guaranteeMoney) ||
             (role === ROLE.Buyer && count > playerState.count - playerState.guaranteeCount)) {
             setCount(0)
             return Toast.warn(lang.invalidCount)
@@ -302,30 +306,46 @@ function _Play({gameState, playerState, frameEmitter}: TPlayProps) {
         })
     }
 
+    function repayMoney() {
+        if (moneyRepay <= 0 || moneyRepay > playerState.money) {
+            Toast.warn(lang.invalidMoney)
+            return
+        }
+        frameEmitter.emit(MoveType.repayMoney, {moneyRepay: +moneyRepay})
+    }
+
+    function repayCount() {
+        if (countRepay <= 0 || countRepay > playerState.count) {
+            Toast.warn(lang.invalidCount)
+            return
+        }
+        frameEmitter.emit(MoveType.repayCount, {countRepay: +countRepay})
+    }
+
     function renderOrderPanel() {
         const timeLeft = tradeTime + prepareTime - countDown
         const privatePrice = playerState.privatePrices[gameState.periodIndex]
         const total = +price * +count
-        const inputFragment = <div className={style.orderInputWrapper}>
-            <Input {...{
-                value: price || '',
-                placeholder: lang.price,
-                onChange: price => setPrice(price),
-                onMinus: price => setPrice(price - 1),
-                onPlus: price => setPrice(price + 1)
-            }}/>
-            <br/>
-            <Input {...{
-                value: count || '',
-                placeholder: lang.count,
-                onChange: count => setCount(count),
-                onMinus: count => setCount(count - 1),
-                onPlus: count => setCount(count + 1)
-            }}/>
-            <br/>
+        const inputPrice = <Input {...{
+            value: price || '',
+            placeholder: lang.price,
+            onChange: v => setPrice(v),
+            onMinus: v => setPrice(v - 1),
+            onPlus: v => setPrice(v + 1)
+        }}/>, inputCount = <Input {...{
+            value: count || '',
+            placeholder: lang.count,
+            onChange: v => setCount(v),
+            onMinus: v => setCount(v - 1),
+            onPlus: v => setCount(v + 1)
+        }}/>, inputFragment = <>
             <label
                 className={style.subLabel}>{lang.priceCountTips}{total && !isNaN(total) ? `${price}*${count}=${total}` : ''}</label>
-        </div>
+            <br/>
+            {inputPrice}
+            <br/>
+            {inputCount}
+        </>
         return <Border style={{flexBasis: '40rem'}} background={STYLE.mainPanelBorder}>
             <div className={style.orderPanel}>
                 <section className={style.orderBook}>
@@ -341,11 +361,12 @@ function _Play({gameState, playerState, frameEmitter}: TPlayProps) {
                         {
                             gamePeriodState.stage === PeriodStage.trading ?
                                 <section className={style.newOrder}>
-                                    <label className={style.subLabel}>{countDown < prepareTime ? '   ' : timeLeft > 0 ? timeLeft : 0}s</label>
+                                    <label
+                                        className={style.subLabel}>{countDown < prepareTime ? '   ' : timeLeft > 0 ? timeLeft : 0}s</label>
                                     <label className={style.label}>{lang.valuation}<em>{privatePrice}</em></label>
-                                    <Tabs labels={[lang.buy, lang.sell, lang.repay]}
+                                    <Tabs labels={[lang.buy, lang.sell]}
                                           activeTabIndex={orderTabIndex} switchTab={setOrderTabIndex}>
-                                        <>
+                                        <div className={style.orderInputWrapper}>
                                             {
                                                 inputFragment
                                             }
@@ -359,8 +380,8 @@ function _Play({gameState, playerState, frameEmitter}: TPlayProps) {
                                                     onClick: () => submitOrder(ROLE.Buyer, true)
                                                 }}/>
                                             </div>
-                                        </>
-                                        <>
+                                        </div>
+                                        <div className={style.orderInputWrapper}>
                                             {
                                                 inputFragment
                                             }
@@ -374,22 +395,7 @@ function _Play({gameState, playerState, frameEmitter}: TPlayProps) {
                                                     onClick: () => submitOrder(ROLE.Seller, true)
                                                 }}/>
                                             </div>
-                                        </>
-                                        <>
-                                            {
-                                                inputFragment
-                                            }
-                                            <div className={style.submitBtnWrapper}>
-                                                <Button {...{
-                                                    label: lang.repayMoney,
-                                                    onClick: () => console.log(lang.repayMoney)
-                                                }}/>&nbsp;
-                                                <Button {...{
-                                                    label: lang.repayStock,
-                                                    onClick: () => console.log(lang.repayStock)
-                                                }}/>
-                                            </div>
-                                        </>
+                                        </div>
                                     </Tabs>
                                 </section> : prepareTime > countDown ?
                                 <p className={style.marketWillOpen}>{lang.marketWillOpen1}
@@ -412,16 +418,45 @@ function _Play({gameState, playerState, frameEmitter}: TPlayProps) {
                 </div>
                 <div>
                     <label>{lang.point}</label>
-                    <em>{playerState.point}</em>
+                    <em>{playerState.money}</em>
                 </div>
                 <div>
                     <label>{lang.guaranteeCount}</label>
                     <em>{playerState.guaranteeCount}</em>
                 </div>
                 <div>
-                    <label>{lang.guaranteePoint}</label>
-                    <em>{playerState.guaranteePoint}</em>
+                    <label>{lang.guaranteeMoney}</label>
+                    <em>{playerState.guaranteeMoney}</em>
                 </div>
+            </div>
+            <Line text={lang.repay} style={STYLE.titleLineStyle}/>
+            <div className={style.repayWrapper}>
+                <Input {...{
+                    value: moneyRepay || '',
+                    placeholder: lang.money,
+                    onChange: v => setMoneyRepay(v),
+                    onMinus: v => setMoneyRepay(v - 1),
+                    onPlus: v => setMoneyRepay(v + 1)
+                }}/>
+                <br/>
+                <Button {...{
+                    label: lang.repayMoney,
+                    onClick: () => repayMoney()
+                }}/>
+            </div>
+            <div className={style.repayWrapper}>
+                <Input {...{
+                    value: countRepay || '',
+                    placeholder: lang.count,
+                    onChange: v => setCountRepay(v),
+                    onMinus: v => setCountRepay(v - 1),
+                    onPlus: v => setCountRepay(v + 1)
+                }}/>
+                <br/>
+                <Button {...{
+                    label: lang.repayStock,
+                    onClick: () => repayCount()
+                }}/>
             </div>
         </section>
     }
