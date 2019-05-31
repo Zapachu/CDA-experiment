@@ -4,13 +4,14 @@ import { Request, Response, NextFunction } from 'express'
 import socketEmitter from 'socket.io-emitter'
 import {RedisCall} from 'bespoke-server'
 import path from 'path'
+import request from 'request-promise-native'
 
 import { User } from './models'
 import { UserDoc } from './interfaces'
 import settings from './settings'
 import {Phase, CreateGame, PhaseDone} from 'bespoke-game-stock-trading-config'
 import { ResCode, serverSocketListenEvents, clientSocketListenEvnets, UserGameStatus } from './enums'
-import XJWT from './XJWT';
+import XJWT, {Type as XJWTType, encryptPassword} from './XJWT';
 
 const ioEmitter = socketEmitter({ host: settings.redishost, port: settings.redisport })
 
@@ -188,7 +189,21 @@ export default class RouterController {
 
     @catchError
     static async renderSignIn(req: Request, res: Response, next: NextFunction) {
-        res.send('index sign in todo')
+        res.render('sign-in', {rootname: settings.rootname});
+    }
+
+    @catchError
+    static async login(req: Request, res: Response, next: NextFunction) {
+      const { username, password } = req.query;
+      const encrypted = encryptPassword(password);
+      const url = `http://ilab-x.com/sys/api/user/validate?username=${encodeURIComponent(
+        username
+      )}&password=${encodeURIComponent(encrypted.password)}&nonce=${
+        encrypted.nonce
+      }&cnonce=${encrypted.cnonce}`;
+      const response = await request(url);
+      console.log(response)
+      res.send(response);
     }
 
     @catchError
