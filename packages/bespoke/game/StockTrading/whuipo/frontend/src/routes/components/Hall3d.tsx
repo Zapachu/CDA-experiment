@@ -1,14 +1,18 @@
 import * as React from "react";
 import * as BABYLON from "babylonjs";
 import { Button, Modal, Spin } from 'antd'
-import {reqInitInfo} from '../../services/index'
+import Modal2 from '../../../../../components/Modal'
 import socket from 'socket.io-client'
+import 'pepjs'
+
+import {reqInitInfo} from '../../services/index'
 import {serverSocketListenEvents, clientSocketListenEvnets, ResCode, UserDoc, UserGameStatus, GameTypes} from '../../enums'
+import Line2d from './line2d'
 
 import BabylonScene from "./BabylonScene";
-import PANO from "./pano.png";
 import Detail from './detail.png'
-import Arrow from './arrow.png'
+import PANO from './pano.jpg'
+
 
 import 'antd/dist/antd.css';
 import style from './style.less'
@@ -19,10 +23,10 @@ const cardWidth = 120
 const cardHeight = cardWidth * (347 / 620)
 
 const redirect = (url) => {
-  if (APP_TYPE === 'production') {
+  // if (APP_TYPE === 'production') {
     location.href = url
     return
-  } 
+  // } 
   const obj = new URL(url)
   obj.host = '192.168.56.1:8081'
   location.href = obj.toString()
@@ -163,6 +167,7 @@ class Hall3D extends React.Component<Props, State> {
 
   }
   componentDidMount () {
+    console.log(APP_TYPE, 'apptype')
     this.reqInitInfo()
   }
   reqInitInfo () {
@@ -305,8 +310,6 @@ class Hall3D extends React.Component<Props, State> {
   renderGameIntroCard(gameStep: GameSteps) {
     const {introPosition, introContent, introRotateY} = GameRenderConfigs[gameStep]
     const { scene } = this
-    var light = new BABYLON.HemisphericLight(`light1${gameStep}`, new BABYLON.Vector3(0, 1, 0), scene);
-    light.intensity = 0.5;
 
     var ground = BABYLON.MeshBuilder.CreateGround(`introGround${gameStep}`, { width: cardWidth, height: cardHeight}, scene);
 
@@ -318,7 +321,6 @@ class Hall3D extends React.Component<Props, State> {
     materialGround.diffuseTexture = textureGround;
     materialGround.emissiveColor = new BABYLON.Color3(1, 1, 1)
     ground.material = materialGround;
-
 
     var textureContext = textureGround.getContext();
     var img = new Image();
@@ -382,25 +384,57 @@ class Hall3D extends React.Component<Props, State> {
   }
   renderGameStepBtn (gameStep: GameSteps) {
     const {btnPosition} = GameRenderConfigs[gameStep]
-    console.log('render step', btnPosition, Detail)
-    const myGround = BABYLON.MeshBuilder.CreateGround(`btn${gameStep}`, { width: 80, height: 30, subdivisions: 4 }, this.scene);
+		var light = new BABYLON.DirectionalLight("direct", new BABYLON.Vector3(0, -1, 0), this.scene);
+
+		// var light = new BABYLON.DirectionalLight(`direct${gameStep}`, new BABYLON.Vector3(-btnPosition.x, -btnPosition.y, -btnPosition.z ), this.scene);
+
+    const path = [ 	
+      new BABYLON.Vector3(-10, 0, 0),
+          new BABYLON.Vector3(0, 10, 0),
+          new BABYLON.Vector3(10, 0, 0),
+    ]
+    const path2 = [ 	
+        new BABYLON.Vector3(-10, -10, 0),
+          new BABYLON.Vector3(0, 0, 0),
+          new BABYLON.Vector3(10, -10, 0),
+    ]
+    const line1 = Line2d('testline', {
+      path,
+      width: 2,
+      color: [0, 0, 1, 1]
+    }, this.scene)
+    const line2 = Line2d('testline2', {
+      path: path2,
+      width: 2,
+      color: [0, 0, 1, 1]
+    }, this.scene)
+    const mesh2 = BABYLON.Mesh.MergeMeshes([line1, line2])
+    mesh2.position.x = btnPosition.x
+    mesh2.position.y = btnPosition.y
+    mesh2.position.z = btnPosition.z
+    mesh2.rotation.x = Math.PI / 4
+
+    var ground = BABYLON.Mesh.CreateGround("ground1", 20, 20, 1, this.scene);
     const myMaterial = new BABYLON.StandardMaterial(`btnMat${gameStep}`, this.scene)
-    const texture = new BABYLON.Texture(Arrow, this.scene)
-    texture.hasAlpha = true
+     const texture = new BABYLON.Texture(Detail, this.scene)
     myMaterial.emissiveTexture = texture
-    // myMaterial.alpha = 0.8
-    myGround.material = myMaterial
-    myGround.position.x = btnPosition.x
-    myGround.position.y = btnPosition.y
-    myGround.position.z = btnPosition.z
-    myGround.rotation.x = - Math.PI / 4
-    myGround.actionManager = new BABYLON.ActionManager(this.scene)
-    myGround.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+    myMaterial.alpha = 0
+    ground.material = myMaterial
+    ground.position.x = btnPosition.x
+    ground.position.y = btnPosition.y + 1
+    ground.position.z = btnPosition.z
+    ground.rotation.x = -Math.PI / 4
+    ground.actionManager = new BABYLON.ActionManager(this.scene)
+    ground.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
       {
         trigger: BABYLON.ActionManager.OnPickDownTrigger,
       },
       this.handleSelectGame.bind(this, gameStep)
     ))
+  
+
+   
+   
   }
   handleShowLeftDetail () {
     const frameRate = 20
@@ -509,7 +543,7 @@ class Hall3D extends React.Component<Props, State> {
     }, 0);
   }
   handleSceneMount ({ engine, scene, canvas }) {
-    // _showWorldAxis(scene, 1);
+    // _showWorldAxis(scene, 20);
     const camera = new BABYLON.ArcRotateCamera(
       "Camera",
       0, 0, 5,
@@ -556,6 +590,7 @@ class Hall3D extends React.Component<Props, State> {
     });
   }
   connectSocket () {
+    // let socketUrl = APP_TYPE === 'production' ? 'localhost:3020' : '192.168.0.135:3020'
     const io = socket.connect('/')
     this.io = io
     io.on('connect', (socket) => {
@@ -582,6 +617,7 @@ class Hall3D extends React.Component<Props, State> {
     const {isDetailView, isInitView} = this.state
     return (
       <div>
+        {/* <img src={Arrow}/> */}
         {
           isInitView && <div className={style.loading}>
             <Spin/>

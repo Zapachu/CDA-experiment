@@ -1,6 +1,7 @@
 import dva from 'dva';
 import './index.less';
 
+window.APP_TYPE = 'APP_DEV_MODE'
 // 1. Initialize
 const app = dva();
 
@@ -15,3 +16,4 @@ app.router(require('./router').default);
 
 // 5. Start
 app.start('#root');
+

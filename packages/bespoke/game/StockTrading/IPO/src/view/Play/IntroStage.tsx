@@ -15,7 +15,7 @@ import {
   PlayerStatus,
   MATCH_TIMER
 } from "../../config";
-import { Line, PlayMode, MatchModal, Modal } from "../../../../components";
+import { Line, PlayMode, MatchModal, Modal } from "bespoke-game-stock-trading-component";
 
 interface IPlayState {
   matchTimer: number;

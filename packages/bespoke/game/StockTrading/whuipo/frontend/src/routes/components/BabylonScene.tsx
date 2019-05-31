@@ -66,6 +66,7 @@ export default class Scene extends React.Component<SceneProps> {
       <canvas
         style={propStyle}
         ref={this.onCanvasLoaded}
+        touchAction="none"
       />
     );
   }
