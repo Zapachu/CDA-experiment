@@ -1,8 +1,8 @@
 {
   "private": true,
   "scripts": {
-    "start": "ESLINT=none roadhog server",
-    "build": "cross-env mode=production webpack --config webpackConfig.js && cp -rf dist ../build/",
+    "start": "cross-env mode=development webpack --watch --config webpackConfig.js --mode development ",
+    "build": "cross-env mode=production webpack --config webpackConfig.js --mode=production && cp -rf dist ../build/",
     "lint": "eslint --ext .js src test",
     "precommit": "npm run lint"
   },
@@ -18,10 +18,11 @@
     "socket.io-client": "^2.2.0"
   },
   "devDependencies": {
+    "webpack": "^4.32.2",
+    "css-loader": "^2.1.1",
     "babel-plugin-dva-hmr": "^0.3.2",
     "clean-webpack-plugin": "^2.0.2",
     "cross-env": "^5.2.0",
-    "css-loader": "1.0.0",
     "eslint": "^4.14.0",
     "eslint-config-umi": "^0.1.1",
     "eslint-plugin-flowtype": "^2.34.1",
@@ -42,7 +43,6 @@
     "style-loader": "^0.23.1",
     "ts-loader": "^6.0.1",
     "typescript": "^3.4.5",
-    "webpack": "3.3.0",
     "webpack-dev-middleware": "^3.7.0"
   }
 }
