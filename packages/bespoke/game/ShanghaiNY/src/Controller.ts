@@ -169,11 +169,12 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             break;
           }
           case MoveType.advanceRoundIndex: {
-            if(playerState.roundIndex === rounds-1) {
+            const nextRoundIndex = params.nextRoundIndex;
+            if(nextRoundIndex === rounds) {
               playerState.stageIndex = 0;
               playerState.stage = Stage.Survey;
             } else {
-              playerState.roundIndex++;
+              playerState.roundIndex = nextRoundIndex;
               playerState.stageIndex = MainStageIndex.Choose;
             }
             break;
