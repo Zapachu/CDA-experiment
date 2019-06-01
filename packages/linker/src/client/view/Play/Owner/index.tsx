@@ -89,7 +89,7 @@ export class Play4Owner extends React.Component<TRootContext & TPlayContext & { 
                     </> :
                     <iframe style={{
                         width: '100%',
-                        height:'100%',
+                        height:'150%',
                         position:'fixed',
                         border: 'none'
                     }} src={gameState.phaseStates[0].playUrl}/>
