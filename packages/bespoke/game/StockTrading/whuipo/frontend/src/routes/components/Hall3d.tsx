@@ -2,6 +2,7 @@ import * as React from "react";
 import * as BABYLON from "babylonjs";
 import socket from 'socket.io-client'
 import {Modal, Button, Loading, MatchModal} from 'bespoke-game-stock-trading-component'
+import 'pepjs'
 
 import {reqInitInfo} from '../../services/index'
 import {serverSocketListenEvents, clientSocketListenEvnets, ResCode, UserDoc, UserGameStatus, GameTypes} from '../../enums'
