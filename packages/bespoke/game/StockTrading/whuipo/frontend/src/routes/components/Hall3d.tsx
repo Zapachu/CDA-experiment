@@ -203,7 +203,7 @@ class Hall3D extends React.Component<Props, State> {
         const user: UserDoc = res.user
         const {status, playerUrl, nowJoinedGame, unblockGamePhase} = user
 
-        const userUnBlockGameOrder = GamePhaseOrder[unblockGamePhase]
+        const userUnBlockGameOrder = GamePhaseOrder[unblockGamePhase] || -1
         console.log(userUnBlockGameOrder, 'user')
         Object.keys(GameRenderConfigs).forEach((gameStep) => {
           let gameStepPhaseOrder = -1
