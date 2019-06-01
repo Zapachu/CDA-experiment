@@ -2,6 +2,7 @@ import * as React from "react";
 import * as BABYLON from "babylonjs";
 import socket from 'socket.io-client'
 import {Modal, Button, Loading, MatchModal} from 'bespoke-game-stock-trading-component'
+import 'pepjs'
 
 import {reqInitInfo} from '../../services/index'
 import {serverSocketListenEvents, clientSocketListenEvnets, ResCode, UserDoc, UserGameStatus, GameTypes} from '../../enums'
@@ -10,8 +11,8 @@ import Line2d from './line2d'
 import BabylonScene from "./BabylonScene";
 import Detail from './detail.png'
 import PANO from './pano.jpg'
-
-
+import LockIcon from './lock.png'
+import UnLockIcon from './unlock.png'
 import style from './style.less'
 
 const zLargeDistance = 500
@@ -39,7 +40,14 @@ const GamePhaseToStep = {
 }
 const GameStepsToGamePhase = {
   [GameSteps.left]: GameTypes.TBM,
-  [GameSteps.right]: GameTypes.CBM
+  [GameSteps.right]: GameTypes.CBM,
+}
+
+const GamePhaseOrder = {
+  [GameTypes.CBM]: 1,
+  [GameTypes.IPO_Median]: 2,
+  [GameTypes.IPO_TopK]: 2,
+  [GameTypes.TBM]: 3
 }
 
 const GameRenderConfigs = {
@@ -65,7 +73,13 @@ const GameRenderConfigs = {
       x: -200,
       y: -80,
       z: -50
-    }
+    },
+    lockIconPosition: {
+      x: -345,
+      y: 95,
+      z: 320
+    },
+    isLock: true,
   },
   [GameSteps.center]: {
     maskSize: {
@@ -89,8 +103,13 @@ const GameRenderConfigs = {
       x: 0,
       y: -80,
       z: -50
-    }
-
+    },
+    lockIconPosition: {
+      x: 0,
+      y: 165,
+      z: 460
+    },
+    isLock: true,
   },
   [GameSteps.right]: {
     maskSize: {
@@ -114,7 +133,13 @@ const GameRenderConfigs = {
       x: 200,
       y: -80,
       z: -50
-    }
+    },
+    lockIconPosition: {
+      x: 355,
+      y: 100,
+      z: 325
+    },
+    isLock: true,
   },
 }
 interface Props {
@@ -135,7 +160,7 @@ interface State {
   modalContentType?: ModalContentTypes,
   isInitView: boolean,
   focusGameType?: GameTypes,
-  matchTimer?: number
+  matchTimer?: number,
 }
 
 class Hall3D extends React.Component<Props, State> {
@@ -167,7 +192,8 @@ class Hall3D extends React.Component<Props, State> {
 
   }
   componentDidMount () {
-    this.reqInitInfo()
+  }
+  componentWillUpdate () {
   }
   reqInitInfo () {
     reqInitInfo().then(res => {
@@ -175,12 +201,28 @@ class Hall3D extends React.Component<Props, State> {
       if (res.code === ResCode.success) {
         this.connectSocket()
         const user: UserDoc = res.user
-        const {status, playerUrl, nowJoinedGame} = user
+        const {status, playerUrl, nowJoinedGame, unblockGamePhase} = user
+
+        const userUnBlockGameOrder = GamePhaseOrder[unblockGamePhase] || -1
+        console.log(userUnBlockGameOrder, 'user')
+        Object.keys(GameRenderConfigs).forEach((gameStep) => {
+          let gameStepPhaseOrder = -1
+          if (Number(gameStep) === GameSteps.center) {
+            gameStepPhaseOrder = GamePhaseOrder[GameTypes.IPO_TopK]
+          } else {
+            const gamePhase = GameStepsToGamePhase[gameStep]
+            gameStepPhaseOrder = GamePhaseOrder[gamePhase]
+          }
+          const isLock = gameStepPhaseOrder > userUnBlockGameOrder
+          GameRenderConfigs[gameStep].isLock = isLock
+        })
+        console.log(GameRenderConfigs, 'config')
+        this.initView()
+
         if (!!nowJoinedGame) {
           if (status === UserGameStatus.end) {
             return
           } else if (status === UserGameStatus.started) {
-            // location.href = playerUrl
             redirect(playerUrl)
           } else {
             const step = GamePhaseToStep[nowJoinedGame]
@@ -388,8 +430,6 @@ class Hall3D extends React.Component<Props, State> {
     const {btnPosition} = GameRenderConfigs[gameStep]
 		var light = new BABYLON.DirectionalLight("direct", new BABYLON.Vector3(0, -1, 0), this.scene);
 
-		// var light = new BABYLON.DirectionalLight(`direct${gameStep}`, new BABYLON.Vector3(-btnPosition.x, -btnPosition.y, -btnPosition.z ), this.scene);
-
     const path = [ 	
       new BABYLON.Vector3(-10, 0, 0),
           new BABYLON.Vector3(0, 10, 0),
@@ -411,9 +451,7 @@ class Hall3D extends React.Component<Props, State> {
       color: [0, 0, 1, 1]
     }, this.scene)
     const mesh2 = BABYLON.Mesh.MergeMeshes([line1, line2])
-    mesh2.position.x = btnPosition.x
-    mesh2.position.y = btnPosition.y
-    mesh2.position.z = btnPosition.z
+    mesh2.position = new BABYLON.Vector3(btnPosition.x, btnPosition.y, btnPosition.z)
     mesh2.rotation.x = Math.PI / 4
 
     var ground = BABYLON.Mesh.CreateGround("ground1", 20, 20, 1, this.scene);
@@ -422,9 +460,7 @@ class Hall3D extends React.Component<Props, State> {
     myMaterial.emissiveTexture = texture
     myMaterial.alpha = 0
     ground.material = myMaterial
-    ground.position.x = btnPosition.x
-    ground.position.y = btnPosition.y + 1
-    ground.position.z = btnPosition.z
+    ground.position = new BABYLON.Vector3(btnPosition.x, btnPosition.y + 1, btnPosition.z)
     ground.rotation.x = -Math.PI / 4
     ground.actionManager = new BABYLON.ActionManager(this.scene)
     ground.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
@@ -433,10 +469,21 @@ class Hall3D extends React.Component<Props, State> {
       },
       this.handleSelectGame.bind(this, gameStep)
     ))
-  
+  }
+  renderLockIcon (gameStep: GameSteps){
+		var light = new BABYLON.DirectionalLight("direct", new BABYLON.Vector3(0, 1, 1), this.scene);
 
-   
-   
+    const {isLock, lockIconPosition, maskRotateY} = GameRenderConfigs[gameStep]
+    var ground = BABYLON.Mesh.CreateGround(`lockGround${gameStep}`, 30, 30 * (186 / 144), 1, this.scene);
+    const myMaterial = new BABYLON.StandardMaterial(`lockMat${gameStep}`, this.scene)
+     const texture = new BABYLON.Texture(isLock ? LockIcon : UnLockIcon, this.scene)
+     texture.hasAlpha = true
+    myMaterial.diffuseTexture = texture
+    // myMaterial.diffuseColor = new BABYLON.Color3(1, 1, 1)
+    ground.material = myMaterial
+    ground.rotation.x = - Math.PI / 2
+    ground.rotation.y = maskRotateY
+    ground.position = new BABYLON.Vector3(lockIconPosition.x, lockIconPosition.y, lockIconPosition.z)
   }
   handleShowLeftDetail () {
     const frameRate = 20
@@ -537,12 +584,13 @@ class Hall3D extends React.Component<Props, State> {
         this.hoverMaskInstance[gameStep] = maskInstance
       }
       this.renderGameStepBtn(Number(gameStep))
+      this.renderLockIcon(Number(gameStep))
     })
     setTimeout(() => {
       this.setState({
         isInitView: false
       })
-    }, 0);
+    }, 500);
   }
   handleSceneMount ({ engine, scene, canvas }) {
     // _showWorldAxis(scene, 20);
@@ -567,23 +615,20 @@ class Hall3D extends React.Component<Props, State> {
       },
       scene
     );
-
-    setTimeout(() => {
-      this.initView()
-    }, 500)
+    this.reqInitInfo()
       
-    // scene.onPointerObservable.add((pointerInfo) => {
-    //   switch (pointerInfo.type) {
+    scene.onPointerObservable.add((pointerInfo) => {
+      switch (pointerInfo.type) {
 
-    //     case BABYLON.PointerEventTypes.POINTERUP:
-    //       const { clientX, clientY } = pointerInfo.event
-    //       const x = getRelativePageX(clientX), y = getRelativePageY(clientY)
-    //       console.log(pointerInfo, x, y)
-    //       break;
-    //     case BABYLON.PointerEventTypes.POINTERMOVE:
-    //       break;
-    //   }
-    // });
+        case BABYLON.PointerEventTypes.POINTERUP:
+          const { clientX, clientY } = pointerInfo.event
+          // const x = getRelativePageX(clientX), y = getRelativePageY(clientY)
+          console.log(pointerInfo)
+          break;
+        case BABYLON.PointerEventTypes.POINTERMOVE:
+          break;
+      }
+    });
 
     engine.runRenderLoop(() => {
       if (scene) {
@@ -618,7 +663,6 @@ class Hall3D extends React.Component<Props, State> {
           modalContentType: ModalContentTypes.matchSuccess
         })
         setTimeout(() => {
-          // location.href = playerUrl
           redirect(playerUrl)
         }, 1000)
     })       
@@ -627,7 +671,6 @@ class Hall3D extends React.Component<Props, State> {
     const {isDetailView, isInitView} = this.state
     return (
       <div>
-        {/* <img src={Arrow}/> */}
         {
           isInitView && <div className={style.loading}>
             <Loading label="加载中"/>
