@@ -106,7 +106,7 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
           <Button width={ButtonProps.Width.small}
                   label={lang.confirm}
                   onClick={() => {
-                    frameEmitter.emit(MoveType.advanceRoundIndex);
+                    frameEmitter.emit(MoveType.advanceRoundIndex, {nextRoundIndex: curRoundIndex+1});
                     this.setState({c1: 0, c2: []})
                   }}
           />
@@ -124,7 +124,7 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
           <Button width={ButtonProps.Width.small}
                   label={lang.confirm}
                   onClick={() => {
-                    frameEmitter.emit(MoveType.advanceRoundIndex);
+                    frameEmitter.emit(MoveType.advanceRoundIndex, {nextRoundIndex: curRoundIndex+1});
                     this.setState({c1: 0, c2: []})
                   }}
           />

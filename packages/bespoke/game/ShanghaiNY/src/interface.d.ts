@@ -655,6 +655,9 @@ export interface IMoveParams {
 
     /** MoveParams surveys */
     surveys?: (string[]|null);
+
+    /** MoveParams nextRoundIndex */
+    nextRoundIndex?: (number|null);
 }
 
 /** Represents a MoveParams. */
@@ -677,6 +680,9 @@ export class MoveParams implements IMoveParams {
 
     /** MoveParams surveys. */
     public surveys: string[];
+
+    /** MoveParams nextRoundIndex. */
+    public nextRoundIndex: number;
 
     /**
      * Creates a new MoveParams instance using the specified properties.
