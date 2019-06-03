@@ -3,6 +3,7 @@ import * as BABYLON from "babylonjs";
 import socket from 'socket.io-client'
 import {Modal, Button, Loading, MatchModal} from 'bespoke-game-stock-trading-component'
 import 'pepjs'
+import qs from 'qs'
 
 import {reqInitInfo} from '../../services/index'
 import {serverSocketListenEvents, clientSocketListenEvnets, ResCode, UserDoc, UserGameStatus, GameTypes} from '../../enums'
@@ -35,19 +36,20 @@ enum GameSteps { left, center, right }
 const GamePhaseToStep = {
   [GameTypes.IPO_Median]: GameSteps.center,
   [GameTypes.IPO_TopK]: GameSteps.center,
-  [GameTypes.CBM]: GameSteps.right,
-  [GameTypes.TBM]: GameSteps.left
+  [GameTypes.CBM]: GameSteps.left,
+  [GameTypes.TBM]: GameSteps.right
 }
+
 const GameStepsToGamePhase = {
-  [GameSteps.left]: GameTypes.TBM,
-  [GameSteps.right]: GameTypes.CBM,
+  [GameSteps.left]: GameTypes.CBM,
+  [GameSteps.right]: GameTypes.TBM,
 }
 
 const GamePhaseOrder = {
-  [GameTypes.CBM]: 1,
+  [GameTypes.TBM]: 1,
   [GameTypes.IPO_Median]: 2,
   [GameTypes.IPO_TopK]: 2,
-  [GameTypes.TBM]: 3
+  [GameTypes.CBM]: 3
 }
 
 const GameRenderConfigs = {
@@ -148,6 +150,7 @@ interface Props {
 
 enum ModalContentTypes {
   selectSubGameType,
+  continueGame,
   selectMode,
   preMatch,
   waittingMatch,
@@ -177,6 +180,7 @@ class Hall3D extends React.Component<Props, State> {
   }
   io: SocketIOClient.Socket
   matchTimer: NodeJS.Timer
+  continuePlayUrl: string
   constructor(props) {
     super(props)
     this.hoverMaskInstance = {}
@@ -201,7 +205,7 @@ class Hall3D extends React.Component<Props, State> {
       if (res.code === ResCode.success) {
         this.connectSocket()
         const user: UserDoc = res.user
-        const {status, playerUrl, nowJoinedGame, unblockGamePhase} = user
+        const { unblockGamePhase} = user
 
         const userUnBlockGameOrder = GamePhaseOrder[unblockGamePhase] || -1
         console.log(userUnBlockGameOrder, 'user')
@@ -219,22 +223,18 @@ class Hall3D extends React.Component<Props, State> {
         console.log(GameRenderConfigs, 'config')
         this.initView()
 
-        if (!!nowJoinedGame) {
-          if (status === UserGameStatus.end) {
-            return
-          } else if (status === UserGameStatus.started) {
-            redirect(playerUrl)
-          } else {
-            const step = GamePhaseToStep[nowJoinedGame]
+        const urlObj = new URL(window.location.href)
+        const queryObj = qs.parse(urlObj.search.replace('?', '')) || {}
+        if (queryObj.gamePhase) {
+          const step = GamePhaseToStep[queryObj.gamePhase]
             this.handleSelectGame(step)
             setTimeout(_ => {
               this.setState({
                 showPreStartModal: true,
-                modalContentType: status === UserGameStatus.waittingMatch ? ModalContentTypes.waittingMatch : ModalContentTypes.selectMode,
-                focusGameType: nowJoinedGame,
+                modalContentType: ModalContentTypes.selectMode,
+                focusGameType: queryObj.gamePhase,
               })
             }, 2000)
-          } 
         }
         
         return
@@ -261,7 +261,9 @@ class Hall3D extends React.Component<Props, State> {
         showPreStartModal: false
       })
       if ([ModalContentTypes.waittingMatch, ModalContentTypes.preMatch].includes(modalContentType)) {
-       this.io.emit(serverSocketListenEvents.leaveMatchRoom)
+       this.io.emit(serverSocketListenEvents.leaveMatchRoom, {
+         gamePhase: focusGameType
+       })
       }
     }
     const handleSelectGameMode = (isGroupMode: boolean) => {
@@ -280,6 +282,13 @@ class Hall3D extends React.Component<Props, State> {
             <div className={style.selectSubGame}>
                 <Button onClick={_ => this.setState({focusGameType: GameTypes.IPO_Median, modalContentType: ModalContentTypes.selectMode})} label="IPO_Median"></Button>
                 <Button onClick={_ => this.setState({focusGameType: GameTypes.IPO_TopK, modalContentType: ModalContentTypes.selectMode})} label="IPO_TopK"></Button>
+            </div>
+          }
+          {
+            modalContentType === ModalContentTypes.continueGame &&
+            <div>
+              您尚有实验正在进行中，继续该实验吗？
+              <Button onClick={_ => redirect(this.continuePlayUrl)} label="继续"></Button>
             </div>
           }
           {
@@ -357,7 +366,7 @@ class Hall3D extends React.Component<Props, State> {
 
     var ground = BABYLON.MeshBuilder.CreateGround(`introGround${gameStep}`, { width: cardWidth, height: cardHeight}, scene);
 
-    var textureGround = new BABYLON.DynamicTexture(`dynamicTexture${gameStep}`, { width: cardWidth, height: cardHeight }, scene);
+    var textureGround = new BABYLON.DynamicTexture(`dynamicTexture${gameStep}`, { width: cardWidth, height: cardHeight }, scene, false);
     var textureContext = textureGround.getContext();
     textureGround.hasAlpha = true
 
@@ -386,9 +395,7 @@ class Hall3D extends React.Component<Props, State> {
       textureGround.drawText(introContent, null, 20, font, "white", null);
       textureGround.update();
     }
-    ground.position.x = introPosition.x
-    ground.position.y = introPosition.y
-    ground.position.z = introPosition.z
+    ground.position = new BABYLON.Vector3(introPosition.x, introPosition.y, introPosition.z)
     ground.rotation.x = - Math.PI / 2
     ground.rotation.y = introRotateY
     return ground
@@ -621,8 +628,6 @@ class Hall3D extends React.Component<Props, State> {
       switch (pointerInfo.type) {
 
         case BABYLON.PointerEventTypes.POINTERUP:
-          const { clientX, clientY } = pointerInfo.event
-          // const x = getRelativePageX(clientX), y = getRelativePageY(clientY)
           console.log(pointerInfo)
           break;
         case BABYLON.PointerEventTypes.POINTERMOVE:
@@ -666,11 +671,17 @@ class Hall3D extends React.Component<Props, State> {
           redirect(playerUrl)
         }, 1000)
     })       
+    io.on(clientSocketListenEvnets.continueGame, ({playerUrl}) => {
+      this.setState({
+        modalContentType: ModalContentTypes.continueGame,
+      })
+      this.continuePlayUrl = playerUrl
+    })
   }
   render() {
     const {isDetailView, isInitView} = this.state
     return (
-      <div>
+      <div >
         {
           isInitView && <div className={style.loading}>
             <Loading label="加载中"/>

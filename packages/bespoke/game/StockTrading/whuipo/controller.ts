@@ -4,6 +4,9 @@ import { Request, Response, NextFunction } from 'express'
 import socketEmitter from 'socket.io-emitter'
 import {RedisCall} from 'bespoke-server'
 import path from 'path'
+import Redis from 'ioredis'
+import {URL} from 'url'
+import qs from 'qs'
 
 import { User } from './models'
 import { UserDoc } from './interfaces'
@@ -12,6 +15,7 @@ import {Phase, CreateGame, PhaseDone} from 'bespoke-game-stock-trading-config'
 import { ResCode, serverSocketListenEvents, clientSocketListenEvnets, UserGameStatus } from './enums'
 
 const ioEmitter = socketEmitter({ host: settings.redishost, port: settings.redisport })
+const redisCli = new Redis(settings.redisport, settings.redishost)
 
 passport.serializeUser(function (user: UserDoc, done) {
     done(null, user._id);
@@ -118,36 +122,71 @@ const emitMatchSuccess = async (gamePhase: Phase, uids = []) => {
         arr.forEach(socketId => {
             ioEmitter.to(socketId).emit(clientSocketListenEvnets.startGame, {playerUrl })
         })
-        await User.updateOne({
-            _id: uid
-        }, {
-            $set: {
-                status: UserGameStatus.started,
-                playerUrl
-            }
+        await RedisTools.setUserGameData(uid, gamePhase, {
+            status: UserGameStatus.started,
+            playerUrl
         })
+        await RedisTools.recordPalyerUrl(playerUrl, uid)
     })
 }
 
-const gamePhaseOrder = {
-    [Phase.CBM]: 1,
-    [Phase.IPO_Median]: 2,
-    [Phase.IPO_TopK]: 2,
-    [Phase.TBM]: 3
+interface UserGameData {
+    playerUrl?: string,
+    status: UserGameStatus
 }
 
-RedisCall.handle<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, async ({playUrl, onceMore}) => {
-    console.log('redis handle phase done', playUrl, onceMore)
-    const user = await User.findOne({playerUrl: playUrl})
-    console.log(!!user)
+const RedisTools = {
+    _getUserGameKey: (uid: string, game: Phase) => `usergamedata:${uid}/${game}`,
+    _getRecordPlayerUrlKey: (playerUrl: string) => `playerUrlToUid:${playerUrl}`,
+    setUserGameData: async (uid: string, game: Phase, data: {playerUrl?: string, status?: UserGameStatus}) => {
+        const key = RedisTools._getUserGameKey(uid, game)
+        const oldData = await redisCli.get(key)
+        const oldDataObj = oldData ? JSON.parse(oldData) : {}
+        const mergeData = Object.assign(oldDataObj, data)
+        await redisCli.set(key, JSON.stringify(mergeData))
+    },
+    getUserGameData: async (uid: string, game: Phase): Promise<UserGameData> => {
+        const key = RedisTools._getUserGameKey(uid, game)
+        const oldData = await redisCli.get(key)
+        return oldData ? JSON.parse(oldData) : null
+    },
+    recordPalyerUrl: async (playerUrl: string, uid: string) => {
+        await redisCli.set(RedisTools._getRecordPlayerUrlKey(playerUrl), uid)
+    },
+    getPlayerUrlRecord: async (playerUrl: string) => {
+        return await redisCli.get(RedisTools._getRecordPlayerUrlKey(playerUrl))
+    }
+}
+
+const gamePhaseOrder = {
+    [Phase.TBM]: 1,
+    [Phase.IPO_Median]: 2,
+    [Phase.IPO_TopK]: 2,
+    [Phase.CBM]: 3
+}
+
+RedisCall.handle<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, async ({playUrl, onceMore, phase = Phase.TBM}) => {
+    console.log(`redis handle phase: ${phase} done`, playUrl, onceMore)
+    const uid = await RedisTools.getPlayerUrlRecord(playUrl)
+    const user = await User.findById(uid)
+    let lobbyUrl = settings.lobbyUrl
     if (user) {
         const lastUserUnlockOrder = gamePhaseOrder[user.unblockGamePhase] || -1
-        const orderOfNowGame = gamePhaseOrder[user.nowJoinedGame]
+        const orderOfNowGame = gamePhaseOrder[phase]
         if (orderOfNowGame > lastUserUnlockOrder) {
-            user.unblockGamePhase = user.nowJoinedGame
+            user.unblockGamePhase = phase
         }
-        user.status = onceMore ? UserGameStatus.beforeStart : UserGameStatus.end
         await user.save()
+        await RedisTools.setUserGameData(uid, phase, {
+            status: UserGameStatus.notStarted
+        })
+        if (onceMore) {
+            const urlObj = new URL(lobbyUrl)
+            const queryObj = qs.parse(urlObj.search.replace('?', ''))
+            queryObj.gamePhase = phase
+            urlObj.search = qs.stringify(queryObj)
+            lobbyUrl = urlObj.toString()
+        }
     }
     return {lobbyUrl: settings.lobbyUrl}
 })
@@ -201,7 +240,7 @@ export function handleSocketInit(ioServer: Socket.Server) {
         if (socket.request.isAuthenticated()) {
             pushUserSocket(user._id, socket.id)
         }
-        socket.on(serverSocketListenEvents.reqStartGame, async function (msg) {
+        socket.on(serverSocketListenEvents.reqStartGame, async function (msg: {isGroupMode: boolean, gamePhase: Phase}) {
             try {
                 console.log('req Start msg: ');
                 console.log(msg)
@@ -209,9 +248,17 @@ export function handleSocketInit(ioServer: Socket.Server) {
                     console.log('没有登陆')
                     return
                 }
-                if ([UserGameStatus.beforeStart, UserGameStatus.end].includes(user.status)) {
-                    const user = await User.findById(socket.request.user._id)
-                    const {isGroupMode, gamePhase} = msg
+                const uid = socket.request.user._id
+                const {isGroupMode, gamePhase} = msg
+                const userGameData = await RedisTools.getUserGameData(uid, gamePhase)
+                if (userGameData && userGameData.status === UserGameStatus.started) {
+                    socket.emit(clientSocketListenEvnets.continueGame, {
+                        playerUrl: userGameData.playerUrl
+                    })
+                    return
+                }
+                if (!userGameData || userGameData.status === UserGameStatus.notStarted) {
+                    const user = await User.findById(uid)
                     const orderOfPhase = gamePhaseOrder[gamePhase]
                     const unblockPhaseLimit = gamePhaseOrder[user.unblockGamePhase]
                     if (orderOfPhase > unblockPhaseLimit + 1) {
@@ -220,18 +267,18 @@ export function handleSocketInit(ioServer: Socket.Server) {
                     if (isGroupMode) {
                         joinMatchRoom(gamePhase, user._id)
                         const matchRoom = matchRoomOfGame[gamePhase]
-                        user.nowJoinedGame = gamePhase
-                        user.status = UserGameStatus.waittingMatch
-                        await user.save()
+                        
+                        await RedisTools.setUserGameData(uid, gamePhase,
+                            {
+                                status: UserGameStatus.waittingMatch
+                            }
+                        )
                         socket.emit(clientSocketListenEvnets.startMatch) // TODO
                         if (matchRoom.length === matchRoomLimit) {
                             await emitMatchSuccess(gamePhase, matchRoom)
                             await clearRoom(gamePhase)
                         }
                     } else {
-                        user.nowJoinedGame = gamePhase
-                        // user.status = UserGameStatus.started
-                        await user.save()
                         await emitMatchSuccess(gamePhase, [user._id])
                     }
                 }
@@ -240,18 +287,20 @@ export function handleSocketInit(ioServer: Socket.Server) {
             }
 
         });
-        socket.on(serverSocketListenEvents.leaveMatchRoom, async function () {
+        socket.on(serverSocketListenEvents.leaveMatchRoom, async function (gamePhase) {
             console.log(' req leave room')
             try {
                 if (socket.request.isAuthenticated()) {
                     const uid = socket.request.user._id
-                    const user = await User.findById(uid)
-                    if (user.status === UserGameStatus.waittingMatch) {
-                        leaveRoom(user.nowJoinedGame, user._id)
-                        user.status = UserGameStatus.beforeStart
-                        await user.save()
+                    const userGameData = await RedisTools.getUserGameData(uid, gamePhase)
+                    if (!userGameData) {
+                        return
                     }
-                   
+                    if (userGameData.status === UserGameStatus.waittingMatch) {
+                        leaveRoom(gamePhase, uid)
+                        userGameData.status = UserGameStatus.notStarted
+                        await RedisTools.setUserGameData(uid, gamePhase, userGameData)
+                    }
                 }
             } catch (e) {
                 console.error(e)
@@ -266,14 +315,20 @@ export function handleSocketInit(ioServer: Socket.Server) {
                     const userSockets = removeUserSocket(uid, socket.id)                
                     
                     if (userSockets.length === 0) {
-                        const user = await User.findById(uid)
-                        if (user.status === UserGameStatus.waittingMatch) {
-                            leaveRoom(user.nowJoinedGame, user._id)
-                            user.status = UserGameStatus.beforeStart
-                            await user.save()
-                        }
+                        const games = [Phase.CBM, Phase.IPO_Median, Phase.IPO_TopK, Phase.TBM]
+                        const tasks = games.map(async (game: Phase) => {
+                            const userGameData = await RedisTools.getUserGameData(uid, game)
+                            if (!userGameData) {
+                                return
+                            }
+                            if (userGameData.status === UserGameStatus.waittingMatch) {
+                                leaveRoom(game, uid)
+                                userGameData.status = UserGameStatus.notStarted
+                                await RedisTools.setUserGameData(uid, game, userGameData)
+                            }
+                        })
+                        await Promise.all(tasks)
                     }
-                   
                 }
             } catch (e) {
                 console.error(e)
