@@ -12,7 +12,7 @@ red = require "resty.redis":new()
 red:set_timeout(1000)
 local _, err = red:connect(os.getenv("REDIS_IP"), os.getenv("REDIS_PORT"))
 if err then
-    ngx.log(ngx.ERR, 'Connect to redis failed : '..os.getenv("REDIS_IP")..':'..os.getenv("REDIS_PORT"))
+    ngx.log(ngx.ERR, 'Connect to redis failed : ' .. os.getenv("REDIS_IP") .. ':' .. os.getenv("REDIS_PORT"))
 end
 local pathWords = {}
 local serverAddress = ''
