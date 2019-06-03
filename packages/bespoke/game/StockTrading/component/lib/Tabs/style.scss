@@ -1,0 +1,31 @@
+.tabs {
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+  background: #1e2752;
+  border-radius: 1rem;
+  margin: .5rem;
+
+  .tabsHeader {
+    display: flex;
+    justify-content: center;
+    margin: 1rem 2rem;
+    padding-bottom: .5rem;
+    color: #ddd;
+    border-bottom: 1px solid #394263;
+    span {
+      display: inline-block;
+      padding: .5rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+
+      &:hover ,&.active {
+        color: #67e968;
+      }
+      &.active {
+        color: #67e968;
+        border-bottom: 2px solid;
+      }
+    }
+  }
+}

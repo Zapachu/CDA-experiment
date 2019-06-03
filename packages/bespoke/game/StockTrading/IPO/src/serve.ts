@@ -4,7 +4,7 @@ import Controller from './Controller'
 import {namespace, IPOType} from './config'
 import {ICreateParams} from './interface'
 import Robot from './Robot'
-import {CreateGame, Phase, PhaseDone} from '../../protocol'
+import {CreateGame, Phase} from 'bespoke-game-stock-trading-config'
 
 Server.start({
     namespace,

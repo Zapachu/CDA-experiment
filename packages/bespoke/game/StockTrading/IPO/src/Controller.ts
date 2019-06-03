@@ -31,8 +31,7 @@ import {
   SHOUT_TIMER,
   namespace
 } from "./config";
-import { STOCKS } from "../../components/constants";
-import {PhaseDone} from '../../protocol'
+import {PhaseDone, STOCKS} from 'bespoke-game-stock-trading-config'
 
 export default class Controller extends BaseController<
   ICreateParams,

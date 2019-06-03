@@ -76,7 +76,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     playerNum: 0,
                     mins: [],
                     ones: [],
-                    probs: new Array(rounds).fill('').map(() => isP())
+                    probs: new Array(rounds).fill('').map(() => this._isP(p))
                 }
                 openGroupIndex = groups.push(group) - 1
             }
@@ -169,11 +169,12 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             break;
           }
           case MoveType.advanceRoundIndex: {
-            if(playerState.roundIndex === rounds-1) {
+            const nextRoundIndex = params.nextRoundIndex;
+            if(nextRoundIndex === rounds) {
               playerState.stageIndex = 0;
               playerState.stage = Stage.Survey;
             } else {
-              playerState.roundIndex++;
+              playerState.roundIndex = nextRoundIndex;
               playerState.stageIndex = MainStageIndex.Choose;
             }
             break;
@@ -209,11 +210,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         if(curChoice.c1===Choice.Wait && curChoice.c===Choice.One) ui = ui - d;
         return ui;
       }
-
-      function isP(): boolean {
-        const random = Math.floor(Math.random()*10)/10;
-        return random < p;
-      }
   }
 
   protected async teacherMoveReducer(actor: IActor, type: string, params: IMoveParams, cb: IMoveCallback): Promise<void> {
@@ -240,7 +236,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
     const gameState = await this.stateManager.getGameState()
     const playerStates = await this.stateManager.getPlayerStates()
     const {rounds,gameType,participationFee,s} = this.game.params;
-    const {groups} = gameState;
+    let {groups} = gameState;
 
     const choiceTerms = {
       [Choice.One]: 1,
@@ -250,6 +246,9 @@ export default class Controller extends BaseController<ICreateParams, IGameState
 
     const resultData: Array<Array<any>> = [['组', '座位号', '手机号', '最终收益', '轮次', '第一阶段选择', '第二阶段选择(结果1)', '第二阶段选择(结果2)', '最终选择', '第一阶段有人选1', '组内最低选择', '该轮积分', '专业', '年龄', '年级', '家庭住址', '性别']]
     const playersByGroup = Object.values(playerStates).sort((a, b) => a.groupIndex - b.groupIndex);
+    if(!groups) {
+      groups = this._rebuildGroups(playersByGroup, this.game.params);
+    }
     playersByGroup.forEach(ps => {
       const curGroup = groups[ps.groupIndex];
       let curRound = 0;
@@ -270,6 +269,60 @@ export default class Controller extends BaseController<ICreateParams, IGameState
       }
     })
     return resultData;
+  }
+
+  _rebuildGroups(playerStates: Array<TPlayerState<IPlayerState>>, {rounds,p,playersPerGroup,gameType,version}: ICreateParams): Array<GameState.IGroup> {
+    const groups: Array<GameState.IGroup> = [];
+    const playerArrayByGroup: Array<Array<TPlayerState<IPlayerState>>> = [];
+    playerStates.forEach(ps => {
+      const groupIndex = ps.groupIndex;
+      if(!playerArrayByGroup[groupIndex]) {
+        playerArrayByGroup[groupIndex] = [];
+      }
+      playerArrayByGroup[groupIndex].push(ps);
+      if(!groups[groupIndex]) {
+        groups[groupIndex] = {
+          playerNum: playersPerGroup,
+          mins: [],
+          ones: [],
+          probs: new Array(rounds).fill('').map(() => this._isP(p))
+        }
+      }
+    });
+    groups.forEach((group, groupIndex) => {
+      const playersInGroup = playerArrayByGroup[groupIndex];
+      let roundIndex = 0;
+      while(roundIndex >= 0) {
+        if(playersInGroup.every(ps => !!ps.choices[roundIndex])) {
+          switch(gameType) {
+            case GameType.T1: {
+              const min = playersInGroup.some(ps => ps.choices[roundIndex].c1 === Choice.One) ? Choice.One : Choice.Two;
+              group.mins[roundIndex] = min;
+              break;
+            }
+            case GameType.T2: {
+              let choseOne: boolean = playersInGroup.some(ps => ps.choices[roundIndex].c1 === Choice.One);
+              if(version === Version.V3) {
+                choseOne = choseOne && group.probs[roundIndex];
+              }
+              group.ones[roundIndex] = choseOne;
+              const min = playersInGroup.some(ps => ps.choices[roundIndex].c === Choice.One) ? Choice.One : Choice.Two;
+              group.mins[roundIndex] = min;
+              break;
+            }
+          }
+          roundIndex++;
+        } else {
+          roundIndex = -1;
+        }
+      }
+    });
+    return groups;
+  }
+
+  _isP(p: number): boolean {
+    const random = Math.floor(Math.random()*10)/10;
+    return random < p;
   }
 
   _formatSurveyAnswers(surveyAnswers: Array<string>): Array<string> {

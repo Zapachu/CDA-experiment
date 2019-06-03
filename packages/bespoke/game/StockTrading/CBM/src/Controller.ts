@@ -1,19 +1,20 @@
 import {
     BaseController,
     baseEnum,
+    gameId2PlayUrl,
     IActor,
     IMoveCallback,
     Log,
-    TGameState,
-    TPlayerState,
     RedisCall,
-    gameId2PlayUrl
+    TGameState,
+    TPlayerState
 } from 'bespoke-server'
 import {
     CONFIG,
     FetchType,
     GameType,
     ICreateParams,
+    Identity,
     IGamePeriodState,
     IGameState,
     IMoveParams,
@@ -22,14 +23,16 @@ import {
     IPushParams,
     ITrade,
     MoveType,
+    namespace,
     PERIOD,
     PeriodStage,
+    PrivatePriceRegion,
     PushType,
-    ROLE,
-    PrivatePriceRegion, namespace
+    ROLE
 } from './config'
-import {CreateGame, PhaseDone} from '../../protocol'
+import {CreateGame, PhaseDone} from 'bespoke-game-stock-trading-config'
 import {getBalanceIndex, getEnumKeys, random} from './util'
+import {Actor} from 'bespoke-common/build/baseEnum'
 
 export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
 
@@ -49,30 +52,47 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         gameState.periodIndex = 0
         gameState.initialAsset = {
             count: 100 + ~~(Math.random() * 50),
-            point: 3e4 + ~~(Math.random() * 1e4)
+            money: 3e4 + ~~(Math.random() * 1e4)
         }
         return gameState
     }
 
     async initPlayerState(actor: IActor): Promise<TPlayerState<IPlayerState>> {
         const playerState = await super.initPlayerState(actor)
-        const {initialAsset: {point, count}, type} = await this.stateManager.getGameState()
-        playerState.count = count
-        playerState.point = point
+        const {type} = await this.stateManager.getGameState()
         const [[min, max]] = PrivatePriceRegion[type]
         playerState.privatePrices = [random(min, max)]
+        playerState.guaranteeMoney = 0
+        playerState.guaranteeCount = 0
         return playerState
     }
 
     protected async playerMoveReducer(actor: IActor, type: string, params: IMoveParams, cb: IMoveCallback): Promise<void> {
         const gameState = await this.stateManager.getGameState(),
-            playerState = await this.stateManager.getPlayerState(actor)
+            playerState = await this.stateManager.getPlayerState(actor),
+            playerStates = await this.getActivePlayerStates()
         switch (type) {
             case MoveType.getIndex: {
                 if (playerState.playerIndex !== undefined) {
                     break
                 }
                 playerState.playerIndex = gameState.playerIndex++
+                switch (true) {
+                    case actor.type === Actor.serverRobot && playerStates.every(({identity}) => identity != Identity.moneyGuarantor):
+                        playerState.identity = Identity.moneyGuarantor
+                        playerState.count = 0
+                        playerState.money = gameState.initialAsset.money * CreateGame.playerLimit
+                        break
+                    case actor.type === Actor.serverRobot && playerStates.every(({identity}) => identity != Identity.stockGuarantor):
+                        playerState.identity = Identity.stockGuarantor
+                        playerState.count = gameState.initialAsset.count * CreateGame.playerLimit
+                        playerState.money = 0
+                        break
+                    default:
+                        playerState.identity = Identity.retailPlayer
+                        playerState.count = gameState.initialAsset.count
+                        playerState.money = gameState.initialAsset.money
+                }
                 if (playerState.playerIndex > 0) {
                     break
                 }
@@ -85,7 +105,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     const gamePeriodState = gameState.periods[periodIndex]
                     const {prepareTime, tradeTime, resultTime} = CONFIG,
                         periodCountDown = countDown % (prepareTime + tradeTime + resultTime)
-                    Array(CreateGame.playerLimit - gameState.playerIndex).fill(null).forEach(
+                    Array(2 + CreateGame.playerLimit - gameState.playerIndex).fill(null).forEach(
                         async (_, i) => await this.startNewRobotScheduler(`$Robot_${i}`)
                     )
                     const playerStates = await this.getActivePlayerStates()
@@ -98,7 +118,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         case prepareTime + tradeTime: {
                             gamePeriodState.stage = PeriodStage.result
                             const {periodIndex} = gameState
-                            if (![PERIOD - 1, (PERIOD / 2 - 1)].includes(periodIndex)) {
+                            if (PERIOD % 2 === 0) {
                                 break
                             }
                             const countArr = [], priceArr = []
@@ -108,6 +128,17 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                                     priceArr.push(privatePrices[periodIndex])
                                 })
                             gamePeriodState.balancePrice = priceArr[getBalanceIndex(countArr)]
+                            playerStates.forEach(async playerState => {
+                                const asset = gamePeriodState.balancePrice * (playerState.count - playerState.guaranteeCount) + playerState.money
+                                if (asset < playerState.guaranteeMoney * 1.3) {
+                                    await this.guaranteeWithMoneyRobot(playerState.playerIndex, -playerState.guaranteeMoney)
+                                    this.push(playerState.actor, PushType.closeOut)
+                                    return
+                                }
+                                if (asset < playerState.guaranteeMoney * 1.5) {
+                                    this.push(playerState.actor, PushType.closeOutWarning)
+                                }
+                            })
                             break
                         }
                         case 0: {
@@ -135,11 +166,21 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             case MoveType.submitOrder: {
                 const {periodIndex} = gameState,
                     gamePeriodState = gameState.periods[periodIndex]
+                if (params.guarantee) {
+                    switch (params.role) {
+                        case ROLE.Seller:
+                            await this.guaranteeWithCountRobot(playerState.playerIndex, params.count)
+                            break
+                        case ROLE.Buyer:
+                            await this.guaranteeWithMoneyRobot(playerState.playerIndex, params.count * params.price)
+                            break
+                    }
+                }
                 const {playerIndex} = playerState
                 const {price, count} = params
                 if (count <= 0 ||
                     (params.role === ROLE.Seller && count > playerState.count) ||
-                    (params.role === ROLE.Buyer && count * price > playerState.point)
+                    (params.role === ROLE.Buyer && count * price > playerState.money)
                 ) {
                     Log.d('数量有误，无法继续报价')
                 } else {
@@ -148,7 +189,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         playerIndex,
                         role: params.role,
                         price,
-                        count
+                        count,
+                        guarantee: params.guarantee
                     }
                     await this.shoutNewOrder(periodIndex, newOrder)
                 }
@@ -157,6 +199,18 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             case MoveType.cancelOrder: {
                 const {periodIndex} = gameState
                 await this.cancelOrder(periodIndex, playerState.playerIndex)
+                break
+            }
+            case MoveType.repayMoney: {
+                playerState.money -= params.moneyRepay
+                playerState.guaranteeMoney -= params.moneyRepay
+                playerStates.find(({identity}) => identity === Identity.moneyGuarantor).money += params.moneyRepay
+                break
+            }
+            case MoveType.repayCount: {
+                playerState.count -= params.countRepay
+                playerState.guaranteeCount -= params.countRepay
+                playerStates.find(({identity}) => identity === Identity.stockGuarantor).count += params.countRepay
                 break
             }
             case MoveType.exitGame: {
@@ -168,6 +222,31 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 res ? cb(res.lobbyUrl) : null
                 break
             }
+        }
+    }
+
+    async guaranteeWithCountRobot(playerIndex: number, count: number) {
+        const playerStates = await this.getActivePlayerStates(),
+            playerState = playerStates.find(s => s.playerIndex === playerIndex)
+        playerState.count += count
+        playerState.guaranteeCount += count
+        playerStates.find(({identity}) => identity === Identity.stockGuarantor).count -= count
+    }
+
+    async guaranteeWithMoneyRobot(playerIndex: number, money: number) {
+        const playerStates = await this.getActivePlayerStates(),
+            playerState = playerStates.find(s => s.playerIndex === playerIndex)
+        playerState.money += money
+        playerState.guaranteeMoney += money
+        const moneyRobot = playerStates.find(({identity}) => identity === Identity.moneyGuarantor)
+        moneyRobot.money -= money
+        if (playerState.money < 0) {
+            const {periodIndex, periods} = await this.stateManager.getGameState()
+            const {balancePrice} = periods[periodIndex]
+            const count = Math.ceil(-playerState.money / balancePrice)
+            playerState.count -= count
+            playerState.money += count * balancePrice
+            moneyRobot.count += count
         }
     }
 
@@ -225,32 +304,42 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             switch (playerRole) {
                 case ROLE.Buyer:
                     playerState.count += trade.count
-                    playerState.point -= trade.count * pairOrder.price
+                    playerState.money -= trade.count * pairOrder.price
                     break
                 case ROLE.Seller:
                     playerState.count -= trade.count
-                    playerState.point += trade.count * pairOrder.price
+                    playerState.money += trade.count * pairOrder.price
                     break
             }
         })
     }
 
-    async cancelOrder(periodIndex: number, playerIndex: number) {
+    async cancelOrder(periodIndex: number, playerIndex: number): Promise<void> {
         const {buyOrderIds, sellOrderIds, orders} = (await this.stateManager.getGameState()).periods[periodIndex]
         for (let i = 0; i < buyOrderIds.length; i++) {
-            if (orders.find(({id}) => id === buyOrderIds[i]).playerIndex === playerIndex) {
-                return buyOrderIds.splice(i, 1)
+            const targetOrder = orders.find(({id}) => id === buyOrderIds[i])
+            if (targetOrder.playerIndex === playerIndex) {
+                if (targetOrder.guarantee) {
+                    await this.guaranteeWithMoneyRobot(playerIndex, -targetOrder.count * targetOrder.price)
+                }
+                buyOrderIds.splice(i, 1)
+                return
             }
         }
         for (let i = 0; i < sellOrderIds.length; i++) {
-            if (orders.find(({id}) => id === sellOrderIds[i]).playerIndex === playerIndex) {
-                return sellOrderIds.splice(i, 1)
+            const targetOrder = orders.find(({id}) => id === sellOrderIds[i])
+            if (targetOrder.playerIndex === playerIndex) {
+                if (targetOrder.guarantee) {
+                    await this.guaranteeWithCountRobot(playerIndex, -targetOrder.count)
+                }
+                sellOrderIds.splice(i, 1)
+                return
             }
         }
     }
 
-    async getActivePlayerStates(): Promise<TPlayerState<IPlayerState>[]> {
+    async getActivePlayerStates(playerIndex?: number): Promise<TPlayerState<IPlayerState>[]> {
         const playerStates = await this.stateManager.getPlayerStates()
-        return Object.values(playerStates).filter(({playerIndex}) => playerIndex !== undefined)
+        return Object.values(playerStates).filter(s => playerIndex ? s.playerIndex === playerIndex : s.playerIndex !== undefined)
     }
 }

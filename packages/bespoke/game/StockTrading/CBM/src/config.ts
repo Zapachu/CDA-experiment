@@ -15,12 +15,16 @@ export enum MoveType {
     getIndex = 'getIndex',
     submitOrder = 'submitOrder',
     cancelOrder = 'cancelOrder',
+    repayMoney = 'repayMoney',
+    repayCount = 'repayCount',
     exitGame = 'exitGame'
 }
 
 export enum PushType {
     countDown = 'countDown',
-    beginTrading = 'beginTrading'
+    beginTrading = 'beginTrading',
+    closeOutWarning = 'closeOutWarning',
+    closeOut = 'closeOut'
 }
 
 export enum FetchType {
@@ -29,8 +33,8 @@ export enum FetchType {
 export const PERIOD = 6
 
 export const CONFIG = {
-    prepareTime: 30,
-    tradeTime: 180,
+    prepareTime: 5,
+    tradeTime: 18000,
     resultTime: 30
 }
 
@@ -43,6 +47,7 @@ export interface IOrder {
     role: ROLE
     price: number
     count: number
+    guarantee: boolean
 }
 
 export interface ITrade {
@@ -83,22 +88,34 @@ export interface IGameState {
     playerIndex: number
     initialAsset: {
         count: number
-        point: number
+        money: number
     }
+}
+
+export enum Identity {
+    retailPlayer,
+    moneyGuarantor,
+    stockGuarantor
 }
 
 export interface IPlayerState {
     playerIndex: number
+    identity: Identity
     privatePrices: number[]
     count: number
-    point: number
+    money: number
+    guaranteeCount: number
+    guaranteeMoney: number
 }
 
 export type IMoveParams = Partial<{
     role: ROLE
     price: number
     count: number
+    guarantee: boolean
     onceMore: boolean
+    moneyRepay: number
+    countRepay: number
 }>
 
 export type IPushParams = Partial<{

@@ -1,9 +1,9 @@
-import {TGameState, TPlayerState, IActor, baseEnum} from 'bespoke-common'
-import isEqual = require('lodash/isEqual')
-import cloneDeep = require('lodash/cloneDeep')
+import {baseEnum, IActor, TGameState, TPlayerState} from 'bespoke-common'
 import GameDAO from '../GameDAO'
 import {BaseController} from '../GameLogic'
 import {EventIO} from '../../util'
+import isEqual = require('lodash/isEqual')
+import cloneDeep = require('lodash/cloneDeep')
 
 export class GameStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
     private _state: TGameState<IGameState>
@@ -25,19 +25,19 @@ export class GameStateSynchronizer<ICreateParams, IGameState, IPlayerState, Move
 
     async syncState(wholeState?: boolean) {
         const state = await this.getState(false)
-        if(wholeState){
+        if (wholeState) {
             await this.syncClientState(wholeState)
-        }else{
+        } else {
             if (isEqual(state, this._stateSnapshot)) {
                 return
             }
             await this.syncClientState(wholeState)
         }
         this._stateSnapshot = cloneDeep(state)
-        GameDAO.saveGameState(this.controller.game.id, this.getState(false))
+        GameDAO.saveGameState(this.controller.game.id, await this.getState(false))
     }
 
-    async syncClientState(wholeState?: boolean){
+    async syncClientState(wholeState?: boolean) {
         const state = await this.getState(true)
         EventIO.emitEvent(this.controller.game.id, baseEnum.SocketEvent.syncGameState_json, state)
     }
@@ -60,9 +60,9 @@ export class PlayerStateSynchronizer<ICreateParams, IGameState, IPlayerState, Mo
 
     async syncState(wholeState?: boolean) {
         const state = await this.getState()
-        if(wholeState){
+        if (wholeState) {
             await this.syncClientState(wholeState)
-        }else {
+        } else {
             if (isEqual(state, this._stateSnapshot)) {
                 return
             }
@@ -72,7 +72,7 @@ export class PlayerStateSynchronizer<ICreateParams, IGameState, IPlayerState, Mo
         GameDAO.savePlayerState(this.controller.game.id, this.actor.token, state)
     }
 
-    async syncClientState(wholeState?: boolean){
+    async syncClientState(wholeState?: boolean) {
         const gameState = await this.controller.stateManager.getGameState()
         const state = await this.getState()
         EventIO.emitEvent(state.connectionId, baseEnum.SocketEvent.syncPlayerState_json, state)
