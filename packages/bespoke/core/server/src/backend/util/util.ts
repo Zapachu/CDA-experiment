@@ -24,7 +24,7 @@ export class Token {
         if (elfSetting.bespokeWithLinker) {
             return token.length === 32
         }
-        Log.w(`Invalid Token: ${token}`)
+        chars.length === 32 ? Log.w(`Invalid Token: ${token}`) : null
         return false
     }
 }
