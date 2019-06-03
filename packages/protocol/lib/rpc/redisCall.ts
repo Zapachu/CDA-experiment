@@ -1,5 +1,5 @@
 import {Log} from '../util'
-import {elfSetting} from "elf-setting"
+import {elfSetting} from 'elf-setting'
 import * as IORedis from 'ioredis'
 
 export namespace RedisCall {
@@ -38,7 +38,11 @@ export namespace RedisCall {
         const key = geneReqKey(), reqPack: IReqPack<IReq> = {method, params, key}
         redis.rpush(getServiceKey(method), JSON.stringify(reqPack))
         const res = await redis.blpop(key, 1 as any)
-        return res ? JSON.parse(res[1]) : null
+        if (!res) {
+            await redis.del(getServiceKey(method))
+            throw new Error(`RedisCall Time out : ${JSON.stringify(reqPack)}`)
+        }
+        return JSON.parse(res[1])
     }
 }
 
