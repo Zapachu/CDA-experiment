@@ -33,8 +33,8 @@ export enum FetchType {
 export const PERIOD = 6
 
 export const CONFIG = {
-    prepareTime: 5,
-    tradeTime: 18000,
+    prepareTime: 15,
+    tradeTime: 180,
     resultTime: 30
 }
 

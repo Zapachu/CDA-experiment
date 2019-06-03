@@ -26,6 +26,7 @@ function Border({background = `radial-gradient(at 50% 0%, #67e968 1rem, transpar
     children: React.ReactNode,
 }) {
     return <div style={{
+        margin:'2px',
         padding: '1px',
         background,
         borderRadius,
@@ -312,7 +313,7 @@ function _Play({gameState, playerState, frameEmitter}: TPlayProps) {
     }
 
     function repayMoney() {
-        if (moneyRepay <= 0 || moneyRepay > playerState.money || countRepay > playerState.guaranteeMoney) {
+        if (moneyRepay <= 0 || moneyRepay > playerState.money || moneyRepay > playerState.guaranteeMoney) {
             Toast.warn(lang.invalidMoney)
             return
         }
@@ -473,7 +474,7 @@ function _Play({gameState, playerState, frameEmitter}: TPlayProps) {
                 renderAsset()
             }
             <Line text={lang.yourTrades} style={STYLE.titleLineStyle}/>
-            <Border background={STYLE.mainPanelBorder} style={{margin: '1px'}}>
+            <Border background={STYLE.mainPanelBorder}>
                 <div className={style.yourTrades}>
                     <table className={style.tradeList}>
                         <thead>
