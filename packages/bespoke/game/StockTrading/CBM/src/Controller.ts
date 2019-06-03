@@ -71,7 +71,16 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             playerState = playerStates.find(s => s.playerIndex === playerIndex)
         playerState.count += count
         playerState.guaranteeCount += count
-        playerStates.find(({identity}) => identity === Identity.stockGuarantor).count -= count
+        const countRobot = playerStates.find(({identity}) => identity === Identity.stockGuarantor)
+        countRobot.count -= count
+        if (playerState.count < 0) {
+            const {periodIndex, periods} = await this.stateManager.getGameState(),
+                {balancePrice} = periods[periodIndex]
+            const money = -playerState.count * balancePrice
+            playerState.money -= money
+            playerState.count = 0
+            countRobot.money += money
+        }
     }
 
     async guaranteeWithMoneyRobot(playerIndex: number, money: number) {
@@ -131,15 +140,19 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         trades.push(trade)
         gamePeriodState.closingPrice = pairOrder.price
         playerStates.forEach(playerState => {
-            const playerRole = playerState.playerIndex === order.playerIndex ? order.role :
-                playerState.playerIndex === pairOrder.playerIndex ? pairOrder.role : null
-            switch (playerRole) {
+            const o = playerState.playerIndex === order.playerIndex ? order :
+                playerState.playerIndex === pairOrder.playerIndex ? pairOrder : null
+            if (!o) {
+                return null
+            }
+            switch (o.role) {
                 case ROLE.Buyer:
+                    const money = trade.count * pairOrder.price
                     playerState.count += trade.count
-                    playerState.money -= trade.count * pairOrder.price
+                    o.guarantee ? playerState.guaranteeMoney += money : playerState.money -= money
                     break
                 case ROLE.Seller:
-                    playerState.count -= trade.count
+                    o.guarantee ? playerState.guaranteeCount += trade.count : playerState.count -= trade.count
                     playerState.money += trade.count * pairOrder.price
                     break
             }
@@ -151,9 +164,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         for (let i = 0; i < buyOrderIds.length; i++) {
             const targetOrder = orders.find(({id}) => id === buyOrderIds[i])
             if (targetOrder.playerIndex === playerIndex) {
-                if (targetOrder.guarantee) {
-                    await this.guaranteeWithMoneyRobot(playerIndex, -targetOrder.count * targetOrder.price)
-                }
                 buyOrderIds.splice(i, 1)
                 return
             }
@@ -161,9 +171,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         for (let i = 0; i < sellOrderIds.length; i++) {
             const targetOrder = orders.find(({id}) => id === sellOrderIds[i])
             if (targetOrder.playerIndex === playerIndex) {
-                if (targetOrder.guarantee) {
-                    await this.guaranteeWithCountRobot(playerIndex, -targetOrder.count)
-                }
                 sellOrderIds.splice(i, 1)
                 return
             }
@@ -276,16 +283,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             case MoveType.submitOrder: {
                 const {periodIndex} = gameState,
                     gamePeriodState = gameState.periods[periodIndex]
-                if (params.guarantee) {
-                    switch (params.role) {
-                        case ROLE.Seller:
-                            await this.guaranteeWithCountRobot(playerState.playerIndex, params.count)
-                            break
-                        case ROLE.Buyer:
-                            await this.guaranteeWithMoneyRobot(playerState.playerIndex, params.count * params.price)
-                            break
-                    }
-                }
                 const {playerIndex} = playerState
                 const {price, count} = params
                 if (count <= 0 ||

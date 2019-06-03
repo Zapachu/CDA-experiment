@@ -177,7 +177,7 @@ function Result({count, point, closingPrice, balancePrice}: { count: number, poi
 
 type TPlayProps = Core.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>
 
-function _Play({gameState, playerState, frameEmitter}: TPlayProps) {
+function _Play({gameState, playerState, frameEmitter, game: {params: {allowLeverage}}}: TPlayProps) {
     const STYLE = {
         titleLineStyle: {
             maxWidth: '24rem',
@@ -197,8 +197,10 @@ function _Play({gameState, playerState, frameEmitter}: TPlayProps) {
         count: ['数量', 'Count'],
         point: ['余额', 'Point'],
         money: ['金额', 'Money'],
-        guaranteeCount: ['担保股票', 'GuaranteeCount'],
-        guaranteeMoney: ['担保金额', 'GuaranteeMoney'],
+        guaranteeCount: ['已融券', 'GuaranteeCount'],
+        guaranteeCountLimit: ['可融券', 'GuaranteeCountLimit'],
+        guaranteeMoney: ['已融资', 'GuaranteeMoney'],
+        guaranteeMoneyLimit: ['可融资', 'GuaranteeMoneyLimit'],
         profit: ['利润', 'Profit'],
         tradeCount: ['成交数量', 'Trade Count'],
         valuation: ['当前股票估值', 'Stock Valuation'],
@@ -381,10 +383,12 @@ function _Play({gameState, playerState, frameEmitter}: TPlayProps) {
                                                     label: lang.buy,
                                                     onClick: () => submitOrder(ROLE.Buyer)
                                                 }}/>&nbsp;
-                                                <Button {...{
-                                                    label: lang.guaranteeBuy,
-                                                    onClick: () => submitOrder(ROLE.Buyer, true)
-                                                }}/>
+                                                {
+                                                    allowLeverage ? <Button {...{
+                                                        label: lang.guaranteeBuy,
+                                                        onClick: () => submitOrder(ROLE.Buyer, true)
+                                                    }}/> : null
+                                                }
                                             </div>
                                         </div>
                                         <div className={style.orderInputWrapper}>
@@ -396,10 +400,12 @@ function _Play({gameState, playerState, frameEmitter}: TPlayProps) {
                                                     label: lang.sell,
                                                     onClick: () => submitOrder(ROLE.Seller)
                                                 }}/>&nbsp;
-                                                <Button {...{
-                                                    label: lang.guaranteeSell,
-                                                    onClick: () => submitOrder(ROLE.Seller, true)
-                                                }}/>
+                                                {
+                                                    allowLeverage ? <Button {...{
+                                                        label: lang.guaranteeSell,
+                                                        onClick: () => submitOrder(ROLE.Seller, true)
+                                                    }}/> : null
+                                                }
                                             </div>
                                         </div>
                                     </Tabs>
@@ -426,44 +432,60 @@ function _Play({gameState, playerState, frameEmitter}: TPlayProps) {
                     <label>{lang.point}</label>
                     <em>{playerState.money}</em>
                 </div>
-                <div>
-                    <label>{lang.guaranteeCount}</label>
-                    <em>{playerState.guaranteeCount}</em>
-                </div>
-                <div>
-                    <label>{lang.guaranteeMoney}</label>
-                    <em>{playerState.guaranteeMoney}</em>
-                </div>
+                {
+                    allowLeverage ? <>
+                        <div>
+                            <label>{lang.guaranteeCount}</label>
+                            <em>{playerState.guaranteeCount}</em>
+                        </div>
+                        <div>
+                            <label>{lang.guaranteeMoney}</label>
+                            <em>{playerState.guaranteeMoney}</em>
+                        </div>
+                        <div>
+                            <label>{lang.guaranteeCountLimit}</label>
+                            <em>{playerState.count - playerState.guaranteeCount}</em>
+                        </div>
+                        <div>
+                            <label>{lang.guaranteeMoneyLimit}</label>
+                            <em>{playerState.money - playerState.guaranteeMoney}</em>
+                        </div>
+                    </> : null
+                }
             </div>
-            <Line text={lang.repay} style={STYLE.titleLineStyle}/>
-            <div className={style.repayWrapper}>
-                <Input {...{
-                    value: moneyRepay || '',
-                    placeholder: lang.money,
-                    onChange: v => setMoneyRepay(v),
-                    onMinus: v => setMoneyRepay(v - 1),
-                    onPlus: v => setMoneyRepay(v + 1)
-                }}/>
-                <br/>
-                <Button {...{
-                    label: lang.repayMoney,
-                    onClick: () => repayMoney()
-                }}/>
-            </div>
-            <div className={style.repayWrapper}>
-                <Input {...{
-                    value: countRepay || '',
-                    placeholder: lang.count,
-                    onChange: v => setCountRepay(v),
-                    onMinus: v => setCountRepay(v - 1),
-                    onPlus: v => setCountRepay(v + 1)
-                }}/>
-                <br/>
-                <Button {...{
-                    label: lang.repayStock,
-                    onClick: () => repayCount()
-                }}/>
-            </div>
+            {
+                allowLeverage ? <>
+                    <Line text={lang.repay} style={STYLE.titleLineStyle}/>
+                    <div className={style.repayWrapper}>
+                        <Input {...{
+                            value: moneyRepay || '',
+                            placeholder: lang.money,
+                            onChange: v => setMoneyRepay(v),
+                            onMinus: v => setMoneyRepay(v - 1),
+                            onPlus: v => setMoneyRepay(v + 1)
+                        }}/>
+                        <br/>
+                        <Button {...{
+                            label: lang.repayMoney,
+                            onClick: () => repayMoney()
+                        }}/>
+                    </div>
+                    <div className={style.repayWrapper}>
+                        <Input {...{
+                            value: countRepay || '',
+                            placeholder: lang.count,
+                            onChange: v => setCountRepay(v),
+                            onMinus: v => setCountRepay(v - 1),
+                            onPlus: v => setCountRepay(v + 1)
+                        }}/>
+                        <br/>
+                        <Button {...{
+                            label: lang.repayStock,
+                            onClick: () => repayCount()
+                        }}/>
+                    </div>
+                </> : null
+            }
         </section>
     }
 

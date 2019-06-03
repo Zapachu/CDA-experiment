@@ -33,12 +33,13 @@ export enum FetchType {
 export const PERIOD = 6
 
 export const CONFIG = {
-    prepareTime: 15,
-    tradeTime: 180,
+    prepareTime: 10,
+    tradeTime: 18000,
     resultTime: 30
 }
 
 export interface ICreateParams {
+    allowLeverage: boolean
 }
 
 export interface IOrder {
