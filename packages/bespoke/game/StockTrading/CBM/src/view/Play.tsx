@@ -26,7 +26,7 @@ function Border({background = `radial-gradient(at 50% 0%, #67e968 1rem, transpar
     children: React.ReactNode,
 }) {
     return <div style={{
-        margin:'2px',
+        margin: '2px',
         padding: '1px',
         background,
         borderRadius,
@@ -300,7 +300,7 @@ function _Play({gameState, playerState, frameEmitter}: TPlayProps) {
         }
         if (count <= 0 ||
             (role === ROLE.Buyer && _price * +count > playerState.money - playerState.guaranteeMoney) ||
-            (role === ROLE.Buyer && count > playerState.count - playerState.guaranteeCount)) {
+            (role === ROLE.Seller && count > playerState.count - playerState.guaranteeCount)) {
             setCount(0)
             return Toast.warn(lang.invalidCount)
         }
