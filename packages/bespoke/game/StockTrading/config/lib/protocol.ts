@@ -24,6 +24,7 @@ export namespace PhaseDone{
     export interface IReq {
         playUrl: string
         onceMore: boolean
+        phase: Phase
     }
 
     export interface IRes {

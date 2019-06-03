@@ -29,8 +29,8 @@ export default class Scene extends React.Component<SceneProps> {
     this.engine = new BABYLON.Engine(
       this.canvas,
       true,
-      this.props.engineOptions,
-      this.props.adaptToDeviceRatio
+      // this.props.engineOptions,
+      // this.props.adaptToDeviceRatio
     );
 
     let scene = new BABYLON.Scene(this.engine);

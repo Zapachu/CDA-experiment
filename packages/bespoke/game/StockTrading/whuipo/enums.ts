@@ -1,8 +1,7 @@
 export enum UserGameStatus {
-    beforeStart,
     waittingMatch,
     started,
-    end
+    notStarted
 }
 
 export enum ResCode {
@@ -18,4 +17,5 @@ export enum serverSocketListenEvents {
 export enum clientSocketListenEvnets {
     startMatch = 'startMatch',
     startGame = 'startGame',
+    continueGame = 'continueGame'
 }
