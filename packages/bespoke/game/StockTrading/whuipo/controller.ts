@@ -329,3 +329,15 @@ function cbToPromise(func) {
         })
     }
 }
+
+async function sendBackData(body) {
+  const token = XJWT.encode(XJWTType.SYS);
+  const url = `http://ilab-x.com/project/log/upload?xjwt=${encodeURIComponent(token)}`;
+  const response = await request({
+    url,
+    method: 'POST',
+    body,
+    json: true
+  });
+  console.log(response);
+}
