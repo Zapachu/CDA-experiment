@@ -2,6 +2,7 @@ import * as React from "react";
 import * as BABYLON from "babylonjs";
 import socket from 'socket.io-client'
 import {Modal, Button, Loading, MatchModal} from 'bespoke-game-stock-trading-component'
+import {Toast} from '@bespoke-client-util'
 import 'pepjs'
 import qs from 'qs'
 
@@ -28,7 +29,7 @@ const redirect = (url) => {
     return
   } 
   const obj = new URL(url)
-  obj.host = '192.168.56.1:8081'
+  obj.hostname = location.hostname
   location.href = obj.toString()
 }
 
@@ -45,10 +46,10 @@ const GameStepsToGamePhase = {
   [GameSteps.right]: GameTypes.TBM,
 }
 
-const GamePhaseOrder = {
-  [GameTypes.TBM]: 1,
-  [GameTypes.IPO_Median]: 2,
-  [GameTypes.IPO_TopK]: 2,
+const gamePhaseOrder = {
+  [GameTypes.IPO_Median]: 1,
+  [GameTypes.IPO_TopK]: 1,
+  [GameTypes.TBM]: 2,
   [GameTypes.CBM]: 3
 }
 
@@ -207,17 +208,17 @@ class Hall3D extends React.Component<Props, State> {
         const user: UserDoc = res.user
         const { unblockGamePhase} = user
 
-        const userUnBlockGameOrder = GamePhaseOrder[unblockGamePhase] || -1
+        const userUnBlockGameOrder = gamePhaseOrder[unblockGamePhase] || 0
         console.log(userUnBlockGameOrder, 'user')
         Object.keys(GameRenderConfigs).forEach((gameStep) => {
           let gameStepPhaseOrder = -1
           if (Number(gameStep) === GameSteps.center) {
-            gameStepPhaseOrder = GamePhaseOrder[GameTypes.IPO_TopK]
+            gameStepPhaseOrder = gamePhaseOrder[GameTypes.IPO_TopK]
           } else {
             const gamePhase = GameStepsToGamePhase[gameStep]
-            gameStepPhaseOrder = GamePhaseOrder[gamePhase]
+            gameStepPhaseOrder = gamePhaseOrder[gamePhase]
           }
-          const isLock = gameStepPhaseOrder > userUnBlockGameOrder
+          const isLock = gameStepPhaseOrder > (userUnBlockGameOrder + 1)
           GameRenderConfigs[gameStep].isLock = isLock
         })
         console.log(GameRenderConfigs, 'config')
@@ -286,8 +287,8 @@ class Hall3D extends React.Component<Props, State> {
           }
           {
             modalContentType === ModalContentTypes.continueGame &&
-            <div>
-              您尚有实验正在进行中，继续该实验吗？
+            <div className={style.continueGame}>
+              <div className={style.label}>您尚有实验正在进行中，继续该实验吗？</div>
               <Button onClick={_ => redirect(this.continuePlayUrl)} label="继续"></Button>
             </div>
           }
@@ -318,6 +319,7 @@ class Hall3D extends React.Component<Props, State> {
   }
   handlePointerOver (gameStep: GameSteps) {
     // console.log('onver', gameStep, arguments)
+    return
     if (!this.state.isDetailView) {
       return
     }
@@ -572,6 +574,11 @@ class Hall3D extends React.Component<Props, State> {
       })
   }
   handleStartGame (gameStep: GameSteps) {
+    const {isLock} = GameRenderConfigs[gameStep]
+    if (isLock) {
+      Toast.warn('尚未解锁！')
+      return
+    }
     const gameType = GameStepsToGamePhase[gameStep]
     this.setState({
       showPreStartModal: true,

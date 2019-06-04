@@ -33,7 +33,8 @@ module.exports = {
     resolve: {
         extensions: [".ts", ".tsx", ".js"],
         alias: {
-            'component': path.resolve(__dirname, '../../components')
+            'component': path.resolve(__dirname, '../../components'),
+            '@bespoke-client-util': path.resolve(__dirname, '../../../../core/client/lib/index'),
         }
     },
     optimization: {
@@ -119,10 +120,15 @@ module.exports = {
                         loader: 'css-loader',
                         options: {
                             modules: true,
-                            localIdentName: '[name]__[local]___[hash:base64:5]'
+                            localIdentName: '[name]__[local]___[hash:base64:5]',
                         }
                     },
-                    'sass-loader'
+                    {
+                        loader: 'sass-loader',
+                        options: {
+                            includePaths: [path.resolve(__dirname, '../../../../core/client/lib/resource/')]
+                        }
+                    }
                 ]
             }
         ]

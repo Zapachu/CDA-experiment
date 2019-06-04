@@ -56,8 +56,8 @@ const removeUserSocket = (uid, socketId) => {
     return arr
 }
 
-const matchRoomLimit = 10
-const waittingTime = 10 // 秒
+const matchRoomLimit = settings.gameRoomSize || 10
+const waittingTime = settings.gameMatchTime || 10 // 秒
 const matchRoomOfGame: {[gamePhase: number]: string[]} = {
 }
 const matchRoomTimerOfGame = {}
@@ -159,13 +159,13 @@ const RedisTools = {
 }
 
 const gamePhaseOrder = {
-    [Phase.TBM]: 1,
-    [Phase.IPO_Median]: 2,
-    [Phase.IPO_TopK]: 2,
+    [Phase.IPO_Median]: 1,
+    [Phase.IPO_TopK]: 1,
+    [Phase.TBM]: 2,
     [Phase.CBM]: 3
 }
 
-RedisCall.handle<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, async ({playUrl, onceMore, phase = Phase.TBM}) => {
+RedisCall.handle<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, async ({playUrl, onceMore, phase}) => {
     console.log(`redis handle phase: ${phase} done`, playUrl, onceMore)
     const uid = await RedisTools.getPlayerUrlRecord(playUrl)
     const user = await User.findById(uid)
@@ -182,13 +182,14 @@ RedisCall.handle<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, async ({playUrl
         })
         if (onceMore) {
             const urlObj = new URL(lobbyUrl)
-            const queryObj = qs.parse(urlObj.search.replace('?', ''))
+            const queryObj = qs.parse(urlObj.search.replace('?', '')) || {}
             queryObj.gamePhase = phase
             urlObj.search = qs.stringify(queryObj)
             lobbyUrl = urlObj.toString()
         }
     }
-    return {lobbyUrl: settings.lobbyUrl}
+    console.log(lobbyUrl, 'lobbyurl')
+    return {lobbyUrl}
 })
 export default class RouterController {
     @catchError
@@ -210,7 +211,6 @@ export default class RouterController {
 
     @catchError
     static async renderIndex(req: Request, res: Response, next: NextFunction) {
-        // res.send('index html todo')
         res.sendfile(path.resolve(__dirname, './dist/index.html'))
     }
 
@@ -224,7 +224,6 @@ export default class RouterController {
 }
 
 export function handleSocketPassportSuccess(data, cb) {
-    // console.log(Object.keys(data), 'passport', data.socket.handshake)
     cb(null, true)
 }
 

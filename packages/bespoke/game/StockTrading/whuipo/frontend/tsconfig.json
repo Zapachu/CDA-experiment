@@ -16,7 +16,8 @@
     "esModuleInterop": true,
     "baseUrl": "./",
     "paths": {
-      "component/*" : ["../../components/*"]
+      "component/*" : ["../../components/*"],
+      "@bespoke-client-util": ["../../../../core/client/lib/index.ts"]
     }
   },
   // "include": [
