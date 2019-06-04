@@ -24,17 +24,23 @@ export class Token {
         if (elfSetting.bespokeWithLinker) {
             return token.length === 32
         }
-        Log.w(`Invalid Token: ${token}`)
+        chars.length === 32 ? Log.w(`Invalid Token: ${token}`) : null
         return false
     }
 }
 
 export function gameId2PlayUrl(namespace: string, gameId: string, keyOrToken?: string): string {
-    const {proxyService: {host, port}} = elfSetting
     const query = keyOrToken ? `?token=${Token.checkToken(keyOrToken) ? keyOrToken : Token.geneToken(keyOrToken)}` : ''
-    const domain = elfSetting.bespokeWithProxy ? host.startsWith('http') ? host : `http://${host}:${port}` :
+    const domain = elfSetting.bespokeWithProxy ? elfSetting.proxyOrigin :
         `http://${Setting.ip}:${elfSetting.bespokeHmr ? config.devPort.client : Setting.port}`
     return `${domain}/${config.rootName}/${namespace}/play/${gameId}${query}`
+}
+
+export function heartBeat(fn: () => void | Promise<void>) {
+    (async function foo() {
+        await fn()
+        setTimeout(foo, config.heartBeatSeconds * 1e3)
+    })()
 }
 
 export namespace Log {
