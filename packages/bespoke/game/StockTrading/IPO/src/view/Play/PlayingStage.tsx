@@ -117,7 +117,11 @@ export default class PlayingStage extends Core.Play<
   };
 
   exitGame(onceMore?: boolean) {
-    this.props.frameEmitter.emit(MoveType.nextGame, {onceMore}, lobbyUrl => location.href = lobbyUrl)
+    this.props.frameEmitter.emit(
+      MoveType.nextGame,
+      { onceMore },
+      lobbyUrl => (location.href = lobbyUrl)
+    );
   }
 
   renderResult = (
@@ -205,13 +209,13 @@ export default class PlayingStage extends Core.Play<
                 price: undefined,
                 num: undefined
               });
-              this.exitGame(true)
+              this.exitGame(true);
             }}
           />
           <Button
             label={"下一局"}
             onClick={() => {
-              this.exitGame()
+              this.exitGame();
             }}
           />
         </div>
@@ -241,7 +245,7 @@ export default class PlayingStage extends Core.Play<
     const { price, num, shoutTimer } = this.state;
     return (
       <>
-        <div style={{ position: "fixed", top: "35vh", right: "15vw" }}>
+        <div className={style.tradeBtn}>
           <Button
             label={"交易规则回顾"}
             size={Button.Size.Small}
@@ -249,7 +253,7 @@ export default class PlayingStage extends Core.Play<
             onClick={() => this.setState({ modalType: ModalType.Trade })}
           />
         </div>
-        <div style={{ position: "fixed", top: "42vh", right: "15vw" }}>
+        <div className={style.ipoBtn}>
           <Button
             label={"ipo知识扩展"}
             size={Button.Size.Small}
@@ -279,7 +283,9 @@ export default class PlayingStage extends Core.Play<
               onMinus={val => this.setState({ price: "" + (+val - 1) })}
               onPlus={val => this.setState({ price: "" + (+val + 1) })}
             />
-            <p style={{ fontSize: "12px", marginTop: "5px" }}>
+            <p
+              style={{ fontSize: "12px", marginTop: "5px", marginLeft: "45px" }}
+            >
               可买
               <span style={{ color: "orange" }}>
                 {+price
@@ -305,7 +311,8 @@ export default class PlayingStage extends Core.Play<
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                marginTop: "5px"
+                marginTop: "5px",
+                marginLeft: "45px"
               }}
             >
               <span>

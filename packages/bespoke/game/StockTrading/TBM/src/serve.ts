@@ -19,7 +19,7 @@ RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(CreateGame.name(Phase.TBM), a
         desc: '',
         params: {
             groupSize: 6,
-            waitingSeconds: 3,
+            waitingSeconds: 1,
             positions: [
                 {role: 0, privatePrice: genRan()},
                 {role: 1, privatePrice: genRan()},
