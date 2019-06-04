@@ -92,7 +92,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                         />
                     </li>
                     <li style={{marginTop: 12}}>
-                        <a>可买 <span className={style.priceHighlight}>
+                        <a className={style.countLimit}>可买 <span className={style.priceHighlight}>
                             {!isNaN(parseInt(price)) && parseInt(price) !== 0 ? Math.round(InitMoney / Number(price)) : 0}
                         </span> 股</a>
                     </li>
@@ -213,13 +213,13 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                         color={Button.Color.Blue}
                         style={{marginRight: "20px"}}
                         onClick={() => {
-                            frameEmitter.emit(MoveType.nextStage, {onceMore: true})
+                            frameEmitter.emit(MoveType.nextStage, {onceMore: true},lobbyUrl => location.href = lobbyUrl)
                         }}
                     />
                     <Button
                         label={"下一阶段"}
                         onClick={() => {
-                            frameEmitter.emit(MoveType.nextStage, {onceMore: false})
+                            frameEmitter.emit(MoveType.nextStage, {onceMore: false},lobbyUrl => location.href = lobbyUrl)
                         }}
                     />
                 </div>
