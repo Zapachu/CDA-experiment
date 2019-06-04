@@ -319,6 +319,7 @@ class Hall3D extends React.Component<Props, State> {
   }
   handlePointerOver (gameStep: GameSteps) {
     // console.log('onver', gameStep, arguments)
+    return
     if (!this.state.isDetailView) {
       return
     }
