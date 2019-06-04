@@ -3,15 +3,13 @@ import * as style from './style.scss'
 import Stock from './coms/Stock'
 import InfoBar from './coms/InfoBar'
 import {Line, Input, Button, Loading, Modal, ListItem} from 'bespoke-game-stock-trading-component'
-import IntroStage from './coms/IntroStage'
-import {Core, Toast} from 'bespoke-client-util'
+import {Core, Toast, MaskLoading} from 'bespoke-client-util'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import {FetchType, MoveType, PushType, PlayerStatus} from '../config'
 
 interface IPlayState {
     price: string
     count: string
-    loading: boolean
     showRule: boolean,
     showTBMRule: boolean
 }
@@ -20,13 +18,12 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     state = {
         price: '',
         count: '',
-        loading: true,
         showRule: false,
         showTBMRule: false
     }
 
-    async componentDidMount() {
-        this.setState({loading: false})
+    componentDidMount(): void {
+        this.props.frameEmitter.emit(MoveType.startMulti)
     }
 
     setPriceVal = (value) => this.setState({price: value})
@@ -154,7 +151,6 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     dynamicBtnView = () => {
         const {props: {playerState: {playerStatus}}} = this
         switch (playerStatus) {
-            case PlayerStatus.outside:
             case PlayerStatus.prepared:
                 return <Button label={this.dynamicTip()} onClick={this.dynamicBtnAction} style={{marginTop: 36}}/>
             default:
@@ -268,27 +264,20 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 playerState: {playerStatus}
             }
         } = this
-
         switch (playerStatus) {
-            case PlayerStatus.intro:
-            case PlayerStatus.matching:
-                return <IntroStage {...this.props}/>
             case PlayerStatus.prepared:
             case PlayerStatus.shouted:
                 return this.renderPlay()
             case PlayerStatus.result:
                 return this.renderResult()
             default:
-                return
+                return <MaskLoading label=' '/>
 
         }
     }
 
     render() {
-        const {state: {loading, showRule, showTBMRule}} = this
-        if (loading) {
-            return <Loading label='加载中...'/>
-        }
+        const {state: {showRule, showTBMRule}} = this
         return <section className={style.play}>
 
             {this.renderStage()}
@@ -310,7 +299,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 visible={showRule}
                 children={
                     <div className={style.modalContent}>
-                        <p>交易规则回复</p>
+                        <p>交易规则回顾</p>
                         <p>...</p>
                         <Button
                             style={{marginTop: "30px"}}

@@ -12,7 +12,7 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
     async init() {
         // online and getPosition
 
-        setTimeout(() => this.frameEmitter.emit(MoveType.joinRobot), 2000)
+        setTimeout(() => this.frameEmitter.emit(MoveType.joinRobot), 1000)
 
         // shout stage
         this.frameEmitter.on(PushType.startBid, ({privatePrice, role}) => {
