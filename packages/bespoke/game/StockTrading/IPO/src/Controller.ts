@@ -31,7 +31,7 @@ import {
   SHOUT_TIMER,
   namespace
 } from "./config";
-import {PhaseDone, STOCKS} from 'bespoke-game-stock-trading-config'
+import {Phase, PhaseDone, STOCKS} from 'bespoke-game-stock-trading-config'
 
 export default class Controller extends BaseController<
   ICreateParams,
@@ -199,7 +199,8 @@ export default class Controller extends BaseController<
         const {onceMore} = params
         const res = await RedisCall.call<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, {
           playUrl: gameId2PlayUrl(namespace, this.game.id, actor.token),
-          onceMore
+          onceMore,
+          phase: this.game.params.type == IPOType.Median ? Phase.IPO_Median : Phase.IPO_TopK
         })
         res ? cb(res.lobbyUrl) : null
         break;

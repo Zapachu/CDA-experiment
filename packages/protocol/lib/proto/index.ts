@@ -1,7 +1,6 @@
 import {loadPackageDefinition, credentials, Server} from 'grpc'
 import {loadSync} from '@grpc/proto-loader'
 import {resolve} from 'path'
-import {proto} from './BespokeProxy'
 import {
     GameService,
     PhaseService,
@@ -46,22 +45,6 @@ export namespace ElfAdmin {
 
     export function setElfService(server: Server, elfService: TElfService) {
         server.addService(protoDef.ElfService.service, elfService)
-    }
-}
-
-export namespace BespokeProxy {
-    let proxyServiceConsumer: proto.ProxyService
-
-    export function getProxyService(serviceURI: string): proto.ProxyService {
-        if (!proxyServiceConsumer) {
-            try {
-                const {proto: {ProxyService}} = loadPackageDefinition(loadSync(resolve(__dirname, './BespokeProxy.proto'))) as any
-                proxyServiceConsumer = new ProxyService(serviceURI, credentials.createInsecure()) as proto.ProxyService
-            } catch (e) {
-                console.error(e)
-            }
-        }
-        return proxyServiceConsumer
     }
 }
 
