@@ -32,7 +32,7 @@ export enum IPOType {
 }
 
 export const MATCH_TIMER = 3;
-export const SHOUT_TIMER = 10;
+export const SHOUT_TIMER = 60;
 export const minA = 30;
 export const maxA = 100;
 export const minB = 0.6;
