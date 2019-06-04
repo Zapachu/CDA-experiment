@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "start": "cross-env mode=development webpack --watch --config webpackConfig.js --mode development ",
-    "build": "cross-env mode=production webpack --config webpackConfig.js --mode=production && cp -rf dist ../build/",
+    "build": "cross-env mode=production webpack --config webpackConfig.js --mode=production && cp -rf dist ../",
     "lint": "eslint --ext .js src test",
     "precommit": "npm run lint"
   },

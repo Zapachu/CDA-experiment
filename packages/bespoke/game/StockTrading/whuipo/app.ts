@@ -16,6 +16,7 @@ import socketSession from 'express-socket.io-session'
 import socketPassport from 'passport.socketio'
 import cookieParser from 'cookie-parser'
 
+
 import router from './router'
 import { handleSocketInit, handleSocketPassportFailed, handleSocketPassportSuccess } from './controller'
 
@@ -156,9 +157,10 @@ app.use((req, res, next) => {
 
 
 // server静态文件
+const staticPath = process.env.NODE_ENV === 'production' ? path.resolve(__dirname, '../dist') : path.join(__dirname, './dist')
 app.use(
   settings.rootname + '/static',
-  express.static(path.join(__dirname, 'dist'), { maxAge: '10d' })
+  express.static(staticPath, { maxAge: '10d' })
 );
 
 

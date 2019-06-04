@@ -56,8 +56,8 @@ const removeUserSocket = (uid, socketId) => {
     return arr
 }
 
-const matchRoomLimit = 10
-const waittingTime = 10 // 秒
+const matchRoomLimit = settings.gameRoomSize || 10
+const waittingTime = settings.gameMatchTime || 10 // 秒
 const matchRoomOfGame: {[gamePhase: number]: string[]} = {
 }
 const matchRoomTimerOfGame = {}
@@ -165,7 +165,7 @@ const gamePhaseOrder = {
     [Phase.CBM]: 3
 }
 
-RedisCall.handle<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, async ({playUrl, onceMore, phase = Phase.TBM}) => {
+RedisCall.handle<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, async ({playUrl, onceMore, phase}) => {
     console.log(`redis handle phase: ${phase} done`, playUrl, onceMore)
     const uid = await RedisTools.getPlayerUrlRecord(playUrl)
     const user = await User.findById(uid)
@@ -188,7 +188,8 @@ RedisCall.handle<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, async ({playUrl
             lobbyUrl = urlObj.toString()
         }
     }
-    return {lobbyUrl: settings.lobbyUrl}
+    console.log(lobbyUrl, 'lobbyurl')
+    return {lobbyUrl}
 })
 export default class RouterController {
     @catchError
