@@ -132,7 +132,7 @@ export default class Controller extends BaseController<
           const { min } = gameRounds[roundIndex];
           const { privateValue, startingPrice } = playerRounds[roundIndex];
           if (this.invalidParams(params, privateValue, min, startingPrice)) {
-            return cb("invalid input");
+            return cb(`价格应在${min}与${privateValue}之间`);
           }
           playerState.playerStatus = PlayerStatus.shouted;
           playerRounds[roundIndex].price = params.price;
@@ -145,7 +145,7 @@ export default class Controller extends BaseController<
           const { roundIndex, rounds: gameRounds } = group;
           const { min } = gameRounds[roundIndex];
           if (this.invalidParams(params, privateValue, min, startingPrice)) {
-            return cb("invalid input");
+            return cb(`价格应在${min}与${privateValue}之间`);
           }
           playerState.playerStatus = PlayerStatus.shouted;
           playerState.multi.price = params.price;
