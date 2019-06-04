@@ -67,7 +67,7 @@ export default class IntroStage extends Core.Play<
       <section className={style.introStage}>
         <Line text={type===IPOType.Median?"IPO中位数定价":"IPO荷兰式拍卖"} style={{ marginBottom: "20px" }} />
         <img src={LOADING} />
-        <div className={style.mask}></div>
+        {/* <div className={style.mask}></div> */}
         {/* <PlayMode
           onPlay={mode => {
             if (mode === PlayMode.Single) {

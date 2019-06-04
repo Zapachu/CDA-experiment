@@ -12,6 +12,7 @@ const Input: React.SFC<PropType> = ({
 }) => {
   return (
     <div className={style.input} style={propStyle}>
+      <label>{placeholder}</label>
       <div className={style.inputComp}>
         {onMinus ? <span onClick={() => onMinus(+value || 0)}>-</span> : null}
         <input
