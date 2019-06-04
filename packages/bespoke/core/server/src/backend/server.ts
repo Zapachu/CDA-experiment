@@ -13,13 +13,13 @@ import * as bodyParser from 'body-parser'
 import * as compression from 'compression'
 import * as morgan from 'morgan'
 import {elfSetting} from 'elf-setting'
-import {Log, redisClient, Setting, QCloudSMS} from './util'
-import {baseEnum, config, IGameSetting, IGameConfig} from 'bespoke-common'
+import {heartBeat, Log, QCloudSMS, redisClient, RedisKey, Setting} from './util'
+import {baseEnum, config, IGameConfig, IGameSetting} from 'bespoke-common'
 import {EventDispatcher} from './controller/eventDispatcher'
-import {rootRouter, namespaceRouter} from './controller/requestRouter'
+import {namespaceRouter, rootRouter} from './controller/requestRouter'
 import {GameLogic, ILogicTemplate} from './service/GameLogic'
 import GameDAO from './service/GameDAO'
-import {serve as serveRPC, getProxyService} from './rpc'
+import {serve as serveRPC} from './rpc'
 import {AddressInfo} from 'net'
 import {UserDoc, UserModel} from './model'
 import {Strategy} from 'passport-local'
@@ -140,22 +140,14 @@ export class Server {
         EventDispatcher.startGameSocket(server).use(socketIOSession(this.sessionMiddleware))
         this.bindServerListener(server, () => {
             Log.i(`CreateGame：http://${Setting.ip}:${elfSetting.bespokeHmr ? config.devPort.client : Setting.port}/${config.rootName}/${Setting.namespace}/create`)
-            if (!elfSetting.bespokeWithProxy) {
-                return
-            }
+            heartBeat(async () => await redisClient.setex(
+                RedisKey.gameServer(Setting.namespace),
+                config.heartBeatSeconds + 1,
+                `${Setting.ip}:${Setting.port}`
+            ))
             if (elfSetting.bespokeWithLinker) {
                 serveRPC()
             }
-            const heartBeat2Proxy = () => {
-                getProxyService().registerGame({
-                        namespace: Setting.namespace,
-                        port: Setting.port.toString(),
-                        rpcPort: Setting.rpcPort.toString()
-                    },
-                    err => err ? Log.w(`注册至代理失败，${config.gameRegisterInterval}秒后重试`) : null)
-                setTimeout(() => heartBeat2Proxy(), config.gameRegisterInterval)
-            }
-            setTimeout(() => heartBeat2Proxy(), .5 * config.gameRegisterInterval)
         })
     }
 
@@ -164,7 +156,13 @@ export class Server {
         if (!mobile) {
             Log.e('未配置管理员账号，无法创建实验')
         }
-        const {id: owner} = await UserModel.findOne({mobile})
-        return await GameDAO.newGame(namespace, owner, gameConfig)
+        let owner: UserDoc = await UserModel.findOne({mobile})
+        if (!owner) {
+            owner = await UserModel.create({
+                role: baseEnum.AcademusRole.teacher,
+                mobile: mobile
+            })
+        }
+        return await GameDAO.newGame(namespace, owner.id, gameConfig)
     }
 }

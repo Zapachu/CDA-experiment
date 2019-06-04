@@ -7,10 +7,10 @@ import {
     RedisCall,
     TGameState,
     TPlayerState
-} from "bespoke-server"
-import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from "./interface"
-import {FetchType, MoveType, OUT_TIME, PlayerStatus, PushType, namespace} from './config'
-import {PhaseDone} from "bespoke-game-stock-trading-config"
+} from 'bespoke-server'
+import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
+import {FetchType, MoveType, namespace, OUT_TIME, PlayerStatus, PushType} from './config'
+import {Phase, PhaseDone} from 'bespoke-game-stock-trading-config'
 
 const getBestMatching = G => {
     const MATCHED = 'matched',
@@ -66,7 +66,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 if (groupIndex === -1) {
                     const group: GameState.IGroup = {
                         roundIndex: 0,
-                        playerNum: 0,
+                        playerNum: 0
                     }
                     groupIndex = gameState.groups.push(group) - 1
                 }
@@ -82,7 +82,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         setTimeout(() => {
                             this.push(p.actor, PushType.startBid, {
                                 role: p.role,
-                                privatePrice: p.privatePrice,
+                                privatePrice: p.privatePrice
                             })
                         }, 1000 * i)
                     })
@@ -97,7 +97,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 if (groupIndex === -1) {
                     const group: GameState.IGroup = {
                         roundIndex: 0,
-                        playerNum: 0,
+                        playerNum: 0
                     }
                     groupIndex = gameState.groups.push(group) - 1
                 }
@@ -119,7 +119,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         setTimeout(() => {
                             this.push(p.actor, PushType.startBid, {
                                 role: p.role,
-                                privatePrice: p.privatePrice,
+                                privatePrice: p.privatePrice
                             })
                         }, 1000 * i)
                     })
@@ -134,7 +134,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 if (groupIndex === -1) {
                     const group: GameState.IGroup = {
                         roundIndex: 0,
-                        playerNum: 0,
+                        playerNum: 0
                     }
                     groupIndex = gameState.groups.push(group) - 1
                 }
@@ -169,7 +169,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         setTimeout(() => {
                             this.push(p.actor, PushType.startBid, {
                                 role: p.role,
-                                privatePrice: p.privatePrice,
+                                privatePrice: p.privatePrice
                             })
                         }, 1000 * i)
                     })
@@ -180,10 +180,11 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 const {onceMore} = params
                 const res = await RedisCall.call<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, {
                     playUrl: gameId2PlayUrl(namespace, this.game.id, actor.token),
-                    onceMore
+                    onceMore,
+                    phase: Phase.TBM
                 })
                 res ? cb(res.lobbyUrl) : null
-                break;
+                break
             }
             case MoveType.shout: {
                 const {groupIndex} = playerState,

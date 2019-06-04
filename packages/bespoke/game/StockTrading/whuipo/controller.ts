@@ -161,9 +161,9 @@ const RedisTools = {
 }
 
 const gamePhaseOrder = {
-    [Phase.TBM]: 1,
-    [Phase.IPO_Median]: 2,
-    [Phase.IPO_TopK]: 2,
+    [Phase.IPO_Median]: 1,
+    [Phase.IPO_TopK]: 1,
+    [Phase.TBM]: 2,
     [Phase.CBM]: 3
 }
 
@@ -184,7 +184,7 @@ RedisCall.handle<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, async ({playUrl
         })
         if (onceMore) {
             const urlObj = new URL(lobbyUrl)
-            const queryObj = qs.parse(urlObj.search.replace('?', ''))
+            const queryObj = qs.parse(urlObj.search.replace('?', '')) || {}
             queryObj.gamePhase = phase
             urlObj.search = qs.stringify(queryObj)
             lobbyUrl = urlObj.toString()
@@ -222,7 +222,6 @@ export default class RouterController {
 
     @catchError
     static async renderIndex(req: Request, res: Response, next: NextFunction) {
-        // res.send('index html todo')
         res.sendfile(path.resolve(__dirname, './dist/index.html'))
     }
 
@@ -255,7 +254,6 @@ export default class RouterController {
 }
 
 export function handleSocketPassportSuccess(data, cb) {
-    // console.log(Object.keys(data), 'passport', data.socket.handshake)
     cb(null, true)
 }
 
