@@ -174,12 +174,16 @@
 }
 /*shout stage*/
 .shoutStage {
-  .priceHighlight {
-    color: orange;
+  .countLimit{
+    color: #7d85b3;
+    .priceHighlight {
+      color: orange;
+    }
   }
   .feeInfo {
     position: relative;
     .feeNumber {
+      color: #7d85b3;
       position: absolute;
       left: 0;
       top: 2px;

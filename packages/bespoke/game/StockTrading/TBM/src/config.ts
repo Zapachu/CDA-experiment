@@ -37,6 +37,6 @@ export enum PlayerStatus {
 }
 
 export const NEW_ROUND_TIMER = 3
-export const OUT_TIME = 120
+export const OUT_TIME = 0
 
 // role 0 : buyer 1: seller
