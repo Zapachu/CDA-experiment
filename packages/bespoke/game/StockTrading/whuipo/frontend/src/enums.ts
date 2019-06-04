@@ -3,9 +3,6 @@ export interface UserDoc {
     updateAt: number;
     createAt: number;
     unionId: string,
-    status: UserGameStatus,
-    nowJoinedGame?: GameTypes,
-    playerUrl?: string,
     unblockGamePhase?: GameTypes
 }
 
@@ -36,4 +33,5 @@ export enum serverSocketListenEvents {
 export enum clientSocketListenEvnets {
     startMatch = 'startMatch',
     startGame = 'startGame',
+    continueGame = 'continueGame'
 }

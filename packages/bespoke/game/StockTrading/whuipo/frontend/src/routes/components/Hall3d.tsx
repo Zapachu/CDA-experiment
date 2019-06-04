@@ -1,9 +1,9 @@
 import * as React from "react";
 import * as BABYLON from "babylonjs";
-import { Button, Modal, Spin } from 'antd'
-import Modal2 from '../../../../../components/Modal'
 import socket from 'socket.io-client'
+import {Modal, Button, Loading, MatchModal} from 'bespoke-game-stock-trading-component'
 import 'pepjs'
+import qs from 'qs'
 
 import {reqInitInfo} from '../../services/index'
 import {serverSocketListenEvents, clientSocketListenEvnets, ResCode, UserDoc, UserGameStatus, GameTypes} from '../../enums'
@@ -12,9 +12,8 @@ import Line2d from './line2d'
 import BabylonScene from "./BabylonScene";
 import Detail from './detail.png'
 import PANO from './pano.jpg'
-
-
-import 'antd/dist/antd.css';
+import LockIcon from './lock.png'
+import UnLockIcon from './unlock.png'
 import style from './style.less'
 
 const zLargeDistance = 500
@@ -22,11 +21,12 @@ const zLargeDistance = 500
 const cardWidth = 120
 const cardHeight = cardWidth * (347 / 620)
 
+
 const redirect = (url) => {
-  // if (APP_TYPE === 'production') {
+  if (APP_TYPE === 'production') {
     location.href = url
     return
-  // } 
+  } 
   const obj = new URL(url)
   obj.host = '192.168.56.1:8081'
   location.href = obj.toString()
@@ -36,12 +36,20 @@ enum GameSteps { left, center, right }
 const GamePhaseToStep = {
   [GameTypes.IPO_Median]: GameSteps.center,
   [GameTypes.IPO_TopK]: GameSteps.center,
-  [GameTypes.CBM]: GameSteps.right,
-  [GameTypes.TBM]: GameSteps.left
+  [GameTypes.CBM]: GameSteps.left,
+  [GameTypes.TBM]: GameSteps.right
 }
+
 const GameStepsToGamePhase = {
-  [GameSteps.left]: GameTypes.TBM,
-  [GameSteps.right]: GameTypes.CBM
+  [GameSteps.left]: GameTypes.CBM,
+  [GameSteps.right]: GameTypes.TBM,
+}
+
+const GamePhaseOrder = {
+  [GameTypes.TBM]: 1,
+  [GameTypes.IPO_Median]: 2,
+  [GameTypes.IPO_TopK]: 2,
+  [GameTypes.CBM]: 3
 }
 
 const GameRenderConfigs = {
@@ -67,7 +75,13 @@ const GameRenderConfigs = {
       x: -200,
       y: -80,
       z: -50
-    }
+    },
+    lockIconPosition: {
+      x: -345,
+      y: 95,
+      z: 320
+    },
+    isLock: true,
   },
   [GameSteps.center]: {
     maskSize: {
@@ -91,8 +105,13 @@ const GameRenderConfigs = {
       x: 0,
       y: -80,
       z: -50
-    }
-
+    },
+    lockIconPosition: {
+      x: 0,
+      y: 165,
+      z: 460
+    },
+    isLock: true,
   },
   [GameSteps.right]: {
     maskSize: {
@@ -116,7 +135,13 @@ const GameRenderConfigs = {
       x: 200,
       y: -80,
       z: -50
-    }
+    },
+    lockIconPosition: {
+      x: 355,
+      y: 100,
+      z: 325
+    },
+    isLock: true,
   },
 }
 interface Props {
@@ -125,6 +150,7 @@ interface Props {
 
 enum ModalContentTypes {
   selectSubGameType,
+  continueGame,
   selectMode,
   preMatch,
   waittingMatch,
@@ -136,7 +162,8 @@ interface State {
   showPreStartModal: boolean
   modalContentType?: ModalContentTypes,
   isInitView: boolean,
-  focusGameType?: GameTypes
+  focusGameType?: GameTypes,
+  matchTimer?: number,
 }
 
 class Hall3D extends React.Component<Props, State> {
@@ -152,6 +179,8 @@ class Hall3D extends React.Component<Props, State> {
     [gameStep: string]: BABYLON.Mesh
   }
   io: SocketIOClient.Socket
+  matchTimer: NodeJS.Timer
+  continuePlayUrl: string
   constructor(props) {
     super(props)
     this.hoverMaskInstance = {}
@@ -167,8 +196,8 @@ class Hall3D extends React.Component<Props, State> {
 
   }
   componentDidMount () {
-    console.log(APP_TYPE, 'apptype')
-    this.reqInitInfo()
+  }
+  componentWillUpdate () {
   }
   reqInitInfo () {
     reqInitInfo().then(res => {
@@ -176,24 +205,36 @@ class Hall3D extends React.Component<Props, State> {
       if (res.code === ResCode.success) {
         this.connectSocket()
         const user: UserDoc = res.user
-        const {status, playerUrl, nowJoinedGame} = user
-        if (!!nowJoinedGame) {
-          if (status === UserGameStatus.end) {
-            return
-          } else if (status === UserGameStatus.started) {
-            // location.href = playerUrl
-            redirect(playerUrl)
+        const { unblockGamePhase} = user
+
+        const userUnBlockGameOrder = GamePhaseOrder[unblockGamePhase] || -1
+        console.log(userUnBlockGameOrder, 'user')
+        Object.keys(GameRenderConfigs).forEach((gameStep) => {
+          let gameStepPhaseOrder = -1
+          if (Number(gameStep) === GameSteps.center) {
+            gameStepPhaseOrder = GamePhaseOrder[GameTypes.IPO_TopK]
           } else {
-            const step = GamePhaseToStep[nowJoinedGame]
+            const gamePhase = GameStepsToGamePhase[gameStep]
+            gameStepPhaseOrder = GamePhaseOrder[gamePhase]
+          }
+          const isLock = gameStepPhaseOrder > userUnBlockGameOrder
+          GameRenderConfigs[gameStep].isLock = isLock
+        })
+        console.log(GameRenderConfigs, 'config')
+        this.initView()
+
+        const urlObj = new URL(window.location.href)
+        const queryObj = qs.parse(urlObj.search.replace('?', '')) || {}
+        if (queryObj.gamePhase) {
+          const step = GamePhaseToStep[queryObj.gamePhase]
             this.handleSelectGame(step)
             setTimeout(_ => {
               this.setState({
                 showPreStartModal: true,
-                modalContentType: status === UserGameStatus.waittingMatch ? ModalContentTypes.waittingMatch : ModalContentTypes.selectMode,
-                focusGameType: nowJoinedGame,
+                modalContentType: ModalContentTypes.selectMode,
+                focusGameType: queryObj.gamePhase,
               })
             }, 2000)
-          } 
         }
         
         return
@@ -211,13 +252,18 @@ class Hall3D extends React.Component<Props, State> {
     }, 2000);
   }
   renderModal () {
-    const {showPreStartModal, modalContentType, focusGameStep, focusGameType} = this.state
+    const {showPreStartModal, modalContentType, focusGameStep, focusGameType, matchTimer} = this.state
     const handleClose = async () => {
+      if (this.matchTimer) {
+        clearInterval(this.matchTimer)
+      }
       this.setState({
         showPreStartModal: false
       })
       if ([ModalContentTypes.waittingMatch, ModalContentTypes.preMatch].includes(modalContentType)) {
-       this.io.emit(serverSocketListenEvents.leaveMatchRoom)
+       this.io.emit(serverSocketListenEvents.leaveMatchRoom, {
+         gamePhase: focusGameType
+       })
       }
     }
     const handleSelectGameMode = (isGroupMode: boolean) => {
@@ -226,41 +272,48 @@ class Hall3D extends React.Component<Props, State> {
         modalContentType: ModalContentTypes.preMatch
       })
     }
-    return <Modal visible={showPreStartModal} onCancel={handleClose}>
-       {
-          modalContentType === ModalContentTypes.selectSubGameType && 
-          <div>
-              <Button onClick={_ => this.setState({focusGameType: GameTypes.IPO_Median, modalContentType: ModalContentTypes.selectMode})}>IPO_Median</Button>
-              <Button onClick={_ => this.setState({focusGameType: GameTypes.IPO_TopK, modalContentType: ModalContentTypes.selectMode})}>IPO_TopK</Button>
-          </div>
-        }
+    if (modalContentType === ModalContentTypes.waittingMatch) {
+      return <MatchModal visible={true} totalNum={4} matchNum={matchTimer % 5} timer={matchTimer}></MatchModal>
+    }
+    return <Modal visible={showPreStartModal}>
+       <div className={style.modalContent}>
         {
-          modalContentType === ModalContentTypes.selectMode && 
-          <div>
-              <Button onClick={_ => handleSelectGameMode(false)}>单人模式</Button>
-              <Button onClick={_ => handleSelectGameMode(true)}>多人模式</Button>
+            modalContentType === ModalContentTypes.selectSubGameType && 
+            <div className={style.selectSubGame}>
+                <Button onClick={_ => this.setState({focusGameType: GameTypes.IPO_Median, modalContentType: ModalContentTypes.selectMode})} label="IPO_Median"></Button>
+                <Button onClick={_ => this.setState({focusGameType: GameTypes.IPO_TopK, modalContentType: ModalContentTypes.selectMode})} label="IPO_TopK"></Button>
+            </div>
+          }
+          {
+            modalContentType === ModalContentTypes.continueGame &&
+            <div>
+              您尚有实验正在进行中，继续该实验吗？
+              <Button onClick={_ => redirect(this.continuePlayUrl)} label="继续"></Button>
+            </div>
+          }
+          {
+            modalContentType === ModalContentTypes.selectMode && 
+            <div className={style.selectGameMode}>
+                <Button onClick={_ => handleSelectGameMode(false)} label="单人模式"></Button>
+                <Button onClick={_ => handleSelectGameMode(true)} label="多人模式"></Button>
+            </div>
+          }
+          {
+            modalContentType === ModalContentTypes.preMatch &&
+            <div>
+              <Loading label="处理中"/>
+            </div>
+          }
+          {
+            modalContentType === ModalContentTypes.matchSuccess &&
+            <div className={style.matchSuccess}>
+              玩家匹配成功！
+            </div>
+          }
+          <div className={style.bottom}>
+            <Button onClick={handleClose} label="关闭"></Button>
           </div>
-        }
-         {
-          modalContentType === ModalContentTypes.preMatch &&
-          <div>
-            <Spin/>
-            <div>处理中....</div>
-          </div>
-        }
-        {
-          modalContentType === ModalContentTypes.waittingMatch &&
-          <div>
-            <Spin/>
-            <div>匹配中....</div>
-          </div>
-        }
-        {
-          modalContentType === ModalContentTypes.matchSuccess &&
-          <div>
-            玩家匹配成功！
-          </div>
-        }
+       </div>
     </Modal>
   }
   handlePointerOver (gameStep: GameSteps) {
@@ -313,7 +366,7 @@ class Hall3D extends React.Component<Props, State> {
 
     var ground = BABYLON.MeshBuilder.CreateGround(`introGround${gameStep}`, { width: cardWidth, height: cardHeight}, scene);
 
-    var textureGround = new BABYLON.DynamicTexture(`dynamicTexture${gameStep}`, { width: cardWidth, height: cardHeight }, scene);
+    var textureGround = new BABYLON.DynamicTexture(`dynamicTexture${gameStep}`, { width: cardWidth, height: cardHeight }, scene, false);
     var textureContext = textureGround.getContext();
     textureGround.hasAlpha = true
 
@@ -342,9 +395,7 @@ class Hall3D extends React.Component<Props, State> {
       textureGround.drawText(introContent, null, 20, font, "white", null);
       textureGround.update();
     }
-    ground.position.x = introPosition.x
-    ground.position.y = introPosition.y
-    ground.position.z = introPosition.z
+    ground.position = new BABYLON.Vector3(introPosition.x, introPosition.y, introPosition.z)
     ground.rotation.x = - Math.PI / 2
     ground.rotation.y = introRotateY
     return ground
@@ -386,8 +437,6 @@ class Hall3D extends React.Component<Props, State> {
     const {btnPosition} = GameRenderConfigs[gameStep]
 		var light = new BABYLON.DirectionalLight("direct", new BABYLON.Vector3(0, -1, 0), this.scene);
 
-		// var light = new BABYLON.DirectionalLight(`direct${gameStep}`, new BABYLON.Vector3(-btnPosition.x, -btnPosition.y, -btnPosition.z ), this.scene);
-
     const path = [ 	
       new BABYLON.Vector3(-10, 0, 0),
           new BABYLON.Vector3(0, 10, 0),
@@ -409,9 +458,7 @@ class Hall3D extends React.Component<Props, State> {
       color: [0, 0, 1, 1]
     }, this.scene)
     const mesh2 = BABYLON.Mesh.MergeMeshes([line1, line2])
-    mesh2.position.x = btnPosition.x
-    mesh2.position.y = btnPosition.y
-    mesh2.position.z = btnPosition.z
+    mesh2.position = new BABYLON.Vector3(btnPosition.x, btnPosition.y, btnPosition.z)
     mesh2.rotation.x = Math.PI / 4
 
     var ground = BABYLON.Mesh.CreateGround("ground1", 20, 20, 1, this.scene);
@@ -420,9 +467,7 @@ class Hall3D extends React.Component<Props, State> {
     myMaterial.emissiveTexture = texture
     myMaterial.alpha = 0
     ground.material = myMaterial
-    ground.position.x = btnPosition.x
-    ground.position.y = btnPosition.y + 1
-    ground.position.z = btnPosition.z
+    ground.position = new BABYLON.Vector3(btnPosition.x, btnPosition.y + 1, btnPosition.z)
     ground.rotation.x = -Math.PI / 4
     ground.actionManager = new BABYLON.ActionManager(this.scene)
     ground.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
@@ -431,10 +476,21 @@ class Hall3D extends React.Component<Props, State> {
       },
       this.handleSelectGame.bind(this, gameStep)
     ))
-  
+  }
+  renderLockIcon (gameStep: GameSteps){
+		var light = new BABYLON.DirectionalLight("direct", new BABYLON.Vector3(0, 1, 1), this.scene);
 
-   
-   
+    const {isLock, lockIconPosition, maskRotateY} = GameRenderConfigs[gameStep]
+    var ground = BABYLON.Mesh.CreateGround(`lockGround${gameStep}`, 30, 30 * (186 / 144), 1, this.scene);
+    const myMaterial = new BABYLON.StandardMaterial(`lockMat${gameStep}`, this.scene)
+     const texture = new BABYLON.Texture(isLock ? LockIcon : UnLockIcon, this.scene)
+     texture.hasAlpha = true
+    myMaterial.diffuseTexture = texture
+    // myMaterial.diffuseColor = new BABYLON.Color3(1, 1, 1)
+    ground.material = myMaterial
+    ground.rotation.x = - Math.PI / 2
+    ground.rotation.y = maskRotateY
+    ground.position = new BABYLON.Vector3(lockIconPosition.x, lockIconPosition.y, lockIconPosition.z)
   }
   handleShowLeftDetail () {
     const frameRate = 20
@@ -535,12 +591,13 @@ class Hall3D extends React.Component<Props, State> {
         this.hoverMaskInstance[gameStep] = maskInstance
       }
       this.renderGameStepBtn(Number(gameStep))
+      this.renderLockIcon(Number(gameStep))
     })
     setTimeout(() => {
       this.setState({
         isInitView: false
       })
-    }, 0);
+    }, 500);
   }
   handleSceneMount ({ engine, scene, canvas }) {
     // _showWorldAxis(scene, 20);
@@ -565,23 +622,18 @@ class Hall3D extends React.Component<Props, State> {
       },
       scene
     );
-
-    setTimeout(() => {
-      this.initView()
-    }, 500)
+    this.reqInitInfo()
       
-    // scene.onPointerObservable.add((pointerInfo) => {
-    //   switch (pointerInfo.type) {
+    scene.onPointerObservable.add((pointerInfo) => {
+      switch (pointerInfo.type) {
 
-    //     case BABYLON.PointerEventTypes.POINTERUP:
-    //       const { clientX, clientY } = pointerInfo.event
-    //       const x = getRelativePageX(clientX), y = getRelativePageY(clientY)
-    //       console.log(pointerInfo, x, y)
-    //       break;
-    //     case BABYLON.PointerEventTypes.POINTERMOVE:
-    //       break;
-    //   }
-    // });
+        case BABYLON.PointerEventTypes.POINTERUP:
+          console.log(pointerInfo)
+          break;
+        case BABYLON.PointerEventTypes.POINTERMOVE:
+          break;
+      }
+    });
 
     engine.runRenderLoop(() => {
       if (scene) {
@@ -590,7 +642,6 @@ class Hall3D extends React.Component<Props, State> {
     });
   }
   connectSocket () {
-    // let socketUrl = APP_TYPE === 'production' ? 'localhost:3020' : '192.168.0.135:3020'
     const io = socket.connect('/')
     this.io = io
     io.on('connect', (socket) => {
@@ -599,33 +650,46 @@ class Hall3D extends React.Component<Props, State> {
     io.on(clientSocketListenEvnets.startMatch, () => {
       console.log('recive startmatch')
       this.setState({
-        modalContentType: ModalContentTypes.waittingMatch
+        modalContentType: ModalContentTypes.waittingMatch,
+        matchTimer: 0
       })
+      this.matchTimer = setInterval(() => {
+        this.setState({
+          matchTimer: this.state.matchTimer + 1
+        })
+      }, 1000)
     })
     io.on(clientSocketListenEvnets.startGame, ({playerUrl}) => {
+      if (this.matchTimer) {
+          clearInterval(this.matchTimer)
+      }
         console.log('recive start game', playerUrl)
         this.setState({
           modalContentType: ModalContentTypes.matchSuccess
         })
         setTimeout(() => {
-          // location.href = playerUrl
           redirect(playerUrl)
         }, 1000)
     })       
+    io.on(clientSocketListenEvnets.continueGame, ({playerUrl}) => {
+      this.setState({
+        modalContentType: ModalContentTypes.continueGame,
+      })
+      this.continuePlayUrl = playerUrl
+    })
   }
   render() {
     const {isDetailView, isInitView} = this.state
     return (
-      <div>
-        {/* <img src={Arrow}/> */}
+      <div >
         {
           isInitView && <div className={style.loading}>
-            <Spin/>
+            <Loading label="加载中"/>
           </div>
         }
         {
           isDetailView && <div className={style.actionBtns}>
-            <Button onClick={this.handleCancelOverview.bind(this)}>返回</Button>
+            <Button onClick={this.handleCancelOverview.bind(this)} label="返回"></Button>
           </div>
         }
         {this.renderModal()}

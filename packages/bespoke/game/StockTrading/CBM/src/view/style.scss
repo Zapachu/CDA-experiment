@@ -8,6 +8,24 @@ $color-dark: #2a3564;
 $color-dark2: #212a51;
 $color-orange: #f99460;
 $color-red: #d6444e;
+
+.label {
+  display: inline-block;
+  margin: 1rem;
+
+  em {
+    margin: 1rem;
+    font-size: $fontSize-large;
+    color: $color-orange;
+  }
+}
+
+.subLabel {
+  display: block;
+  text-align: center;
+  opacity: .6;
+}
+
 .play {
   position: absolute;
   width: 100%;
@@ -31,12 +49,42 @@ $color-red: #d6444e;
       display: flex;
       flex-direction: column;
       background: linear-gradient($color-dark, $color-dark2);
-      padding-bottom: 5rem;
+      padding-bottom: 3rem;
       height: 100%;
     }
 
 
     .tradePanel {
+      flex-basis: 24rem;
+
+      .asset {
+        .summary {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+
+          div {
+            flex-basis: 45%;
+            margin-top: 1.5rem;
+
+            em {
+              display: inline-block;
+              width: 6rem;
+              font-size: $fontSize-large;
+              color: $color-orange;
+              text-align: center;
+            }
+          }
+        }
+
+        .repayWrapper {
+          margin: 1rem 0;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+      }
+
       .yourTrades {
         @include panel;
 
@@ -66,23 +114,6 @@ $color-red: #d6444e;
                 color: $color-red;
               }
             }
-          }
-        }
-      }
-
-      .summary {
-        margin: 1rem;
-        display: flex;
-
-        div {
-          padding: 1rem;
-
-          em {
-            display: inline-block;
-            width: 6rem;
-            font-size: $fontSize-large;
-            color: $color-orange;
-            text-align: center;
           }
         }
       }
@@ -156,20 +187,12 @@ $color-red: #d6444e;
         }
 
         .newOrder {
+          text-align: center;
+
           .orderInputWrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
-
-            label {
-              margin: 1rem;
-
-              em {
-                margin: 1rem;
-                font-size: $fontSize-large;
-                color: $color-orange;
-              }
-            }
           }
 
           .submitBtnWrapper {
@@ -177,20 +200,20 @@ $color-red: #d6444e;
             display: flex;
             justify-content: center;
           }
-
-          .timeLeft {
-            display: flex;
-            justify-content: center;
-            opacity: .6;
-          }
         }
       }
     }
 
     .marketHistoryWrapper {
-
       .marketHistory {
         @include panel;
+        padding: 1rem;
+        cursor: pointer;
+        transition: $transition-normal;
+
+        &:hover {
+          background: linear-gradient($color-dark, $color-dark);
+        }
       }
     }
   }
@@ -225,7 +248,7 @@ $color-red: #d6444e;
       }
     }
 
-    .switchBtns{
+    .switchBtns {
       margin: 2rem;
       display: flex;
       justify-content: center;

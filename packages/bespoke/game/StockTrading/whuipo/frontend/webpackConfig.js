@@ -9,17 +9,18 @@ console.log(mode)
 const plugins = [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
-    title: 'ipo',
-    template: './public/build.html'
-}),
-new ProgressBarPlugin({
-    format: '  build [:bar] :percent (:elapsed seconds)',
-    clear: false,
-    width: 60
-}),
-new webpack.DefinePlugin({
-    APP_DEV_MODE: mode
-})]
+        title: 'ipo',
+        template: './public/build.html'
+    }),
+    new ProgressBarPlugin({
+        format: '  build [:bar] :percent (:elapsed seconds)',
+        clear: false,
+        width: 60
+    }),
+    new webpack.DefinePlugin({
+        APP_DEV_MODE: JSON.stringify(mode)
+    })
+]
 
 module.exports = {
     entry: './src/index.js',
@@ -30,16 +31,18 @@ module.exports = {
     },
     plugins: plugins,
     resolve: {
-        extensions: [".ts", ".tsx", ".js"]
+        extensions: [".ts", ".tsx", ".js"],
+        alias: {
+            'component': path.resolve(__dirname, '../../components')
+        }
     },
-    // optimization: {
-    //     splitChunks: {
-    //         chunks: 'all'
-    //     }
-    // },
+    optimization: {
+        splitChunks: {
+            chunks: 'all'
+        }
+    },
     externals: {
         babylonjs: 'BABYLON',
-        // antd: 'antd'
     },
     module: {
         rules: [
@@ -72,9 +75,10 @@ module.exports = {
                     'style-loader',
                     {
                         loader: 'css-loader',
-                        // options: {
-                        //     modules: true
-                        // }
+                        options: {
+                            modules: true,
+                            localIdentName: '[name]__[local]___[hash:base64:5]'
+                        }
                     },
                 ]
             },
@@ -86,7 +90,8 @@ module.exports = {
                     {
                         loader: 'css-loader',
                         options: {
-                            modules: true
+                            modules: true,
+                            localIdentName: '[name]__[local]___[hash:base64:5]'
                         }
                     },
                     'less-loader'
@@ -113,7 +118,8 @@ module.exports = {
                     {
                         loader: 'css-loader',
                         options: {
-                            modules: true
+                            modules: true,
+                            localIdentName: '[name]__[local]___[hash:base64:5]'
                         }
                     },
                     'sass-loader'
