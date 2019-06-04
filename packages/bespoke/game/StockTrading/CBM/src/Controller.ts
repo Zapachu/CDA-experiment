@@ -30,7 +30,7 @@ import {
     PushType,
     ROLE
 } from './config'
-import {CreateGame, PhaseDone} from 'bespoke-game-stock-trading-config'
+import {CreateGame, Phase, PhaseDone} from 'bespoke-game-stock-trading-config'
 import {getBalanceIndex, getEnumKeys, random} from './util'
 
 export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
@@ -324,7 +324,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 const {onceMore} = params
                 const res = await RedisCall.call<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, {
                     playUrl: gameId2PlayUrl(namespace, this.game.id, actor.token),
-                    onceMore
+                    onceMore,
+                    phase: Phase.CBM
                 })
                 res ? cb(res.lobbyUrl) : null
                 break
