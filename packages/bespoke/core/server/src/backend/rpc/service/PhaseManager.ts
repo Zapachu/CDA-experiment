@@ -14,7 +14,7 @@ export function setPhaseService(server: Server) {
             elfGameId,
             namespace,
             params: JSON.parse(param)
-        }).save().then(({id}) => callback(null, {playUrl: gameId2PlayUrl(namespace, id)}))
+        }).save().then(({id}) => callback(null, {playUrl: gameId2PlayUrl(id)}))
     }
 
     P.setPhaseService(server, {newPhase})

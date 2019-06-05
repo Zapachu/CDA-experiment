@@ -14,7 +14,7 @@ Server.start({
 const genRan = () => ~~(Math.random() * (100000 - 1000)) + 2000
 
 RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(CreateGame.name(Phase.TBM), async ({keys}) => {
-    const gameId = await Server.newGame<ICreateParams>(namespace, {
+    const gameId = await Server.newGame<ICreateParams>({
         title: `${Phase.TBM}:${new Date().toUTCString()}`,
         desc: '',
         params: {
@@ -35,5 +35,5 @@ RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(CreateGame.name(Phase.TBM), a
             sellerPriceEnd: 100000,
         }
     })
-    return {playUrls: keys.map(key => gameId2PlayUrl(namespace, gameId, key))}
+    return {playUrls: keys.map(key => gameId2PlayUrl(gameId, key))}
 })

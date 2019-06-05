@@ -37,7 +37,7 @@ export class Play extends React.Component<TPageProps, IPlayState> {
         const {token, props: {match: {params: {gameId}}}} = this
         const {game} = await Api.getGame(gameId)
         const socketClient = connect('/', {
-            path: config.socketPath(game.namespace),
+            path: config.socketPath(NAMESPACE),
             query: `gameId=${gameId}&token=${token}`
         })
         this.registerStateReducer(socketClient)

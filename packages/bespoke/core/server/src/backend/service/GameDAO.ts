@@ -5,14 +5,14 @@ import {
     IGameConfig
 } from 'bespoke-common'
 import {elfSetting} from 'elf-setting'
-import {cacheResult, Log, redisClient, RedisKey} from '../util'
+import {cacheResult, Log, redisClient, RedisKey, Setting} from '../util'
 import {GameModel, GameDoc} from '../model'
 
 export default class GameDAO {
 
-    static async newGame<ICreateParams>(namespace:string, owner:string, gameConfig: IGameConfig<ICreateParams>){
+    static async newGame<ICreateParams>(owner:string, gameConfig: IGameConfig<ICreateParams>){
         try {
-            const newGame = await GameModel.create({...gameConfig, owner, namespace})
+            const newGame = await GameModel.create({...gameConfig, owner, namespace: Setting.namespace})
             return newGame.id
         } catch (e) {
             return null

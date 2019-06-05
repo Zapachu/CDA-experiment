@@ -198,7 +198,7 @@ export default class Controller extends BaseController<
       case MoveType.nextGame: {
         const {onceMore} = params
         const res = await RedisCall.call<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, {
-          playUrl: gameId2PlayUrl(namespace, this.game.id, actor.token),
+          playUrl: gameId2PlayUrl(this.game.id, actor.token),
           onceMore,
           phase: this.game.params.type == IPOType.Median ? Phase.IPO_Median : Phase.IPO_TopK
         })

@@ -7,7 +7,7 @@ import {Api, buildFetcher} from '../util'
 
 const SubmitBarHeight = '5rem'
 
-export function Create({user, history, gameTemplate: {namespace, Create: GameCreate}}: TPageProps) {
+export function Create({user, history, gameTemplate: {Create: GameCreate}}: TPageProps) {
     const lang = Lang.extractLang({
         GameTitle: ['实验标题', 'Title'],
         GameDesc: ['实验详情', 'Description'],
@@ -27,7 +27,7 @@ export function Create({user, history, gameTemplate: {namespace, Create: GameCre
     }, [])
 
     async function submit() {
-        const {code, gameId} = await Api.newGame({title, desc, params}, namespace)
+        const {code, gameId} = await Api.newGame({title, desc, params})
         if (code === baseEnum.ResponseCode.success) {
             Toast.success(lang.CreateSuccess)
             setTimeout(() => history.push(`/play/${gameId}`), 1000)
@@ -50,7 +50,6 @@ export function Create({user, history, gameTemplate: {namespace, Create: GameCre
                 </div>
             </section>
             <HistoryGame {...{
-                namespace,
                 applyHistoryGame: ({title, desc, params}: IGameConfig<any>) => {
                     setTitle(title)
                     setDesc(desc)

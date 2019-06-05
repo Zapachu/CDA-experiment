@@ -127,21 +127,13 @@ export class GameCtrl {
     }
 
     static async newGame(req, res) {
-        const {namespace, game} = req.body, owner = req.user
-        const gameId = await GameDAO.newGame(namespace, owner, game)
+        const {game} = req.body, owner = req.user
+        const gameId = await GameDAO.newGame(owner, game)
         res.json(gameId ? {
             code: baseEnum.ResponseCode.success,
             gameId
         } : {
             code: baseEnum.ResponseCode.serverError
-        })
-    }
-
-    static async getNamespace(req, res) {
-        const {namespace} = await GameDAO.getGame(req.params.gameId)
-        res.json({
-            code: baseEnum.ResponseCode.success,
-            namespace
         })
     }
 
@@ -226,9 +218,9 @@ export class GameCtrl {
     }
 
     static async getHistoryGameThumbs(req, res) {
-        const {user, query: {namespace}} = req
+        const {user} = req
         try {
-            const historyGameThumbs: Array<IGameThumb> = (await GameModel.find({owner: user.id, ...namespace ? {namespace} : {}})
+            const historyGameThumbs: Array<IGameThumb> = (await GameModel.find({owner: user.id, namespace:Setting.namespace})
                 .limit(historyGamesListSize)
                 .sort({createAt: -1})).map(({id, namespace, title, createAt}) => ({id, namespace, title, createAt}))
             res.json({

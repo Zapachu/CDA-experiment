@@ -12,7 +12,7 @@ Server.start({
 }, {Controller, Robot})
 
 RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(CreateGame.name(Phase.IPO_TopK), async ({keys}) => {
-    const gameId = await Server.newGame<ICreateParams>(namespace, {
+    const gameId = await Server.newGame<ICreateParams>({
         title: `${Phase.IPO_TopK}:${new Date().toUTCString()}`,
         desc: '',
         params: {
@@ -21,10 +21,10 @@ RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(CreateGame.name(Phase.IPO_Top
             type: IPOType.TopK
         }
     })
-    return {playUrls: keys.map(key => gameId2PlayUrl(namespace, gameId, key))}
+    return {playUrls: keys.map(key => gameId2PlayUrl(gameId, key))}
 })
 RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(CreateGame.name(Phase.IPO_Median), async ({keys}) => {
-    const gameId = await Server.newGame<ICreateParams>(namespace, {
+    const gameId = await Server.newGame<ICreateParams>({
         title: `${Phase.IPO_Median}:${new Date().toUTCString()}`,
         desc: '',
         params: {
@@ -33,5 +33,5 @@ RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(CreateGame.name(Phase.IPO_Med
             type: IPOType.Median
         }
     })
-    return {playUrls: keys.map(key => gameId2PlayUrl(namespace, gameId, key))}
+    return {playUrls: keys.map(key => gameId2PlayUrl(gameId, key))}
 })

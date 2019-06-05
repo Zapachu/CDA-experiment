@@ -29,11 +29,11 @@ export class Token {
     }
 }
 
-export function gameId2PlayUrl(namespace: string, gameId: string, keyOrToken?: string): string {
+export function gameId2PlayUrl(gameId: string, keyOrToken?: string): string {
     const query = keyOrToken ? `?token=${Token.checkToken(keyOrToken) ? keyOrToken : Token.geneToken(keyOrToken)}` : ''
     const domain = elfSetting.bespokeWithProxy ? elfSetting.proxyOrigin :
         `http://${Setting.ip}:${elfSetting.bespokeHmr ? config.devPort.client : Setting.port}`
-    return `${domain}/${config.rootName}/${namespace}/play/${gameId}${query}`
+    return `${domain}/${config.rootName}/${Setting.namespace}/play/${gameId}${query}`
 }
 
 export function heartBeat(fn: () => void | Promise<void>) {

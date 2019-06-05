@@ -6,7 +6,6 @@ import {Lang} from 'bespoke-client-util'
 import {Api} from '../util'
 
 declare interface IHistoryGameProps {
-    namespace: string,
     applyHistoryGame: (gameCfg: IGameConfig<any>) => void,
 }
 
@@ -23,8 +22,7 @@ export class HistoryGame extends React.Component<IHistoryGameProps, IHistoryGame
     })
 
     async componentDidMount() {
-        const {namespace} = this.props
-        const {code, historyGameThumbs} = await Api.getHistoryGames(namespace)
+        const {code, historyGameThumbs} = await Api.getHistoryGames()
         if (code === baseEnum.ResponseCode.success) {
             this.setState({historyGameThumbs})
         }

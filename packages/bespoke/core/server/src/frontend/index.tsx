@@ -1,6 +1,6 @@
 import './initial.scss'
 import * as React from 'react'
-import {IGameTemplate, Lang, MaskLoading, TRegisterGame, TPageProps} from 'bespoke-client-util'
+import {IGameTemplate, Lang, MaskLoading, TPageProps, TRegisterGame} from 'bespoke-client-util'
 import {BrowserRouter, Redirect, Route as ReactRoute, RouteComponentProps, RouteProps, Switch} from 'react-router-dom'
 import {config} from 'bespoke-common'
 import {Login} from './Login'
@@ -17,7 +17,8 @@ import {Api} from './util'
 function renderRoot(pageProps: TPageProps, rootContainer: HTMLElement) {
     const Route = ({component: Component, ...routeProps}: RouteProps) =>
         <ReactRoute {...routeProps} render={(props: RouteComponentProps<{ gameId?: string }>) =>
-            <Component {...pageProps} {...props}/>}/>
+            <Component {...pageProps} {...props}/>
+        }/>
 
     render(<BrowserRouter key={Lang.activeLanguage} basename={`${config.rootName}/${NAMESPACE}`}>
         <Switch>
@@ -37,10 +38,9 @@ function renderRoot(pageProps: TPageProps, rootContainer: HTMLElement) {
     </BrowserRouter>, rootContainer)
 }
 
-export const registerGame: TRegisterGame = (namespace: string, gameTemplate: IGameTemplate) => {
+export const registerGame: TRegisterGame = (gameTemplate: IGameTemplate) => {
     const Empty = () => null
     const template = {
-        namespace,
         Create: Empty,
         Info: Empty,
         Play4Owner: () => <MaskLoading label={Lang.extractLang({label: ['实验进行中', 'Playing...']}).label}/>,

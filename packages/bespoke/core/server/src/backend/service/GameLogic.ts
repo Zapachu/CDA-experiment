@@ -1,4 +1,4 @@
-import {gameId2PlayUrl, EventIO, Token, Log} from '../util'
+import {EventIO, gameId2PlayUrl, Log, Token} from '../util'
 import {
     baseEnum,
     FrameEmitter,
@@ -15,8 +15,8 @@ import {StateManager} from './StateManager'
 import {MoveQueue} from './MoveQueue'
 import {Request, Response} from 'express'
 import {getGameService} from '../rpc'
-import SyncStrategy = baseEnum.SyncStrategy
 import {PhaseManager} from 'elf-protocol'
+import SyncStrategy = baseEnum.SyncStrategy
 
 export type AnyController = BaseController<any, any, any, any, any, any, any, any>
 type AnyRobotScheduler = RobotScheduler<any, any, any, any, any, any, any>
@@ -166,7 +166,7 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
             return Log.w('Bespoke单独部署，game未关联至Elf group')
         }
         getGameService().setPhaseResult({
-            playUrl: gameId2PlayUrl(this.game.namespace, this.game.id),
+            playUrl: gameId2PlayUrl(this.game.id),
             playerToken,
             elfGameId: this.game.elfGameId,
             phaseResult
@@ -178,7 +178,7 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
             return Log.w('Bespoke单独部署，game未关联至Elf group')
         }
         getGameService().sendBackPlayer({
-            playUrl: gameId2PlayUrl(this.game.namespace, this.game.id),
+            playUrl: gameId2PlayUrl(this.game.id),
             playerToken,
             nextPhaseKey,
             elfGameId: this.game.elfGameId,

@@ -150,7 +150,7 @@ export class Server {
         })
     }
 
-    static async newGame<ICreateParams>(namespace: string, gameConfig: IGameConfig<ICreateParams>): Promise<string> {
+    static async newGame<ICreateParams>(gameConfig: IGameConfig<ICreateParams>): Promise<string> {
         const [mobile] = elfSetting.adminMobileNumbers
         if (!mobile) {
             Log.e('未配置管理员账号，无法创建实验')
@@ -162,6 +162,6 @@ export class Server {
                 mobile: mobile
             })
         }
-        return await GameDAO.newGame(namespace, owner.id, gameConfig)
+        return await GameDAO.newGame(owner.id, gameConfig)
     }
 }

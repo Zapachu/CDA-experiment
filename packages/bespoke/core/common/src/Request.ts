@@ -45,16 +45,12 @@ export class Request {
 
     //endregion
     //region game
-    async getHistoryGames(namespace?: string): Promise<IHttpRes & { historyGameThumbs: Array<IGameThumb> }> {
-        return await this.get('/game/historyThumb', null, {namespace})
+    async getHistoryGames(): Promise<IHttpRes & { historyGameThumbs: Array<IGameThumb> }> {
+        return await this.get('/game/historyThumb', null)
     }
 
-    async newGame(game: IGameConfig<any>, namespace: string): Promise<IHttpRes & { gameId: string }> {
-        return await this.post('/game/new', null, null, {game, namespace})
-    }
-
-    async getNamespace(gameId: string): Promise<IHttpRes & { namespace: string }> {
-        return await this.get('/game/namespace/:gameId', {gameId})
+    async newGame(game: IGameConfig<any>): Promise<IHttpRes & { gameId: string }> {
+        return await this.post('/game/new', null, null, {game})
     }
 
     async shareGame(gameId: string): Promise<IHttpRes & { shareCode: string, title: string }> {

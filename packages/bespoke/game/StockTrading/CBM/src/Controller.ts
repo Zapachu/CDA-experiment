@@ -328,7 +328,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             case MoveType.exitGame: {
                 const {onceMore} = params
                 const res = await RedisCall.call<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, {
-                    playUrl: gameId2PlayUrl(namespace, this.game.id, actor.token),
+                    playUrl: gameId2PlayUrl(this.game.id, actor.token),
                     onceMore,
                     phase: Phase.CBM
                 })
