@@ -1,24 +1,15 @@
 import * as React from 'react'
-import {
-    config,
-    baseEnum,
-    TGameState,
-    TPlayerState,
-    TSocket,
-    FrameEmitter,
-    IActor,
-    IGameWithId
-} from 'bespoke-common'
+import {baseEnum, config, FrameEmitter, IActor, IGameWithId, TGameState, TPlayerState, TSocket} from 'bespoke-common'
 import * as style from './style.scss'
 import {decode} from 'msgpack-lite'
-import {MaskLoading, Lang, IFetcher, TPageProps} from 'bespoke-client-util'
+import {IFetcher, Lang, MaskLoading, TPageProps} from 'bespoke-client-util'
 import {Api, buildFetcher} from '../util'
 import {connect} from 'socket.io-client'
 import {applyChange, Diff} from 'deep-diff'
 import * as queryString from 'query-string'
-import cloneDeep = require('lodash/cloneDeep')
 import {GameControl} from './console/GameControl'
 import {GameResult} from './console/GameResult'
+import cloneDeep = require('lodash/cloneDeep')
 
 declare interface IPlayState {
     actor?: IActor
@@ -57,9 +48,9 @@ export class Play extends React.Component<TPageProps, IPlayState> {
             frameEmitter: new FrameEmitter(socketClient as any)
         }), () =>
             socketClient.emit(baseEnum.SocketEvent.online, (actor: IActor) => {
-                if(token && (actor.token !== token)){
+                if (token && (actor.token !== token)) {
                     location.href = `${location.origin}${location.pathname}?token=${actor.token}`
-                }else{
+                } else {
                     this.setState({actor})
                 }
             }))
@@ -92,7 +83,6 @@ export class Play extends React.Component<TPageProps, IPlayState> {
             }) : this.setState({playerState})
         })
         socketClient.on(baseEnum.SocketEvent.syncGameState_msgpack, (gameStateBuffer: Array<number>) => {
-            console.log(gameStateBuffer.length / JSON.stringify(decode(gameStateBuffer)).length)
             this.setState({gameState: decode(gameStateBuffer)})
         })
         socketClient.on(baseEnum.SocketEvent.syncPlayerState_msgpack,
@@ -125,7 +115,9 @@ export class Play extends React.Component<TPageProps, IPlayState> {
         }
         const {Play4Owner, Result4Owner, Play, Result} = gameTemplate
         if (actor.type === baseEnum.Actor.owner) {
-            console.log(gameState, playerStates)
+            if (!PRODUCT_ENV) {
+                console.log(gameState, playerStates)
+            }
             return <section className={style.play4owner}>
                 <GameControl {...{
                     game,

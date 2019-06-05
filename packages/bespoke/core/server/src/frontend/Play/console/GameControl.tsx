@@ -91,9 +91,11 @@ export class GameControl extends React.Component<IGameControlProps> {
                 <div className={style.btnGroup}>
                     <Button {...btnProps} icon={ButtonProps.Icon.home} onClick={() => historyPush(`/dashboard`)}/>
                     <Button {...btnProps} icon={ButtonProps.Icon.parameter}
-                            onClick={() => historyPush(`/${game.namespace}/configuration/${game.id}`)}/>
-                    <Button {...btnProps} icon={ButtonProps.Icon.share}
-                            onClick={() => historyPush(`/share/${game.id}`)}/>
+                            onClick={() => historyPush(`/configuration/${game.id}`)}/>
+                    {
+                        WITH_LINKER ? null : <Button {...btnProps} icon={ButtonProps.Icon.share}
+                                                     onClick={() => historyPush(`/share/${game.id}`)}/>
+                    }
                 </div>
             </div>
             <section className={style.players}>
