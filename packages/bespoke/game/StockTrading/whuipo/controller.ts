@@ -32,6 +32,7 @@ function catchError(target: any, key: string, descriptor: PropertyDescriptor) {
         try {
             await func(req, res, next)
         } catch (e) {
+            console.error(e)
             res.json({
                 code: ResCode.unexpectError,
                 msg: e.message
@@ -250,6 +251,7 @@ export function handleSocketInit(ioServer: Socket.Server) {
                     console.log('没有登陆')
                     return
                 }
+                console.log(`请求者uid:${socket.request.user._id}`)
                 const uid = socket.request.user._id
                 const {isGroupMode, gamePhase} = msg
                 const userGameData = await RedisTools.getUserGameData(uid, gamePhase)
