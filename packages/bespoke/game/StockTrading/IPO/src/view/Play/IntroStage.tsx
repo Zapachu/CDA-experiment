@@ -13,9 +13,11 @@ import {
   MoveType,
   PushType,
   PlayerStatus,
-  MATCH_TIMER
+  MATCH_TIMER,
+  IPOType
 } from "../../config";
 import { Line, PlayMode, MatchModal, Modal } from "bespoke-game-stock-trading-component";
+const LOADING = require("bespoke-game-stock-trading-component/lib/loading.png");
 
 interface IPlayState {
   matchTimer: number;
@@ -45,9 +47,9 @@ export default class IntroStage extends Core.Play<
 
   componentDidMount() {
     const { frameEmitter } = this.props;
-    frameEmitter.on(PushType.matchTimer, ({ matchTimer, matchNum }) => {
-      this.setState({ matchTimer, matchNum });
-    });
+    // frameEmitter.on(PushType.matchTimer, ({ matchTimer, matchNum }) => {
+    //   this.setState({ matchTimer, matchNum });
+    // });
     //TODO 由Match系统匹配玩家，Game内仅处理单轮的业务逻辑(临时方案，待移除此Game内match相关代码)
     frameEmitter.emit(MoveType.startMulti)
   }
@@ -57,14 +59,16 @@ export default class IntroStage extends Core.Play<
       frameEmitter,
       playerState: { playerStatus, single, multi },
       game: {
-        params: { groupSize }
+        params: { groupSize, type }
       }
     } = this.props;
     const { matchTimer, matchNum } = this.state;
     return (
       <section className={style.introStage}>
-        <Line text={"交易规则介绍"} style={{ marginBottom: "20px" }} />
-        <PlayMode
+        <Line text={type===IPOType.Median?"IPO中位数定价":"IPO荷兰式拍卖"} style={{ marginBottom: "20px" }} />
+        <img src={LOADING} />
+        {/* <div className={style.mask}></div> */}
+        {/* <PlayMode
           onPlay={mode => {
             if (mode === PlayMode.Single) {
               frameEmitter.emit(MoveType.startSingle);
@@ -87,7 +91,7 @@ export default class IntroStage extends Core.Play<
           <p style={{ textAlign: "center", padding: "50px 0" }}>
             加载算法交易者...
           </p>
-        </Modal>
+        </Modal> */}
       </section>
     );
   }

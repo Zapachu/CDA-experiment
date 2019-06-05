@@ -15,6 +15,16 @@ RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(CreateGame.name(Phase.CBM), a
         title: `${Phase.CBM}:${new Date().toUTCString()}`,
         desc: '',
         params: {
+            allowLeverage: false
+        }
+    })
+    return {playUrls: keys.map(key => gameId2PlayUrl(namespace, gameId, key))}
+})
+RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(CreateGame.name(Phase.CBM_Leverage), async ({keys}) => {
+    const gameId = await Server.newGame<ICreateParams>(namespace, {
+        title: `${Phase.CBM}:${new Date().toUTCString()}`,
+        desc: '',
+        params: {
             allowLeverage: true
         }
     })

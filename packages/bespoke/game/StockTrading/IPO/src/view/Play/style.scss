@@ -22,6 +22,17 @@
     p {
       color: #dde1e9;
     }
+    .mask {
+      position: fixed;
+      background-color: #080d25;
+      pointer-events: none;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 100;
+      opacity: 0.8;
+    }
   }
 
   .playingStage {
@@ -52,6 +63,30 @@
       cursor: pointer;
       &:first-child {
         margin-right: 5px;
+      }
+    }
+    .tradeBtn {
+      position: fixed;
+      top: 35vh;
+      right: 15vw;
+    }
+    .ipoBtn {
+      position: fixed;
+      top: 42vh;
+      right: 15vw;
+    }
+  }
+}
+
+@media(max-width: 768px) {
+  .play {
+    .playingStage {
+      .tradeBtn {
+        top: 10px;
+        right: 55vw;
+      }
+      .ipoBtn {
+        top: 10px;
       }
     }
   }

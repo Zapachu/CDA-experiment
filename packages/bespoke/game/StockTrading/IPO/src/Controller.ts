@@ -70,13 +70,13 @@ export default class Controller extends BaseController<
       gameState = await this.stateManager.getGameState(),
       playerStates = await this.stateManager.getPlayerStates();
     switch (type) {
-      case MoveType.startSingle: {
-        if (playerState.playerStatus !== PlayerStatus.intro) {
-          break;
-        }
-        this.createGroupAndInitRobots(gameState, playerState);
-        break;
-      }
+      // case MoveType.startSingle: {
+      //   if (playerState.playerStatus !== PlayerStatus.intro) {
+      //     break;
+      //   }
+      //   this.createGroupAndInitRobots(gameState, playerState);
+      //   break;
+      // }
       case MoveType.startMulti: {
         if (playerState.playerStatus !== PlayerStatus.intro) {
           break;
@@ -132,7 +132,7 @@ export default class Controller extends BaseController<
           const { min } = gameRounds[roundIndex];
           const { privateValue, startingPrice } = playerRounds[roundIndex];
           if (this.invalidParams(params, privateValue, min, startingPrice)) {
-            return cb("invalid input");
+            return cb(`价格应在${min}与${privateValue}之间`);
           }
           playerState.playerStatus = PlayerStatus.shouted;
           playerRounds[roundIndex].price = params.price;
@@ -145,7 +145,7 @@ export default class Controller extends BaseController<
           const { roundIndex, rounds: gameRounds } = group;
           const { min } = gameRounds[roundIndex];
           if (this.invalidParams(params, privateValue, min, startingPrice)) {
-            return cb("invalid input");
+            return cb(`价格应在${min}与${privateValue}之间`);
           }
           playerState.playerStatus = PlayerStatus.shouted;
           playerState.multi.price = params.price;
@@ -178,23 +178,23 @@ export default class Controller extends BaseController<
         }, 2000);
         break;
       }
-      case MoveType.replay: {
-        if (playerState.playerStatus !== PlayerStatus.result) {
-          return;
-        }
-        if (playerState.single) {
-          const { groupIndex } = playerState.single;
-          const group = gameState.groups[groupIndex];
-          const groupPlayerStates = Object.values(playerStates).filter(
-            s => s.single && s.single.groupIndex === groupIndex
-          );
-          group.roundIndex++;
-          this._initState(group, groupPlayerStates);
-        } else {
-          this.createGroupAndInitRobots(gameState, playerState);
-        }
-        break;
-      }
+      // case MoveType.replay: {
+      //   if (playerState.playerStatus !== PlayerStatus.result) {
+      //     return;
+      //   }
+      //   if (playerState.single) {
+      //     const { groupIndex } = playerState.single;
+      //     const group = gameState.groups[groupIndex];
+      //     const groupPlayerStates = Object.values(playerStates).filter(
+      //       s => s.single && s.single.groupIndex === groupIndex
+      //     );
+      //     group.roundIndex++;
+      //     this._initState(group, groupPlayerStates);
+      //   } else {
+      //     this.createGroupAndInitRobots(gameState, playerState);
+      //   }
+      //   break;
+      // }
       case MoveType.nextGame: {
         const {onceMore} = params
         const res = await RedisCall.call<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, {
@@ -244,7 +244,7 @@ export default class Controller extends BaseController<
         rounds: [{}]
       };
     }
-    playerState.playerStatus = PlayerStatus.matching;
+    // playerState.playerStatus = PlayerStatus.matching;
   }
 
   // simulateNPCs(amount: number, min: number, max: number): Array<InvestorState> {
@@ -384,12 +384,12 @@ export default class Controller extends BaseController<
         const groupPlayerStates = Object.values(playerStates).filter(
           s => s.multi && s.multi.groupIndex === groupIndex
         );
-        groupPlayerStates.forEach(s => {
-          this.push(s.actor, PushType.matchTimer, {
-            matchTimer,
-            matchNum: groupPlayerStates.length
-          });
-        });
+        // groupPlayerStates.forEach(s => {
+        //   this.push(s.actor, PushType.matchTimer, {
+        //     matchTimer,
+        //     matchNum: groupPlayerStates.length
+        //   });
+        // });
         if (group.playerNum === groupSize) {
           global.clearInterval(matchIntervals[groupIndex]);
           delete matchIntervals[groupIndex];
