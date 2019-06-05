@@ -11,7 +11,7 @@ export class Request {
     private readonly get: (path: string, params?: {}, query?: {}) => Promise<any>
     private readonly post: (path: string, params?: {}, query?: {}, data?: {}) => Promise<any>
 
-    constructor(public namespace:string, get: (url: string) => Promise<any>,
+    constructor(public namespace: string, get: (url: string) => Promise<any>,
                 post: (url: string, data?: {}) => Promise<any>) {
         this.get = async (path, params, query) => await get(this.buildUrl(path, params, query))
         this.post = async (path, params, query, data) => await post(this.buildUrl(path, params, query), data)
@@ -45,10 +45,6 @@ export class Request {
 
     //endregion
     //region game
-    async getAccessibleTemplates(): Promise<IHttpRes & { namespaces: Array<string> }> {
-        return await this.get('/game/accessibleTemplates')
-    }
-
     async getHistoryGames(namespace?: string): Promise<IHttpRes & { historyGameThumbs: Array<IGameThumb> }> {
         return await this.get('/game/historyThumb', null, {namespace})
     }

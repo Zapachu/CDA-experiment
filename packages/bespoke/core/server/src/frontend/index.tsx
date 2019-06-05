@@ -1,10 +1,8 @@
 import './initial.scss'
 import * as React from 'react'
-import {Lang} from 'bespoke-client-util'
-import {BrowserRouter, Switch, Route, RouteComponentProps} from 'react-router-dom'
+import {IGameTemplate, Lang, MaskLoading, TRegisterGame, TPageProps} from 'bespoke-client-util'
+import {BrowserRouter, Redirect, Route as ReactRoute, RouteComponentProps, RouteProps, Switch} from 'react-router-dom'
 import {config} from 'bespoke-common'
-import {rootContext, TRootCtx} from './context'
-import {IGameTemplate, TRegisterGame, MaskLoading} from 'bespoke-client-util'
 import {Login} from './Login'
 import {Dashboard} from './Dashboard'
 import {Create} from './Create'
@@ -14,27 +12,30 @@ import {Join} from './Join'
 import {Play} from './Play'
 import {Configuration} from './Configuration'
 import {render} from 'react-dom'
+import {Api} from './util'
 
-const Root: React.FunctionComponent<TRootCtx> = props =>
-    <rootContext.Provider value={props}>
-        <BrowserRouter basename={config.rootName}>
-            <Switch>
-                <Route path={`/${props.gameTemplate.namespace}`} component={NamespaceRoute}/>
-                <Route path='/login' component={Login}/>
-                <Route path='/dashboard' component={Dashboard}/>
-                <Route path='/info/:gameId' component={Info}/>
-                <Route path='/share/:gameId' component={Share}/>
-                <Route path='/join' component={Join}/>
-            </Switch>
-        </BrowserRouter>
-    </rootContext.Provider>
+function renderRoot(pageProps: TPageProps, rootContainer: HTMLElement) {
+    const Route = ({component: Component, ...routeProps}: RouteProps) =>
+        <ReactRoute {...routeProps} render={(props: RouteComponentProps<{ gameId?: string }>) =>
+            <Component {...pageProps} {...props}/>}/>
 
-const NamespaceRoute: React.FunctionComponent<RouteComponentProps> = ({match}) =>
-    <Switch>
-        <Route path={`${match.url}/create`} component={Create}/>
-        <Route path={`${match.url}/play/:gameId`} component={Play}/>
-        <Route path={`${match.url}/configuration/:gameId`} component={Configuration}/>
-    </Switch>
+    render(<BrowserRouter key={Lang.activeLanguage} basename={`${config.rootName}/${NAMESPACE}`}>
+        <Switch>
+            <Route exact path="/" component={Dashboard}/>
+            <Route path='/create' component={Create}/>
+            <Route path='/play/:gameId' component={Play}/>
+            <Route path='/configuration/:gameId' component={Configuration}/>
+            <Route path='/login' component={Login}/>
+            <Route path='/dashboard' component={Dashboard}/>
+            <Route path='/info/:gameId' component={Info}/>
+            <Route path='/share/:gameId' component={Share}/>
+            <Route path='/join' component={Join}/>
+            <Route path='/*'>
+                <Redirect to='/'/>
+            </Route>
+        </Switch>
+    </BrowserRouter>, rootContainer)
+}
 
 export const registerGame: TRegisterGame = (namespace: string, gameTemplate: IGameTemplate) => {
     const Empty = () => null
@@ -42,14 +43,15 @@ export const registerGame: TRegisterGame = (namespace: string, gameTemplate: IGa
         namespace,
         Create: Empty,
         Info: Empty,
-        Play4Owner: ()=><MaskLoading label={Lang.extractLang({label:['实验进行中','Playing...']}).label}/>,
+        Play4Owner: () => <MaskLoading label={Lang.extractLang({label: ['实验进行中', 'Playing...']}).label}/>,
         Result: Empty,
         Result4Owner: Empty,
         ...gameTemplate
     }
-    const rootContainer = document.body.appendChild(document.createElement('div'))
-    render(<Root gameTemplate={template}/>, rootContainer)
-    Lang.switchListeners.push(() => {
-        render(<Root key={Lang.activeLanguage} gameTemplate={template}/>, rootContainer)
+    Api.getUser().then(({user}) => {
+        const rootContainer = document.body.appendChild(document.createElement('div')),
+            props = {gameTemplate: template, user}
+        renderRoot(props, rootContainer)
+        Lang.switchListeners.push(() => renderRoot(props, rootContainer))
     })
 }

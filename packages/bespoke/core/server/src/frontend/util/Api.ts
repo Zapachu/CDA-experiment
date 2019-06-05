@@ -33,7 +33,7 @@ export const Api = new Request(
     async (url: string, data = {}) => await request(url, baseEnum.RequestMethod.POST, data)
 )
 
-export function buildFetcher<FetchType>(gameId: string): IFetcher<FetchType> {
+export function buildFetcher<FetchType>(gameId?: string): IFetcher<FetchType> {
     return {
         buildGetUrl(type: FetchType, params = {}): string {
             return Api.buildUrl('/pass2Game/:gameId', {gameId}, {type, ...params})

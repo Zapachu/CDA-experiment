@@ -1,10 +1,8 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {RouteComponentProps} from 'react-router'
 import {baseEnum, config} from 'bespoke-common'
-import {Lang, Toast} from 'bespoke-client-util'
+import {Lang, Toast, TPageProps} from 'bespoke-client-util'
 import {Api} from '../util'
-import {connCtx, rootContext, TRootCtx} from '../context'
 
 declare interface ILoginState {
     nationCode: baseEnum.NationCode
@@ -13,8 +11,7 @@ declare interface ILoginState {
     counter: number
 }
 
-@connCtx(rootContext)
-export class Login extends React.Component<TRootCtx & RouteComponentProps<{}>, ILoginState> {
+export class Login extends React.Component<TPageProps, ILoginState> {
     lang = Lang.extractLang({
         title: ['你的 { 课研助手 } ', 'Your { Experiment Assistant }'],
         mobileNumber: ['手机号', 'Mobile Number'],

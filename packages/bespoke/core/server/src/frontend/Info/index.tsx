@@ -28,7 +28,7 @@ export function Info({history, match: {params: {gameId}}}: RouteComponentProps<{
                 style: {
                     backgroundColor: '#ff888e'
                 },
-                onClick: () => history.push(`/${game.namespace}/play/${gameId}${location.search}`)
+                onClick: () => history.push(`/play/${gameId}${location.search}`)
             }}>{game.owner === user.id ? lang.enterRoom : lang.joinGame}</li>
         </ul>
     </div>

@@ -16,7 +16,7 @@ import {elfSetting} from 'elf-setting'
 import {heartBeat, Log, QCloudSMS, redisClient, RedisKey, Setting} from './util'
 import {baseEnum, config, IGameConfig, IGameSetting} from 'bespoke-common'
 import {EventDispatcher} from './controller/eventDispatcher'
-import {namespaceRouter, rootRouter} from './controller/requestRouter'
+import {router} from './controller/requestRouter'
 import {GameLogic, ILogicTemplate} from './service/GameLogic'
 import GameDAO from './service/GameDAO'
 import {serve as serveRPC} from './rpc'
@@ -73,8 +73,7 @@ export class Server {
         express.use(`/${config.rootName}/${Setting.namespace}/static`, Express.static(Setting.staticPath, {maxAge: '10d'}))
         express.use(`/${config.rootName}/static`, Express.static(path.join(__dirname, '../../dist/'), {maxAge: '10d'}))
         express.use(`/${config.rootName}/${Setting.namespace}`, bespokeRouter)
-        express.use(`/${config.rootName}/${Setting.namespace}`, namespaceRouter)
-        express.use(`/${config.rootName}`, rootRouter)
+        express.use(`/${config.rootName}/${Setting.namespace}`, router)
         return express
     }
 
@@ -139,7 +138,7 @@ export class Server {
             server = express.listen(Setting.port)
         EventDispatcher.startGameSocket(server).use(socketIOSession(this.sessionMiddleware))
         this.bindServerListener(server, () => {
-            Log.i(`CreateGame：http://${Setting.ip}:${elfSetting.bespokeHmr ? config.devPort.client : Setting.port}/${config.rootName}/${Setting.namespace}/create`)
+            Log.i(`Running at：http://${Setting.ip}:${elfSetting.bespokeHmr ? config.devPort.client : Setting.port}/${config.rootName}/${Setting.namespace}`)
             heartBeat(async () => await redisClient.setex(
                 RedisKey.gameServer(Setting.namespace),
                 config.heartBeatSeconds + 1,

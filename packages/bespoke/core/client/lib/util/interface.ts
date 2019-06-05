@@ -1,6 +1,12 @@
 import * as React from 'react'
 import {IElfCreateProps} from 'elf-linker'
-import {FrameEmitter, IGameWithId, TGameState, TPlayerState} from 'bespoke-common'
+import {FrameEmitter, IGameWithId, TGameState, TPlayerState, IUserWithId} from 'bespoke-common'
+import {RouteComponentProps} from 'react-router-dom'
+
+export type TPageProps = Partial<{
+    gameTemplate: IGameTemplate
+    user: IUserWithId
+} & RouteComponentProps<{ gameId?: string }>>
 
 export interface IFetcher<FetchType> {
     buildGetUrl(type: FetchType, params?: {}): string;

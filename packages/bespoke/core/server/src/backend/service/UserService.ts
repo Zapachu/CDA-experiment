@@ -47,9 +47,4 @@ export default class UserService {
             }
         }
     }
-
-    static getGameTemplateNamespaces(mobile: string): Array<string> {
-        //TODO 由GO Proxy处理
-        return []
-    }
 }

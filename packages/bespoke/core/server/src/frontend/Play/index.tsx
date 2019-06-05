@@ -1,5 +1,4 @@
 import * as React from 'react'
-import {RouteComponentProps} from 'react-router-dom'
 import {
     config,
     baseEnum,
@@ -12,8 +11,7 @@ import {
 } from 'bespoke-common'
 import * as style from './style.scss'
 import {decode} from 'msgpack-lite'
-import {MaskLoading, Lang, IFetcher} from 'bespoke-client-util'
-import {connCtx, rootContext, TRootCtx} from '../context'
+import {MaskLoading, Lang, IFetcher, TPageProps} from 'bespoke-client-util'
 import {Api, buildFetcher} from '../util'
 import {connect} from 'socket.io-client'
 import {applyChange, Diff} from 'deep-diff'
@@ -33,8 +31,7 @@ declare interface IPlayState {
     frameEmitter?: FrameEmitter<any, any, any, any>
 }
 
-@connCtx(rootContext)
-export class Play extends React.Component<TRootCtx & RouteComponentProps<{ gameId: string }>, IPlayState> {
+export class Play extends React.Component<TPageProps, IPlayState> {
     token = queryString.parse(location.search).token as string
     lang = Lang.extractLang({
         Mask_WaitForGameToStart: ['等待实验开始', 'Waiting for experiment to Start'],

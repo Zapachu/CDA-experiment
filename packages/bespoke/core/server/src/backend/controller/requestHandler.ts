@@ -1,5 +1,5 @@
 import {baseEnum, config, IGameThumb} from 'bespoke-common'
-import {NextFunction, Request, Response} from 'express'
+import {Request, Response} from 'express'
 import * as passport from 'passport'
 import {elfSetting} from 'elf-setting'
 import {Log, redisClient, RedisKey, Setting, Token} from '../util'
@@ -22,21 +22,8 @@ export class UserCtrl {
             `<script type="text/javascript" src="${Setting.getClientPath()}"></script>`)
     }
 
-    static hasLogin(req, res: Response, next: NextFunction) {
-        req.user ? next() : res.redirect(`/${config.rootName}/login`)
-    }
-
-    static isTeacher(req, res: Response, next: NextFunction) {
-        req.user && req.user.role === baseEnum.AcademusRole.teacher ? next() : res.redirect(`/${config.rootName}/login`)
-    }
-
     static async getVerifyCode(req, res) {
         const {query: {nationCode, mobile}} = req
-        if (!UserService.getGameTemplateNamespaces(mobile)) {
-            return res.json({
-                code: baseEnum.ResponseCode.notFound
-            })
-        }
         const sendResult = await UserService.sendVerifyCode(+nationCode, mobile)
         switch (sendResult.code) {
             case UserService.sendVerifyCodeResCode.tooManyTimes:
@@ -132,17 +119,6 @@ export class GameCtrl {
                 code: baseEnum.ResponseCode.notFound
             })
         }
-    }
-
-    static async getAccessibleTemplates(req, res: Response) {
-        const {mobile} = req.user
-        const namespaces = UserService.getGameTemplateNamespaces(mobile)
-        res.json(namespaces ? {
-            code: baseEnum.ResponseCode.success,
-            namespaces
-        } : {
-            code: baseEnum.ResponseCode.notFound
-        })
     }
 
     static async newGame(req, res) {
