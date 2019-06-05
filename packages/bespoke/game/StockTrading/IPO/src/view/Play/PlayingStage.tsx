@@ -24,9 +24,9 @@ import {
   ListItem,
   Line,
   Modal,
-  StockInfo
+  StockInfo,
+  Loading
 } from "bespoke-game-stock-trading-component";
-const LOADING = require("bespoke-game-stock-trading-component/lib/loading.png");
 
 enum ModalType {
   None,
@@ -185,7 +185,7 @@ export default class PlayingStage extends Core.Play<
           text={"交易结果展示"}
           style={{
             margin: "auto",
-            width: "400px",
+            width: "320px",
             marginTop: "15vh",
             marginBottom: "20px"
           }}
@@ -223,7 +223,7 @@ export default class PlayingStage extends Core.Play<
           color={Line.Color.White}
           style={{
             margin: "auto",
-            width: "400px",
+            width: "320px",
             marginTop: "40px",
             marginBottom: "20px"
           }}
@@ -446,8 +446,7 @@ export default class PlayingStage extends Core.Play<
             <div
               style={{ width: "200px", margin: "auto", textAlign: "center" }}
             >
-              <img src={LOADING} style={{ marginBottom: "20px" }} />
-              <p>等待其他玩家</p>
+              <Loading label={'等待其他玩家'} />
             </div>
           </>
         );
