@@ -145,6 +145,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             if (!o) {
                 return null
             }
+            this.push(playerState.actor, PushType.tradeSuccess, {tradeCount: trade.count})
             switch (o.role) {
                 case ROLE.Buyer:
                     const money = trade.count * pairOrder.price
@@ -220,11 +221,15 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     const gamePeriodState = gameState.periods[periodIndex]
                     const {prepareTime, tradeTime, resultTime} = CONFIG,
                         periodCountDown = countDown % (prepareTime + tradeTime + resultTime)
-                    Array(2 + CreateGame.playerLimit - gameState.playerIndex).fill(null).forEach(
-                        async (_, i) => await this.startNewRobotScheduler(`$Robot_${i}`)
-                    )
                     const playerStates = await this.getActivePlayerStates()
                     switch (periodCountDown) {
+                        case ~~(prepareTime/2):{
+                            if (periodIndex === 0) {
+                                Array(2 + CreateGame.playerLimit - gameState.playerIndex).fill(null).forEach(
+                                    async (_, i) => await this.startNewRobotScheduler(`$Robot_${i}`))
+                            }
+                            break
+                        }
                         case prepareTime: {
                             gamePeriodState.stage = PeriodStage.trading
                             this.broadcast(PushType.beginTrading)
