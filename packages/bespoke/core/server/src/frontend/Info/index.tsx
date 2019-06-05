@@ -1,7 +1,8 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {IGameWithId, IUserWithId} from 'bespoke-common'
-import {Api, Lang, Markdown, MaskLoading} from 'bespoke-client-util'
+import {Lang, Markdown, MaskLoading} from 'bespoke-client-util'
+import {Api} from '../util'
 import {RouteComponentProps} from 'react-router'
 
 export function Info({history, match: {params: {gameId}}}: RouteComponentProps<{ gameId: string }>) {

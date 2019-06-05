@@ -1,7 +1,14 @@
 import * as React from 'react'
 import {IElfCreateProps} from 'elf-linker'
 import {FrameEmitter, IGameWithId, TGameState, TPlayerState} from 'bespoke-common'
-import {Fetcher} from '.'
+
+export interface IFetcher<FetchType> {
+    buildGetUrl(type: FetchType, params?: {}): string;
+    getFromGame(type: FetchType, params?: {}): any;
+    postToGame(type: FetchType, params?: {}): any;
+    getFromNamespace(type: FetchType, params?: {}): any;
+    postToNamespace(type: FetchType, params?: {}): any;
+}
 
 export interface IGameTemplate {
     namespace?: string
@@ -22,7 +29,7 @@ export namespace Core {
     interface ICreateProps<ICreateParams, FetchType> {
         params: Partial<ICreateParams>
         setParams: (newParams: Partial<ICreateParams>) => void
-        fetcher?: Fetcher<FetchType>
+        fetcher?: IFetcher<FetchType>
         submitable?: boolean
         setSubmitable?: (submitable: boolean) => void
     }
@@ -33,20 +40,20 @@ export namespace Core {
 
     export interface IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> extends Partial<ITravelState<IGameState, IPlayerState, MoveType, IMoveParams>> {
         game: IGameWithId<ICreateParams>,
-        fetcher: Fetcher<FetchType>
+        fetcher: IFetcher<FetchType>
         frameEmitter?: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
         playerState: TPlayerState<IPlayerState>
     }
 
     interface IPlay4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> extends Partial<ITravelState<IGameState, IPlayerState, MoveType, IMoveParams>> {
         game: IGameWithId<ICreateParams>,
-        fetcher: Fetcher<FetchType>
+        fetcher: IFetcher<FetchType>
         frameEmitter?: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
     }
 
     interface IResult4PlayerProps<ICreateParams, IGameState, IPlayerState, FetchType> {
         game: IGameWithId<ICreateParams>
-        fetcher: Fetcher<FetchType>
+        fetcher: IFetcher<FetchType>
         gameState: TGameState<IGameState>,
         playerState: TPlayerState<IPlayerState>
     }
@@ -61,7 +68,7 @@ export namespace Core {
 
     interface IResult4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams, FetchType> {
         game: IGameWithId<ICreateParams>,
-        fetcher: Fetcher<FetchType>
+        fetcher: IFetcher<FetchType>
         travelStates: Array<ITravelState<IGameState, IPlayerState, MoveType, IMoveParams>>
     }
 

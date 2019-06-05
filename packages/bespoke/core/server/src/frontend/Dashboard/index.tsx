@@ -2,7 +2,8 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {IGameThumb} from 'bespoke-common'
 import {RouteComponentProps} from 'react-router-dom'
-import {Api, Lang} from 'bespoke-client-util'
+import {Lang} from 'bespoke-client-util'
+import {Api} from '../util'
 import * as dateFormat from 'dateformat'
 
 declare interface IDashboardState {
@@ -48,7 +49,7 @@ export class Dashboard extends React.Component<RouteComponentProps<{}>, IDashboa
                 {
                     historyGameThumbs.map(({id, namespace, title, createAt}) =>
                         <li key={id}
-                            onClick={()=>history.push(`/${namespace}/play/${id}`)}
+                            onClick={() => history.push(`/${namespace}/play/${id}`)}
                         >
                             {title}
                             <span className={style.timestamp}>{dateFormat(createAt, 'yyyy-mm-dd')}</span>

@@ -1,9 +1,9 @@
-import {config, baseEnum, IGameThumb} from 'bespoke-common'
-import {Request, Response, NextFunction} from 'express'
+import {baseEnum, config, IGameThumb} from 'bespoke-common'
+import {NextFunction, Request, Response} from 'express'
 import * as passport from 'passport'
 import {elfSetting} from 'elf-setting'
-import {Log, RedisKey, redisClient, Token, Setting} from '../util'
-import {GameModel, UserModel, UserDoc, MoveLogModel, SimulatePlayerModel} from '../model'
+import {Log, redisClient, RedisKey, Setting, Token} from '../util'
+import {GameModel, MoveLogModel, SimulatePlayerModel, UserDoc, UserModel} from '../model'
 import {AnyController, GameLogic} from '../service/GameLogic'
 import GameDAO from '../service/GameDAO'
 import UserService from '../service/UserService'
@@ -16,7 +16,10 @@ export class UserCtrl {
     static async renderApp(req, res: Response) {
         const chunk = fs.readFileSync(path.resolve(__dirname, `../../../dist/index.html`)).toString()
         res.set('content-type', 'text/html')
-        res.end(chunk + `<script type="text/javascript" src="${Setting.getClientPath()}"></script>`)
+        res.end(
+            `<script type="text/javascript">window['NAMESPACE']="${Setting.namespace}"</script>` +
+            chunk +
+            `<script type="text/javascript" src="${Setting.getClientPath()}"></script>`)
     }
 
     static hasLogin(req, res: Response, next: NextFunction) {

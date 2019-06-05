@@ -2,7 +2,8 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {RouteComponentProps} from 'react-router'
 import {baseEnum, config} from 'bespoke-common'
-import {Toast, Api, Lang} from 'bespoke-client-util'
+import {Lang, Toast} from 'bespoke-client-util'
+import {Api} from '../util'
 import {connCtx, rootContext, TRootCtx} from '../context'
 
 declare interface ILoginState {

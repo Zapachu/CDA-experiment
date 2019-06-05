@@ -12,8 +12,9 @@ import {
 } from 'bespoke-common'
 import * as style from './style.scss'
 import {decode} from 'msgpack-lite'
-import {MaskLoading, Lang, Api, Fetcher} from 'bespoke-client-util'
+import {MaskLoading, Lang, IFetcher} from 'bespoke-client-util'
 import {connCtx, rootContext, TRootCtx} from '../context'
+import {Api, buildFetcher} from '../util'
 import {connect} from 'socket.io-client'
 import {applyChange, Diff} from 'deep-diff'
 import * as queryString from 'query-string'
@@ -27,7 +28,7 @@ declare interface IPlayState {
     gameState?: TGameState<{}>
     playerState?: TPlayerState<{}>
     playerStates: { [token: string]: TPlayerState<{}> }
-    fetcher?: Fetcher<any>
+    fetcher?: IFetcher<any>
     socketClient?: TSocket
     frameEmitter?: FrameEmitter<any, any, any, any>
 }
@@ -54,7 +55,7 @@ export class Play extends React.Component<TRootCtx & RouteComponentProps<{ gameI
         this.registerStateReducer(socketClient)
         this.setState(() => ({
             game,
-            fetcher: new Fetcher<any>(game.namespace, game.id),
+            fetcher: buildFetcher(game.id),
             socketClient,
             frameEmitter: new FrameEmitter(socketClient as any)
         }), () =>

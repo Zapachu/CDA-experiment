@@ -4,8 +4,9 @@ import * as style from './style.scss'
 import {connCtx, rootContext, TRootCtx} from '../context'
 import {GameInfo} from './GameInfo'
 import {HistoryGame} from './HistoryGame'
-import {Button, ButtonProps, Toast, Api, Fetcher, Lang} from 'bespoke-client-util'
-import {IGameConfig, baseEnum} from 'bespoke-common'
+import {Button, ButtonProps, Lang, Toast} from 'bespoke-client-util'
+import {baseEnum, IGameConfig} from 'bespoke-common'
+import {Api, buildFetcher} from '../util'
 
 const SubmitBarHeight = '5rem'
 
@@ -72,7 +73,7 @@ export class Create extends React.Component<RouteComponentProps<{ namespace: str
             <div className={style.bespokeWrapper}>
                 <Create {...{
                     params: game.params,
-                    fetcher: new Fetcher<any>(namespace),
+                    fetcher: buildFetcher(namespace),
                     setParams: newParams => this.setState({game: {...game, params: {...game.params, ...newParams}}}),
                     submitable,
                     setSubmitable: submitable => this.setSubmitable(submitable)

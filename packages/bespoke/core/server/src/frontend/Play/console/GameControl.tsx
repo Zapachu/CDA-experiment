@@ -1,7 +1,8 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {baseEnum, FrameEmitter, IGameWithId, ISimulatePlayer, TGameState, TPlayerState} from 'bespoke-common'
-import {Api, Lang, Button, ButtonProps} from 'bespoke-client-util'
+import {Button, ButtonProps, Lang} from 'bespoke-client-util'
+import {Api} from '../../util'
 
 const {notStarted, started, paused, over} = baseEnum.GameStatus
 
@@ -26,8 +27,8 @@ export class GameControl extends React.Component<IGameControlProps> {
         resume: ['恢复', 'RESUME'],
         stop: ['结束', 'OVER'],
         GameOver: ['实验结束', 'GAME OVER'],
-        onlinePlayers:['当前在线人数','Online Players'],
-        players:['实验成员','Players']
+        onlinePlayers: ['当前在线人数', 'Online Players'],
+        players: ['实验成员', 'Players']
     })
     gameStatusMachine = {
         [notStarted]: [

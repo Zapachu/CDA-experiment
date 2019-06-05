@@ -1,3 +1,4 @@
+declare let NAMESPACE:string
 declare module '*.scss' {
     interface IClassNames {
         [className: string]: string

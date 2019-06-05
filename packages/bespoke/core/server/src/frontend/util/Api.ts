@@ -1,4 +1,5 @@
-import {config, baseEnum, Request} from 'bespoke-common'
+import {baseEnum, config, Request} from 'bespoke-common'
+import {IFetcher} from 'bespoke-client-util'
 
 const baseFetchOption = {
     credentials: 'include',
@@ -27,6 +28,31 @@ async function request(url, method: baseEnum.RequestMethod = baseEnum.RequestMet
 }
 
 export const Api = new Request(
+    NAMESPACE,
     async (url: string) => await request(url),
     async (url: string, data = {}) => await request(url, baseEnum.RequestMethod.POST, data)
 )
+
+export function buildFetcher<FetchType>(gameId: string): IFetcher<FetchType> {
+    return {
+        buildGetUrl(type: FetchType, params = {}): string {
+            return Api.buildUrl('/pass2Game/:gameId', {gameId}, {type, ...params})
+        },
+
+        getFromGame(type: FetchType, params = {}) {
+            return Api.getFromGame(gameId, type.toString(), params)
+        },
+
+        postToGame(type: FetchType, params = {}) {
+            return Api.postToGame(gameId, type.toString(), params)
+        },
+
+        getFromNamespace(type: FetchType, params = {}) {
+            return Api.getFromNamespace(type.toString(), params)
+        },
+
+        postToNamespace(type: FetchType, params = {}) {
+            return Api.postToNamespace(type.toString(), params)
+        }
+    }
+}

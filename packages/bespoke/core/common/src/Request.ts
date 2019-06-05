@@ -7,26 +7,22 @@ interface IHttpRes {
     code: baseEnum.ResponseCode
 }
 
-export function buildUrl(pathFragment: string, params = {}, query = {}, namespace = ''): string {
-    let path = `/${config.rootName}/${namespace ? `${namespace}/` : ''}${config.apiPrefix}${pathFragment}`
-    if (params) {
-        path = path.replace(/:([\w\d]+)/, (matchedParam, paramName) => params[paramName])
-    }
-    return `${path}?${queryString.stringify(query)}`
-}
-
 export class Request {
     private readonly get: (path: string, params?: {}, query?: {}) => Promise<any>
     private readonly post: (path: string, params?: {}, query?: {}, data?: {}) => Promise<any>
-    private readonly get_nsp: (namespace: string, path: string, params?: {}, query?: {}) => Promise<any>
-    private readonly post_nsp: (namespace: string, path: string, params?: {}, query?: {}, data?: {}) => Promise<any>
 
-    constructor(get: (url: string) => Promise<any>,
+    constructor(public namespace:string, get: (url: string) => Promise<any>,
                 post: (url: string, data?: {}) => Promise<any>) {
-        this.get = async (path, params, query) => await get(buildUrl(path, params, query))
-        this.post = async (path, params, query, data) => await post(buildUrl(path, params, query), data)
-        this.get_nsp = async (namespace, path, params, query) => await get(buildUrl(path, params, query, namespace))
-        this.post_nsp = async (namespace, path, params, query, data) => await post(buildUrl(path, params, query, namespace), data)
+        this.get = async (path, params, query) => await get(this.buildUrl(path, params, query))
+        this.post = async (path, params, query, data) => await post(this.buildUrl(path, params, query), data)
+    }
+
+    buildUrl(pathFragment: string, params = {}, query = {}): string {
+        let path = `/${config.rootName}/${this.namespace}/${config.apiPrefix}${pathFragment}`
+        if (params) {
+            path = path.replace(/:([\w\d]+)/, (matchedParam, paramName) => params[paramName])
+        }
+        return `${path}?${queryString.stringify(query)}`
     }
 
     //region /
@@ -89,24 +85,23 @@ export class Request {
     //endregion
     //region /namespace
     async getGame(gameId: string): Promise<IHttpRes & { game: IGameWithId<any> }> {
-        const {namespace} = await this.getNamespace(gameId)
-        return await this.get_nsp(namespace, '/game/:gameId', {gameId})
+        return await this.get('/game/:gameId', {gameId})
     }
 
-    async getFromNamespace(namespace: string, type: string, params: {}) {
-        return await this.get_nsp(namespace, `/pass2Namespace`, null, {type, ...params})
+    async getFromNamespace(type: string, params: {}) {
+        return await this.get(`/pass2Namespace`, null, {type, ...params})
     }
 
-    async postToNamespace(namespace: string, type: string, params: {}) {
-        return await this.post_nsp(namespace, `/pass2Namespace`, null, {type, ...params})
+    async postToNamespace(type: string, params: {}) {
+        return await this.post(`/pass2Namespace`, null, {type, ...params})
     }
 
-    async getFromGame(namespace: string, gameId: string, type: string, params: {}) {
-        return await this.get_nsp(namespace, `/pass2Game/:gameId`, {gameId}, {type, ...params})
+    async getFromGame(gameId: string, type: string, params: {}) {
+        return await this.get(`/pass2Game/:gameId`, {gameId}, {type, ...params})
     }
 
-    async postToGame(namespace: string, gameId: string, type: string, params: {}) {
-        return await this.post_nsp(namespace, `/pass2Game/:gameId`, {gameId}, {type, ...params})
+    async postToGame(gameId: string, type: string, params: {}) {
+        return await this.post(`/pass2Game/:gameId`, {gameId}, {type, ...params})
     }
 
     //endregion
