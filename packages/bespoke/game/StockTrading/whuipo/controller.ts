@@ -195,6 +195,9 @@ export default class RouterController {
     @catchError
     static async isLogined(req: Request, res: Response, next: NextFunction) {
         if (!req.isAuthenticated()) {
+            if (!['get', 'post'].includes(req.method.toLowerCase())) {
+                throw new Error('')
+            }
             const key = req.sessionID
             let user = await User.findOne({ unionId: key })
             if (!user) {
