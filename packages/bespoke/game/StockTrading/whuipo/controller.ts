@@ -196,7 +196,7 @@ export default class RouterController {
     static async isLogined(req: Request, res: Response, next: NextFunction) {
         if (!req.isAuthenticated()) {
             if (!['get', 'post'].includes(req.method.toLowerCase())) {
-                throw new Error('')
+                throw new Error('非法请求')
             }
             const key = req.sessionID
             let user = await User.findOne({ unionId: key })
@@ -214,7 +214,7 @@ export default class RouterController {
 
     @catchError
     static async renderIndex(req: Request, res: Response, next: NextFunction) {
-        res.sendfile(path.resolve(__dirname, './dist/index.html'))
+        res.sendFile(process.env.NODE_ENV === 'production' ? path.resolve(__dirname, '../dist/index.html') : path.resolve(__dirname, './dist/index.html'))
     }
 
     @catchError
