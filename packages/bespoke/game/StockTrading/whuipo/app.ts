@@ -101,9 +101,7 @@ const redisClient = new Redis({
   host: settings.redishost,
 })
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+
 app.use(compression());
 // app.use(cookieParser())
 // uncomment after placing your favicon in /public

@@ -32,6 +32,7 @@ function catchError(target: any, key: string, descriptor: PropertyDescriptor) {
         try {
             await func(req, res, next)
         } catch (e) {
+            console.error(e)
             res.json({
                 code: ResCode.unexpectError,
                 msg: e.message
@@ -195,6 +196,9 @@ export default class RouterController {
     @catchError
     static async isLogined(req: Request, res: Response, next: NextFunction) {
         if (!req.isAuthenticated()) {
+            if (!['get', 'post'].includes(req.method.toLowerCase())) {
+                throw new Error('非法请求')
+            }
             const key = req.sessionID
             let user = await User.findOne({ unionId: key })
             if (!user) {
@@ -211,7 +215,7 @@ export default class RouterController {
 
     @catchError
     static async renderIndex(req: Request, res: Response, next: NextFunction) {
-        res.sendfile(path.resolve(__dirname, './dist/index.html'))
+        res.sendFile(process.env.NODE_ENV === 'production' ? path.resolve(__dirname, '../dist/index.html') : path.resolve(__dirname, './dist/index.html'))
     }
 
     @catchError
@@ -247,6 +251,7 @@ export function handleSocketInit(ioServer: Socket.Server) {
                     console.log('没有登陆')
                     return
                 }
+                console.log(`请求者uid:${socket.request.user._id}`)
                 const uid = socket.request.user._id
                 const {isGroupMode, gamePhase} = msg
                 const userGameData = await RedisTools.getUserGameData(uid, gamePhase)
