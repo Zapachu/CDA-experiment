@@ -66,7 +66,7 @@ export default class IntroStage extends Core.Play<
     return (
       <section className={style.introStage}>
         <Line
-          text={type === IPOType.Median ? "IPO中位数定价" : "IPO荷兰式拍卖"}
+          text={type === IPOType.Median ? "IPO中位数定价" : "IPO荷兰式定价"}
           style={{ marginBottom: "20px" }}
         />
         <Loading label={""} />
