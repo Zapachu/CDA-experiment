@@ -176,7 +176,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             <>
                 <Line
                     text={"交易结果展示"}
-                    style={{margin: "auto", width: "400px", marginTop: "30px", marginBottom: "20px"}}
+                    style={{margin: "auto", maxWidth: "400px", marginTop: "70px", marginBottom: "20px"}}
                 />
                 <ul>
                     {listData.map(({label, value, red}) => {
@@ -198,7 +198,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                     color={Line.Color.White}
                     style={{
                         margin: "auto",
-                        width: "400px",
+                        maxWidth: "400px",
                         marginTop: "20px",
                         marginBottom: "20px"
                     }}
@@ -232,7 +232,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         } = this
         return <>
             <Stock/>
-            <Button
+            {/* <Button
                 style={{position: 'absolute', top: '30%', right: '10%'}}
                 onClick={this.showRule}
                 color={Button.Color.Blue}
@@ -243,7 +243,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 onClick={this.showTBMRule}
                 color={Button.Color.Blue}
                 label={`集合竞价知识扩展`}
-            />
+            /> */}
             <div className={style.workBox}>
                 <div className={style.tipText}>
                     <Line text={` ${this.dynamicTip()} `}/>
@@ -282,18 +282,20 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
 
             {this.renderStage()}
 
+            <div className={style.tradeBtn}>
             <Button
-                style={{position: 'absolute', top: '30%', right: '10%'}}
                 onClick={this.showRule}
                 color={Button.Color.Blue}
                 label={`交易规则回顾`}
             />
+            </div>
+            <div className={style.tbmBtn}>
             <Button
-                style={{position: 'absolute', top: '35%', right: '10%'}}
                 onClick={this.showTBMRule}
                 color={Button.Color.Blue}
                 label={`集合竞价知识扩展`}
             />
+            </div>
 
             <Modal
                 visible={showRule}
