@@ -163,7 +163,8 @@ const gamePhaseOrder = {
     [Phase.IPO_Median]: 1,
     [Phase.IPO_TopK]: 1,
     [Phase.TBM]: 2,
-    [Phase.CBM]: 3
+    [Phase.CBM]: 3,
+    [Phase.CBM_Leverage]: 3
 }
 
 RedisCall.handle<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, async ({playUrl, onceMore, phase}) => {
@@ -319,7 +320,7 @@ export function handleSocketInit(ioServer: Socket.Server) {
                     const userSockets = removeUserSocket(uid, socket.id)                
                     
                     if (userSockets.length === 0) {
-                        const games = [Phase.CBM, Phase.IPO_Median, Phase.IPO_TopK, Phase.TBM]
+                        const games = [Phase.CBM, Phase.CBM_Leverage, Phase.CBM_Leverage, Phase.IPO_Median, Phase.IPO_TopK, Phase.TBM, ]
                         const tasks = games.map(async (game: Phase) => {
                             const userGameData = await RedisTools.getUserGameData(uid, game)
                             if (!userGameData) {

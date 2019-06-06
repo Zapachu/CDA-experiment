@@ -17,7 +17,8 @@ export enum GameTypes {
     IPO_Median,
     IPO_TopK,
     TBM,
-    CBM
+    CBM,
+    CBM_Leverage
 }
 
 export enum ResCode {
