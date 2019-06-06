@@ -197,6 +197,7 @@ export default class RouterController {
     @catchError
     static async isLogined(req: Request, res: Response, next: NextFunction) {
         if (!req.isAuthenticated()) {
+            console.log('未登录 sessionId: ', req.sessionID)
             if (!['get', 'post'].includes(req.method.toLowerCase())) {
                 throw new Error('非法请求')
             }
@@ -233,7 +234,7 @@ export function handleSocketPassportSuccess(data, cb) {
 }
 
 export function handleSocketPassportFailed(data, msg, error, cb) {
-    console.error(error, 'error')
+    console.error('soket passport failed: error:', msg)
     cb(null, true)
 }
 
@@ -241,17 +242,17 @@ export function handleSocketInit(ioServer: Socket.Server) {
     ioServer.on('connection', function (socket) {
         console.log('connected')
         const user = socket.request.user
-        if (socket.request.isAuthenticated()) {
+        if (socket.request.user.logged_in) {
             pushUserSocket(user._id, socket.id)
         }
         socket.on(serverSocketListenEvents.reqStartGame, async function (msg: {isGroupMode: boolean, gamePhase: Phase}) {
             try {
                 console.log('req Start msg: ');
                 console.log(msg)
-                if (!socket.request.isAuthenticated()) {
-                    console.log('没有登陆')
-                    return
+                if (!socket.request.user.logged_in) {
+                    throw new Error('没有登陆')
                 }
+                console.log(socket.request.isAuthenticated, socket.request.isAuthenticated())
                 console.log(`请求者uid:${socket.request.user._id}`)
                 const uid = socket.request.user._id
                 const {isGroupMode, gamePhase} = msg
@@ -267,7 +268,7 @@ export function handleSocketInit(ioServer: Socket.Server) {
                     const orderOfPhase = gamePhaseOrder[gamePhase]
                     const unblockPhaseLimit = gamePhaseOrder[user.unblockGamePhase]
                     if (orderOfPhase > unblockPhaseLimit + 1) {
-                        return
+                        throw new Error('该游戏尚未解锁')
                     }
                     if (isGroupMode) {
                         joinMatchRoom(gamePhase, user._id)
@@ -289,13 +290,14 @@ export function handleSocketInit(ioServer: Socket.Server) {
                 }
             } catch (e) {
                 console.error(e)
+                handleSocketError(serverSocketListenEvents.reqStartGame, '加入游戏失败!')
             }
 
         });
         socket.on(serverSocketListenEvents.leaveMatchRoom, async function (gamePhase) {
             console.log(' req leave room')
             try {
-                if (socket.request.isAuthenticated()) {
+                if (socket.request.user.logged_in) {
                     const uid = socket.request.user._id
                     const userGameData = await RedisTools.getUserGameData(uid, gamePhase)
                     if (!userGameData) {
@@ -309,13 +311,14 @@ export function handleSocketInit(ioServer: Socket.Server) {
                 }
             } catch (e) {
                 console.error(e)
+                handleSocketError(serverSocketListenEvents.leaveMatchRoom, '取消匹配失败!')
             }
            
         })
         socket.on('disconnect',async function () {
             console.log('dis connect')
             try {
-                if (socket.request.isAuthenticated()) {
+                if (socket.request.user.logged_in) {
                     const uid = socket.request.user._id
                     const userSockets = removeUserSocket(uid, socket.id)                
                     
@@ -340,6 +343,13 @@ export function handleSocketInit(ioServer: Socket.Server) {
             }
            
         })
+
+        function handleSocketError (event: serverSocketListenEvents, msg: string) {
+            socket.emit(clientSocketListenEvnets.handleError, {
+                eventType: event,
+                msg
+            })
+        }
     });
  
 }
@@ -358,3 +368,4 @@ function cbToPromise(func) {
         })
     }
 }
+
