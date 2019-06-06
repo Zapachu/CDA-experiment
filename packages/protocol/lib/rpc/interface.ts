@@ -36,7 +36,7 @@ export namespace SetPhaseResult {
         elfGameId: string
         playUrl: string
         playerToken: string
-        phaseResult: IPhaseResult
+        phaseResult?: IPhaseResult
     }
 
     export type IRes = null
@@ -46,7 +46,7 @@ export namespace SendBackPlayer {
     export const name = 'Elf:SendBackPlayer'
 
     export interface IReq extends SetPhaseResult.IReq {
-        nextPhaseKey: string
+        nextPhaseKey?: string
     }
 
     export interface IRes {

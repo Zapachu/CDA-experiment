@@ -37,7 +37,7 @@ export function gameId2PlayUrl(gameId: string, keyOrToken?: string): string {
     return `${domain}/${config.rootName}/${Setting.namespace}/play/${gameId}${query}`
 }
 
-export function heartBeat(key: string, value: any, seconds: number = config.heartBeatSeconds) {
+export function heartBeat(key: string, value: string, seconds: number = config.heartBeatSeconds) {
     (async function foo() {
         await redisClient.setex(key, seconds + 1, value)
         setTimeout(foo, seconds * 1e3)

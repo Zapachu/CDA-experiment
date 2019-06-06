@@ -143,7 +143,7 @@ export class Server {
             namespace: Setting.namespace,
             jsUrl: `${elfSetting.proxyOrigin}/${config.rootName}/static/bespoke-client-util.min.js;${elfSetting.proxyOrigin}${Setting.getClientPath()}`
         }
-        heartBeat(PhaseReg.key(Setting.namespace), regInfo)
+        heartBeat(PhaseReg.key(Setting.namespace), JSON.stringify(regInfo))
     }
 
     static start(gameSetting: IGameSetting, logicTemplate: ILogicTemplate, bespokeRouter: Express.Router = Express.Router()) {
