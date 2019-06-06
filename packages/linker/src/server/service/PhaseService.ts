@@ -7,7 +7,9 @@ export class PhaseService {
     static async getPhaseTemplates(userId?: string): Promise<Array<PhaseReg.IRegInfo>> {
         const phaseTemplates: Array<PhaseReg.IRegInfo> = []
         const registeredPhaseKeys: Array<string> = await redisClient.keys(PhaseReg.key('*'))
-        registeredPhaseKeys.forEach(async key => phaseTemplates.push(JSON.parse(await redisClient.get(key))))
+        for(let key of registeredPhaseKeys){
+            phaseTemplates.push(JSON.parse(await redisClient.get(key)))
+        }
         if (!elfSetting.inProductEnv || !userId) {
             return phaseTemplates
         }

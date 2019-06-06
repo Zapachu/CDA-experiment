@@ -25,7 +25,7 @@ export namespace RedisCall {
 
     function _handle<IReq, IRes>(method: string, handler: (req: IReq) => Promise<IRes>, redis: IORedis.Redis) {
         redis.blpop(getServiceKey(method), 0 as any).then(async ([, reqText]) => {
-            Log.i(`REQ:${method}`, reqText)
+            Log.i(method, reqText)
             const reqPack: IReqPack<IReq> = JSON.parse(reqText)
             const res = await handler(reqPack.params)
             redis.rpush(reqPack.key, JSON.stringify(res))

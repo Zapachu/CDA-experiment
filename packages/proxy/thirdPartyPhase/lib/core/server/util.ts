@@ -12,7 +12,7 @@ export function withLinker(namespace: string, proxyOrigin: string, getUrlByNames
         return {playUrl: await getUrlByNamespace(req)}
     })
     setInterval(() => {
-        const manifest = JSON.parse(readFileSync(resolve(__dirname, '../../../../dist/manifest.json')).toString())
+        const manifest = JSON.parse(readFileSync(resolve(__dirname, '../../../dist/manifest.json')).toString())
         const regPhase: PhaseReg.IRegInfo = {
             namespace: namespace,
             jsUrl: `${proxyOrigin}${manifest[`${namespace}.js`]}`

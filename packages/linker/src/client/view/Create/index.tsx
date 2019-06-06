@@ -102,7 +102,9 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
         const {Create} = phaseTemplates[phaseConfig.namespace]
         return <section style={{
             maxWidth: '64rem',
-            margin: 'auto'
+            margin: '1rem auto',
+            padding:'1rem 1.5rem',
+            background:'white'
         }}>
             <br/>
             <Input value={title}

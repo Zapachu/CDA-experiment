@@ -32,9 +32,12 @@ export class Token {
 
 export function gameId2PlayUrl(gameId: string, keyOrToken?: string): string {
     const query = keyOrToken ? `?token=${Token.checkToken(keyOrToken) ? keyOrToken : Token.geneToken(keyOrToken)}` : ''
-    const domain = elfSetting.bespokeWithProxy ? elfSetting.proxyOrigin :
+    return `${getOrigin()}/${config.rootName}/${Setting.namespace}/play/${gameId}${query}`
+}
+
+export function getOrigin(): string {
+    return elfSetting.bespokeWithProxy ? elfSetting.proxyOrigin :
         `http://${Setting.ip}:${elfSetting.bespokeHmr ? config.devPort.client : Setting.port}`
-    return `${domain}/${config.rootName}/${Setting.namespace}/play/${gameId}${query}`
 }
 
 export function heartBeat(key: string, value: string, seconds: number = config.heartBeatSeconds) {

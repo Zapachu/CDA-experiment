@@ -13,7 +13,7 @@ import * as bodyParser from 'body-parser'
 import * as compression from 'compression'
 import * as morgan from 'morgan'
 import {elfSetting} from 'elf-setting'
-import {gameId2PlayUrl, heartBeat, Log, QCloudSMS, RedisKey, Setting} from './util'
+import {gameId2PlayUrl, getOrigin, heartBeat, Log, QCloudSMS, RedisKey, Setting} from './util'
 import {baseEnum, config, IGameConfig, IGameSetting} from 'bespoke-common'
 import {EventDispatcher} from './controller/eventDispatcher'
 import {router} from './controller/requestRouter'
@@ -141,7 +141,7 @@ export class Server {
         })
         const regInfo: PhaseReg.IRegInfo = {
             namespace: Setting.namespace,
-            jsUrl: `${elfSetting.proxyOrigin}/${config.rootName}/static/bespoke-client-util.min.js;${elfSetting.proxyOrigin}${Setting.getClientPath()}`
+            jsUrl: `${getOrigin()}/${config.rootName}/static/bespoke-client-util.min.js;${getOrigin()}${Setting.getClientPath()}`
         }
         heartBeat(PhaseReg.key(Setting.namespace), JSON.stringify(regInfo))
     }
