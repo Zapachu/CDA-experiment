@@ -1,8 +1,9 @@
 import {baseEnum, config, IGameThumb} from 'bespoke-common'
+import {redisClient} from 'elf-protocol'
 import {Request, Response} from 'express'
 import * as passport from 'passport'
 import {elfSetting} from 'elf-setting'
-import {Log, redisClient, RedisKey, Setting, Token} from '../util'
+import {Log, RedisKey, Setting, Token} from '../util'
 import {GameModel, MoveLogModel, SimulatePlayerModel, UserDoc, UserModel} from '../model'
 import {AnyController, GameLogic} from '../service/GameLogic'
 import GameDAO from '../service/GameDAO'
@@ -220,7 +221,10 @@ export class GameCtrl {
     static async getHistoryGameThumbs(req, res) {
         const {user} = req
         try {
-            const historyGameThumbs: Array<IGameThumb> = (await GameModel.find({owner: user.id, namespace:Setting.namespace})
+            const historyGameThumbs: Array<IGameThumb> = (await GameModel.find({
+                owner: user.id,
+                namespace: Setting.namespace
+            })
                 .limit(historyGamesListSize)
                 .sort({createAt: -1})).map(({id, namespace, title, createAt}) => ({id, namespace, title, createAt}))
             res.json({

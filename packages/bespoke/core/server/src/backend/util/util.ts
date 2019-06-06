@@ -5,6 +5,7 @@ import {resolve} from 'path'
 import {readFileSync} from 'fs'
 import * as objHash from 'object-hash'
 import {NetworkInterfaceInfo, networkInterfaces} from 'os'
+import {redisClient} from 'elf-protocol'
 
 export class Token {
     private static geneCheckCode(chars: string[]) {
@@ -36,10 +37,10 @@ export function gameId2PlayUrl(gameId: string, keyOrToken?: string): string {
     return `${domain}/${config.rootName}/${Setting.namespace}/play/${gameId}${query}`
 }
 
-export function heartBeat(fn: () => void | Promise<void>) {
+export function heartBeat(key: string, value: any, seconds: number = config.heartBeatSeconds) {
     (async function foo() {
-        await fn()
-        setTimeout(foo, config.heartBeatSeconds * 1e3)
+        await redisClient.setex(key, seconds + 1, value)
+        setTimeout(foo, seconds * 1e3)
     })()
 }
 
@@ -70,7 +71,6 @@ export class Setting {
     static staticPath: string
     private static _ip: string
     private static _port: number
-    private static _rpcPort: number
 
     static get ip() {
         return this._ip
@@ -80,25 +80,15 @@ export class Setting {
         return this._port
     }
 
-    static get rpcPort() {
-        return this._rpcPort
-    }
-
     static setPort(port: number) {
         this._port = port
         Log.i(`Listening on port ${port}`)
-    }
-
-    static setRpcPort(rpcPort: number) {
-        this._rpcPort = rpcPort
-        Log.i(`Serving on rpcPort ${rpcPort}`)
     }
 
     static init(setting: IGameSetting) {
         this.namespace = setting.namespace
         this.staticPath = setting.staticPath
         this._port = setting.port || (elfSetting.inProductEnv ? 0 : config.devPort.server)
-        this._rpcPort = setting.rpcPort || 0
         Log.init(setting.logPath || resolve(setting.staticPath, '../log'))
         Object.values<NetworkInterfaceInfo[]>(networkInterfaces()).forEach(infos => {
             infos.forEach(({family, internal, address}) => {

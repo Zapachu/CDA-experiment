@@ -1,16 +1,12 @@
-import {
-    TGameState,
-    IGameWithId,
-    TPlayerState,
-    IGameConfig
-} from 'bespoke-common'
+import {IGameConfig, IGameWithId, TGameState, TPlayerState} from 'bespoke-common'
 import {elfSetting} from 'elf-setting'
-import {cacheResult, Log, redisClient, RedisKey, Setting} from '../util'
-import {GameModel, GameDoc} from '../model'
+import {redisClient} from 'elf-protocol'
+import {cacheResult, Log, RedisKey, Setting} from '../util'
+import {GameDoc, GameModel} from '../model'
 
 export default class GameDAO {
 
-    static async newGame<ICreateParams>(owner:string, gameConfig: IGameConfig<ICreateParams>){
+    static async newGame<ICreateParams>(owner: string, gameConfig: IGameConfig<ICreateParams>) {
         try {
             const newGame = await GameModel.create({...gameConfig, owner, namespace: Setting.namespace})
             return newGame.id

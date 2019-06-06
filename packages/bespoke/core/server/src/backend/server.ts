@@ -13,17 +13,17 @@ import * as bodyParser from 'body-parser'
 import * as compression from 'compression'
 import * as morgan from 'morgan'
 import {elfSetting} from 'elf-setting'
-import {heartBeat, Log, QCloudSMS, redisClient, RedisKey, Setting} from './util'
+import {gameId2PlayUrl, heartBeat, Log, QCloudSMS, RedisKey, Setting} from './util'
 import {baseEnum, config, IGameConfig, IGameSetting} from 'bespoke-common'
 import {EventDispatcher} from './controller/eventDispatcher'
 import {router} from './controller/requestRouter'
 import {GameLogic, ILogicTemplate} from './service/GameLogic'
 import GameDAO from './service/GameDAO'
-import {serve as serveRPC} from './rpc'
 import {AddressInfo} from 'net'
-import {UserDoc, UserModel} from './model'
+import {GameModel, UserDoc, UserModel} from './model'
 import {Strategy} from 'passport-local'
 import * as http from 'http'
+import {NewPhase, PhaseReg, RedisCall, redisClient} from 'elf-protocol'
 
 export class Server {
     private static sessionMiddleware
@@ -127,6 +127,25 @@ export class Server {
             })
     }
 
+    static withLinker() {
+        RedisCall.handle<NewPhase.IReq, NewPhase.IRes>(NewPhase.name(Setting.namespace), async ({elfGameId, owner, namespace, param}) => {
+            const {id} = await GameModel.create({
+                title: '',
+                desc: '',
+                owner,
+                elfGameId,
+                namespace,
+                params: JSON.parse(param)
+            })
+            return {playUrl: gameId2PlayUrl(id)}
+        })
+        const regInfo: PhaseReg.IRegInfo = {
+            namespace: Setting.namespace,
+            jsUrl: `${elfSetting.proxyOrigin}/${config.rootName}/static/bespoke-client-util.min.js;${elfSetting.proxyOrigin}${Setting.getClientPath()}`
+        }
+        heartBeat(PhaseReg.key(Setting.namespace), regInfo)
+    }
+
     static start(gameSetting: IGameSetting, logicTemplate: ILogicTemplate, bespokeRouter: Express.Router = Express.Router()) {
         Setting.init(gameSetting)
         this.initSessionMiddleware()
@@ -139,13 +158,9 @@ export class Server {
         EventDispatcher.startGameSocket(server).use(socketIOSession(this.sessionMiddleware))
         this.bindServerListener(server, () => {
             Log.i(`Running at：http://${Setting.ip}:${elfSetting.bespokeHmr ? config.devPort.client : Setting.port}/${config.rootName}/${Setting.namespace}`)
-            heartBeat(async () => await redisClient.setex(
-                RedisKey.gameServer(Setting.namespace),
-                config.heartBeatSeconds + 1,
-                `${Setting.ip}:${Setting.port}`
-            ))
+            heartBeat(RedisKey.gameServer(Setting.namespace), `${Setting.ip}:${Setting.port}`)
             if (elfSetting.bespokeWithLinker) {
-                serveRPC()
+                this.withLinker()
             }
         })
     }
