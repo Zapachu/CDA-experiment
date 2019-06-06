@@ -17,5 +17,6 @@ export enum serverSocketListenEvents {
 export enum clientSocketListenEvnets {
     startMatch = 'startMatch',
     startGame = 'startGame',
-    continueGame = 'continueGame'
+    continueGame = 'continueGame',
+    handleError = 'handleError' 
 }
