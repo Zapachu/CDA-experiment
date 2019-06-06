@@ -17,7 +17,8 @@ export enum GameTypes {
     IPO_Median,
     IPO_TopK,
     TBM,
-    CBM
+    CBM,
+    CBM_Leverage
 }
 
 export enum ResCode {
@@ -33,5 +34,6 @@ export enum serverSocketListenEvents {
 export enum clientSocketListenEvnets {
     startMatch = 'startMatch',
     startGame = 'startGame',
-    continueGame = 'continueGame'
+    continueGame = 'continueGame',
+    handleError = 'handleError' 
 }

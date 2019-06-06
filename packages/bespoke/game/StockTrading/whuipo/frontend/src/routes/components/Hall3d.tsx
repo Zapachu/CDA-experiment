@@ -42,24 +42,35 @@ const GamePhaseToStep = {
   [GameTypes.IPO_Median]: GameSteps.center,
   [GameTypes.IPO_TopK]: GameSteps.center,
   [GameTypes.CBM]: GameSteps.left,
+  [GameTypes.CBM_Leverage]: GameSteps.left,
   [GameTypes.TBM]: GameSteps.right
 }
 
 const GameStepsToGamePhase = {
-  [GameSteps.left]: GameTypes.CBM,
+  [GameSteps.left]: [GameTypes.CBM, GameTypes.CBM_Leverage],
   [GameSteps.right]: GameTypes.TBM,
+  [GameSteps.center]: [GameTypes.IPO_TopK, GameTypes.IPO_Median],
 }
 
 const gamePhaseOrder = {
   [GameTypes.IPO_Median]: 1,
   [GameTypes.IPO_TopK]: 1,
   [GameTypes.TBM]: 2,
-  [GameTypes.CBM]: 3
+  [GameTypes.CBM]: 3,
+  [GameTypes.CBM_Leverage]: 3
 }
 
 const gamePhaseVideoSrc = {
   [GameTypes.IPO_TopK]: 'https://qiniu0.anlint.com/video/whuipo/ipohe.mp4',
   [GameTypes.IPO_Median]: 'https://qiniu0.anlint.com/video/whuipo/ipozhong.mp4'
+}
+
+const gamePhaseLabel = {
+  [GameTypes.IPO_Median]: '中位数竞价',
+  [GameTypes.IPO_TopK]: '荷兰竞价',
+  [GameTypes.TBM]: '集合竞价',
+  [GameTypes.CBM]: '连续竞价',
+  [GameTypes.CBM_Leverage]: '连续竞价(杠杆)'
 }
 
 const GameRenderConfigs = {
@@ -221,15 +232,11 @@ class Hall3D extends React.Component<Props, State> {
         const { unblockGamePhase } = user
 
         const userUnBlockGameOrder = gamePhaseOrder[unblockGamePhase] || 0
-        console.log(userUnBlockGameOrder, 'user')
+        console.log(userUnBlockGameOrder, 'user now unlock order')
         Object.keys(GameRenderConfigs).forEach((gameStep) => {
-          let gameStepPhaseOrder = -1
-          if (Number(gameStep) === GameSteps.center) {
-            gameStepPhaseOrder = gamePhaseOrder[GameTypes.IPO_TopK]
-          } else {
+        
             const gamePhase = GameStepsToGamePhase[gameStep]
-            gameStepPhaseOrder = gamePhaseOrder[gamePhase]
-          }
+            const gameStepPhaseOrder = gamePhaseOrder[gamePhase instanceof Array ? gamePhase[0] : gamePhase]
           const isLock = gameStepPhaseOrder > (userUnBlockGameOrder + 1)
           GameRenderConfigs[gameStep].isLock = isLock
         })
@@ -283,12 +290,14 @@ class Hall3D extends React.Component<Props, State> {
         videoNodeRef.pause()
       }
     }
+
     const handleSelectGameMode = (isGroupMode: boolean) => {
       this.io.emit(serverSocketListenEvents.reqStartGame, { isGroupMode, gamePhase: focusGameType })
       this.setState({
         modalContentType: ModalContentTypes.preMatch
       })
     }
+
     if (modalContentType === ModalContentTypes.waittingMatch) {
       return <MatchModal visible={true} totalNum={4} matchNum={matchTimer % 5} timer={matchTimer}></MatchModal>
     }
@@ -298,8 +307,11 @@ class Hall3D extends React.Component<Props, State> {
         {
           modalContentType === ModalContentTypes.selectSubGameType &&
           <div className={style.selectSubGame}>
-            <Button onClick={_ => this.setState({ focusGameType: GameTypes.IPO_Median, modalContentType: ModalContentTypes.selectMode })} label="中位数拍卖"></Button>
-            <Button onClick={_ => this.setState({ focusGameType: GameTypes.IPO_TopK, modalContentType: ModalContentTypes.selectMode })} label="荷兰式拍卖"></Button>
+            {
+              (GameStepsToGamePhase[focusGameStep] as Array<GameTypes> ).map((gameType: GameTypes) => {
+                return   <Button key={gameType} onClick={_ => this.setState({ focusGameType: gameType, modalContentType: ModalContentTypes.selectMode })} label={gamePhaseLabel[gameType]}></Button>
+              })
+            }
           </div>
         }
         {
@@ -455,7 +467,7 @@ class Hall3D extends React.Component<Props, State> {
       {
         trigger: BABYLON.ActionManager.OnPickDownTrigger,
       },
-      this.handleStartGame.bind(this, gameStep)
+      this.handleShowGameModal.bind(this, gameStep)
     ))
     return myGround
   }
@@ -597,18 +609,19 @@ class Hall3D extends React.Component<Props, State> {
       isDetailView: false
     })
   }
-  handleStartGame(gameStep: GameSteps) {
+  handleShowGameModal(gameStep: GameSteps) {
     const { isLock } = GameRenderConfigs[gameStep]
     if (isLock) {
       Toast.warn('尚未解锁！')
       return
     }
     const gameType = GameStepsToGamePhase[gameStep]
+    const isArray = gameType instanceof Array
     this.setState({
       showPreStartModal: true,
-      modalContentType: gameType ? ModalContentTypes.selectMode : ModalContentTypes.selectSubGameType,
+      modalContentType: isArray ?  ModalContentTypes.selectSubGameType : ModalContentTypes.selectMode,
       focusGameStep: gameStep,
-      focusGameType: gameType
+      focusGameType: isArray ? null : (gameType as GameTypes )
     })
   }
   initView() {
@@ -707,6 +720,17 @@ class Hall3D extends React.Component<Props, State> {
         modalContentType: ModalContentTypes.continueGame,
       })
       this.continuePlayUrl = playerUrl
+    })
+    io.on(clientSocketListenEvnets.handleError, (data: {eventType: serverSocketListenEvents, msg: string}) => {
+      const {eventType, msg} = data
+      if (eventType === serverSocketListenEvents.reqStartGame) {
+        // Todo
+        Toast.error(msg)
+      }
+      if (eventType === serverSocketListenEvents.leaveMatchRoom) {
+        // TODO
+        Toast.error(msg)
+      }
     })
   }
   render() {
