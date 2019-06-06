@@ -1,9 +1,10 @@
-import {config, baseEnum, IGameThumb} from 'bespoke-common'
-import {Request, Response, NextFunction} from 'express'
+import {baseEnum, config, IGameThumb} from 'bespoke-common'
+import {redisClient} from 'elf-protocol'
+import {Request, Response} from 'express'
 import * as passport from 'passport'
 import {elfSetting} from 'elf-setting'
-import {Log, RedisKey, redisClient, Token, Setting} from '../util'
-import {GameModel, UserModel, UserDoc, MoveLogModel, SimulatePlayerModel} from '../model'
+import {Log, RedisKey, Setting, Token} from '../util'
+import {GameModel, MoveLogModel, SimulatePlayerModel, UserDoc, UserModel} from '../model'
 import {AnyController, GameLogic} from '../service/GameLogic'
 import GameDAO from '../service/GameDAO'
 import UserService from '../service/UserService'
@@ -16,24 +17,19 @@ export class UserCtrl {
     static async renderApp(req, res: Response) {
         const chunk = fs.readFileSync(path.resolve(__dirname, `../../../dist/index.html`)).toString()
         res.set('content-type', 'text/html')
-        res.end(chunk + `<script type="text/javascript" src="${Setting.getClientPath()}"></script>`)
-    }
-
-    static hasLogin(req, res: Response, next: NextFunction) {
-        req.user ? next() : res.redirect(`/${config.rootName}/login`)
-    }
-
-    static isTeacher(req, res: Response, next: NextFunction) {
-        req.user && req.user.role === baseEnum.AcademusRole.teacher ? next() : res.redirect(`/${config.rootName}/login`)
+        res.end(`<script type="text/javascript">
+Object.assign(window, {
+    NAMESPACE:'${Setting.namespace}',
+    WITH_LINKER:${elfSetting.bespokeWithLinker},
+    PRODUCT_ENV:${elfSetting.inProductEnv}
+})
+</script>` +
+            chunk +
+            `<script type="text/javascript" src="${Setting.getClientPath()}"></script>`)
     }
 
     static async getVerifyCode(req, res) {
         const {query: {nationCode, mobile}} = req
-        if (!UserService.getGameTemplateNamespaces(mobile)) {
-            return res.json({
-                code: baseEnum.ResponseCode.notFound
-            })
-        }
         const sendResult = await UserService.sendVerifyCode(+nationCode, mobile)
         switch (sendResult.code) {
             case UserService.sendVerifyCodeResCode.tooManyTimes:
@@ -131,33 +127,14 @@ export class GameCtrl {
         }
     }
 
-    static async getAccessibleTemplates(req, res: Response) {
-        const {mobile} = req.user
-        const namespaces = UserService.getGameTemplateNamespaces(mobile)
-        res.json(namespaces ? {
-            code: baseEnum.ResponseCode.success,
-            namespaces
-        } : {
-            code: baseEnum.ResponseCode.notFound
-        })
-    }
-
     static async newGame(req, res) {
-        const {namespace, game} = req.body, owner = req.user
-        const gameId = await GameDAO.newGame(namespace, owner, game)
+        const {game} = req.body, owner = req.user
+        const gameId = await GameDAO.newGame(owner, game)
         res.json(gameId ? {
             code: baseEnum.ResponseCode.success,
             gameId
         } : {
             code: baseEnum.ResponseCode.serverError
-        })
-    }
-
-    static async getNamespace(req, res) {
-        const {namespace} = await GameDAO.getGame(req.params.gameId)
-        res.json({
-            code: baseEnum.ResponseCode.success,
-            namespace
         })
     }
 
@@ -242,9 +219,12 @@ export class GameCtrl {
     }
 
     static async getHistoryGameThumbs(req, res) {
-        const {user, query: {namespace}} = req
+        const {user} = req
         try {
-            const historyGameThumbs: Array<IGameThumb> = (await GameModel.find({owner: user.id, ...namespace ? {namespace} : {}})
+            const historyGameThumbs: Array<IGameThumb> = (await GameModel.find({
+                owner: user.id,
+                namespace: Setting.namespace
+            })
                 .limit(historyGamesListSize)
                 .sort({createAt: -1})).map(({id, namespace, title, createAt}) => ({id, namespace, title, createAt}))
             res.json({

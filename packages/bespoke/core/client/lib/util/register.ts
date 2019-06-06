@@ -5,7 +5,7 @@ export function registerOnFramework(namespace: string, gameTemplate: IGameTempla
     gameTemplate.namespace = namespace
     if (window['BespokeServer']) {
         const _registerGame = window['BespokeServer'].registerGame as TRegisterGame
-        _registerGame(namespace, gameTemplate)
+        _registerGame(gameTemplate)
     }
     if (window['ElfLinker']) {
         const phaseTemplate: IPhaseTemplate = {

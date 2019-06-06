@@ -1,6 +1,6 @@
 import {PhaseStatus, PlayerStatus, Actor, AcademusRole} from './baseEnum'
 import {Socket} from 'socket.io-client'
-import {PhaseManager} from 'elf-protocol'
+import {SetPhaseResult} from 'elf-protocol'
 import {baseEnum} from '@common'
 
 export type TSocket = typeof Socket
@@ -25,10 +25,6 @@ export interface IActor {
     playerId: string
 }
 
-export interface IPhaseRegInfo extends PhaseManager.TPhaseRegInfo {
-    rpcUri: string
-}
-
 export interface IPhaseConfig<ICreateParam = {}> {
     namespace: string
     key: string
@@ -40,7 +36,7 @@ export interface IPhaseConfig<ICreateParam = {}> {
 export interface IPlayerState {
     actor: IActor
     status: PlayerStatus
-    phaseResult?: PhaseManager.TPhaseResult
+    phaseResult?: SetPhaseResult.IPhaseResult
 }
 
 export interface IPhaseState {
@@ -128,5 +124,5 @@ export type TApiPlayers = Array<{
     name: string
 }>
 
-export type TApiPlayerResults = Array<{ phaseName: string } & PhaseManager.TPhaseResult>
+export type TApiPlayerResults = Array<{ phaseName: string } & SetPhaseResult.IPhaseResult>
 //endregion

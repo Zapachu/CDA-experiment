@@ -1,25 +1,15 @@
 import * as React from 'react'
-import {RouteComponentProps} from 'react-router-dom'
-import {
-    config,
-    baseEnum,
-    TGameState,
-    TPlayerState,
-    TSocket,
-    FrameEmitter,
-    IActor,
-    IGameWithId
-} from 'bespoke-common'
+import {baseEnum, config, FrameEmitter, IActor, IGameWithId, TGameState, TPlayerState, TSocket} from 'bespoke-common'
 import * as style from './style.scss'
 import {decode} from 'msgpack-lite'
-import {MaskLoading, Lang, Api, Fetcher} from 'bespoke-client-util'
-import {connCtx, rootContext, TRootCtx} from '../context'
+import {IFetcher, Lang, MaskLoading, TPageProps} from 'bespoke-client-util'
+import {Api, buildFetcher} from '../util'
 import {connect} from 'socket.io-client'
 import {applyChange, Diff} from 'deep-diff'
 import * as queryString from 'query-string'
-import cloneDeep = require('lodash/cloneDeep')
 import {GameControl} from './console/GameControl'
 import {GameResult} from './console/GameResult'
+import cloneDeep = require('lodash/cloneDeep')
 
 declare interface IPlayState {
     actor?: IActor
@@ -27,13 +17,12 @@ declare interface IPlayState {
     gameState?: TGameState<{}>
     playerState?: TPlayerState<{}>
     playerStates: { [token: string]: TPlayerState<{}> }
-    fetcher?: Fetcher<any>
+    fetcher?: IFetcher<any>
     socketClient?: TSocket
     frameEmitter?: FrameEmitter<any, any, any, any>
 }
 
-@connCtx(rootContext)
-export class Play extends React.Component<TRootCtx & RouteComponentProps<{ gameId: string }>, IPlayState> {
+export class Play extends React.Component<TPageProps, IPlayState> {
     token = queryString.parse(location.search).token as string
     lang = Lang.extractLang({
         Mask_WaitForGameToStart: ['等待实验开始', 'Waiting for experiment to Start'],
@@ -48,20 +37,20 @@ export class Play extends React.Component<TRootCtx & RouteComponentProps<{ gameI
         const {token, props: {match: {params: {gameId}}}} = this
         const {game} = await Api.getGame(gameId)
         const socketClient = connect('/', {
-            path: config.socketPath(game.namespace),
+            path: config.socketPath(NAMESPACE),
             query: `gameId=${gameId}&token=${token}`
         })
         this.registerStateReducer(socketClient)
         this.setState(() => ({
             game,
-            fetcher: new Fetcher<any>(game.namespace, game.id),
+            fetcher: buildFetcher(game.id),
             socketClient,
             frameEmitter: new FrameEmitter(socketClient as any)
         }), () =>
             socketClient.emit(baseEnum.SocketEvent.online, (actor: IActor) => {
-                if(token && (actor.token !== token)){
+                if (token && (actor.token !== token)) {
                     location.href = `${location.origin}${location.pathname}?token=${actor.token}`
-                }else{
+                } else {
                     this.setState({actor})
                 }
             }))
@@ -94,7 +83,6 @@ export class Play extends React.Component<TRootCtx & RouteComponentProps<{ gameI
             }) : this.setState({playerState})
         })
         socketClient.on(baseEnum.SocketEvent.syncGameState_msgpack, (gameStateBuffer: Array<number>) => {
-            console.log(gameStateBuffer.length / JSON.stringify(decode(gameStateBuffer)).length)
             this.setState({gameState: decode(gameStateBuffer)})
         })
         socketClient.on(baseEnum.SocketEvent.syncPlayerState_msgpack,
@@ -127,7 +115,9 @@ export class Play extends React.Component<TRootCtx & RouteComponentProps<{ gameI
         }
         const {Play4Owner, Result4Owner, Play, Result} = gameTemplate
         if (actor.type === baseEnum.Actor.owner) {
-            console.log(gameState, playerStates)
+            if (!PRODUCT_ENV) {
+                console.log(gameState, playerStates)
+            }
             return <section className={style.play4owner}>
                 <GameControl {...{
                     game,

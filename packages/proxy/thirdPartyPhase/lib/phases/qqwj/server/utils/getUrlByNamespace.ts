@@ -1,15 +1,8 @@
 import {elfSetting as setting} from 'elf-setting'
 import {ThirdPartPhase} from '../../../../core/server/models'
-import {PhaseManager} from 'elf-protocol'
-import * as objectHash from "object-hash"
+import {gen32Token} from '../../../../core/server/util'
 
-const {qqwjProxy} = setting
-
-const gen32Token = (source) => {
-    return objectHash(source, {algorithm: 'md5'})
-}
-
-const getUrlByNamespace = async (elfGameId, namespace, param, owner) => {
+export const getUrlByNamespace = async ({elfGameId, namespace, param, owner}) => {
     let paramJson = JSON.parse(param)
     const {qqwjUrl: realqqwjUrl} = paramJson
     paramJson.qqwjHash = realqqwjUrl.split('wj.qq.com')[1]
@@ -25,17 +18,11 @@ const getUrlByNamespace = async (elfGameId, namespace, param, owner) => {
             namespace: namespace,
             ownerToken: gen32Token(owner.toString())
         }).save()
-        return `${qqwjProxy}/init/qqwj/${newqqwjPhase._id.toString()}`
+        return `${setting.qqwjProxy}/init/qqwj/${newqqwjPhase._id.toString()}`
     } catch (err) {
         if (err) {
             console.log(err)
             return 'Error'
         }
-    }
-}
-
-export const phaseService = {
-    async newPhase({request: {elfGameId, namespace, param, owner}}: { request: PhaseManager.TNewPhaseReq }, callback: PhaseManager.TNewPhaseCallback) {
-        callback(null, {playUrl: await getUrlByNamespace(elfGameId, namespace, param, owner)})
     }
 }

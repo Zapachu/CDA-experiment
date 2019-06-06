@@ -1,91 +1,79 @@
 import * as React from 'react'
-import {RouteComponentProps} from 'react-router'
 import * as style from './style.scss'
-import {connCtx, rootContext, TRootCtx} from '../context'
-import {GameInfo} from './GameInfo'
 import {HistoryGame} from './HistoryGame'
-import {Button, ButtonProps, Toast, Api, Fetcher, Lang} from 'bespoke-client-util'
-import {IGameConfig, baseEnum} from 'bespoke-common'
+import {Button, ButtonProps, Input, Label, Lang, Markdown, Toast, TPageProps} from 'bespoke-client-util'
+import {baseEnum, IGameConfig} from 'bespoke-common'
+import {Api, buildFetcher} from '../util'
 
 const SubmitBarHeight = '5rem'
 
-declare interface ICreateState {
-    game: IGameConfig<any>
-    submitable: boolean
-}
-
-@connCtx(rootContext)
-export class Create extends React.Component<RouteComponentProps<{ namespace: string }> & TRootCtx, ICreateState> {
-    lang = Lang.extractLang({
+export function Create({user, history, gameTemplate: {Create: GameCreate}}: TPageProps) {
+    const lang = Lang.extractLang({
+        GameTitle: ['实验标题', 'Title'],
+        GameDesc: ['实验详情', 'Description'],
         Submit: ['提交', 'Submit'],
-        InvalidBaseGameInfo: ['实验标题或描述有误', 'Invalid game title or description'],
         CreateSuccess: ['实验创建成功', 'Create success'],
         CreateFailed: ['实验创建失败', 'Create Failed']
     })
-
-    state: ICreateState = {
-        game: {
-            title: '',
-            desc: '',
-            params: {}
-        },
-        submitable: true
-    }
-
-    setSubmitable(submitable: boolean) {
-        this.setState({submitable})
-    }
-
-    async submit() {
-        const {lang, props: {gameTemplate: {namespace}}, state: {game}} = this
-        if (!game.title || !game.desc) {
-            return Toast.warn(lang.InvalidBaseGameInfo)
+    const [title, setTitle] = React.useState(''),
+        [desc, setDesc] = React.useState(''),
+        [params, setParams] = React.useState({}),
+        [submitable, setSubmitable] = React.useState(true)
+    React.useEffect(() => {
+        if (user && user.role === baseEnum.AcademusRole.teacher) {
+            return
         }
-        const {code, gameId} = await Api.newGame(game, namespace)
+        history.push('/join')
+    }, [])
+
+    async function submit() {
+        const {code, gameId} = await Api.newGame({title, desc, params})
         if (code === baseEnum.ResponseCode.success) {
             Toast.success(lang.CreateSuccess)
-            setTimeout(() => this.props.history.push(`/${namespace}/play/${gameId}`), 1000)
+            setTimeout(() => history.push(`/play/${gameId}`), 1000)
         } else {
             Toast.error(lang.CreateFailed)
         }
     }
 
-    render(): React.ReactNode {
-        const {lang, props: {gameTemplate}, state: {game, submitable}} = this
-        if (!gameTemplate) {
-            return null
-        }
-        const {namespace, Create} = gameTemplate
-        return <section className={style.create} style={{marginBottom: SubmitBarHeight}}>
-            <div className={style.baseInfoWrapper}>
-                <GameInfo {...{
-                    title: game.title,
-                    desc: game.desc,
-                    updateGameInfo: (gameCfgPartial: { title?: string, desc?: string }) =>
-                        this.setState(({game}) => ({game: {...game, ...gameCfgPartial}}))
-                }}/>
-                <HistoryGame {...{
-                    namespace,
-                    applyHistoryGame: (game: IGameConfig<any>) => this.setState({game})
-                }}/>
-            </div>
-            <div className={style.bespokeWrapper}>
-                <Create {...{
-                    params: game.params,
-                    fetcher: new Fetcher<any>(namespace),
-                    setParams: newParams => this.setState({game: {...game, params: {...game.params, ...newParams}}}),
-                    submitable,
-                    setSubmitable: submitable => this.setSubmitable(submitable)
-                }}/>
-            </div>
-            <div className={style.submitBtnWrapper} style={{height: SubmitBarHeight}}>
-                {
-                    submitable ? <Button width={ButtonProps.Width.medium}
-                                         label={lang.Submit}
-                                         onClick={() => this.submit()}
-                    /> : null
+    return <section className={style.create} style={{marginBottom: SubmitBarHeight}}>
+        <div className={style.baseInfoWrapper}>
+            <section className={style.gameInfo}>
+                <div className={style.gameFieldWrapper}>
+                    <Input value={title} placeholder={lang.GameTitle}
+                           onChange={({target: {value: title}}) => setTitle(title)}/>
+                </div>
+                <div className={style.gameFieldWrapper}>
+                    <Label label={lang.GameDesc}/>
+                    <Markdown editable={true} value={desc}
+                              onChange={({target: {value: desc}}) => setDesc(desc)}/>
+                </div>
+            </section>
+            <HistoryGame {...{
+                applyHistoryGame: ({title, desc, params}: IGameConfig<any>) => {
+                    setTitle(title)
+                    setDesc(desc)
+                    setParams(params)
                 }
-            </div>
-        </section>
-    }
+            }}/>
+        </div>
+        <div className={style.bespokeWrapper}>
+            <GameCreate {...{
+                params,
+                fetcher: buildFetcher(),
+                setParams: newParams => setParams({...params, ...newParams}),
+                submitable,
+                setSubmitable: submitable => setSubmitable(submitable)
+            }}/>
+        </div>
+        <div className={style.submitBtnWrapper} style={{height: SubmitBarHeight}}>
+            {
+                submitable ? <Button width={ButtonProps.Width.medium}
+                                     label={lang.Submit}
+                                     onClick={() => submit()}
+                /> : null
+            }
+        </div>
+    </section>
+
 }

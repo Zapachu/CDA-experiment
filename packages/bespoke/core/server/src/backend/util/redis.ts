@@ -1,12 +1,4 @@
-import * as IORedis from 'ioredis'
-import {elfSetting} from 'elf-setting'
 import {baseEnum} from 'bespoke-common'
-
-export const redisClient = new IORedis(elfSetting.redisPort, elfSetting.redisHost)
-    .on('error', (err) => {
-        console.error(err)
-    })
-
 export const RedisKey = {
     verifyCodeSendTimes: (nationCode: baseEnum.NationCode, phoneNumber: string) => `verifyCodeSendTimes:${nationCode}:${phoneNumber}`,
     verifyCode: (nationCode: baseEnum.NationCode, phoneNumber: string) => `verifyCode:${nationCode}:${phoneNumber}`,

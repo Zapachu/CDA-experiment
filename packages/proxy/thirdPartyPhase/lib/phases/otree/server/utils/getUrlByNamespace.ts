@@ -1,20 +1,19 @@
 import * as objectHash from 'object-hash'
 import {elfSetting as settings} from 'elf-setting'
-import {ThirdPartPhase} from '../../../../../core/server/models'
+import {ThirdPartPhase} from '../../../../core/server/models'
+import * as rp from 'request-promise'
+import ListMap from './ListMap'
 
 const oTreeList = `${settings.oTreeServer}/demo/`
 const playerUrl = 'InitializeParticipant/'
 const oTreeProxy = settings.oTreeProxy
-
-import * as rp from 'request-promise'
-import ListMap from '../../../server/utils/ListMap'
 
 const gen32Token = (source) => {
     return objectHash(source, {algorithm: 'md5'})
 }
 
 // get demo list
-const getDemoList = async (namespace) => {
+export const getDemoList = async (namespace) => {
     const list = ListMap.getList(namespace)
     if (list.length > 0) {
         return list
@@ -48,7 +47,7 @@ const syncWaitingForCreated = async (uri) => {
 }
 
 // get play link
-const getUrlByNamespace = async (elfGameId, namespace, param, owner): Promise<any> => {
+export const getUrlByNamespace = async ({elfGameId, namespace, param, owner}): Promise<any> => {
     let handleBody = ''
     const playHash = []
     const paramJson = JSON.parse(param)
@@ -79,7 +78,7 @@ const getUrlByNamespace = async (elfGameId, namespace, param, owner): Promise<an
         elfGameId: elfGameId,
         namespace: namespace,
         playHash: playHashConf,
-        ownerToken: gen32Token(owner.toString()),
+        ownerToken: gen32Token(owner.toString())
     }).save()
 
     const phaseId = newOTreePhase._id.toString()
@@ -89,5 +88,3 @@ const getUrlByNamespace = async (elfGameId, namespace, param, owner): Promise<an
         playUrl: `${oTreeProxy}/init/${playerUrl}${phaseId}`
     }
 }
-
-export {getUrlByNamespace, getDemoList}

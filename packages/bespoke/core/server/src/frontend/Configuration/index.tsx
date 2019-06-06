@@ -2,17 +2,15 @@ import * as React from 'react'
 import * as style from './style.scss'
 
 import {IGameWithId} from 'bespoke-common'
-import {Api, Lang, MaskLoading, Button, ButtonProps} from 'bespoke-client-util'
-import {connCtx, rootContext, TRootCtx} from '../context'
-import {RouteComponentProps} from 'react-router'
+import {Button, ButtonProps, Lang, MaskLoading, TPageProps} from 'bespoke-client-util'
+import {Api} from '../util'
 
 declare type IConfigurationState = {
     loading: boolean,
     game?: IGameWithId<any>
 }
 
-@connCtx(rootContext)
-export class Configuration extends React.Component<TRootCtx & RouteComponentProps<{ gameId: string }>, IConfigurationState> {
+export class Configuration extends React.Component<TPageProps, IConfigurationState> {
     lang = Lang.extractLang({
         playRoom: ['返回游戏', 'BACK TO GAME']
     })
@@ -45,7 +43,7 @@ export class Configuration extends React.Component<TRootCtx & RouteComponentProp
                     <Button width={ButtonProps.Width.medium}
                             color={ButtonProps.Color.blue}
                             label={lang.playRoom}
-                            onClick={() => history.push(`/${game.namespace}/play/${gameId}`)}
+                            onClick={() => history.push(`/play/${gameId}`)}
                     />
                 </li>
             </ul>

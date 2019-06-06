@@ -2,10 +2,10 @@ import * as React from 'react'
 import * as style from './style.scss'
 import * as dateFormat from 'dateformat'
 import {baseEnum, IGameConfig, IGameThumb} from 'bespoke-common'
-import {Api, Lang} from 'bespoke-client-util'
+import {Lang} from 'bespoke-client-util'
+import {Api} from '../util'
 
 declare interface IHistoryGameProps {
-    namespace: string,
     applyHistoryGame: (gameCfg: IGameConfig<any>) => void,
 }
 
@@ -18,12 +18,11 @@ export class HistoryGame extends React.Component<IHistoryGameProps, IHistoryGame
         historyGameThumbs: []
     }
     lang = Lang.extractLang({
-        LoadFromHistory: ['点击加载历史实验配置', 'click to load configuration from history game'],
+        LoadFromHistory: ['点击加载历史实验配置', 'click to load configuration from history game']
     })
 
     async componentDidMount() {
-        const {namespace} = this.props
-        const {code, historyGameThumbs} = await Api.getHistoryGames(namespace)
+        const {code, historyGameThumbs} = await Api.getHistoryGames()
         if (code === baseEnum.ResponseCode.success) {
             this.setState({historyGameThumbs})
         }

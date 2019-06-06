@@ -2,6 +2,8 @@ import {Log} from '../util'
 import {elfSetting} from 'elf-setting'
 import * as IORedis from 'ioredis'
 
+export const redisClient = new IORedis(elfSetting.redisPort, elfSetting.redisHost)
+
 export namespace RedisCall {
     interface IReqPack<IReq> {
         key: string
@@ -17,24 +19,27 @@ export namespace RedisCall {
         return Math.random().toString(36).substr(2)
     }
 
-    function getRedisClient(): IORedis.Redis {
+    function getBlockRedisClient(): IORedis.Redis {
         return new IORedis(elfSetting.redisPort, elfSetting.redisHost)
     }
 
-    export function handle<IReq, IRes>(method: string, handler: (req: IReq) => Promise<IRes>) {
-        const redis = getRedisClient()
+    function _handle<IReq, IRes>(method: string, handler: (req: IReq) => Promise<IRes>, redis: IORedis.Redis) {
         redis.blpop(getServiceKey(method), 0 as any).then(async ([, reqText]) => {
-            Log.i(`REQ:${method}`, reqText)
+            Log.i(method, reqText)
             const reqPack: IReqPack<IReq> = JSON.parse(reqText)
             const res = await handler(reqPack.params)
             redis.rpush(reqPack.key, JSON.stringify(res))
             redis.expire(reqPack.key, 1).catch(e => Log.e(e))
-            handle(method, handler)
+            _handle(method, handler, redis)
         })
     }
 
+    export function handle<IReq, IRes>(method: string, handler: (req: IReq) => Promise<IRes>) {
+        _handle(method, handler, getBlockRedisClient())
+    }
+
     export async function call<IReq, IRes>(method: string, params: IReq): Promise<IRes> {
-        const redis = getRedisClient()
+        const redis = getBlockRedisClient()
         const key = geneReqKey(), reqPack: IReqPack<IReq> = {method, params, key}
         redis.rpush(getServiceKey(method), JSON.stringify(reqPack))
         const res = await redis.blpop(key, 1 as any)
@@ -42,6 +47,7 @@ export namespace RedisCall {
             await redis.del(getServiceKey(method))
             throw new Error(`RedisCall Time out : ${JSON.stringify(reqPack)}`)
         }
+        redis.disconnect()
         return JSON.parse(res[1])
     }
 }

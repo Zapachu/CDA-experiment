@@ -1,7 +1,8 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {IGameWithId, IUserWithId} from 'bespoke-common'
-import {Api, Lang, Markdown, MaskLoading} from 'bespoke-client-util'
+import {Lang, Markdown, MaskLoading} from 'bespoke-client-util'
+import {Api} from '../util'
 import {RouteComponentProps} from 'react-router'
 
 export function Info({history, match: {params: {gameId}}}: RouteComponentProps<{ gameId: string }>) {
@@ -27,7 +28,7 @@ export function Info({history, match: {params: {gameId}}}: RouteComponentProps<{
                 style: {
                     backgroundColor: '#ff888e'
                 },
-                onClick: () => history.push(`/${game.namespace}/play/${gameId}${location.search}`)
+                onClick: () => history.push(`/play/${gameId}${location.search}`)
             }}>{game.owner === user.id ? lang.enterRoom : lang.joinGame}</li>
         </ul>
     </div>

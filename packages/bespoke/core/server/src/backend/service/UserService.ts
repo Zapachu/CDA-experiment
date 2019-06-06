@@ -1,6 +1,7 @@
 import {baseEnum, config} from 'bespoke-common'
 import {elfSetting} from 'elf-setting'
-import {redisClient, RedisKey, QCloudSMS, Log} from '../util'
+import {Log, QCloudSMS, RedisKey} from '../util'
+import {redisClient} from 'elf-protocol'
 
 const SEND_TIMES_PER_DAY = 3
 
@@ -46,10 +47,5 @@ export default class UserService {
                 code: this.sendVerifyCodeResCode.sendError
             }
         }
-    }
-
-    static getGameTemplateNamespaces(mobile: string): Array<string> {
-        //TODO 由GO Proxy处理
-        return []
     }
 }

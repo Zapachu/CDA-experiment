@@ -1,4 +1,4 @@
-import {gameId2PlayUrl, EventIO, Token, Log} from '../util'
+import {EventIO, gameId2PlayUrl, Log, Token} from '../util'
 import {
     baseEnum,
     FrameEmitter,
@@ -14,9 +14,8 @@ import {NodeRobotsScheduler, PythonSchedulerProxy, RobotScheduler} from './robot
 import {StateManager} from './StateManager'
 import {MoveQueue} from './MoveQueue'
 import {Request, Response} from 'express'
-import {getGameService} from '../rpc'
+import {RedisCall, SendBackPlayer, SetPhaseResult} from 'elf-protocol'
 import SyncStrategy = baseEnum.SyncStrategy
-import {PhaseManager} from 'elf-protocol'
 
 export type AnyController = BaseController<any, any, any, any, any, any, any, any>
 type AnyRobotScheduler = RobotScheduler<any, any, any, any, any, any, any>
@@ -161,34 +160,32 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
     //endregion
 
     //region elf
-    protected setPhaseResult(playerToken: string, phaseResult: PhaseManager.TPhaseResult) {
+    protected setPhaseResult(playerToken: string, phaseResult: SetPhaseResult.IPhaseResult) {
         if (!this.game.elfGameId) {
             return Log.w('Bespoke单独部署，game未关联至Elf group')
         }
-        getGameService().setPhaseResult({
-            playUrl: gameId2PlayUrl(this.game.namespace, this.game.id),
+        RedisCall.call<SetPhaseResult.IReq, SetPhaseResult.IRes>(SetPhaseResult.name, {
+            playUrl: gameId2PlayUrl(this.game.id),
             playerToken,
             elfGameId: this.game.elfGameId,
             phaseResult
-        }, err => err ? Log.e(err) : null)
+        }).catch(e => Log.e(e))
     }
 
-    protected sendBackPlayer(playerToken: string, phaseResult?: PhaseManager.TPhaseResult, nextPhaseKey?: string) {
+    protected sendBackPlayer(playerToken: string, phaseResult?: SetPhaseResult.IPhaseResult, nextPhaseKey?: string) {
         if (!this.game.elfGameId) {
             return Log.w('Bespoke单独部署，game未关联至Elf group')
         }
-        getGameService().sendBackPlayer({
-            playUrl: gameId2PlayUrl(this.game.namespace, this.game.id),
+        RedisCall.call<SendBackPlayer.IReq, SendBackPlayer.IRes>(SendBackPlayer.name, {
+            playUrl: gameId2PlayUrl(this.game.id),
             playerToken,
-            nextPhaseKey,
             elfGameId: this.game.elfGameId,
-            phaseResult
-        }, (err, res) => {
-            if (err) {
-                return Log.e(err)
-            }
-            EventIO.emitEvent(this.connections.get(playerToken).id, baseEnum.SocketEvent.sendBack, res.sendBackUrl)
+            phaseResult,
+            nextPhaseKey
         })
+            .catch(e => Log.e(e))
+            .then(({sendBackUrl}) =>
+                EventIO.emitEvent(this.connections.get(playerToken).id, baseEnum.SocketEvent.sendBack, sendBackUrl))
     }
 
     //endregion

@@ -2,8 +2,9 @@ import * as errorhandler from 'errorhandler'
 import {elfSetting as settings} from 'elf-setting'
 import '../../common/auth/passport'
 import {routePrefix} from '../../common/config'
-import {InitWork, ProxyWork, RPCWork} from './utils'
-import {ConDB, SessionSetMiddleware, PassportMiddleware, StaticPathMiddleware} from '../../common/utils'
+import {getUrlByNamespace, InitWork, ProxyWork} from './utils'
+import {ConDB, PassportMiddleware, SessionSetMiddleware, StaticPathMiddleware} from '../../common/utils'
+import {withLinker} from '../../../core/server/util'
 
 import * as Express from 'express'
 
@@ -18,7 +19,7 @@ StaticPathMiddleware(app, routePrefix.wjxStaticNamespace)
 
 InitWork(app)
 ProxyWork(app)
-RPCWork()
+withLinker('wjx', settings.wjxProxy, getUrlByNamespace)
 
 app.use(errorhandler())
 app.listen(wjxPort, () => {

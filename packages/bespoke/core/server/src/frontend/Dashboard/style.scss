@@ -5,12 +5,17 @@
 
   .title {
     font-size: $fontSize-middle;
-    font-weight: bold;
     color: rgba($color-black, .6);
     margin: 1rem;
   }
 
-  .namespaces {
+  .createBtnWrapper {
+    display: flex;
+    justify-content: center;
+  }
+
+  .historyGames {
+
     display: flex;
     flex-wrap: wrap;
     margin: 2rem;
@@ -24,25 +29,19 @@
       cursor: pointer;
       transition: $transition-normal;
       border: $borderLine;
-
-      &:hover {
-        color: $color-blue;
-      }
-    }
-  }
-
-  .historyGames {
-    @extend .namespaces;
-
-    li {
       min-width: 16rem;
       max-width: 32rem;
       word-break: break-all;
-      .timestamp{
+
+      .timestamp {
         color: rgba($color-black, .6);
         font-size: $fontSize-small;
         display: block;
         text-align: right;
+      }
+
+      &:hover {
+        color: $color-blue;
       }
     }
   }

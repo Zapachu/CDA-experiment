@@ -1,60 +1,38 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {IGameThumb} from 'bespoke-common'
-import {RouteComponentProps} from 'react-router-dom'
-import {Api, Lang} from 'bespoke-client-util'
+import {baseEnum, IGameThumb} from 'bespoke-common'
+import {Button, Lang, TPageProps} from 'bespoke-client-util'
+import {Api} from '../util'
 import * as dateFormat from 'dateformat'
 
-declare interface IDashboardState {
-    namespaces: Array<string>
-    historyGameThumbs: Array<IGameThumb>
-}
-
-export class Dashboard extends React.Component<RouteComponentProps<{}>, IDashboardState> {
-    state: IDashboardState = {
-        namespaces: [],
-        historyGameThumbs: []
-    }
-
-    lang = Lang.extractLang({
-        createExperiment: ['创建实验', 'Create Experiment'],
-        historyExperiment: ['历史实验', 'History Experiment']
+export function Dashboard({history, user}: TPageProps) {
+    const lang = Lang.extractLang({
+        createGame: ['创建实验', 'Create Game'],
+        historyGame: ['历史实验', 'History Game']
     })
-
-    async componentDidMount() {
-        const {namespaces} = await Api.getAccessibleTemplates(),
-            {historyGameThumbs} = await Api.getHistoryGames()
-        this.setState({
-            namespaces,
-            historyGameThumbs
-        })
-    }
-
-    render(): React.ReactNode {
-        const {lang, props: {history}, state: {namespaces, historyGameThumbs}} = this
-        return <section className={style.dashboard}>
-            <label className={style.title}>{lang.createExperiment}</label>
-            <ul className={style.namespaces}>
-                {
-                    namespaces.map(namespace =>
-                        <li key={namespace}
-                            onClick={() => history.push(`/${namespace}/create`)}
-                        >{namespace}</li>
-                    )
-                }
-            </ul>
-            <label className={style.title}>{lang.historyExperiment}</label>
-            <ul className={style.historyGames}>
-                {
-                    historyGameThumbs.map(({id, namespace, title, createAt}) =>
-                        <li key={id}
-                            onClick={()=>history.push(`/${namespace}/play/${id}`)}
-                        >
-                            {title}
-                            <span className={style.timestamp}>{dateFormat(createAt, 'yyyy-mm-dd')}</span>
-                        </li>)
-                }
-            </ul>
-        </section>
-    }
+    const [historyGameThumbs, setHistoryGameThumbs] = React.useState<Array<IGameThumb>>([])
+    React.useEffect(() => {
+        if (user && user.role === baseEnum.AcademusRole.teacher) {
+            Api.getHistoryGames().then(({code, historyGameThumbs}) => code === baseEnum.ResponseCode.success ? setHistoryGameThumbs(historyGameThumbs) : null)
+        } else {
+            history.push('/join')
+        }
+    }, [])
+    return <section className={style.dashboard}>
+        <div className={style.createBtnWrapper}>
+            <Button onClick={() => history.push('/create')} label={lang.createGame}/>
+        </div>
+        <label className={style.title}>{lang.historyGame}</label>
+        <ul className={style.historyGames}>
+            {
+                historyGameThumbs.map(({id, title, createAt}) =>
+                    <li key={id}
+                        onClick={() => history.push(`/play/${id}`)}
+                    >
+                        {title}
+                        <span className={style.timestamp}>{dateFormat(createAt, 'yyyy-mm-dd')}</span>
+                    </li>)
+            }
+        </ul>
+    </section>
 }

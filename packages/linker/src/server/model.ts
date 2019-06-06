@@ -1,5 +1,5 @@
 import {Document, Model, model, Schema} from 'mongoose'
-import {getModels, PhaseManager} from 'elf-protocol'
+import {getModels, SetPhaseResult} from 'elf-protocol'
 import {IGame, IGameState, IPlayer, IUser} from '@common'
 
 const {String} = Schema.Types
@@ -30,7 +30,7 @@ export type PhaseResultDoc = {
     gameId: string
     playerId: string
     phaseName: string
-} & PhaseManager.TPhaseResult & Document
+} & SetPhaseResult.IPhaseResult & Document
 export const PhaseResultModel: Model<PhaseResultDoc> = model('LinkerPhaseResult', new Schema({
     gameId: String,
     playerId: String,
