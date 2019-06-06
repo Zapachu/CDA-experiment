@@ -5,4 +5,3 @@ export {SessionTokenCheck} from "./sessionTokenCheck"
 export {SessionSetMiddleware} from './sessionSetMiddleware'
 export {PassportMiddleware} from './passportMiddleware'
 export {StaticPathMiddleware} from './staticPathMiddleware'
-export {gameService} from './gameService'
