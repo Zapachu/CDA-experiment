@@ -721,6 +721,17 @@ class Hall3D extends React.Component<Props, State> {
       })
       this.continuePlayUrl = playerUrl
     })
+    io.on(clientSocketListenEvnets.handleError, (data: {eventType: serverSocketListenEvents, msg: string}) => {
+      const {eventType, msg} = data
+      if (eventType === serverSocketListenEvents.reqStartGame) {
+        // Todo
+        Toast.error(msg)
+      }
+      if (eventType === serverSocketListenEvents.leaveMatchRoom) {
+        // TODO
+        Toast.error(msg)
+      }
+    })
   }
   render() {
     const { isDetailView, isInitView } = this.state

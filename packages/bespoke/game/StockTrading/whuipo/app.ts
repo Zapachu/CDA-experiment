@@ -103,7 +103,7 @@ const redisClient = new Redis({
 
 
 app.use(compression());
-// app.use(cookieParser())
+app.use(cookieParser())
 // uncomment after placing your favicon in /public
 app.use(morgan('dev'));
 app.use(bodyParser.json());
