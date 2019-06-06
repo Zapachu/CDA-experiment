@@ -118,7 +118,7 @@ export default class Controller extends BaseController<
       }
       case MoveType.shout: {
         const playerStatus = playerState.playerStatus;
-        if (playerStatus === PlayerStatus.shouted) {
+        if (playerStatus !== PlayerStatus.prepared) {
           return;
         }
         let group: GameState.IGroup;
@@ -196,6 +196,10 @@ export default class Controller extends BaseController<
       //   break;
       // }
       case MoveType.nextGame: {
+        const playerStatus = playerState.playerStatus;
+        if (playerStatus !== PlayerStatus.result) {
+          return;
+        }
         const {onceMore} = params
         const res = await RedisCall.call<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, {
           playUrl: gameId2PlayUrl(namespace, this.game.id, actor.token),
