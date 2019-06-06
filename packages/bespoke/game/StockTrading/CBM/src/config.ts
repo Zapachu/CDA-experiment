@@ -24,7 +24,8 @@ export enum PushType {
     countDown = 'countDown',
     beginTrading = 'beginTrading',
     closeOutWarning = 'closeOutWarning',
-    closeOut = 'closeOut'
+    closeOut = 'closeOut',
+    tradeSuccess = 'tradeSuccess'
 }
 
 export enum FetchType {
@@ -34,7 +35,7 @@ export const PERIOD = 6
 
 export const CONFIG = {
     prepareTime: 10,
-    tradeTime: 18000,
+    tradeTime: 180,
     resultTime: 30
 }
 
@@ -123,4 +124,5 @@ export type IPushParams = Partial<{
     countDown: number
     newOrderId: number
     resOrderId: number
+    tradeCount: number
 }>

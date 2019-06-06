@@ -234,7 +234,8 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
         nextPhase: ['下一环节', 'Next Phase'],
         priceCountTips: ['价格 * 数量 ：', 'price * count : '],
         closeOutWarning: ['资产低于担保金额130%将被平仓', 'Your count will be closed out when assets is below 130% of guarantee money'],
-        closedOut: ['资产低于担保金额130%，已被平仓', 'Your count has been closed out since assets is below 130% of guarantee money']
+        closedOut: ['资产低于担保金额130%，已被平仓', 'Your count has been closed out since assets is below 130% of guarantee money'],
+        tradeSuccess: [count => `交易成功 , 数量 : ${count}`, count => `Trade success, count : ${count}`]
     })
     const {prepareTime, tradeTime, resultTime} = CONFIG
     const [countDown, setCountDown] = React.useState(0)
@@ -248,6 +249,7 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
         frameEmitter.on(PushType.countDown, ({countDown}) => setCountDown(countDown))
         frameEmitter.on(PushType.closeOutWarning, () => Toast.warn(lang.closeOutWarning))
         frameEmitter.on(PushType.closeOut, () => Toast.warn(lang.closedOut))
+        frameEmitter.on(PushType.tradeSuccess, ({tradeCount}) => Toast.success(lang.tradeSuccess(tradeCount)))
         frameEmitter.emit(MoveType.getIndex)
     }, [])
     const gamePeriodState = gameState.periods[gameState.periodIndex]

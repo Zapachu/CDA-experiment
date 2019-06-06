@@ -34,6 +34,7 @@ function catchError(target: any, key: string, descriptor: PropertyDescriptor) {
         try {
             await func(req, res, next)
         } catch (e) {
+            console.error(e)
             res.json({
                 code: ResCode.unexpectError,
                 msg: e.message
@@ -58,8 +59,8 @@ const removeUserSocket = (uid, socketId) => {
     return arr
 }
 
-const matchRoomLimit = 10
-const waittingTime = 10 // 秒
+const matchRoomLimit = settings.gameRoomSize || 10
+const waittingTime = settings.gameMatchTime || 10 // 秒
 const matchRoomOfGame: {[gamePhase: number]: string[]} = {
 }
 const matchRoomTimerOfGame = {}
@@ -164,10 +165,11 @@ const gamePhaseOrder = {
     [Phase.IPO_Median]: 1,
     [Phase.IPO_TopK]: 1,
     [Phase.TBM]: 2,
-    [Phase.CBM]: 3
+    [Phase.CBM]: 3,
+    [Phase.CBM_Leverage]: 3
 }
 
-RedisCall.handle<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, async ({playUrl, onceMore, phase = Phase.TBM}) => {
+RedisCall.handle<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, async ({playUrl, onceMore, phase}) => {
     console.log(`redis handle phase: ${phase} done`, playUrl, onceMore)
     const uid = await RedisTools.getPlayerUrlRecord(playUrl)
     const user = await User.findById(uid)
@@ -190,7 +192,8 @@ RedisCall.handle<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, async ({playUrl
             lobbyUrl = urlObj.toString()
         }
     }
-    return {lobbyUrl: settings.lobbyUrl}
+    console.log(lobbyUrl, 'lobbyurl')
+    return {lobbyUrl}
 })
 export default class RouterController {
     @catchError
@@ -200,6 +203,9 @@ export default class RouterController {
         if(isValid) {
             console.log('isLogined, succeeded')
             if (!req.isAuthenticated()) {
+                if (!['get', 'post'].includes(req.method.toLowerCase())) {
+                    throw new Error('非法请求')
+                }
                 const key = payload.id
                 let user = await User.findOne({ unionId: key })
                 if (!user) {
@@ -222,7 +228,7 @@ export default class RouterController {
 
     @catchError
     static async renderIndex(req: Request, res: Response, next: NextFunction) {
-        res.sendfile(path.resolve(__dirname, './dist/index.html'))
+        res.sendFile(process.env.NODE_ENV === 'production' ? path.resolve(__dirname, '../dist/index.html') : path.resolve(__dirname, './dist/index.html'))
     }
 
     @catchError
@@ -277,6 +283,7 @@ export function handleSocketInit(ioServer: Socket.Server) {
                     console.log('没有登陆')
                     return
                 }
+                console.log(`请求者uid:${socket.request.user._id}`)
                 const uid = socket.request.user._id
                 const {isGroupMode, gamePhase} = msg
                 const userGameData = await RedisTools.getUserGameData(uid, gamePhase)
@@ -344,7 +351,7 @@ export function handleSocketInit(ioServer: Socket.Server) {
                     const userSockets = removeUserSocket(uid, socket.id)                
                     
                     if (userSockets.length === 0) {
-                        const games = [Phase.CBM, Phase.IPO_Median, Phase.IPO_TopK, Phase.TBM]
+                        const games = [Phase.CBM, Phase.CBM_Leverage, Phase.CBM_Leverage, Phase.IPO_Median, Phase.IPO_TopK, Phase.TBM, ]
                         const tasks = games.map(async (game: Phase) => {
                             const userGameData = await RedisTools.getUserGameData(uid, game)
                             if (!userGameData) {

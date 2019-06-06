@@ -64,7 +64,7 @@ class XJWT {
       const decryptedStr = aesjs.utils.utf8.fromBytes(
         decryptedBytes.slice(PAYLOAD_OFFSET, len - padding)
       );
-      // console.log("decryptedStr, ", decryptedStr);
+      console.log("decryptedStr, ", decryptedStr);
       const type = this.extractType(header);
       switch (type) {
         case Type.JSON: {

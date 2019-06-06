@@ -3,15 +3,13 @@ import * as style from './style.scss'
 import Stock from './coms/Stock'
 import InfoBar from './coms/InfoBar'
 import {Line, Input, Button, Loading, Modal, ListItem} from 'bespoke-game-stock-trading-component'
-import IntroStage from './coms/IntroStage'
-import {Core, Toast} from 'bespoke-client-util'
+import {Core, Toast, MaskLoading} from 'bespoke-client-util'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import {FetchType, MoveType, PushType, PlayerStatus} from '../config'
 
 interface IPlayState {
     price: string
     count: string
-    loading: boolean
     showRule: boolean,
     showTBMRule: boolean
 }
@@ -20,13 +18,12 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     state = {
         price: '',
         count: '',
-        loading: true,
         showRule: false,
         showTBMRule: false
     }
 
-    async componentDidMount() {
-        this.setState({loading: false})
+    componentDidMount(): void {
+        this.props.frameEmitter.emit(MoveType.startMulti)
     }
 
     setPriceVal = (value) => this.setState({price: value})
@@ -92,7 +89,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                         />
                     </li>
                     <li style={{marginTop: 12}}>
-                        <a>可买 <span className={style.priceHighlight}>
+                        <a className={style.countLimit}>可买 <span className={style.priceHighlight}>
                             {!isNaN(parseInt(price)) && parseInt(price) !== 0 ? Math.round(InitMoney / Number(price)) : 0}
                         </span> 股</a>
                     </li>
@@ -154,7 +151,6 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     dynamicBtnView = () => {
         const {props: {playerState: {playerStatus}}} = this
         switch (playerStatus) {
-            case PlayerStatus.outside:
             case PlayerStatus.prepared:
                 return <Button label={this.dynamicTip()} onClick={this.dynamicBtnAction} style={{marginTop: 36}}/>
             default:
@@ -180,7 +176,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
             <>
                 <Line
                     text={"交易结果展示"}
-                    style={{margin: "auto", width: "400px", marginTop: "30px", marginBottom: "20px"}}
+                    style={{margin: "auto", maxWidth: "400px", marginTop: "70px", marginBottom: "20px"}}
                 />
                 <ul>
                     {listData.map(({label, value, red}) => {
@@ -202,7 +198,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                     color={Line.Color.White}
                     style={{
                         margin: "auto",
-                        width: "400px",
+                        maxWidth: "400px",
                         marginTop: "20px",
                         marginBottom: "20px"
                     }}
@@ -213,13 +209,13 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                         color={Button.Color.Blue}
                         style={{marginRight: "20px"}}
                         onClick={() => {
-                            frameEmitter.emit(MoveType.nextStage, {onceMore: true})
+                            frameEmitter.emit(MoveType.nextStage, {onceMore: true},lobbyUrl => location.href = lobbyUrl)
                         }}
                     />
                     <Button
                         label={"下一阶段"}
                         onClick={() => {
-                            frameEmitter.emit(MoveType.nextStage, {onceMore: false})
+                            frameEmitter.emit(MoveType.nextStage, {onceMore: false},lobbyUrl => location.href = lobbyUrl)
                         }}
                     />
                 </div>
@@ -236,7 +232,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         } = this
         return <>
             <Stock/>
-            <Button
+            {/* <Button
                 style={{position: 'absolute', top: '30%', right: '10%'}}
                 onClick={this.showRule}
                 color={Button.Color.Blue}
@@ -247,7 +243,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 onClick={this.showTBMRule}
                 color={Button.Color.Blue}
                 label={`集合竞价知识扩展`}
-            />
+            /> */}
             <div className={style.workBox}>
                 <div className={style.tipText}>
                     <Line text={` ${this.dynamicTip()} `}/>
@@ -268,49 +264,44 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 playerState: {playerStatus}
             }
         } = this
-
         switch (playerStatus) {
-            case PlayerStatus.intro:
-            case PlayerStatus.matching:
-                return <IntroStage {...this.props}/>
             case PlayerStatus.prepared:
             case PlayerStatus.shouted:
                 return this.renderPlay()
             case PlayerStatus.result:
                 return this.renderResult()
             default:
-                return
+                return <MaskLoading label=' '/>
 
         }
     }
 
     render() {
-        const {state: {loading, showRule, showTBMRule}} = this
-        if (loading) {
-            return <Loading label='加载中...'/>
-        }
+        const {state: {showRule, showTBMRule}} = this
         return <section className={style.play}>
 
             {this.renderStage()}
 
+            <div className={style.tradeBtn}>
             <Button
-                style={{position: 'absolute', top: '30%', right: '10%'}}
                 onClick={this.showRule}
                 color={Button.Color.Blue}
                 label={`交易规则回顾`}
             />
+            </div>
+            <div className={style.tbmBtn}>
             <Button
-                style={{position: 'absolute', top: '35%', right: '10%'}}
                 onClick={this.showTBMRule}
                 color={Button.Color.Blue}
                 label={`集合竞价知识扩展`}
             />
+            </div>
 
             <Modal
                 visible={showRule}
                 children={
                     <div className={style.modalContent}>
-                        <p>交易规则回复</p>
+                        <p>交易规则回顾</p>
                         <p>...</p>
                         <Button
                             style={{marginTop: "30px"}}

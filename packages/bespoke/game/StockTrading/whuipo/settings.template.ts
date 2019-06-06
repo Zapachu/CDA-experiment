@@ -13,5 +13,7 @@ export default {
     lobbyUrl: 'https://www.microexperiment.cn',
     domain: 'microexperiment.cn',
     tokenSecret: '',
-    tokenAesKey: ''
+    tokenAesKey: '',
+    gameMatchTime:  10, // 多人模式匹配时间 s
+    gameRoomSize: 10, // 多人模式每局最大人数 
 }

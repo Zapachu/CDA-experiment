@@ -43,7 +43,7 @@ export default class extends BaseRobot<
     });
     setTimeout(() => {
       this.frameEmitter.emit(MoveType.joinRobot);
-    }, 1500);
+    }, 1100);
     return this;
   }
 

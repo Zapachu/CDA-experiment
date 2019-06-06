@@ -12,12 +12,12 @@ import {
   FetchType,
   MoveType,
   PushType,
-  PlayerStatus,
-  MATCH_TIMER,
   IPOType
 } from "../../config";
-import { Line, PlayMode, MatchModal, Modal } from "bespoke-game-stock-trading-component";
-const LOADING = require("bespoke-game-stock-trading-component/lib/loading.png");
+import {
+  Line,
+  Loading
+} from "bespoke-game-stock-trading-component";
 
 interface IPlayState {
   matchTimer: number;
@@ -51,7 +51,7 @@ export default class IntroStage extends Core.Play<
     //   this.setState({ matchTimer, matchNum });
     // });
     //TODO 由Match系统匹配玩家，Game内仅处理单轮的业务逻辑(临时方案，待移除此Game内match相关代码)
-    frameEmitter.emit(MoveType.startMulti)
+    frameEmitter.emit(MoveType.startMulti);
   }
 
   render() {
@@ -65,33 +65,11 @@ export default class IntroStage extends Core.Play<
     const { matchTimer, matchNum } = this.state;
     return (
       <section className={style.introStage}>
-        <Line text={type===IPOType.Median?"IPO中位数定价":"IPO荷兰式拍卖"} style={{ marginBottom: "20px" }} />
-        <img src={LOADING} />
-        <div className={style.mask}></div>
-        {/* <PlayMode
-          onPlay={mode => {
-            if (mode === PlayMode.Single) {
-              frameEmitter.emit(MoveType.startSingle);
-            }
-            if (mode === PlayMode.Multi) {
-              frameEmitter.emit(MoveType.startMulti);
-            }
-          }}
+        <Line
+          text={type === IPOType.Median ? "IPO中位数定价" : "IPO荷兰式定价"}
+          style={{ marginBottom: "20px" }}
         />
-        <MatchModal
-          visible={playerStatus === PlayerStatus.matching && !!multi}
-          totalNum={groupSize}
-          matchNum={matchNum}
-          timer={MATCH_TIMER - matchTimer}
-        />
-        <Modal
-          visible={playerStatus === PlayerStatus.matching && !!single}
-          width={300}
-        >
-          <p style={{ textAlign: "center", padding: "50px 0" }}>
-            加载算法交易者...
-          </p>
-        </Modal> */}
+        <Loading label={""} />
       </section>
     );
   }

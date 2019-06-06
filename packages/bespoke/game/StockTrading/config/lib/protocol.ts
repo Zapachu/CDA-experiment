@@ -2,7 +2,8 @@ export enum Phase {
     IPO_Median,
     IPO_TopK,
     TBM,
-    CBM
+    CBM,
+    CBM_Leverage
 }
 
 export namespace CreateGame {

@@ -31,7 +31,7 @@ export enum IPOType {
   TopK
 }
 
-export const MATCH_TIMER = 3;
+export const MATCH_TIMER = 2;
 export const SHOUT_TIMER = 60;
 export const minA = 30;
 export const maxA = 100;
