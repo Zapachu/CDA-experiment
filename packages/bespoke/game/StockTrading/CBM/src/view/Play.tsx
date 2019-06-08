@@ -204,6 +204,7 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
         profit: ['利润', 'Profit'],
         tradeCount: ['成交数量', 'Trade Count'],
         valuation: ['当前股票估值', 'Stock Valuation'],
+        timeLeft: [(n, s) => `第${n}期，剩余${s}秒`, (n, s) => `Period : ${n}, time left : ${s}s`],
         buyCountLimit: ['可买入', 'You can buy'],
         openMarket: ['开放市场', 'Open Market'],
         marketWillOpen1: ['市场将在', 'Market will open in '],
@@ -314,6 +315,7 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
             role,
             guarantee
         })
+        setCount('')
     }
 
     function repayMoney() {
@@ -371,8 +373,8 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
                         {
                             gamePeriodState.stage === PeriodStage.trading ?
                                 <section className={style.newOrder}>
-                                    <label
-                                        className={style.subLabel}>{countDown < prepareTime ? '   ' : timeLeft > 0 ? timeLeft : 0}s</label>
+                                    <label className={style.subLabel}>
+                                        {lang.timeLeft(gameState.periodIndex + 1, countDown < prepareTime ? '' : timeLeft > 0 ? timeLeft : 0)}</label>
                                     <label className={style.label}>{lang.valuation}<em>{privatePrice}</em></label>
                                     <Tabs labels={[lang.buy, lang.sell]}
                                           activeTabIndex={orderTabIndex} switchTab={setOrderTabIndex}>
@@ -523,7 +525,7 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
                                     <td>{price}</td>
                                     <td>{count}</td>
                                 </tr>
-                            })
+                            }).reverse()
                         }
                         </tbody>
                     </table>
