@@ -20,7 +20,8 @@
     "."
   ],
   "exclude": [
-    "**/egret/**",
-    "build"
+    "build",
+    "**/egret",
+    "**/whuipo"
   ]
 }
