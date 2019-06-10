@@ -3,12 +3,12 @@ import {StateSynchronizer, GameStateSynchronizer, PlayerStateSynchronizer} from 
 import {BaseController} from './GameLogic'
 import GameDAO from './GameDAO'
 
-export class StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
-    private gameStateManager: GameStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>
-    private playerStateManagers: Array<PlayerStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>> = []
-    private stateSynchronizer: StateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>
+export class StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
+    private gameStateManager: GameStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>
+    private playerStateManagers: Array<PlayerStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>> = []
+    private stateSynchronizer: StateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>
 
-    constructor(strategy: baseEnum.SyncStrategy, private controller: BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>) {
+    constructor(strategy: baseEnum.SyncStrategy, private controller: BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {
         this.stateSynchronizer = new StateSynchronizer(strategy, controller)
         this.gameStateManager = this.stateSynchronizer.getGameStateSynchronizer()
     }
@@ -17,7 +17,7 @@ export class StateManager<ICreateParams, IGameState, IPlayerState, MoveType, Pus
         return await this.gameStateManager.getState(false)
     }
 
-    private getPlayerManager(actor: IActor): PlayerStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
+    private getPlayerManager(actor: IActor): PlayerStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
         let playerStateManager = this.playerStateManagers.find(manager => manager.actor.token === actor.token)
         if (!playerStateManager) {
             playerStateManager = this.stateSynchronizer.getPlayerStateSynchronizer(actor)

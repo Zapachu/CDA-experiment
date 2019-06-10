@@ -17,7 +17,7 @@ import {Request, Response} from 'express'
 import {RedisCall, SendBackPlayer, SetPhaseResult} from 'elf-protocol'
 import SyncStrategy = baseEnum.SyncStrategy
 
-export type AnyController = BaseController<any, any, any, any, any, any, any, any>
+export type AnyController = BaseController<any, any, any, any, any, any, any>
 type AnyRobotScheduler = RobotScheduler<any, any, any, any, any, any, any>
 type AnyRobot = BaseRobot<any, any, any, any, any, any, any>
 
@@ -65,16 +65,16 @@ export namespace GameLogic {
     }
 }
 
-export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
-    private moveQueue: MoveQueue<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>
+export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
+    private moveQueue: MoveQueue<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>
     public connections = new Map<string, IConnection>()
-    stateManager: StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>
+    stateManager: StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>
 
     constructor(public game?: IGameWithId<ICreateParams>) {
     }
 
     async init() {
-        this.stateManager = new StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>(GameLogic.sncStrategy, this)
+        this.stateManager = new StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>(GameLogic.sncStrategy, this)
         this.moveQueue = new MoveQueue(this.game, this.stateManager)
         return this
     }

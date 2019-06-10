@@ -4,7 +4,7 @@ import {baseEnum, TGameState, TPlayerState} from 'bespoke-common'
 import {GameStateSynchronizer, PlayerStateSynchronizer} from './BaseSynchronizer'
 import cloneDeep = require('lodash/cloneDeep')
 
-export class DiffGameStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> extends GameStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
+export class DiffGameStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> extends GameStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     private stateSnapshot: TGameState<IGameState>
 
     async syncClientState(wholeState?: boolean) {
@@ -18,7 +18,7 @@ export class DiffGameStateSynchronizer<ICreateParams, IGameState, IPlayerState, 
     }
 }
 
-export class DiffPlayerStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> extends PlayerStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
+export class DiffPlayerStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> extends PlayerStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     private stateSnapshot: TPlayerState<IPlayerState>
 
     async syncClientState(wholeState?: boolean) {

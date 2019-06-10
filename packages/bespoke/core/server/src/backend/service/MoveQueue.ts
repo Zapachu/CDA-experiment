@@ -5,7 +5,7 @@ import {TGameState, TPlayerState, IGameWithId, IMoveLog, IActor} from 'bespoke-c
 import {MoveLogModel} from '../model'
 import {StateManager} from './StateManager'
 
-export class MoveQueue<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
+export class MoveQueue<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     private seq = 0
     private gameState: TGameState<IGameState> = null
     private playerStates: { [token: string]: TPlayerState<IPlayerState> } = null
@@ -14,7 +14,7 @@ export class MoveQueue<ICreateParams, IGameState, IPlayerState, MoveType, PushTy
         autostart: true
     } as any)
 
-    constructor(private game: IGameWithId<ICreateParams>, private stateManager: StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>) {
+    constructor(private game: IGameWithId<ICreateParams>, private stateManager: StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {
     }
 
     push(actor: IActor, type: string, params: {}, moveHandler: QueueWorker): void {

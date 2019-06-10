@@ -5,11 +5,11 @@ import {EventIO} from '../../util'
 import isEqual = require('lodash/isEqual')
 import cloneDeep = require('lodash/cloneDeep')
 
-export class GameStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
+export class GameStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     private _state: TGameState<IGameState>
     private _stateSnapshot: TGameState<IGameState>
 
-    constructor(protected controller: BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>) {
+    constructor(protected controller: BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {
     }
 
     async getState(forClient: boolean): Promise<TGameState<IGameState>> {
@@ -43,11 +43,11 @@ export class GameStateSynchronizer<ICreateParams, IGameState, IPlayerState, Move
     }
 }
 
-export class PlayerStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
+export class PlayerStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     private _state: TPlayerState<IPlayerState>
     private _stateSnapshot: TPlayerState<IPlayerState>
 
-    constructor(public actor: IActor, protected controller: BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>) {
+    constructor(public actor: IActor, protected controller: BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {
     }
 
     async getState(): Promise<TPlayerState<IPlayerState>> {

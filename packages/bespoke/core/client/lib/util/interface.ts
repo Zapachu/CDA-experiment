@@ -24,7 +24,7 @@ export type TRegisterGame = (gameTemplate: IGameTemplate) => void
 
 export namespace Core {
 
-    interface ICreateProps<ICreateParams, FetchType> {
+    interface ICreateProps<ICreateParams> {
         params: Partial<ICreateParams>
         setParams: (newParams: Partial<ICreateParams>) => void
         submitable?: boolean
@@ -35,18 +35,18 @@ export namespace Core {
         game: IGameWithId<ICreateParams>,
     }
 
-    export interface IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> extends Partial<ITravelState<IGameState, IPlayerState, MoveType, IMoveParams>> {
+    export interface IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> extends Partial<ITravelState<IGameState, IPlayerState, MoveType, IMoveParams>> {
         game: IGameWithId<ICreateParams>,
         frameEmitter?: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
         playerState: TPlayerState<IPlayerState>
     }
 
-    interface IPlay4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> extends Partial<ITravelState<IGameState, IPlayerState, MoveType, IMoveParams>> {
+    interface IPlay4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> extends Partial<ITravelState<IGameState, IPlayerState, MoveType, IMoveParams>> {
         game: IGameWithId<ICreateParams>,
         frameEmitter?: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
     }
 
-    interface IResult4PlayerProps<ICreateParams, IGameState, IPlayerState, FetchType> {
+    interface IResult4PlayerProps<ICreateParams, IGameState, IPlayerState> {
         game: IGameWithId<ICreateParams>
         gameState: TGameState<IGameState>,
         playerState: TPlayerState<IPlayerState>
@@ -60,16 +60,16 @@ export namespace Core {
         playerStates: { [token: string]: TPlayerState<IPlayerState> }
     }
 
-    interface IResult4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams, FetchType> {
+    interface IResult4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams> {
         game: IGameWithId<ICreateParams>,
         travelStates: Array<ITravelState<IGameState, IPlayerState, MoveType, IMoveParams>>
     }
 
 
-    export class Create<ICreateParams, FetchType, S = {}> extends React.Component<ICreateProps<ICreateParams, FetchType>, S> {
+    export class Create<ICreateParams, S = {}> extends React.Component<ICreateProps<ICreateParams>, S> {
     }
 
-    export type CreateSFC<ICreateParams, FetchType> = React.FC<ICreateProps<ICreateParams, FetchType>>
+    export type CreateSFC<ICreateParams> = React.FC<ICreateProps<ICreateParams>>
 
 
     export class Info<ICreateParams, S = {}> extends React.Component<IInfoProps<ICreateParams>, S> {
@@ -78,51 +78,51 @@ export namespace Core {
     export type InfoSFC<ICreateParams> = React.FC<IInfoProps<ICreateParams>>
 
 
-    export class Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, S = {}>
-        extends React.Component<IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>, S> {
+    export class Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, S = {}>
+        extends React.Component<IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>, S> {
     }
 
-    export type PlaySFC<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> =
-        React.FC<IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>>
+    export type PlaySFC<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> =
+        React.FC<IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>>
 
 
-    export class Play4Owner<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, S = {}>
-        extends React.Component<IPlay4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>, S> {
+    export class Play4Owner<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, S = {}>
+        extends React.Component<IPlay4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>, S> {
     }
 
-    export type Play4OwnerSFC<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> =
-        React.FC<IPlay4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>>
+    export type Play4OwnerSFC<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> =
+        React.FC<IPlay4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>>
 
 
-    export class Result<ICreateParams, IGameState, IPlayerState, FetchType, S = {}>
-        extends React.Component<IResult4PlayerProps<ICreateParams, IGameState, IPlayerState, FetchType>, S> {
+    export class Result<ICreateParams, IGameState, IPlayerState, S = {}>
+        extends React.Component<IResult4PlayerProps<ICreateParams, IGameState, IPlayerState>, S> {
     }
 
-    export type ResultSFC<ICreateParams, IGameState, IPlayerState, FetchType> =
-        React.FC<IResult4PlayerProps<ICreateParams, IGameState, IPlayerState, FetchType>>
+    export type ResultSFC<ICreateParams, IGameState, IPlayerState> =
+        React.FC<IResult4PlayerProps<ICreateParams, IGameState, IPlayerState>>
 
-    export class Result4Owner<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams, FetchType, S = {}>
-        extends React.Component<IResult4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams, FetchType>, S> {
+    export class Result4Owner<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams, S = {}>
+        extends React.Component<IResult4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams>, S> {
     }
 
-    export type Result4OwnerSFC<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams, FetchType> =
-        React.FC<IResult4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams, FetchType>>
+    export type Result4OwnerSFC<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams> =
+        React.FC<IResult4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams>>
 
-    export type CreateClass = (new(...args) => Create<{}, any>) | CreateSFC<{}, any>
+    export type CreateClass = (new(...args) => Create<{}, any>) | CreateSFC<{}>
 
     export type InfoClass = (new(...args) => Info<{}>) | InfoSFC<{}>
 
     export type PlayClass = (new(...args) => Play<{}, {}, {}, any, any, {}, {}, any>)
-        | PlaySFC<{}, {}, {}, any, any, {}, {}, any>
+        | PlaySFC<{}, {}, {}, any, any, {}, {}>
 
     export type Play4OwnerClass = (new(...args) => Play4Owner<{}, {}, {}, any, any, {}, {}, any>)
-        | Play4OwnerSFC<{}, {}, {}, any, any, {}, {}, any>
+        | Play4OwnerSFC<{}, {}, {}, any, any, {}, {}>
 
     export type ResultClass = (new(...args) => Result<{}, {}, {}, any>)
-        | ResultSFC<{}, {}, {}, any>
+        | ResultSFC<{}, {}, {}>
 
     export type Result4OwnerClass = (new(...args) => Result4Owner<{}, {}, {}, any, {}, any>)
-        | Result4OwnerSFC<{}, {}, {}, any, {}, any>
+        | Result4OwnerSFC<{}, {}, {}, any, {}>
 
     //region Elf
     export class CreateOnElf<ICreateParams, S = {}> extends React.Component<IElfCreateProps<ICreateParams>, S> {
