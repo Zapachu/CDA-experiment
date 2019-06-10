@@ -1,8 +1,8 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang, Tabs, RangeInput} from 'bespoke-client-util'
+import {Core, Lang, Tabs, RangeInput, Request} from 'bespoke-client-util'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState} from '../interface'
-import {FetchType, MoveType, SheetType} from '../config'
+import {FetchRoute, MoveType, namespace, SheetType} from '../config'
 import {Play4Owner} from './Play4Owner'
 
 declare interface IResult4OwnerState {
@@ -12,7 +12,7 @@ declare interface IResult4OwnerState {
     money: number
 }
 
-export class Result4Owner extends Core.Result4Owner<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams, FetchType, IResult4OwnerState> {
+export class Result4Owner extends Core.Result4Owner<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams, IResult4OwnerState> {
     state: IResult4OwnerState = {
         activeTabIndex: 0,
         activeMoveSeq: 0,
@@ -61,7 +61,7 @@ export class Result4Owner extends Core.Result4Owner<ICreateParams, IGameState, I
     }
 
     render(): React.ReactNode {
-        const {lang, props: {game, travelStates, fetcher}, state: {activeMoveSeq, activeTabIndex}} = this;
+        const {lang, props: {game, travelStates}, state: {activeMoveSeq, activeTabIndex}} = this;
         const travelState = travelStates[activeMoveSeq];
         const {s, participationFee} = game.params;
         return <section className={style.result4Owner}>
@@ -93,7 +93,8 @@ export class Result4Owner extends Core.Result4Owner<ICreateParams, IGameState, I
                             {
                                 Object.values(SheetType).map(sheetType =>
                                     <a key={sheetType}
-                                       href={fetcher.buildGetUrl(FetchType.exportXls, {sheetType})}>{lang[SheetType[sheetType]]}</a>)
+                                       href = {Request.buildUrl(namespace, FetchRoute.exportXls, {sheetType})}
+                                    >{lang[SheetType[sheetType]]}</a>)
                             }
                         </div>
                     </div>
@@ -111,7 +112,7 @@ export class Result4Owner extends Core.Result4Owner<ICreateParams, IGameState, I
                     <div>
                         {
                             travelState.gameState ?
-                                <Play4Owner {...{game, fetcher, ...travelState}}/> : null
+                                <Play4Owner {...{game, ...travelState}}/> : null
                         }
                     </div>
                 </div>
