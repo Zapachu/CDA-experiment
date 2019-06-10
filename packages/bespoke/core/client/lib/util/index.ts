@@ -1,4 +1,5 @@
-export {Lang, languages} from './language'
-export {loadScript, loadThirdPartyLib} from './fileLoader'
-export {registerOnFramework} from './register'
+export * from './language'
+export * from './fileLoader'
+export * from './register'
 export * from './interface'
+export * from './request'

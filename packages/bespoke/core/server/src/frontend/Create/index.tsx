@@ -3,7 +3,7 @@ import * as style from './style.scss'
 import {HistoryGame} from './HistoryGame'
 import {Button, ButtonProps, Input, Label, Lang, Markdown, Toast, TPageProps} from 'bespoke-client-util'
 import {baseEnum, IGameConfig} from 'bespoke-common'
-import {Api, buildFetcher} from '../util'
+import {Api} from '../util'
 
 const SubmitBarHeight = '5rem'
 
@@ -60,7 +60,6 @@ export function Create({user, history, gameTemplate: {Create: GameCreate}}: TPag
         <div className={style.bespokeWrapper}>
             <GameCreate {...{
                 params,
-                fetcher: buildFetcher(),
                 setParams: newParams => setParams({...params, ...newParams}),
                 submitable,
                 setSubmitable: submitable => setSubmitable(submitable)
