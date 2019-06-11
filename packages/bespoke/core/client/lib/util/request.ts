@@ -32,12 +32,12 @@ export namespace Request {
             .substring(key.length + 1)
     }
 
-    export function buildUrl(namespace: string, pathFragment: string, params = {}, query = {}): string {
-        let path = `/${config.rootName}/${namespace}/${config.apiPrefix}${pathFragment}`
+    export function buildUrl(namespace: string, path: string, params = {}, query = {}): string {
+        let _path = `/${config.rootName}/${namespace}${path}`
         if (params) {
-            path = path.replace(/:([\w\d]+)/, (matchedParam, paramName) => params[paramName])
+            _path = _path.replace(/:([\w\d]+)/, (matchedParam, paramName) => params[paramName])
         }
-        return `${path}?${queryString.stringify(query)}`
+        return `${_path}?${queryString.stringify(query)}`
     }
 
     export async function get(namespace: string, path: string, params = {}, query = {}) {

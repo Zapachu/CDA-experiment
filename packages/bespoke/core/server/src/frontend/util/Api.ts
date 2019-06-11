@@ -1,4 +1,4 @@
-import {baseEnum, IGameConfig, IGameThumb, IGameWithId, IMoveLog, ISimulatePlayer, IUserWithId} from 'bespoke-common'
+import {config, baseEnum, IGameConfig, IGameThumb, IGameWithId, IMoveLog, ISimulatePlayer, IUserWithId} from 'bespoke-common'
 import {IHttpRes, Request} from 'bespoke-client-util'
 
 export const Api = new class {
@@ -6,8 +6,8 @@ export const Api = new class {
     post: (path: string, params?: {}, query?: {}, data?: {}) => Promise<any>
 
     constructor() {
-        this.get = async (path, params, query) => await Request.get(NAMESPACE, path, params, query)
-        this.post = async (path, params, query, data) => await Request.post(NAMESPACE, path, params, query, data)
+        this.get = async (path, params, query) => await Request.get(NAMESPACE, `/${config.apiPrefix}${path}`, params, query)
+        this.post = async (path, params, query, data) => await Request.post(NAMESPACE, `/${config.apiPrefix}${path}`, params, query, data)
     }
 
     //region user

@@ -8,20 +8,20 @@ import {FetchRoute, namespace, SheetType} from './config'
 const router = Router()
     .get(FetchRoute.getUserMobile, async (req, res: Response) => {
         const {user: {_id: userId, mobile}, params: {gameId}, query: {token, actorType}} = req
-        if (this.game.owner.toString() !== userId.toString()) {
-            const controller = await GameLogic.getGameController(gameId)
-            const playerState = await controller.stateManager.getPlayerState({type: actorType, token})
+        const {game, stateManager} = await GameLogic.getGameController(gameId)
+        if (game.owner.toString() !== userId.toString()) {
+            const playerState = await stateManager.getPlayerState({type: actorType, token})
             playerState.mobile = mobile || '-'
         }
         return res.end()
     })
     .get(FetchRoute.exportXls, async (req, res: Response) => {
-        if (req.user.id !== this.game.owner) {
+        const {params: {gameId}, query: {sheetType}} = req
+        const {game, stateManager} = await GameLogic.getGameController(gameId)
+        if (req.user.id !== game.owner) {
             return res.end('Invalid Request')
         }
-        const {params: {gameId}, query: {sheetType}} = req
-        const controller = await GameLogic.getGameController(gameId),
-            gameState = await controller.stateManager.getGameState()
+        const gameState = await stateManager.getGameState()
         const name = SheetType[sheetType]
         let data = [], option = {}
         switch (sheetType) {
@@ -38,11 +38,11 @@ const router = Router()
         return res.end(buffer, 'binary')
     })
     .get(FetchRoute.exportXlsPlaying, async (req, res: Response) => {
-        if (req.user.id !== this.game.owner) {
-            return res.end('Invalid Request')
-        }
         const {params: {gameId}, query: {sheetType}} = req
         const controller = await GameLogic.getGameController(gameId) as Controller
+        if (req.user.id !== controller.game.owner) {
+            return res.end('Invalid Request')
+        }
         const name = SheetType[sheetType]
         let data = [], option = {}
         switch (sheetType) {
