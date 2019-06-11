@@ -46,7 +46,6 @@ export default class Controller extends BaseController<
 
   initGameState(): TGameState<IGameState> {
     const gameState = super.initGameState();
-    gameState.status = baseEnum.GameStatus.started
     gameState.groups = [];
     return gameState;
   }

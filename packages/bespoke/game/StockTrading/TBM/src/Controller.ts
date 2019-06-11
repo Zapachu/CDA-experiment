@@ -39,7 +39,6 @@ const getBestMatching = G => {
 export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     initGameState(): TGameState<IGameState> {
         const gameState = super.initGameState()
-        gameState.status = baseEnum.GameStatus.started
         gameState.groups = []
         return gameState
     }

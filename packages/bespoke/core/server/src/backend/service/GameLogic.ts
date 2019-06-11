@@ -84,7 +84,7 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
 
     initGameState(): TGameState<IGameState> {
         return {
-            status: baseEnum.GameStatus.notStarted
+            status: baseEnum.GameStatus.started
         } as any
     }
 

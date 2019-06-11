@@ -24,7 +24,6 @@ declare interface IPlayState {
 export class Play extends React.Component<TPageProps, IPlayState> {
     token = queryString.parse(location.search).token as string
     lang = Lang.extractLang({
-        Mask_WaitForGameToStart: ['等待实验开始', 'Waiting for experiment to Start'],
         Mask_GamePaused: ['实验已暂停', 'Experiment Paused']
     })
 
@@ -127,14 +126,12 @@ export class Play extends React.Component<TPageProps, IPlayState> {
                 {
                     gameState.status === baseEnum.GameStatus.over ?
                         <GameResult {...{game, Result4Owner}}/> :
-                        gameState.status === baseEnum.GameStatus.notStarted ?
-                            <MaskLoading label={lang.Mask_WaitForGameToStart}/> :
-                            <Play4Owner {...{
-                                game,
-                                frameEmitter,
-                                gameState,
-                                playerStates
-                            }}/>
+                        <Play4Owner {...{
+                            game,
+                            frameEmitter,
+                            gameState,
+                            playerStates
+                        }}/>
                 }
             </section>
         }
@@ -142,8 +139,6 @@ export class Play extends React.Component<TPageProps, IPlayState> {
             return <MaskLoading/>
         }
         switch (gameState.status) {
-            case baseEnum.GameStatus.notStarted:
-                return <MaskLoading label={lang.Mask_WaitForGameToStart}/>
             case baseEnum.GameStatus.paused:
                 return <MaskLoading label={lang.Mask_GamePaused}/>
             case baseEnum.GameStatus.started:

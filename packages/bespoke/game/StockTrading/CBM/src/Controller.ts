@@ -35,7 +35,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
 
     initGameState(): TGameState<IGameState> {
         const gameState = super.initGameState()
-        gameState.status = baseEnum.GameStatus.started
         gameState.type = ~~(Math.random() * getEnumKeys(GameType).length)
         gameState.playerIndex = 0
         gameState.periods = (Array(PERIOD).fill(null).map(() => ({
