@@ -13,7 +13,6 @@ import GameDAO from './GameDAO'
 import {NodeRobotsScheduler, PythonSchedulerProxy, RobotScheduler} from './robotSchedulerManager'
 import {StateManager} from './StateManager'
 import {MoveQueue} from './MoveQueue'
-import {Request, Response} from 'express'
 import {RedisCall, SendBackPlayer, SetPhaseResult} from 'elf-protocol'
 import SyncStrategy = baseEnum.SyncStrategy
 
@@ -133,12 +132,6 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
 
     async startNewRobotScheduler(key, pythonRobot: boolean = false) {
         await GameLogic.startNewRobotScheduler(this.game.id, key, pythonRobot)
-    }
-
-    async handleFetch(req: Request, res: Response) {
-        res.json({
-            code: baseEnum.ResponseCode.success
-        })
     }
 
     //region pushEvent

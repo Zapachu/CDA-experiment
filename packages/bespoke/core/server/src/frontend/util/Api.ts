@@ -1,4 +1,13 @@
-import {config, baseEnum, IGameConfig, IGameThumb, IGameWithId, IMoveLog, ISimulatePlayer, IUserWithId} from 'bespoke-common'
+import {
+    baseEnum,
+    config,
+    IGameConfig,
+    IGameThumb,
+    IGameWithId,
+    IMoveLog,
+    ISimulatePlayer,
+    IUserWithId
+} from 'bespoke-common'
 import {IHttpRes, Request} from 'bespoke-client-util'
 
 export const Api = new class {

@@ -18,8 +18,6 @@ const gameApiRouter = Router()
     .get('/:gameId', GameCtrl.getGame)
 
 const apiRouter = Router()
-    .all('/pass2Game/:gameId', GameCtrl.passThrough)
-    .all('/pass2Namespace', GameCtrl.passThrough)
     .use('/user', userApiRouter)
     .use('/game', gameApiRouter)
 
