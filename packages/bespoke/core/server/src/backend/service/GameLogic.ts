@@ -10,7 +10,7 @@ import {
     TPlayerState
 } from 'bespoke-common'
 import GameDAO from './GameDAO'
-import {NodeRobotsScheduler, PythonSchedulerProxy, RobotScheduler} from './robotSchedulerManager'
+import {NodeRobotsScheduler, RobotScheduler} from './robotSchedulerManager'
 import {StateManager} from './StateManager'
 import {MoveQueue} from './MoveQueue'
 import {RedisCall, SendBackPlayer, SetPhaseResult} from 'elf-protocol'
@@ -50,7 +50,7 @@ export namespace GameLogic {
 
     const robotSchedulers = new Map<string, AnyRobotScheduler>()
 
-    export async function startNewRobotScheduler<ICreateParams, IGameState, IPlayerState>(gameId: string, key: string, pythonRobot: boolean): Promise<void> {
+    export async function startNewRobotScheduler<ICreateParams, IGameState, IPlayerState>(gameId: string, key: string): Promise<void> {
         const actor: IActor = {
             token: Token.geneToken(`${gameId}${key}`),
             type: baseEnum.Actor.serverRobot
@@ -59,7 +59,7 @@ export namespace GameLogic {
             return
         }
         const game = await GameDAO.getGame<ICreateParams>(gameId)
-        const robotProxy = await (pythonRobot ? new PythonSchedulerProxy(game, actor) : new NodeRobotsScheduler(game, actor, template.Robot)).init()
+        const robotProxy = await (new NodeRobotsScheduler(game, actor, template.Robot)).init()
         robotSchedulers.set(actor.token, robotProxy.online())
     }
 }
@@ -130,8 +130,8 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
     protected async teacherMoveReducer(actor: IActor, type: string, params: IMoveParams, cb: IMoveCallback): Promise<void> {
     }
 
-    async startNewRobotScheduler(key, pythonRobot: boolean = false) {
-        await GameLogic.startNewRobotScheduler(this.game.id, key, pythonRobot)
+    async startNewRobotScheduler(key) {
+        await GameLogic.startNewRobotScheduler(this.game.id, key)
     }
 
     //region pushEvent

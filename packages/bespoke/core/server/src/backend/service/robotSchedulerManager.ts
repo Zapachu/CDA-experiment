@@ -1,13 +1,9 @@
-import {Log, EventIO, RobotConnection, cacheResultSync} from '../util'
-import * as path from 'path'
-import {elfSetting} from 'elf-setting'
-import {credentials, load as grpcLoad, loadPackageDefinition} from 'grpc'
-import {loadSync} from '@grpc/proto-loader'
+import {EventIO, RobotConnection} from '../util'
 import {decode} from 'msgpack-lite'
-import cloneDeep = require('lodash/cloneDeep')
 import {applyChange, Diff} from 'deep-diff'
-import {baseEnum, IActor, TGameState, IGameWithId, TPlayerState, FrameEmitter} from 'bespoke-common'
+import {baseEnum, FrameEmitter, IActor, IGameWithId, TGameState, TPlayerState} from 'bespoke-common'
 import {BaseRobot} from './GameLogic'
+import cloneDeep = require('lodash/cloneDeep')
 
 export abstract class RobotScheduler<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     public id: string
@@ -60,7 +56,7 @@ export abstract class RobotScheduler<ICreateParams, IGameState, IPlayerState, Mo
         return this
     }
 
-    online():RobotScheduler<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>{
+    online(): RobotScheduler<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
         this.connection.emit(baseEnum.SocketEvent.online)
         return this
     }
@@ -91,75 +87,5 @@ export class NodeRobotsScheduler<ICreateParams, IGameState, IPlayerState, MoveTy
 
     protected receivePlayerState() {
         this.robot.receivePlayerState()
-    }
-}
-
-export class PythonSchedulerProxy<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> extends RobotScheduler<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
-    private syncStateStream: any
-
-    @cacheResultSync
-    loadBespokePlayChannel(namespace: string): {
-        syncStateStream: any
-        moveStream: any
-    } {
-        const {PlayChannel} = grpcLoad(`${__dirname}/../../../../dist/${namespace}.proto`)[namespace] as any
-        const playChannel = new PlayChannel(elfSetting.pythonRobotUri, credentials.createInsecure())
-        const syncStateStream = playChannel.syncState(() => {
-            }),
-            moveStream = playChannel.sendMove()
-        return {syncStateStream, moveStream}
-    }
-
-    async init() {
-        await super.init()
-        const game = (({id, owner, namespace}: IGameWithId<ICreateParams>) => ({
-            id,
-            owner: owner.toString(),
-            namespace
-        }))(this.game)
-        const {RobotManager} = loadPackageDefinition(loadSync(path.resolve(__dirname, `../../../../robot/core/proto/RobotManager.proto`))) as any,
-            robotManager = new RobotManager(elfSetting.pythonRobotUri, credentials.createInsecure())
-        robotManager.newRobot({
-            game,
-            moveTypes: []
-        }, err => {
-            err ? Log.l(err) : null
-        })
-        const {syncStateStream, moveStream} = this.loadBespokePlayChannel(this.game.namespace)
-        this.syncStateStream = syncStateStream
-        moveStream.on('data', ({token, type, params}) => {
-            if (token !== this.actor.token) {
-                return
-            }
-            this.connection.emit(baseEnum.SocketEvent.move, {
-                type,
-                params,
-                logStack: {
-                    startTime: 0,
-                    logs: [],
-                    submitTime: 0
-                }
-            })
-        })
-        return this
-    }
-
-    protected receiveGameState() {
-        this.writeStateStream()
-    }
-
-    protected receivePlayerState() {
-        this.writeStateStream()
-    }
-
-    private writeStateStream() {
-        try {
-            this.syncStateStream.write(JSON.parse(JSON.stringify({
-                gameState: this.gameState,
-                playerState: this.playerState
-            })))
-        } catch (e) {
-            Log.e(e)
-        }
     }
 }
