@@ -3,7 +3,7 @@ import {Core, config} from 'bespoke-client-util'
 import {stringify} from 'querystring'
 import {namespace} from '../config'
 
-type TProps = Core.IPlayProps<any, any, any, any, any, any, any, any>
+type TProps = Core.IPlayProps<any, any, any, any, any, any, any>
 
 export function Play({game, playerState}: TProps) {
     return <iframe style={{

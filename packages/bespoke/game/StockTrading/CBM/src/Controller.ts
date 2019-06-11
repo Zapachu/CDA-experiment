@@ -11,7 +11,6 @@ import {
 } from 'bespoke-server'
 import {
     CONFIG,
-    FetchType,
     GameType,
     ICreateParams,
     Identity,
@@ -32,7 +31,7 @@ import {
 import {CreateGame, Phase, PhaseDone} from 'bespoke-game-stock-trading-config'
 import {getBalanceIndex, getEnumKeys, random} from './util'
 
-export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
+export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
 
     initGameState(): TGameState<IGameState> {
         const gameState = super.initGameState()

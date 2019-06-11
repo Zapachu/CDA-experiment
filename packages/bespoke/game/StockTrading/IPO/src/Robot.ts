@@ -1,19 +1,16 @@
-import { BaseRobot, FreeStyleModel, redisClient } from "bespoke-server";
+import { BaseRobot} from "bespoke-server";
 import {
   MoveType,
   PushType,
   minNPCNum,
   maxNPCNum,
-  PlayerStatus
 } from "./config";
 import {
-  GameState,
   ICreateParams,
   IGameState,
   IMoveParams,
   IPlayerState,
   IPushParams,
-  PlayerState
 } from "./interface";
 import { genRandomInt, formatDigits } from "./Controller";
 

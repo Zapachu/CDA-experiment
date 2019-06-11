@@ -12,10 +12,6 @@ export enum PushType {
     newRoundTimer
 }
 
-export enum FetchType {
-
-}
-
 export enum PlayerStatus {
     outside,
     prepared,

@@ -5,7 +5,7 @@ import InfoBar from './coms/InfoBar'
 import {Button, Input, Line, ListItem, Loading, Modal} from 'bespoke-game-stock-trading-component'
 import {Core, Toast} from 'bespoke-client-util'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
-import {FetchType, MoveType, PlayerStatus, PushType} from '../config'
+import {MoveType, PlayerStatus, PushType} from '../config'
 
 interface IPlayState {
     price: string
@@ -14,7 +14,7 @@ interface IPlayState {
     showTBMRule: boolean
 }
 
-export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, IPlayState> {
+export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IPlayState> {
     state = {
         price: '',
         count: '',

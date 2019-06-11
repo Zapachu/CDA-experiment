@@ -16,8 +16,6 @@ export enum PushType {
   shoutTimer
 }
 
-export enum FetchType {}
-
 export enum PlayerStatus {
   intro,
   matching,

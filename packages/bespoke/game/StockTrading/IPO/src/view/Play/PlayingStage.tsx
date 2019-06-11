@@ -2,7 +2,6 @@ import * as React from "react";
 import * as style from "./style.scss";
 import { Core, Lang, Toast } from "bespoke-client-util";
 import {
-  FetchType,
   MoveType,
   PushType,
   PlayerStatus,
@@ -50,7 +49,6 @@ export default class PlayingStage extends Core.Play<
   PushType,
   IMoveParams,
   IPushParams,
-  FetchType,
   IPlayState
 > {
   constructor(props) {
@@ -66,8 +64,7 @@ export default class PlayingStage extends Core.Play<
       MoveType,
       PushType,
       IMoveParams,
-      IPushParams,
-      FetchType
+      IPushParams
     >
   ) => {
     const {

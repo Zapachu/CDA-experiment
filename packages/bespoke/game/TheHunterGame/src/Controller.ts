@@ -1,8 +1,8 @@
 import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from 'bespoke-server'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
-import { FetchType, MoveType, PlayerStatus, PushType, Prey} from './config'
+import { MoveType, PlayerStatus, PushType, Prey} from './config'
 
-export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
+export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
 
     initGameState(): TGameState<IGameState> {
         const gameState = super.initGameState()

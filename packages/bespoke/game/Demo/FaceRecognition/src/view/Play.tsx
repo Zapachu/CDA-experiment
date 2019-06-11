@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as style from './style.scss'
 import * as qiniu from 'qiniu-js'
 import {Core, Lang, Button, ButtonProps} from 'bespoke-client-util'
-import {FetchType, MoveType, PushType, TResultItem, Point, recognizeInterval} from '../config'
+import {MoveType, PushType, TResultItem, Point, recognizeInterval} from '../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 
 interface IPlayState {
@@ -15,7 +15,7 @@ interface IPlayState {
     }
 }
 
-export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, IPlayState> {
+export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IPlayState> {
     videoRef = React.createRef<HTMLVideoElement>()
     canvasRef = React.createRef<HTMLCanvasElement>()
     recognizeTimer: number

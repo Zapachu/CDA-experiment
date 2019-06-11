@@ -14,10 +14,6 @@ export enum PushType {
     newRound
 }
 
-export enum FetchType {
-
-}
-
 export const RedisKey = {
     frameSeq: (gameId: string) => `frameSeq:${gameId}`
 }

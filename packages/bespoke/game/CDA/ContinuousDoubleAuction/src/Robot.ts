@@ -1,4 +1,4 @@
-import {BaseRobot, FreeStyleModel, redisClient} from 'bespoke-server'
+import {BaseRobot, Model, redisClient} from 'bespoke-server'
 import * as dateFormat from 'dateformat'
 import {
     AdjustDirection,
@@ -190,7 +190,7 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
                     CalculatedPrice: newPrice,
                     timestamp: dateFormat(Date.now(), 'HH:MM:ss:l')
                 }
-                await new FreeStyleModel({
+                await new Model.FreeStyleModel({
                     game: this.game.id,
                     key: DBKey.robotCalcLog,
                     data
@@ -232,7 +232,7 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
             unitIndex,
             gamePhaseIndex
         }, async (shoutResult: ShoutResult, marketBuyOrders, marketSellOrders) => {
-            await new FreeStyleModel({
+            await new Model.FreeStyleModel({
                 game: this.game.id,
                 key: DBKey.robotSubmitLog,
                 data: {...data, shoutResult, marketBuyOrders, marketSellOrders}

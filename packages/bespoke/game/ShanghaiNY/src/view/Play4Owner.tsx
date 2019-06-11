@@ -26,9 +26,9 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
     state: IPlay4OwnerState = {}
 
     render(): React.ReactNode {
-        const {lang, props: {playerStates, frameEmitter}} = this
+        const {lang, props: {game, playerStates, frameEmitter}} = this
         return <section className={style.play4Owner}>
-            <a className={style.exportBtn} href={Request.buildUrl(namespace, FetchRoute.exportXlsPlaying,{sheetType: SheetType.result} )}>{lang[SheetType[SheetType.result]]}</a>
+            <a className={style.exportBtn} href={Request.buildUrl(namespace, FetchRoute.exportXlsPlaying, {gameId:game.id},{sheetType: SheetType.result} )}>{lang[SheetType[SheetType.result]]}</a>
             <table className={style.resultTable}>
                 <tbody>
                 <tr>

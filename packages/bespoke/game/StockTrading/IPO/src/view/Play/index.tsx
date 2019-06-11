@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as style from "./style.scss";
 import { Core, Lang } from "bespoke-client-util";
-import { FetchType, MoveType, PushType, PlayerStatus } from "../../config";
+import { MoveType, PushType, PlayerStatus } from "../../config";
 import {
   ICreateParams,
   IGameState,
@@ -22,7 +22,6 @@ export class Play extends Core.Play<
   PushType,
   IMoveParams,
   IPushParams,
-  FetchType,
   IPlayState
 > {
   lang = Lang.extractLang({});

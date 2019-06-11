@@ -12,7 +12,7 @@ import {
     IPlayerState,
     IPushParams
 } from '../interface'
-import {FetchType, MoveType, PlayerStatus, PushType, NEW_ROUND_TIMER} from '../config'
+import {MoveType, PlayerStatus, PushType, NEW_ROUND_TIMER} from '../config'
 import * as style from './style.scss'
 
 interface IPlayState {
@@ -21,7 +21,7 @@ interface IPlayState {
     newRoundTimers: Array<number>
 }
 
-export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, IPlayState> {
+export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IPlayState> {
     state = {
         price: '',
         loading: true,

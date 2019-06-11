@@ -2,7 +2,6 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {ICreateParams} from '../interface'
 import {Core, Label, RangeInput, Input, Toast} from 'bespoke-client-util'
-import {FetchType} from "../config"
 
 interface IGroupParams {
     initialFunding: number
@@ -19,7 +18,7 @@ interface ICreateState {
     readonly: boolean
 }
 
-export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> {
+export class Create extends Core.Create<ICreateParams, ICreateState> {
 
     state: ICreateState = {
         initialFunding: 100,

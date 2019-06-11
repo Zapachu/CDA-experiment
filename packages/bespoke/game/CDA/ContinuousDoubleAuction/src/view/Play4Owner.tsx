@@ -2,14 +2,14 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {Core, Lang, Button, MaskLoading, baseEnum} from 'bespoke-client-util'
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
-import {FetchType, MoveType, phaseNames, PlayerStatus, PushType, ROLE} from '../config'
+import {MoveType, phaseNames, PlayerStatus, PushType, ROLE} from '../config'
 import {TradeChart} from './phase/mainGame'
 
 interface IPlay4OwnerState {
     timer?: number
 }
 
-export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, IPlay4OwnerState> {
+export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IPlay4OwnerState> {
     lang = Lang.extractLang({
         seatNumber: ['座位号', 'SeatNumber'],
         gameHasNotStarted: ['实验尚未开始', 'Experiment has not started'],

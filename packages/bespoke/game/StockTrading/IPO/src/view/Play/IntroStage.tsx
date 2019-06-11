@@ -9,7 +9,6 @@ import {
   IPushParams
 } from "../../interface";
 import {
-  FetchType,
   MoveType,
   PushType,
   IPOType
@@ -32,7 +31,6 @@ export default class IntroStage extends Core.Play<
   PushType,
   IMoveParams,
   IPushParams,
-  FetchType,
   IPlayState
 > {
   constructor(props) {

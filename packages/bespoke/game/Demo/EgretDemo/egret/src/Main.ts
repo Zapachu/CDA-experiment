@@ -7,10 +7,6 @@ enum PushType {
     greet = 'greet'
 }
 
-enum FetchType {
-
-}
-
 interface ICreateParams {
 }
 

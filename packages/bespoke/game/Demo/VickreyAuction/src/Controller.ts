@@ -1,9 +1,9 @@
 import {BaseController, IActor, IGameWithId, IMoveCallback, redisClient, TGameState, TPlayerState} from 'bespoke-server'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
-import {FetchType, MoveType, PushType, RedisKey} from './config'
+import {MoveType, PushType, RedisKey} from './config'
 import cloneDeep = require('lodash/cloneDeep')
 
-export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
+export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
 
     initGameState(): TGameState<IGameState> {
         const gameState = super.initGameState()

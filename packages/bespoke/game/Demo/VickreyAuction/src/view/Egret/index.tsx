@@ -1,14 +1,14 @@
 import * as React from 'react'
 import {baseEnum, Core, loadThirdPartyLib, MaskLoading} from 'bespoke-client-util'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
-import {FetchType, MoveType, PushType} from '../../config'
+import {MoveType, PushType} from '../../config'
 import {gameData} from './gameData'
 
 interface IPlayState {
     loading: boolean
 }
 
-export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, IPlayState> {
+export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IPlayState> {
     state: IPlayState = {
         loading: true
     }

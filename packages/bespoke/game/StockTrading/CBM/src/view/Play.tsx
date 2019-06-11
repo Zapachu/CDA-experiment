@@ -4,7 +4,6 @@ import {Core, Lang, Toast} from 'bespoke-client-util'
 
 import {
     CONFIG,
-    FetchType,
     ICreateParams,
     IGameState,
     IMoveParams,
@@ -175,7 +174,7 @@ function Result({count, point, closingPrice, balancePrice}: { count: number, poi
     </section>
 }
 
-type TPlayProps = Core.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>
+type TPlayProps = Core.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>
 
 function _Play({gameState, playerState, frameEmitter, game: {params: {allowLeverage}}}: TPlayProps) {
     const STYLE = {

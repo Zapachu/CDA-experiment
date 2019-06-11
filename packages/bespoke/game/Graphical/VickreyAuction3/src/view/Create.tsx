@@ -1,7 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {Core, Input, Label, Lang, RangeInput, Toast, MaskLoading, Button} from 'bespoke-client-util'
-import {FetchType} from '../config'
 import {ICreateParams} from '../interface'
 
 interface ICreateState {
@@ -9,7 +8,7 @@ interface ICreateState {
     privatePriceLimit: number
 }
 
-export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> {
+export class Create extends Core.Create<ICreateParams, ICreateState> {
     lang = Lang.extractLang({
         round: ['轮次', 'Round'],
         player: ['玩家', 'Player'],

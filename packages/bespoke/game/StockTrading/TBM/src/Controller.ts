@@ -9,7 +9,7 @@ import {
     TPlayerState
 } from 'bespoke-server'
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
-import {FetchType, MoveType, namespace, PlayerStatus, PushType} from './config'
+import {MoveType, namespace, PlayerStatus, PushType} from './config'
 import {Phase, PhaseDone} from 'bespoke-game-stock-trading-config'
 
 const getBestMatching = G => {
@@ -36,7 +36,7 @@ const getBestMatching = G => {
         .filter(_ => _)
 }
 
-export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
+export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     initGameState(): TGameState<IGameState> {
         const gameState = super.initGameState()
         gameState.status = baseEnum.GameStatus.started

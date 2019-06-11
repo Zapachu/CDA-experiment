@@ -28,9 +28,9 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     })
 
     componentDidMount() {
-      const {playerState:{actor}, frameEmitter} = this.props;
+      const {playerState:{actor}, frameEmitter, game} = this.props;
       frameEmitter.emit(MoveType.initPosition);
-      Request.get(namespace, FetchRoute.getUserMobile, {token: actor.token, actorType: actor.type})
+      Request.get(namespace, FetchRoute.getUserMobile, {gameId:game.id},{token: actor.token, actorType: actor.type})
     }
 
     render(): React.ReactNode {

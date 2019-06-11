@@ -1,10 +1,10 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {Button, Core, Lang, MaskLoading, baseEnum} from 'bespoke-client-util'
-import {FetchType, GameStage, MoveType, PushType} from '../config'
+import {GameStage, MoveType, PushType} from '../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 
-export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
+export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     lang = Lang.extractLang({
         gameHasNotStarted: ['游戏尚未开始', 'Game has not Started'],
         unknown: ['???', '???'],

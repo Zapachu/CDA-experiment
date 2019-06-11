@@ -172,8 +172,8 @@ export enum PushType {
     newTrade = 'newTrade'
 }
 
-export enum FetchType {
-    exportXls = 'exportXls'
+export enum FetchRoute {
+    exportXls = '/exportXls/:gameId'
 }
 
 export enum ReactionType {

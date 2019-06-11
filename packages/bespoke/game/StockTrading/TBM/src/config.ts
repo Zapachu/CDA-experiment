@@ -17,10 +17,6 @@ export enum PushType {
     nextRound,
 }
 
-export enum FetchType {
-
-}
-
 export enum PlayerStatus {
     matching,
     prepared,

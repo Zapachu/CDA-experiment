@@ -93,7 +93,7 @@ export class Result4Owner extends Core.Result4Owner<ICreateParams, IGameState, I
                             {
                                 Object.values(SheetType).map(sheetType =>
                                     <a key={sheetType}
-                                       href = {Request.buildUrl(namespace, FetchRoute.exportXls, {sheetType})}
+                                       href = {Request.buildUrl(namespace, FetchRoute.exportXls,{gameId:game.id}, {sheetType})}
                                     >{lang[SheetType[sheetType]]}</a>)
                             }
                         </div>

@@ -7,10 +7,6 @@ enum PushType {
     greet = 'greet'
 }
 
-enum FetchType {
-
-}
-
 interface ICreateParams {
 }
 
@@ -29,7 +25,7 @@ interface IPlayerState {
 
 import {BaseController, IActor, IMoveCallback} from 'bespoke-server'
 
-export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
+export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
 
     async playerMoveReducer(actor: IActor, type: string, params: IMoveParams, cb: IMoveCallback): Promise<void> {
         switch (type) {

@@ -2,7 +2,6 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {Core, Input, Label, Lang, RangeInput, Toast} from 'bespoke-client-util'
 import cloneDeep = require('lodash/cloneDeep')
-import {FetchType} from '../config'
 import {ICreateParams} from '../interface'
 
 interface ICreateState {
@@ -14,7 +13,7 @@ interface ICreateState {
     privatePrice: Array<Array<number>>
 }
 
-export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> {
+export class Create extends Core.Create<ICreateParams, ICreateState> {
     state: ICreateState = {
         edit: false,
         round: 3,

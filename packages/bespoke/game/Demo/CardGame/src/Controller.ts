@@ -1,8 +1,8 @@
 import {BaseController, baseEnum, IActor, IMoveCallback, TGameState, TPlayerState} from 'bespoke-server'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
-import {FetchType, GameType, MoveType, PushType, Role, cardGame, LRGame, PlayerStatus} from './config'
+import {GameType, MoveType, PushType, Role, cardGame, LRGame, PlayerStatus} from './config'
 
-export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
+export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
 
     initGameState(): TGameState<IGameState> {
         const gameState = super.initGameState()
@@ -99,23 +99,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     const [aEarning, bEarning] = matrix[aChoice][bChoice]
                     return {aEarning, bEarning, dieRoll}
                 }
-            }
-        }
-    }
-
-    async handleFetch(req, res): Promise<void> {
-        const {query: {type}} = req
-        console.log(type)
-        switch (type) {
-            case FetchType.getRobotInputSeqList: {
-                if(req.user.role !== baseEnum.AcademusRole.teacher){
-                    return res.end('Invalid Request')
-                }
-                res.json({
-                    code: baseEnum.ResponseCode.success,
-                    historyGames: []
-                })
-                break
             }
         }
     }

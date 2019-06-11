@@ -18,7 +18,6 @@ import {
 } from "./interface";
 import {
   MATCH_TIMER,
-  FetchType,
   MoveType,
   PlayerStatus,
   PushType,
@@ -40,8 +39,7 @@ export default class Controller extends BaseController<
   MoveType,
   PushType,
   IMoveParams,
-  IPushParams,
-  FetchType
+  IPushParams
 > {
   private matchIntervals: { [groupIndex: string]: NodeJS.Timer } = {};
   private shoutIntervals: { [groupIndex: string]: NodeJS.Timer } = {};

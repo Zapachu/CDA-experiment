@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {FetchType, MoveType, PushType} from '../../config'
+import {MoveType, PushType} from '../../config'
 import {
     CreateParams,
     ICreateParams,
@@ -9,12 +9,11 @@ import {
     IPlayerState,
     IPushParams
 } from '../../interface'
-import {MaskLoading, Fetcher, FrameEmitter, IGame} from 'bespoke-client-util'
+import {MaskLoading, FrameEmitter, IGame} from 'bespoke-client-util'
 
 export namespace BasePhase {
 
     export class Create<S = {}> extends React.Component<BaseInfoProps & {
-        fetcher: Fetcher<FetchType>
         updateParams?: (newParams: Partial<CreateParams.Phase.IParams>) => void
     }, S> {
         constructor(public phases) {
@@ -42,7 +41,6 @@ export namespace BasePhase {
     }
 
     export class Play<S = {}> extends React.Component<{
-        fetcher: Fetcher<FetchType>
         game: IGame<ICreateParams>
         gameState: IGameState
         playerState: IPlayerState

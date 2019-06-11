@@ -3,7 +3,7 @@ import * as style from './style.scss'
 import {Core, Lang, MaskLoading, Toast} from 'bespoke-client-util'
 import {animated, useSpring} from 'react-spring'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
-import {FetchType, MoveType, NEW_ROUND_TIMER, PlayerStatus, PushType} from '../../config'
+import {MoveType, NEW_ROUND_TIMER, PlayerStatus, PushType} from '../../config'
 import {
     span,
     Stage,
@@ -118,7 +118,7 @@ interface IPlayState {
     newRoundTimers: Array<number>
 }
 
-export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, IPlayState> {
+export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IPlayState> {
     lang = Lang.extractLang({
         loading: ['加载中...', 'LOADING...'],
         matchPlayers: ['正在匹配玩家...', 'Matching other players...'],

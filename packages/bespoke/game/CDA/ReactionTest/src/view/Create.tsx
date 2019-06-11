@@ -2,13 +2,12 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {ICreateParams} from '../interface'
 import {Core, Lang, Label, Input} from 'bespoke-client-util'
-import {PushType} from '../config'
 
 interface ICreateState {
 
 }
 
-export class Create extends Core.Create<ICreateParams, PushType, ICreateState> {
+export class Create extends Core.Create<ICreateParams, ICreateState> {
 
     lang = Lang.extractLang({
         exchangeRate: ['兑换比率(￥/题)', 'Exchange rate (￥/Q)'],
