@@ -114,7 +114,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     global.clearInterval(addRobotTask)
                     if (gameState.groups[groupIndex].playerNum < groupSize) {
                         for (let num = 0; num < groupSize - gameState.groups[groupIndex].playerNum; num++) {
-                            await this.startNewRobotScheduler(`Robot_${num}`, false)
+                            await this.startRobot(`Robot_${num}`)
                         }
                     }
                 }, 1000)

@@ -29,6 +29,7 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
     zipFreeField: IZipFreeField
 
     async init(): Promise<BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>> {
+        await super.init()
         this.frameEmitter.on(PushType.assignedPosition, () => {
             setTimeout(() => this.frameEmitter.emit(MoveType.enterMarket, {seatNumber: ~~(Math.random() * 10000)}), Math.random() * 3000)
         })

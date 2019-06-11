@@ -10,8 +10,8 @@ import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from 
 
 export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     async init() {
+        await super.init()
         // online and getPosition
-
         setTimeout(() => this.frameEmitter.emit(MoveType.joinRobot), 1000)
 
         // shout stage

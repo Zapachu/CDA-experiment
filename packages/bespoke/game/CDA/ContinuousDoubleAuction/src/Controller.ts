@@ -27,7 +27,6 @@ import {
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
 import * as dateFormat from 'dateformat'
 import cloneDeep = require('lodash/cloneDeep')
-import {getEnumKeys} from './util'
 
 export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     private positionStack: {
@@ -55,7 +54,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         positions.forEach(({identity}, i) => (identity === IDENTITY.Player ? player : robot).push(i))
         this.positionStack = {player, robot}
         robot.forEach((_, i) => setTimeout(async () =>
-            await this.startNewRobotScheduler(`Robot_${i}`, false), Math.random() * 3000))
+            await this.startRobot(`Robot_${i}`), Math.random() * 3000))
         return this
     }
 
