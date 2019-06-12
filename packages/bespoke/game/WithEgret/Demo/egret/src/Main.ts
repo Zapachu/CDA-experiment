@@ -1,41 +1,33 @@
-//region protocol
-enum MoveType {
-    greet = 'greet'
+class LoadingUI extends egret.Sprite implements RES.PromiseTaskReporter {
+    private readonly textField: egret.TextField
+
+    public constructor() {
+        super()
+        const textField = new egret.TextField()
+        textField.y = 300
+        textField.width = 480
+        textField.height = 100
+        textField.textAlign = 'center'
+        this.textField = textField
+        this.addChild(this.textField)
+    }
+
+    public onProgress(current: number, total: number): void {
+        this.textField.text = `Loading...${current}/${total}`
+    }
 }
 
-enum PushType {
-    greet = 'greet'
-}
-
-interface ICreateParams {
-}
-
-interface IMoveParams {
-}
-
-interface IPushParams {
-}
-
-interface IGameState {
-}
-
-interface IPlayerState {
-}
-
-//endregion
-
-enum SocketEvent {
-    online = 'online',
-    move = 'move',
-    push = 'push',
-    syncGameState_json = 'SGJ',
-    syncPlayerState_json = 'SPJ',
+enum SceneName {
+    prepare,
+    trade
 }
 
 class Main extends eui.UILayer {
-    socketClient: typeof io.Socket
-    gameState: IGameState
-    playerState: IPlayerState
+    private curSceneName: SceneName
+    private sceneMap = {
+        [SceneName.prepare]: new Trade(),
+        [SceneName.trade]: new Trade()
+    }
 
     protected createChildren(): void {
         super.createChildren()
@@ -43,113 +35,27 @@ class Main extends eui.UILayer {
         egret.lifecycle.onResume = () => egret.ticker.resume()
         egret.registerImplementation('eui.IAssetAdapter', new AssetAdapter())
         egret.registerImplementation('eui.IThemeAdapter', new ThemeAdapter())
-        this.loadResource().then(() => this.runGame())
+        this.loadResource().then(() => this.switchScene(SceneName.prepare))
     }
 
-    runGame() {
-        this.initIO()
-        this.createGameScene()
-    }
-
-    initIO() {
-        this.socketClient = io.connect('/', {
-            path: location.pathname.replace('egret', 'socket.io'),
-            query: location.search.replace('?', '')
-        })
-        this.bindEventHandler()
-        this.socketClient.emit(SocketEvent.online)
-    }
-
-    bindEventHandler() {
-        this.socketClient.on(SocketEvent.syncGameState_json, gameState => {
-            this.gameState = gameState
-            console.log(gameState)
-        })
-        this.socketClient.on(SocketEvent.syncPlayerState_json, playerState => {
-            this.playerState = playerState
-            console.log(playerState)
-        })
-        this.socketClient.on(SocketEvent.push, (type: PushType, data) => {
-            switch (type) {
-                case PushType.greet: {
-                    console.log('push greet', data)
-                }
-            }
-        })
+    switchScene(scene: SceneName) {
+        const curScene = this.sceneMap[this.curSceneName]
+        if (curScene) {
+            this.removeChild(curScene)
+        }
+        const {stageWidth, stageHeight} = this.stage
+        const newScene = this.sceneMap[scene]
+        newScene.width = stageWidth
+        newScene.height = stageHeight
+        this.addChild(newScene)
     }
 
     async loadResource() {
         const loadingView = new LoadingUI()
         this.stage.addChild(loadingView)
         await RES.loadConfig('resource/default.res.json', 'resource/')
-        await this.loadTheme()
+        await new Promise(resolve => new eui.Theme('resource/default.thm.json', this.stage).addEventListener(eui.UIEvent.COMPLETE, resolve, this))
         await RES.loadGroup('preload', 0, loadingView)
         this.stage.removeChild(loadingView)
-    }
-
-    loadTheme() {
-
-        return new Promise((resolve, reject) => new eui.Theme('resource/default.thm.json', this.stage).addEventListener(eui.UIEvent.COMPLETE, resolve, this)
-        )
-    }
-
-    createGameScene(): void {
-        const stageW = this.stage.stageWidth
-
-        let topMask = new egret.Shape()
-        topMask.graphics.beginFill(0x000000, 0.5)
-        topMask.graphics.drawRect(0, 0, stageW, 172)
-        topMask.graphics.endFill()
-        topMask.y = 33
-        this.addChild(topMask)
-
-        let icon: egret.Bitmap = new egret.Bitmap(RES.getRes('egret_icon_png'))
-        this.addChild(icon)
-        icon.x = 26
-        icon.y = 33
-
-        let line = new egret.Shape()
-        line.graphics.lineStyle(2, 0xffffff)
-        line.graphics.moveTo(0, 0)
-        line.graphics.lineTo(0, 117)
-        line.graphics.endFill()
-        line.x = 172
-        line.y = 61
-        this.addChild(line)
-
-
-        let colorLabel = new egret.TextField()
-        colorLabel.textColor = 0xffffff
-        colorLabel.width = stageW - 172
-        colorLabel.textAlign = 'center'
-        colorLabel.text = 'Hello Egret'
-        colorLabel.size = 24
-        colorLabel.x = 172
-        colorLabel.y = 80
-        this.addChild(colorLabel)
-
-        let textfield = new egret.TextField()
-        this.addChild(textfield)
-        textfield.alpha = 0
-        textfield.width = stageW - 172
-        textfield.textAlign = egret.HorizontalAlign.CENTER
-        textfield.size = 24
-        textfield.textColor = 0xffffff
-        textfield.x = 172
-        textfield.y = 135
-
-        let button = new eui.Button()
-        button.label = 'Click!'
-        button.horizontalCenter = 0
-        button.verticalCenter = 0
-        this.addChild(button)
-        button.addEventListener(egret.TouchEvent.TOUCH_TAP, (e: egret.TouchEvent) => {
-            this.socketClient.emit(SocketEvent.move, MoveType.greet, {hello: 'world'})
-            let panel = new eui.Panel()
-            panel.title = 'Title'
-            panel.horizontalCenter = 0
-            panel.verticalCenter = 0
-            this.addChild(panel)
-        }, this)
     }
 }

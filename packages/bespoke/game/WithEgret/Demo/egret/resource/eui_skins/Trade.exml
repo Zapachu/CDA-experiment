@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<e:Skin class="PlaySkin" width="750" height="1334" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" >
+	<w:Config id="16b4a7f58a6" ></w:Config>
+	<e:Rect left="0" right="0" top="0" bottom="0" fillColor="0xffffff" locked="true"/>
+	<e:Group height="360" y="0" left="0" right="0">
+		<e:Image x="100" y="60" anchorOffsetX="0" anchorOffsetY="0" scaleX="1" scaleY="1" source="teacher_png"/>
+		<e:Image x="274" y="41.33" anchorOffsetX="0" width="409.33" anchorOffsetY="0" height="142.67" scale9Grid="35,36,1,1" source="tip_png"/>
+	</e:Group>
+	<e:Rect width="244" height="102" x="565" y="209" anchorOffsetY="0" ellipseWidth="60" ellipseHeight="60" anchorOffsetX="0" fillColor="0xff6c32" locked="true"/>
+	<e:Group anchorOffsetY="0" left="0" right="0" y="360">
+		<e:Group y="0" scaleX="1" scaleY="1" left="0" right="0">
+		<e:Label text="卖价" y="5" x="358" width="50%" textAlign="center" fontFamily="SimHei" size="60" bold="true" textColor="0x3c5abb"/>
+		<e:Label text="买价" y="5" x="0" width="50%" textAlign="center" fontFamily="SimHei" size="60" bold="true" textColor="0xf25c7c"/>
+		</e:Group>
+	</e:Group>
+	<e:Image source="border2_png" y="425" anchorOffsetY="0" height="701" horizontalCenter="0"/>
+	<e:Group y="449.5" horizontalCenter="0">
+		<e:DataGroup width="276" height="652" x="0" y="0" anchorOffsetX="0" anchorOffsetY="0" itemRendererSkinName="skins.ItemRendererSkin">
+			<e:ArrayCollection>
+				<e:Array>
+					<e:Object price="30"/>
+					<e:Object price="20"/>
+				</e:Array>
+			</e:ArrayCollection>
+		</e:DataGroup>
+		<e:DataGroup width="276" height="652" x="303" y="0" anchorOffsetX="0" anchorOffsetY="0"/>
+	</e:Group>
+	<e:Group y="1198" horizontalCenter="0">
+		<e:Button label="前6轮结果" x="0" y="0"/>
+		<e:Button label="报价" x="319" y="0"/>
+	</e:Group>
+	<e:Label text="180s" x="588" y="230" size="60"/>
+	<e:Label id="tip" text="" x="303" y="61.33" anchorOffsetX="0" width="358" anchorOffsetY="0" height="86.66" size="36"/>
+</e:Skin>
