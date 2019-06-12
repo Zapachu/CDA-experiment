@@ -52,10 +52,9 @@ class Main extends eui.UILayer {
     }
 
     initIO() {
-        const [, namespace, , gameId, , token] = location.search.split(/[=&]/)
         this.socketClient = io.connect('/', {
-            path: `/bespoke/${namespace}/socket.io`,
-            query: `gameId=${gameId}&token=${token}`
+            path: location.pathname.replace('egret', 'socket.io'),
+            query: location.search.replace('?', '')
         })
         this.bindEventHandler()
         this.socketClient.emit(SocketEvent.online)
