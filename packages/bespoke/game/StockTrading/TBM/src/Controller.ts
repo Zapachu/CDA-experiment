@@ -200,7 +200,7 @@ export default class Controller extends BaseController<
 
   private initRobots(amount: number) {
     for (let i = 0; i < amount; i++) {
-      this.startNewRobotScheduler(`Robot_${i}`);
+      this.startRobot(`Robot_${i}`);
     }
   }
 

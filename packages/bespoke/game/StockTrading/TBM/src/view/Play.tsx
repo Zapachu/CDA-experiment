@@ -209,9 +209,9 @@ export class Play extends Core.Play<
         label: role === Role.Buyer ? "你购买的股票数量" : "你出售的股票数量",
         value: actualNum
       },
-      { label: "你的总收益", value: profit },
+      { label: "你的总收益", value: profit.toFixed(2) },
       {
-        label: "你的现有总资产",
+        label: "现有总资产",
         value:
           role === Role.Buyer
             ? `资金${(startingPrice - strikePrice * actualNum).toFixed(

@@ -206,7 +206,6 @@ export default class RouterController {
             if (!user) {
                 user = new User({
                     unionId: key,
-                    unblockGamePhase: 2
                 })
                 await user.save()
             }
