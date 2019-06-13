@@ -1,181 +1,255 @@
 import {
-    BaseController,
-    baseEnum,
-    gameId2PlayUrl,
-    IActor,
-    IMoveCallback,
-    RedisCall,
-    TGameState,
-    TPlayerState
-} from 'bespoke-server'
-import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
-import {MoveType, namespace, PlayerStatus, PushType} from './config'
-import {Phase, PhaseDone} from 'bespoke-game-stock-trading-config'
+  BaseController,
+  baseEnum,
+  gameId2PlayUrl,
+  IActor,
+  IMoveCallback,
+  RedisCall,
+  TGameState,
+  TPlayerState
+} from "bespoke-server";
+import {
+  MoveType,
+  PushType,
+  Role,
+  ICreateParams,
+  IGameState,
+  IMoveParams,
+  IPlayerState,
+  IPushParams
+} from "./config";
+import { Phase, PhaseDone, STOCKS } from "bespoke-game-stock-trading-config";
 
-const getBestMatching = G => {
-    const MATCHED = 'matched',
-        UNMATCHED = 'unMatched'
-    const _dfs = (G, right, left, r) => {
-        for (let c = 0; c < G[0].length; c++) {
-            if (right[c] !== MATCHED && G[r][c]) {
-                right[c] = MATCHED
-                if (left[c] === UNMATCHED || _dfs(G, right, left, left[c])) {
-                    left[c] = r
-                    return true
-                }
-            }
+export default class Controller extends BaseController<
+  ICreateParams,
+  IGameState,
+  IPlayerState,
+  MoveType,
+  PushType,
+  IMoveParams,
+  IPushParams
+> {
+  private role = Role.Buyer;
+  private robotJoined = false;
+
+  initGameState(): TGameState<IGameState> {
+    const gameState = super.initGameState();
+    gameState.status = baseEnum.GameStatus.started;
+    gameState.stockIndex = genRandomInt(0, STOCKS.length - 1);
+    return gameState;
+  }
+
+  async initPlayerState(actor: IActor): Promise<TPlayerState<IPlayerState>> {
+    const playerState = await super.initPlayerState(actor);
+    playerState.actualNum = 0;
+    playerState.profit = 0;
+    return playerState;
+  }
+
+  protected async playerMoveReducer(
+    actor: IActor,
+    type: string,
+    params: IMoveParams,
+    cb: IMoveCallback
+  ): Promise<void> {
+    const { groupSize } = this.game.params;
+    const playerState = await this.stateManager.getPlayerState(actor),
+      gameState = await this.stateManager.getGameState(),
+      playerStates = await this.stateManager.getPlayerStates();
+    switch (type) {
+      case MoveType.join: {
+        if (playerState.role !== undefined) {
+          return;
         }
-        return false
+        this.initPlayer(playerState);
+        if (playerState.actor.type = baseEnum.Actor.serverRobot) {
+          this.push(playerState.actor, PushType.robotShout);
+        }
+        break;
+      }
+      case MoveType.shout: {
+        if (playerState.price !== undefined) {
+          return;
+        }
+        if (this.invalidParams(playerState, params)) {
+          return cb(
+            playerState.role === Role.Buyer
+              ? "价格应不大于估值"
+              : "价格应不小于估值"
+          );
+        }
+        playerState.price = params.price;
+        playerState.bidNum = params.num;
+        const playerStateArray = Object.values(playerStates);
+        if (!this.robotJoined && playerStateArray.length < groupSize) {
+          this.initRobots(groupSize - playerStateArray.length);
+          this.robotJoined = true;
+        }
+        console.log(playerStateArray.length);
+        console.log(playerStateArray.every(ps => !!ps.price));
+        if (
+          playerStateArray.length === groupSize &&
+          playerStateArray.every(ps => !!ps.price)
+        ) {
+          this.processProfits(gameState, playerStateArray);
+        }
+        break;
+      }
+      case MoveType.nextStage: {
+        const { onceMore } = params;
+        const res = await RedisCall.call<PhaseDone.IReq, PhaseDone.IRes>(
+          PhaseDone.name,
+          {
+            playUrl: gameId2PlayUrl(this.game.id, actor.token),
+            onceMore,
+            phase: Phase.TBM
+          }
+        );
+        res ? cb(res.lobbyUrl) : null;
+        break;
+      }
     }
-    const left = Array(G[0].length).fill(UNMATCHED)
-    G.forEach((_, r) => {
-        const right = []
-        _dfs(G, right, left, r)
-    })
-    return left.map((linkTo, index) => linkTo === UNMATCHED ? null : [linkTo, index])
-        .filter(_ => _)
+  }
+
+  private invalidParams(
+    playerState: IPlayerState,
+    params: IMoveParams
+  ): boolean {
+    const { price, num } = params;
+    const { role, startingPrice, startingQuota, privateValue } = playerState;
+    return (
+      !price ||
+      !num ||
+      (role === Role.Buyer &&
+        (price * num > startingPrice || price > privateValue)) ||
+      (role == Role.Seller && (num > startingQuota || price < privateValue))
+    );
+  }
+
+  private processProfits(
+    gameState: IGameState,
+    playerStates: Array<IPlayerState>
+  ) {
+    const buyerList = playerStates
+      .filter(ps => ps.role === Role.Buyer)
+      .sort((a, b) => b.price - a.price);
+    const sellerList = playerStates
+      .filter(ps => ps.role === Role.Seller)
+      .sort((a, b) => a.price - b.price);
+    const { strikePrice, strikeNum } = this._strikeDeal(buyerList, sellerList);
+    this._updateGameState(gameState, strikePrice, strikeNum);
+    this._updatePlayerStates(playerStates, strikePrice);
+  }
+
+  private _strikeDeal(
+    buyerList: Array<IPlayerState>,
+    sellerList: Array<IPlayerState>
+  ): { strikePrice: number; strikeNum: number } {
+    let buyerIndex = 0;
+    let sellerIndex = 0;
+    let strikeNum = 0;
+    let strikePrice = 0;
+    while (buyerIndex < buyerList.length && sellerIndex < sellerList.length) {
+      const buyer = buyerList[buyerIndex];
+      const seller = sellerList[sellerIndex];
+      if (buyer.price >= seller.price) {
+        const num = Math.min(
+          buyer.bidNum - buyer.actualNum,
+          seller.bidNum - seller.actualNum
+        );
+        buyer.actualNum += num;
+        seller.actualNum += num;
+        strikeNum += num;
+        strikePrice = (buyer.price + seller.price) / 2;
+        if (buyer.actualNum === buyer.bidNum) {
+          buyerIndex++;
+        } else {
+          sellerIndex++;
+        }
+      } else {
+        break;
+      }
+    }
+    return { strikePrice, strikeNum };
+  }
+
+  private _updatePlayerStates(
+    playerStates: Array<IPlayerState>,
+    strikePrice: number
+  ) {
+    playerStates.forEach(ps => {
+      if (!ps.actualNum) {
+        return;
+      }
+      if (ps.role === Role.Buyer) {
+        ps.profit = (ps.privateValue - strikePrice) * ps.actualNum;
+      } else {
+        ps.profit = (strikePrice - ps.privateValue) * ps.actualNum;
+      }
+    });
+  }
+
+  private _updateGameState(
+    gameState: IGameState,
+    strikePrice: number,
+    strikeNum: number
+  ) {
+    gameState.strikePrice = strikePrice;
+    gameState.strikeNum = strikeNum;
+  }
+
+  private initRobots(amount: number) {
+    for (let i = 0; i < amount; i++) {
+      this.startNewRobotScheduler(`Robot_${i}`);
+    }
+  }
+
+  private initPlayer(playerState: IPlayerState) {
+    const role = this._getRole();
+    playerState.role = role;
+    playerState.privateValue = this._getPrivatePrice(role);
+    if (role === Role.Buyer) {
+      playerState.startingPrice = this._getStartingPrice();
+    } else {
+      playerState.startingQuota = this._getStartingQuota();
+    }
+  }
+
+  private _getRole(): Role {
+    const curRole = this.role;
+    this.role = curRole === Role.Buyer ? Role.Seller : Role.Buyer;
+    return curRole;
+  }
+
+  private _getPrivatePrice(role: Role): number {
+    const {
+      buyerPrivateMin,
+      buyerPrivateMax,
+      sellerPrivateMin,
+      sellerPrivateMax
+    } = this.game.params;
+    let min: number, max: number;
+    if (role === Role.Buyer) {
+      min = buyerPrivateMin;
+      max = buyerPrivateMax;
+    } else {
+      min = sellerPrivateMin;
+      max = sellerPrivateMax;
+    }
+    return genRandomInt(min * 100, max * 100) / 100;
+  }
+
+  private _getStartingPrice(): number {
+    const { buyerCapitalMin, buyerCapitalMax } = this.game.params;
+    return genRandomInt(buyerCapitalMin / 100, buyerCapitalMax / 100) * 100;
+  }
+
+  private _getStartingQuota(): number {
+    const { sellerQuotaMin, sellerQuotaMax } = this.game.params;
+    return genRandomInt(sellerQuotaMin / 100, sellerQuotaMax / 100) * 100;
+  }
 }
 
-export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
-    initGameState(): TGameState<IGameState> {
-        const gameState = super.initGameState()
-        gameState.status = baseEnum.GameStatus.started
-        gameState.groups = []
-        return gameState
-    }
-
-    async initPlayerState(actor: IActor): Promise<TPlayerState<IPlayerState>> {
-        const playerState = await super.initPlayerState(actor)
-        playerState.price = null
-        playerState.profit = 0
-        playerState.playerStatus = PlayerStatus.matching
-        return playerState
-    }
-
-    protected async playerMoveReducer(actor: IActor, type: string, params: IMoveParams, cb: IMoveCallback): Promise<void> {
-        const {game: {params: {groupSize, positions, waitingSeconds}}} = this
-        const playerState = await this.stateManager.getPlayerState(actor),
-            gameState = await this.stateManager.getGameState(),
-            playerStates = await this.stateManager.getPlayerStates()
-        switch (type) {
-            case MoveType.joinRobot: {
-                if (playerState.groupIndex !== undefined) {
-                    break
-                }
-                let groupIndex = gameState.groups.findIndex(({playerNum}) => playerNum < groupSize)
-                if (groupIndex === -1) {
-                    const group: GameState.IGroup = {
-                        roundIndex: 0,
-                        playerNum: 0
-                    }
-                    groupIndex = gameState.groups.push(group) - 1
-                }
-                playerState.groupIndex = groupIndex
-                playerState.positionIndex = gameState.groups[groupIndex].playerNum++
-                playerState.role = positions[playerState.positionIndex].role
-                playerState.privatePrice = positions[playerState.positionIndex].privatePrice
-                const groupPlayerStates = Object.values(playerStates).filter(s => s.groupIndex === groupIndex)
-                if (groupPlayerStates.length === groupSize && groupPlayerStates.every(p => p.playerStatus === PlayerStatus.matching)) {
-                    groupPlayerStates.map((p, i) => {
-                        p.playerStatus = PlayerStatus.prepared
-                        setTimeout(() => {
-                            this.push(p.actor, PushType.startBid, {
-                                role: p.role,
-                                privatePrice: p.privatePrice
-                            })
-                        }, 1000 * i)
-                    })
-                }
-                break
-            }
-            case MoveType.startMulti: {
-                if (playerState.groupIndex !== undefined) {
-                    break
-                }
-                let groupIndex = gameState.groups.findIndex(({playerNum}) => playerNum < groupSize)
-                if (groupIndex === -1) {
-                    const group: GameState.IGroup = {
-                        roundIndex: 0,
-                        playerNum: 0
-                    }
-                    groupIndex = gameState.groups.push(group) - 1
-                }
-
-                let addRobotTimer = 1
-                const addRobotTask = global.setInterval(async () => {
-                    const {groupIndex} = playerState
-                    if (addRobotTimer++ < waitingSeconds) {
-                        this.push(playerState.actor, PushType.matchTimer, {
-                            matchTimer: addRobotTimer,
-                            matchNum: gameState.groups[groupIndex].playerNum
-                        })
-                        return
-                    }
-                    global.clearInterval(addRobotTask)
-                    if (gameState.groups[groupIndex].playerNum < groupSize) {
-                        for (let num = 0; num < groupSize - gameState.groups[groupIndex].playerNum; num++) {
-                            await this.startNewRobotScheduler(`Robot_${num}`, false)
-                        }
-                    }
-                }, 1000)
-                playerState.groupIndex = groupIndex
-                playerState.positionIndex = gameState.groups[groupIndex].playerNum++
-                playerState.role = positions[playerState.positionIndex].role
-                playerState.privatePrice = positions[playerState.positionIndex].privatePrice
-
-                const groupPlayerStates = Object.values(playerStates).filter(s => s.groupIndex === groupIndex)
-                if (groupPlayerStates.length === groupSize && groupPlayerStates.every(p => p.playerStatus === PlayerStatus.matching)) {
-                    groupPlayerStates.map((p, i) => {
-                        p.playerStatus = PlayerStatus.prepared
-                        setTimeout(() => {
-                            this.push(p.actor, PushType.startBid, {
-                                role: p.role,
-                                privatePrice: p.privatePrice
-                            })
-                        }, 1000 * i)
-                    })
-                }
-                break
-            }
-            case MoveType.nextStage: {
-                const {onceMore} = params
-                const res = await RedisCall.call<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, {
-                    playUrl: gameId2PlayUrl(this.game.id, actor.token),
-                    onceMore,
-                    phase: Phase.TBM
-                })
-                res ? cb(res.lobbyUrl) : null
-                break
-            }
-            case MoveType.shout: {
-                const {groupIndex} = playerState,
-                    groupState = gameState.groups[groupIndex],
-                    groupPlayerStates = Object.values(playerStates).filter(s => s.groupIndex === groupIndex)
-                playerState.playerStatus = PlayerStatus.shouted
-                playerState.price = params.price
-                playerState.bidNum = params.num
-                if (groupPlayerStates.length === groupSize && groupPlayerStates.every(p => p.playerStatus === PlayerStatus.shouted)) {
-                    const buyerStates = groupPlayerStates.filter(s => s.role === 0)
-                    const sellerStates = groupPlayerStates.filter(s => s.role === 1)
-                    const intentionG = buyerStates.map(({price: buyPrice, bidNum: buyNum}) =>
-                        sellerStates.map(({price: sellerPrice, bidNum: sellNum}) =>
-                            buyPrice * buyNum >= sellerPrice * sellNum))
-                    groupState.results = []
-                    getBestMatching(intentionG)
-                        .forEach(async ([buyerIndex, sellerIndex]) => {
-                            groupState.results.push({
-                                buyerPosition: buyerStates[buyerIndex].positionIndex,
-                                sellerPosition: sellerStates[sellerIndex].positionIndex
-                            })
-                        })
-                    groupPlayerStates.map(p => {
-                        p.profit = p.privatePrice - p.price * p.bidNum
-                        p.playerStatus = PlayerStatus.result
-                    })
-                    await this.stateManager.syncState()
-                    return
-                }
-            }
-        }
-    }
+export function genRandomInt(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
