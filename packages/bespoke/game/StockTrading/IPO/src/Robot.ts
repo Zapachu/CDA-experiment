@@ -34,6 +34,7 @@ export default class extends BaseRobot<
       IPushParams
     >
   > {
+    await super.init()
     this.frameEmitter.on(PushType.robotShout, ({ min, max, startingPrice }) => {
       const { price, bidNum } = this.genPriceAndNum(min, max, startingPrice);
       this.frameEmitter.emit(MoveType.shout, { price, num: bidNum });

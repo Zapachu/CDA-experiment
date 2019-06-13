@@ -35,7 +35,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
 
     initGameState(): TGameState<IGameState> {
         const gameState = super.initGameState()
-        gameState.status = baseEnum.GameStatus.started
         gameState.type = ~~(Math.random() * getEnumKeys(GameType).length)
         gameState.playerIndex = 0
         gameState.periods = (Array(PERIOD).fill(null).map(() => ({
@@ -225,7 +224,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         case ~~(prepareTime / 2): {
                             if (periodIndex === 0) {
                                 Array(2 + CreateGame.playerLimit - gameState.playerIndex).fill(null).forEach(
-                                    async (_, i) => await this.startNewRobotScheduler(`$Robot_${i}`))
+                                    async (_, i) => await this.startRobot(`$Robot_${i}`))
                             }
                             break
                         }

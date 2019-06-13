@@ -4,7 +4,7 @@ import {baseEnum, FrameEmitter, IGameWithId, ISimulatePlayer, TGameState, TPlaye
 import {Button, ButtonProps, Lang} from 'bespoke-client-util'
 import {Api} from '../../util'
 
-const {notStarted, started, paused, over} = baseEnum.GameStatus
+const {started, paused, over} = baseEnum.GameStatus
 
 declare interface IGameControlProps {
     game: IGameWithId<{}>
@@ -31,12 +31,6 @@ export class GameControl extends React.Component<IGameControlProps> {
         players: ['实验成员', 'Players']
     })
     gameStatusMachine = {
-        [notStarted]: [
-            {
-                status: started,
-                label: this.lang.start
-            }
-        ],
         [started]: [
             {
                 status: over,
@@ -78,7 +72,6 @@ export class GameControl extends React.Component<IGameControlProps> {
                 <div className={style.gameStatus}>
                     <label>{lang.gameStatus}</label>
                     <span>{{
-                        [notStarted]: lang.notStarted,
                         [started]: lang.start,
                         [paused]: lang.paused,
                         [over]: lang.over

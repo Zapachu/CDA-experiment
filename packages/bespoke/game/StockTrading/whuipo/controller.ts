@@ -205,7 +205,8 @@ export default class RouterController {
             let user = await User.findOne({ unionId: key })
             if (!user) {
                 user = new User({
-                    unionId: key
+                    unionId: key,
+                    unblockGamePhase: 2
                 })
                 await user.save()
             }

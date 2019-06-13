@@ -29,7 +29,7 @@ export default class extends BaseRobot<
   IPushParams
 > {
   async init() {
-    super.init();
+    await super.init();
     setTimeout(() => this.frameEmitter.emit(MoveType.join), 1000);
     this.frameEmitter.on(PushType.robotShout, () => {
       const { price, bidNum } = genPriceAndNum(this.playerState);

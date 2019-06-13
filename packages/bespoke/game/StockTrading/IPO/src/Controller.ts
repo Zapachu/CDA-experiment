@@ -46,7 +46,6 @@ export default class Controller extends BaseController<
 
   initGameState(): TGameState<IGameState> {
     const gameState = super.initGameState();
-    gameState.status = baseEnum.GameStatus.started
     gameState.groups = [];
     return gameState;
   }
@@ -275,7 +274,7 @@ export default class Controller extends BaseController<
 
   _initRobots(groupIndex: number, amount: number) {
     for (let i = 0; i < amount; i++) {
-      this.startNewRobotScheduler(`Robot_G${groupIndex}_${i}`, false);
+      this.startRobot(`Robot_G${groupIndex}_${i}`);
     }
   }
 

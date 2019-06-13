@@ -1,0 +1,19 @@
+{
+	"initial": [
+		"libs/modules/egret/egret.js",
+		"libs/modules/egret/egret.web.js",
+		"libs/modules/eui/eui.js",
+		"libs/modules/assetsmanager/assetsmanager.js",
+		"libs/modules/tween/tween.js",
+		"libs/modules/promise/promise.js",
+		"libs/modules/socket.io/socket.io.js"
+	],
+	"game": [
+		"bin-debug/IO.js",
+		"bin-debug/Main.js",
+		"bin-debug/Trade.js",
+		"bin-debug/lib/AssetAdapter.js",
+		"bin-debug/lib/Platform.js",
+		"bin-debug/lib/ThemeAdapter.js"
+	]
+}

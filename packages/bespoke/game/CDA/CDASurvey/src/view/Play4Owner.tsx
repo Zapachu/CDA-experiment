@@ -6,9 +6,8 @@ import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from 
 
 export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     lang = Lang.extractLang({
-        gameHasNotStarted: ['游戏尚未开始', 'Game has not Started'],
         unknown: ['???', '???'],
-        startAnwserStage: ['开始答题', 'Start Anwser Stage'],
+        startAnswerStage: ['开始答题', 'Start Answer Stage'],
         seatNumber: ['座位号', 'Seat Number'],
         surveyStage: ['问卷进度', 'Survey Stage'],
         countDown: ['倒计时', 'Countdown']
@@ -16,9 +15,6 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
 
     render(): React.ReactNode {
         const {lang, props: {frameEmitter, gameState, playerStates}} = this
-        if (gameState.status === baseEnum.GameStatus.notStarted) {
-            return <MaskLoading label={lang.gameHasNotStarted}/>
-        }
         const playerStatesArr = Object.values(playerStates)
         return <section className={style.play4Owner}>
             <table className={style.playerStates}>
@@ -44,7 +40,7 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
             </table>
             {
                 gameState.gameStage === GameStage.seatNumber ?
-                    <Button label={lang.startAnwserStage}
+                    <Button label={lang.startAnswerStage}
                             onClick={() => frameEmitter.emit(MoveType.startMainTest)}/> : null
             }
         </section>
