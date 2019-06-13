@@ -1,14 +1,16 @@
 {
-	"skins": {
-		"eui.Button": "resource/eui_skins/ButtonSkin.exml",
-		"eui.ItemRenderer": "resource/eui_skins/ItemRendererSkin.exml",
-		"Trade": "resource/eui_skins/Trade.exml"
-	},
-	"autoGenerateExmlsList": true,
-	"exmls": [
-		"resource/eui_skins/ButtonSkin.exml",
-		"resource/eui_skins/ItemRendererSkin.exml",
-		"resource/eui_skins/Trade.exml"
-	],
-	"path": "resource/default.thm.json"
+    "skins": {
+        "eui.Button": "resource/eui_skins/ButtonSkin.exml",
+        "eui.ItemRenderer": "resource/eui_skins/ItemRendererSkin.exml",
+        "Trade": "resource/eui_skins/Trade.exml",
+        "Prepare": "resource/eui_skins/Prepare.exml",
+        "TextInputSkin": "resource/eui_skins/TextInputSkin.exml"
+    },
+    "autoGenerateExmlsList": true,
+    "exmls": [
+        "resource/eui_skins/ButtonSkin.exml",
+        "resource/eui_skins/ItemRendererSkin.exml",
+        "resource/eui_skins/Trade.exml"
+    ],
+    "path": "resource/default.thm.json"
 }

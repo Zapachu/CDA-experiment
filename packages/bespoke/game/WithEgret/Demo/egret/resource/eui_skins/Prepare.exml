@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<e:Skin class="PrepareSkin" width="750" height="1334" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" >
+	<w:Config id="16b4e6bc886" ></w:Config>
+	<e:Rect left="0" right="0" top="0" bottom="0" fillColor="0xffffff" locked="true"/>
+	<e:Group width="460" height="80" y="72" horizontalCenter="0">
+		<e:Rect strokeColor="0xf45b7c" fillColor="0xffffff" strokeAlpha="1" strokeWeight="4" ellipseWidth="8" ellipseHeight="8" scaleX="1" scaleY="1" left="0" right="0" top="0" bottom="0"/>
+		<e:Rect width="440" height="62" fillColor="0xf45b7c" horizontalCenter="0" verticalCenter="0" ellipseWidth="16"/>
+		<e:Label text="游戏规则" horizontalCenter="0" verticalCenter="0" size="32" fontFamily="SimHei"/>
+	</e:Group>
+	<e:Label text="本实验共进行R轮，每组N人。参与者会被随机分配到某一组中，担任卖家或者买家其中一种角色，实验中角色不变，双方人数对半，每轮进行1单位商品的交易；每轮实验中，每单位商品对于买家有一个货币价值，该价值是V1到V2之间的随机数，买家根据自身的货币价值进行出价（Bid prices），买家的出价只有低于货币价值时才会获得收益；每单位商品对于卖家有一定的成本，该成本是C1到C2之间的随机数，卖家根据商品的成本进行 要价（Ask prices），卖家的要价只有高于商品成本时才能获得收益。卖家接受买家的出价或者买家同意卖家的要价时，交易达成。实验中可及时修价格（降低要价、提高出价），最终收益计算：买家（Buyer）——每买进一单位商品，收益=货币价值-成交价格；卖家（Seller）——每卖出一单位商品，收益=成交价格-商品成本" y="176.83" anchorOffsetX="0" width="90%" anchorOffsetY="0" height="569.99" textColor="0x000000" fontFamily="SimHei" lineSpacing="10" size="28" horizontalCenter="0.5"/>
+	<e:Button label="开始" y="1161" horizontalCenter="0"/>
+	<e:Group y="767.32" horizontalCenter="0">
+		<e:Image x="0" y="0" anchorOffsetY="0" anchorOffsetX="0" source="buyer_png" scaleX="0.8" scaleY="0.8"/>
+		<e:Image source="seller_png" x="348" y="6" scaleX="0.8" scaleY="0.8"/>
+	</e:Group>
+</e:Skin>
