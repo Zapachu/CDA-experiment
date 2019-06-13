@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <e:Skin class="skins.TradeHistoryItemSkin" states="normal" minHeight="50" minWidth="100" currentState="normal" xmlns:e="http://ns.egret.com/eui" width="640">
-    <e:Label id="labelDisplay"              size="48" fontFamily="SimHei"              verticalAlign="middle" textAlign="center" text="{data.price}" bold="true" height="72" textColor="0xffffff" width="30%" y="8" left="0"/>
-	<e:Label id="labelDisplay0" size="48" fontFamily="SimHei" verticalAlign="middle" textAlign="center" textColor="0xFFFFFF" text="{data.price}" bold="true" height="72" anchorOffsetX="0" width="30%" y="8" horizontalCenter="0"/>
-	<e:Label id="labelDisplay1" size="48" fontFamily="SimHei" verticalAlign="middle" textAlign="center" textColor="0xFFFFFF" text="{data.price}" bold="true" height="72" anchorOffsetX="0" width="30%" y="8" right="0"/>
+    <e:Label id="labelDisplay"              size="48" fontFamily="SimHei"              verticalAlign="middle" textAlign="center" bold="true" height="72" width="30%" y="8" left="0" text="{data.round}" textColor="0xffffff"/>
+	<e:Label id="labelDisplay0" size="48" fontFamily="SimHei" verticalAlign="middle" textAlign="center" text="{data.price}" bold="true" height="72" anchorOffsetX="0" width="30%" y="8" horizontalCenter="0" textColor="0xffffff"/>
+	<e:Label id="labelDisplay1" size="48" fontFamily="SimHei" verticalAlign="middle" textAlign="center" text="{data.price}" bold="true" height="72" anchorOffsetX="0" width="30%" y="8" right="0" textColor="0xffffff"/>
 </e:Skin>

@@ -17,17 +17,31 @@ class LoadingUI extends egret.Sprite implements RES.PromiseTaskReporter {
     }
 }
 
-enum SceneName {
+enum SceneKey {
     prepare,
-    trade
+    trade,
+    result
+}
+
+abstract class Scene<State extends string = string> extends eui.Component implements eui.UIComponent {
+    _state:State
+    abstract key: SceneKey
+
+    static switchScene: (key: SceneKey) => void
+
+    switchState(state:State){
+        this._state = state
+        this.invalidateState()
+    }
+
+    getCurrentState() {
+        return this._state
+    }
 }
 
 class Main extends eui.UILayer {
-    private curSceneName: SceneName
-    private sceneMap = {
-        [SceneName.prepare]: new Trade(),
-        [SceneName.trade]: new Trade()
-    }
+    private scene: Scene
+    private scenes: Array<Scene> = [new Prepare(), new Trade(), new Result()]
 
     protected createChildren(): void {
         super.createChildren()
@@ -35,19 +49,20 @@ class Main extends eui.UILayer {
         egret.lifecycle.onResume = () => egret.ticker.resume()
         egret.registerImplementation('eui.IAssetAdapter', new AssetAdapter())
         egret.registerImplementation('eui.IThemeAdapter', new ThemeAdapter())
-        this.loadResource().then(() => this.switchScene(SceneName.prepare))
-    }
-
-    switchScene(scene: SceneName) {
-        const curScene = this.sceneMap[this.curSceneName]
-        if (curScene) {
-            this.removeChild(curScene)
-        }
-        const {stageWidth, stageHeight} = this.stage
-        const newScene = this.sceneMap[scene]
-        newScene.width = stageWidth
-        newScene.height = stageHeight
-        this.addChild(newScene)
+        this.loadResource().then(() => {
+            Scene.switchScene = (sceneKey: SceneKey) => {
+                if (this.scene) {
+                    this.removeChild(this.scene)
+                }
+                const {stageWidth, stageHeight} = this.stage
+                const scene = this.scenes.find(({key}) => key === sceneKey)
+                scene.width = stageWidth
+                scene.height = stageHeight
+                this.addChild(scene)
+                this.scene = scene
+            }
+            Scene.switchScene(SceneKey.trade)
+        })
     }
 
     async loadResource() {
