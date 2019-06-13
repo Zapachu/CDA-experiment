@@ -15,7 +15,9 @@ import socketRedis from 'socket.io-redis'
 import socketSession from 'express-socket.io-session'
 import socketPassport from 'passport.socketio'
 import cookieParser from 'cookie-parser'
+import headdump from 'heapdump'
 
+console.log(headdump)
 
 import router from './router'
 import { handleSocketInit, handleSocketPassportFailed, handleSocketPassportSuccess } from './controller'
