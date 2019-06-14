@@ -34,3 +34,4 @@ else
 end
 ngx.log(ngx.ALERT, 'ServerAddress : ', serverAddress)
 ngx.var.target = serverAddress
+red:set_keepalive(10000, 100)
