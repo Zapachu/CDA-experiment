@@ -17,19 +17,16 @@ class LoadingUI extends egret.Sprite implements RES.PromiseTaskReporter {
     }
 }
 
-enum SceneKey {
-    prepare,
-    trade,
-    result
-}
-
 abstract class Scene<State extends string = string> extends eui.Component implements eui.UIComponent {
-    _state:State
-    abstract key: SceneKey
+    _state: State
+    abstract key: GameScene
 
-    static switchScene: (key: SceneKey) => void
+    static switchScene: (key: GameScene) => void
 
-    switchState(state:State){
+    switchState(state: State) {
+        if (this._state === state) {
+            return
+        }
         this._state = state
         this.invalidateState()
     }
@@ -50,7 +47,7 @@ class Main extends eui.UILayer {
         egret.registerImplementation('eui.IAssetAdapter', new AssetAdapter())
         egret.registerImplementation('eui.IThemeAdapter', new ThemeAdapter())
         this.loadResource().then(() => {
-            Scene.switchScene = (sceneKey: SceneKey) => {
+            Scene.switchScene = (sceneKey: GameScene) => {
                 if (this.scene) {
                     this.removeChild(this.scene)
                 }
@@ -61,7 +58,7 @@ class Main extends eui.UILayer {
                 this.addChild(scene)
                 this.scene = scene
             }
-            Scene.switchScene(SceneKey.trade)
+            IO.onRender(() => Scene.switchScene(IO.gameState.scene))
         })
     }
 

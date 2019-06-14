@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <e:Skin class="PlaySkin" width="750" height="1334" currentState="normal" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing"  states="normal,input,history,roundOver" >
 	<w:Config id="16b4a7f58a6" ></w:Config>
-	<e:Rect left="0" right="0" top="0" bottom="0" fillColor="0xffffff" locked="true"/>
-	<e:Group height="360" y="0" left="0" right="0" locked="true">
+	<e:Rect left="0" right="0" top="0" bottom="0" fillColor="0xffffff"/>
+	<e:Group height="360" y="0" left="0" right="0">
 		<e:Image x="100" y="60" anchorOffsetX="0" anchorOffsetY="0" scaleX="1" scaleY="1" source="teacher_png"/>
 		<e:Image x="274" y="41.33" anchorOffsetX="0" width="409.33" anchorOffsetY="0" height="142.67" scale9Grid="35,36,1,1" source="tip_png"/>
-		<e:Label id="tip" text="" x="0" y="0" anchorOffsetX="0" width="358" anchorOffsetY="0" height="86.66" size="36" text.normal="Hello" x.normal="299.66" y.normal="65"/>
+		<e:Label id="tip" text="" x="299.97" y="60.65" anchorOffsetX="0" width="358" anchorOffsetY="0" height="86.66" size="36"/>
 	</e:Group>
-	<e:Rect width="244" height="102" x="565" y="209" anchorOffsetY="0" ellipseWidth="60" ellipseHeight="60" anchorOffsetX="0" fillColor="0xff6c32" locked="true"/>
+	<e:Rect width="244" height="102" x="565" y="209" anchorOffsetY="0" ellipseWidth="60" ellipseHeight="60" anchorOffsetX="0" fillColor="0xff6c32"/>
 	<e:Group y="465.5" horizontalCenter="1">
 		<e:Image source="border2_png" y="0" anchorOffsetY="0" height="701" horizontalCenter="0.5"/>
 		<e:DataGroup width="276" height="652" anchorOffsetX="0" anchorOffsetY="0" itemRendererSkinName="skins.ItemRendererSkin" verticalCenter="0" x="48">
@@ -25,11 +25,15 @@
 		<e:Label text="买价" y="5" x="74" width="279" textAlign="center" fontFamily="SimHei" size="60" bold="true" textColor="0xf25c7c" anchorOffsetX="0"/>
 	</e:Group>
 	<e:Group y="1198" horizontalCenter="0">
-		<e:Button id="btnHistory" label="前6轮结果" x="0" y="0"/>
+		<e:Button id="btnHistory" label="交易记录" x="0" y="0"/>
 		<e:Button id="btnShout" label="报价" x="319" y="0"/>
 	</e:Group>
-	<e:Label text="180s" x="588" y="230" size="60" locked="true"/>
-	<e:Rect left="0" right="0" top="0" bottom="0" fillAlpha="0.85" includeIn="input,history,roundOver" locked="true"/>
+	<e:Group x="565" y="209">
+		<e:Rect width="244" height="102" x="0" y="0" anchorOffsetY="0" ellipseWidth="60" ellipseHeight="60" anchorOffsetX="0" fillColor="0xFF6C32"/>
+		<e:Label id="countDown" text="180" x="10.88" y="21" size="60" anchorOffsetX="0" width="122.72" textAlign="right"/>
+		<e:Label text="s" x="142" y="21" size="60"/>
+	</e:Group>
+	<e:Rect left="0" right="0" top="0" bottom="0" fillAlpha="0.85" includeIn="input,history,roundOver"/>
 	<e:Group width="90%" height="732" includeIn="history,roundOver" y="344" anchorOffsetY="0" horizontalCenter="0.5">
 		<e:Rect left="0" right="0" top="0" bottom="0" ellipseWidth="95" fillColor="0x0a0a0a"/>
 		<e:Rect height="1" y="92" fillColor="0xffffff" width="90%" horizontalCenter="0"/>
@@ -51,13 +55,13 @@
 	<e:Image id="btnClose" source="close_png" includeIn="history" y="1096" width="45" height="45" horizontalCenter="0"/>
 	<e:Group y="200" horizontalCenter="0" includeIn="history">
 		<e:Label text="当前为第" x="0" y="12" size="48" fontFamily="SimHei" verticalAlign="middle"/>
-		<e:Label text="10" x="191.16" fontFamily="SimHei" size="72" textColor="0xE62222" y="0" verticalAlign="middle" bold="true"/>
+		<e:Label id="curRound" text="10" x="191.16" fontFamily="SimHei" size="72" textColor="0xE62222" y="0" verticalAlign="middle" bold="true" width="75" textAlign="center"/>
 		<e:Label text="轮，共" x="266" y="12" size="48" fontFamily="SimHei" verticalAlign="middle"/>
-		<e:Label text="10" x="409.83" fontFamily="SimHei" size="72" textColor="0xE62222" y="0" verticalAlign="middle" bold="true"/>
+		<e:Label id="totalRound" text="10" x="409.83" fontFamily="SimHei" size="72" textColor="0xE62222" y="0" verticalAlign="middle" bold="true" width="75" textAlign="center"/>
 		<e:Label text="轮" x="484.33" y="12" size="48" fontFamily="SimHei" verticalAlign="middle"/>
 	</e:Group>
-	<e:Group width="80%" height="72" includeIn="roundOver" y="200" horizontalCenter="0" locked="true">
-		<e:Label text="10" x="97.66" fontFamily="SimHei" size="72" textColor="0xE62222" y="0" verticalAlign="middle" bold="true"/>
+	<e:Group width="80%" height="72" includeIn="roundOver" y="200" horizontalCenter="0">
+		<e:Label id="roundOverTime" text="10" x="97.66" fontFamily="SimHei" size="72" textColor="0xE62222" y="0" verticalAlign="middle" bold="true"/>
 		<e:Label text="秒后进入下一轮" x="187" y="12" size="48" fontFamily="SimHei" verticalAlign="middle"/>
 	</e:Group>
 	<e:Group includeIn="input" left="0" right="0" top="0" bottom="0">

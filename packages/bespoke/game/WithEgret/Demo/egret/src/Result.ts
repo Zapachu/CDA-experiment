@@ -1,3 +1,3 @@
 class Result extends Scene {
-    key = SceneKey.result
+    key = GameScene.result
 }

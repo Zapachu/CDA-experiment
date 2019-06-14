@@ -6,11 +6,17 @@ enum TradeState {
 }
 
 class Trade extends Scene<TradeState> {
-    key = SceneKey.trade
+    key = GameScene.trade
     btnHistory: eui.Button
     btnShout: eui.Button
     btnClose: eui.Image
     priceInput: eui.TextInput
+    countDown: eui.Label
+    tip: eui.Label
+    totalRound: eui.Label
+    curRound: eui.Label
+    roundOverTime: eui.Label
+
 
     protected childrenCreated(): void {
         this.priceInput.touchEnabled = true
@@ -25,6 +31,21 @@ class Trade extends Scene<TradeState> {
             }
             console.log('报价', price)
             this.switchState(TradeState.normal)
+            4
         }, this)
+        IO.onRender(() => {
+            const {rounds, roundIndex} = IO.gameState,
+                timeLeft = TRADE_TIME - rounds[roundIndex].time
+            this.tip.text = `您的角色为 : ${IO.playerState.role === Role.seller ? '卖家' : '买家'}`
+            this.totalRound.text = ROUND.toString()
+            this.curRound.text = (roundIndex + 1).toString()
+            this.countDown.text = timeLeft.toString()
+            this.roundOverTime.text = (RESULT_TIME + timeLeft).toString()
+            if (timeLeft < 0) {
+                this.switchState(TradeState.roundOver)
+            } else if (this._state === TradeState.roundOver) {
+                this.switchState(TradeState.normal)
+            }
+        })
     }
 }
