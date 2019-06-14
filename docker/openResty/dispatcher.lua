@@ -22,9 +22,6 @@ string.gsub(ngx.var.request_uri, "[^'..%/..']+", function(w)
 end)
 if pathWords[1] == BESPOKE_PREFIX then
     serverAddress = red:get(GAME_SERVER_KEY_PREFIX .. pathWords[2])
-    if serverAddress == ngx.null then
-        serverAddress = red:get(red:keys(GAME_SERVER_KEY_PREFIX .. "*")[1])
-    end
 else
     for k, v in pairs(ROUTE_TABLE) do
         if k == pathWords[1] then
