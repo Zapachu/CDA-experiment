@@ -48,6 +48,7 @@
   }
 }
 .play {
+  color: #dde1e9;
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -136,7 +137,6 @@
 /*workBox*/
 .workBox {
   border-radius: 1rem;
-  margin-top: 4rem;
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -163,6 +163,7 @@
 /*infoBar*/
 .infoBar {
   margin-top: 2rem;
+  margin-bottom: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
