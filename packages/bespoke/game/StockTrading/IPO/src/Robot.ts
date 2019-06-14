@@ -1,19 +1,16 @@
-import { BaseRobot, FreeStyleModel, redisClient } from "bespoke-server";
+import { BaseRobot} from "bespoke-server";
 import {
   MoveType,
   PushType,
   minNPCNum,
   maxNPCNum,
-  PlayerStatus
 } from "./config";
 import {
-  GameState,
   ICreateParams,
   IGameState,
   IMoveParams,
   IPlayerState,
   IPushParams,
-  PlayerState
 } from "./interface";
 import { genRandomInt, formatDigits } from "./Controller";
 
@@ -37,6 +34,7 @@ export default class extends BaseRobot<
       IPushParams
     >
   > {
+    await super.init()
     this.frameEmitter.on(PushType.robotShout, ({ min, max, startingPrice }) => {
       const { price, bidNum } = this.genPriceAndNum(min, max, startingPrice);
       this.frameEmitter.emit(MoveType.shout, { price, num: bidNum });

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {Button, ButtonProps, Core, Lang, Radio, MaskLoading} from 'bespoke-client-util'
-import {FetchType, MoveType, PushType, GameType, Test1, Test2, Choice, TestStageIndex, Version} from '../../config'
+import {MoveType, PushType, GameType, Test1, Test2, Choice, TestStageIndex, Version} from '../../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
 import Display from './Display'
 import Choice1 from './Choice1'
@@ -34,7 +34,7 @@ interface Test {
   }>
 }
 
-export default class TestStage extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, IPlayState> {
+export default class TestStage extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IPlayState> {
   private Test: Array<Test>
 
   constructor(props) {

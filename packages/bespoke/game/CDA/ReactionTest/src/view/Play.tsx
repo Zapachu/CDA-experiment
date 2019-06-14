@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {Button, ButtonProps, Core, FrameEmitter, IGame, Lang, MaskLoading, Toast} from 'bespoke-client-util'
-import {FetchType, GameStage, MoveType, PushType} from '../config'
+import {GameStage, MoveType, PushType} from '../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 
 const PhaseOver: React.SFC<{
@@ -28,7 +28,7 @@ interface IPlayState {
     input: string
 }
 
-export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, IPlayState> {
+export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IPlayState> {
 
     state: IPlayState = {
         nums: this.genRandomNums(),

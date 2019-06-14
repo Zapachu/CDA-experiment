@@ -2,7 +2,6 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {ICreateParams} from '../interface'
 import {Button, Core, Label, RangeInput, Input} from 'bespoke-client-util'
-import {FetchType} from "../config"
 
 interface ICreateState {
     buyerPriceStart: number
@@ -19,7 +18,7 @@ interface ICreateState {
     readonly: boolean
 }
 
-export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> {
+export class Create extends Core.Create<ICreateParams, ICreateState> {
 
     state: ICreateState = {
         buyerPriceStart: 0,

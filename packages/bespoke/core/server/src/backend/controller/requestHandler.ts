@@ -5,7 +5,7 @@ import * as passport from 'passport'
 import {elfSetting} from 'elf-setting'
 import {Log, RedisKey, Setting, Token} from '../util'
 import {GameModel, MoveLogModel, SimulatePlayerModel, UserDoc, UserModel} from '../model'
-import {AnyController, GameLogic} from '../service/GameLogic'
+import {GameLogic} from '../service/GameLogic'
 import GameDAO from '../service/GameDAO'
 import UserService from '../service/UserService'
 import * as fs from 'fs'
@@ -236,17 +236,5 @@ export class GameCtrl {
                 code: baseEnum.ResponseCode.serverError
             })
         }
-    }
-
-    static async passThrough(req, res) {
-        let controller: AnyController
-        const {params: {gameId}} = req
-        if (gameId) {
-            const game = await GameDAO.getGame(gameId)
-            controller = await GameLogic.getGameController(game.id)
-        } else {
-            controller = GameLogic.namespaceController
-        }
-        await controller.handleFetch(req, res)
     }
 }

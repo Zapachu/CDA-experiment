@@ -1,13 +1,12 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {Core, Label, Lang, RangeInput} from 'bespoke-client-util'
-import {FetchType} from '../config'
 import {ICreateParams} from '../interface'
 
 interface ICreateState {
 }
 
-export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> {
+export class Create extends Core.Create<ICreateParams, ICreateState> {
     lang = Lang.extractLang({
         round: ['轮次', 'Round'],
         player: ['玩家', 'Player'],

@@ -1,7 +1,7 @@
 import * as path from 'path'
 import * as fs from 'fs'
 import {prompt} from 'inquirer'
-import {cd, exec, env} from 'shelljs'
+import {cd, env, exec} from 'shelljs'
 
 interface Task {
     env?: { [key: string]: string }
@@ -43,7 +43,8 @@ namespace TaskHelper {
 
 enum Side {
     client = 'client',
-    server = 'server'
+    server = 'server',
+    both = 'both(dist)',
 }
 
 enum ClientTask {
@@ -99,7 +100,7 @@ enum ServerTask {
         {
             name: 'side',
             type: 'list',
-            choices: [Side.client, Side.server],
+            choices: [Side.client, Side.server, Side.both],
             message: 'Side:'
         }
     ]))
@@ -191,6 +192,16 @@ enum ServerTask {
                     break
                 }
             }
+            break
+        }
+        case Side.both:{
+            TaskHelper.execTask({
+                env: {BUILD_MODE: ClientTask.dist},
+                command: `webpack --env.TS_NODE_PROJECT="tsconfig.json" --config ./${projectPath}/script/webpack.config.ts`
+            })
+            TaskHelper.execTask({
+                command: `tsc --outDir ./${projectPath}/build --listEmittedFiles true ./${projectPath}/src/serve.ts`
+            })
         }
     }
 })()

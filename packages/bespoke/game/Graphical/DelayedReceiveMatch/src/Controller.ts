@@ -1,9 +1,9 @@
 import {BaseController, IActor, IMoveCallback, TGameState, IGameWithId} from 'bespoke-server'
 import {ICreateParams, IGameState, IPlayerState, IPushParams, IMoveParams, GameState} from './interface'
-import {MoveType, PushType, FetchType, PlayerStatus, DEAL_TIMER, NEW_ROUND_TIMER} from './config'
+import {MoveType, PushType, PlayerStatus, DEAL_TIMER, NEW_ROUND_TIMER} from './config'
 import cloneDeep = require('lodash/cloneDeep')
 
-export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
+export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
 
     initGameState(): TGameState<IGameState> {
         const gameState = super.initGameState()

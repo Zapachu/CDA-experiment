@@ -1,19 +1,18 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {baseEnum} from 'bespoke-common'
-import {RouteComponentProps} from 'react-router-dom'
-import {CodePanel, Lang, Toast} from 'bespoke-client-util'
+import {CodePanel, Lang, Toast, TPageProps} from 'bespoke-client-util'
+import {Link} from 'react-router-dom'
 import {Api} from '../util'
 
-export class Join extends React.Component<RouteComponentProps<{}>> {
-    lang = Lang.extractLang({
-        joinGame: ['加入实验', 'Join Experiment'],
+export function Join({history}: TPageProps) {
+    const lang = Lang.extractLang({
+        login: ['登录', 'LogIn'],
         notFound: ['未找到对应实验', 'Experiment not Found'],
         tips: ['输入6位数字快速加入实验', 'Input a 6-digit number to join an experiment']
     })
 
-    async joinGame(code: string) {
-        const {lang, props: {history}} = this
+    async function joinGame(code: string) {
         const res = await Api.joinGameWithCode(code)
         switch (res.code) {
             case baseEnum.ResponseCode.success: {
@@ -26,14 +25,14 @@ export class Join extends React.Component<RouteComponentProps<{}>> {
         }
     }
 
-    render(): React.ReactNode {
-        return <section className={style.Join}>
-            <div className={style.title}>{this.lang.joinGame}</div>
-            <div className={style.tips}>{this.lang.tips}</div>
-            <CodePanel number={6}
-                       onFinish={code => this.joinGame(code)}
-                       goBack={() => this.props.history.goBack()}
-            />
-        </section>
-    }
+    return <section className={style.Join}>
+        <div className={style.btnLogin}>
+            <Link to={'/login'}>{lang.login}</Link>
+        </div>
+        <div className={style.tips}>{lang.tips}</div>
+        <CodePanel number={6}
+                   onFinish={code => joinGame(code)}
+                   goBack={() => history.goBack()}
+        />
+    </section>
 }

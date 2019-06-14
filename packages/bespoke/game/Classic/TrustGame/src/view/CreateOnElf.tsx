@@ -26,7 +26,6 @@ export class CreateOnElf extends Core.CreateOnElf<ICreateParams> {
                 setParams: newParams => {
                     updatePhase(param.nextPhaseKey ? [param.nextPhaseKey] : [], newParams)
                 },
-                fetcher: null,
                 setSubmitable: () => null
             }}/>
         </section>

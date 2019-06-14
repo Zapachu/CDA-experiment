@@ -1,27 +1,23 @@
 import {
     BaseController,
     baseEnum,
-    FreeStyleModel,
     IActor,
     IMoveCallback,
     TGameState,
     TPlayerState,
-    Log
+    Log,
+    Model
 } from 'bespoke-server'
-import nodeXlsx from 'node-xlsx'
 import {
     DBKey,
     EVENT_TYPE,
     EventParams,
-    FetchType,
     IDENTITY, ISeatNumberRow,
     MarketStage,
     MoveType,
     orderNumberLimit,
     phaseNames, PlayerStatus,
     PushType,
-    RobotCalcLog,
-    RobotSubmitLog,
     ROLE,
     SheetType,
     ShoutResult,
@@ -31,9 +27,8 @@ import {
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
 import * as dateFormat from 'dateformat'
 import cloneDeep = require('lodash/cloneDeep')
-import {getEnumKeys} from './util'
 
-export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
+export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     private positionStack: {
         player: Array<number>
         robot: Array<number>
@@ -59,7 +54,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         positions.forEach(({identity}, i) => (identity === IDENTITY.Player ? player : robot).push(i))
         this.positionStack = {player, robot}
         robot.forEach((_, i) => setTimeout(async () =>
-            await this.startNewRobotScheduler(`Robot_${i}`, false), Math.random() * 3000))
+            await this.startRobot(`Robot_${i}`), Math.random() * 3000))
         return this
     }
 
@@ -169,7 +164,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     playerSeq: positionIndex + 1,
                     seatNumber: params.seatNumber
                 }
-                await new FreeStyleModel({
+                await new Model.FreeStyleModel({
                     game: this.game.id,
                     key: DBKey.seatNumber,
                     data
@@ -705,7 +700,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
 
     //region util
     insertMoveEvent(data: Object): void {
-        new FreeStyleModel({data, game: this.game.id, key: DBKey.moveEvent}).save(err => {
+        new Model.FreeStyleModel({data, game: this.game.id, key: DBKey.moveEvent}).save(err => {
             if (err) console.log(err)
         })
     }
@@ -713,70 +708,10 @@ export default class Controller extends BaseController<ICreateParams, IGameState
     async getMoveEvent(query = {}, options = {sort: null}): Promise<Array<{ data: EventParams }>> {
         const queryObj = {...query, game: this.game.id, key: DBKey.moveEvent}
         if (options.sort) {
-            return FreeStyleModel.find(queryObj).lean().sort(options.sort).exec()
+            return Model.FreeStyleModel.find(queryObj).lean().sort(options.sort).exec()
         }
-        return FreeStyleModel.find(queryObj).lean().exec()
+        return Model.FreeStyleModel.find(queryObj).lean().exec()
     }
 
     //endregion
-
-    async handleFetch(req, res) {
-        const {query: {type, sheetType}} = req
-        const gameState = await this.stateManager.getGameState()
-        switch (type) {
-            case FetchType.exportXls: {
-                if(req.user.id !== this.game.owner){
-                    return res.end('Invalid Request')
-                }
-                const name = SheetType[sheetType]
-                let data = [], option = {}
-                switch (sheetType) {
-                    case SheetType.robotCalcLog: {
-                        data.push(['seq', 'Subject', 'role', 'box', 'R', 'A', 'q', 'tau', 'beta', 'p', 'delta', 'r', 'LagGamma', 'Gamma', 'ValueCost', 'u', 'CalculatedPrice', 'Timestamp'])
-                        const robotCalcLogs: Array<{ data: RobotCalcLog }> = await FreeStyleModel.find({
-                            game: this.game.id,
-                            key: DBKey.robotCalcLog
-                        }) as any
-                        robotCalcLogs.sort(({data: {seq: m}}, {data: {seq: n}}) => m - n)
-                            .forEach(({data: {seq, playerSeq, role, unitIndex, R, A, q, tau, beta, p, delta, r, LagGamma, Gamma, ValueCost, u, CalculatedPrice, timestamp}}) =>
-                                data.push([seq, playerSeq, role, unitIndex + 1, R, A, q, tau, beta, p, delta, r, LagGamma, Gamma, ValueCost, u, CalculatedPrice, timestamp]
-                                    .map(v => typeof v === 'number' && v % 1 ? v.toFixed(2) : v)
-                                ))
-                        break
-                    }
-                    case SheetType.robotSubmitLog: {
-                        data.push(['seq', 'Subject', 'role', 'box', 'ValueCost', 'Price', 'BuyOrders', 'SellOrders', `ShoutResult:${getEnumKeys(ShoutResult).join('/')}`, 'MarketBuyOrders', 'MarketSellOrders', 'Timestamp'])
-                        const robotSubmitLogs: Array<{ data: RobotSubmitLog }> = await FreeStyleModel.find({
-                            game: this.game.id,
-                            key: DBKey.robotSubmitLog
-                        }) as any
-                        robotSubmitLogs.sort(({data: {seq: m}}, {data: {seq: n}}) => m - n)
-                            .forEach(({data: {seq, playerSeq, role, unitIndex, ValueCost, price, buyOrders, sellOrders, shoutResult, marketBuyOrders, marketSellOrders, timestamp}}) =>
-                                data.push([seq, playerSeq, role, unitIndex + 1, ValueCost, price, buyOrders, sellOrders, `${shoutResult + 1}:${ShoutResult[shoutResult]}`, marketBuyOrders, marketSellOrders, timestamp]
-                                    .map(v => typeof v === 'number' && v % 1 ? v.toFixed(2) : v)
-                                ))
-                        break
-                    }
-                    case SheetType.seatNumber: {
-                        data.push(['Subject', 'seatNumber'])
-                        const seatNumberRows: Array<{ data: ISeatNumberRow }> = await FreeStyleModel.find({
-                            game: this.game.id,
-                            key: DBKey.seatNumber
-                        }) as any
-                        seatNumberRows.forEach(({data: {seatNumber, playerSeq}}) => data.push([playerSeq, seatNumber]))
-                        break
-                    }
-                    default: {
-                        const sheet = gameState['sheets'][sheetType]
-                        data = sheet.data
-                        option = sheet.data
-                    }
-                }
-                let buffer = nodeXlsx.build([{name, data}], option)
-                res.setHeader('Content-Type', 'application/vnd.openxmlformats')
-                res.setHeader('Content-Disposition', 'attachment; filename=' + `${encodeURI(name)}.xlsx`)
-                return res.end(buffer, 'binary')
-            }
-        }
-    }
 }

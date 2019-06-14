@@ -4,43 +4,58 @@
  *      如果在规定时间内匹配到玩家，则玩家间相互交互
  * */
 
-import {BaseRobot} from 'bespoke-server'
-import {MoveType, PushType} from './config'
-import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
+import { BaseRobot } from "bespoke-server";
+import {
+  MoveType,
+  PushType,
+  ICreateParams,
+  IGameState,
+  IMoveParams,
+  IPlayerState,
+  IPushParams,
+  NPC_PRICE_MIN,
+  NPC_PRICE_MAX,
+  Role
+} from "./config";
+import { genRandomInt } from "./Controller";
 
-export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
-    async init() {
-        // online and getPosition
-
-        setTimeout(() => this.frameEmitter.emit(MoveType.joinRobot), 1000)
-
-        // shout stage
-        this.frameEmitter.on(PushType.startBid, ({privatePrice, role}) => {
-            const price = this.genPrice(role, privatePrice)
-            this.frameEmitter.emit(MoveType.shout, {price, num: 1})
-        })
-
-        // round switch
-        this.frameEmitter.on(PushType.nextRound, async () => {
-            await this.frameEmitter.emit(MoveType.prepare)
-        })
-        return this
-    }
-
-    genPrice(role, privatePrice) {
-        const genRan = (min, max) => {
-            return parseInt((Math.random() * (max - min)).toFixed(1))
-        }
-        switch (role) {
-            case 0:
-                return genRan(0, privatePrice)
-            case 1:
-                return genRan(privatePrice, privatePrice + 20)
-            default:
-                return privatePrice
-        }
-    }
-
-
+export default class extends BaseRobot<
+  ICreateParams,
+  IGameState,
+  IPlayerState,
+  MoveType,
+  PushType,
+  IMoveParams,
+  IPushParams
+> {
+  async init() {
+    await super.init();
+    setTimeout(() => this.frameEmitter.emit(MoveType.join), 1000);
+    this.frameEmitter.on(PushType.robotShout, () => {
+      const { price, bidNum } = genPriceAndNum(this.playerState);
+      console.log('robot shout, ', price, bidNum)
+      setTimeout(() => this.frameEmitter.emit(MoveType.shout, { price, num: bidNum }), 1000);
+    });
+    return this;
+  }
 }
 
+function genPriceAndNum(
+  playerState: IPlayerState
+): { price: number; bidNum: number } {
+  if (playerState.role === Role.Buyer) {
+    const price = _genPrice();
+    const maxNum = Math.floor(playerState.startingPrice / price);
+    const bidNum = genRandomInt(Math.floor(maxNum / 2), maxNum);
+    return { price, bidNum };
+  } else {
+    const quota = playerState.startingQuota;
+    const price = _genPrice();
+    const bidNum = genRandomInt(Math.floor(quota / 2), quota);
+    return { price, bidNum };
+  }
+}
+
+function _genPrice(): number {
+  return genRandomInt(NPC_PRICE_MIN * 100, NPC_PRICE_MAX * 100) / 100;
+}

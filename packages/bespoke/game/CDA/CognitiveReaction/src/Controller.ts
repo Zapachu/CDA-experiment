@@ -1,11 +1,10 @@
-import nodeXlsx from 'node-xlsx'
-import {BaseController, IActor, IMoveCallback, TGameState, FreeStyleModel, baseEnum, TPlayerState} from 'bespoke-server'
+import {BaseController, IActor, IMoveCallback, TGameState, baseEnum, TPlayerState, Model} from 'bespoke-server'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
-import {FetchType, MoveType, GameStage, PushType, SheetType, IResult, QUESTIONS, PlayerStage} from './config'
+import {MoveType, GameStage, PushType, SheetType, IResult, QUESTIONS, PlayerStage} from './config'
 
-const QUESTION_ANSWERS: Array<string> = ['0.05', '5', '47', '4', '29', '20', 'C'];
+export const QUESTION_ANSWERS: Array<string> = ['0.05', '5', '47', '4', '29', '20', 'C'];
 
-export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
+export class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     private timer: NodeJS.Timer
 
     initGameState(): TGameState<IGameState> {
@@ -81,39 +80,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         }
     }
 
-
-    async handleFetch(req, res): Promise<void> {
-        const {query: {type, sheetType}} = req
-        switch (type) {
-            case FetchType.exportXls: {
-                if(req.user.id !== this.game.owner){
-                    return res.end('Invalid Request')
-                }
-                const name = SheetType[sheetType]
-                let data = [], option = {}
-                switch (sheetType) {
-                    case SheetType.result: {
-                        data.push(['被试编号', '题目序号', '正确答案', '被试答案', '是否正确'])
-                        const logs: Array<{ data: IResult }> = await FreeStyleModel.find({
-                            game: this.game.id,
-                            key: SheetType.result
-                        }) as any
-                        logs.forEach(({data: {seatNumber, answers}}) => {
-                            answers.forEach((ans, i) => {
-                                data.push([seatNumber, i+1, QUESTION_ANSWERS[i], ans, ans===QUESTION_ANSWERS[i]?'是':'否'])
-                            })
-                        })
-                        break
-                    }
-                }
-                let buffer = nodeXlsx.build([{name, data}], option)
-                res.setHeader('Content-Type', 'application/vnd.openxmlformats')
-                res.setHeader('Content-Disposition', 'attachment; filename=' + `${encodeURI(name)}.xlsx`)
-                return res.end(buffer, 'binary')
-            }
-        }
-    }
-
     calcResult = async (playerState: IPlayerState) => {
         let correctNumber = 0;
         playerState.answers.forEach((ans, i) => {
@@ -127,7 +93,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             seatNumber: playerState.seatNumber,
             answers: playerState.answers
         }
-        await new FreeStyleModel({
+        await new Model.FreeStyleModel({
             game: this.game.id,
             key: SheetType.result,
             data

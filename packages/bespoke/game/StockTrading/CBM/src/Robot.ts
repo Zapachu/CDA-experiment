@@ -17,6 +17,7 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
     sleepLoop: NodeJS.Timer
 
     async init(): Promise<BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>> {
+        await super.init()
         setTimeout(() => this.frameEmitter.emit(MoveType.getIndex), 1000)
         this.frameEmitter.on(PushType.beginTrading, () => {
             global.setInterval(() => {

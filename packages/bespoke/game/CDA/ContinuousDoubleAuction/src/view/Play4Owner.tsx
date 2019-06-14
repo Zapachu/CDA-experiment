@@ -2,17 +2,16 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {Core, Lang, Button, MaskLoading, baseEnum} from 'bespoke-client-util'
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
-import {FetchType, MoveType, phaseNames, PlayerStatus, PushType, ROLE} from '../config'
+import {MoveType, phaseNames, PlayerStatus, PushType, ROLE} from '../config'
 import {TradeChart} from './phase/mainGame'
 
 interface IPlay4OwnerState {
     timer?: number
 }
 
-export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, IPlay4OwnerState> {
+export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IPlay4OwnerState> {
     lang = Lang.extractLang({
         seatNumber: ['座位号', 'SeatNumber'],
-        gameHasNotStarted: ['实验尚未开始', 'Experiment has not started'],
         assignPosition: ['分发角色', 'ASSIGN POSITION'],
         openMarket: ['开放市场', 'Open Market'],
         shoutInfo: ['报价信息', 'Shout Info'],
@@ -23,7 +22,7 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
         position: ['玩家编号', 'Player Seq'],
         role: ['角色', 'Role'],
         marketClosed: ['市场关闭', 'Market Closed'],
-        readingInfo: ['阅览市场信息', 'Reading market infomation'],
+        readingInfo: ['阅览市场信息', 'Reading market information'],
         trading: ['交易中', 'Trading'],
         showResult: ['展示结果', 'Show result'],
         unknown: ['???', '???'],
@@ -156,10 +155,6 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
     }
 
     render() {
-        const {lang, props: {gameState}} = this
-        if (gameState.status === baseEnum.GameStatus.notStarted) {
-            return <MaskLoading label={lang.gameHasNotStarted}/>
-        }
         return <section className={style.player4Owner}>
             {
                 this.renderMarket()

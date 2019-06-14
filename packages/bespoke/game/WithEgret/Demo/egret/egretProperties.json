@@ -1,0 +1,29 @@
+{
+	"engineVersion": "5.2.21",
+	"compilerVersion": "5.2.21",
+	"template": {},
+	"target": {
+		"current": "web"
+	},
+	"modules": [
+		{
+			"name": "egret"
+		},
+		{
+			"name": "eui"
+		},
+		{
+			"name": "assetsmanager"
+		},
+		{
+			"name": "tween"
+		},
+		{
+			"name": "promise"
+		},
+		{
+			"name": "socket.io",
+			"path": "../../lib/socket.io"
+		}
+	]
+}

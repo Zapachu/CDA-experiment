@@ -2,8 +2,8 @@ import * as React from 'react'
 import {baseEnum, config, FrameEmitter, IActor, IGameWithId, TGameState, TPlayerState, TSocket} from 'bespoke-common'
 import * as style from './style.scss'
 import {decode} from 'msgpack-lite'
-import {IFetcher, Lang, MaskLoading, TPageProps} from 'bespoke-client-util'
-import {Api, buildFetcher} from '../util'
+import {Lang, MaskLoading, TPageProps} from 'bespoke-client-util'
+import {Api} from '../util'
 import {connect} from 'socket.io-client'
 import {applyChange, Diff} from 'deep-diff'
 import * as queryString from 'query-string'
@@ -17,7 +17,6 @@ declare interface IPlayState {
     gameState?: TGameState<{}>
     playerState?: TPlayerState<{}>
     playerStates: { [token: string]: TPlayerState<{}> }
-    fetcher?: IFetcher<any>
     socketClient?: TSocket
     frameEmitter?: FrameEmitter<any, any, any, any>
 }
@@ -25,7 +24,6 @@ declare interface IPlayState {
 export class Play extends React.Component<TPageProps, IPlayState> {
     token = queryString.parse(location.search).token as string
     lang = Lang.extractLang({
-        Mask_WaitForGameToStart: ['等待实验开始', 'Waiting for experiment to Start'],
         Mask_GamePaused: ['实验已暂停', 'Experiment Paused']
     })
 
@@ -43,7 +41,6 @@ export class Play extends React.Component<TPageProps, IPlayState> {
         this.registerStateReducer(socketClient)
         this.setState(() => ({
             game,
-            fetcher: buildFetcher(game.id),
             socketClient,
             frameEmitter: new FrameEmitter(socketClient as any)
         }), () =>
@@ -108,7 +105,7 @@ export class Play extends React.Component<TPageProps, IPlayState> {
         const {
             lang,
             props: {history, gameTemplate},
-            state: {game, actor, gameState, playerState, playerStates, fetcher, frameEmitter}
+            state: {game, actor, gameState, playerState, playerStates, frameEmitter}
         } = this
         if (!gameTemplate || !gameState) {
             return <MaskLoading/>
@@ -128,16 +125,13 @@ export class Play extends React.Component<TPageProps, IPlayState> {
                 }}/>
                 {
                     gameState.status === baseEnum.GameStatus.over ?
-                        <GameResult {...{game, fetcher, Result4Owner}}/> :
-                        gameState.status === baseEnum.GameStatus.notStarted ?
-                            <MaskLoading label={lang.Mask_WaitForGameToStart}/> :
-                            <Play4Owner {...{
-                                game,
-                                fetcher,
-                                frameEmitter,
-                                gameState,
-                                playerStates
-                            }}/>
+                        <GameResult {...{game, Result4Owner}}/> :
+                        <Play4Owner {...{
+                            game,
+                            frameEmitter,
+                            gameState,
+                            playerStates
+                        }}/>
                 }
             </section>
         }
@@ -145,14 +139,12 @@ export class Play extends React.Component<TPageProps, IPlayState> {
             return <MaskLoading/>
         }
         switch (gameState.status) {
-            case baseEnum.GameStatus.notStarted:
-                return <MaskLoading label={lang.Mask_WaitForGameToStart}/>
             case baseEnum.GameStatus.paused:
                 return <MaskLoading label={lang.Mask_GamePaused}/>
             case baseEnum.GameStatus.started:
-                return <Play {...{game, fetcher, gameState, playerState, frameEmitter}}/>
+                return <Play {...{game, gameState, playerState, frameEmitter}}/>
             case baseEnum.GameStatus.over:
-                return <Result {...{game, fetcher, gameState, playerState}}/>
+                return <Result {...{game, gameState, playerState}}/>
         }
     }
 }

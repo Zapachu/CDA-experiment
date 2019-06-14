@@ -12,8 +12,8 @@ export enum MoveType {
 export enum PushType {
 }
 
-export enum FetchType {
-    exportXls = 'exportXls'
+export enum FetchRoute {
+    exportXls = '/exportXls/:gameId'
 }
 
 /**------------------------------------------**/

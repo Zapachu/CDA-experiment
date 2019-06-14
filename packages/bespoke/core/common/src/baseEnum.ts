@@ -65,7 +65,6 @@ export enum ResponseCode {
 }
 
 export enum GameStatus {
-    notStarted,
     started,
     paused,
     over

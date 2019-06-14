@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<e:Skin class="skins.ItemRendererSkin" states="active_buy,active_sell,normal" minHeight="50" minWidth="100" currentState="normal" xmlns:e="http://ns.egret.com/eui">
+    <e:Image width="100%" height="100%" scale9Grid="1,3,8,8"              source="button_up_png"              visible="false"/>
+	<e:Rect left="0" right="0" top="0" bottom="0" fillColor="0xffffff" ellipseWidth="48" fillColor.active_buy="0xf45b7c" fillColor.active_sell="0x3c5bbc" anchorOffsetY="0"/>
+    <e:Label id="labelDisplay" top="8" bottom="8" left="8" right="8"
+             size="48" fontFamily="SimHei"
+             verticalAlign="middle" textAlign="center" textColor="0x000000" text="{data.price}" textColor.active_buy="0xffffff" textColor.active_sell="0xffffff" bold="true" height="72"/>
+</e:Skin>

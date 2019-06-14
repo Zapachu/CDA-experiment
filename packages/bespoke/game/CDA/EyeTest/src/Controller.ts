@@ -1,7 +1,6 @@
-import nodeXlsx from 'node-xlsx'
-import {BaseController, IActor, IMoveCallback, TGameState, FreeStyleModel, baseEnum} from 'bespoke-server'
+import {BaseController, IActor, IMoveCallback, TGameState, baseEnum, Model} from 'bespoke-server'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
-import {FetchType, MoveType, GameStage, PushType, GENDER, SheetType, IAnwserLog, IResult, EYES} from './config'
+import {MoveType, GameStage, PushType, GENDER, SheetType, IAnwserLog, IResult, EYES} from './config'
 
 const RIGHT_ANSWER = [
     {emotion: 0, gender: GENDER.male},
@@ -41,7 +40,7 @@ const RIGHT_ANSWER = [
     {emotion: 1, gender: GENDER.female},
     {emotion: 2, gender: GENDER.male}
 ]
-export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
+export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     private timer: NodeJS.Timer
 
     initGameState(): TGameState<IGameState> {
@@ -79,7 +78,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         gender,
                         time: gameState.time
                     }
-                    await new FreeStyleModel({
+                    await new Model.FreeStyleModel({
                         game: this.game.id,
                         key: SheetType.log,
                         data
@@ -135,7 +134,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 genderNum,
                 point
             }
-            await new FreeStyleModel({
+            await new Model.FreeStyleModel({
                 game: this.game.id,
                 key: SheetType.result,
                 data
@@ -159,47 +158,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     }
                     await this.stateManager.syncState()
                 }, 1000)
-            }
-        }
-    }
-
-    async handleFetch(req, res): Promise<void> {
-        const {query: {type, sheetType}} = req
-        switch (type) {
-            case FetchType.exportXls: {
-                if(req.user.id !== this.game.owner){
-                    return res.end('Invalid Request')
-                }
-                const name = SheetType[sheetType]
-                let data = [], option = {}
-                switch (sheetType) {
-                    case SheetType.log: {
-                        data.push(['seatNumber', 'emotion', 'gender', 'time'])
-                        const logs: Array<{ data: IAnwserLog }> = await FreeStyleModel.find({
-                            game: this.game.id,
-                            key: SheetType.log
-                        }) as any
-                        logs.forEach(({data: {seatNumber, emotion, gender, time}}) =>
-                            data.push([seatNumber, emotion, gender, time])
-                        )
-                        break
-                    }
-                    case SheetType.result: {
-                        data.push(['seatNumber', 'emotion', 'gender', 'point'])
-                        const logs: Array<{ data: IResult }> = await FreeStyleModel.find({
-                            game: this.game.id,
-                            key: SheetType.result
-                        }) as any
-                        logs.forEach(({data: {seatNumber, emotionNum, genderNum, point}}) =>
-                            data.push([seatNumber, emotionNum, genderNum, point])
-                        )
-                        break
-                    }
-                }
-                let buffer = nodeXlsx.build([{name, data}], option)
-                res.setHeader('Content-Type', 'application/vnd.openxmlformats')
-                res.setHeader('Content-Disposition', 'attachment; filename=' + `${encodeURI(name)}.xlsx`)
-                return res.end(buffer, 'binary')
             }
         }
     }

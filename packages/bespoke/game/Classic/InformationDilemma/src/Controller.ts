@@ -1,6 +1,6 @@
 import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from "bespoke-server";
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from "./interface";
-import {Balls, FetchType, MoveType, NEW_ROUND_TIMER, PlayerStatus, PushType} from './config'
+import {Balls, MoveType, NEW_ROUND_TIMER, PlayerStatus, PushType} from './config'
 
 
 const genCupAndBall = () => {
@@ -15,7 +15,7 @@ const genCupAndBall = () => {
     }
 }
 
-export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
+export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     initGameState(): TGameState<IGameState> {
         const gameState = super.initGameState()
         gameState.groups = []

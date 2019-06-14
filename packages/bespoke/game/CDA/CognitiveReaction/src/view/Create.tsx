@@ -8,7 +8,7 @@ interface ICreateState {
 
 }
 
-export class Create extends Core.Create<ICreateParams, PushType, ICreateState> {
+export class Create extends Core.Create<ICreateParams, ICreateState> {
 
     lang = Lang.extractLang({
         exchangeRate: ['兑换比率(￥/题)', 'Exchange rate (￥/Q)'],

@@ -2,8 +2,6 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {ICreateParams} from '../interface'
 import {Core, Label, RangeInput} from 'bespoke-client-util'
-import {FetchType} from "../config"
-
 interface ICreateState {
     rightReward: number,
     falseReward: number,
@@ -12,7 +10,7 @@ interface ICreateState {
     readonly: boolean
 }
 
-export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> {
+export class Create extends Core.Create<ICreateParams, ICreateState> {
 
     state: ICreateState = {
         rightReward: 100,

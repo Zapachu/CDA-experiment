@@ -1,58 +1,74 @@
-import {baseEnum, config, Request} from 'bespoke-common'
-import {IFetcher} from 'bespoke-client-util'
+import {
+    baseEnum,
+    config,
+    IGameConfig,
+    IGameThumb,
+    IGameWithId,
+    IMoveLog,
+    ISimulatePlayer,
+    IUserWithId
+} from 'bespoke-common'
+import {IHttpRes, Request} from 'bespoke-client-util'
 
-const baseFetchOption = {
-    credentials: 'include',
-    method: baseEnum.RequestMethod.GET,
-    headers: {'Content-Type': 'application/json; charset=utf-8'},
-    cache: 'default'
-}
+export const Api = new class {
+    get: (path: string, params?: {}, query?: {}) => Promise<any>
+    post: (path: string, params?: {}, query?: {}, data?: {}) => Promise<any>
 
-function getCookie(key: string) {
-    return decodeURIComponent(document.cookie)
-        .split('; ')
-        .find(str => str.startsWith(`${key}=`))
-        .substring(key.length + 1)
-}
-
-async function request(url, method: baseEnum.RequestMethod = baseEnum.RequestMethod.GET, data = null): Promise<any> {
-    const option = {
-        ...baseFetchOption,
-        method,
-        ...(data ? {body: JSON.stringify({...data, _csrf: getCookie(config.cookieKey.csrf)})} : {})
-    } as RequestInit
-    const res = await fetch(url, option)
-    if (res.ok) {
-        return res.json()
+    constructor() {
+        this.get = async (path, params, query) => await Request.get(NAMESPACE, `/${config.apiPrefix}${path}`, params, query)
+        this.post = async (path, params, query, data) => await Request.post(NAMESPACE, `/${config.apiPrefix}${path}`, params, query, data)
     }
-}
 
-export const Api = new Request(
-    NAMESPACE,
-    async (url: string) => await request(url),
-    async (url: string, data = {}) => await request(url, baseEnum.RequestMethod.POST, data)
-)
-
-export function buildFetcher<FetchType>(gameId?: string): IFetcher<FetchType> {
-    return {
-        buildGetUrl(type: FetchType, params = {}): string {
-            return Api.buildUrl('/pass2Game/:gameId', {gameId}, {type, ...params})
-        },
-
-        getFromGame(type: FetchType, params = {}) {
-            return Api.getFromGame(gameId, type.toString(), params)
-        },
-
-        postToGame(type: FetchType, params = {}) {
-            return Api.postToGame(gameId, type.toString(), params)
-        },
-
-        getFromNamespace(type: FetchType, params = {}) {
-            return Api.getFromNamespace(type.toString(), params)
-        },
-
-        postToNamespace(type: FetchType, params = {}) {
-            return Api.postToNamespace(type.toString(), params)
-        }
+    //region user
+    async getVerifyCode(nationCode: baseEnum.NationCode, mobile: string): Promise<IHttpRes & { msg: string }> {
+        return await this.get('/user/verifyCode', null, {nationCode, mobile})
     }
+
+    async login(nationCode: baseEnum.NationCode, mobile: string, verifyCode: string): Promise<IHttpRes & { returnToUrl: string }> {
+        return await this.post('/user/login', null, null, {nationCode, mobile, verifyCode})
+    }
+
+    async getUser(): Promise<IHttpRes & { user: IUserWithId }> {
+        return await this.get('/user')
+    }
+
+    async logout(): Promise<IHttpRes> {
+        return await this.post('/user/logout')
+    }
+
+    //endregion
+    //region game
+    async getGame(gameId: string): Promise<IHttpRes & { game: IGameWithId<any> }> {
+        return await this.get('/game/:gameId', {gameId})
+    }
+
+    async getHistoryGames(): Promise<IHttpRes & { historyGameThumbs: Array<IGameThumb> }> {
+        return await this.get('/game/historyThumb', null)
+    }
+
+    async newGame(game: IGameConfig<any>): Promise<IHttpRes & { gameId: string }> {
+        return await this.post('/game/new', null, null, {game})
+    }
+
+    async shareGame(gameId: string): Promise<IHttpRes & { shareCode: string, title: string }> {
+        return await this.get('/game/share/:gameId', {gameId})
+    }
+
+    async getSimulatePlayers(gameId: string): Promise<IHttpRes & { simulatePlayers: Array<ISimulatePlayer> }> {
+        return await this.get('/game/simulatePlayer/:gameId', {gameId})
+    }
+
+    async newSimulatePlayer(gameId: string, name: string): Promise<IHttpRes & { token: string }> {
+        return await this.post('/game/simulatePlayer/:gameId', {gameId}, null, {name})
+    }
+
+    async joinGameWithCode(code: string): Promise<IHttpRes & { gameId?: string }> {
+        return await this.post('/game/joinWithShareCode', null, null, {code})
+    }
+
+    async getMoveLogs(gameId: string): Promise<IHttpRes & { moveLogs: IMoveLog<any, any>[] }> {
+        return this.get('/game/moveLogs/:gameId', {gameId})
+    }
+
+    //end region
 }

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {baseEnum, IGameWithId} from 'bespoke-common'
-import {Core, IFetcher, MaskLoading} from 'bespoke-client-util'
+import {Core, MaskLoading} from 'bespoke-client-util'
 import {Api} from '../../util'
 import cloneDeep = require('lodash/cloneDeep')
 import {applyChange} from 'deep-diff'
@@ -9,7 +9,6 @@ declare type TTravelState = Core.ITravelState<any, any, any, any>
 
 declare interface IGameResultProps {
     game: IGameWithId<{}>
-    fetcher: IFetcher<any>
     Result4Owner: Core.Result4OwnerClass
 }
 
@@ -50,10 +49,10 @@ export class GameResult extends React.Component<IGameResultProps, IGameResultSta
     }
 
     render(): React.ReactNode {
-        const {props: {game, fetcher, Result4Owner}, state: {loading, travelStates}} = this
+        const {props: {game, Result4Owner}, state: {loading, travelStates}} = this
         if (loading) {
             return <MaskLoading/>
         }
-        return <Result4Owner {...{fetcher, game, travelStates}}/>
+        return <Result4Owner {...{game, travelStates}}/>
     }
 }

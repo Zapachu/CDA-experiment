@@ -18,7 +18,6 @@ import {
 } from "./interface";
 import {
   MATCH_TIMER,
-  FetchType,
   MoveType,
   PlayerStatus,
   PushType,
@@ -40,15 +39,13 @@ export default class Controller extends BaseController<
   MoveType,
   PushType,
   IMoveParams,
-  IPushParams,
-  FetchType
+  IPushParams
 > {
   private matchIntervals: { [groupIndex: string]: NodeJS.Timer } = {};
   private shoutIntervals: { [groupIndex: string]: NodeJS.Timer } = {};
 
   initGameState(): TGameState<IGameState> {
     const gameState = super.initGameState();
-    gameState.status = baseEnum.GameStatus.started
     gameState.groups = [];
     return gameState;
   }
@@ -277,7 +274,7 @@ export default class Controller extends BaseController<
 
   _initRobots(groupIndex: number, amount: number) {
     for (let i = 0; i < amount; i++) {
-      this.startNewRobotScheduler(`Robot_G${groupIndex}_${i}`, false);
+      this.startRobot(`Robot_G${groupIndex}_${i}`);
     }
   }
 

@@ -8,14 +8,14 @@ export {GameStateSynchronizer, PlayerStateSynchronizer}
 
 const UNSUPPORTED_STRATEGY_WARNING = 'Unsupported State Synchronize Strategy'
 
-export class StateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
+export class StateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     constructor(
         private strategy: baseEnum.SyncStrategy,
-        private controller: BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>
+        private controller: BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>
     ) {
     }
 
-    getGameStateSynchronizer(): GameStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
+    getGameStateSynchronizer(): GameStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
         switch (this.strategy) {
             case baseEnum.SyncStrategy.default:
                 return new GameStateSynchronizer(this.controller)
@@ -28,7 +28,7 @@ export class StateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType
         }
     }
 
-    getPlayerStateSynchronizer(actor: IActor): PlayerStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
+    getPlayerStateSynchronizer(actor: IActor): PlayerStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
         switch (this.strategy) {
             case baseEnum.SyncStrategy.default:
                 return new PlayerStateSynchronizer(actor, this.controller)

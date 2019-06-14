@@ -1,10 +1,10 @@
 import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from "bespoke-server"
 import {ICreateParams, IGameState, IPlayerState, IPushParams, IMoveParams} from "./interface"
-import {MoveType, PushType, FetchType, PlayerStatus} from './config'
+import {MoveType, PushType, PlayerStatus} from './config'
 import {GameState} from './interface'
 import {NEW_ROUND_TIMER} from './config'
 
-export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
+export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     initGameState(): TGameState<IGameState> {
         const gameState = super.initGameState()
         gameState.groups = []
