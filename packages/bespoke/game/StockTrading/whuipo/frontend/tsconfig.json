@@ -17,7 +17,7 @@
     "baseUrl": "./",
     "paths": {
       "component/*" : ["../../components/*"],
-      "@bespoke-client-util": ["../../../../core/client/lib/index.ts"]
+      "@bespoke-client-util": ["../../../../core/clientUtil/lib/index.ts"]
     }
   },
   // "include": [
