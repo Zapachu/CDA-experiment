@@ -71,7 +71,7 @@ export class Server {
         })
         express.use(errorHandler())
         express.use(`/${config.rootName}/${Setting.namespace}/static`, Express.static(Setting.staticPath, {maxAge: '10d'}))
-        express.use(`/${config.rootName}/static`, Express.static(path.join(__dirname, '../../dist/'), {maxAge: '10d'}))
+        express.use(`/${config.rootName}/${Setting.namespace}/static`, Express.static(path.join(__dirname, '../../dist/'), {maxAge: '10d'}))
         express.use(`/${config.rootName}/${Setting.namespace}`, bespokeRouter)
         express.use(`/${config.rootName}/${Setting.namespace}`, router)
         return express

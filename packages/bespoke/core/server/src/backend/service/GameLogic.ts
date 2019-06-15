@@ -136,7 +136,7 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
     }
 
     //region pushEvent
-    protected push(actors: IActor | IActor[], type: PushType, params?: IPushParams) {
+    protected push(actors: IActor | IActor[], type: PushType, params?: Partial<IPushParams>) {
         const _actors = Array.isArray(actors) ? actors : [actors]
         setTimeout(() => _actors.forEach(actor => {
             try {
@@ -147,7 +147,7 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
         }), 0)
     }
 
-    protected broadcast(type: PushType, params?: IPushParams) {
+    protected broadcast(type: PushType, params?: Partial<IPushParams>) {
         setTimeout(() => EventIO.emitEvent(this.game.id, baseEnum.SocketEvent.push, type, params), 0)
     }
 

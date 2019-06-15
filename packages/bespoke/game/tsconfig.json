@@ -21,7 +21,6 @@
   ],
   "exclude": [
     "build",
-    "**/egret",
     "**/whuipo"
   ]
 }
