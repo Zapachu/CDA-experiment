@@ -34,6 +34,14 @@ abstract class Scene<State extends string = string> extends eui.Component implem
     getCurrentState() {
         return this._state
     }
+
+    protected childrenCreated(): void {
+        IO.onRender(()=>this.render())
+    }
+
+    render(){
+
+    }
 }
 
 class Main extends eui.UILayer {
@@ -49,6 +57,9 @@ class Main extends eui.UILayer {
         this.loadResource().then(() => {
             Scene.switchScene = (sceneKey: GameScene) => {
                 if (this.scene) {
+                    if (this.scene.key === sceneKey) {
+                        return
+                    }
                     this.removeChild(this.scene)
                 }
                 const {stageWidth, stageHeight} = this.stage

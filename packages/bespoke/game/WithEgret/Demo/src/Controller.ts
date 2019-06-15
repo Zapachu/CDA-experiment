@@ -3,8 +3,9 @@ import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from 'b
 //region
 const ROUND = 3,
     PREPARE_TIME = 5,
-    TRADE_TIME = 20,
-    RESULT_TIME = 5
+    TRADE_TIME = 120,
+    RESULT_TIME = 10,
+    PLAYER_NUM = 6
 
 enum GameScene {
     prepare,
@@ -18,7 +19,8 @@ enum Role {
 }
 
 enum MoveType {
-    getIndex = 'getIndex'
+    getIndex = 'getIndex',
+    shout = 'shout'
 }
 
 enum PushType {
@@ -42,9 +44,22 @@ interface IGameState {
     scene: GameScene
 }
 
+interface IShout {
+    role: Role,
+    price: number,
+    traded?: boolean
+}
+
+interface ITrade {
+    reqIndex: number
+    resIndex: number
+    price: number
+}
+
 interface IGameRoundState {
     time: number
-    prices: []
+    shouts: IShout[]
+    trades: ITrade[]
 }
 
 interface IPlayerState {
@@ -62,15 +77,13 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         const gameState = super.initGameState()
         gameState.playerIndex = 0
         gameState.scene = GameScene.prepare
-        gameState.rounds = Array(ROUND).fill(null).map<IGameRoundState>(() => ({time: 0, prices: []}))
+        gameState.rounds = Array(ROUND).fill(null).map<IGameRoundState>(() => ({time: 0, shouts: [], trades: []}))
         gameState.prepareTime = 0
         return gameState
     }
 
     async initPlayerState(actor: IActor): Promise<TPlayerState<IPlayerState>> {
         const playerState = await super.initPlayerState(actor)
-        playerState.role = Math.random() > .5 ? Role.buyer : Role.seller
-        playerState.privatePrices = Array(ROUND).fill(null).map(() => ~~(Math.random() * 20 + 70))
         playerState.profits = []
         return playerState
     }
@@ -109,13 +122,45 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             playerState = await this.stateManager.getPlayerState(actor)
         switch (type) {
             case MoveType.getIndex: {
-                if (playerState.index !== undefined) {
+                if ((playerState.index !== undefined) || (gameState.playerIndex >= PLAYER_NUM)) {
                     break
                 }
                 playerState.index = gameState.playerIndex++
-                if (playerState.index === 0) {
+                playerState.role = playerState.index % 2 ? Role.buyer : Role.seller
+                playerState.privatePrices = Array(ROUND).fill(null).map(() => ~~(Math.random() * 20 * (playerState.role === Role.seller ? -1 : 1) + 70))
+                if (playerState.index === PLAYER_NUM - 1) {
                     await this.startPrepareCountDown()
                 }
+                break
+            }
+            case MoveType.shout: {
+                const {shouts, trades} = gameState.rounds[gameState.roundIndex]
+                let myShout = shouts[playerState.index]
+                if (myShout && !myShout.traded) {
+                    break
+                }
+                myShout = {
+                    price: params.price,
+                    role: playerState.role
+                }
+                shouts[playerState.index] = myShout
+                const pairShoutIndex = shouts.findIndex(shout => {
+                    if (!shout || (shout.role === myShout.role)||shout.traded) {
+                        return false
+                    }
+                    return myShout.role === Role.seller ? shout.price >= myShout.price : shout.price <= myShout.price
+                })
+                if (pairShoutIndex === -1) {
+                    break
+                }
+                myShout.traded = true
+                shouts[pairShoutIndex].traded = true
+                trades.push({
+                    reqIndex: pairShoutIndex,
+                    resIndex: playerState.index,
+                    price: shouts[pairShoutIndex].price
+                })
+                break
             }
         }
     }

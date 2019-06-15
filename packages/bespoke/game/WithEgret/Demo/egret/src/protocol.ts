@@ -1,8 +1,9 @@
 //region
 const ROUND = 3,
     PREPARE_TIME = 5,
-    TRADE_TIME = 20,
-    RESULT_TIME = 5
+    TRADE_TIME = 120,
+    RESULT_TIME = 10,
+    PLAYER_NUM = 6
 
 enum GameScene {
     prepare,
@@ -16,7 +17,8 @@ enum Role {
 }
 
 enum MoveType {
-    getIndex = 'getIndex'
+    getIndex = 'getIndex',
+    shout = 'shout'
 }
 
 enum PushType {
@@ -40,9 +42,22 @@ interface IGameState {
     scene: GameScene
 }
 
+interface IShout {
+    role: Role,
+    price: number,
+    traded?: boolean
+}
+
+interface ITrade {
+    reqIndex: number
+    resIndex: number
+    price: number
+}
+
 interface IGameRoundState {
-    time:number
-    prices: []
+    time: number
+    shouts: IShout[]
+    trades: ITrade[]
 }
 
 interface IPlayerState {
