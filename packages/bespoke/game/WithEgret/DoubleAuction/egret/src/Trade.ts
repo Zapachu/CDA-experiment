@@ -50,6 +50,7 @@ class Trade extends Scene<TradeState> {
             myShout = shouts[playerState.index]
         this.privatePrice.text = playerState.privatePrices[roundIndex].toString()
         this.tip.text = `您的角色为 : ${playerState.role === Role.seller ? '卖家' : '买家'}${myShout && myShout.traded ? ',交易成功' : ''}`
+        this.btnShout.enabled = !(myShout && myShout.traded)
         this.conditionTip.text = playerState.role === Role.seller ? '高于' : '低于'
         this.totalRound.text = ROUND.toString()
         this.curRound.text = (roundIndex + 1).toString()
@@ -97,11 +98,6 @@ enum ShoutItemState {
 
 class ShoutItem extends eui.ItemRenderer {
     innerContent: eui.ItemRenderer
-
-    switchState(state: ShoutItemState) {
-        this.innerContent.invalidateState()
-        this.innerContent.currentState = state
-    }
 
     dataChanged() {
         this.innerContent.data = this.data

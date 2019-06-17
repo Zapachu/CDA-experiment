@@ -136,7 +136,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             case MoveType.shout: {
                 const {shouts, trades} = gameState.rounds[gameState.roundIndex]
                 let myShout = shouts[playerState.index]
-                if (myShout && !myShout.traded) {
+                if (myShout && myShout.traded) {
                     break
                 }
                 myShout = {

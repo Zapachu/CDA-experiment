@@ -1,4 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <e:Skin xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing">
-	<e:Component id="innerContent" height="72" left="0" top="0" skinName="ShoutItemInnerSkin" right="0" bottom="0"/>
+	<e:Component id="innerContent" height="72" left="0" top="0" right="0" bottom="0">
+		<e:skinName>
+			<e:Skin states="normal,buy,sell" currentState="normal">
+			<e:Rect fillColor="0xffffff" ellipseWidth="48" anchorOffsetY="0" fillColor.buy="0xf45b7c" fillColor.sell="0x3c5bbc" left="0" right="0" top="0" bottom="0"/>
+			<e:Label id="labelDisplay" top="0" bottom="0" left="0" right="0" size="48" fontFamily="SimHei" verticalAlign="middle" textAlign="center" textColor="0x000000" text="{data.price}" bold="true" textColor.buy="0xffffff" textColor.sell="0xffffff"/>
+			</e:Skin>
+		</e:skinName>
+	</e:Component>
 </e:Skin>
