@@ -30,7 +30,7 @@ import {
   SHOUT_TIMER,
   namespace
 } from "./config";
-import {Phase, PhaseDone, STOCKS} from 'bespoke-game-stock-trading-config'
+import { Phase, PhaseDone, STOCKS } from "bespoke-game-stock-trading-config";
 
 export default class Controller extends BaseController<
   ICreateParams,
@@ -141,8 +141,16 @@ export default class Controller extends BaseController<
           group = gameState.groups[groupIndex];
           const { roundIndex, rounds: gameRounds } = group;
           const { min } = gameRounds[roundIndex];
-          if (this.invalidParams(params, privateValue, min, startingPrice)) {
-            return cb(`价格应在${min}与${privateValue}之间`);
+          let errMsg;
+          if (
+            (errMsg = this.invalidParams(
+              params,
+              privateValue,
+              min,
+              startingPrice
+            ))
+          ) {
+            return cb(errMsg);
           }
           playerState.playerStatus = PlayerStatus.shouted;
           playerState.multi.price = params.price;
@@ -197,13 +205,19 @@ export default class Controller extends BaseController<
         if (playerStatus !== PlayerStatus.result) {
           return;
         }
-        const {onceMore} = params
-        const res = await RedisCall.call<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, {
-          playUrl: gameId2PlayUrl(this.game.id, actor.token),
-          onceMore,
-          phase: this.game.params.type == IPOType.Median ? Phase.IPO_Median : Phase.IPO_TopK
-        })
-        res ? cb(res.lobbyUrl) : null
+        const { onceMore } = params;
+        const res = await RedisCall.call<PhaseDone.IReq, PhaseDone.IRes>(
+          PhaseDone.name,
+          {
+            playUrl: gameId2PlayUrl(this.game.id, actor.token),
+            onceMore,
+            phase:
+              this.game.params.type == IPOType.Median
+                ? Phase.IPO_Median
+                : Phase.IPO_TopK
+          }
+        );
+        res ? cb(res.lobbyUrl) : null;
         break;
       }
     }
@@ -263,13 +277,14 @@ export default class Controller extends BaseController<
     privateValue: number,
     min: number,
     startingPrice: number
-  ): boolean {
-    return (
-      params.num <= 0 ||
-      params.price < min ||
-      params.price > privateValue ||
-      params.price * params.num > startingPrice
-    );
+  ): string {
+    if (params.num <= 0 || params.price * params.num > startingPrice) {
+      return "您购买的股票数量超过您的可购买数量";
+    }
+    if (params.price < min || params.price > privateValue) {
+      return `价格应在${min}与${privateValue}之间`;
+    }
+    return "";
   }
 
   _initRobots(groupIndex: number, amount: number) {

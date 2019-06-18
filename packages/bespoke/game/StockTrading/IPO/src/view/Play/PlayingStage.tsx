@@ -31,7 +31,8 @@ import {
 enum ModalType {
   None,
   Ipo,
-  Trade
+  Trade,
+  Price
 }
 
 interface IPlayState {
@@ -126,7 +127,11 @@ export default class PlayingStage extends Core.Play<
     investorState: Partial<PlayerState.IMulti>,
     marketState: Partial<GameState.Group.IRound>
   ) => {
-    const { frameEmitter } = this.props;
+    const {
+      game: {
+        params: { type }
+      }
+    } = this.props;
     const dataList = [
       {
         label: "股票的成交价格",
@@ -189,16 +194,27 @@ export default class PlayingStage extends Core.Play<
           }}
         />
         <TableInfo dataList={dataList} style={{ margin: "30px auto" }} />
-        <Button
-          style={{ justifyContent: "flex-end", marginBottom: "50px" }}
-          label={"ipo知识扩展"}
-          size={Button.Size.Small}
-          color={Button.Color.Blue}
-          onClick={() => this.setState({ modalType: ModalType.Ipo })}
-        />
+        <div className={style.leftBtn}>
+          <Button
+            label={"ipo知识扩展"}
+            size={Button.Size.Big}
+            color={Button.Color.Blue}
+            onClick={() => this.setState({ modalType: ModalType.Ipo })}
+          />
+        </div>
+        <div className={style.rightBtn}>
+          <Button
+            label={
+              type === IPOType.Median ? "IPO价格知识扩展" : "荷兰式拍卖知识扩展"
+            }
+            size={Button.Size.Big}
+            color={Button.Color.Blue}
+            onClick={() => this.setState({ modalType: ModalType.Price })}
+          />
+        </div>
         <div style={{ display: "flex", justifyContent: "center" }}>
           <Button
-            label={"再玩一局"}
+            label={"再学一次"}
             color={Button.Color.Blue}
             style={{ marginRight: "20px" }}
             onClick={() => {
@@ -211,7 +227,7 @@ export default class PlayingStage extends Core.Play<
             }}
           />
           <Button
-            label={"下一局"}
+            label={"返回交易大厅"}
             onClick={() => {
               this.exitGame();
             }}
@@ -238,25 +254,17 @@ export default class PlayingStage extends Core.Play<
       frameEmitter,
       game: {
         params: { total }
-      }
+      },
     } = this.props;
     const { price, num, shoutTimer } = this.state;
     return (
       <>
-        <div className={style.tradeBtn}>
+        <div className={style.leftBtn}>
           <Button
             label={"交易规则回顾"}
-            size={Button.Size.Small}
+            size={Button.Size.Big}
             color={Button.Color.Blue}
             onClick={() => this.setState({ modalType: ModalType.Trade })}
-          />
-        </div>
-        <div className={style.ipoBtn}>
-          <Button
-            label={"ipo知识扩展"}
-            size={Button.Size.Small}
-            color={Button.Color.Blue}
-            onClick={() => this.setState({ modalType: ModalType.Ipo })}
           />
         </div>
         <StockInfo
@@ -384,16 +392,50 @@ export default class PlayingStage extends Core.Play<
           <div className={style.modalIpo}>
             <p className={style.title}>ipo知识扩展</p>
             <p>
-              IPO(Initial Public
-              Offering)价格又称新股发行价格，是指获准发行股票上市的公司与其承销商共同确定的将股票公开发售给特定或非特定投资者的价格。在这一价格的确定程序中，相关的影响因素包括公司帐面价值、经营业绩、发展前景、股票发行数量、行业特点及市场波动状况等，而这些因素的量化过程会随着定价者选用方法的不同而出现很大差别。
+              首次公开募股（Initial Public
+              Offerings，简称IPO）是指有限责任公司或股份有限公司第一次将它的股份向公众出售。通常，上市公司的股份是根据相应证监会出具的招股书或登记声明中约定的条款通过经纪商或做市商进行销售。
             </p>
-            <p>较为常用的估值方式可以分为两大类：收益折现法与类比法。</p>
-            <p>
-              1、收益折现法：就是通过合理的方式估计出上市公司未来的经营状况，并选择恰当的贴现率与贴现模型，计算出上市公司价值。如最常用的股利折现模型(ddm)、现金流贴现(dcf)模型等。
+            <Button
+              style={{ marginTop: "30px" }}
+              label={"关闭"}
+              color={Button.Color.Blue}
+              onClick={() => this.setState({ modalType: ModalType.None })}
+            />
+          </div>
+        );
+      }
+      case ModalType.Price: {
+        return (
+          <div className={style.modalIpo}>
+            <p className={style.title}>
+              {type === IPOType.Median
+                ? "IPO价格知识扩展"
+                : "荷兰式拍卖知识扩展"}
             </p>
-            <p>
-              2、类比法，就是通过选择同类上市公司的一些比率，如最常用的市盈率、市净率(p/b即股价/每股净资产)，再结合新上市公司的财务指标如每股收益、每股净资产来确定上市公司价值，一般都采用预测的指标。市盈率法的适用具有许多局限性，例如要求上市公司经营业绩要稳定，不能出现亏损等，而市净率法则没有这些问题，但同样也有缺陷，主要是过分依赖公司账面价值而不是最新的市场价值。因此对于那些流动资产比例高的公司如银行、保险公司比较适用此方法。
-            </p>
+            {type === IPOType.Median ? (
+              <>
+                <p>
+                  IPO(Initial Public
+                  Offering)价格又称新股发行价格，是指获准发行股票上市的公司与其承销商共同确定的将股票公开发售给特定或非特定投资者的价格。在这一价格的确定程序中，相关的影响因素包括公司帐面价值、经营业绩、发展前景、股票发行数量、行业特点及市场波动状况等，而这些因素的量化过程会随着定价者选用方法的不同而出现很大差别。
+                </p>
+                <p>较为常用的估值方式可以分为两大类：收益折现法与类比法。</p>
+                <p>
+                  1、收益折现法：就是通过合理的方式估计出上市公司未来的经营状况，并选择恰当的贴现率与贴现模型，计算出上市公司价值。如最常用的股利折现模型(ddm)、现金流贴现(dcf)模型等。
+                </p>
+                <p>
+                  2、类比法，就是通过选择同类上市公司的一些比率，如最常用的市盈率、市净率(p/b即股价/每股净资产)，再结合新上市公司的财务指标如每股收益、每股净资产来确定上市公司价值，一般都采用预测的指标。市盈率法的适用具有许多局限性，例如要求上市公司经营业绩要稳定，不能出现亏损等，而市净率法则没有这些问题，但同样也有缺陷，主要是过分依赖公司账面价值而不是最新的市场价值。因此对于那些流动资产比例高的公司如银行、保险公司比较适用此方法。
+                </p>
+              </>
+            ) : (
+              <>
+                <p>
+                  荷兰式拍卖亦称为“减价式拍卖”。拍卖标的的竞价由高到低依次递减直到第一个竞买入应价（达到或超过底价）时击槌成交的拍卖。减价式拍卖通常从非常高的价格开始，价格就以事先确定的降价阶梯，由高到低递减，直到有竞买人愿意接受为止。
+                </p>
+                <p>
+                  荷兰式拍卖的特点：1、价格随着一定的时间间隔，按照事先确定的降价阶梯，由高到低递减。2、所有买受人（即买到物品的人）都以最后的竞价（即所有买受人中的最低出价）成交。
+                </p>
+              </>
+            )}
             <Button
               style={{ marginTop: "30px" }}
               label={"关闭"}
