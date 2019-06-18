@@ -1,4 +1,3 @@
-export * from './language'
 export * from './fileLoader'
 export * from './register'
 export * from './interface'

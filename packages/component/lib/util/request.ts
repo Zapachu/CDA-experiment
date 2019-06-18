@@ -1,19 +1,24 @@
 import * as queryString from 'query-string'
-import {baseEnum, config} from 'bespoke-common'
+import {ResponseCode, config} from 'bespoke-common'
+
+enum RequestMethod {
+    GET = 'get',
+    POST = 'post'
+}
 
 export interface IHttpRes {
-    code: baseEnum.ResponseCode
+    code: ResponseCode
 }
 
 export namespace Request {
     const baseFetchOption = {
         credentials: 'include',
-        method: baseEnum.RequestMethod.GET,
+        method: RequestMethod.GET,
         headers: {'Content-Type': 'application/json; charset=utf-8'},
         cache: 'default'
     }
 
-    async function request(url: string, method: baseEnum.RequestMethod = baseEnum.RequestMethod.GET, data = null): Promise<any> {
+    async function request(url: string, method: RequestMethod = RequestMethod.GET, data = null): Promise<any> {
         const option = {
             ...baseFetchOption,
             method,
@@ -45,6 +50,6 @@ export namespace Request {
     }
 
     export async function post(namespace: string, path: string, params = {}, query = {}, data) {
-        return await request(buildUrl(namespace, path, params, query), baseEnum.RequestMethod.POST, data)
+        return await request(buildUrl(namespace, path, params, query), RequestMethod.POST, data)
     }
 }

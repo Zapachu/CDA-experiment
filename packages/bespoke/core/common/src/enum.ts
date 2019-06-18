@@ -1,24 +1,3 @@
-export enum Env {
-    production = 'production',
-    development = 'development',
-    testing = 'testing'
-}
-
-export enum Language {
-    zh = 'zh',
-    en = 'en'
-}
-
-export enum RequestMethod {
-    GET = 'get',
-    POST = 'post',
-    PUT = 'put',
-}
-
-export enum PassportStrategy {
-    local = 'local'
-}
-
 export enum AcademusRole {
     student = 0,
     teacher = 1
@@ -45,16 +24,6 @@ export enum SocketEvent {
 
 export enum CoreMove {
     switchGameStatus = 'switchGameStatus'
-}
-
-export enum LogLevel {
-    log,
-    trace,
-    debug,
-    info,
-    warn,
-    error,
-    fatal
 }
 
 export enum ResponseCode {

@@ -1,6 +1,7 @@
-import * as baseEnum from './baseEnum'
+import * as baseEnum from './enum'
 
 export {baseEnum}
-export {config} from './config'
+export * from './enum'
+export * from './class'
+export * from './config'
 export * from './interface'
-export {FrameEmitter} from './FrameEmitter'

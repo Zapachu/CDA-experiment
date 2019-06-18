@@ -1,4 +1,4 @@
-import {AcademusRole, Actor, GameStatus} from './baseEnum'
+import {AcademusRole, Actor, GameStatus} from './enum'
 import {EventEmitter} from 'events'
 import {Socket} from 'socket.io-client'
 import {Diff} from 'deep-diff'

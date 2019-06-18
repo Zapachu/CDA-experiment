@@ -1,10 +1,9 @@
-import {baseEnum, config, IActor, IConnection, IConnectionNamespace, IGameWithId} from 'bespoke-common'
+import {Actor, SocketEvent, config, IActor, IConnection, IConnectionNamespace, IGameWithId} from 'bespoke-common'
 import {Server} from 'http'
 import {EventEmitter} from 'events'
 import * as socketIO from 'socket.io'
 import GameDAO from '../service/GameDAO'
 import {Token, Setting} from './util'
-import {Actor} from 'bespoke-common/build/baseEnum'
 
 export class EventIO {
     private static socketIOServer: socketIO.Server
@@ -22,7 +21,7 @@ export class EventIO {
 
     static initSocketIOServer(server: Server, subscribeOnConnection: (clientConn: IConnection) => void): socketIO.Server {
         this.socketIOServer = socketIO(server, {path: config.socketPath(Setting.namespace)})
-        this.socketIOServer.on(baseEnum.SocketEvent.connection, async (connection: socketIO.Socket) => {
+        this.socketIOServer.on(SocketEvent.connection, async (connection: socketIO.Socket) => {
             const {query: {token, gameId}, session: {passport: {user} = {user: undefined}}, sessionID} = connection.handshake
             const game = await GameDAO.getGame(gameId)
             const actor: IActor = Token.checkToken(token) ?
@@ -37,7 +36,7 @@ export class EventIO {
 
     static initRobotIOServer(subscribeOnConnection: (clientConn: IConnection) => void) {
         this.robotIOServer = new RobotIOServer()
-        this.robotIOServer.on(baseEnum.SocketEvent.connection, (connection: RobotConnection) => {
+        this.robotIOServer.on(SocketEvent.connection, (connection: RobotConnection) => {
             subscribeOnConnection(connection)
             this.robotIOServer.online(connection)
         })
@@ -45,7 +44,7 @@ export class EventIO {
 
     static robotConnect(id: string, actor: IActor, game: IGameWithId<any>): RobotConnection {
         const robotConnection = new RobotConnection(id, actor, game)
-        this.robotIOServer.emit(baseEnum.SocketEvent.connection, robotConnection)
+        this.robotIOServer.emit(SocketEvent.connection, robotConnection)
         return robotConnection
     }
 }

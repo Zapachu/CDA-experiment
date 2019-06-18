@@ -1,6 +1,6 @@
 import {config} from './config'
 import {IMoveCallback} from './interface'
-import {SocketEvent} from './baseEnum'
+import {SocketEvent} from './enum'
 import {EventEmitter} from 'events'
 import throttle = require('lodash/throttle')
 

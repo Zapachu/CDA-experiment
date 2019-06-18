@@ -1,8 +1,3 @@
-/**
- * Description : 非敏感配置信息
- */
-import {LogLevel, Language} from './baseEnum'
-
 export const config = {
     rootName: 'bespoke',
     apiPrefix: 'api',
@@ -11,14 +6,8 @@ export const config = {
       client:8080,
       server:8081
     },
-    memoryCacheLifetime: 3 * 60 * 1000,
     minMoveInterval: 500,
-    historyGamesListSize: 12,
-    shareCodeLifeTime: 3 * 24 * 60 * 60,
     vcodeLifetime: 60,
-    heartBeatSeconds: 10,
-    logLevel: LogLevel.log,
-    defaultLanguage: Language.zh,
     cookieKey: {
         csrf: '_csrf'
     }

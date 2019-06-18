@@ -1,17 +1,15 @@
-import {baseEnum, config, IGameThumb} from 'bespoke-common'
+import {baseEnum, IGameThumb} from 'bespoke-common'
 import {redisClient} from 'elf-protocol'
 import {Request, Response} from 'express'
 import * as passport from 'passport'
 import {elfSetting} from 'elf-setting'
-import {Log, RedisKey, Setting, Token} from '../util'
+import {Log, RedisKey, Setting, Token, CONFIG, PassportStrategy} from '../util'
 import {GameModel, MoveLogModel, SimulatePlayerModel, UserDoc, UserModel} from '../model'
 import {GameLogic} from '../service/GameLogic'
 import GameDAO from '../service/GameDAO'
 import UserService from '../service/UserService'
 import * as fs from 'fs'
 import * as path from 'path'
-
-const {historyGamesListSize} = config
 
 export class UserCtrl {
     static async renderApp(req, res: Response) {
@@ -69,7 +67,7 @@ Object.assign(window, {
                 role: baseEnum.AcademusRole.teacher
             }).save()
         }
-        passport.authenticate(baseEnum.PassportStrategy.local, function (err, user) {
+        passport.authenticate(PassportStrategy.local, function (err, user) {
             if (err || !user) {
                 res.json({
                     code: baseEnum.ResponseCode.notFound
@@ -151,8 +149,8 @@ export class GameCtrl {
         }
         shareCode = Math.random().toString().substr(2, 6)
         try {
-            await redisClient.setex(RedisKey.share_GameCode(gameId), config.shareCodeLifeTime, shareCode)
-            await redisClient.setex(RedisKey.share_CodeGame(shareCode), config.shareCodeLifeTime, gameId)
+            await redisClient.setex(RedisKey.share_GameCode(gameId), CONFIG.shareCodeLifeTime, shareCode)
+            await redisClient.setex(RedisKey.share_CodeGame(shareCode), CONFIG.shareCodeLifeTime, gameId)
             res.json({
                 code: baseEnum.ResponseCode.success,
                 title,
@@ -225,7 +223,7 @@ export class GameCtrl {
                 owner: user.id,
                 namespace: Setting.namespace
             })
-                .limit(historyGamesListSize)
+                .limit(CONFIG.historyGamesListSize)
                 .sort({createAt: -1})).map(({id, namespace, title, createAt}) => ({id, namespace, title, createAt}))
             res.json({
                 code: baseEnum.ResponseCode.success,

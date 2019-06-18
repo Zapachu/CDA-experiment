@@ -13,7 +13,7 @@ import * as bodyParser from 'body-parser'
 import * as compression from 'compression'
 import * as morgan from 'morgan'
 import {elfSetting} from 'elf-setting'
-import {gameId2PlayUrl, getOrigin, heartBeat, Log, QCloudSMS, RedisKey, Setting} from './util'
+import {gameId2PlayUrl, getOrigin, heartBeat, Log, QCloudSMS, RedisKey, Setting, PassportStrategy} from './util'
 import {baseEnum, config, IGameConfig, IGameSetting} from 'bespoke-common'
 import {EventDispatcher} from './controller/eventDispatcher'
 import {router} from './controller/requestRouter'
@@ -87,7 +87,7 @@ export class Server {
             })
         })
 
-        passport.use(baseEnum.PassportStrategy.local, new Strategy({
+        passport.use(PassportStrategy.local, new Strategy({
             usernameField: 'mobile',
             passwordField: 'mobile'
         }, function (mobile, password, done) {

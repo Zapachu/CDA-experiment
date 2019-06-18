@@ -1,4 +1,4 @@
-import {config} from 'bespoke-common'
+import {CONFIG} from './config'
 
 export interface CacheData{
     timestamp:number
@@ -20,7 +20,7 @@ export class Cache{
         if(!data){
             return null
         }
-        if(Date.now() - data.timestamp > config.memoryCacheLifetime){
+        if(Date.now() - data.timestamp > CONFIG.memoryCacheLifetime){
             cache.delete(key)
             return null
         }

@@ -6,6 +6,7 @@ import {readFileSync} from 'fs'
 import * as objHash from 'object-hash'
 import {NetworkInterfaceInfo, networkInterfaces} from 'os'
 import {redisClient} from 'elf-protocol'
+import {CONFIG} from './config'
 
 export class Token {
     private static geneCheckCode(chars: string[]) {
@@ -40,7 +41,7 @@ export function getOrigin(): string {
         `http://${Setting.ip}:${elfSetting.bespokeHmr ? config.devPort.client : Setting.port}`
 }
 
-export function heartBeat(key: string, value: string, seconds: number = config.heartBeatSeconds) {
+export function heartBeat(key: string, value: string, seconds: number = CONFIG.heartBeatSeconds) {
     (async function foo() {
         await redisClient.setex(key, seconds + 1, value)
         setTimeout(foo, seconds * 1e3)
@@ -59,7 +60,7 @@ export namespace Log {
     export function init(logPath: string) {
         if (elfSetting.inProductEnv) {
             logger = dailyfile({
-                level: config.logLevel.toString(),
+                level: CONFIG.logLevel.toString(),
                 root: logPath
             })
             console.log(`当前为生成环境,日志记录于:${logPath}`)
