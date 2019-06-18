@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Lang} from '../../util'
+import {Lang} from '../LanguageSwitcher'
 
 export const Loading: React.SFC<{
     label?: string

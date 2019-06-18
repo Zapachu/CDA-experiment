@@ -1,5 +1,5 @@
 import * as queryString from 'query-string'
-import {ResponseCode, config} from 'bespoke-common'
+import {ResponseCode, config} from 'bespoke-core-share'
 
 enum RequestMethod {
     GET = 'get',

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {IElfCreateProps} from 'elf-linker'
-import {FrameEmitter, IGameWithId, TGameState, TPlayerState, IUserWithId} from 'bespoke-common'
+import {FrameEmitter, IGameWithId, TGameState, TPlayerState, IUserWithId} from 'bespoke-core-share'
 import {RouteComponentProps} from 'react-router-dom'
 
 export type TPageProps = Partial<{

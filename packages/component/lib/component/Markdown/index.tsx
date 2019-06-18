@@ -1,8 +1,9 @@
 import * as React from 'react'
-import marked = require('marked')
 import * as style from './style.scss'
 import {BtnGroup} from '../BtnGruop'
-import {Lang, loadScript} from '../../util'
+import {Lang} from '../LanguageSwitcher'
+import {loadScript} from '../../util'
+import marked = require('marked')
 
 interface IMarkdownProps extends React.DetailedHTMLProps<React.TextareaHTMLAttributes<HTMLTextAreaElement>, HTMLTextAreaElement> {
     editable: boolean
