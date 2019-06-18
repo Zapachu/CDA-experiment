@@ -1,12 +1,12 @@
-"use strict";
-var path = require("path");
-var CleanWebpackPlugin = require("clean-webpack-plugin");
-var QiniuPlugin = require("qiniu-webpack-plugin");
-var bespoke_common_1 = require("bespoke-common");
-var elf_setting_1 = require("elf-setting");
-var qiNiu = elf_setting_1.elfSetting.qiNiu;
-var buildMode = process.env.npm_config_buildMode || 'dev';
-module.exports = {
+import * as path from 'path'
+import * as CleanWebpackPlugin from 'clean-webpack-plugin'
+import * as QiniuPlugin from 'qiniu-webpack-plugin'
+import {elfSetting} from 'elf-setting'
+
+const {qiNiu} = elfSetting
+const buildMode = process.env.npm_config_buildMode || 'dev'
+
+export = {
     devtool: buildMode === 'dev' ? 'eval' : '',
     mode: buildMode === 'dev' ? 'development' : 'production',
     watch: buildMode === 'dev',
@@ -16,19 +16,21 @@ module.exports = {
     entry: path.resolve(__dirname, '../lib/index.ts'),
     output: {
         path: path.resolve(__dirname, '../dist'),
-        filename: "bespoke-client-util" + (buildMode === 'dev' ? '' : '.min') + ".js",
-        library: 'BespokeClientUtil',
-        libraryTarget: 'umd',
-        publicPath: buildMode === 'publish' ? qiNiu.download.jsDomain + "/" + qiNiu.upload.path + "/" : "/" + bespoke_common_1.config.rootName + "/static/"
+        filename: 'index.js'
     },
     resolve: {
-        extensions: ['.ts', '.tsx', '.js', '.jsx', '.json']
+        extensions: ['.ts', '.tsx', '.js', '.jsx']
     },
     module: {
         rules: [
             {
                 test: /\.(ts|tsx)$/,
-                use: 'ts-loader',
+                loader: 'ts-loader',
+                options:{
+                    compilerOptions:{
+                        "emitDeclarationOnly": false,
+                    }
+                },
                 exclude: /node_modules/
             },
             {
@@ -87,11 +89,10 @@ module.exports = {
     },
     plugins: [
         new CleanWebpackPlugin('*', {
-            root: path.resolve(__dirname, "../dist"),
+            root: path.resolve(__dirname, `../dist`),
             watch: true
         })
     ].concat(buildMode === 'publish' ? [
         new QiniuPlugin(qiNiu.upload)
     ] : [])
-};
-//# sourceMappingURL=webpack.config.js.map
+}

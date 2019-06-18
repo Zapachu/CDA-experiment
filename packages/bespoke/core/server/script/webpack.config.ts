@@ -15,12 +15,15 @@ export = {
     watchOptions: {
         poll: true
     },
-    entry: path.resolve(__dirname, '../src/frontend/index.tsx'),
+    entry: {
+        BespokeClientUtil:path.resolve(__dirname, '../node_modules/bespoke-client-util/lib/index.ts'),
+        BespokeServer:path.resolve(__dirname, '../src/frontend/index.tsx')
+    },
     output: {
         path: path.resolve(__dirname, '../dist'),
         filename: `[name].[hash:4]${buildMode === 'dev' ? '' : '.min'}.js`,
         publicPath: buildMode === 'publish' ? `${qiNiu.download.jsDomain}/${qiNiu.upload.path}/` : `/${config.rootName}/static/`,
-        library: 'BespokeServer',
+        library: '[name]',
         libraryTarget: 'umd',
     },
     resolve: {
@@ -66,7 +69,6 @@ export = {
     plugins: [
         new HtmlWebpackPlugin({
             filename: 'index.html',
-            clientUtilBundlePath: `/${config.rootName}/static/bespoke-client-util.min.js`,
             template: path.resolve(__dirname, './index.html')
         }),
         new CleanWebpackPlugin('main*.js', {

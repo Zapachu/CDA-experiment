@@ -1,14 +1,13 @@
 {
   "name": "bespoke-client-util",
   "version": "1.0.0",
-  "main": "build/index",
+  "main": "dist/index",
   "types": "build/index",
   "scripts": {
     "tsc-w": "tsc -w",
     "install": "tsc & npm run dist",
     "build": "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./script/webpack.config.ts",
-    "dist": "npm run build --buildMode=dist",
-    "publish": "npm run build --buildMode=publish"
+    "dist": "npm run build --buildMode=dist"
   },
   "devDependencies": {
     "typescript": "^3.3.3333",
