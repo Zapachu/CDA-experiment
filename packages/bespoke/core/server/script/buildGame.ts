@@ -1,9 +1,5 @@
 import {NetworkInterfaceInfo, networkInterfaces} from 'os'
 import {resolve} from 'path'
-import * as fs from 'fs'
-import * as chokidar from 'chokidar'
-import * as pbjs from 'protobufjs/cli/pbjs'
-import * as pbts from 'protobufjs/cli/pbts'
 import * as webpack from 'webpack'
 import * as QiniuPlugin from 'qiniu-webpack-plugin'
 import * as ManifestPlugin from 'webpack-manifest-plugin'
@@ -12,13 +8,11 @@ import {config} from 'bespoke-common'
 import {elfSetting} from 'elf-setting'
 
 interface IPaths {
-    proto?: string
     entry?: string
     output?: string
 }
 
 const defaultPaths: IPaths = {
-    proto: './src/interface.proto',
     entry: './src/view',
     output: './dist'
 }
@@ -43,26 +37,6 @@ function resolvePaths(basePath, paths: IPaths = defaultPaths): IPaths {
     return p
 }
 
-function buildProtoDts(protoPath: string, watch: boolean = false) {
-    const p = protoPath.replace('.proto', '')
-    if (!fs.existsSync(`${p}.proto`)) {
-        return
-    }
-
-    function build() {
-        pbjs.main(['-t', 'static-module', '-w', 'commonjs', '-o', `${p}.js`, `${p}.proto`], () =>
-            pbts.main(['-o', `${p}.d.ts`, `${p}.js`], () =>
-                fs.unlinkSync(`${p}.js`)
-            )
-        )
-    }
-
-    build()
-    if (watch) {
-        chokidar.watch(`${p}.proto`).on('change', build)
-    }
-}
-
 interface IBuildOption {
     namespace: string
     basePath: string
@@ -77,10 +51,9 @@ export function geneClientBuilder(
         paths,
         qiNiu
     }: IBuildOption): webpack.Configuration {
-    const {proto, entry, output} = resolvePaths(basePath, paths)
+    const {entry, output} = resolvePaths(basePath, paths)
     const buildMode = process.env.BUILD_MODE || 'dev',
         HMR = process.env.HMR === 'true'
-    buildProtoDts(proto, buildMode === 'dev')
     return {
         devtool: buildMode === 'dev' ? 'cheap-module-eval-source-map' : false,
         devServer: {
