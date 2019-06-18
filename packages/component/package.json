@@ -1,5 +1,5 @@
 {
-  "name": "bespoke-client-util",
+  "name": "elf-component",
   "version": "1.0.0",
   "main": "dist/index",
   "types": "build/index",

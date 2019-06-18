@@ -17,7 +17,7 @@
     "baseUrl": "./",
     "paths": {
       "component/*" : ["../../components/*"],
-      "@bespoke-client-util": ["../../../../core/client/lib/index.ts"]
+      "@elf-component": ["../../../../core/client/lib/index.ts"]
     }
   },
   // "include": [

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, ButtonProps, Label, Lang, MaskLoading, RangeInput, Toast, Input, Switch} from 'bespoke-client-util'
+import {Button, ButtonProps, Label, Lang, MaskLoading, RangeInput, Toast, Input, Switch} from 'elf-component'
 import {BasePhase} from './BasePhase'
 import {CreateParams, GameState} from '../../interface'
 

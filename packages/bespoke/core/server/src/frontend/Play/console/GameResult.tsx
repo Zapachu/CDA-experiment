@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {baseEnum, IGameWithId} from 'bespoke-common'
-import {Core, MaskLoading} from 'bespoke-client-util'
+import {Core, MaskLoading} from 'elf-component'
 import {Api} from '../../util'
 import cloneDeep = require('lodash/cloneDeep')
 import {applyChange} from 'deep-diff'

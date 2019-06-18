@@ -1,4 +1,4 @@
-import {registerOnFramework} from 'bespoke-client-util'
+import {registerOnFramework} from 'elf-component'
 import {namespace} from '../config'
 import {Create} from './Create'
 import {CreateOnElf} from './CreateOnElf'

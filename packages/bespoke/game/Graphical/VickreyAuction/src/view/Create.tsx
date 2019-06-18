@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Input, Label, Lang, RangeInput, Toast, MaskLoading, Button} from 'bespoke-client-util'
+import {Core, Input, Label, Lang, RangeInput, Toast, MaskLoading, Button} from 'elf-component'
 import {ICreateParams} from '../interface'
 
 interface ICreateState {

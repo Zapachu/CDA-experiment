@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang, baseEnum, Label, Switch, BtnGroup} from 'bespoke-client-util'
+import {Core, Lang, baseEnum, Label, Switch, BtnGroup} from 'elf-component'
 import {GameType} from '../config'
 import {ICreateParams} from '../interface'
 

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {IGameWithId, IUserWithId} from 'bespoke-common'
-import {Lang, Markdown, MaskLoading} from 'bespoke-client-util'
+import {Lang, Markdown, MaskLoading} from 'elf-component'
 import {Api} from '../util'
 import {RouteComponentProps} from 'react-router'
 

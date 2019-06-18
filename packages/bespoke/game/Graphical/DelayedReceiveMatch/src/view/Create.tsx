@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang, Label, RangeInput, Button, MaskLoading, Input, Toast, Tabs} from 'bespoke-client-util'
+import {Core, Lang, Label, RangeInput, Button, MaskLoading, Input, Toast, Tabs} from 'elf-component'
 import {ICreateParams, CreateParams} from '../interface'
 import cloneDeep = require('lodash/cloneDeep')
 

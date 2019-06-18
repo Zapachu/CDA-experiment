@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {phaseTemplates, localePhaseNames} from './phase'
 import {CreateParams, ICreateParams} from '../interface'
-import {Core, Lang} from 'bespoke-client-util'
+import {Core, Lang} from 'elf-component'
 import {IDENTITY, phaseNames, ROLE, ReactionType} from '../config'
 import cloneDeep = require('lodash/cloneDeep')
 

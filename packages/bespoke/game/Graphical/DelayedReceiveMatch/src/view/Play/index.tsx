@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang, MaskLoading} from 'bespoke-client-util'
+import {Core, Lang, MaskLoading} from 'elf-component'
 import {DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd'
 import {Button, Host, ImgLoader, RoundSwitching, Shadow, span, Stage, spanDom} from 'bespoke-game-graphical-util'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, GameState} from '../../interface'

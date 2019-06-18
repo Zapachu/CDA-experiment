@@ -125,7 +125,7 @@ export function geneClientBuilder(
         externals: {
             'react': 'React',
             'react-dom': 'ReactDOM',
-            'bespoke-client-util': 'BespokeClientUtil'
+            'elf-component': 'ElfComponent'
         },
         plugins: [
             new ManifestPlugin({

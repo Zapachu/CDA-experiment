@@ -1,6 +1,6 @@
 import './initial.scss'
 import * as React from 'react'
-import {IGameTemplate, Lang, MaskLoading, TPageProps, TRegisterGame} from 'bespoke-client-util'
+import {IGameTemplate, Lang, MaskLoading, TPageProps, TRegisterGame} from 'elf-component'
 import {BrowserRouter, Redirect, Route as ReactRoute, RouteComponentProps, RouteProps, Switch} from 'react-router-dom'
 import {config} from 'bespoke-common'
 import {Login} from './Login'

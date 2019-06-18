@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang} from 'bespoke-client-util'
+import {Core, Lang} from 'elf-component'
 import {ICreateParams, IPlayerState, IGameState} from '../interface'
 
 export class Result extends Core.Result<ICreateParams, IGameState, IPlayerState> {

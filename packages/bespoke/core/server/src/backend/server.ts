@@ -141,7 +141,7 @@ export class Server {
         })
         const regInfo: PhaseReg.IRegInfo = {
             namespace: Setting.namespace,
-            jsUrl: `${getOrigin()}/${config.rootName}/static/bespoke-client-util.min.js;${getOrigin()}${Setting.getClientPath()}`
+            jsUrl: `${getOrigin()}/${config.rootName}/static/elf-component.min.js;${getOrigin()}${Setting.getClientPath()}`
         }
         heartBeat(PhaseReg.key(Setting.namespace), JSON.stringify(regInfo))
     }

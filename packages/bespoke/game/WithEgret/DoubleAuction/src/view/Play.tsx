@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {Core, config} from 'bespoke-client-util'
+import {Core, config} from 'elf-component'
 import {stringify} from 'query-string'
 import {namespace} from '../config'
 

@@ -34,7 +34,7 @@ module.exports = {
         extensions: [".ts", ".tsx", ".js"],
         alias: {
             'component': path.resolve(__dirname, '../../components'),
-            '@bespoke-client-util': path.resolve(__dirname, '../../../../core/client/lib/index'),
+            '@elf-component': path.resolve(__dirname, '../../../../core/client/lib/index'),
         }
     },
     optimization: {

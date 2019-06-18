@@ -37,7 +37,7 @@
 
     dir | npm | description
     ---- | --- | ---
-    client | bespoke-client-util | 前端
+    client | elf-component | 前端
     config | @common | 全局配置
     server | server-vendor | 后端
 
@@ -60,7 +60,7 @@
 - 以game002为例，与game002相关的所有文件均被组织在game002目录下，核心为view(前端)、controller.js(后端)
 ```
     ├─script
-    │      entry.client.js (webpack入口, 调用bespoke-client-util.renderRoot 打包生成game002.hash.js)
+    │      entry.client.js (webpack入口, 调用elf-component.renderRoot 打包生成game002.hash.js)
     ├─src
     │  │  config.js (i18n字典、玩家动作声明、游戏phase声明... + 自定义配置)
     │  │  Controller.js (后端逻辑)

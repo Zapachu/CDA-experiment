@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as style from './style.scss'
 
 import {IGameWithId} from 'bespoke-common'
-import {Button, ButtonProps, Lang, MaskLoading, TPageProps} from 'bespoke-client-util'
+import {Button, ButtonProps, Lang, MaskLoading, TPageProps} from 'elf-component'
 import {Api} from '../util'
 
 declare type IConfigurationState = {

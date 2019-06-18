@@ -8,7 +8,7 @@ import {
     ISimulatePlayer,
     IUserWithId
 } from 'bespoke-common'
-import {IHttpRes, Request} from 'bespoke-client-util'
+import {IHttpRes, Request} from 'elf-component'
 
 export const Api = new class {
     get: (path: string, params?: {}, query?: {}) => Promise<any>

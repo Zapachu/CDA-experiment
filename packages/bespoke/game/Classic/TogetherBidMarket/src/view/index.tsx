@@ -1,4 +1,4 @@
-import {registerOnFramework} from 'bespoke-client-util'
+import {registerOnFramework} from 'elf-component'
 import {Create} from './Create'
 import {CreateOnElf} from './CreateOnElf'
 import {Play} from './Play'

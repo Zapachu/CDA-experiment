@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as style from './style.scss'
 import * as dateFormat from 'dateformat'
 import {baseEnum, IGameConfig, IGameThumb} from 'bespoke-common'
-import {Lang} from 'bespoke-client-util'
+import {Lang} from 'elf-component'
 import {Api} from '../util'
 
 declare interface IHistoryGameProps {

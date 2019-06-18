@@ -16,7 +16,7 @@ export = {
         poll: true
     },
     entry: {
-        BespokeClientUtil:path.resolve(__dirname, '../node_modules/bespoke-client-util/lib/index.ts'),
+        ElfComponent:path.resolve(__dirname, '../node_modules/elf-component/lib/index.ts'),
         BespokeServer:path.resolve(__dirname, '../src/frontend/index.tsx')
     },
     output: {
@@ -64,7 +64,7 @@ export = {
     externals: {
         'react': 'React',
         'react-dom': 'ReactDOM',
-        'bespoke-client-util': 'BespokeClientUtil'
+        'elf-component': 'ElfComponent'
     },
     plugins: [
         new HtmlWebpackPlugin({
