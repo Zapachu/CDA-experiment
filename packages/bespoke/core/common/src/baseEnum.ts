@@ -300,11 +300,6 @@ export enum NationCode {
     'Zimbabwe' = 263,
 }
 
-export enum ThirdPartyLib {
-    egret,
-    phaser,
-}
-
 export enum SyncStrategy {
     default,
     msgPack,

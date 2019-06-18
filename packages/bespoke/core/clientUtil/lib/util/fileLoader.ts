@@ -1,5 +1,3 @@
-import {baseEnum} from 'bespoke-common'
-
 export function loadScript(list: Array<string>, callback = () => null) {
     let loaded = 0
 
@@ -31,25 +29,4 @@ function loadSingleScript(src: string, callback = () => null) {
 
     s.addEventListener(EVENT_LOAD, load, false)
     document.body.appendChild(s)
-}
-
-export function loadThirdPartyLib(target: baseEnum.ThirdPartyLib, callback = ()=>null) {
-    switch (target) {
-        case baseEnum.ThirdPartyLib.egret: {
-            loadScript([
-                'https://qiniu0.anlint.com/egret/5.2.13/module/egret.min.js',
-                'https://qiniu0.anlint.com/egret/5.2.13/module/egret.web.min.js',
-                'https://qiniu0.anlint.com/egret/5.2.13/module/game.min.js',
-                'https://qiniu0.anlint.com/egret/5.2.13/module/tween.min.js',
-                'https://qiniu0.anlint.com/egret/5.2.13/module/assetsmanager.min.js',
-                'https://qiniu0.anlint.com/egret/5.2.13/module/promise.min.js',
-            ],callback)
-            break
-        }
-        case baseEnum.ThirdPartyLib.phaser:{
-            loadScript([
-                'https://cdn.jsdelivr.net/npm/phaser@3.16.2/dist/phaser.min.js'
-            ], callback)
-        }
-    }
 }
