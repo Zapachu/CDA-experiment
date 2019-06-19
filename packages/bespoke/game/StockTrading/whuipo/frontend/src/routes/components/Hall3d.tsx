@@ -234,8 +234,6 @@ class Hall3D extends React.Component<Props, State> {
         this.connectSocket()
         const user: UserDoc = res.user
         const { unblockGamePhase } = user
-        this.initView()
-        return
 
         const userUnBlockGameOrder = gamePhaseOrder[unblockGamePhase] || 0
         console.log(userUnBlockGameOrder, 'user now unlock order')
