@@ -16,8 +16,7 @@
     "esModuleInterop": true,
     "baseUrl": "./",
     "paths": {
-      "component/*" : ["../../components/*"],
-      "@elf-component": ["../../../../core/client/lib/index.ts"]
+      "component/*" : ["../../components/*"]
     }
   },
   // "include": [

@@ -2,7 +2,7 @@ import * as React from "react";
 import * as BABYLON from "babylonjs";
 import socket from 'socket.io-client'
 import { Modal, Button, Loading, MatchModal, PlayMode } from 'bespoke-game-stock-trading-component'
-import { Toast } from '@elf-component'
+import { Toast } from 'elf-component'
 import 'pepjs'
 import qs from 'qs'
 

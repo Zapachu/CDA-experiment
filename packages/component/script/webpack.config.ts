@@ -16,7 +16,8 @@ export = {
     entry: path.resolve(__dirname, '../lib/index.ts'),
     output: {
         path: path.resolve(__dirname, '../dist'),
-        filename: 'index.js'
+        filename: 'index.js',
+        libraryTarget: 'commonjs',
     },
     resolve: {
         extensions: ['.ts', '.tsx', '.js', '.jsx']
@@ -83,8 +84,8 @@ export = {
         ]
     },
     externals: {
-        'react': 'React',
-        'react-dom': 'ReactDOM',
+        'react': 'react',
+        'react-dom': 'react-dom',
         'elf-linker': 'ElfLinker'
     },
     plugins: [
