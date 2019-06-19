@@ -235,6 +235,21 @@ $color-red: #d6444e;
           border: 1px solid;
         }
       }
+      .tips{
+        position: fixed;
+        right: 15vw;
+        top: 55vh;
+        .tipsTitle{
+          margin: 1rem;
+        }
+        .tipsContent{
+          margin: 1rem 2rem;
+          text-align: left;
+        }
+        @media (max-width: $layout-mediaWidth) {
+          top: 90vh;
+        }
+      }
     }
 
     .toNextPeriod {
