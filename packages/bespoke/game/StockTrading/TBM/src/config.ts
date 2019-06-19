@@ -12,7 +12,8 @@ export enum MoveType {
 }
 
 export enum PushType {
-  robotShout
+  robotShout,
+  shoutTimer
 }
 
 export interface ICreateParams {
@@ -34,6 +35,7 @@ export interface IMoveParams {
 }
 
 export interface IPushParams {
+  shoutTime: number;
 }
 
 export interface IGameState {
@@ -53,5 +55,6 @@ export interface IPlayerState {
   profit: number;
 }
 
+export const SHOUT_TIMER = 60;
 export const NPC_PRICE_MIN = 50;
 export const NPC_PRICE_MAX = 60;
