@@ -46,7 +46,7 @@ const SingleMode: React.SFC<ModePropType> = ({ active, onClick }) => {
     <li onClick={() => onClick()}>
       <img src={active ? PLAY_MODE_ACTIVE : PLAY_MODE_INACTIVE} />
       <div className={active ? style.active : style.inactive}>
-        <p>单人玩法</p>
+        <p>单人学习</p>
         <p>市场上为算法交易者</p>
       </div>
     </li>
@@ -58,7 +58,7 @@ const MultiMode: React.SFC<ModePropType> = ({ active, onClick }) => {
     <li onClick={() => onClick()}>
       <img src={active ? PLAY_MODE_ACTIVE : PLAY_MODE_INACTIVE} />
       <div className={active ? style.active : style.inactive}>
-        <p>多人玩法</p>
+        <p>交互学习</p>
         <p>市场上为其他玩家</p>
       </div>
     </li>
