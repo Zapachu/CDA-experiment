@@ -34,7 +34,6 @@ module.exports = {
         extensions: [".ts", ".tsx", ".js"],
         alias: {
             'component': path.resolve(__dirname, '../../components'),
-            '@bespoke-client-util': path.resolve(__dirname, '../../../../core/client/lib/index'),
         }
     },
     optimization: {
@@ -43,7 +42,9 @@ module.exports = {
         }
     },
     externals: {
-        babylonjs: 'BABYLON',
+        'babylonjs': 'BABYLON',
+        'react': 'React',
+        'react-dom': 'ReactDOM',
     },
     module: {
         rules: [

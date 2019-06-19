@@ -1,0 +1,20 @@
+{
+	"skins": {
+		"eui.Button": "resource/eui_skins/Button.exml",
+		"eui.TextInput": "resource/eui_skins/TextInput.exml",
+		"Prepare": "resource/eui_skins/Prepare.exml",
+		"Trade": "resource/eui_skins/Trade.exml",
+		"ShoutItem": "resource/eui_skins/ShoutItem.exml",
+		"Result": "resource/eui_skins/Result.exml"
+	},
+	"autoGenerateExmlsList": true,
+	"exmls": [
+		"resource/eui_skins/Button.exml",
+		"resource/eui_skins/Prepare.exml",
+		"resource/eui_skins/Result.exml",
+		"resource/eui_skins/ShoutItem.exml",
+		"resource/eui_skins/TextInput.exml",
+		"resource/eui_skins/Trade.exml"
+	],
+	"path": "resource/default.thm.json"
+}

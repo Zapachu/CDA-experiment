@@ -9,6 +9,9 @@ ROUTE_TABLE = {
 GAME_SERVER_KEY_PREFIX = "bespokeGameServer:"
 BESPOKE_PREFIX = 'bespoke'
 
+if(ngx.var.request_method == 'HEAD')then
+   ngx.exit(200)
+end
 red = require "resty.redis":new()
 red:set_timeout(1000)
 local _, err = red:connect(os.getenv("REDIS_IP"), os.getenv("REDIS_PORT"))

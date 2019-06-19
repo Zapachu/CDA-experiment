@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {ICreateParams} from '../interface'
-import {Core, Label, RangeInput, Toast} from 'bespoke-client-util'
+import {Core, Label, RangeInput, Toast} from 'elf-component'
 
 interface ICreateState {
     fishCount: number

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {Button, ButtonProps, Core, Lang, RadioGroup, Select, Input} from 'bespoke-client-util'
+import {Button, ButtonProps, Core, Lang, RadioGroup, Select, Input} from 'elf-component'
 import {MoveType, PushType, Survey} from '../../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
 

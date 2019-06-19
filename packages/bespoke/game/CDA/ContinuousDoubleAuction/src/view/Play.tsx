@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {Core} from 'bespoke-client-util'
+import {Core} from 'elf-component'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import {MoveType, PushType} from '../config'
 import {phaseTemplates} from './phase'

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {ICreateParams} from '../interface'
-import {Core, Label, RangeInput, Input, Button} from 'bespoke-client-util'
+import {Core, Label, RangeInput, Input, Button} from 'elf-component'
 interface ICreateState {
     startingPrice: number
     maxPrivatePrice: number

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Lang, Label, Input, Button, ButtonProps, MaskLoading, BtnGroup, Toast} from 'bespoke-client-util'
+import {Lang, Label, Input, Button, ButtonProps, MaskLoading, BtnGroup, Toast} from 'elf-component'
 import {IDENTITY, MoveType, ROLE, PlayerStatus, ReactionType} from '../../config'
 import {BasePhase} from './BasePhase'
 import {getEnumKeys} from '../../util'

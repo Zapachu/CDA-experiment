@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as style from "./style.scss";
-import { Core, Lang } from "bespoke-client-util";
+import { Core, Lang } from "elf-component";
 import { MoveType, PushType, PlayerStatus } from "../../config";
 import {
   ICreateParams,

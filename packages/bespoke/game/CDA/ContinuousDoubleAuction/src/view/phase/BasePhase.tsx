@@ -9,7 +9,7 @@ import {
     IPlayerState,
     IPushParams
 } from '../../interface'
-import {MaskLoading, FrameEmitter, IGame} from 'bespoke-client-util'
+import {MaskLoading, FrameEmitter, IGame} from 'elf-component'
 
 export namespace BasePhase {
 

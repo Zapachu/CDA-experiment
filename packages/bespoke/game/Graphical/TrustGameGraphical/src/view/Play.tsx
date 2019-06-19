@@ -3,7 +3,7 @@ import Cash from './coms/Cash'
 import Referee from './coms/Referee'
 import PutShadow from "./coms/PutShadow"
 import Background from './coms/Background'
-import {Core, Lang, MaskLoading, Toast} from 'bespoke-client-util'
+import {Core, Lang, MaskLoading, Toast} from 'elf-component'
 import {Stage, span, Input, Button, RoundSwitching} from 'bespoke-game-graphical-util'
 import {
     ICreateParams,
