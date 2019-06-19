@@ -19,7 +19,8 @@ import {
   IMoveParams,
   IPlayerState,
   IPushParams,
-  Role
+  Role,
+  SHOUT_TIMER
 } from "../config";
 
 interface IPlayState {
@@ -27,6 +28,7 @@ interface IPlayState {
   count: string;
   showRule: boolean;
   showTBMRule: boolean;
+  shoutTime: number;
 }
 
 export class Play extends Core.Play<
@@ -43,11 +45,16 @@ export class Play extends Core.Play<
     price: "",
     count: "",
     showRule: false,
-    showTBMRule: false
+    showTBMRule: false,
+    shoutTime: 0
   };
 
   componentDidMount(): void {
-    this.props.frameEmitter.emit(MoveType.join);
+    const { frameEmitter } = this.props;
+    frameEmitter.emit(MoveType.join);
+    frameEmitter.on(PushType.shoutTimer, ({ shoutTime }) => {
+      this.setState({ shoutTime });
+    });
   }
 
   setPriceVal = value => this.setState({ price: value });
@@ -62,9 +69,27 @@ export class Play extends Core.Play<
 
   onCountMinus = value => this.setState({ count: (--value).toString() });
 
-  allIn = () => this.setState({ price: "100", count: "1000" });
+  allIn = () => {
+    const { startingPrice } = this.props.playerState;
+    const { price } = this.state;
+    if (!+price) {
+      return;
+    }
+    const money = 1 * startingPrice;
+    const count = Math.floor(money / +price);
+    this.setState({ count: "" + count });
+  };
 
-  halfIn = () => this.setState({ price: "100", count: "500" });
+  halfIn = () => {
+    const { startingPrice } = this.props.playerState;
+    const { price } = this.state;
+    if (!+price) {
+      return;
+    }
+    const money = 0.5 * startingPrice;
+    const count = Math.floor(money / +price);
+    this.setState({ count: "" + count });
+  };
 
   showRule = () => this.setState({ showRule: !this.state.showRule });
 
@@ -77,6 +102,8 @@ export class Play extends Core.Play<
     } = this.props;
     const { price, count } = this.state;
     if (
+      !price ||
+      !count ||
       Number.isNaN(+price) ||
       Number.isNaN(+count) ||
       (role === Role.Buyer && +price * +count > startingPrice) ||
@@ -191,9 +218,15 @@ export class Play extends Core.Play<
       playerState: { role, startingPrice, startingQuota }
     } = this.props;
     return role === Role.Buyer ? (
-      <InfoBar text={`账户余额${startingPrice}元`} />
+      <div className="test">
+        <InfoBar text="您是买家" />
+        <InfoBar text={`账户余额${startingPrice}元`} />
+      </div>
     ) : (
-      <InfoBar text={`拥有股票${startingQuota}股`} />
+      <div>
+        <InfoBar text="您是卖家" />
+        <InfoBar text={`拥有股票${startingQuota}股`} />
+      </div>
     );
   };
 
@@ -233,6 +266,13 @@ export class Play extends Core.Play<
             marginBottom: "20px"
           }}
         />
+        <div className={style.tradeBtn}>
+          <Button
+            onClick={this.showTBMRule}
+            color={Button.Color.Blue}
+            label={`集合竞价知识扩展`}
+          />
+        </div>
         <ul>
           {listData.map(({ label, value }) => {
             return (
@@ -258,7 +298,7 @@ export class Play extends Core.Play<
         />
         <div style={{ display: "flex", justifyContent: "center" }}>
           <Button
-            label={"再玩一局"}
+            label={"再学一次"}
             color={Button.Color.Blue}
             style={{ marginRight: "20px" }}
             onClick={() => {
@@ -270,7 +310,7 @@ export class Play extends Core.Play<
             }}
           />
           <Button
-            label={"下一阶段"}
+            label={"返回交易大厅"}
             onClick={() => {
               frameEmitter.emit(
                 MoveType.nextStage,
@@ -289,6 +329,7 @@ export class Play extends Core.Play<
       playerState: { privateValue },
       gameState: { stockIndex }
     } = this.props;
+    const { shoutTime } = this.state;
     return (
       <>
         <StockInfo
@@ -306,7 +347,17 @@ export class Play extends Core.Play<
           {this.dynamicAction()}
           {this.dynamicBtnView()}
         </div>
+        <p style={{ marginBottom: "20px", textAlign: "center" }}>
+          {SHOUT_TIMER - shoutTime} S
+        </p>
         {this.dynamicInfo()}
+        <div className={style.tradeBtn}>
+          <Button
+            onClick={this.showRule}
+            color={Button.Color.Blue}
+            label={`交易规则回顾`}
+          />
+        </div>
       </>
     );
   };
@@ -337,28 +388,14 @@ export class Play extends Core.Play<
     return (
       <section className={style.play}>
         {this.renderStage()}
-
-        <div className={style.tradeBtn}>
-          <Button
-            onClick={this.showRule}
-            color={Button.Color.Blue}
-            label={`交易规则回顾`}
-          />
-        </div>
-        <div className={style.tbmBtn}>
-          <Button
-            onClick={this.showTBMRule}
-            color={Button.Color.Blue}
-            label={`集合竞价知识扩展`}
-          />
-        </div>
-
         <Modal
           visible={showRule}
           children={
             <div className={style.modalContent}>
               <p>交易规则回顾</p>
-              <p>...</p>
+              <p>
+                您在一个基金机构工作，您所在的基金机构经过对市场信息的精密分析，现对市场上的股票有一个估值，要您在市场上进行股票交易活动。在这个市场中，您会被系统随机分配为买家或卖家。买家有初始的购买资金M，卖家有初始的股票数量S。买家和卖家对股票的估值不同，并根据自己的估值一次性进行买卖申请。系统将在有效价格范围内选取成交量最大的价位，对接受到的买卖申报一次性集中撮合，产生股票的成交价格。报价大于等于市场成交价格的买家成交；价小于等于市场成交成交价格的卖家成交。买家收益=（成交价-估值）*成交数量；卖家收益=（估值-成交价）*成交数量
+              </p>
               <Button
                 style={{ marginTop: "30px" }}
                 label={"关闭"}

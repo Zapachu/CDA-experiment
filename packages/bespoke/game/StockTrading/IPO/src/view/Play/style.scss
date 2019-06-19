@@ -65,15 +65,15 @@
         margin-right: 5px;
       }
     }
-    .tradeBtn {
+    .leftBtn {
       position: fixed;
-      top: 35vh;
       right: 15vw;
+      top: 48vh;
     }
-    .ipoBtn {
+    .rightBtn {
       position: fixed;
-      top: 42vh;
       right: 15vw;
+      top: 55vh;
     }
   }
 }
@@ -81,12 +81,13 @@
 @media(max-width: 768px) {
   .play {
     .playingStage {
-      .tradeBtn {
+      .leftBtn {
         top: 10px;
         right: 55vw;
       }
-      .ipoBtn {
+      .rightBtn {
         top: 10px;
+        right: 10vw;
       }
     }
   }

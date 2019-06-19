@@ -33,7 +33,6 @@ export default class extends BaseRobot<
     setTimeout(() => this.frameEmitter.emit(MoveType.join), 1000);
     this.frameEmitter.on(PushType.robotShout, () => {
       const { price, bidNum } = genPriceAndNum(this.playerState);
-      console.log('robot shout, ', price, bidNum)
       setTimeout(() => this.frameEmitter.emit(MoveType.shout, { price, num: bidNum }), 1000);
     });
     return this;

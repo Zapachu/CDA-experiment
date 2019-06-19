@@ -16,7 +16,8 @@ import {
   IGameState,
   IMoveParams,
   IPlayerState,
-  IPushParams
+  IPushParams,
+  SHOUT_TIMER
 } from "./config";
 import { Phase, PhaseDone, STOCKS } from "bespoke-game-stock-trading-config";
 
@@ -31,6 +32,7 @@ export default class Controller extends BaseController<
 > {
   private role = Role.Buyer;
   private robotJoined = false;
+  private shoutTimer: NodeJS.Timer;
 
   initGameState(): TGameState<IGameState> {
     const gameState = super.initGameState();
@@ -62,7 +64,7 @@ export default class Controller extends BaseController<
           return;
         }
         this.initPlayer(playerState);
-        if (playerState.actor.type = baseEnum.Actor.serverRobot) {
+        if ((playerState.actor.type = baseEnum.Actor.serverRobot)) {
           this.push(playerState.actor, PushType.robotShout);
         }
         break;
@@ -82,14 +84,13 @@ export default class Controller extends BaseController<
         playerState.bidNum = params.num;
         const playerStateArray = Object.values(playerStates);
         if (!this.robotJoined && playerStateArray.length < groupSize) {
+          // 第一次有人报价时补满机器人
           this.initRobots(groupSize - playerStateArray.length);
           this.robotJoined = true;
         }
-        console.log(playerStateArray.length);
-        console.log(playerStateArray.every(ps => !!ps.price));
         if (
           playerStateArray.length === groupSize &&
-          playerStateArray.every(ps => !!ps.price)
+          playerStateArray.every(ps => ps.price !== undefined)
         ) {
           this.processProfits(gameState, playerStateArray);
         }
@@ -213,6 +214,57 @@ export default class Controller extends BaseController<
     } else {
       playerState.startingQuota = this._getStartingQuota();
     }
+    this._shoutTicking();
+  }
+
+  private _shoutTicking() {
+    if (this.shoutTimer) {
+      return;
+    }
+    const { groupSize } = this.game.params;
+    let shoutTime = 1;
+    this.shoutTimer = setInterval(async () => {
+      const playerStates = await this.stateManager.getPlayerStates();
+      const playerStateArray = Object.values(playerStates);
+      playerStateArray.forEach(s => {
+        this.push(s.actor, PushType.shoutTimer, { shoutTime });
+      });
+      if (
+        playerStateArray.length === groupSize &&
+        playerStateArray.every(ps => ps.price !== undefined)
+      ) {
+        clearInterval(this.shoutTimer);
+        return;
+      }
+      if (
+        !this.robotJoined &&
+        playerStateArray.length < groupSize &&
+        SHOUT_TIMER - shoutTime < 30
+      ) {
+        // 倒计时30秒时补满机器人
+        this.initRobots(groupSize - playerStateArray.length);
+        this.robotJoined = true;
+      }
+      if (shoutTime++ < SHOUT_TIMER) {
+        return;
+      }
+      clearInterval(this.shoutTimer);
+      await this._shoutTickEnds(playerStateArray);
+    }, 1000);
+  }
+
+  private async _shoutTickEnds(playerStates: Array<IPlayerState>) {
+    const shoutedPlayerStates = playerStates.filter(ps => {
+      if (ps.price === undefined) {
+        ps.price = 0;
+        ps.bidNum = 0;
+        return false;
+      }
+      return true;
+    });
+    const gameState = await this.stateManager.getGameState();
+    this.processProfits(gameState, shoutedPlayerStates);
+    await this.stateManager.syncState();
   }
 
   private _getRole(): Role {
