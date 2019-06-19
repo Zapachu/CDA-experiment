@@ -71,7 +71,7 @@ export = {
             filename: 'index.html',
             template: path.resolve(__dirname, './index.html')
         }),
-        new CleanWebpackPlugin('main*.js', {
+        new CleanWebpackPlugin('*.js', {
             root: path.resolve(__dirname, `../dist`),
             watch: true
         })
