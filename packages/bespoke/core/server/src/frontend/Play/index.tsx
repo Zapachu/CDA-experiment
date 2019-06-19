@@ -111,10 +111,10 @@ export class Play extends React.Component<TPageProps, IPlayState> {
             return <MaskLoading/>
         }
         const {Play4Owner, Result4Owner, Play, Result} = gameTemplate
+        if (!PRODUCT_ENV) {
+            console.log(gameState, playerState || playerStates)
+        }
         if (actor.type === baseEnum.Actor.owner) {
-            if (!PRODUCT_ENV) {
-                console.log(gameState, playerStates)
-            }
             return <section className={style.play4owner}>
                 <GameControl {...{
                     game,

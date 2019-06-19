@@ -30,6 +30,21 @@
 			"url": "assets/border.png",
 			"type": "image",
 			"name": "border2_png"
+		},
+		{
+			"url": "assets/Prepare/buyer.png",
+			"type": "image",
+			"name": "buyer_png"
+		},
+		{
+			"url": "assets/Prepare/seller.png",
+			"type": "image",
+			"name": "seller_png"
+		},
+		{
+			"url": "assets/close.png",
+			"type": "image",
+			"name": "close_png"
 		}
 	]
 }

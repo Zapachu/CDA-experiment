@@ -24,7 +24,7 @@ Object.assign(window, {
     PRODUCT_ENV:${elfSetting.inProductEnv}
 })
 </script>` +
-            chunk +
+            chunk.replace(/static/g, `${Setting.namespace}/static`) +
             `<script type="text/javascript" src="${Setting.getClientPath()}"></script>`)
     }
 

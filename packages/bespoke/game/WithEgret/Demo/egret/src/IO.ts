@@ -6,29 +6,6 @@ enum SocketEvent {
     syncPlayerState_json = 'SPJ',
 }
 
-enum MoveType {
-    greet = 'greet'
-}
-
-enum PushType {
-    greet = 'greet'
-}
-
-interface ICreateParams {
-}
-
-interface IMoveParams {
-}
-
-interface IPushParams {
-}
-
-interface IGameState {
-}
-
-interface IPlayerState {
-}
-
 namespace IO {
     const socketClient = io.connect('/', {
         path: location.pathname.replace('egret', 'socket.io'),
@@ -37,7 +14,7 @@ namespace IO {
     export let gameState: IGameState
     export let playerState: IPlayerState
 
-    export function emit(type: MoveType, params: Partial<IMoveParams>) {
+    export function emit(type: MoveType, params?: Partial<IMoveParams>) {
         socketClient.emit(SocketEvent.move, type, params)
     }
 
@@ -59,4 +36,18 @@ namespace IO {
     function trigger(pushType: PushType, params: Partial<IPushParams>) {
         getListeners(pushType).forEach(fn => fn(params))
     }
+
+    export let showTween = false
+    const renderCallbacks = []
+
+    export function onRender(render: () => void) {
+        renderCallbacks.push(render)
+    }
+
+    setInterval(() => {
+        if (showTween || !playerState || !gameState) {
+            return
+        }
+        renderCallbacks.forEach(render => render())
+    }, 200)
 }

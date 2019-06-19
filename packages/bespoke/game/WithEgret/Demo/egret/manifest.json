@@ -9,8 +9,11 @@
 		"libs/modules/socket.io/socket.io.js"
 	],
 	"game": [
-		"bin-debug/IO.js",
 		"bin-debug/Main.js",
+		"bin-debug/IO.js",
+		"bin-debug/Prepare.js",
+		"bin-debug/protocol.js",
+		"bin-debug/Result.js",
 		"bin-debug/Trade.js",
 		"bin-debug/lib/AssetAdapter.js",
 		"bin-debug/lib/Platform.js",
