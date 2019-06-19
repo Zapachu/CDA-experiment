@@ -126,7 +126,7 @@ module.exports = {
                     {
                         loader: 'sass-loader',
                         options: {
-                            includePaths: [path.resolve(__dirname, '../../../../core/client/lib/resource/')]
+                            includePaths: [path.resolve(__dirname, '../../../../core/clientUtil/lib/resource/')]
                         }
                     }
                 ]

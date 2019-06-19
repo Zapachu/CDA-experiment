@@ -9,6 +9,7 @@ import qs from 'qs'
 import { reqInitInfo } from '../../services/index'
 import { serverSocketListenEvents, clientSocketListenEvnets, ResCode, UserDoc, UserGameStatus, GameTypes } from '../../enums'
 import Line2d from './line2d'
+import gameDesc from './gameDesc';
 
 import BabylonScene from "./BabylonScene";
 import Detail from './detail.png'
@@ -66,11 +67,11 @@ const gamePhaseVideoSrc = {
 }
 
 const gamePhaseLabel = {
-  [GameTypes.IPO_Median]: '中位数竞价',
-  [GameTypes.IPO_TopK]: '荷兰竞价',
+  [GameTypes.IPO_Median]: '中位数定价',
+  [GameTypes.IPO_TopK]: '荷兰式拍卖',
   [GameTypes.TBM]: '集合竞价',
   [GameTypes.CBM]: '连续竞价',
-  [GameTypes.CBM_Leverage]: '连续竞价(杠杆)'
+  [GameTypes.CBM_Leverage]: '融资融券'
 }
 
 const GameRenderConfigs = {
@@ -102,7 +103,7 @@ const GameRenderConfigs = {
       y: 95,
       z: 320
     },
-    isLock: true,
+    isLock: false,
   },
   [GameSteps.center]: {
     maskSize: {
@@ -132,7 +133,7 @@ const GameRenderConfigs = {
       y: 165,
       z: 460
     },
-    isLock: true,
+    isLock: false,
   },
   [GameSteps.right]: {
     maskSize: {
@@ -162,7 +163,7 @@ const GameRenderConfigs = {
       y: 100,
       z: 325
     },
-    isLock: true,
+    isLock: false,
   },
 }
 interface Props {
@@ -171,6 +172,7 @@ interface Props {
 
 enum ModalContentTypes {
   selectSubGameType,
+  gameTypeDesc,
   continueGame,
   selectMode,
   preMatch,
@@ -182,6 +184,7 @@ interface State {
   focusGameStep: GameSteps,
   showPreStartModal: boolean
   modalContentType?: ModalContentTypes,
+  modelTypeStack: ModalContentTypes[],
   isInitView: boolean,
   focusGameType?: GameTypes,
   matchTimer?: number,
@@ -215,7 +218,8 @@ class Hall3D extends React.Component<Props, State> {
       focusGameStep: null,
       showPreStartModal: false,
       isDetailView: false,
-      focusGameType: null
+      focusGameType: null,
+      modelTypeStack: []
     }
     this.gamePhaseVideoRefs = {}
   }
@@ -230,13 +234,15 @@ class Hall3D extends React.Component<Props, State> {
         this.connectSocket()
         const user: UserDoc = res.user
         const { unblockGamePhase } = user
+        this.initView()
+        return
 
         const userUnBlockGameOrder = gamePhaseOrder[unblockGamePhase] || 0
         console.log(userUnBlockGameOrder, 'user now unlock order')
         Object.keys(GameRenderConfigs).forEach((gameStep) => {
-        
-            const gamePhase = GameStepsToGamePhase[gameStep]
-            const gameStepPhaseOrder = gamePhaseOrder[gamePhase instanceof Array ? gamePhase[0] : gamePhase]
+
+          const gamePhase = GameStepsToGamePhase[gameStep]
+          const gameStepPhaseOrder = gamePhaseOrder[gamePhase instanceof Array ? gamePhase[0] : gamePhase]
           const isLock = gameStepPhaseOrder > (userUnBlockGameOrder + 1)
           GameRenderConfigs[gameStep].isLock = isLock
         })
@@ -271,11 +277,40 @@ class Hall3D extends React.Component<Props, State> {
       })
     }, 2000);
   }
+  pushModalType (type: ModalContentTypes) {
+    const {modelTypeStack} = this.state
+    modelTypeStack.push(type)
+    this.setState({
+      modalContentType: type,
+      modelTypeStack: [...modelTypeStack]
+    })
+  }
+  popModalType () {
+    const {modelTypeStack} = this.state
+    if (modelTypeStack.length === 0) {
+      return
+    }
+    const nextType = modelTypeStack.pop()
+    this.setState({
+      modalContentType: nextType,
+      modelTypeStack: [...modelTypeStack]
+    })
+  }
   renderModal() {
     const { showPreStartModal, modalContentType, focusGameStep, focusGameType, matchTimer } = this.state
     const handleClose = async () => {
       if (this.matchTimer) {
         clearInterval(this.matchTimer)
+      }
+      const videoNodeRef = this.gamePhaseVideoRefs[focusGameType]
+      if (videoNodeRef) {
+        videoNodeRef.pause()
+      }
+      if (modalContentType === ModalContentTypes.gameTypeDesc) {
+        this.setState({
+          modalContentType: ModalContentTypes.selectMode
+        })
+        return
       }
       this.setState({
         showPreStartModal: false
@@ -285,10 +320,7 @@ class Hall3D extends React.Component<Props, State> {
           gamePhase: focusGameType
         })
       }
-      const videoNodeRef = this.gamePhaseVideoRefs[focusGameType]
-      if (videoNodeRef) {
-        videoNodeRef.pause()
-      }
+      
     }
 
     const handleSelectGameMode = (isGroupMode: boolean) => {
@@ -308,10 +340,27 @@ class Hall3D extends React.Component<Props, State> {
           modalContentType === ModalContentTypes.selectSubGameType &&
           <div className={style.selectSubGame}>
             {
-              (GameStepsToGamePhase[focusGameStep] as Array<GameTypes> ).map((gameType: GameTypes) => {
-                return   <Button key={gameType} onClick={_ => this.setState({ focusGameType: gameType, modalContentType: ModalContentTypes.selectMode })} label={gamePhaseLabel[gameType]}></Button>
+              (GameStepsToGamePhase[focusGameStep] as Array<GameTypes>).map((gameType: GameTypes) => {
+                const onClick = _ => {
+                  this.setState({ focusGameType: gameType, modalContentType: ModalContentTypes.selectMode })
+                }
+                return <Button key={gameType} onClick={onClick} label={gamePhaseLabel[gameType]}></Button>
               })
             }
+          </div>
+        }
+        {
+          modalContentType === ModalContentTypes.gameTypeDesc &&
+          <div className={style.gameDesc}>
+            <div className={style.title}>
+              <div className={style.label}>
+                <div>{gamePhaseLabel[focusGameType]}</div>
+              </div>
+              <div className={style.splitLine}></div>
+            </div>
+            <div className={style.detail}>
+              {gameDesc[focusGameType]}
+            </div>
           </div>
         }
         {
@@ -324,14 +373,17 @@ class Hall3D extends React.Component<Props, State> {
         {
           modalContentType === ModalContentTypes.selectMode &&
           <div className={style.selectGameMode}>
-            {
-              !!videoUrl &&
-              <div className={style.videoBox}>
-                <div className={style.header}>交易规则介绍</div>
-                <div className={style.splitLine}></div>
-                <video src={videoUrl} controls autoPlay ref={node => this.gamePhaseVideoRefs[focusGameType] = node}/>
-              </div>
-            }
+            <div className={style.baseBox}>
+              <div className={style.label}>
+                <div>{gamePhaseLabel[focusGameType]}</div> 
+                <div className={style.customShowGameDescBtn} onClick={_ => this.setState({modalContentType: ModalContentTypes.gameTypeDesc})}>详细规则</div>
+              </div> 
+              <div className={style.splitLine}></div>
+              {
+                !!videoUrl &&
+                <video src={videoUrl} controls autoPlay ref={node => this.gamePhaseVideoRefs[focusGameType] = node} />
+              }
+            </div>
             <PlayMode onPlay={(playMode: any) => handleSelectGameMode(playMode === PlayModes.Multi)} />
           </div>
         }
@@ -348,7 +400,7 @@ class Hall3D extends React.Component<Props, State> {
             </div>
         }
         <div className={style.bottom}>
-          <Button onClick={handleClose} label="关闭"></Button>
+          <Button onClick={handleClose} label="返回"></Button>
         </div>
       </div>
     </Modal>
@@ -619,9 +671,9 @@ class Hall3D extends React.Component<Props, State> {
     const isArray = gameType instanceof Array
     this.setState({
       showPreStartModal: true,
-      modalContentType: isArray ?  ModalContentTypes.selectSubGameType : ModalContentTypes.selectMode,
+      modalContentType: isArray ? ModalContentTypes.selectSubGameType : ModalContentTypes.selectMode,
       focusGameStep: gameStep,
-      focusGameType: isArray ? null : (gameType as GameTypes )
+      focusGameType: isArray ? null : (gameType as GameTypes)
     })
   }
   initView() {
@@ -721,8 +773,8 @@ class Hall3D extends React.Component<Props, State> {
       })
       this.continuePlayUrl = playerUrl
     })
-    io.on(clientSocketListenEvnets.handleError, (data: {eventType: serverSocketListenEvents, msg: string}) => {
-      const {eventType, msg} = data
+    io.on(clientSocketListenEvnets.handleError, (data: { eventType: serverSocketListenEvents, msg: string }) => {
+      const { eventType, msg } = data
       if (eventType === serverSocketListenEvents.reqStartGame) {
         // Todo
         Toast.error(msg)
