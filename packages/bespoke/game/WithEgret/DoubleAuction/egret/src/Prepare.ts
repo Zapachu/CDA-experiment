@@ -1,25 +1,25 @@
 enum PrepareState {
     normal = 'normal',
-    waiting = 'waiting',
     match = 'match',
 }
 
 class Prepare extends Scene<PrepareState> {
     key = GameScene.prepare
-    public btnStart: eui.Button
-    public countDown: eui.Label
+    countDown: eui.Label
+    waitLabel: eui.Label
+    i = 1
 
     protected childrenCreated(): void {
         super.childrenCreated()
-        this.btnStart.addEventListener(egret.TouchEvent.TOUCH_TAP, () => IO.emit(MoveType.getIndex), this.btnStart)
+        IO.emit(MoveType.getIndex)
     }
 
     render() {
-        this.countDown.text = (PREPARE_TIME - IO.gameState.prepareTime).toString()
+        const {gameState: {prepareTime, playerIndex}} = IO
+        this.countDown.text = (PREPARE_TIME - prepareTime).toString()
+        this.waitLabel.text = `等待其它玩家加入(${playerIndex}/${PLAYER_NUM})${'...   '.substr(3 - (this.i++) % 4, 3)}`
         if (IO.gameState.prepareTime) {
             this.switchState(PrepareState.match)
-        }else if(IO.playerState.index !== undefined){
-            this.switchState(PrepareState.waiting)
         }
     }
 }
