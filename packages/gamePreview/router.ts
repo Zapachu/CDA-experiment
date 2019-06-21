@@ -1,14 +1,8 @@
 import express from 'express'
-import redis from 'ioredis'
 
-const redisCli = redis()
+import controllers from  './controllers'
 const rootRouter = express.Router()
 
-rootRouter.get('/',async  (req, res) => {
-    const gameList = await redisCli.keys('bespokeGameServer:*')
-    console.log(gameList)
-    res.render('views', {
-        gameList
-    })
-})
+rootRouter.get('/', controllers.renderIndex)
+rootRouter.get('/game/:type', controllers.renderGamePage)
 export default rootRouter

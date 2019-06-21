@@ -9,15 +9,15 @@ import lusca from 'lusca';
 import path from 'path';
 import http from 'http';
 import morgan from 'morgan'
-// import socket from 'socket.io'
-// import passport from 'passport'
-// import socketRedis from 'socket.io-redis'
+import socket from 'socket.io'
+import passport from 'passport'
+import socketRedis from 'socket.io-redis'
 // import socketSession from 'express-socket.io-session'
-// import socketPassport from 'passport.socketio'
+import socketPassport from 'passport.socketio'
 import cookieParser from 'cookie-parser'
 
 import router from './router'
-// import { handleSocketInit, handleSocketPassportFailed, handleSocketPassportSuccess } from './controller'
+import { handleSocketInit, handleSocketPassportFailed, handleSocketPassportSuccess } from './controllers'
 
 import settings from './settings'
 
@@ -130,7 +130,7 @@ const sessionStore = new RedisStore({
   ttl: 60 * 24 * 60 * 30 // expire time in seconds
 })
 let sessionSet = {
-  name: settings.sessionId || 'whuipo.sid',
+  name: settings.sessionId || 'academy.sid',
   resave: true,
   saveUninitialized: true,
   secret: settings.sessionSecret,
@@ -161,8 +161,8 @@ app.use((req, res, next) => {
   lusca.csrf()(req, res, next);
 });
 
-// app.use(passport.initialize());
-// app.use(passport.session());
+app.use(passport.initialize());
+app.use(passport.session());
 app.use((req, res, next) => {
   res.locals.user = req.user;
   next();
@@ -170,7 +170,7 @@ app.use((req, res, next) => {
 
 
 // server静态文件
-const staticPath = process.env.NODE_ENV === 'production' ? path.resolve(__dirname, '../dist') : path.join(__dirname, './dist')
+const staticPath = process.env.NODE_ENV === 'production' ? path.resolve(__dirname, '../static') : path.join(__dirname, './static')
 app.use(
   settings.rootname + '/static',
   express.static(staticPath, { maxAge: '10d' })
@@ -191,21 +191,21 @@ app.set('port', port);
  */
 let server = http.createServer(app);
 
-// const io = socket(server)
-// io.adapter(socketRedis({ host: settings.redishost, port: settings.redisport }))
+const io = socket(server)
+io.adapter(socketRedis({ host: settings.redishost, port: settings.redisport }))
 // // io.path(settings.socketPath)
 // io.use(socketSession(sessionMiddleWare, {
 //   autoSave: true
 // }))
-// io.use(socketPassport.authorize({
-//   cookieParser: cookieParser,
-//   key: settings.sessionId || 'whuipo.sid',
-//   secret: settings.sessionSecret,
-//   store: sessionStore,
-//   success: handleSocketPassportSuccess,
-//   fail: handleSocketPassportFailed
-// }))
-// handleSocketInit(io)
+io.use(socketPassport.authorize({
+  cookieParser: cookieParser,
+  key: settings.sessionId || 'whuipo.sid',
+  secret: settings.sessionSecret,
+  store: sessionStore,
+  success: handleSocketPassportSuccess,
+  fail: handleSocketPassportFailed
+}))
+handleSocketInit(io)
 /**
  * Listen on provided port, on all network interfaces.
  */

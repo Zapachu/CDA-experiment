@@ -4,11 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "nodemon --watch './**/*.ts' --ignore './**/*.spec.ts' --exec 'ts-node' app.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bespoke-server": "^1.0.0"
+    "bespoke-game-stock-trading-config": "^1.0.0",
+    "bespoke-server": "^1.0.0",
+    "mongoose": "^5.6.0",
+    "passport.socketio": "^3.7.0",
+    "socket.io-emitter": "^3.1.1",
+    "socket.io-redis": "^5.2.0"
   }
 }

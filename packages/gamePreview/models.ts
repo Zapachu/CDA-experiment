@@ -45,5 +45,4 @@ const UserSchema = new Schema({
   birth: Date, //出生日期
 });
 
-
-export default model<UserDoc>('User', UserSchema);
+export const User = model<UserDoc>('User', UserSchema)
