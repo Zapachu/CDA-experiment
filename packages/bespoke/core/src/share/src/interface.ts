@@ -64,12 +64,12 @@ export interface IMoveCallback {
     (...args: any[]): void
 }
 
-export interface IMoveLog<IGameState, IPlayerState> {
+export interface IMoveLog<IGameState, IPlayerState, MoveType, IMoveParams> {
     seq: number
     gameId: string
     token: string
-    type: string
-    params: {}
+    type: MoveType
+    params: IMoveParams
     gameState?: TGameState<{}>
     gameStateChanges?: Array<Diff<IGameState>>
     playerStates?: Array<TPlayerState<{}>>
