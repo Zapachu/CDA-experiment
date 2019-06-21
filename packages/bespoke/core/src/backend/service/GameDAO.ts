@@ -4,7 +4,7 @@ import {redisClient} from 'elf-protocol'
 import {cacheResult, Log, RedisKey, Setting} from '../util'
 import {GameDoc, GameModel} from '../model'
 
-export default class GameDAO {
+export class GameDAO {
 
     static async newGame<ICreateParams>(owner: string, gameConfig: IGameConfig<ICreateParams>) {
         try {

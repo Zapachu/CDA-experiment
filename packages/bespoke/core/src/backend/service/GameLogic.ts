@@ -9,7 +9,7 @@ import {
     TGameState,
     TPlayerState
 } from 'bespoke-core-share'
-import GameDAO from './GameDAO'
+import {GameDAO} from './GameDAO'
 import {StateManager} from './StateManager'
 import {MoveQueue} from './MoveQueue'
 import {RedisCall, SendBackPlayer, SetPhaseResult} from 'elf-protocol'
