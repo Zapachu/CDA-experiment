@@ -9,7 +9,7 @@ export default {
     redisport: 6379,
     sessionSecret: process.env.SESSION_SECRET || 'sessionsecret',
 
-    rootname: '',
+    rootname: '/gametrial',
     lobbyUrl: 'http://localhost:3020', // 游戏大厅地址
     domain: 'microexperiment.cn',
     gameMatchTime:  10, // 多人模式匹配时间 s
