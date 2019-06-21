@@ -5,7 +5,7 @@ var path_1 = require("path");
 var webpack = require("webpack");
 var QiniuPlugin = require("qiniu-webpack-plugin");
 var ManifestPlugin = require("webpack-manifest-plugin");
-var CleanWebpackPlugin = require("clean-webpack-plugin");
+var clean_webpack_plugin_1 = require("clean-webpack-plugin");
 var bespoke_core_share_1 = require("bespoke-core-share");
 var defaultPaths = {
     entry: './src/view',
@@ -83,9 +83,10 @@ function geneClientBuilder(_a) {
                         {
                             loader: 'css-loader',
                             options: {
-                                modules: true,
-                                importLoaders: 1,
-                                localIdentName: '[local]_[hash:base64:4]'
+                                modules: {
+                                    localIdentName: '[local]_[hash:base64:4]'
+                                },
+                                importLoaders: 1
                             }
                         },
                         'sass-loader'
@@ -116,9 +117,7 @@ function geneClientBuilder(_a) {
         ].concat(buildMode === 'publish' ? [
             new QiniuPlugin(qiNiu.upload)
         ] : buildMode === 'dist' ? [
-            new CleanWebpackPlugin(namespace + ".*", {
-                root: output
-            })
+            new clean_webpack_plugin_1.CleanWebpackPlugin()
         ] : [
             new webpack.HotModuleReplacementPlugin()
         ])

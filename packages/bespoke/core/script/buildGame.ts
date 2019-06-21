@@ -3,7 +3,7 @@ import {resolve} from 'path'
 import * as webpack from 'webpack'
 import * as QiniuPlugin from 'qiniu-webpack-plugin'
 import * as ManifestPlugin from 'webpack-manifest-plugin'
-import * as CleanWebpackPlugin from 'clean-webpack-plugin'
+import {CleanWebpackPlugin} from 'clean-webpack-plugin'
 import {config} from 'bespoke-core-share'
 import {elfSetting} from 'elf-setting'
 
@@ -101,9 +101,10 @@ export function geneClientBuilder(
                         {
                             loader: 'css-loader',
                             options: {
-                                modules: true,
-                                importLoaders: 1,
-                                localIdentName: '[local]_[hash:base64:4]'
+                                modules: {
+                                    localIdentName: '[local]_[hash:base64:4]'
+                                },
+                                importLoaders: 1
                             }
                         },
                         'sass-loader'
@@ -134,9 +135,7 @@ export function geneClientBuilder(
         ].concat(buildMode === 'publish' ? [
             new QiniuPlugin(qiNiu.upload)
         ] : buildMode === 'dist' ? [
-            new CleanWebpackPlugin(`${namespace}.*`, {
-                root: output
-            })
+            new CleanWebpackPlugin()
         ] : [
             new webpack.HotModuleReplacementPlugin()
         ])
