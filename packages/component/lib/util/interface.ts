@@ -10,7 +10,7 @@ export type TPageProps = Partial<{
 
 export interface IGameTemplate {
     namespace?: string
-    localeNames: Array<string>
+    localeNames?: Array<string>
     Create?: Core.CreateClass
     CreateOnElf?: Core.CreateOnElfClass
     Info?: Core.InfoClass
