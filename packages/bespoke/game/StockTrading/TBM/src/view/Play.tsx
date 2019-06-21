@@ -218,7 +218,7 @@ export class Play extends Core.Play<
       playerState: { role, startingPrice, startingQuota }
     } = this.props;
     return role === Role.Buyer ? (
-      <div className="test">
+      <div>
         <InfoBar text="您是买家" />
         <InfoBar text={`账户余额${startingPrice}元`} />
       </div>
