@@ -3,7 +3,9 @@ export enum Phase {
     IPO_TopK,
     TBM,
     CBM,
-    CBM_Leverage
+    CBM_Leverage,
+    DoubleAuction,
+    ParallelApplication,
 }
 
 export namespace CreateGame {

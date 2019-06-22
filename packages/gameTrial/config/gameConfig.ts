@@ -3,12 +3,12 @@ import settings from '../settings'
 
 // 实验config文件
 export default {
-    [Phase.TBM]: {
-        img: `${settings.rootname}/static/pxzy_p.png`,
-        name: '集合竞价',
-    },
-    [Phase.CBM]: {
+    [Phase.DoubleAuction]: {
         img: `${settings.rootname}/static/sxpm_p.png`,
-        name: 'test',
+        name: '双向拍卖'
+    },
+    [Phase.ParallelApplication]: {
+        img: `${settings.rootname}/static/pxzy_p.png`,
+        name: '平行志愿'
     }
 }
