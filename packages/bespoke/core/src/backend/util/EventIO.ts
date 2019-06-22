@@ -2,7 +2,7 @@ import {Actor, SocketEvent, config, IActor, IConnection, IConnectionNamespace, I
 import {Server} from 'http'
 import {EventEmitter} from 'events'
 import * as socketIO from 'socket.io'
-import GameDAO from '../service/GameDAO'
+import {GameDAO} from '../service'
 import {Token, Setting} from './util'
 
 export class EventIO {

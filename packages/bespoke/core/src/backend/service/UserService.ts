@@ -12,7 +12,7 @@ enum sendVerifyCodeRes {
     sendError
 }
 
-export default class UserService {
+export class UserService {
     static sendVerifyCodeResCode = sendVerifyCodeRes
 
     static async sendVerifyCode(nationCode: baseEnum.NationCode, mobile: string): Promise<{

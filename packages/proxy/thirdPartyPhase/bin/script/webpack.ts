@@ -34,9 +34,10 @@ export = () => {
                         {
                             loader: 'css-loader',
                             options: {
-                                modules: true,
-                                importLoaders: 1,
-                                localIdentName: '[local]_[hash:base64:4]'
+                                modules: {
+                                    localIdentName: '[local]_[hash:base64:4]'
+                                },
+                                importLoaders: 1
                             }
                         },
                         {
@@ -78,10 +79,7 @@ export = () => {
                     return files.reduce((manifest, {name, path}) => ({...manifest, [name]: path}), seed)
                 }
             }),
-            new CleanWebpackPlugin([`phase/${phase}.*.js`], {
-                root: path.resolve(__dirname, `../../dist`),
-                watch: true
-            })
+            new CleanWebpackPlugin()
         ]
     }
 }

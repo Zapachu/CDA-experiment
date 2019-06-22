@@ -3,7 +3,8 @@ import { Server, RedisCall, gameId2PlayUrl } from "bespoke-server";
 import Controller from "./Controller";
 import Robot from "./Robot";
 import { namespace, ICreateParams } from "./config";
-import { CreateGame, Phase } from "bespoke-game-stock-trading-config";
+import {Phase, phaseToNamespace} from "bespoke-game-stock-trading-config";
+import {CreateGame} from 'elf-protocol'
 
 Server.start(
   {
@@ -14,7 +15,7 @@ Server.start(
 );
 
 RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(
-  CreateGame.name(Phase.TBM),
+  CreateGame.name(phaseToNamespace(Phase.TBM)),
   async ({ keys }) => {
     const gameId = await Server.newGame<ICreateParams>({
       title: `${Phase.TBM}:${new Date().toUTCString()}`,

@@ -1,5 +1,5 @@
 import * as path from 'path'
-import * as CleanWebpackPlugin from 'clean-webpack-plugin'
+import {CleanWebpackPlugin} from 'clean-webpack-plugin'
 import * as QiniuPlugin from 'qiniu-webpack-plugin'
 import {elfSetting} from 'elf-setting'
 
@@ -44,9 +44,10 @@ export = {
                     {
                         loader: 'css-loader',
                         options: {
-                            modules: true,
-                            importLoaders: 1,
-                            localIdentName: '[local]'
+                            modules: {
+                                localIdentName: '[local]'
+                            },
+                            importLoaders: 1
                         }
                     },
                     {
@@ -68,9 +69,10 @@ export = {
                     {
                         loader: 'css-loader',
                         options: {
-                            modules: true,
-                            importLoaders: 1,
-                            localIdentName: '[local]_[hash:base64:4]'
+                            modules: {
+                                localIdentName: '[local]_[hash:base64:4]'
+                            },
+                            importLoaders: 1
                         }
                     },
                     {
@@ -89,10 +91,7 @@ export = {
         'elf-linker': 'ElfLinker'
     },
     plugins: [
-        new CleanWebpackPlugin('*', {
-            root: path.resolve(__dirname, `../dist`),
-            watch: true
-        })
+        new CleanWebpackPlugin()
     ].concat(buildMode === 'publish' ? [
         new QiniuPlugin(qiNiu.upload)
     ] : [])

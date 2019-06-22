@@ -1,9 +1,9 @@
 import Queue, {QueueWorker} from 'queue'
-import cloneDeep = require('lodash/cloneDeep')
 import {diff} from 'deep-diff'
-import {TGameState, TPlayerState, IGameWithId, IMoveLog, IActor} from 'bespoke-core-share'
+import {CoreMove, IActor, IGameWithId, IMoveLog, TGameState, TPlayerState} from 'bespoke-core-share'
 import {MoveLogModel} from '../model'
 import {StateManager} from './StateManager'
+import cloneDeep = require('lodash/cloneDeep')
 
 export class MoveQueue<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     private seq = 0
@@ -17,8 +17,8 @@ export class MoveQueue<ICreateParams, IGameState, IPlayerState, MoveType, PushTy
     constructor(private game: IGameWithId<ICreateParams>, private stateManager: StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {
     }
 
-    push(actor: IActor, type: string, params: {}, moveHandler: QueueWorker): void {
-        const moveLog: IMoveLog<IGameState, IPlayerState> = {
+    push(actor: IActor, type: MoveType | CoreMove, params: IMoveParams, moveHandler: QueueWorker): void {
+        const moveLog: IMoveLog<IGameState, IPlayerState, MoveType | CoreMove, IMoveParams> = {
             seq: this.seq++,
             gameId: this.game.id,
             token: actor.token,

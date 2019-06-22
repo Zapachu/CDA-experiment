@@ -30,7 +30,8 @@ import {
   SHOUT_TIMER,
   namespace
 } from "./config";
-import { Phase, PhaseDone, STOCKS } from "bespoke-game-stock-trading-config";
+import { Phase, STOCKS, phaseToNamespace} from "bespoke-game-stock-trading-config";
+import {GameOver} from 'elf-protocol'
 
 export default class Controller extends BaseController<
   ICreateParams,
@@ -206,15 +207,12 @@ export default class Controller extends BaseController<
           return;
         }
         const { onceMore } = params;
-        const res = await RedisCall.call<PhaseDone.IReq, PhaseDone.IRes>(
-          PhaseDone.name,
+        const res = await RedisCall.call<GameOver.IReq, GameOver.IRes>(
+          GameOver.name,
           {
             playUrl: gameId2PlayUrl(this.game.id, actor.token),
             onceMore,
-            phase:
-              this.game.params.type == IPOType.Median
-                ? Phase.IPO_Median
-                : Phase.IPO_TopK
+            namespace: phaseToNamespace(this.game.params.type == IPOType.Median ? Phase.IPO_Median : Phase.IPO_TopK)
           }
         );
         res ? cb(res.lobbyUrl) : null;

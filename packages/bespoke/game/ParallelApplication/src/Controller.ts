@@ -20,7 +20,6 @@ import {
   SCHOOL,
   APPLICATION_NUM
 } from "./config";
-import { Phase, PhaseDone, STOCKS } from "bespoke-game-stock-trading-config";
 
 export default class Controller extends BaseController<
   ICreateParams,

@@ -1,5 +1,5 @@
 import * as path from 'path'
-import * as CleanWebpackPlugin from 'clean-webpack-plugin'
+import {CleanWebpackPlugin} from 'clean-webpack-plugin'
 import * as HtmlWebpackPlugin from 'html-webpack-plugin'
 import * as QiniuPlugin from 'qiniu-webpack-plugin'
 import {config} from 'bespoke-core-share'
@@ -46,9 +46,10 @@ export = {
                     {
                         loader: 'css-loader',
                         options: {
-                            modules: true,
-                            importLoaders: 1,
-                            localIdentName: '[local]_[hash:base64:4]'
+                            modules: {
+                                localIdentName: '[local]_[hash:base64:4]'
+                            },
+                            importLoaders: 1
                         }
                     },
                     {
@@ -71,10 +72,7 @@ export = {
             filename: 'index.html',
             template: path.resolve(__dirname, './index.html')
         }),
-        new CleanWebpackPlugin('*.js', {
-            root: path.resolve(__dirname, `../dist`),
-            watch: true
-        })
+        new CleanWebpackPlugin(),
     ].concat(buildMode === 'publish' ? [
         new QiniuPlugin(qiNiu.upload)
     ] : [])

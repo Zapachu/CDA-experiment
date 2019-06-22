@@ -1,5 +1,5 @@
 import * as path from 'path'
-import * as CleanWebpackPlugin from 'clean-webpack-plugin'
+import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import {TsconfigPathsPlugin} from 'tsconfig-paths-webpack-plugin'
 // import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer'
 import * as HtmlWebpackPlugin from 'html-webpack-plugin'
@@ -58,9 +58,10 @@ export = ({webpackHmr}: { webpackHmr: boolean }) => {
                         {
                             loader: 'css-loader',
                             options: {
-                                modules: true,
-                                importLoaders: 1,
-                                localIdentName: '[local]_[hash:base64:4]'
+                                modules: {
+                                    localIdentName: '[local]_[hash:base64:4]'
+                                },
+                                importLoaders: 1
                             }
                         },
                         {
@@ -90,10 +91,7 @@ export = ({webpackHmr}: { webpackHmr: boolean }) => {
             'react-dom': 'ReactDOM'
         },
         plugins: [
-            new CleanWebpackPlugin(['*'], {
-                root: path.resolve(__dirname, `../../../dist`),
-                watch: true
-            }),
+            new CleanWebpackPlugin(),
             new HtmlWebpackPlugin({
                 filename: 'index.html',
                 template: path.resolve(__dirname, './index.html')
