@@ -3,7 +3,7 @@ import * as Express from 'express'
 import {namespace} from './config'
 import {config, gameId2PlayUrl, RedisCall, Server} from 'bespoke-server'
 import Controller from './Controller'
-import {CreateGame, Phase} from 'bespoke-game-stock-trading-config'
+import {CreateGame} from 'elf-protocol'
 
 const egretRouter = Express.Router()
     .use('/egret/bin-debug', Express.static(resolve(__dirname, '../egret/bin-debug')))
@@ -17,7 +17,7 @@ Server.start(
 )
 
 RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(
-    CreateGame.name(Phase.DoubleAuction),
+    CreateGame.name(namespace),
     async ({keys}) => {
         const gameId = await Server.newGame({
             title: `DoubleAuction:${new Date().toUTCString()}`,

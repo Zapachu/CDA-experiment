@@ -11,7 +11,8 @@ import qs from 'qs'
 import { User } from './models'
 import { UserDoc } from './interfaces'
 import settings from './settings'
-import {Phase, CreateGame, PhaseDone} from 'bespoke-game-stock-trading-config'
+import {Phase, namespaceToPhase, phaseToNamespace} from 'bespoke-game-stock-trading-config'
+import {CreateGame, GameOver} from 'elf-protocol'
 import { ResCode, serverSocketListenEvents, clientSocketListenEvnets, UserGameStatus } from './enums'
 
 const ioEmitter = socketEmitter({ host: settings.redishost, port: settings.redisport })
@@ -113,7 +114,7 @@ const clearRoom = (gamePhase: Phase) => {
 }
 
 const emitMatchSuccess = async (gamePhase: Phase, uids = []) => {
-    const {playUrls: playerUrls} = await RedisCall.call<CreateGame.IReq, CreateGame.IRes>(CreateGame.name(gamePhase), {
+    const {playUrls: playerUrls} = await RedisCall.call<CreateGame.IReq, CreateGame.IRes>(CreateGame.name(phaseToNamespace(gamePhase)), {
         keys: uids
     })
     console.log(playerUrls, 'urls')
@@ -167,7 +168,8 @@ const gamePhaseOrder = {
     [Phase.CBM_Leverage]: 3
 }
 
-RedisCall.handle<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, async ({playUrl, onceMore, phase}) => {
+RedisCall.handle<GameOver.IReq, GameOver.IRes>(GameOver.name, async ({playUrl, onceMore, namespace}) => {
+    const phase = namespaceToPhase(namespace)
     console.log(`redis handle phase: ${phase} done`, playUrl, onceMore)
     const uid = await RedisTools.getPlayerUrlRecord(playUrl)
     const user = await User.findById(uid)

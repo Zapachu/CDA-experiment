@@ -3,7 +3,7 @@ import {gameId2PlayUrl, RedisCall, Server} from 'bespoke-server'
 import Controller from './Controller'
 import Robot from './Robot'
 import {ICreateParams, namespace} from './config'
-import {CreateGame, Phase} from 'bespoke-game-stock-trading-config'
+import {CreateGame} from 'elf-protocol'
 
 Server.start(
   {
@@ -14,7 +14,7 @@ Server.start(
 );
 
 RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(
-  CreateGame.name(Phase.ParallelApplication),
+  CreateGame.name(namespace),
   async ({ keys }) => {
     const gameId = await Server.newGame<ICreateParams>({
       title: `ParallelApplication:${new Date().toUTCString()}`,

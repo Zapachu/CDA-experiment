@@ -1,3 +1,4 @@
+//region Elf
 export namespace PhaseReg {
     export const intervalSeconds = 10
     export const key = namespace=>`Elf:PhaseReg:${namespace}`
@@ -53,3 +54,33 @@ export namespace SendBackPlayer {
         sendBackUrl: string
     }
 }
+//endregion
+
+//region Trial
+export namespace CreateGame {
+    export const name = (namespace:string)=>`Trial:${namespace}:CreateGame`
+    export const playerLimit = 12
+
+    export interface IReq {
+        keys: string[]
+    }
+
+    export interface IRes {
+        playUrls: string[]
+    }
+}
+
+export namespace GameOver{
+    export const name = 'Trial:GameOver'
+
+    export interface IReq {
+        playUrl: string
+        onceMore: boolean
+        namespace: string
+    }
+
+    export interface IRes {
+        lobbyUrl: string
+    }
+}
+//endregion

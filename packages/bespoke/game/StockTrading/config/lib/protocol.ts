@@ -3,34 +3,15 @@ export enum Phase {
     IPO_TopK,
     TBM,
     CBM,
-    CBM_Leverage,
-    DoubleAuction,
-    ParallelApplication,
+    CBM_Leverage
 }
 
-export namespace CreateGame {
-    export const name = (phase:Phase)=>`StockTrade:${phase}:CreateGame`
-    export const playerLimit = 12
+const NAMESPACE_PREFIX = 'stockTrade:'
 
-    export interface IReq {
-        keys: string[]
-    }
-
-    export interface IRes {
-        playUrls: string[]
-    }
+export function phaseToNamespace(phase: Phase) {
+    return `${NAMESPACE_PREFIX}${phase}`
 }
 
-export namespace PhaseDone{
-    export const name = 'StockTrade:PhaseDone'
-
-    export interface IReq {
-        playUrl: string
-        onceMore: boolean
-        phase: Phase
-    }
-
-    export interface IRes {
-        lobbyUrl: string
-    }
+export function namespaceToPhase(namespace: string): Phase {
+    return +namespace.replace(NAMESPACE_PREFIX, '')
 }

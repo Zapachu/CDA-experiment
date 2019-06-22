@@ -28,7 +28,8 @@ import {
     PushType,
     ROLE
 } from './config'
-import {CreateGame, Phase, PhaseDone} from 'bespoke-game-stock-trading-config'
+import {phaseToNamespace, Phase} from 'bespoke-game-stock-trading-config'
+import {CreateGame, GameOver} from 'elf-protocol'
 import {getBalanceIndex, getEnumKeys, random} from './util'
 
 export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
@@ -95,7 +96,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         const marketRejected = order.role === ROLE.Seller ?
             sellOrderIds[0] && order.price > orders.find(({id}) => id === sellOrderIds[0]).price :
             buyOrderIds[0] && order.price < orders.find(({id}) => id === buyOrderIds[0]).price
-        Log.d('Market rejected : ', {price:order.price, count:order.count, role:order.role})
+        Log.d('Market rejected : ', {price: order.price, count: order.count, role: order.role})
         if (marketRejected) {
             return
         } else {
@@ -329,10 +330,10 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             }
             case MoveType.exitGame: {
                 const {onceMore} = params
-                const res = await RedisCall.call<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, {
+                const res = await RedisCall.call<GameOver.IReq, GameOver.IRes>(GameOver.name, {
                     playUrl: gameId2PlayUrl(this.game.id, actor.token),
                     onceMore,
-                    phase: Phase.CBM
+                    namespace: phaseToNamespace(this.game.params.allowLeverage ? Phase.CBM_Leverage : Phase.CBM)
                 })
                 res ? cb(res.lobbyUrl) : null
                 break

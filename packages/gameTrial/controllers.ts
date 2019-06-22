@@ -10,10 +10,11 @@ import qs from 'qs'
 import { User } from './models'
 import { UserDoc } from './interface'
 import settings from './settings'
-import {Phase, CreateGame, PhaseDone} from 'bespoke-game-stock-trading-config'
+import {CreateGame, GameOver} from 'elf-protocol'
 import { ResCode, serverSocketListenEvents, clientSocketListenEvnets, UserGameStatus } from './enums'
 import areaCode from './config/areaCode'
 import gameConfig from './config/gameConfig'
+type Phase = string
 
 const ioEmitter = socketEmitter({ host: settings.redishost, port: settings.redisport })
 const redisCli = new Redis(settings.redisport, settings.redishost)
@@ -198,7 +199,7 @@ const roomManager = new RoomManager(sockerManager);
 //     [Phase.CBM_Leverage]: 3
 // }
 
-RedisCall.handle<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, async ({playUrl, onceMore, phase}) => {
+RedisCall.handle<GameOver.IReq, GameOver.IRes>(GameOver.name, async ({playUrl, onceMore, namespace:phase}) => {
     console.log(`redis handle phase: ${phase} done`, playUrl, onceMore)
     const uid = await redisTools.getPlayerUrlRecord(playUrl)
     // const user = await User.findById(uid)
