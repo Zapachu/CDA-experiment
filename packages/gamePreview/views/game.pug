@@ -1,0 +1,269 @@
+html
+    head
+        meta(charset="utf-8")
+        meta(http-equiv='X-UA-Compatible', content='IE=edge')
+        meta(name="viewport", content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no")
+        meta(name='author', content='微课研')
+        meta(name="description", content="微课研是社会科学领域全球领先的课程和研究管理平台。功能涵盖：被试招募, 被试库管理, 调查问卷, 课程管理, 在线实验, 推送通知, 实验定制, 博弈论实验, 报酬支付。实验经济学领域的高效工具，行为经济学研究的好帮手。管理学沙盘，心理学调查实验，等社科领域也可以适用。")
+        meta(name="keywords", content="实验经济学平台, 被测试者, 被试招募, 被试库管理, 调查问卷, 课程管理, 推送通知, 实验平台, 经济学软件, 实验模型, 实验定制, 行为经济学, 实验经济学, 博弈论, 实验系统")
+        title 微课研 - 实验经济学行为经济学宏观微观市场政策测试招募问卷调查在线实验教学研究平台
+        style.
+            html, body, div, span, applet, object, iframe,
+            h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+            a, abbr, acronym, address, big, cite, code,
+            del, dfn, em, img, ins, kbd, q, s, samp,
+            small, strike, strong, sub, sup, tt, var,
+            b, u, i, center,
+            dl, dt, dd, ol, ul, li,
+            fieldset, form, label, legend,
+            table, caption, tbody, tfoot, thead, tr, th, td,
+            article, aside, canvas, details, embed,
+            figure, figcaption, footer, header, hgroup,
+            menu, nav, output, ruby, section, summary,
+            time, mark, audio, video {
+                margin: 0;
+                padding: 0;
+                border: 0;
+                font-size: 100%;
+                font: inherit;
+                vertical-align: baseline;
+            }
+
+            /* HTML5 display-role reset for older browsers */
+            article, aside, details, figcaption, figure,
+            footer, header, hgroup, menu, nav, section {
+                display: block;
+            }
+
+            body {
+                line-height: 1;
+            }
+
+            ol, ul {
+                list-style: none;
+            }
+
+            blockquote, q {
+                quotes: none;
+            }
+
+            blockquote:before, blockquote:after,
+            q:before, q:after {
+                content: '';
+                content: none;
+            }
+
+            table {
+                border-collapse: collapse;
+                border-spacing: 0;
+            }
+        style.
+            body {
+                background-color: #eff3f5;
+            }
+            .gameTitle {
+                margin: 99px 0 0;
+                text-align: center;
+                line-height: 1.3;
+                color: #F55B7D;
+                font-size: 48px;
+            }
+            .startBtn {
+                position: fixed;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                cursor: pointer;
+                filter: grayscale(50%);
+            }
+            .startBtn:hover {
+                filter: none;
+            }
+            .match {
+                display: flex;
+                width: 666px;
+                margin: 108px auto 0;
+                box-sizing: border-box;
+                display: none;
+            }
+            .match > .person {
+                width: 37%;
+                position: relative;
+            }
+              .match > .person > img{
+                width: 100%;
+            }
+            .match > .person  > .board {
+                position: absolute;
+                left: 98%;
+                top: -4%;
+                width: 168%;
+            }
+            .match > .person  > .board > img{
+                width: 100%;
+                object-fit: contain;
+            }
+            .match > .person  > .board > .label{
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 90%;
+                width: 100%;
+                color: #FEFEFE;
+                font-size: 36px;
+                line-height: 1.3;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .match > .person > .matchLoading {
+                width: 63%;
+                height: 63%;
+                position: absolute;
+                bottom: -32%;
+                right: -63%;
+                color: #769AF3;
+                font-size: 22px;
+            }
+            .match > .person > .matchLoading > .label {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+            }
+             .match > .person > .matchLoading > img {
+                width: 100%;
+                animation: matchLoading 1s infinite;
+            }
+            @media screen and (max-width: 666px) {
+                .match {
+                    width: 90%;
+                    maring: 0 auto;
+                }
+                .match > .person > .matchLoading {
+                    font-size: 12px;
+                }
+            }
+            @media screen and (max-width: 550px) {
+                .match > .person  > .board > .label{
+                    font-size: 16px;
+                    line-height: 1.5;
+                }
+            }
+            @keyframes matchLoading {
+                from {
+                  transform: rotate(0deg);
+                }
+                to {
+                  transform: rotate(360deg);
+                }
+            }
+        style
+            include login/style.css
+        style
+            include message/style.css
+        style
+            include modal/modal.css
+    body
+        include  login/html
+        h3.gameTitle=`${game.name}`
+        img(src=`${rootname}/static/start_button_icon.png` class="startBtn")
+        div.match
+            div.person
+                img(src=`${rootname}/static/person_icon.gif`)
+                div.board
+                    img(src=`${rootname}/static/input_icon.png`)
+                    p.label 游戏正在人员匹配<br>请耐心等待
+                      
+                div.matchLoading
+                    img(src=`${rootname}/static/loading_icon.png`)
+                    span.label="匹配中"
+        script(type="text/javascript" src="https://qiniu1.anlint.com/js/jquery.min.js")
+        script(type="text/javascript" src=`${rootname}/static/js/socket.io.js`)
+        script
+            include  login/script.js
+        script
+            include  modal/modal.js
+        script
+            include  message/script.js
+        script.
+            var clientSocketListenEvnets = {
+                startMatch: 'startMatch',
+                startGame: 'startGame',
+                continueGame: 'continueGame',
+                handleError: 'handleError' 
+            }
+            var serverSocketListenEvents = {
+                reqStartGame:'reqStartGame',
+                leaveMatchRoom:'leaveMatchRoom'
+            }
+            var connection
+            var gameObjStr = '!{JSON.stringify(game)}'
+            var game = JSON.parse(gameObjStr)
+            function connectInit () {
+                connection = io.connect('/')
+                connection.on('connect', (socket) => {
+                    console.log('io connected')
+                    connection.emit(serverSocketListenEvents.reqStartGame, {
+                        isGroupMode: true, 
+                        gamePhase: game.type
+                    })
+                    $('.startBtn').hide()
+                    $('.match').show()
+                })
+                // TODO
+                connection.on(clientSocketListenEvnets.startMatch, () => {
+                    console.log('recive startmatch')
+                })
+                connection.on(clientSocketListenEvnets.startGame, ({ playerUrl }) => {
+                    message.success('匹配成功')
+                    setTimeout(function () {
+                        location = playerUrl
+                    }, 1500)
+                })
+                connection.on(clientSocketListenEvnets.continueGame, ({ playerUrl }) => {
+                    message.warn('检测到已有实验进行中')
+                    setTimeout(function () {
+                        location = playerUrl
+                    }, 1500)
+                })
+                connection.on(clientSocketListenEvnets.handleError, (data) => {
+                    const { eventType, msg } = data
+                    if (eventType === serverSocketListenEvents.reqStartGame) {
+                        // Todo
+                        message.error(msg)
+                    }
+                    if (eventType === serverSocketListenEvents.leaveMatchRoom) {
+                        // TODO
+                        message.error(msg)
+                    }
+                })
+            }
+            window.onload = function () {
+                var inWx = /micromessenger/.test(navigator.userAgent.toLowerCase())
+                var isLogin = !{isLogin}
+                var _csrf = '!{_csrf}'
+                
+                var loginBox = LoginInit(_csrf, null, function () {
+                    isLogin = true
+                    startGame()
+                });
+
+                function startGame (e) {
+                    e && e.stopPropagation()
+                    if (isLogin) {
+                        connectInit()
+                    } else {
+                        // TODO
+                        if (inWx) {
+                            location.href = '/account/wxlogin?redirect=' + encodeURI(location.href)
+                            return
+                        }
+                        message.warn('请先登录')
+                        loginBox.show()
+                    }
+                }
+
+                $('.startBtn').click(startGame)
+            }

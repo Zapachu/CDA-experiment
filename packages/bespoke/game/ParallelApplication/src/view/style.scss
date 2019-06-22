@@ -1,0 +1,164 @@
+@import "~elf-component/lib/resource/public";
+
+@mixin modal {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  color: #fff;
+}
+
+.create {
+}
+.play {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+.playContent {
+  position: relative;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+  padding: 10px;
+  max-width: 320px;
+  min-height: 530px;
+  .redFont {
+    color: #f25d7d;
+  }
+  .scoreBoard {
+    background: url("./components/score_board.png") no-repeat;
+    background-size: 100% 100%;
+    width: 250px;
+    height: 300px;
+    padding: 25px;
+    box-sizing: border-box;
+  }
+  .applyBoard {
+    background: url("./components/apply_board.png") no-repeat;
+    background-size: 100% 100%;
+    width: 250px;
+    height: 300px;
+    padding: 60px 25px 25px 25px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    margin-bottom: 30px;
+    > li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 16px;
+    }
+    .application {
+      display: flex;
+      align-items: center;
+      img {
+        width: 20px;
+        margin-right: 5px;
+      }
+    }
+  }
+  .resultBoard {
+    background: url("./components/result_board.png") no-repeat;
+    background-size: 100% 100%;
+    width: 250px;
+    height: 200px;
+    padding: 70px 20px 20px 20px;
+    box-sizing: border-box;
+    > p {
+      text-align: center;
+      font-weight: 500;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+  }
+  .title {
+    font-size: 28px;
+    font-weight: 500;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #b5b5b5;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+  .name {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .table {
+    display: flex;
+    border: 1px solid #315db9;
+    margin-top: 30px;
+    > li {
+      flex: 25%;
+      border-right: 1px solid #315db9;
+      &:last-child {
+        border-right: none;
+      }
+      p {
+        text-align: center;
+      }
+      .subject {
+        padding: 5px;
+        border-bottom: 1px solid #315db9;
+      }
+      .score {
+        color: #f25d7d;
+        font-size: 18px;
+        font-weight: 500;
+      }
+    }
+  }
+  .arrow {
+    margin: 30px 0 10px 0;
+    width: 30px;
+    animation: move 1s linear infinite;
+  }
+  .scoring {
+    width: 300px;
+  }
+  .choices {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    > li {
+      flex-basis: 45%;
+      margin: 0 5px 20px 5px;
+    }
+  }
+  .ruleModal {
+    @include modal;
+    > p {
+      margin-bottom: 20px;
+    }
+    .ruleTitle {
+      font-size: 20px;
+    }
+    > img {
+      width: 20px;
+      cursor: pointer;
+    }
+  }
+  .applyModal {
+    @include modal;
+  }
+}
+
+@media (max-width: 768px) {
+  .play {
+  }
+}
+
+@keyframes move {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
