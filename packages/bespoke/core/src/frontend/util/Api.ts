@@ -66,7 +66,7 @@ export const Api = new class {
         return await this.post('/game/joinWithShareCode', null, null, {code})
     }
 
-    async getMoveLogs(gameId: string): Promise<IHttpRes & { moveLogs: IMoveLog<any, any>[] }> {
+    async getMoveLogs(gameId: string): Promise<IHttpRes & { moveLogs: IMoveLog<any, any, any, any>[] }> {
         return this.get('/game/moveLogs/:gameId', {gameId})
     }
 

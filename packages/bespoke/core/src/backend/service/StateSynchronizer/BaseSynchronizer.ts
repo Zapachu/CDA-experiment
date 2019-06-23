@@ -1,5 +1,5 @@
 import {baseEnum, IActor, TGameState, TPlayerState} from 'bespoke-core-share'
-import GameDAO from '../GameDAO'
+import {GameDAO} from '../GameDAO'
 import {BaseController} from '../GameLogic'
 import {EventIO} from '../../util'
 import isEqual = require('lodash/isEqual')

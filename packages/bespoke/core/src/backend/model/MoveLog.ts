@@ -3,7 +3,7 @@ import {IMoveLog} from 'bespoke-core-share'
 
 const {Types: {String, Number}} = Schema
 
-export interface MoveLogDoc extends IMoveLog<any, any>, Document {
+export interface MoveLogDoc extends IMoveLog<any, any, any, any>, Document {
 }
 
 const MoveLogSchema = new Schema({

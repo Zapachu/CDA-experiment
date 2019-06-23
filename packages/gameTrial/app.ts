@@ -90,12 +90,19 @@ let app = express();
 if (settings.mongouser) {
   mongoose.connect(
     settings.mongouri,
-    { user: settings.mongouser, pass: settings.mongopass, useMongoClient: true }
+    { user: settings.mongouser,
+      pass: settings.mongopass,
+      useNewUrlParser: true,
+      useCreateIndex: true
+    }
   );
 } else {
   mongoose.connect(
     settings.mongouri,
-    { useMongoClient: true }
+      {
+        useNewUrlParser: true,
+        useCreateIndex: true
+      }
   );
 }
 mongoose.connection.on('error', () => {

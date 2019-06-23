@@ -12,7 +12,8 @@
     "wjx": "ts-node ./lib/phases/wjx/server/app.ts",
     "qqwj": "ts-node ./lib/phases/qqwj/server/app.ts",
     "otree": "ts-node ./lib/phases/otree/server/app.ts",
-    "qualtrics": "ts-node ./lib/phases/qualtrics/server/app.ts"
+    "qualtrics": "ts-node ./lib/phases/qualtrics/server/app.ts",
+    "otreeProxy": "ts-node ./lib/phases/otreeProxy/app.ts"
   },
   "devDependencies":  {
     "@types/elf-linker": "^1.0.0",

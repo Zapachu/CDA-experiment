@@ -9,7 +9,7 @@ export function registerOnFramework(namespace: string, gameTemplate: IGameTempla
     }
     if (window['ElfLinker']) {
         const phaseTemplate: IPhaseTemplate = {
-            localeNames: gameTemplate.localeNames,
+            localeNames: gameTemplate.localeNames || [namespace],
             Create: gameTemplate.CreateOnElf,
         }
         window['ElfLinker'].registerPhaseCreate(namespace, phaseTemplate)

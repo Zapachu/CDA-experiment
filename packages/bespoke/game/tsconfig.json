@@ -8,12 +8,9 @@
       "dom",
       "scripthost"
     ],
-    "declaration": true,
-    "sourceMap": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "skipLibCheck": true,
-    "resolveJsonModule": true,
     "jsx": "react"
   },
   "include": [

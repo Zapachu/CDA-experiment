@@ -19,7 +19,8 @@ import {
   IPushParams,
   SHOUT_TIMER
 } from "./config";
-import { Phase, PhaseDone, STOCKS } from "bespoke-game-stock-trading-config";
+import { Phase, STOCKS, phaseToNamespace } from "bespoke-game-stock-trading-config";
+import {GameOver} from 'elf-protocol'
 
 export default class Controller extends BaseController<
   ICreateParams,
@@ -98,12 +99,12 @@ export default class Controller extends BaseController<
       }
       case MoveType.nextStage: {
         const { onceMore } = params;
-        const res = await RedisCall.call<PhaseDone.IReq, PhaseDone.IRes>(
-          PhaseDone.name,
+        const res = await RedisCall.call<GameOver.IReq, GameOver.IRes>(
+          GameOver.name,
           {
             playUrl: gameId2PlayUrl(this.game.id, actor.token),
             onceMore,
-            phase: Phase.TBM
+            namespace: phaseToNamespace(Phase.TBM)
           }
         );
         res ? cb(res.lobbyUrl) : null;
@@ -223,7 +224,7 @@ export default class Controller extends BaseController<
     }
     const { groupSize } = this.game.params;
     let shoutTime = 1;
-    this.shoutTimer = setInterval(async () => {
+    this.shoutTimer = global.setInterval(async () => {
       const playerStates = await this.stateManager.getPlayerStates();
       const playerStateArray = Object.values(playerStates);
       playerStateArray.forEach(s => {

@@ -1,7 +1,7 @@
 import {TGameState, TPlayerState, IActor, baseEnum} from 'bespoke-core-share'
 import {StateSynchronizer, GameStateSynchronizer, PlayerStateSynchronizer} from './StateSynchronizer'
 import {BaseController} from './GameLogic'
-import GameDAO from './GameDAO'
+import {GameDAO} from './GameDAO'
 
 export class StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     private gameStateManager: GameStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>

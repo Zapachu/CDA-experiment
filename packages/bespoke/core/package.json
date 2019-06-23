@@ -5,7 +5,7 @@
   "types": "build/backend/index",
   "scripts": {
     "tsc-w": "tsc -w",
-    "install": "tsc & npm run dist",
+    "install": "tsc script/buildGame.ts & tsc & npm run dist",
     "build": "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./script/webpack.config.ts",
     "dist": "npm run build --buildMode=dist",
     "publish": "npm run build --buildMode=publish"
