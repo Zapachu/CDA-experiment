@@ -184,7 +184,6 @@ interface State {
   focusGameStep: GameSteps,
   showPreStartModal: boolean
   modalContentType?: ModalContentTypes,
-  modelTypeStack: ModalContentTypes[],
   isInitView: boolean,
   focusGameType?: GameTypes,
   matchTimer?: number,
@@ -219,7 +218,6 @@ class Hall3D extends React.Component<Props, State> {
       showPreStartModal: false,
       isDetailView: false,
       focusGameType: null,
-      modelTypeStack: []
     }
     this.gamePhaseVideoRefs = {}
   }
@@ -274,25 +272,6 @@ class Hall3D extends React.Component<Props, State> {
         isDetailView: true
       })
     }, 2000);
-  }
-  pushModalType (type: ModalContentTypes) {
-    const {modelTypeStack} = this.state
-    modelTypeStack.push(type)
-    this.setState({
-      modalContentType: type,
-      modelTypeStack: [...modelTypeStack]
-    })
-  }
-  popModalType () {
-    const {modelTypeStack} = this.state
-    if (modelTypeStack.length === 0) {
-      return
-    }
-    const nextType = modelTypeStack.pop()
-    this.setState({
-      modalContentType: nextType,
-      modelTypeStack: [...modelTypeStack]
-    })
   }
   renderModal() {
     const { showPreStartModal, modalContentType, focusGameStep, focusGameType, matchTimer } = this.state
