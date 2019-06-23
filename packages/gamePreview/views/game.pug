@@ -201,8 +201,11 @@ html
             var connection
             var gameObjStr = '!{JSON.stringify(game)}'
             var game = JSON.parse(gameObjStr)
+            var rootname = '!{rootname}'
             function connectInit () {
-                connection = io.connect('/')
+                connection = io('/', {
+                    path: rootname + '/socket'
+                })
                 connection.on('connect', (socket) => {
                     console.log('io connected')
                     connection.emit(serverSocketListenEvents.reqStartGame, {
@@ -245,7 +248,7 @@ html
                 var isLogin = !{isLogin}
                 var _csrf = '!{_csrf}'
                 
-                var loginBox = LoginInit(_csrf, null, function () {
+                var loginBox = LoginInit(_csrf, null, null, function () {
                     isLogin = true
                     startGame()
                 });

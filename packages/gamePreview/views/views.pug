@@ -270,7 +270,7 @@ html
                 var inWx = /micromessenger/.test(navigator.userAgent.toLowerCase())
                 var isLogin = !{isLogin};
                 var _csrf = '!{_csrf}'
-                var loginBox = LoginInit(_csrf, null, handleRedirect);
+                var loginBox = LoginInit(_csrf, null, null, handleRedirect);
                 var aimGameType = ''
                 function handleRedirect () {
                     nowUrl = location.href.replace(/\/$/, '')
