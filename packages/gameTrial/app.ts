@@ -129,7 +129,7 @@ app.use(
     parameterLimit: 30000
   })
 );
-app.set('views', './views')
+app.set('views', path.resolve(__dirname, './views'))
 app.set('view engine', 'pug')
 
 const sessionStore = new RedisStore({
