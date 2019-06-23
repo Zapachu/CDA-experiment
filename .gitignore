@@ -69,7 +69,6 @@ typings/
 build
 dist
 log
-bin-debug
 
 # setting
 setting.ts
