@@ -27,4 +27,5 @@
 			</e:Array>
 		</e:ArrayCollection>
 	</e:DataGroup>
+	<e:Button id="btnOnceMore" label="再来一局" y="1201" horizontalCenter="0"/>
 </e:Skin>

@@ -16,8 +16,8 @@ class Prepare extends Scene<PrepareState> {
 
     render() {
         const {gameState: {prepareTime, playerIndex}} = IO
-        this.countDown.text = (PREPARE_TIME - prepareTime).toString()
-        this.waitLabel.text = `等待其它玩家加入(${playerIndex}/${PLAYER_NUM})${'...   '.substr(3 - (this.i++) % 4, 3)}`
+        this.countDown.text = (Config.PREPARE_TIME - prepareTime).toString()
+        this.waitLabel.text = `等待其它玩家加入(${playerIndex}/${Config.PLAYER_NUM})${'...   '.substr(3 - (this.i++) % 4, 3)}`
         if (IO.gameState.prepareTime) {
             this.switchState(PrepareState.match)
         }

@@ -3,6 +3,7 @@ import * as Express from 'express'
 import {namespace} from './config'
 import {config, gameId2PlayUrl, RedisCall, Server} from 'bespoke-server'
 import Controller from './Controller'
+import {Robot} from './Robot'
 import {CreateGame} from 'elf-protocol'
 
 const egretRouter = Express.Router()
@@ -12,7 +13,7 @@ const egretRouter = Express.Router()
 
 Server.start(
     {namespace, staticPath: resolve(__dirname, '../dist')},
-    {Controller},
+    {Controller, Robot},
     egretRouter
 )
 

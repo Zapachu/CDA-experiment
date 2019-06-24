@@ -50,15 +50,15 @@ var Trade = (function (_super) {
         }, this);
     };
     Trade.prototype.render = function () {
-        var _a = IO.gameState, rounds = _a.rounds, roundIndex = _a.roundIndex, playerState = IO.playerState, _b = rounds[roundIndex], time = _b.time, shouts = _b.shouts, timeLeft = TRADE_TIME - time, myShout = shouts[playerState.index];
+        var _a = IO.gameState, rounds = _a.rounds, roundIndex = _a.roundIndex, playerState = IO.playerState, _b = rounds[roundIndex], time = _b.time, shouts = _b.shouts, timeLeft = Config.TRADE_TIME - time, myShout = shouts[playerState.index];
         this.privatePrice.text = playerState.privatePrices[roundIndex].toString();
         this.tip.text = "\u60A8\u7684\u89D2\u8272\u4E3A : " + (playerState.role === Role.seller ? '卖家' : '买家') + (myShout && myShout.traded ? ',交易成功' : '');
         this.btnShout.enabled = !(myShout && myShout.traded);
         this.conditionTip.text = playerState.role === Role.seller ? '高于' : '低于';
-        this.totalRound.text = ROUND.toString();
+        this.totalRound.text = Config.ROUND.toString();
         this.curRound.text = (roundIndex + 1).toString();
         this.countDown.text = timeLeft.toString();
-        this.roundOverTime.text = (RESULT_TIME + timeLeft).toString();
+        this.roundOverTime.text = (Config.RESULT_TIME + timeLeft).toString();
         this.buyPrices.itemRenderer = ShoutItem;
         this.sellPrices.itemRenderer = ShoutItem;
         var shoutsWithState = shouts.map(function (shout, i) { return (__assign({}, shout, { state: i === playerState.index ?

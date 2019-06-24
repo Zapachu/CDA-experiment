@@ -4,8 +4,6 @@ import { Request, Response, NextFunction } from 'express'
 import socketEmitter from 'socket.io-emitter'
 import {RedisCall} from 'bespoke-server'
 import Redis from 'ioredis'
-import {URL} from 'url'
-import qs from 'qs'
 
 import { User } from './models'
 import { UserDoc } from './interface'
@@ -191,37 +189,16 @@ const redisTools = new RedisTools(redisCli);
 const sockerManager = new SocketManager(redisTools);
 const roomManager = new RoomManager(sockerManager);
 
-// const gamePhaseOrder = {
-//     [Phase.IPO_Median]: 1,
-//     [Phase.IPO_TopK]: 1,
-//     [Phase.TBM]: 2,
-//     [Phase.CBM]: 3,
-//     [Phase.CBM_Leverage]: 3
-// }
-
 RedisCall.handle<GameOver.IReq, GameOver.IRes>(GameOver.name, async ({playUrl, onceMore, namespace:phase}) => {
     console.log(`redis handle phase: ${phase} done`, playUrl, onceMore)
     const uid = await redisTools.getPlayerUrlRecord(playUrl)
-    // const user = await User.findById(uid)
     let lobbyUrl = settings.lobbyUrl
-    // if (user) {
-        // const lastUserUnlockOrder = gamePhaseOrder[user.unblockGamePhase] || -1
-        // const orderOfNowGame = gamePhaseOrder[phase]
-        // if (orderOfNowGame > lastUserUnlockOrder) {
-        //     user.unblockGamePhase = phase
-        // }
-        // await user.save()
-        await redisTools.setUserGameData(uid, phase, {
-            status: UserGameStatus.notStarted
-        })
-        if (onceMore) {
-            const urlObj = new URL(lobbyUrl)
-            const queryObj = qs.parse(urlObj.search.replace('?', '')) || {}
-            queryObj.gamePhase = phase
-            urlObj.search = qs.stringify(queryObj)
-            lobbyUrl = urlObj.toString()
-        }
-    // }
+    await redisTools.setUserGameData(uid, phase, {
+        status: UserGameStatus.notStarted
+    })
+    if (onceMore) {
+        lobbyUrl = `${lobbyUrl}/game/${phase}`
+    }
     console.log(lobbyUrl, 'lobbyurl')
     return {lobbyUrl}
 })
@@ -232,26 +209,6 @@ interface IRequest extends Request {
 
   
 export default class RouterController {
-    // @catchError
-    // static async isLogined(req: Request, res: Response, next: NextFunction) {
-    //     if (!req.isAuthenticated()) {
-    //         console.log('未登录 sessionId: ', req.sessionID)
-    //         if (!['get', 'post'].includes(req.method.toLowerCase())) {
-    //             throw new Error('非法请求')
-    //         }
-    //         const key = req.sessionID
-    //         let user = await User.findOne({ unionId: key })
-    //         if (!user) {
-    //             user = new User({
-    //                 unionId: key,
-    //             })
-    //             await user.save()
-    //         }
-
-    //         await cbToPromise(req.logIn.bind(req))(user)
-    //     }
-    //     next()
-    // }
 
     @catchError
     static async renderIndex(req: IRequest, res: Response, next: NextFunction) {
@@ -270,7 +227,8 @@ export default class RouterController {
             areaCode,
             gameList,
             isLogin: req.isAuthenticated(),
-            rootname: settings.rootname
+            rootname: settings.rootname,
+            namespace: settings.namespace
         })
     }
 
@@ -283,7 +241,8 @@ export default class RouterController {
             areaCode,
             game,
             isLogin: req.isAuthenticated(),
-            rootname: settings.rootname
+            rootname: settings.rootname,
+            namespace: settings.namespace
         })
     }
 
@@ -416,19 +375,3 @@ export function handleSocketInit(ioServer: Socket.Server) {
     });
  
 }
-
-
-// function cbToPromise(func) {
-//     return function (...args) {
-//         return new Promise((resolve, reject) => {
-//             func(...args, (err, value) => {
-//                 if (err) {
-//                     reject(err)
-//                     return
-//                 }
-//                 resolve(value)
-//             })
-//         })
-//     }
-// }
-

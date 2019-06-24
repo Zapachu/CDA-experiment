@@ -202,6 +202,7 @@ html
             var gameObjStr = '!{JSON.stringify(game)}'
             var game = JSON.parse(gameObjStr)
             var rootname = '!{rootname}'
+            var namespace = '!{namespace}'
             function connectInit () {
                 connection = io('/', {
                     path: rootname + '/socket'
@@ -260,7 +261,7 @@ html
                     } else {
                         // TODO
                         if (inWx) {
-                            location.href = '/account/wxlogin?redirect=' + encodeURI(location.href)
+                            location.href = namespace + '/account/wxlogin?redirect=' + encodeURI(location.href)
                             return
                         }
                         message.warn('请先登录')

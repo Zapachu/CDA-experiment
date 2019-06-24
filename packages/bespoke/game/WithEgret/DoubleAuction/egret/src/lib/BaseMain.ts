@@ -14,8 +14,8 @@ namespace IO {
     export let gameState: IGameState
     export let playerState: IPlayerState
 
-    export function emit(type: MoveType, params?: Partial<IMoveParams>) {
-        socketClient.emit(SocketEvent.move, type, params)
+    export function emit(type: MoveType, params?: Partial<IMoveParams>, cb?: (...args)=>void) {
+        socketClient.emit(SocketEvent.move, type, params, cb)
     }
 
     socketClient.on(SocketEvent.syncGameState_json, newGameState => gameState = newGameState)

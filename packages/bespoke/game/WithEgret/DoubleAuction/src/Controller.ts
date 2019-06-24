@@ -1,75 +1,21 @@
-import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from 'bespoke-server'
+import {BaseController, gameId2PlayUrl, IActor, IMoveCallback, TGameState, TPlayerState} from 'bespoke-server'
+import {GameOver, RedisCall} from 'elf-protocol'
+import {
+    Config,
+    GameScene,
+    ICreateParams,
+    IGameRoundState,
+    IGameState,
+    IMoveParams,
+    IPlayerState,
+    IPushParams,
+    MoveType,
+    namespace,
+    PushType,
+    Role
+} from './config'
 
-//region
-const ROUND = 3,
-    PREPARE_TIME = 5,
-    TRADE_TIME = 120,
-    RESULT_TIME = 10,
-    PLAYER_NUM = 6
-
-enum GameScene {
-    prepare,
-    trade,
-    result
-}
-
-enum Role {
-    seller,
-    buyer
-}
-
-enum MoveType {
-    getIndex = 'getIndex',
-    shout = 'shout'
-}
-
-enum PushType {
-}
-
-interface ICreateParams {
-}
-
-interface IMoveParams {
-    price: number
-}
-
-interface IPushParams {
-}
-
-interface IGameState {
-    prepareTime: number
-    roundIndex: number
-    rounds: IGameRoundState[]
-    playerIndex: number
-    scene: GameScene
-}
-
-interface IShout {
-    role: Role,
-    price: number,
-    traded?: boolean
-}
-
-interface ITrade {
-    reqIndex: number
-    resIndex: number
-    price: number
-}
-
-interface IGameRoundState {
-    time: number
-    shouts: IShout[]
-    trades: ITrade[]
-}
-
-interface IPlayerState {
-    role: Role
-    privatePrices: number[]
-    index: number
-    profits: number[]
-}
-
-//endregion
+const {ROUND, PLAYER_NUM, PREPARE_TIME, RESULT_TIME, TRADE_TIME} = Config
 
 export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
 
@@ -95,6 +41,9 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             if (++gameState.prepareTime === PREPARE_TIME) {
                 global.clearInterval(timer)
                 gameState.scene = GameScene.trade
+                Array(PLAYER_NUM - gameState.playerIndex).fill(null).forEach(async (_, i) => {
+                    await this.startRobot(i)
+                })
                 await this.startRoundCountDown(0)
             }
             await this.stateManager.syncState()
@@ -105,7 +54,11 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         const gameState = await this.stateManager.getGameState()
         gameState.roundIndex = round
         const timer = global.setInterval(async () => {
-            if (++gameState.rounds[round].time === TRADE_TIME + RESULT_TIME) {
+            const time = ++gameState.rounds[round].time
+            if (time === ~~(TRADE_TIME >> 2)) {
+                this.broadcast(PushType.beginRound, {round})
+            }
+            if (time === TRADE_TIME + RESULT_TIME) {
                 global.clearInterval(timer)
                 if (round < ROUND - 1) {
                     await this.startRoundCountDown(round + 1)
@@ -128,7 +81,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 playerState.index = gameState.playerIndex++
                 playerState.role = playerState.index % 2 ? Role.buyer : Role.seller
                 playerState.privatePrices = Array(ROUND).fill(null).map(() => ~~(Math.random() * 20 * (playerState.role === Role.seller ? -1 : 1) + 70))
-                if (playerState.index === PLAYER_NUM - 1) {
+                if (playerState.index === 0) {
                     await this.startPrepareCountDown()
                 }
                 break
@@ -145,7 +98,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 }
                 shouts[playerState.index] = myShout
                 const pairShoutIndex = shouts.findIndex(shout => {
-                    if (!shout || (shout.role === myShout.role)||shout.traded) {
+                    if (!shout || (shout.role === myShout.role) || shout.traded) {
                         return false
                     }
                     return myShout.role === Role.seller ? shout.price >= myShout.price : shout.price <= myShout.price
@@ -161,6 +114,14 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     price: shouts[pairShoutIndex].price
                 })
                 break
+            }
+            case MoveType.onceMore: {
+                const res = await RedisCall.call<GameOver.IReq, GameOver.IRes>(GameOver.name, {
+                    playUrl: gameId2PlayUrl(this.game.id, actor.token),
+                    onceMore: true,
+                    namespace
+                })
+                res ? cb(res.lobbyUrl) : null
             }
         }
     }

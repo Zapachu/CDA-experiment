@@ -33,7 +33,7 @@ function Border({background = `radial-gradient(at 50% 0%, #67e968 1rem, transpar
     }}>
         <div style={{
             borderRadius,
-            background:'#2a3564',
+            background: '#2a3564',
             overflow: 'hidden',
             height: '100%'
         }}>
@@ -151,9 +151,9 @@ function Result({periodIndex, count, point, closingPrice, balancePrice}: { perio
         stock: ['持有股票', 'Stock'],
         money: ['资金', 'Money'],
         totalAsset: ['总资产', 'TotalAsset'],
-        tips:['连续竞价知识扩展','Tips about Continuous Double Auction'],
-        close:['关闭','Close'],
-        tipsContent:['连续竞价是指买卖股票时，由电脑交易系统连续撮合买卖委托，产生出成交价的一种交易机制。沪深两市上午连续竞价时间一致：09：30~11：30。但是下午就略有不同了，沪市：13：00~15：00，深市13：00~14：57。\n' +
+        tips: ['连续竞价知识扩展', 'Tips about Continuous Double Auction'],
+        close: ['关闭', 'Close'],
+        tipsContent: ['连续竞价是指买卖股票时，由电脑交易系统连续撮合买卖委托，产生出成交价的一种交易机制。沪深两市上午连续竞价时间一致：09：30~11：30。但是下午就略有不同了，沪市：13：00~15：00，深市13：00~14：57。\n' +
         '连续竞价时，电脑系统会先按价格优先，再时间优先的顺序，依次为买卖委托单排队，并根据排队顺序依次撮合成交。所有超过限制价格的买单和卖单会被视为无效委托。连续竞价体现了股市公平公开公正的交易原则。\n' +
         '连续竞价时，成交价格的确定原则为:1、最高买入申报和最低卖出申报价格相同，以该价格成交; 2、买入申报价格高于即时揭示的最低卖出申报价格时，以即时揭示的最低卖出申报价格为成交价格; 3、卖出申报价格低于即时揭示的最高申报买入价格时，以即时揭示的最高申报买入价格为成交价。\n']
     })
@@ -182,14 +182,15 @@ function Result({periodIndex, count, point, closingPrice, balancePrice}: { perio
             </tbody>
         </table>
         <div className={style.tips}>
-            <Button label={lang.tips} onClick={()=>setShowTips(true)}/>
+            <Button label={lang.tips} onClick={() => setShowTips(true)}/>
             <Modal visible={showTips}>
                 <h3 className={style.tipsTitle}>{lang.tips}</h3>
                 <div className={style.tipsContent}>
                     {
-                        lang.tipsContent.split('\n').map(p=><p key={p}>{p}</p>)
+                        lang.tipsContent.split('\n').map(p => <p key={p}>{p}</p>)
                     }
-                    <Button color={Button.Color.Blue} style={{margin:'1rem'}} label={lang.close} onClick={()=>setShowTips(false)}/>
+                    <Button color={Button.Color.Blue} style={{margin: '1rem'}} label={lang.close}
+                            onClick={() => setShowTips(false)}/>
                 </div>
             </Modal>
         </div>
@@ -334,9 +335,18 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
         if (role === ROLE.Buyer && maxBuyOrder && _price < maxBuyOrder.price) {
             return Toast.warn(lang.invalidBuyPrice)
         }
-        if (count <= 0 ||
-            (role === ROLE.Buyer && _price * +count > playerState.money - playerState.guaranteeMoney) ||
-            (role === ROLE.Seller && count > playerState.count - playerState.guaranteeCount)) {
+        let countInvalid = false
+        if (count <= 0) {
+            countInvalid = true
+        }
+        if (guarantee) {
+            countInvalid = (role === ROLE.Buyer && _price * +count > playerState.money) ||
+                (role === ROLE.Seller && count > playerState.count)
+        } else {
+            countInvalid = (role === ROLE.Buyer && _price * +count > playerState.money - playerState.guaranteeMoney) ||
+                (role === ROLE.Seller && count > playerState.count + ~~(playerState.money / gamePeriodState.closingPrice) - playerState.guaranteeCount)
+        }
+        if (countInvalid) {
             setCount(0)
             return Toast.warn(lang.invalidCount)
         }
@@ -527,7 +537,7 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
     function renderTradePanel() {
         return <>
             <Line text={lang.yourTrades} style={STYLE.titleLineStyle}/>
-            <Border background={STYLE.mainPanelBorder} style={{maxWidth:'24rem', margin:'auto'}}>
+            <Border background={STYLE.mainPanelBorder} style={{maxWidth: '24rem', margin: 'auto'}}>
                 <div className={style.tradeListWrapper}>
                     <table className={style.tradeList}>
                         <thead>

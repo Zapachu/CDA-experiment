@@ -46,16 +46,16 @@ class Trade extends Scene<TradeState> {
     render() {
         const {gameState: {rounds, roundIndex}, playerState} = IO,
             {time, shouts} = rounds[roundIndex],
-            timeLeft = TRADE_TIME - time,
+            timeLeft = Config.TRADE_TIME - time,
             myShout = shouts[playerState.index]
         this.privatePrice.text = playerState.privatePrices[roundIndex].toString()
         this.tip.text = `您的角色为 : ${playerState.role === Role.seller ? '卖家' : '买家'}${myShout && myShout.traded ? ',交易成功' : ''}`
         this.btnShout.enabled = !(myShout && myShout.traded)
         this.conditionTip.text = playerState.role === Role.seller ? '高于' : '低于'
-        this.totalRound.text = ROUND.toString()
+        this.totalRound.text = Config.ROUND.toString()
         this.curRound.text = (roundIndex + 1).toString()
         this.countDown.text = timeLeft.toString()
-        this.roundOverTime.text = (RESULT_TIME + timeLeft).toString()
+        this.roundOverTime.text = (Config.RESULT_TIME + timeLeft).toString()
         this.buyPrices.itemRenderer = ShoutItem
         this.sellPrices.itemRenderer = ShoutItem
         const shoutsWithState = shouts.map((shout, i) => ({

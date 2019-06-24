@@ -1,7 +1,7 @@
 {
   "name": "game-trial",
   "version": "1.0.0",
-  "description": "",
+  "description": "desc",
   "main": "index.js",
   "scripts": {
     "start": "nodemon --watch './**/*.ts' --ignore './**/*.spec.ts' --exec 'ts-node' app.ts",

@@ -2,7 +2,8 @@ export const namespace = "ParallelApplication";
 
 export enum MoveType {
   join = "join",
-  shout = "shout"
+  shout = "shout",
+  back = "back"
 }
 
 export enum PushType {
@@ -16,6 +17,7 @@ export interface ICreateParams {
 
 export interface IMoveParams {
   schools: Array<SCHOOL>;
+  onceMore: boolean;
 }
 
 export interface IPushParams {

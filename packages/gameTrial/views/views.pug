@@ -272,6 +272,7 @@ html
                 var _csrf = '!{_csrf}'
                 var loginBox = LoginInit(_csrf, null, null, handleRedirect);
                 var aimGameType = ''
+                var namespace = '!{namespace}'
                 function handleRedirect () {
                     nowUrl = location.href.replace(/\/$/, '')
                     location.href = nowUrl + '/game/' + aimGameType
@@ -281,7 +282,7 @@ html
                     aimGameType = type
                     if (!isLogin) {
                         if (inWx) {
-                            location.href = '/account/wxlogin?redirect=' + encodeURI(location.href)
+                            location.href = namespace + '/account/wxlogin?redirect=' + encodeURI(location.href)
                             return
                         }
                         message.warn('请先登录')
