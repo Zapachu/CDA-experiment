@@ -8,6 +8,7 @@ import {
   TGameState,
   TPlayerState
 } from "bespoke-server";
+import { GameOver } from "elf-protocol";
 import {
   MoveType,
   PushType,
@@ -18,7 +19,8 @@ import {
   IPushParams,
   SHOUT_TIMER,
   SCHOOL,
-  APPLICATION_NUM
+  APPLICATION_NUM,
+  namespace
 } from "./config";
 
 export default class Controller extends BaseController<
@@ -86,19 +88,19 @@ export default class Controller extends BaseController<
         }
         break;
       }
-      // case MoveType.nextStage: {
-      //   const { onceMore } = params;
-      //   const res = await RedisCall.call<PhaseDone.IReq, PhaseDone.IRes>(
-      //     PhaseDone.name,
-      //     {
-      //       playUrl: gameId2PlayUrl(this.game.id, actor.token),
-      //       onceMore,
-      //       phase: Phase.TBM
-      //     }
-      //   );
-      //   res ? cb(res.lobbyUrl) : null;
-      //   break;
-      // }
+      case MoveType.back: {
+        const { onceMore } = params;
+        const res = await RedisCall.call<GameOver.IReq, GameOver.IRes>(
+          GameOver.name,
+          {
+            playUrl: gameId2PlayUrl(this.game.id, actor.token),
+            onceMore,
+            namespace
+          }
+        );
+        res ? cb(res.lobbyUrl) : null;
+        break;
+      }
     }
   }
 
@@ -145,7 +147,6 @@ export default class Controller extends BaseController<
       }
       ps.admission = admission;
     });
-    console.log(enrollment)
   }
 
   private initRobots(amount: number) {
