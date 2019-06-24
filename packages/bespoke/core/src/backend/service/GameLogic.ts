@@ -192,7 +192,7 @@ export class BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushTy
     private readonly connection: RobotConnection
     private preGameState?: TGameState<IGameState> = null
     private prePlayerState?: TPlayerState<IPlayerState> = null
-    frameEmitter: FrameEmitter<any, any, any, any>
+    frameEmitter: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
     gameState?: TGameState<IGameState> = null
     playerState?: TPlayerState<IPlayerState> = null
 

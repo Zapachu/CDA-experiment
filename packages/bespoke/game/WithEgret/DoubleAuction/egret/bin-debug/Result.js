@@ -15,6 +15,10 @@ var Result = (function (_super) {
         _this.key = GameScene.result;
         return _this;
     }
+    Result.prototype.childrenCreated = function () {
+        _super.prototype.childrenCreated.call(this);
+        this.btnOnceMore.addEventListener(egret.TouchEvent.TOUCH_TAP, function () { return IO.emit(MoveType.onceMore, {}, function (lobbyUrl) { return location.href = lobbyUrl; }); }, this);
+    };
     Result.prototype.render = function () {
         var rounds = IO.gameState.rounds, playerState = IO.playerState;
         this.tradeHistory.dataProvider = new eui.ArrayCollection(rounds.map(function (_a, i) {
