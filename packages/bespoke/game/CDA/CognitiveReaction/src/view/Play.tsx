@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, ButtonProps, Core, Lang, MaskLoading, Toast, RadioGroup, Input} from 'bespoke-client-util'
-import {FetchType, GameStage, MoveType, PushType, PlayerStage, QUESTIONS} from '../config'
+import {Button, ButtonProps, Core, Lang, MaskLoading, Toast, RadioGroup, Input} from 'elf-component'
+import {GameStage, MoveType, PushType, PlayerStage, QUESTIONS} from '../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import GameResult from './components/GameResult'
 
@@ -10,7 +10,7 @@ interface IPlayState {
     answer: string
 }
 
-export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, IPlayState> {
+export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IPlayState> {
 
     state: IPlayState = {
         answer: ''

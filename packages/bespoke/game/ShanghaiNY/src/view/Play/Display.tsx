@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Lang} from 'bespoke-client-util'
+import {Lang} from 'elf-component'
 
 interface PropsType {
   data?: {

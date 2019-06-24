@@ -1,4 +1,4 @@
-import {registerOnFramework} from 'bespoke-client-util'
+import {registerOnFramework} from 'elf-component'
 import {Play} from './Play'
 import {Play4Owner} from './Play4Owner'
 import {Result4Owner} from './Result4Owner'

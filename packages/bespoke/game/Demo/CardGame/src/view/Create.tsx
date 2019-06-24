@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang, baseEnum, Label, Switch, BtnGroup} from 'bespoke-client-util'
-import {FetchType, GameType} from '../config'
+import {Core, Lang, baseEnum, Label, Switch, BtnGroup} from 'elf-component'
+import {GameType} from '../config'
 import {ICreateParams} from '../interface'
 
 function getEnumKeys<E>(e:{}):Array<string> {
@@ -21,7 +21,7 @@ interface ICreateState {
     }>
 }
 
-export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> {
+export class Create extends Core.Create<ICreateParams, ICreateState> {
 
     lang = Lang.extractLang({
         gameType: ['游戏类型', 'Game Type'],
@@ -37,16 +37,11 @@ export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> 
     }
 
     async componentDidMount() {
-        const {props: {setParams, fetcher}} = this
+        const {props: {setParams}} = this
         setParams({
             gameType: GameType.Card
         })
-        const {code, historyGames} = await fetcher.getFromNamespace(FetchType.getRobotInputSeqList)
-        if (code === baseEnum.ResponseCode.success) {
-            this.setState({
-                historyGames
-            })
-        }
+        alert('TODO')
     }
 
     render() {

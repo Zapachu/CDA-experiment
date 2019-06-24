@@ -1,14 +1,13 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, Core, Lang, MaskLoading, baseEnum} from 'bespoke-client-util'
-import {QUESTIONS, FetchType, GameStage, MoveType, PushType} from '../config'
+import {Button, Core, Lang, MaskLoading, baseEnum} from 'elf-component'
+import {QUESTIONS, GameStage, MoveType, PushType} from '../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 
-export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
+export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     lang = Lang.extractLang({
-        gameHasNotStarted: ['实验尚未开始', 'Experiment has not started'],
         unknown: ['???', '???'],
-        startAnwserStage: ['开始答题', 'Start Anwser Stage'],
+        startAnswerStage: ['开始答题', 'Start Answer Stage'],
         seatNumber: ['座位号', 'SeatNumber'],
         progress: ['进度', 'Progress'],
         countDown:['倒计时','CountDown']
@@ -16,9 +15,6 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
 
     render(): React.ReactNode {
         const {lang, props: {frameEmitter, game, gameState, playerStates}} = this
-        if (gameState.status === baseEnum.GameStatus.notStarted) {
-            return <MaskLoading label={lang.gameHasNotStarted}/>
-        }
         const timeLeft = game.params.timeLimit*60 - gameState.time
         const timeLeftMin = timeLeft<0 ? 0 : Math.floor(timeLeft/60)
         const timeLeftSec = timeLeft<0 ? 0 : timeLeft%60
@@ -48,7 +44,7 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
             </table>
             {
                 gameState.gameStage === GameStage.seatNumber ?
-                    <Button label={lang.startAnwserStage}
+                    <Button label={lang.startAnswerStage}
                             onClick={() => frameEmitter.emit(MoveType.startMainTest)}/> : null
             }
         </section>

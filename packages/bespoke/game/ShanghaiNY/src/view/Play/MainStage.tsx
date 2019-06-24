@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, ButtonProps, Core, Lang, MaskLoading, Toast} from 'bespoke-client-util'
-import {FetchType, MoveType, PushType, GameType, Version, Choice, MainStageIndex} from '../../config'
+import {Button, ButtonProps, Core, Lang, MaskLoading, Toast} from 'elf-component'
+import {MoveType, PushType, GameType, Version, Choice, MainStageIndex} from '../../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
 import Display from './Display'
 import Choice1 from './Choice1'
@@ -12,7 +12,7 @@ interface IPlayState {
   c2: Array<number>,
 }
 
-export default class MainStage extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, IPlayState> {
+export default class MainStage extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IPlayState> {
 
   constructor(props) {
     super(props);

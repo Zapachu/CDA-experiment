@@ -4,6 +4,7 @@
   "main": "build/index",
   "types": "build/index",
   "scripts": {
+    "tsc-w": "tsc -w",
     "install": "tsc && ts-node ./bin/copyDTS.ts"
   },
   "devDependencies": {

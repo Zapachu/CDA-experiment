@@ -28,13 +28,10 @@ export enum PushType {
     tradeSuccess = 'tradeSuccess'
 }
 
-export enum FetchType {
-}
-
 export const PERIOD = 6
 
 export const CONFIG = {
-    prepareTime: 10,
+    prepareTime: 5,
     tradeTime: 180,
     resultTime: 30
 }

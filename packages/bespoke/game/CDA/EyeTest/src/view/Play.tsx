@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, ButtonProps, Core, Lang, MaskLoading, RadioGroup, Toast} from 'bespoke-client-util'
-import {EYE_EXAMPLE, EYES, FetchType, GameStage, GENDER, MoveType, PushType} from '../config'
+import {Button, ButtonProps, Core, Lang, MaskLoading, RadioGroup, Toast} from 'elf-component'
+import {EYE_EXAMPLE, EYES, GameStage, GENDER, MoveType, PushType} from '../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import {getEnumKeys} from '../util'
 import GameResult from './components/GameResult'
@@ -30,7 +30,7 @@ interface IPlayState {
     gender: GENDER
 }
 
-export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, IPlayState> {
+export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IPlayState> {
 
     state: IPlayState = {
         emotion: undefined,

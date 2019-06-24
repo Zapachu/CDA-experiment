@@ -77,6 +77,7 @@ var Side;
 (function (Side) {
     Side["client"] = "client";
     Side["server"] = "server";
+    Side["both"] = "both(dist)";
 })(Side || (Side = {}));
 var ClientTask;
 (function (ClientTask) {
@@ -137,7 +138,7 @@ var ServerTask;
                         {
                             name: 'side',
                             type: 'list',
-                            choices: [Side.client, Side.server],
+                            choices: [Side.client, Side.server, Side.both],
                             message: 'Side:'
                         }
                     ])];
@@ -147,8 +148,9 @@ var ServerTask;
                     switch (_a) {
                         case Side.client: return [3 /*break*/, 8];
                         case Side.server: return [3 /*break*/, 12];
+                        case Side.both: return [3 /*break*/, 20];
                     }
-                    return [3 /*break*/, 19];
+                    return [3 /*break*/, 21];
                 case 8:
                     shelljs_1.cd(path.resolve(__dirname, '..'));
                     return [4 /*yield*/, inquirer_1.prompt([
@@ -178,7 +180,7 @@ var ServerTask;
                             },
                             command: "webpack-dev-server --hot --progress --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + projectPath + "/script/webpack.config.ts"
                         });
-                        return [3 /*break*/, 19];
+                        return [3 /*break*/, 21];
                     }
                     _d.label = 11;
                 case 11:
@@ -186,7 +188,7 @@ var ServerTask;
                         env: { BUILD_MODE: mode },
                         command: "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + projectPath + "/script/webpack.config.ts"
                     });
-                    return [3 /*break*/, 19];
+                    return [3 /*break*/, 21];
                 case 12: return [4 /*yield*/, inquirer_1.prompt([
                         {
                             name: 'task',
@@ -248,7 +250,19 @@ var ServerTask;
                         command: "node ./" + projectPath + "/build/serve.js"
                     });
                     return [3 /*break*/, 19];
-                case 19: return [2 /*return*/];
+                case 19: return [3 /*break*/, 21];
+                case 20:
+                    {
+                        TaskHelper.execTask({
+                            env: { BUILD_MODE: ClientTask.dist },
+                            command: "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + projectPath + "/script/webpack.config.ts"
+                        });
+                        TaskHelper.execTask({
+                            command: "tsc --outDir ./" + projectPath + "/build --listEmittedFiles true ./" + projectPath + "/src/serve.ts"
+                        });
+                    }
+                    _d.label = 21;
+                case 21: return [2 /*return*/];
             }
         });
     });

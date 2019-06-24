@@ -1,11 +1,11 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang} from 'bespoke-client-util'
+import {Core, Lang} from 'elf-component'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState} from '../interface'
-import {FetchType, SheetType, QUESTIONS} from '../config'
+import {SheetType, QUESTIONS} from '../config'
 import GameResult from './components/GameResult'
 
-export class Result extends Core.Result<ICreateParams, IGameState, IPlayerState, IMoveParams, FetchType> {
+export class Result extends Core.Result<ICreateParams, IGameState, IPlayerState, IMoveParams> {
     lang = Lang.extractLang({
         result: ['游戏结果', 'Game Result'],
         seatNumber: ['座位号', 'Seat Number'],

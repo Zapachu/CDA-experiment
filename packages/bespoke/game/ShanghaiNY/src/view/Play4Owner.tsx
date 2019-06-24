@@ -1,14 +1,14 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, Core, Lang} from 'bespoke-client-util'
+import {Button, Core, Lang, Request} from 'elf-component'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
-import {FetchType, MoveType, PushType, SheetType, Stage} from '../config'
+import {FetchRoute, MoveType, PushType, SheetType, Stage, namespace} from '../config'
 
 interface IPlay4OwnerState {
   timer?: number
 }
 
-export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, IPlay4OwnerState> {
+export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IPlay4OwnerState> {
     lang = Lang.extractLang({
         group: ['组', 'Group'],
         seatNumber: ['座位号', 'Seat Number'],
@@ -26,9 +26,9 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
     state: IPlay4OwnerState = {}
 
     render(): React.ReactNode {
-        const {lang, props: {playerStates, fetcher, frameEmitter}} = this
+        const {lang, props: {game, playerStates, frameEmitter}} = this
         return <section className={style.play4Owner}>
-            <a className={style.exportBtn} href={fetcher.buildGetUrl(FetchType.exportXlsPlaying, {sheetType: SheetType.result})}>{lang[SheetType[SheetType.result]]}</a>
+            <a className={style.exportBtn} href={Request.buildUrl(namespace, FetchRoute.exportXlsPlaying, {gameId:game.id},{sheetType: SheetType.result} )}>{lang[SheetType[SheetType.result]]}</a>
             <table className={style.resultTable}>
                 <tbody>
                 <tr>

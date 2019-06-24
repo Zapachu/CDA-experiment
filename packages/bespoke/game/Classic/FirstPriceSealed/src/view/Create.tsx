@@ -1,9 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {ICreateParams} from '../interface'
-import {Core, Label, RangeInput, Input, Button} from 'bespoke-client-util'
-import {FetchType} from "../config"
-
+import {Core, Label, RangeInput, Input, Button} from 'elf-component'
 interface ICreateState {
     startingPrice: number
     maxPrivatePrice: number
@@ -15,7 +13,7 @@ interface ICreateState {
     readonly: boolean
 }
 
-export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> {
+export class Create extends Core.Create<ICreateParams, ICreateState> {
 
     state: ICreateState = {
         startingPrice: 10,

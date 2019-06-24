@@ -12,14 +12,14 @@ export enum MoveType {
 export enum PushType {
 }
 
-export enum FetchType {
-  exportXls = 'exportXls'
-}
-
 export enum GameStage {
   seatNumber,
   mainTest,
   result
+}
+
+export enum FetchRoute {
+  exportXls = '/exportXls/:gameId'
 }
 
 export enum SheetType {

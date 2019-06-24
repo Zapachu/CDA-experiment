@@ -2,12 +2,12 @@ import * as request from 'request'
 import * as qiniu from 'qiniu'
 import {BaseController, IActor, IMoveCallback, Log} from 'bespoke-server'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
-import {FetchType, MoveType, PushType, qiniuTokenLifetime} from './config'
+import {MoveType, PushType, qiniuTokenLifetime} from './config'
 import {elfSetting} from 'elf-setting'
 
 const {qiNiu} = elfSetting
 
-export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
+export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     _qiniuUploadToken: string
 
     get qiniuUploadToken(): string {

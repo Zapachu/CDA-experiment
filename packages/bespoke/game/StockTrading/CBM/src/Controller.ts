@@ -11,7 +11,6 @@ import {
 } from 'bespoke-server'
 import {
     CONFIG,
-    FetchType,
     GameType,
     ICreateParams,
     Identity,
@@ -23,21 +22,20 @@ import {
     IPushParams,
     ITrade,
     MoveType,
-    namespace,
     PERIOD,
     PeriodStage,
     PrivatePriceRegion,
     PushType,
     ROLE
 } from './config'
-import {CreateGame, Phase, PhaseDone} from 'bespoke-game-stock-trading-config'
+import {phaseToNamespace, Phase} from 'bespoke-game-stock-trading-config'
+import {CreateGame, GameOver} from 'elf-protocol'
 import {getBalanceIndex, getEnumKeys, random} from './util'
 
-export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
+export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
 
     initGameState(): TGameState<IGameState> {
         const gameState = super.initGameState()
-        gameState.status = baseEnum.GameStatus.started
         gameState.type = ~~(Math.random() * getEnumKeys(GameType).length)
         gameState.playerIndex = 0
         gameState.periods = (Array(PERIOD).fill(null).map(() => ({
@@ -98,6 +96,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         const marketRejected = order.role === ROLE.Seller ?
             sellOrderIds[0] && order.price > orders.find(({id}) => id === sellOrderIds[0]).price :
             buyOrderIds[0] && order.price < orders.find(({id}) => id === buyOrderIds[0]).price
+        Log.d('Market rejected : ', {price: order.price, count: order.count, role: order.role})
         if (marketRejected) {
             return
         } else {
@@ -223,10 +222,10 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         periodCountDown = countDown % (prepareTime + tradeTime + resultTime)
                     const playerStates = await this.getActivePlayerStates()
                     switch (periodCountDown) {
-                        case ~~(prepareTime/2):{
+                        case ~~(prepareTime / 2): {
                             if (periodIndex === 0) {
                                 Array(2 + CreateGame.playerLimit - gameState.playerIndex).fill(null).forEach(
-                                    async (_, i) => await this.startNewRobotScheduler(`$Robot_${i}`))
+                                    async (_, i) => await this.startRobot(`$Robot_${i}`))
                             }
                             break
                         }
@@ -294,7 +293,11 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     (params.role === ROLE.Seller && count > playerState.count) ||
                     (params.role === ROLE.Buyer && count * price > playerState.money)
                 ) {
-                    Log.d('数量有误，无法继续报价')
+                    Log.d('ShoutFailed : ', {
+                        role: ROLE[params.role],
+                        count: playerState.count,
+                        money: playerState.money
+                    })
                 } else {
                     const newOrder: IOrder = {
                         id: gamePeriodState.orders.length,
@@ -327,10 +330,10 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             }
             case MoveType.exitGame: {
                 const {onceMore} = params
-                const res = await RedisCall.call<PhaseDone.IReq, PhaseDone.IRes>(PhaseDone.name, {
-                    playUrl: gameId2PlayUrl(namespace, this.game.id, actor.token),
+                const res = await RedisCall.call<GameOver.IReq, GameOver.IRes>(GameOver.name, {
+                    playUrl: gameId2PlayUrl(this.game.id, actor.token),
                     onceMore,
-                    phase: Phase.CBM
+                    namespace: phaseToNamespace(this.game.params.allowLeverage ? Phase.CBM_Leverage : Phase.CBM)
                 })
                 res ? cb(res.lobbyUrl) : null
                 break

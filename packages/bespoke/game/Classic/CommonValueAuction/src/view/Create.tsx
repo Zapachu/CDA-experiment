@@ -1,9 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {ICreateParams} from '../interface'
-import {Button, Core, Label, RangeInput, Input, RadioGroup} from 'bespoke-client-util'
-import {FetchType} from "../config"
-
+import {Button, Core, Label, RangeInput, Input, RadioGroup} from 'elf-component'
 interface ICreateState {
     commonValue: number
     deviation: number
@@ -22,7 +20,7 @@ const winnerModes = [
     '出价大于所有玩家出价中位数的 m位玩家胜利',
 ]
 
-export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> {
+export class Create extends Core.Create<ICreateParams, ICreateState> {
 
     state: ICreateState = {
         commonValue: 100,

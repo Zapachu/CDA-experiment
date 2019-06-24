@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, ButtonProps, Core, Lang, MaskLoading, Toast, RadioGroup, Input} from 'bespoke-client-util'
-import {FetchType, GameStage, MoveType, PushType, SURVEY_STAGE, SURVEY_BASIC, SURVEY_FEEDBACK, SURVEY_TEST} from '../config'
+import {Button, ButtonProps, Core, Lang, MaskLoading, Toast, RadioGroup, Input} from 'elf-component'
+import {GameStage, MoveType, PushType, SURVEY_STAGE, SURVEY_BASIC, SURVEY_FEEDBACK, SURVEY_TEST} from '../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 
 interface IPlayState {
@@ -9,7 +9,7 @@ interface IPlayState {
     inputs: Array<string>
 }
 
-export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, IPlayState> {
+export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IPlayState> {
 
     state: IPlayState = {
         inputs: []

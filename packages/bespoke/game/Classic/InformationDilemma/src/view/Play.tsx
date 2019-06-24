@@ -1,15 +1,15 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, MaskLoading, Button, ButtonProps} from 'bespoke-client-util'
+import {Core, MaskLoading, Button, ButtonProps} from 'elf-component'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
-import {FetchType, MoveType, PushType, NEW_ROUND_TIMER, PlayerStatus, Balls} from '../config'
+import {MoveType, PushType, NEW_ROUND_TIMER, PlayerStatus, Balls} from '../config'
 
 interface IPlayState {
     loading: boolean
     newRoundTimers: Array<number>
 }
 
-export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, IPlayState> {
+export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IPlayState> {
     state = {
         loading: true,
         newRoundTimers: []

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Input, Label, Lang, RangeInput, Select} from 'bespoke-client-util'
-import {FetchType, GameType, Version} from '../config'
+import {Core, Input, Label, Lang, RangeInput, Select} from 'elf-component'
+import {GameType, Version} from '../config'
 import {ICreateParams} from '../interface'
 
 interface ICreateState {
@@ -33,7 +33,7 @@ const versions = [
   {label: 'V3', value: Version.V3},
 ]
 
-export class Create extends Core.Create<ICreateParams, FetchType, ICreateState> {
+export class Create extends Core.Create<ICreateParams, ICreateState> {
     lang = Lang.extractLang({
         round: ['轮次', 'Round'],
         playersPerGroup: ['每组人数', 'Players per Group'],

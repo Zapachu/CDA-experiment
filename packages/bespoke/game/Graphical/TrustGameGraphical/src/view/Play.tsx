@@ -3,7 +3,7 @@ import Cash from './coms/Cash'
 import Referee from './coms/Referee'
 import PutShadow from "./coms/PutShadow"
 import Background from './coms/Background'
-import {Core, Lang, MaskLoading, Toast} from 'bespoke-client-util'
+import {Core, Lang, MaskLoading, Toast} from 'elf-component'
 import {Stage, span, Input, Button, RoundSwitching} from 'bespoke-game-graphical-util'
 import {
     ICreateParams,
@@ -12,7 +12,7 @@ import {
     IPlayerState,
     IPushParams
 } from '../interface'
-import {FetchType, MoveType, PlayerStatus, PushType, NEW_ROUND_TIMER} from '../config'
+import {MoveType, PlayerStatus, PushType, NEW_ROUND_TIMER} from '../config'
 import * as style from './style.scss'
 
 interface IPlayState {
@@ -21,7 +21,7 @@ interface IPlayState {
     newRoundTimers: Array<number>
 }
 
-export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, IPlayState> {
+export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IPlayState> {
     state = {
         price: '',
         loading: true,

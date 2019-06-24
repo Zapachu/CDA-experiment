@@ -1,13 +1,13 @@
 import * as React from 'react'
-import {Button, ButtonProps, Core, Lang, RadioGroup, Select, Input} from 'bespoke-client-util'
-import {FetchType, MoveType, PushType, Survey} from '../../config'
+import {Button, ButtonProps, Core, Lang, RadioGroup, Select, Input} from 'elf-component'
+import {MoveType, PushType, Survey} from '../../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
 
 interface IPlayState {
   answers: Array<string>,
 }
 
-export default class SurveyStage extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, IPlayState> {
+export default class SurveyStage extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IPlayState> {
   state: IPlayState = {
     answers: [],
   }

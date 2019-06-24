@@ -1,0 +1,50 @@
+{
+	"groups": [
+		{
+			"keys": "button_down_png,button_up_png,tip_png,teacher_png",
+			"name": "preload"
+		}
+	],
+	"resources": [
+		{
+			"url": "assets/Button/button_down.png",
+			"type": "image",
+			"name": "button_down_png"
+		},
+		{
+			"url": "assets/Button/button_up.png",
+			"type": "image",
+			"name": "button_up_png"
+		},
+		{
+			"url": "assets/tip.png",
+			"type": "image",
+			"name": "tip_png"
+		},
+		{
+			"url": "assets/teacher.png",
+			"type": "image",
+			"name": "teacher_png"
+		},
+		{
+			"url": "assets/border.png",
+			"type": "image",
+			"name": "border2_png"
+		},
+		{
+			"url": "assets/Prepare/buyer.png",
+			"type": "image",
+			"name": "buyer_png"
+		},
+		{
+			"url": "assets/Prepare/seller.png",
+			"type": "image",
+			"name": "seller_png"
+		},
+		{
+			"url": "assets/close.png",
+			"type": "image",
+			"name": "close_png"
+		}
+	]
+}

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang, BtnGroup} from 'bespoke-client-util'
+import {Core, Lang, BtnGroup} from 'elf-component'
 import {Create} from './Create'
 import {ICreateParams} from '../interface'
 
@@ -26,7 +26,6 @@ export class CreateOnElf extends Core.CreateOnElf<ICreateParams> {
                 setParams: newParams => {
                     updatePhase(param.nextPhaseKey ? [param.nextPhaseKey] : [], newParams)
                 },
-                fetcher: null,
                 setSubmitable: () => null
             }}/>
         </section>

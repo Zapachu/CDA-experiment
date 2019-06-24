@@ -1,4 +1,4 @@
-@import "~bespoke-client-util/lib/resource/public";
+@import "~elf-component/lib/resource/public";
 
 $border: 1px solid rgba($color-black, .05);
 $height-tr: 2.4rem;
@@ -8,6 +8,13 @@ $color-dark: #2a3564;
 $color-dark2: #212a51;
 $color-orange: #f99460;
 $color-red: #d6444e;
+
+@mixin panel {
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient($color-dark, $color-dark2);
+  padding-bottom: 3rem;
+}
 
 .label {
   display: inline-block;
@@ -37,6 +44,36 @@ $color-red: #d6444e;
   background: radial-gradient(at 50% 50%, $color-dark 10%, $color-dark2 80%);
   color: $color-light;
   user-select: none;
+  table{
+    color: $color-light;
+  }
+
+  .tradeListWrapper{
+    @include panel;
+    .tradeList {
+      table-layout: fixed;
+      text-align: center;
+      margin: 1rem auto;
+      flex-grow: 1;
+      overflow: auto;
+
+      tr {
+        height: 2rem;
+
+        th {
+          width: 5rem;
+          font-weight: normal;
+        }
+
+        td {
+          color: $color-orange;
+          &:first-child {
+            color: $color-light;
+          }
+        }
+      }
+    }
+  }
 
   .trading {
     margin: 2rem auto;
@@ -49,77 +86,35 @@ $color-red: #d6444e;
       margin: 1rem;
     }
 
-    @mixin panel {
-      display: flex;
-      flex-direction: column;
-      background: linear-gradient($color-dark, $color-dark2);
-      padding-bottom: 3rem;
-      height: 100%;
-    }
-
 
     .tradePanel {
       flex-basis: 24rem;
+    }
+    .asset {
+      .summary {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
 
-      .asset {
-        .summary {
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: center;
+        div {
+          flex-basis: 45%;
+          margin-top: 1.5rem;
 
-          div {
-            flex-basis: 45%;
-            margin-top: 1.5rem;
-
-            em {
-              display: inline-block;
-              width: 6rem;
-              font-size: $fontSize-large;
-              color: $color-orange;
-              text-align: center;
-            }
+          em {
+            display: inline-block;
+            width: 6rem;
+            font-size: $fontSize-large;
+            color: $color-orange;
+            text-align: center;
           }
-        }
-
-        .repayWrapper {
-          margin: 1rem 0;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
         }
       }
 
-      .yourTrades {
-        @include panel;
-
-        .tradeList {
-          table-layout: fixed;
-          text-align: center;
-          margin: 1rem;
-          flex-grow: 1;
-          overflow: auto;
-
-          tr {
-            height: 2rem;
-
-            th {
-              width: 5rem;
-              font-weight: normal;
-            }
-
-            td {
-              color: $color-orange;
-
-              &:first-child {
-                color: $color-light;
-              }
-
-              &:last-child {
-                color: $color-red;
-              }
-            }
-          }
-        }
+      .repayWrapper {
+        margin: 1rem 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
       }
     }
 
@@ -143,6 +138,7 @@ $color-red: #d6444e;
 
             tr {
               height: 2rem;
+              text-align: center;
 
               th {
                 font-weight: normal;
@@ -237,6 +233,21 @@ $color-red: #d6444e;
         td {
           padding: 1rem 2rem;
           border: 1px solid;
+        }
+      }
+      .tips{
+        position: fixed;
+        right: 15vw;
+        top: 55vh;
+        .tipsTitle{
+          margin: 1rem;
+        }
+        .tipsContent{
+          margin: 1rem 2rem;
+          text-align: left;
+        }
+        @media (max-width: $layout-mediaWidth) {
+          top: 90vh;
         }
       }
     }

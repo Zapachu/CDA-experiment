@@ -1,20 +1,9 @@
-import {
-    baseEnum,
-    CorePhaseNamespace,
-    IGameWithId,
-    IPhaseConfig,
-    IPhaseState,
-    NFrame,
-    IActor,
-    IGameState,
-    IPhaseRegInfo
-} from '@common'
-import {getPhaseService} from '../rpc'
+import {baseEnum, CorePhaseNamespace, IActor, IGameState, IGameWithId, IPhaseConfig, IPhaseState, NFrame} from '@common'
 import {GameService} from './GameService'
 import {GameStateDoc, GameStateModel, PhaseResultModel} from '@server-model'
 import {EventDispatcher} from '../controller/eventDispatcher'
-import {Log, RedisKey, redisClient} from '@server-util'
-import {PhaseManager} from 'elf-protocol'
+import {Log} from '@server-util'
+import {NewPhase, RedisCall, SetPhaseResult} from 'elf-protocol'
 
 const stateManagers: { [gameId: string]: StateManager } = {}
 
@@ -45,26 +34,22 @@ export class StateManager {
                 playerState: {}
             })
         }
-        const regInfo = await redisClient.get(RedisKey.phaseRegInfo(phaseCfg.namespace))
-        const {rpcUri} = JSON.parse(regInfo) as IPhaseRegInfo
-        return new Promise<IPhaseState>((resolve, reject) => {
-            getPhaseService(rpcUri).newPhase({
-                owner: this.game.owner,
-                elfGameId: this.game.id,
-                namespace: phaseCfg.namespace,
-                param: JSON.stringify(phaseCfg.param)
-            }, (err, res) => {
-                if (err) {
-                    return reject(err)
-                }
-                resolve({
-                    key: phaseCfg.key,
-                    status: baseEnum.PhaseStatus.playing,
-                    playUrl: res.playUrl,
-                    playerState: {}
-                })
-            })
+        const {namespace, key, param} = phaseCfg
+        const res = await RedisCall.call<NewPhase.IReq, NewPhase.IRes>(NewPhase.name(namespace), {
+            owner: this.game.owner,
+            elfGameId: this.game.id,
+            namespace,
+            param: JSON.stringify(param)
         })
+        if (!res) {
+            Log.e(`Call:NewPhase Error  ${namespace}`)
+        }
+        return {
+            key,
+            status: baseEnum.PhaseStatus.playing,
+            playUrl: res.playUrl,
+            playerState: {}
+        }
     }
 
     async init(): Promise<StateManager> {
@@ -98,7 +83,7 @@ export class StateManager {
         }
     }
 
-    async setPhaseResult(playUrl: string, playerToken: string, phaseResult: PhaseManager.TPhaseResult): Promise<void> {
+    async setPhaseResult(playUrl: string, playerToken: string, phaseResult: SetPhaseResult.IPhaseResult): Promise<void> {
         const {game: {phaseConfigs}, gameState: {phaseStates}} = this
         const curPhaseState = phaseStates.find(phaseState => phaseState.playUrl === playUrl),
             curPhaseCfgIndex = phaseConfigs.findIndex(phaseCfg => phaseCfg.key === curPhaseState.key),
@@ -117,7 +102,7 @@ export class StateManager {
         })
     }
 
-    async sendBackPlayer(playUrl: string, playerToken: string, nextPhaseKey: string, phaseResult: PhaseManager.TPhaseResult): Promise<void> {
+    async sendBackPlayer(playUrl: string, playerToken: string, nextPhaseKey: string, phaseResult: SetPhaseResult.IPhaseResult): Promise<void> {
         const {game: {phaseConfigs}, gameState: {phaseStates}} = this
 
         let nextPhaseState: IPhaseState

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, ButtonProps, Core, Lang, MaskLoading, Dice} from 'bespoke-client-util'
-import {FetchType, GameType, MoveType, PushType, Role, cardGame, LRGame, PlayerStatus} from '../config'
+import {Button, ButtonProps, Core, Lang, MaskLoading, Dice} from 'elf-component'
+import {GameType, MoveType, PushType, Role, cardGame, LRGame, PlayerStatus} from '../config'
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import {Header, HistoryTable, Matrix, BtnGroup} from './component'
 
@@ -9,7 +9,7 @@ interface IPlayState {
     choice: number
 }
 
-export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, IPlayState> {
+export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IPlayState> {
 
     lang = Lang.extractLang({
         seatNumber: ['请输入座位号', 'Input Your Seat Number Please'],

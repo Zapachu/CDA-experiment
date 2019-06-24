@@ -3,10 +3,11 @@ import * as errorhandler from 'errorhandler'
 import '../../common/auth/passport'
 import {routePrefix} from '../../common/config'
 import {elfSetting as settings} from 'elf-setting'
-import {InitWork, ProxyWork, RPCWork} from './utils'
-const {qqwjPort} = settings
+import {getUrlByNamespace, InitWork, ProxyWork} from './utils'
+import {withLinker} from '../../../core/server/util'
+import {ConDB, PassportMiddleware, SessionSetMiddleware, StaticPathMiddleware} from '../../common/utils'
 
-import {ConDB, SessionSetMiddleware, PassportMiddleware, StaticPathMiddleware} from '../../common/utils'
+const {qqwjPort} = settings
 
 ConDB()
 
@@ -18,7 +19,7 @@ StaticPathMiddleware(app, routePrefix.qqwjStaticNamespace)
 
 InitWork(app)
 ProxyWork(app)
-RPCWork()
+withLinker('qqwj', settings.qqwjProxy, getUrlByNamespace)
 
 app.use(errorhandler())
 app.listen(3073, () => {

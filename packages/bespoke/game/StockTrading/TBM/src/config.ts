@@ -1,33 +1,60 @@
-export const namespace = 'TBM'
+export const namespace = "TBM";
+
+export enum Role {
+  Buyer = 1,
+  Seller = 2
+}
 
 export enum MoveType {
-    shout = 'shout',
-    prepare = 'prepare',
-    getPosition = 'getPosition',
-    nextStage = 'nextStage',
-    startMulti = 'startMulti',
-    joinRobot = 'joinRobot',
-
+  join = "join",
+  shout = "shout",
+  nextStage = "nextStage"
 }
 
 export enum PushType {
-    matchTimer,
-    startBid,
-    newRoundTimer,
-    nextRound,
+  robotShout,
+  shoutTimer
 }
 
-export enum FetchType {
-
+export interface ICreateParams {
+  groupSize: number;
+  buyerCapitalMin: number;
+  buyerCapitalMax: number;
+  buyerPrivateMin: number;
+  buyerPrivateMax: number;
+  sellerQuotaMin: number;
+  sellerQuotaMax: number;
+  sellerPrivateMin: number;
+  sellerPrivateMax: number;
 }
 
-export enum PlayerStatus {
-    matching,
-    prepared,
-    shouted,
-    result,
+export interface IMoveParams {
+  price: number;
+  num: number;
+  onceMore: boolean;
 }
 
-export const NEW_ROUND_TIMER = 3
+export interface IPushParams {
+  shoutTime: number;
+}
 
-// role 0 : buyer 1: seller
+export interface IGameState {
+  strikePrice: number;
+  strikeNum: number;
+  stockIndex: number;
+}
+
+export interface IPlayerState {
+  startingPrice: number;
+  startingQuota: number;
+  privateValue: number;
+  role: Role;
+  price: number;
+  bidNum: number;
+  actualNum: number;
+  profit: number;
+}
+
+export const SHOUT_TIMER = 60;
+export const NPC_PRICE_MIN = 50;
+export const NPC_PRICE_MAX = 60;

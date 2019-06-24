@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<e:Skin class="PrepareSkin" width="750" height="1334" currentState="normal" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing"  states="normal,match" >
+	<w:Config id="16b4e6bc886" ></w:Config>
+	<e:Rect left="0" right="0" top="0" bottom="0" fillColor="0xffffff" locked="true"/>
+	<e:Group y="767.32" horizontalCenter="0">
+		<e:Image x="0" y="0" anchorOffsetY="0" anchorOffsetX="0" source="buyer_png" scaleX="0.8" scaleY="0.8"/>
+		<e:Image source="seller_png" x="348" y="6" scaleX="0.8" scaleY="0.8"/>
+	</e:Group>
+	<e:Group y="288" horizontalCenter="0">
+		<e:Label text="市场将在" includeIn="match" x="0" y="26" textColor="0x3c5abb" size="48" fontFamily="SimHei"/>
+		<e:Label id="countDown" text="10" includeIn="match" x="206.3" y="0" size="100" fontFamily="SimHei" textColor="0xf25a7b" bold="true" anchorOffsetX="0" width="128" textAlign="center"/>
+		<e:Label text="秒后开放" includeIn="match" x="349.6" y="26" textColor="0x3C5ABB" size="48" fontFamily="SimHei"/>
+	</e:Group>
+	<e:Label id="waitLabel" text="等待其它玩家加入..." includeIn="normal" y="324" textColor="0x3C5ABB" size="48" fontFamily="SimHei" horizontalCenter="0"/>
+</e:Skin>

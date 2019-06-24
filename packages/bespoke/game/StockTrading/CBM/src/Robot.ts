@@ -1,4 +1,4 @@
-import {BaseRobot, baseEnum} from 'bespoke-server'
+import {baseEnum, BaseRobot} from 'bespoke-server'
 import {
     ICreateParams,
     Identity,
@@ -17,7 +17,8 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
     sleepLoop: NodeJS.Timer
 
     async init(): Promise<BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>> {
-        setTimeout(() => this.frameEmitter.emit(MoveType.getIndex), Math.random() * 3000)
+        await super.init()
+        setTimeout(() => this.frameEmitter.emit(MoveType.getIndex), 1000)
         this.frameEmitter.on(PushType.beginTrading, () => {
             global.setInterval(() => {
                 if (this.gameState.periodIndex === PERIOD - 1 && this.gameState.periods[this.gameState.periodIndex].stage === PeriodStage.result) {
@@ -27,13 +28,17 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
                     return
                 }
                 this.wakeUp()
-            }, 5000 * Math.random() + 5000)
+            }, 5e3 * Math.random() + 10e3)
         })
         return this
     }
 
     wakeUp(): void {
-        if (this.gameState.periods[this.gameState.periodIndex].stage !== PeriodStage.trading) {
+        if (!this.playerState || !this.gameState) {
+            return
+        }
+        const {stage, orders, sellOrderIds, buyOrderIds} = this.gameState.periods[this.gameState.periodIndex]
+        if (stage !== PeriodStage.trading) {
             return
         }
         const privatePrice = this.playerState.privatePrices[this.gameState.periodIndex]
@@ -45,6 +50,12 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
         const price = privatePrice + ~~(Math.random() * 10 * (role === ROLE.Seller ? 1 : -1))
         const maxCount = role === ROLE.Seller ? this.playerState.count : this.playerState.money / privatePrice
         if (maxCount < 1) {
+            return
+        }
+        const marketRejected = role === ROLE.Seller ?
+            sellOrderIds[0] && price > orders.find(({id}) => id === sellOrderIds[0]).price :
+            buyOrderIds[0] && price < orders.find(({id}) => id === buyOrderIds[0]).price
+        if (marketRejected) {
             return
         }
         this.frameEmitter.emit(MoveType.submitOrder, {price, count: ~~(maxCount * (.7 * Math.random() + .3)) + 1, role})

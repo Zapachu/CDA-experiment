@@ -3,7 +3,7 @@
 
 import {ErrorPage} from '../../../common/utils'
 import {ThirdPartPhase} from "../../../../core/server/models"
-import {gameService} from "../../../common/utils"
+import {RedisCall, SendBackPlayer} from 'elf-protocol'
 import {elfSetting as settings} from 'elf-setting'
 import {Request, Response} from 'express'
 import {previewScreenXlsxRoute} from '../config'
@@ -48,17 +48,11 @@ export const rewriteResBuffers = async (proxyRes, req: Request, res: Response) =
             const playUrl: string = `${oTreeProxy}/init/${START_SIGN}/${otreePhase._id}`
             const playerToken: string = playerGameHash
             const nextPhaseKey: string = params.nextPhaseKey
-            gameService.sendBackPlayer({
+            const {sendBackUrl} = await RedisCall.call<SendBackPlayer.IReq, SendBackPlayer.IRes>(SendBackPlayer.name, {
                 elfGameId, playUrl, playerToken, nextPhaseKey,
                 phaseResult: {uniKey: playerOtreeHash, detailIframeUrl:`${oTreeProxy}${previewScreenXlsxRoute}/${otreePhase.id}`}
-            }, (err: {}, service_res: { sendBackUrl: string }) => {
-                if (err) {
-                    console.trace(err)
-                    return ErrorPage(okRes(), 'Get Next Phase Error From Core')
-                }
-                const nextPhaseUrl = service_res.sendBackUrl
-                return okRes().redirect(nextPhaseUrl)
             })
+            return okRes().redirect(sendBackUrl)
         } catch (err) {
             if (err) {
                 console.trace(err)

@@ -5,9 +5,7 @@ import {
   TGameState,
   TPlayerState
 } from 'bespoke-server'
-import nodeXlsx from 'node-xlsx'
 import {
-  FetchType,
   MoveType,
   PushType,
   Stage,
@@ -23,7 +21,7 @@ import {
 } from './config'
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
 
-export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
+export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
   private Test: Array<any>;
 
   //region init
@@ -232,7 +230,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
     return playersInGroup;
   }
 
-  private async genExportData(): Promise<Array<Array<any>>> {
+  async genExportData(): Promise<Array<Array<any>>> {
     const gameState = await this.stateManager.getGameState()
     const playerStates = await this.stateManager.getPlayerStates()
     const {rounds,gameType,participationFee,s} = this.game.params;
@@ -352,57 +350,5 @@ export default class Controller extends BaseController<ICreateParams, IGameState
       const point = participationFee+(ps.finalProfit*s||0);
       this.sendBackPlayer(token, {point: point.toString(), uniKey: ps.seatNumber||'-'});
     })
-  }
-
-  async handleFetch(req, res) {
-      const {query: {type, sheetType}} = req
-      const gameState = await this.stateManager.getGameState()
-      switch (type) {
-          case FetchType.exportXls: {
-              if(req.user.id !== this.game.owner){
-                  return res.end('Invalid Request')
-              }
-              const name = SheetType[sheetType]
-              let data = [], option = {}
-              switch (sheetType) {
-                  case SheetType.result:
-                  default: {
-                      const sheet = gameState['sheets'][sheetType]
-                      data = sheet.data
-                      option = sheet.data
-                  }
-              }
-              let buffer = nodeXlsx.build([{name, data}], option)
-              res.setHeader('Content-Type', 'application/vnd.openxmlformats')
-              res.setHeader('Content-Disposition', 'attachment; filename=' + `${encodeURI(name)}.xlsx`)
-              return res.end(buffer, 'binary')
-          }
-          case FetchType.exportXlsPlaying: {
-              if(req.user.id !== this.game.owner){
-                  return res.end('Invalid Request')
-              }
-            const name = SheetType[sheetType]
-            let data = [], option = {}
-            switch (sheetType) {
-                case SheetType.result:
-                default: {
-                    data = await this.genExportData();
-                }
-            }
-            let buffer = nodeXlsx.build([{name, data}], option)
-            res.setHeader('Content-Type', 'application/vnd.openxmlformats')
-            res.setHeader('Content-Disposition', 'attachment; filename=' + `${encodeURI(name)}.xlsx`)
-            return res.end(buffer, 'binary')
-        }
-        case FetchType.getUserMobile: {
-          const {token, actorType} = req.query;
-          const {_id: userId, mobile} = req.user;
-          if(this.game.owner.toString() !== userId.toString()) {
-            const playerState = await this.stateManager.getPlayerState({type: actorType, token});
-            playerState.mobile = mobile || '-';
-          }
-          return res.end();
-      }
-      }
   }
 }

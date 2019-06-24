@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, ButtonProps, MaskLoading, Core, Lang, Toast, Label, Input} from 'bespoke-client-util'
-import {FetchType, MoveType, PushType, Stage} from '../../config'
+import {Button, ButtonProps, MaskLoading, Core, Lang, Toast, Label, Input, Request} from 'elf-component'
+import {FetchRoute, MoveType, PushType, Stage, namespace} from '../../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
 import TestStage from './TestStage'
 import MainStage from './MainStage'
@@ -11,7 +11,7 @@ interface IPlayState {
     seatNumber: string
 }
 
-export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, IPlayState> {
+export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IPlayState> {
 
     state: IPlayState = {
       seatNumber: ''
@@ -28,9 +28,9 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     })
 
     componentDidMount() {
-      const {playerState:{actor}, frameEmitter, fetcher} = this.props;
+      const {playerState:{actor}, frameEmitter, game} = this.props;
       frameEmitter.emit(MoveType.initPosition);
-      fetcher.getFromGame(FetchType.getUserMobile, {token: actor.token, actorType: actor.type});
+      Request.get(namespace, FetchRoute.getUserMobile, {gameId:game.id},{token: actor.token, actorType: actor.type})
     }
 
     render(): React.ReactNode {

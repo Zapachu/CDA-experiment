@@ -62,11 +62,10 @@ export enum SheetType {
 
 export enum PushType {}
 
-export enum FetchType {
-  exportXls = "exportXls",
-  exportXlsPlaying = "exportXlsPlaying",
-  getUserMobile = "getUserMobile",
-  getOrgCode = "getOrgCode"
+export enum FetchRoute {
+  exportXls = "/exportXls/:gameId:",
+  exportXlsPlaying = "/exportXlsPlaying/:gameId",
+  getUserMobile = "/getUserMobile/:gameId"
 }
 
 export const Test1 = [

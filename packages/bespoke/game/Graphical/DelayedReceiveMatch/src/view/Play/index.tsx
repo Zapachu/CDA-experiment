@@ -1,10 +1,10 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang, MaskLoading} from 'bespoke-client-util'
+import {Core, Lang, MaskLoading} from 'elf-component'
 import {DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd'
 import {Button, Host, ImgLoader, RoundSwitching, Shadow, span, Stage, spanDom} from 'bespoke-game-graphical-util'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, GameState} from '../../interface'
-import {FetchType, MoveType, PlayerStatus, PushType, NEW_ROUND_TIMER} from '../../config'
+import { MoveType, PlayerStatus, PushType, NEW_ROUND_TIMER} from '../../config'
 
 function Player({active, showBack, matched}: {
     active: boolean
@@ -105,7 +105,7 @@ interface IPlayState {
     newRoundTimers: Array<number>
 }
 
-export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType, IPlayState> {
+export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IPlayState> {
     lang = Lang.extractLang({
         desc: ['延迟接受匹配机制: 参与者依据自己对于物品的心理价值对物品进行偏好表达，系统将自动为您匹配'],
         operateTips: ['请将物品按照偏好拖入右边排序'],

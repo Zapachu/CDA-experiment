@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Input, Label, Lang, RangeInput, Select} from 'bespoke-client-util'
-import {FetchType, IPOType} from '../config'
+import {Core, Input, Label, Lang, RangeInput, Select} from 'elf-component'
+import {IPOType} from '../config'
 import {ICreateParams} from '../interface'
 
 const gameTypes = [
@@ -9,7 +9,7 @@ const gameTypes = [
   {label: '最高价前K', value: IPOType.TopK},
 ]
 
-export class Create extends Core.Create<ICreateParams, FetchType> {
+export class Create extends Core.Create<ICreateParams> {
     lang = Lang.extractLang({
         round: ['轮次', 'Round'],
         groupSize: ['每组人数', 'Players per Group'],

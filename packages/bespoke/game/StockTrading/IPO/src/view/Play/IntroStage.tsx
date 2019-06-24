@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as style from "./style.scss";
-import { Lang, Core } from "bespoke-client-util";
+import { Lang, Core } from "elf-component";
 import {
   ICreateParams,
   IGameState,
@@ -9,7 +9,6 @@ import {
   IPushParams
 } from "../../interface";
 import {
-  FetchType,
   MoveType,
   PushType,
   IPOType
@@ -32,7 +31,6 @@ export default class IntroStage extends Core.Play<
   PushType,
   IMoveParams,
   IPushParams,
-  FetchType,
   IPlayState
 > {
   constructor(props) {

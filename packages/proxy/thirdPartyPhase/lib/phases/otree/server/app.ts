@@ -4,11 +4,13 @@ import * as path from 'path'
 import {elfSetting} from 'elf-setting'
 import '../../common/auth/passport'
 import {routePrefix} from '../../common/config'
-import {ProxyWork, RPCWork, InitWork} from './utils'
+import {withLinker} from '../../../core/server/util'
+import {getUrlByNamespace, InitWork, ProxyWork} from './utils'
+
 import {
     ConDB,
-    SessionSetMiddleware,
     PassportMiddleware,
+    SessionSetMiddleware,
     SessionTokenCheck,
     StaticPathMiddleware
 } from '../../common/utils'
@@ -24,7 +26,7 @@ PassportMiddleware(app)
 SessionTokenCheck(app)
 InitWork(app)
 ProxyWork(app)
-RPCWork()
+withLinker(elfSetting.oTreeNamespace, elfSetting.oTreeProxy, getUrlByNamespace)
 
 app.set('view engine', 'pug')
 app.set('views', path.resolve(__dirname, './views'))

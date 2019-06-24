@@ -1,18 +1,18 @@
-import {Request, Response, NextFunction} from 'express'
+import {NextFunction, Request, Response} from 'express'
 import {ErrorPage} from '../../../common/utils'
 import ListMap from '../utils/ListMap'
 import {ThirdPartPhase} from '../../../../core/server/models'
 import {elfSetting as elfSetting} from 'elf-setting'
-import {gameService} from "../../../common/utils"
+import {RedisCall, SendBackPlayer} from 'elf-protocol'
 import nodeXlsx from 'node-xlsx'
 import {
-    virtualJsRoute,
+    downloadScreenXlsxRoute,
     getOTreeListRoute,
-    reportScreenRoute,
-    jqueryRoute,
     initRoute,
+    jqueryRoute,
     previewScreenXlsxRoute,
-    downloadScreenXlsxRoute
+    reportScreenRoute,
+    virtualJsRoute
 } from '../config'
 import * as path from 'path'
 
@@ -66,8 +66,8 @@ export const InitWork = (app) => {
                     if (ph.player === gameServicePlayerHash) {
                         ph.screen = JSON.stringify({winW: body.winW, winH: body.winH})
                         ph.referer = req.headers.referer
-                        ph.userAgent = req.headers["user-agent"]
-                        ph.ipAddress = req.headers['x-forwarded-for'] as string||req.connection.remoteAddress
+                        ph.userAgent = req.headers['user-agent']
+                        ph.ipAddress = req.headers['x-forwarded-for'] as string || req.connection.remoteAddress
                         let os = {android: false, iphone: false, ios: false, version: undefined}
                         const android = ph.userAgent.match(/(Android);?[\s\/]+([\d.]+)?/)
                         const iPad = ph.userAgent.match(/(iPad).*OS\s([\d_]+)/)
@@ -102,7 +102,7 @@ export const InitWork = (app) => {
                 }
                 phase.markModified('playHash')
                 await phase.save()
-                gameService.setPhaseResult({
+                await RedisCall.call<SendBackPlayer.IReq, SendBackPlayer.IRes>(SendBackPlayer.name, {
                     elfGameId: phase.elfGameId,
                     playUrl: `${oTreeProxy}/init/${START_SIGN}/${phase._id}`,
                     playerToken: gameServicePlayerHash,
@@ -110,8 +110,7 @@ export const InitWork = (app) => {
                         uniKey: playerOtreeHash,
                         detailIframeUrl: `${oTreeProxy}${previewScreenXlsxRoute}/${phaseId}`
                     }
-                }, err => err ? console.error(err) : null)
-
+                })
                 return okRes().json({code: 0, msg: 'reported'})
             })
         }

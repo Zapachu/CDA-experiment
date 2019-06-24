@@ -1,14 +1,13 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, Core, Lang, MaskLoading, baseEnum} from 'bespoke-client-util'
-import {FetchType, GameStage, MoveType, PushType} from '../config'
+import {Button, Core, Lang, MaskLoading, baseEnum} from 'elf-component'
+import {GameStage, MoveType, PushType} from '../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 
-export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType> {
+export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     lang = Lang.extractLang({
-        gameHasNotStarted: ['游戏尚未开始', 'Game has not Started'],
         unknown: ['???', '???'],
-        startAnwserStage: ['开始答题', 'Start Anwser Stage'],
+        startAnswerStage: ['开始答题', 'Start Answer Stage'],
         seatNumber: ['座位号', 'Seat Number'],
         correctNumber: ['正确题数', 'Correct Number'],
         countDown:['倒计时','Countdown']
@@ -16,9 +15,6 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
 
     render(): React.ReactNode {
         const {lang, props: {frameEmitter, game, gameState, playerStates}} = this
-        if (gameState.status === baseEnum.GameStatus.notStarted) {
-            return <MaskLoading label={lang.gameHasNotStarted}/>
-        }
         const playerStatesArr = Object.values(playerStates)
         return <section className={style.play4Owner}>
             <label className={style.countDown}>{lang.countDown}<em>{game.params.timeLimit - gameState.time + 1}</em></label>
@@ -45,7 +41,7 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
             </table>
             {
                 gameState.gameStage === GameStage.seatNumber ?
-                    <Button label={lang.startAnwserStage}
+                    <Button label={lang.startAnswerStage}
                             onClick={() => frameEmitter.emit(MoveType.startMainTest)}/> : null
             }
         </section>

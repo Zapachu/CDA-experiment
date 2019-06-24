@@ -2,11 +2,11 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {phaseTemplates, localePhaseNames} from './phase'
 import {CreateParams, ICreateParams} from '../interface'
-import {Core, Lang} from 'bespoke-client-util'
-import {FetchType, IDENTITY, phaseNames, ROLE, ReactionType} from '../config'
+import {Core, Lang} from 'elf-component'
+import {IDENTITY, phaseNames, ROLE, ReactionType} from '../config'
 import cloneDeep = require('lodash/cloneDeep')
 
-export class Create extends Core.Create<ICreateParams, FetchType> {
+export class Create extends Core.Create<ICreateParams> {
     lang = Lang.extractLang({
         gameType: ['实验类型', 'Game Type'],
         clone: ['复制', 'CLONE'],
@@ -85,7 +85,7 @@ export class Create extends Core.Create<ICreateParams, FetchType> {
     }
 
     render(): React.ReactNode {
-        const {lang, props: {fetcher, params: {phases = []}}} = this
+        const {lang, props: {params: {phases = []}}} = this
         return <section className={style.create}>
             <ul className={style.phases}>{
                 phases.map(({templateName, params}, i) => {
@@ -97,7 +97,6 @@ export class Create extends Core.Create<ICreateParams, FetchType> {
                             <Create {...{
                                 params,
                                 phases,
-                                fetcher,
                                 updateParams: newParams => this.updateCreateParams(i, newParams)
                             }}/>
                             {

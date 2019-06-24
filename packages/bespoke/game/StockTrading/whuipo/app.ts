@@ -15,7 +15,9 @@ import socketRedis from 'socket.io-redis'
 import socketSession from 'express-socket.io-session'
 import socketPassport from 'passport.socketio'
 import cookieParser from 'cookie-parser'
+import headdump from 'heapdump'
 
+console.log(headdump)
 
 import router from './router'
 import { handleSocketInit, handleSocketPassportFailed, handleSocketPassportSuccess } from './controller'
@@ -105,7 +107,7 @@ const redisClient = new Redis({
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.use(compression());
-// app.use(cookieParser())
+app.use(cookieParser())
 // uncomment after placing your favicon in /public
 app.use(morgan('dev'));
 app.use(bodyParser.json());
@@ -135,7 +137,13 @@ let sessionSet = {
   }
 };
 const sessionMiddleWare = session(sessionSet)
-app.use(sessionMiddleWare);
+app.use((req, res, next) => {
+  if(req.method === 'HEAD') { // 腾讯云心跳检查 导致一直新建session
+    res.end();
+  } else {
+    sessionMiddleWare(req, res, next);
+  }
+});
 
 /**csrf whitelist*/
 // const csrfExclude = [];

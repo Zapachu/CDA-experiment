@@ -1,39 +1,37 @@
-import {resolve} from 'path'
-import {Server, RedisCall, gameId2PlayUrl} from 'bespoke-server'
-import Controller from './Controller'
-import Robot from './Robot'
-import {namespace} from './config'
-import {CreateGame, Phase} from 'bespoke-game-stock-trading-config'
-import {ICreateParams} from "./interface";
+import { resolve } from "path";
+import { Server, RedisCall, gameId2PlayUrl } from "bespoke-server";
+import Controller from "./Controller";
+import Robot from "./Robot";
+import { namespace, ICreateParams } from "./config";
+import {Phase, phaseToNamespace} from "bespoke-game-stock-trading-config";
+import {CreateGame} from 'elf-protocol'
 
-Server.start({
+Server.start(
+  {
     namespace,
-    staticPath: resolve(__dirname, '../dist'),
-}, {Controller, Robot})
+    staticPath: resolve(__dirname, "../dist")
+  },
+  { Controller, Robot }
+);
 
-const genRan = () => ~~(Math.random() * (100000 - 1000)) + 2000
-
-RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(CreateGame.name(Phase.TBM), async ({keys}) => {
-    const gameId = await Server.newGame<ICreateParams>(namespace, {
-        title: `${Phase.TBM}:${new Date().toUTCString()}`,
-        desc: '',
-        params: {
-            groupSize: 6,
-            waitingSeconds: 1,
-            positions: [
-                {role: 0, privatePrice: genRan()},
-                {role: 1, privatePrice: genRan()},
-                {role: 0, privatePrice: genRan()},
-                {role: 1, privatePrice: genRan()},
-                {role: 0, privatePrice: genRan()},
-                {role: 1, privatePrice: genRan()},
-            ],
-            InitMoney: 100000,
-            buyerPriceStart: 0,
-            buyerPriceEnd: 100000,
-            sellerPriceStart: 0,
-            sellerPriceEnd: 100000,
-        }
-    })
-    return {playUrls: keys.map(key => gameId2PlayUrl(namespace, gameId, key))}
-})
+RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(
+  CreateGame.name(phaseToNamespace(Phase.TBM)),
+  async ({ keys }) => {
+    const gameId = await Server.newGame<ICreateParams>({
+      title: `${Phase.TBM}:${new Date().toUTCString()}`,
+      desc: "",
+      params: {
+        groupSize: 12,
+        buyerCapitalMin: 50000,
+        buyerCapitalMax: 100000,
+        buyerPrivateMin: 65,
+        buyerPrivateMax: 80,
+        sellerQuotaMin: 1000,
+        sellerQuotaMax: 2000,
+        sellerPrivateMin: 30,
+        sellerPrivateMax: 45
+      }
+    });
+    return { playUrls: keys.map(key => gameId2PlayUrl(gameId, key)) };
+  }
+);

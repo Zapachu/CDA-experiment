@@ -1,8 +1,8 @@
 'use strict'
 
 import {ThirdPartPhase} from "../../../../core/server/models"
-import {gameService} from "../../../common/utils"
 import {elfSetting as settings} from 'elf-setting'
+import {RedisCall, SendBackPlayer} from 'elf-protocol'
 
 const {qualtricsProxy} = settings
 
@@ -26,17 +26,8 @@ const getNextPhaseUrl = async (req) => {
         playUrl: `${qualtricsProxy}/init/jfe/form/${qualtricsPhase._id.toString()}`,
     }
 
-    return await new Promise((resolve, reject) => {
-        console.log(request)
-        gameService.sendBackPlayer(request, (err: {}, service_res: { sendBackUrl: string }) => {
-            if (err) {
-                console.log(err)
-            }
-            console.log('log > service_res', service_res)
-            const nextPhaseUrl = service_res.sendBackUrl
-            resolve(nextPhaseUrl)
-        })
-    })
+    const {sendBackUrl} = await RedisCall.call<SendBackPlayer.IReq, SendBackPlayer.IRes>(SendBackPlayer.name, request)
+    return sendBackUrl
 }
 
 export {

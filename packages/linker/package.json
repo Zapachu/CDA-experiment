@@ -5,6 +5,7 @@
   "repository": " ",
   "license": "ISC",
   "scripts": {
+    "tsc-w": "tsc -w",
     "install": "tsc & npm run client:dist",
     "start": "node build/server/server",
     "client:build": "webpack  --env.TS_NODE_PROJECT=\"tsconfig.json\"  --config ./src/client/script/webpack.ts",

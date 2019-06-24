@@ -1,0 +1,14 @@
+{
+  "name": "bespoke-core-share",
+  "version": "1.0.0",
+  "main": "build/index",
+  "types": "build/index",
+  "scripts": {
+    "install": "tsc",
+    "tsc-w": "tsc -w"
+  },
+  "devDependencies": {
+    "typescript": "^3.3.3333",
+    "elf-setting": "^1.0.0"
+  }
+}

@@ -40,12 +40,10 @@ export default {
     //region linker
     linkerGatewayHost: '127.0.0.1',
     linkerPort: 4000,
-    linkerServiceUri: '127.0.0.1:54000',
     //endregion
     //region bespoke
     proxyOrigin:'http://127.0.0.1',
     adminMobileNumbers: ['13000000000'],
-    pythonRobotUri: '127.0.0.1:54001',
     //endregion
     //region thirdPartyPhaseProxy
     // qualtrics

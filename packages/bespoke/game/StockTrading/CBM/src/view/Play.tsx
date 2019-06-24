@@ -1,10 +1,9 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang, Toast} from 'bespoke-client-util'
+import {Core, Lang, Toast} from 'elf-component'
 
 import {
     CONFIG,
-    FetchType,
     ICreateParams,
     IGameState,
     IMoveParams,
@@ -34,6 +33,7 @@ function Border({background = `radial-gradient(at 50% 0%, #67e968 1rem, transpar
     }}>
         <div style={{
             borderRadius,
+            background:'#2a3564',
             overflow: 'hidden',
             height: '100%'
         }}>
@@ -143,21 +143,30 @@ function TradeChart({
     </section>
 }
 
-function Result({count, point, closingPrice, balancePrice}: { count: number, point: number, closingPrice?: number, balancePrice?: number }) {
+function Result({periodIndex, count, point, closingPrice, balancePrice}: { periodIndex: number, count: number, point: number, closingPrice?: number, balancePrice?: number }) {
     const lang = Lang.extractLang({
-        result: ['您本期交易结果如下', 'Your results in this period are as follows'],
-        closingPrice: ['收盘价', 'Closing Price'],
-        balancePrice: ['均衡价', 'Balance Price'],
-        stock: ['股票', 'Stock'],
+        news: [`据财经网新闻，该企业发布财报后，股价受到相应影响，现股价为${balancePrice}元`],
+        result: [`当前第${periodIndex + 1}期您的交易结果如下`, 'Your results in this period are as follows'],
+        stockPrice: ['股价', 'Stock Price'],
+        stock: ['持有股票', 'Stock'],
         money: ['资金', 'Money'],
-        totalAsset: ['总资产', 'TotalAsset']
+        totalAsset: ['总资产', 'TotalAsset'],
+        tips:['连续竞价知识扩展','Tips about Continuous Double Auction'],
+        close:['关闭','Close'],
+        tipsContent:['连续竞价是指买卖股票时，由电脑交易系统连续撮合买卖委托，产生出成交价的一种交易机制。沪深两市上午连续竞价时间一致：09：30~11：30。但是下午就略有不同了，沪市：13：00~15：00，深市13：00~14：57。\n' +
+        '连续竞价时，电脑系统会先按价格优先，再时间优先的顺序，依次为买卖委托单排队，并根据排队顺序依次撮合成交。所有超过限制价格的买单和卖单会被视为无效委托。连续竞价体现了股市公平公开公正的交易原则。\n' +
+        '连续竞价时，成交价格的确定原则为:1、最高买入申报和最低卖出申报价格相同，以该价格成交; 2、买入申报价格高于即时揭示的最低卖出申报价格时，以即时揭示的最低卖出申报价格为成交价格; 3、卖出申报价格低于即时揭示的最高申报买入价格时，以即时揭示的最高申报买入价格为成交价。\n']
     })
+    const [showTips, setShowTips] = React.useState(false)
     return <section className={style.result}>
+        {
+            balancePrice ? <p className={style.resultTitle}>{lang.news}</p> : null
+        }
         <p className={style.resultTitle}>{lang.result}</p>
         <table className={style.resultTable}>
             <thead>
             <tr>
-                <td>{balancePrice ? lang.balancePrice : lang.closingPrice}</td>
+                <td>{lang.stockPrice}</td>
                 <td>{lang.stock}</td>
                 <td>{lang.money}</td>
                 <td>{lang.totalAsset}</td>
@@ -172,10 +181,22 @@ function Result({count, point, closingPrice, balancePrice}: { count: number, poi
             </tr>
             </tbody>
         </table>
+        <div className={style.tips}>
+            <Button label={lang.tips} onClick={()=>setShowTips(true)}/>
+            <Modal visible={showTips}>
+                <h3 className={style.tipsTitle}>{lang.tips}</h3>
+                <div className={style.tipsContent}>
+                    {
+                        lang.tipsContent.split('\n').map(p=><p key={p}>{p}</p>)
+                    }
+                    <Button color={Button.Color.Blue} style={{margin:'1rem'}} label={lang.close} onClick={()=>setShowTips(false)}/>
+                </div>
+            </Modal>
+        </div>
     </section>
 }
 
-type TPlayProps = Core.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, FetchType>
+type TPlayProps = Core.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>
 
 function _Play({gameState, playerState, frameEmitter, game: {params: {allowLeverage}}}: TPlayProps) {
     const STYLE = {
@@ -202,8 +223,10 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
         guaranteeMoney: ['已融资', 'GuaranteeMoney'],
         guaranteeMoneyLimit: ['可融资', 'GuaranteeMoneyLimit'],
         profit: ['利润', 'Profit'],
+        tradeType: ['交易类型', 'Trade Type'],
         tradeCount: ['成交数量', 'Trade Count'],
         valuation: ['当前股票估值', 'Stock Valuation'],
+        timeLeft: [(n, s) => `第${n}期，剩余${s}秒`, (n, s) => `Period : ${n}, time left : ${s}s`],
         buyCountLimit: ['可买入', 'You can buy'],
         openMarket: ['开放市场', 'Open Market'],
         marketWillOpen1: ['市场将在', 'Market will open in '],
@@ -230,8 +253,8 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
         yourTrades: ['交易记录', 'Your Trades'],
         marketHistory: ['市场记录', 'Market History'],
         asset: ['资产', 'Asset'],
-        onceMore: ['再来一次', 'Once More'],
-        nextPhase: ['下一环节', 'Next Phase'],
+        onceMore: ['再学一次', 'Once More'],
+        nextPhase: ['返回交易大厅', 'Back to Lobby'],
         priceCountTips: ['价格 * 数量 ：', 'price * count : '],
         closeOutWarning: ['资产低于担保金额130%将被平仓', 'Your count will be closed out when assets is below 130% of guarantee money'],
         closedOut: ['资产低于担保金额130%，已被平仓', 'Your count has been closed out since assets is below 130% of guarantee money'],
@@ -253,12 +276,24 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
         frameEmitter.emit(MoveType.getIndex)
     }, [])
     const gamePeriodState = gameState.periods[gameState.periodIndex]
+    const {buyOrderIds, sellOrderIds, trades} = gamePeriodState,
+        orderDict: { [id: number]: IOrder } = (() => {
+            const orderDict: { [id: number]: IOrder } = {}
+            gamePeriodState.orders.forEach(order => {
+                orderDict[order.id] = order
+            })
+            return orderDict
+        })()
     if (gamePeriodState.stage === PeriodStage.result) {
         return <section className={style.resultWrapper}>
-            <Result count={playerState.count}
+            <Result periodIndex={gameState.periodIndex}
+                    count={playerState.count}
                     point={playerState.money}
                     closingPrice={gamePeriodState.closingPrice}
                     balancePrice={gamePeriodState.balancePrice}/>
+            {
+                renderTradePanel()
+            }
             {
                 gameState.periodIndex === PERIOD - 1 ? <section className={style.switchBtns}>
                     <Button label={lang.onceMore}
@@ -272,18 +307,15 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
             }
         </section>
     }
-    const {buyOrderIds, sellOrderIds, trades} = gamePeriodState,
-        orderDict: { [id: number]: IOrder } = (() => {
-            const orderDict: { [id: number]: IOrder } = {}
-            gamePeriodState.orders.forEach(order => {
-                orderDict[order.id] = order
-            })
-            return orderDict
-        })()
     return <section className={style.trading}>
-        {
-            renderTradePanel()
-        }
+        <div className={style.tradePanel}>
+            {
+                renderAsset()
+            }
+            {
+                renderTradePanel()
+            }
+        </div>
         {
             renderOrderPanel()
         }
@@ -314,6 +346,7 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
             role,
             guarantee
         })
+        setCount('')
     }
 
     function repayMoney() {
@@ -371,8 +404,8 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
                         {
                             gamePeriodState.stage === PeriodStage.trading ?
                                 <section className={style.newOrder}>
-                                    <label
-                                        className={style.subLabel}>{countDown < prepareTime ? '   ' : timeLeft > 0 ? timeLeft : 0}s</label>
+                                    <label className={style.subLabel}>
+                                        {lang.timeLeft(gameState.periodIndex + 1, countDown < prepareTime ? '' : timeLeft > 0 ? timeLeft : 0)}</label>
                                     <label className={style.label}>{lang.valuation}<em>{privatePrice}</em></label>
                                     <Tabs labels={[lang.buy, lang.sell]}
                                           activeTabIndex={orderTabIndex} switchTab={setOrderTabIndex}>
@@ -492,19 +525,16 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
     }
 
     function renderTradePanel() {
-        let tradeCount = 0
-        return <div className={style.tradePanel}>
-            {
-                renderAsset()
-            }
+        return <>
             <Line text={lang.yourTrades} style={STYLE.titleLineStyle}/>
-            <Border background={STYLE.mainPanelBorder}>
-                <div className={style.yourTrades}>
+            <Border background={STYLE.mainPanelBorder} style={{maxWidth:'24rem', margin:'auto'}}>
+                <div className={style.tradeListWrapper}>
                     <table className={style.tradeList}>
                         <thead>
                         <tr>
                             <th>{lang.tradeSeq}</th>
                             <th>{lang.tradePrice}</th>
+                            <th>{lang.tradeType}</th>
                             <th>{lang.tradeCount}</th>
                         </tr>
                         </thead>
@@ -513,23 +543,30 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
                             trades.map(({reqOrderId, resOrderId, count}, i) => {
                                 const reqOrder = orderDict[reqOrderId],
                                     resOrder = orderDict[resOrderId]
-                                if (![reqOrder.playerIndex, resOrder.playerIndex].includes(playerState.playerIndex)) {
-                                    return null
+                                let myOrder: IOrder
+                                switch (playerState.playerIndex) {
+                                    case reqOrder.playerIndex:
+                                        myOrder = reqOrder
+                                        break
+                                    case resOrder.playerIndex:
+                                        myOrder = resOrder
+                                        break
+                                    default:
+                                        return null
                                 }
-                                const price = reqOrder.price
-                                tradeCount += count
                                 return <tr key={i}>
                                     <td>{i + 1}</td>
-                                    <td>{price}</td>
+                                    <td>{reqOrder.price}</td>
+                                    <td>{myOrder.role === ROLE.Seller ? lang.sell : lang.buy}</td>
                                     <td>{count}</td>
                                 </tr>
-                            })
+                            }).reverse()
                         }
                         </tbody>
                     </table>
                 </div>
             </Border>
-        </div>
+        </>
     }
 
     function renderChartPanel() {
