@@ -106,24 +106,35 @@ export class Play extends Core.Play<
   };
 
   _renderAdmission = (admission: SCHOOL) => {
+    const { frameEmitter } = this.props;
     return (
-      <div className={style.resultBoard}>
-        {admission === SCHOOL.none ? (
-          <>
-            <p>很遗憾</p>
-            <p>您没能被录取</p>
-          </>
-        ) : (
-          <>
-            <p>录取通知书</p>
-            <p>
-              恭喜您被
-              <span className={style.redFont}>{SCHOOL_NAME[admission]}</span>
-              录取了
-            </p>
-          </>
-        )}
-      </div>
+      <>
+        <div className={style.resultBoard}>
+          {admission === SCHOOL.none ? (
+            <>
+              <p>很遗憾</p>
+              <p>您没能被录取</p>
+            </>
+          ) : (
+            <>
+              <p>录取通知书</p>
+              <p>
+                恭喜您被
+                <span className={style.redFont}>{SCHOOL_NAME[admission]}</span>
+                录取了
+              </p>
+            </>
+          )}
+        </div>
+        <Button
+          label="再来一局"
+          onClick={() =>
+            frameEmitter.emit(MoveType.back, { onceMore: true }, url => {
+              window.location = url;
+            })
+          }
+        />
+      </>
     );
   };
 

@@ -255,6 +255,10 @@ export default class RouterController {
 
     @catchError
     static async renderIndex(req: IRequest, res: Response, next: NextFunction) {
+      const {gamePhase} = req.query;
+      if(gamePhase && gameConfig.hasOwnProperty(gamePhase)) {
+        return res.redirect(`${settings.rootname}/game/${gamePhase}`)
+      }
         const tasks = Object.keys(gameConfig).map(async (gameType) => {
             const playerCount = await redisTools.getGamePlayerCount(gameType as any)
             return {
