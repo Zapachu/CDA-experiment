@@ -227,7 +227,8 @@ export default class RouterController {
             areaCode,
             gameList,
             isLogin: req.isAuthenticated(),
-            rootname: settings.rootname
+            rootname: settings.rootname,
+            namespace: settings.namespace
         })
     }
 
@@ -240,7 +241,8 @@ export default class RouterController {
             areaCode,
             game,
             isLogin: req.isAuthenticated(),
-            rootname: settings.rootname
+            rootname: settings.rootname,
+            namespace: settings.namespace
         })
     }
 
