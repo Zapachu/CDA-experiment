@@ -1,9 +1,12 @@
-//region
-const ROUND = 3,
-    PREPARE_TIME = 5,
-    TRADE_TIME = 120,
-    RESULT_TIME = 10,
-    PLAYER_NUM = 6
+const namespace = 'EgretDoubleAuction'
+
+const Config = {
+    ROUND : 3,
+    PREPARE_TIME : 5,
+    TRADE_TIME : 120,
+    RESULT_TIME : 10,
+    PLAYER_NUM : 6
+}
 
 enum GameScene {
     prepare,
@@ -18,20 +21,23 @@ enum Role {
 
 enum MoveType {
     getIndex = 'getIndex',
-    shout = 'shout'
+    shout = 'shout',
+    onceMore = 'onceMore'
 }
 
 enum PushType {
+    beginRound
 }
 
 interface ICreateParams {
 }
 
 interface IMoveParams {
-    price: number
+    price: number,
 }
 
 interface IPushParams {
+    round:number
 }
 
 interface IGameState {
@@ -66,5 +72,3 @@ interface IPlayerState {
     index: number
     profits: number[]
 }
-
-//endregion

@@ -1,6 +1,12 @@
 class Result extends Scene {
     key = GameScene.result
     tradeHistory: eui.DataGroup
+    btnOnceMore: eui.Button
+
+    protected childrenCreated(): void {
+        super.childrenCreated()
+        this.btnOnceMore.addEventListener(egret.TouchEvent.TOUCH_TAP, ()=>IO.emit(MoveType.onceMore, {}, lobbyUrl => location.href = lobbyUrl), this)
+    }
 
     render() {
         const {gameState: {rounds}, playerState} = IO

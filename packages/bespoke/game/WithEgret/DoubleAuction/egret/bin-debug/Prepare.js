@@ -27,8 +27,8 @@ var Prepare = (function (_super) {
     };
     Prepare.prototype.render = function () {
         var _a = IO.gameState, prepareTime = _a.prepareTime, playerIndex = _a.playerIndex;
-        this.countDown.text = (PREPARE_TIME - prepareTime).toString();
-        this.waitLabel.text = "\u7B49\u5F85\u5176\u5B83\u73A9\u5BB6\u52A0\u5165(" + playerIndex + "/" + PLAYER_NUM + ")" + '...   '.substr(3 - (this.i++) % 4, 3);
+        this.countDown.text = (Config.PREPARE_TIME - prepareTime).toString();
+        this.waitLabel.text = "\u7B49\u5F85\u5176\u5B83\u73A9\u5BB6\u52A0\u5165(" + playerIndex + "/" + Config.PLAYER_NUM + ")" + '...   '.substr(3 - (this.i++) % 4, 3);
         if (IO.gameState.prepareTime) {
             this.switchState(PrepareState.match);
         }

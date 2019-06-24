@@ -1,4 +1,5 @@
-import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from 'bespoke-server'
+import {BaseController, gameId2PlayUrl, IActor, IMoveCallback, TGameState, TPlayerState} from 'bespoke-server'
+import {GameOver, RedisCall} from 'elf-protocol'
 import {
     Config,
     GameScene,
@@ -9,6 +10,7 @@ import {
     IPlayerState,
     IPushParams,
     MoveType,
+    namespace,
     PushType,
     Role
 } from './config'
@@ -53,8 +55,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         gameState.roundIndex = round
         const timer = global.setInterval(async () => {
             const time = ++gameState.rounds[round].time
-            if (time === ~~(TRADE_TIME>>2)) {
-                this.broadcast(PushType.beginRound ,{round})
+            if (time === ~~(TRADE_TIME >> 2)) {
+                this.broadcast(PushType.beginRound, {round})
             }
             if (time === TRADE_TIME + RESULT_TIME) {
                 global.clearInterval(timer)
@@ -112,6 +114,14 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     price: shouts[pairShoutIndex].price
                 })
                 break
+            }
+            case MoveType.onceMore: {
+                const res = await RedisCall.call<GameOver.IReq, GameOver.IRes>(GameOver.name, {
+                    playUrl: gameId2PlayUrl(this.game.id, actor.token),
+                    onceMore: true,
+                    namespace
+                })
+                res ? cb(res.lobbyUrl) : null
             }
         }
     }

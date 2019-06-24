@@ -21,7 +21,8 @@ export enum Role {
 
 export enum MoveType {
     getIndex = 'getIndex',
-    shout = 'shout'
+    shout = 'shout',
+    onceMore = 'onceMore'
 }
 
 export enum PushType {

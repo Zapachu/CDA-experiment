@@ -57,8 +57,8 @@ var IO;
         path: location.pathname.replace('egret', 'socket.io'),
         query: location.search.replace('?', '')
     });
-    function emit(type, params) {
-        socketClient.emit(SocketEvent.move, type, params);
+    function emit(type, params, cb) {
+        socketClient.emit(SocketEvent.move, type, params, cb);
     }
     IO.emit = emit;
     socketClient.on(SocketEvent.syncGameState_json, function (newGameState) { return IO.gameState = newGameState; })
