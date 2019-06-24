@@ -7,7 +7,7 @@ export const gen32Token = (source) => {
     return objectHash(source, {algorithm: 'md5'})
 }
 
-export function withLinker(namespace: string, proxyOrigin: string, getUrlByNamespace: (req: NewPhase.IReq) => Promise<string>) {
+export function withLinker(namespace: string, proxyOrigin: string, getUrlByNamespace: (req: NewPhase.IReq) => Promise<string>, jsUrl?: string) {
     RedisCall.handle<NewPhase.IReq, NewPhase.IRes>(NewPhase.name(namespace), async req => {
         return {playUrl: await getUrlByNamespace(req)}
     })
@@ -15,7 +15,7 @@ export function withLinker(namespace: string, proxyOrigin: string, getUrlByNames
         const manifest = JSON.parse(readFileSync(resolve(__dirname, '../../../dist/manifest.json')).toString())
         const regPhase: PhaseReg.IRegInfo = {
             namespace: namespace,
-            jsUrl: `${proxyOrigin}${manifest[`${namespace}.js`]}`
+            jsUrl: jsUrl || `${proxyOrigin}${manifest[`${namespace}.js`]}`
         }
         redisClient.setex(PhaseReg.key(namespace), PhaseReg.intervalSeconds + 1, JSON.stringify(regPhase)).catch(e => console.log(e))
     }, PhaseReg.intervalSeconds)
