@@ -1,7 +1,7 @@
+import {CleanWebpackPlugin} from 'clean-webpack-plugin'
 const fs = require('fs')
 const path = require('path')
-const CleanWebpackPlugin = require('clean-webpack-plugin'),
-    ManifestPlugin = require('webpack-manifest-plugin'),
+const  ManifestPlugin = require('webpack-manifest-plugin'),
     TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin')
 
 export = () => {

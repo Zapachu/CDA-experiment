@@ -2,6 +2,8 @@ import * as Express from 'express'
 import * as errorHandler from 'errorhandler'
 import * as path from 'path'
 import {elfSetting} from 'elf-setting'
+import {readFileSync} from 'fs'
+import {virtualJsRoute} from './config'
 import '../../common/auth/passport'
 import {routePrefix} from '../../common/config'
 import {withLinker} from '../../../core/server/util'
@@ -26,7 +28,8 @@ PassportMiddleware(app)
 SessionTokenCheck(app)
 InitWork(app)
 ProxyWork(app)
-withLinker(elfSetting.oTreeNamespace, elfSetting.oTreeProxy, getUrlByNamespace)
+const manifest = JSON.parse(readFileSync(path.resolve(__dirname, '../../../../dist/manifest.json')).toString())
+withLinker(elfSetting.oTreeNamespace, elfSetting.oTreeProxy, getUrlByNamespace, `${elfSetting.oTreeProxy}${manifest['otree.js']};${elfSetting.oTreeProxy}/${routePrefix.oTreeStaticPathNamespace}${virtualJsRoute}`)
 
 app.set('view engine', 'pug')
 app.set('views', path.resolve(__dirname, './views'))
