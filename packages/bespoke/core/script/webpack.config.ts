@@ -2,6 +2,7 @@ import * as path from 'path'
 import {CleanWebpackPlugin} from 'clean-webpack-plugin'
 import * as HtmlWebpackPlugin from 'html-webpack-plugin'
 import * as QiniuPlugin from 'qiniu-webpack-plugin'
+import * as ManifestPlugin from 'webpack-manifest-plugin'
 import {config} from 'bespoke-core-share'
 import {elfSetting} from 'elf-setting'
 
@@ -68,6 +69,9 @@ export = {
         'elf-component': 'ElfComponent'
     },
     plugins: [
+        new ManifestPlugin({
+            fileName: `index.json`
+        }),
         new HtmlWebpackPlugin({
             filename: 'index.html',
             template: path.resolve(__dirname, './index.html')

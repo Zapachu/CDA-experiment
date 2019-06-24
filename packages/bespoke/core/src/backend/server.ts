@@ -139,9 +139,10 @@ export class Server {
             })
             return {playUrl: gameId2PlayUrl(id)}
         })
+        const elfComponentPath = require('../../dist/index.json')['ElfComponent.js'].replace('static', `${Setting.namespace}/static`)
         const regInfo: PhaseReg.IRegInfo = {
             namespace: Setting.namespace,
-            jsUrl: `${getOrigin()}/${config.rootName}/static/elf-component.min.js;${getOrigin()}${Setting.getClientPath()}`
+            jsUrl: `${getOrigin()}${elfComponentPath};${getOrigin()}${Setting.getClientPath()}`
         }
         heartBeat(PhaseReg.key(Setting.namespace), JSON.stringify(regInfo))
     }
