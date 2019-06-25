@@ -39,11 +39,11 @@ export class GameDAO {
     }
 
     static async queryGameState<IGameState>(gameId: string): Promise<TGameState<IGameState>> {
-        return JSON.parse(await redisClient.get(RedisKey.gameState(gameId)))
+        return elfSetting.inProductEnv ? JSON.parse(await redisClient.get(RedisKey.gameState(gameId))) : null
     }
 
     static async queryPlayerState<IPlayerState>(gameId: string, token: string): Promise<TPlayerState<IPlayerState>> {
-        return JSON.parse(await redisClient.get(RedisKey.playerState(gameId, token)))
+        return elfSetting.inProductEnv ? JSON.parse(await redisClient.get(RedisKey.playerState(gameId, token))) : null
     }
 
     static async getPlayerTokens(gameId: string): Promise<Array<string>> {
