@@ -22,6 +22,11 @@ export enum SocketEvent {
     //endregion
 }
 
+export enum UnixSocketEvent {
+    mainConnection = 'mainConnection',
+    newRobot = 'newRobot'
+}
+
 export enum CoreMove {
     switchGameStatus = 'switchGameStatus'
 }
@@ -43,7 +48,8 @@ export enum Actor {
     owner = 'o',
     player = 'p',
     clientRobot = 'cr',
-    serverRobot = 'sr'
+    serverRobot = 'sr',
+    socketRobot = 'skr'
 }
 
 export enum NationCode {

@@ -54,16 +54,20 @@ export namespace GameLogic {
 
     const robots = new Map<string, AnyRobot>()
 
-    export async function startRobot<ICreateParams, IGameState, IPlayerState>(gameId: string, key: string): Promise<void> {
-        const actor: IActor = {
-            token: Token.geneToken(`${gameId}${key}`),
-            type: Actor.serverRobot
-        }
+    export async function startRobot<ICreateParams, IGameState, IPlayerState>(gameId: string, key: string, type: Actor.serverRobot | Actor.socketRobot = Actor.socketRobot): Promise<void> {
+        const actor: IActor = {token: Token.geneToken(`${gameId}${key}`), type}
         if (robots.has(actor.token)) {
             return
         }
         const game = await GameDAO.getGame<ICreateParams>(gameId)
-        robots.set(actor.token, await new template.Robot(game, actor).init())
+        switch (type) {
+            case Actor.serverRobot:
+                robots.set(actor.token, await new template.Robot(game, actor).init())
+                break
+            case Actor.socketRobot:
+                EventIO.socketRobotConnect(`ROBOT_${Math.random().toString(36).substr(2)}`, actor, game)
+                break
+        }
     }
 }
 

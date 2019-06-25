@@ -1,4 +1,4 @@
-import {AcademusRole, Actor, GameStatus} from './enum'
+import {AcademusRole, Actor, GameStatus, SocketEvent, UnixSocketEvent} from './enum'
 import {EventEmitter} from 'events'
 import {Socket} from 'socket.io-client'
 import {Diff} from 'deep-diff'
@@ -37,7 +37,7 @@ export interface IGame<ICreateParams> extends IGameConfig<ICreateParams> {
     namespace: string
 }
 
-export interface IGameWithId<ICreateParams>extends IGame<ICreateParams> {
+export interface IGameWithId<ICreateParams> extends IGame<ICreateParams> {
     id: string
 }
 
@@ -105,4 +105,21 @@ export interface IGameSetting {
     logPath?: string
     port?: number
     rpcPort?: number
+}
+
+export interface ISocketHandshakeQuery {
+    id: string
+    token: string
+    gameId: string
+}
+
+export interface ISocketMsgPack {
+    event: SocketEvent | UnixSocketEvent,
+    params?: any
+}
+
+export interface INewRobotParams {
+    id: string
+    actor: IActor
+    game: IGameWithId<any>
 }
