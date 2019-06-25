@@ -3,6 +3,7 @@ export const namespace = "ParallelApplication";
 export enum MoveType {
   join = "join",
   shout = "shout",
+  result = "result",
   back = "back"
 }
 
@@ -24,7 +25,14 @@ export interface IPushParams {
   shoutTime: number;
 }
 
-export interface IGameState {}
+export interface IGameState {
+  sortedPlayers: Array<{
+    token: string;
+    schools: Array<SCHOOL>;
+    score: number;
+    admission: SCHOOL;
+  }>;
+}
 
 export interface IPlayerState {
   score: number;
@@ -65,4 +73,19 @@ export const SCHOOL_NAME = {
   [SCHOOL.nankaiUni]: "南开大学",
   [SCHOOL.xiamenUni]: "厦门大学",
   [SCHOOL.zhongshanUni]: "中山大学"
+};
+
+export const QUOTA = {
+  [SCHOOL.beijingUni]: 1,
+  [SCHOOL.qinghuaUni]: 1,
+  [SCHOOL.renminUni]: 2,
+  [SCHOOL.fudanUni]: 2,
+  [SCHOOL.shangjiaoUni]: 2,
+  [SCHOOL.zhejiangUni]: 2,
+  [SCHOOL.nanjingUni]: 2,
+  [SCHOOL.wuhanUni]: 2,
+  [SCHOOL.huakeUni]: 2,
+  [SCHOOL.nankaiUni]: 2,
+  [SCHOOL.xiamenUni]: 3,
+  [SCHOOL.zhongshanUni]: 3
 };
