@@ -47,7 +47,7 @@ const syncWaitingForCreated = async (uri) => {
 }
 
 // get play link
-export const getUrlByNamespace = async ({elfGameId, namespace, param, owner}): Promise<any> => {
+export const getUrlByNamespace = async ({elfGameId, namespace, param, owner}): Promise<string> => {
     let handleBody = ''
     const playHash = []
     const paramJson = JSON.parse(param)
@@ -82,9 +82,5 @@ export const getUrlByNamespace = async ({elfGameId, namespace, param, owner}): P
     }).save()
 
     const phaseId = newOTreePhase._id.toString()
-    return {
-        err: 0,
-        phaseId: newOTreePhase._id.toString(),
-        playUrl: `${oTreeProxy}/init/${playerUrl}${phaseId}`
-    }
+    return `${oTreeProxy}/init/${playerUrl}${phaseId}`
 }

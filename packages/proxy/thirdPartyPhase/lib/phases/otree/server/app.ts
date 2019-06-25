@@ -7,7 +7,7 @@ import {virtualJsRoute} from './config'
 import '../../common/auth/passport'
 import {routePrefix} from '../../common/config'
 import {withLinker} from '../../../core/server/util'
-import {getUrlByNamespace, InitWork, ProxyWork} from './utils'
+import {getUrlByNamespace, InitWork, ProxyWork, getDemoList} from './utils'
 
 import {
     ConDB,
@@ -34,4 +34,7 @@ withLinker(elfSetting.oTreeNamespace, elfSetting.oTreeProxy, getUrlByNamespace, 
 app.set('view engine', 'pug')
 app.set('views', path.resolve(__dirname, './views'))
 app.use(errorHandler())
-app.listen(port, () => console.log(`listening at ${port}`))
+app.listen(port, () => {
+    console.log(`listening at ${port}`)
+    getDemoList(elfSetting.oTreeNamespace).catch(e=>console.error(e))
+})

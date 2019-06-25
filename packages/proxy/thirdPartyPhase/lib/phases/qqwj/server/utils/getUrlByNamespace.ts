@@ -2,7 +2,7 @@ import {elfSetting as setting} from 'elf-setting'
 import {ThirdPartPhase} from '../../../../core/server/models'
 import {gen32Token} from '../../../../core/server/util'
 
-export const getUrlByNamespace = async ({elfGameId, namespace, param, owner}) => {
+export const getUrlByNamespace = async ({elfGameId, namespace, param, owner}):Promise<string> => {
     let paramJson = JSON.parse(param)
     const {qqwjUrl: realqqwjUrl} = paramJson
     paramJson.qqwjHash = realqqwjUrl.split('wj.qq.com')[1]
