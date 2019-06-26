@@ -1,7 +1,8 @@
 import {IGameConfig, IGameWithId, TGameState, TPlayerState} from 'bespoke-core-share'
 import {elfSetting} from 'elf-setting'
 import {redisClient} from 'elf-protocol'
-import {cacheResult, Log, RedisKey, Setting} from '../util'
+import {Log} from 'bespoke-server-util'
+import {cacheResult, RedisKey, Setting} from '../util'
 import {GameDoc, GameModel} from '../model'
 
 export class GameDAO {

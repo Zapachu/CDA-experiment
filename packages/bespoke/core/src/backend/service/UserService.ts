@@ -1,6 +1,7 @@
 import {baseEnum, config} from 'bespoke-core-share'
 import {elfSetting} from 'elf-setting'
-import {Log, QCloudSMS, RedisKey} from '../util'
+import {QCloudSMS, RedisKey} from '../util'
+import {Log} from 'bespoke-server-util'
 import {redisClient} from 'elf-protocol'
 
 const SEND_TIMES_PER_DAY = 3

@@ -13,7 +13,7 @@ import * as bodyParser from 'body-parser'
 import * as compression from 'compression'
 import * as morgan from 'morgan'
 import {elfSetting} from 'elf-setting'
-import {gameId2PlayUrl, getOrigin, heartBeat, Log, QCloudSMS, RedisKey, Setting} from './util'
+import {gameId2PlayUrl, getOrigin, heartBeat, QCloudSMS, RedisKey, Setting} from './util'
 import {PassportStrategy} from './interface'
 import {baseEnum, config, IGameConfig, IGameSetting} from 'bespoke-core-share'
 import {EventDispatcher} from './controller/eventDispatcher'
@@ -24,6 +24,7 @@ import {GameModel, UserDoc, UserModel} from './model'
 import {Strategy} from 'passport-local'
 import * as http from 'http'
 import {NewPhase, PhaseReg, RedisCall, redisClient} from 'elf-protocol'
+import {Log} from 'bespoke-server-util'
 
 export class Server {
     private static sessionMiddleware

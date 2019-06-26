@@ -1,4 +1,4 @@
-import {EventIO, gameId2PlayUrl, Log, Token} from '../util'
+import {EventIO, gameId2PlayUrl, Token} from '../util'
 import {
     Actor,
     CoreMove,
@@ -12,6 +12,7 @@ import {
     TGameState,
     TPlayerState
 } from 'bespoke-core-share'
+import {Log} from 'bespoke-server-util'
 import {GameDAO} from './GameDAO'
 import {StateManager} from './StateManager'
 import {MoveQueue} from './MoveQueue'
