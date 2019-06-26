@@ -1,11 +1,11 @@
+import {SocketEvent, UnixSocketEvent} from 'bespoke-core-share'
 import {StringDecoder} from 'string_decoder'
-import {ISocketMsgPack, SocketEvent, UnixSocketEvent} from 'bespoke-core-share'
 import {EventEmitter} from 'events'
 import * as path from 'path'
 import * as os from 'os'
 import * as net from 'net'
 
-export function getSocketPath(namespace = 'midway.sock'): string {
+export function getSocketPath(namespace): string {
     let socketPath = path.join(os.tmpdir(), namespace)
     if (process.platform === 'win32') {
         socketPath = socketPath.replace(/^\//, '')
@@ -15,15 +15,15 @@ export function getSocketPath(namespace = 'midway.sock'): string {
     return socketPath
 }
 
-export class SocketWrapper extends EventEmitter {
+export class SocketEmitter extends EventEmitter {
     private decoder = new StringDecoder('utf8')
     private jsonBuffer = ''
 
-    static encode(message: ISocketMsgPack) {
-        return JSON.stringify(message) + '\n'
+    static encode(event: SocketEvent | UnixSocketEvent, ...args) {
+        return JSON.stringify([event, ...args]) + '\n'
     }
 
-    constructor(private socket: net.Socket = net.connect(getSocketPath())) {
+    constructor(namespace: string, public socket: net.Socket = net.connect(getSocketPath(namespace))) {
         super()
         this.socket.on('data', buf => {
             this.feed(buf)
@@ -36,9 +36,9 @@ export class SocketWrapper extends EventEmitter {
         let i, start = 0
         while ((i = jsonBuffer.indexOf('\n', start)) >= 0) {
             const json = jsonBuffer.slice(start, i)
-            const {event, params} = JSON.parse(json) as ISocketMsgPack
-            if(this.eventNames().includes(event)){
-                this.emit(event, params)
+            const [event, ...args] = JSON.parse(json) as [SocketEvent | UnixSocketEvent, ...any[]]
+            if (this.eventNames().includes(event)) {
+                this.emit(event, ...args)
             }
             start = i + 1
         }
@@ -52,6 +52,6 @@ export class SocketWrapper extends EventEmitter {
     emit(event: SocketEvent | UnixSocketEvent, ...args): boolean {
         return this.eventNames().includes(event) ?
             super.emit(event, ...args) :
-            this.socket.write(SocketWrapper.encode({event, params: args[0]}))
+            this.socket.write(SocketEmitter.encode(event, ...args))
     }
 }

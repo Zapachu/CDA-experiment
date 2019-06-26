@@ -1,5 +1,5 @@
 {
-  "name": "bespoke-robot",
+  "name": "bespoke-server-util",
   "version": "1.0.0",
   "main": "build/index",
   "types": "build/index",
@@ -9,7 +9,6 @@
   },
   "devDependencies": {
     "bespoke-core-share": "^1.0.0",
-    "bespoke-server-util": "^1.0.0",
     "typescript": "^3.3.3333",
     "elf-setting": "^1.0.0"
   }

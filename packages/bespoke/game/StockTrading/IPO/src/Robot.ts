@@ -1,4 +1,4 @@
-import { BaseRobot} from "bespoke-server";
+import { BaseRobot} from "bespoke-robot";
 import {
   MoveType,
   PushType,

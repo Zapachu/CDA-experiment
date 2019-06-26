@@ -48,8 +48,7 @@ export enum Actor {
     owner = 'o',
     player = 'p',
     clientRobot = 'cr',
-    serverRobot = 'sr',
-    socketRobot = 'skr'
+    serverRobot = 'sr'
 }
 
 export enum NationCode {

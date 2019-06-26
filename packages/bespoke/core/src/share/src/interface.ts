@@ -1,4 +1,4 @@
-import {AcademusRole, Actor, GameStatus, SocketEvent, UnixSocketEvent} from './enum'
+import {AcademusRole, Actor, GameStatus} from './enum'
 import {EventEmitter} from 'events'
 import {Socket} from 'socket.io-client'
 import {Diff} from 'deep-diff'
@@ -111,11 +111,6 @@ export interface ISocketHandshakeQuery {
     id: string
     token: string
     gameId: string
-}
-
-export interface ISocketMsgPack {
-    event: SocketEvent | UnixSocketEvent,
-    params?: any
 }
 
 export interface INewRobotParams {

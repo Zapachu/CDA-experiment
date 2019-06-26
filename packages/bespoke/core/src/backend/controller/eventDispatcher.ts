@@ -31,7 +31,6 @@ export class EventDispatcher {
     static startGameSocket(server: Server): socketIO.Server {
         const socketIOServer = EventIO.initSocketIOServer(server, this.subscribeOnConnection)
         EventIO.initSocketRobotServer(this.subscribeOnConnection)
-        EventIO.initRobotIOServer(this.subscribeOnConnection)
         return socketIOServer
     }
 }
