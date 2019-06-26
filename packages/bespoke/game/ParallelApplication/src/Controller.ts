@@ -20,7 +20,8 @@ import {
   SHOUT_TIMER,
   SCHOOL,
   APPLICATION_NUM,
-  namespace
+  namespace,
+  QUOTA
 } from "./config";
 
 export default class Controller extends BaseController<
@@ -35,10 +36,11 @@ export default class Controller extends BaseController<
   private robotJoined = false;
   private shoutTimer: NodeJS.Timer;
 
-  // initGameState(): TGameState<IGameState> {
-  //   const gameState = super.initGameState();
-  //   return gameState;
-  // }
+  initGameState(): TGameState<IGameState> {
+    const gameState = super.initGameState();
+    gameState.sortedPlayers = [];
+    return gameState;
+  }
 
   // async initPlayerState(actor: IActor): Promise<TPlayerState<IPlayerState>> {
   //   const playerState = await super.initPlayerState(actor);
@@ -53,7 +55,7 @@ export default class Controller extends BaseController<
   ): Promise<void> {
     const { groupSize } = this.game.params;
     const playerState = await this.stateManager.getPlayerState(actor),
-      // gameState = await this.stateManager.getGameState(),
+      gameState = await this.stateManager.getGameState(),
       playerStates = await this.stateManager.getPlayerStates();
     switch (type) {
       case MoveType.join: {
@@ -84,8 +86,18 @@ export default class Controller extends BaseController<
           playerStateArray.length === groupSize &&
           playerStateArray.every(ps => ps.schools !== undefined)
         ) {
-          this.processProfits(playerStateArray);
+          this.processGameState(gameState, playerStateArray);
         }
+        break;
+      }
+      case MoveType.result: {
+        if (playerState.admission !== undefined) {
+          return;
+        }
+        const token = playerState.actor.token;
+        const me = gameState.sortedPlayers.find(item => item.token === token);
+        playerState.admission = me && me.admission;
+        cb();
         break;
       }
       case MoveType.back: {
@@ -118,7 +130,10 @@ export default class Controller extends BaseController<
     );
   }
 
-  private processProfits(playerStates: Array<IPlayerState>) {
+  private processGameState(
+    gameState: IGameState,
+    playerStates: Array<TPlayerState<IPlayerState>>
+  ) {
     const enrollment = {
       [SCHOOL.beijingUni]: 0,
       [SCHOOL.qinghuaUni]: 0,
@@ -133,6 +148,7 @@ export default class Controller extends BaseController<
       [SCHOOL.xiamenUni]: 0,
       [SCHOOL.zhongshanUni]: 0
     };
+    const { sortedPlayers } = gameState;
     const candidates = playerStates.sort((a, b) => b.score - a.score);
     candidates.forEach(ps => {
       let admission = SCHOOL.none;
@@ -145,7 +161,12 @@ export default class Controller extends BaseController<
           break;
         }
       }
-      ps.admission = admission;
+      sortedPlayers.push({
+        token: ps.actor.token,
+        schools,
+        score: ps.score,
+        admission
+      });
     });
   }
 
@@ -220,21 +241,6 @@ export default class Controller extends BaseController<
     return [chinese, maths, english, comprehensive];
   }
 }
-
-const QUOTA = {
-  [SCHOOL.beijingUni]: 1,
-  [SCHOOL.qinghuaUni]: 1,
-  [SCHOOL.renminUni]: 2,
-  [SCHOOL.fudanUni]: 2,
-  [SCHOOL.shangjiaoUni]: 2,
-  [SCHOOL.zhejiangUni]: 2,
-  [SCHOOL.nanjingUni]: 2,
-  [SCHOOL.wuhanUni]: 2,
-  [SCHOOL.huakeUni]: 2,
-  [SCHOOL.nankaiUni]: 2,
-  [SCHOOL.xiamenUni]: 3,
-  [SCHOOL.zhongshanUni]: 3
-};
 
 export function genRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;

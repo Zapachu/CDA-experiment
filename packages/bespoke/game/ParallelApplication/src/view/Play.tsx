@@ -17,20 +17,24 @@ import Teacher from "./components/Teacher";
 import Button from "./components/Button";
 import Choice from "./components/Choice";
 import Modal from "./components/Modal";
+import ApplyAnimation from "./components/ApplyAnimation";
 
 const ARROW = require("./components/arrow.png");
 const SCORING = require("./components/scoring.gif");
 const CLOSE = require("./components/close.png");
 const SCHOOL_ICON = require("./components/school.png");
+const ADMISSION_PIE = require("./components/admission_pie.png");
 
 interface IPlayState {
   schools: Array<SCHOOL>;
   curSchool: SCHOOL;
   showModal: MODAL;
+  admission: SCHOOL;
 }
 
 enum MODAL {
-  rule
+  rule,
+  admission
 }
 
 export class Play extends Core.Play<
@@ -46,7 +50,8 @@ export class Play extends Core.Play<
   state = {
     schools: undefined,
     curSchool: undefined,
-    showModal: undefined
+    showModal: undefined,
+    admission: undefined
   };
 
   componentDidMount(): void {
@@ -75,6 +80,19 @@ export class Play extends Core.Play<
     this.setState({ schools, curSchool: undefined });
   };
 
+  finishApplying = (school: SCHOOL) => {
+    const { frameEmitter } = this.props;
+    this.setState({ showModal: MODAL.admission, admission: school }, () => {
+      setTimeout(
+        () =>
+          frameEmitter.emit(MoveType.result, {}, () =>
+            this.setState({ showModal: undefined })
+          ),
+        1000
+      );
+    });
+  };
+
   renderMessage = (): string => {
     const { playerState } = this.props;
     const { schools } = this.state;
@@ -82,7 +100,7 @@ export class Play extends Core.Play<
       return "录取结果出来啦";
     }
     if (playerState.schools !== undefined) {
-      return "投档中，等待其他考生";
+      return "已投档，等待其他考生";
     }
     if (playerState.score !== undefined) {
       if (!Array.isArray(schools)) {
@@ -237,28 +255,49 @@ export class Play extends Core.Play<
   };
 
   renderContent = () => {
-    const { playerState } = this.props;
+    const { playerState, gameState } = this.props;
     const { schools } = this.state;
+    let content;
     if (playerState.admission !== undefined) {
-      return this._renderAdmission(playerState.admission);
-    }
-    if (playerState.schools !== undefined) {
-      return this._renderReady2Apply(playerState.schools);
-    }
-    if (playerState.score !== undefined) {
+      content = this._renderAdmission(playerState.admission);
+    } else if (gameState.sortedPlayers && gameState.sortedPlayers.length) {
+      return (
+        <ApplyAnimation
+          players={gameState.sortedPlayers}
+          myToken={playerState.actor.token}
+          onFinish={school => this.finishApplying(school)}
+        />
+      );
+    } else if (playerState.schools !== undefined) {
+      content = this._renderReady2Apply(playerState.schools);
+    } else if (playerState.score !== undefined) {
       if (!Array.isArray(schools)) {
-        return this._renderReady2Choose(playerState.score, playerState.scores);
-      }
-      if (schools.length === APPLICATION_NUM) {
+        content = this._renderReady2Choose(
+          playerState.score,
+          playerState.scores
+        );
+      } else if (schools.length === APPLICATION_NUM) {
         const index = schools.indexOf(undefined);
         if (index === -1) {
-          return this._renderReady2Apply(schools);
+          content = this._renderReady2Apply(schools);
+        } else {
+          content = this._renderChoosing(index);
         }
-        return this._renderChoosing(index);
+      } else {
+        content = this._renderChoosing(schools.length);
       }
-      return this._renderChoosing(schools.length);
+    } else {
+      content = this._renderReady2Score();
     }
-    return this._renderReady2Score();
+    return (
+      <>
+        <Teacher
+          msg={this.renderMessage()}
+          onGameRuleClick={() => this.setState({ showModal: MODAL.rule })}
+        />
+        {content}
+      </>
+    );
   };
 
   _renderRuleModal = () => {
@@ -266,7 +305,8 @@ export class Play extends Core.Play<
       <div className={style.ruleModal}>
         <p className={style.ruleTitle}>平行志愿</p>
         <p>
-          平行志愿是高考志愿的一种新的投档录取模式。所谓平行志愿，即一个志愿中包含若干所平行的院校。是指考生在填报高考志愿时，可在指定的批次同时填报若干个平行院校志愿。录取时，按照“分数优先，遵循志愿”的原则进行投档，对同一科类分数线上未被录取的考生按总分从高到低排序进行一次性投档，即所有考生排一个队列，高分者优先投档。每个考生投档时，根据考生所填报的院校顺序，投档到排序在前且有计划余额的院校。</p>
+          平行志愿是高考志愿的一种新的投档录取模式。所谓平行志愿，即一个志愿中包含若干所平行的院校。是指考生在填报高考志愿时，可在指定的批次同时填报若干个平行院校志愿。录取时，按照“分数优先，遵循志愿”的原则进行投档，对同一科类分数线上未被录取的考生按总分从高到低排序进行一次性投档，即所有考生排一个队列，高分者优先投档。每个考生投档时，根据考生所填报的院校顺序，投档到排序在前且有计划余额的院校。
+        </p>
         <img
           src={CLOSE}
           onClick={() => this.setState({ showModal: undefined })}
@@ -278,16 +318,39 @@ export class Play extends Core.Play<
   _renderApplyModal = () => {
     return (
       <div className={style.applyModal}>
-        <p>投档中...</p>
+        <p>已投档，等待其他考生...</p>
+      </div>
+    );
+  };
+
+  _renderAdmissionModal = () => {
+    const { admission } = this.state;
+    return (
+      <div className={style.admissionModal}>
+        <img src={ADMISSION_PIE} />
+        {admission === SCHOOL.none ? (
+          <div>
+            <p>很遗憾</p>
+            <p>您没能被录取</p>
+          </div>
+        ) : (
+          <div>
+            <p>恭喜您</p>
+            <p>
+              被<span>{SCHOOL_NAME[admission]}</span>录取
+            </p>
+          </div>
+        )}
       </div>
     );
   };
 
   renderModal = () => {
-    const { playerState } = this.props;
+    const { playerState, gameState } = this.props;
     const { showModal } = this.state;
     if (
       playerState.admission === undefined &&
+      !gameState.sortedPlayers.length &&
       playerState.schools !== undefined
     ) {
       return <Modal visible={true}>{this._renderApplyModal()}</Modal>;
@@ -295,6 +358,9 @@ export class Play extends Core.Play<
     switch (showModal) {
       case MODAL.rule: {
         return <Modal visible={true}>{this._renderRuleModal()}</Modal>;
+      }
+      case MODAL.admission: {
+        return <Modal visible={true}>{this._renderAdmissionModal()}</Modal>;
       }
       default: {
         return <Modal visible={false} />;
@@ -307,10 +373,6 @@ export class Play extends Core.Play<
     return (
       <section className={style.play}>
         <div className={style.playContent}>
-          <Teacher
-            msg={this.renderMessage()}
-            onGameRuleClick={() => this.setState({ showModal: MODAL.rule })}
-          />
           {content}
           {this.renderModal()}
         </div>
