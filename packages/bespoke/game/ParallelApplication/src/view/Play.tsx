@@ -23,15 +23,18 @@ const ARROW = require("./components/arrow.png");
 const SCORING = require("./components/scoring.gif");
 const CLOSE = require("./components/close.png");
 const SCHOOL_ICON = require("./components/school.png");
+const ADMISSION_PIE = require("./components/admission_pie.png");
 
 interface IPlayState {
   schools: Array<SCHOOL>;
   curSchool: SCHOOL;
   showModal: MODAL;
+  admission: SCHOOL;
 }
 
 enum MODAL {
-  rule
+  rule,
+  admission
 }
 
 export class Play extends Core.Play<
@@ -47,7 +50,8 @@ export class Play extends Core.Play<
   state = {
     schools: undefined,
     curSchool: undefined,
-    showModal: undefined
+    showModal: undefined,
+    admission: undefined
   };
 
   componentDidMount(): void {
@@ -76,6 +80,19 @@ export class Play extends Core.Play<
     this.setState({ schools, curSchool: undefined });
   };
 
+  finishApplying = (school: SCHOOL) => {
+    const { frameEmitter } = this.props;
+    this.setState({ showModal: MODAL.admission, admission: school }, () => {
+      setTimeout(
+        () =>
+          frameEmitter.emit(MoveType.result, {}, () =>
+            this.setState({ showModal: undefined })
+          ),
+        1000
+      );
+    });
+  };
+
   renderMessage = (): string => {
     const { playerState } = this.props;
     const { schools } = this.state;
@@ -83,7 +100,7 @@ export class Play extends Core.Play<
       return "录取结果出来啦";
     }
     if (playerState.schools !== undefined) {
-      return "投档中，等待其他考生";
+      return "已投档，等待其他考生";
     }
     if (playerState.score !== undefined) {
       if (!Array.isArray(schools)) {
@@ -244,7 +261,13 @@ export class Play extends Core.Play<
     if (playerState.admission !== undefined) {
       content = this._renderAdmission(playerState.admission);
     } else if (gameState.sortedPlayers && gameState.sortedPlayers.length) {
-      return <ApplyAnimation players={gameState.sortedPlayers} myToken={playerState.actor.token} />;
+      return (
+        <ApplyAnimation
+          players={gameState.sortedPlayers}
+          myToken={playerState.actor.token}
+          onFinish={school => this.finishApplying(school)}
+        />
+      );
     } else if (playerState.schools !== undefined) {
       content = this._renderReady2Apply(playerState.schools);
     } else if (playerState.score !== undefined) {
@@ -295,7 +318,29 @@ export class Play extends Core.Play<
   _renderApplyModal = () => {
     return (
       <div className={style.applyModal}>
-        <p>投档中，等待其他考生...</p>
+        <p>已投档，等待其他考生...</p>
+      </div>
+    );
+  };
+
+  _renderAdmissionModal = () => {
+    const { admission } = this.state;
+    return (
+      <div className={style.admissionModal}>
+        <img src={ADMISSION_PIE} />
+        {admission === SCHOOL.none ? (
+          <div>
+            <p>很遗憾</p>
+            <p>您没能被录取</p>
+          </div>
+        ) : (
+          <div>
+            <p>恭喜您</p>
+            <p>
+              被<span>{SCHOOL_NAME[admission]}</span>录取
+            </p>
+          </div>
+        )}
       </div>
     );
   };
@@ -313,6 +358,9 @@ export class Play extends Core.Play<
     switch (showModal) {
       case MODAL.rule: {
         return <Modal visible={true}>{this._renderRuleModal()}</Modal>;
+      }
+      case MODAL.admission: {
+        return <Modal visible={true}>{this._renderAdmissionModal()}</Modal>;
       }
       default: {
         return <Modal visible={false} />;

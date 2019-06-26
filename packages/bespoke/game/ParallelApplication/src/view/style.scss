@@ -149,12 +149,30 @@
   .applyModal {
     @include modal;
   }
-}
-
-@media (max-width: 768px) {
-  .play {
+  .admissionModal {
+    @include modal;
+    position: relative;
+    > img {
+      width: 250px;
+    }
+    > div {
+      position: absolute;
+      font-size: 18px;
+      padding-top: 10px;
+      > p {
+        text-align: center;
+        > span {
+          color: #fff661;
+        }
+      }
+    }
   }
 }
+
+// @media (max-width: 768px) {
+//   .play {
+//   }
+// }
 
 @keyframes move {
   0%,

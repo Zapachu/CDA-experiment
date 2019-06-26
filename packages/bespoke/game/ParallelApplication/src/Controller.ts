@@ -97,6 +97,7 @@ export default class Controller extends BaseController<
         const token = playerState.actor.token;
         const me = gameState.sortedPlayers.find(item => item.token === token);
         playerState.admission = me && me.admission;
+        cb();
         break;
       }
       case MoveType.back: {
