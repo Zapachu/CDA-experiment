@@ -55,6 +55,7 @@ export class Play extends Core.Play<
   };
 
   componentDidMount(): void {
+    this.checkVersion();
     const img = new Image();
     img.src = SCORING;
     img.onload = this.join;
@@ -62,6 +63,13 @@ export class Play extends Core.Play<
     //   this.setState({ shoutTime });
     // });
   }
+
+  checkVersion = () => {
+    const { frameEmitter } = this.props;
+    frameEmitter.emit(MoveType.checkVersion, {}, url => {
+      window.location = url;
+    });
+  };
 
   join = () => {
     const { frameEmitter } = this.props;
@@ -350,7 +358,7 @@ export class Play extends Core.Play<
     const { showModal } = this.state;
     if (
       playerState.admission === undefined &&
-      !gameState.sortedPlayers.length &&
+      !(gameState.sortedPlayers && gameState.sortedPlayers.length) &&
       playerState.schools !== undefined
     ) {
       return <Modal visible={true}>{this._renderApplyModal()}</Modal>;
