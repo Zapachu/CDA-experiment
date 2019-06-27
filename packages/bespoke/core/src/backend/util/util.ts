@@ -1,6 +1,6 @@
 import {config, IGameSetting} from 'bespoke-core-share'
 import {elfSetting} from 'elf-setting'
-import {Log} from 'bespoke-server-util'
+import {Log, LogLevel} from 'bespoke-server-util'
 import {resolve} from 'path'
 import {readFileSync} from 'fs'
 import * as objHash from 'object-hash'
@@ -72,7 +72,7 @@ export class Setting {
         this.staticPath = setting.staticPath
         this._port = setting.port || (elfSetting.inProductEnv ? 0 : config.devPort.server)
         elfSetting.inProductEnv ?
-            Log.setLogPath(setting.logPath || resolve(setting.staticPath, '../log'), Log.Level.log) :
+            Log.setLogPath(setting.logPath || resolve(setting.staticPath, '../log'), LogLevel.log) :
             Log.d('当前为开发环境,短信/邮件发送、游戏状态持久化等可能受影响')
         Object.values<NetworkInterfaceInfo[]>(networkInterfaces()).forEach(infos => {
             infos.forEach(({family, internal, address}) => {
