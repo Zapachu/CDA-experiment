@@ -1,6 +1,6 @@
 import {config, IGameSetting} from 'bespoke-core-share'
 import {elfSetting} from 'elf-setting'
-import {colorConsole, dailyfile} from 'tracer'
+import {Log} from 'bespoke-server-util'
 import {resolve} from 'path'
 import {readFileSync} from 'fs'
 import * as objHash from 'object-hash'
@@ -48,28 +48,6 @@ export function heartBeat(key: string, value: string, seconds: number = CONFIG.h
     })()
 }
 
-export namespace Log {
-    let logger = colorConsole()
-
-    export const l = logger.log
-    export const i = logger.info
-    export const d = logger.debug
-    export const w = logger.warn
-    export const e = logger.error
-
-    export function init(logPath: string) {
-        if (elfSetting.inProductEnv) {
-            logger = dailyfile({
-                level: CONFIG.logLevel.toString(),
-                root: logPath
-            })
-            console.log(`当前为生成环境,日志记录于:${logPath}`)
-        } else {
-            this.l('当前为开发环境,短信/邮件发送、游戏状态持久化等可能受影响')
-        }
-    }
-}
-
 export class Setting {
     static namespace: string
     static staticPath: string
@@ -93,7 +71,9 @@ export class Setting {
         this.namespace = setting.namespace
         this.staticPath = setting.staticPath
         this._port = setting.port || (elfSetting.inProductEnv ? 0 : config.devPort.server)
-        Log.init(setting.logPath || resolve(setting.staticPath, '../log'))
+        elfSetting.inProductEnv ?
+            Log.setLogPath(setting.logPath || resolve(setting.staticPath, '../log'), Log.Level.log) :
+            Log.d('当前为开发环境,短信/邮件发送、游戏状态持久化等可能受影响')
         Object.values<NetworkInterfaceInfo[]>(networkInterfaces()).forEach(infos => {
             infos.forEach(({family, internal, address}) => {
                 if (family === 'IPv4' && !internal) {

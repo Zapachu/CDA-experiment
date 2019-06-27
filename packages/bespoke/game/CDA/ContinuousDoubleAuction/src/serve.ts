@@ -15,6 +15,7 @@ import {
 import {Router} from 'express'
 import {getEnumKeys} from './util'
 import nodeXlsx from 'node-xlsx'
+import {RobotServer} from 'bespoke-robot'
 
 const router = Router()
     .get(FetchRoute.exportXls, async (req, res) => {
@@ -77,4 +78,6 @@ const router = Router()
 Server.start({
     namespace,
     staticPath: resolve(__dirname, '../dist'),
-}, {Controller, Robot}, router)
+}, {Controller}, router)
+
+RobotServer.start(namespace, Robot)

@@ -1,7 +1,8 @@
 import {baseEnum} from 'bespoke-core-share'
 import {encode} from 'msgpack-lite'
+import {Log} from 'bespoke-server-util'
 import {GameStateSynchronizer, PlayerStateSynchronizer} from './BaseSynchronizer'
-import {EventIO, Log} from '../../util'
+import {EventIO} from '../../util'
 
 export class MsgPackGameStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> extends GameStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     async syncClientState(wholeState?: boolean) {

@@ -1,5 +1,5 @@
 export {Cache} from './Cache'
-export {EventIO, RobotConnection} from './EventIO'
+export {EventIO} from './EventIO'
 export {cacheResult, cacheResultSync} from './serviceDecorator'
 export * from './util'
 export * from './config'

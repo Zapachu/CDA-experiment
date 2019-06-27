@@ -1,7 +1,8 @@
 import {IGameConfig, IGameWithId, TGameState, TPlayerState} from 'bespoke-core-share'
 import {elfSetting} from 'elf-setting'
 import {redisClient} from 'elf-protocol'
-import {cacheResult, Log, RedisKey, Setting} from '../util'
+import {Log} from 'bespoke-server-util'
+import {cacheResult, RedisKey, Setting} from '../util'
 import {GameDoc, GameModel} from '../model'
 
 export class GameDAO {
@@ -39,11 +40,11 @@ export class GameDAO {
     }
 
     static async queryGameState<IGameState>(gameId: string): Promise<TGameState<IGameState>> {
-        return JSON.parse(await redisClient.get(RedisKey.gameState(gameId)))
+        return elfSetting.inProductEnv ? JSON.parse(await redisClient.get(RedisKey.gameState(gameId))) : null
     }
 
     static async queryPlayerState<IPlayerState>(gameId: string, token: string): Promise<TPlayerState<IPlayerState>> {
-        return JSON.parse(await redisClient.get(RedisKey.playerState(gameId, token)))
+        return elfSetting.inProductEnv ? JSON.parse(await redisClient.get(RedisKey.playerState(gameId, token))) : null
     }
 
     static async getPlayerTokens(gameId: string): Promise<Array<string>> {

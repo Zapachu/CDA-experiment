@@ -37,7 +37,7 @@ export interface IGame<ICreateParams> extends IGameConfig<ICreateParams> {
     namespace: string
 }
 
-export interface IGameWithId<ICreateParams>extends IGame<ICreateParams> {
+export interface IGameWithId<ICreateParams> extends IGame<ICreateParams> {
     id: string
 }
 
@@ -104,5 +104,16 @@ export interface IGameSetting {
     staticPath: string
     logPath?: string
     port?: number
-    rpcPort?: number
+}
+
+export interface ISocketHandshakeQuery {
+    id: string
+    token: string
+    gameId: string
+}
+
+export interface INewRobotParams {
+    id: string
+    actor: IActor
+    game: IGameWithId<any>
 }

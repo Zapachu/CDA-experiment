@@ -1,5 +1,6 @@
 import { resolve } from "path";
 import { Server, RedisCall, gameId2PlayUrl } from "bespoke-server";
+import { RobotServer} from 'bespoke-robot'
 import Controller from "./Controller";
 import Robot from "./Robot";
 import { namespace, ICreateParams } from "./config";
@@ -11,8 +12,10 @@ Server.start(
     namespace,
     staticPath: resolve(__dirname, "../dist")
   },
-  { Controller, Robot }
+  { Controller }
 );
+
+RobotServer.start(namespace, Robot)
 
 RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(
   CreateGame.name(phaseToNamespace(Phase.TBM)),

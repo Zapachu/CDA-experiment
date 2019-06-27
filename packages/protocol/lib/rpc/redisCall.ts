@@ -2,6 +2,8 @@ import {Log} from '../util'
 import {elfSetting} from 'elf-setting'
 import * as IORedis from 'ioredis'
 
+const DEFAULT_TTL = 5
+
 export const redisClient = new IORedis(elfSetting.redisPort, elfSetting.redisHost)
 
 export namespace RedisCall {
@@ -29,7 +31,7 @@ export namespace RedisCall {
             const reqPack: IReqPack<IReq> = JSON.parse(reqText)
             const res = await handler(reqPack.params)
             redis.rpush(reqPack.key, JSON.stringify(res))
-            redis.expire(reqPack.key, 1).catch(e => Log.e(e))
+            redis.expire(reqPack.key, DEFAULT_TTL).catch(e => Log.e(e))
             _handle(method, handler, redis)
         })
     }
@@ -38,11 +40,11 @@ export namespace RedisCall {
         _handle(method, handler, getBlockRedisClient())
     }
 
-    export async function call<IReq, IRes>(method: string, params: IReq): Promise<IRes> {
+    export async function call<IReq, IRes>(method: string, params: IReq, ttl: number = DEFAULT_TTL): Promise<IRes> {
         const redis = getBlockRedisClient()
         const key = geneReqKey(), reqPack: IReqPack<IReq> = {method, params, key}
         redis.rpush(getServiceKey(method), JSON.stringify(reqPack))
-        const res = await redis.blpop(key, 1 as any)
+        const res = await redis.blpop(key, ttl as any)
         if (!res) {
             await redis.del(getServiceKey(method))
             throw new Error(`RedisCall Time out : ${JSON.stringify(reqPack)}`)

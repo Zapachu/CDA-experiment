@@ -15,6 +15,7 @@
     "typescript": "^3.3.3333",
     "webpack": "^4.29.6",
     "bespoke-core-share": "^1.0.0",
+    "bespoke-server-util": "^1.0.0",
     "elf-component": "^1.0.0",
     "elf-protocol": "^1.0.0",
     "elf-setting": "^1.0.0"

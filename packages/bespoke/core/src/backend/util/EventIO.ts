@@ -1,22 +1,36 @@
-import {Actor, SocketEvent, config, IActor, IConnection, IConnectionNamespace, IGameWithId} from 'bespoke-core-share'
+import {
+    Actor,
+    config,
+    IActor,
+    IConnection,
+    IConnectionNamespace,
+    IGameWithId,
+    INewRobotParams,
+    ISocketHandshakeQuery,
+    SocketEvent,
+    UnixSocketEvent
+} from 'bespoke-core-share'
+import {createServer, Socket} from 'net'
+import {existsSync, unlinkSync} from 'fs'
 import {Server} from 'http'
 import {EventEmitter} from 'events'
 import * as socketIO from 'socket.io'
 import {GameDAO} from '../service'
-import {Token, Setting} from './util'
+import {Setting, Token} from './util'
+import {getSocketPath, SocketEmitter} from 'bespoke-server-util'
 
 export class EventIO {
+    private static socketRobotServer: SocketRobotServer
     private static socketIOServer: socketIO.Server
-    private static robotIOServer: RobotIOServer
 
-    static emitEvent(nspId: string, event: string, ...args) {
+    static emitEvent(nspId: string, event: SocketEvent | UnixSocketEvent, ...args) {
         if (!(nspId && event && args.length)) {
             return
         }
         const socketNsp = this.socketIOServer.to(nspId),
-            robotNsp = this.robotIOServer.to(nspId)
+            unixSocketNsp = this.socketRobotServer.to(nspId)
         socketNsp && socketNsp.emit(event, ...args)
-        robotNsp && robotNsp.emit(event, ...args)
+        unixSocketNsp && unixSocketNsp.emit(event, ...args)
     }
 
     static initSocketIOServer(server: Server, subscribeOnConnection: (clientConn: IConnection) => void): socketIO.Server {
@@ -34,55 +48,62 @@ export class EventIO {
         return this.socketIOServer
     }
 
-    static initRobotIOServer(subscribeOnConnection: (clientConn: IConnection) => void) {
-        this.robotIOServer = new RobotIOServer()
-        this.robotIOServer.on(SocketEvent.connection, (connection: RobotConnection) => {
-            subscribeOnConnection(connection)
-            this.robotIOServer.online(connection)
-        })
+    static initSocketRobotServer(subscribeOnConnection: (clientConn: IConnection) => void) {
+        const socketPath = getSocketPath(Setting.namespace)
+        if (existsSync(socketPath)) {
+            unlinkSync(socketPath)
+        }
+        this.socketRobotServer = new SocketRobotServer()
+        createServer(socket => {
+            const socketWrapper: SocketEmitter = new SocketEmitter(Setting.namespace, socket)
+            socketWrapper
+                .on(UnixSocketEvent.mainConnection, () => this.socketRobotServer.mainConnection = socketWrapper)
+                .on(SocketEvent.connection, async ({id, token, gameId}: ISocketHandshakeQuery) => {
+                    const game = await GameDAO.getGame(gameId),
+                        actor: IActor = {token, type: Actor.serverRobot}
+                    const socketConnection = new SocketConnection(id, actor, game, socket)
+                    subscribeOnConnection(socketConnection)
+                    this.socketRobotServer.initNamespace(socketConnection)
+                })
+        }).listen(socketPath)
     }
 
-    static robotConnect(id: string, actor: IActor, game: IGameWithId<any>): RobotConnection {
-        const robotConnection = new RobotConnection(id, actor, game)
-        this.robotIOServer.emit(SocketEvent.connection, robotConnection)
-        return robotConnection
+    static socketRobotConnect(id: string, actor: IActor, game: IGameWithId<any>) {
+        this.socketRobotServer.mainConnection.emit(UnixSocketEvent.newRobot, {id, actor, game} as INewRobotParams)
     }
 }
 
-class RobotIOServer extends EventEmitter {
-    private namespaces: { [room: string]: RobotNamespace } = {}
+class SocketRobotServer {
+    private namespaces: { [room: string]: SocketRobotNamespace } = {}
+    mainConnection: SocketEmitter
 
-    getNamespace(nsp: string): RobotNamespace {
+    getNamespace(nsp: string): SocketRobotNamespace {
         if (!this.namespaces[nsp]) {
-            this.namespaces[nsp] = new RobotNamespace((nsp))
+            this.namespaces[nsp] = new SocketRobotNamespace()
         }
         return this.namespaces[nsp]
     }
 
-    online(connection: RobotConnection) {
-        this.namespaces[connection.id] = new RobotNamespace(connection.id)
+    initNamespace(connection: SocketConnection) {
+        this.namespaces[connection.id] = new SocketRobotNamespace()
         connection.robotIOServer = this
         connection.join(connection.id)
     }
 
-    to(clientId: string): RobotNamespace {
+    to(clientId: string): SocketRobotNamespace {
         return this.namespaces[clientId]
     }
 }
 
-class RobotNamespace extends EventEmitter implements IConnectionNamespace {
-    private connections: { [connectionId: string]: RobotConnection } = {}
+class SocketRobotNamespace extends EventEmitter implements IConnectionNamespace {
+    private connections: { [connectionId: string]: SocketConnection } = {}
 
-    constructor(id: string) {
-        super()
-    }
-
-    addConnection(connection: RobotConnection): RobotNamespace {
+    addConnection(connection: SocketConnection): SocketRobotNamespace {
         this.connections[connection.id] = connection
         return this
     }
 
-    emit(event: string | symbol, ...args): boolean {
+    emit(event: SocketEvent | UnixSocketEvent, ...args): boolean {
         let success = true
         for (let id in this.connections) {
             if (!this.connections[id].emit(event, ...args)) {
@@ -93,14 +114,14 @@ class RobotNamespace extends EventEmitter implements IConnectionNamespace {
     }
 }
 
-export class RobotConnection extends EventEmitter implements IConnection {
-    robotIOServer: RobotIOServer
+class SocketConnection extends SocketEmitter implements IConnection {
+    robotIOServer: SocketRobotServer
 
-    constructor(public id: string, public actor: IActor, public game: IGameWithId<any>) {
-        super()
+    constructor(public id: string, public actor: IActor, public game: IGameWithId<any>, socket: Socket) {
+        super(Setting.namespace, socket)
     }
 
-    join(nsp: string): RobotNamespace {
+    join(nsp: string): SocketRobotNamespace {
         return this.robotIOServer.getNamespace(nsp).addConnection(this)
     }
 }

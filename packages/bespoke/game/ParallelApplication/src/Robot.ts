@@ -4,7 +4,7 @@
  *      如果在规定时间内匹配到玩家，则玩家间相互交互
  * */
 
-import { BaseRobot } from "bespoke-server";
+import { BaseRobot } from "bespoke-robot";
 import {
   MoveType,
   PushType,

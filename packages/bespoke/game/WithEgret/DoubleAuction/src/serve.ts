@@ -5,6 +5,7 @@ import {config, gameId2PlayUrl, RedisCall, Server} from 'bespoke-server'
 import Controller from './Controller'
 import {Robot} from './Robot'
 import {CreateGame} from 'elf-protocol'
+import {RobotServer} from 'bespoke-robot'
 
 const egretRouter = Express.Router()
     .use('/egret/bin-debug', Express.static(resolve(__dirname, '../egret/bin-debug')))
@@ -13,9 +14,11 @@ const egretRouter = Express.Router()
 
 Server.start(
     {namespace, staticPath: resolve(__dirname, '../dist')},
-    {Controller, Robot},
+    {Controller},
     egretRouter
 )
+
+RobotServer.start(namespace, Robot)
 
 RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(
     CreateGame.name(namespace),

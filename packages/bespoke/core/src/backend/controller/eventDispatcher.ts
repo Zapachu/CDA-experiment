@@ -1,8 +1,9 @@
 import {Server} from 'http'
 import * as socketIO from 'socket.io'
-import {EventHandler} from './eventHandler'
-import {EventIO, Log} from '../util'
+import {Log} from 'bespoke-server-util'
 import {IConnection, IEventHandler} from 'bespoke-core-share'
+import {EventHandler} from './eventHandler'
+import {EventIO} from '../util'
 
 export class EventDispatcher {
     private static subscribeOnConnection(clientConn: IConnection) {
@@ -30,7 +31,7 @@ export class EventDispatcher {
 
     static startGameSocket(server: Server): socketIO.Server {
         const socketIOServer = EventIO.initSocketIOServer(server, this.subscribeOnConnection)
-        EventIO.initRobotIOServer(this.subscribeOnConnection)
+        EventIO.initSocketRobotServer(this.subscribeOnConnection)
         return socketIOServer
     }
 }
