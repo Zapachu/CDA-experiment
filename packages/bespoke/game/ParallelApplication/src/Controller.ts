@@ -58,6 +58,10 @@ export default class Controller extends BaseController<
       gameState = await this.stateManager.getGameState(),
       playerStates = await this.stateManager.getPlayerStates();
     switch (type) {
+      case MoveType.checkVersion: {
+        await this.checkOldVersion(gameState, actor.token, cb);
+        break;
+      }
       case MoveType.join: {
         if (playerState.score !== undefined) {
           return;
@@ -232,6 +236,25 @@ export default class Controller extends BaseController<
   //   this.processProfits(gameState, shoutedPlayerStates);
   //   await this.stateManager.syncState();
   // }
+
+  private async checkOldVersion(
+    gameState: TGameState<IGameState>,
+    token: string,
+    cb: IMoveCallback
+  ) {
+    if (!gameState.sortedPlayers) {
+      const res = await RedisCall.call<GameOver.IReq, GameOver.IRes>(
+        GameOver.name,
+        {
+          playUrl: gameId2PlayUrl(this.game.id, token),
+          onceMore: true,
+          namespace
+        }
+      );
+      res ? cb(res.lobbyUrl) : null;
+    }
+    
+  }
 
   private _getScores(): Array<number> {
     const chinese = genRandomInt(80, 149);
