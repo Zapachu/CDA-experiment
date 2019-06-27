@@ -3,7 +3,6 @@ import {Log} from 'bespoke-server-util'
 import {BaseController} from '../..'
 import {GameStateSynchronizer, PlayerStateSynchronizer} from './BaseSynchronizer'
 import {DiffGameStateSynchronizer, DiffPlayerStateSynchronizer} from './DiffSynchronizer'
-import {MsgPackGameStateSynchronizer, MsgPackPlayerStateSynchronizer} from './MsgPackSynchronizer'
 
 export {GameStateSynchronizer, PlayerStateSynchronizer}
 
@@ -22,8 +21,6 @@ export class StateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType
                 return new GameStateSynchronizer(this.controller)
             case baseEnum.SyncStrategy.diff:
                 return new DiffGameStateSynchronizer(this.controller)
-            case baseEnum.SyncStrategy.msgPack:
-                return new MsgPackGameStateSynchronizer(this.controller)
             default:
                 Log.w(UNSUPPORTED_STRATEGY_WARNING)
         }
@@ -35,8 +32,6 @@ export class StateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType
                 return new PlayerStateSynchronizer(actor, this.controller)
             case baseEnum.SyncStrategy.diff:
                 return new DiffPlayerStateSynchronizer(actor, this.controller)
-            case baseEnum.SyncStrategy.msgPack:
-                return new MsgPackPlayerStateSynchronizer(actor, this.controller)
             default:
                 Log.w(UNSUPPORTED_STRATEGY_WARNING)
         }

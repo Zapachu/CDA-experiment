@@ -1,5 +1,4 @@
 import {EventEmitter} from 'events'
-import {decode} from 'msgpack-lite'
 import {applyChange, Diff} from 'deep-diff'
 import {FrameEmitter, IActor, IGameWithId, SocketEvent, TGameState, TPlayerState} from 'bespoke-core-share'
 import {Log} from 'bespoke-server-util'
@@ -18,10 +17,6 @@ export class BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushTy
                 this.preGameState = cloneDeep(this.gameState)
                 this.gameState = cloneDeep(gameState)
             })
-            .on(SocketEvent.syncGameState_msgpack, (gameStateBuffer: Array<number>) => {
-                this.preGameState = cloneDeep(this.gameState)
-                this.gameState = cloneDeep(decode(gameStateBuffer))
-            })
             .on(SocketEvent.changeGameState_diff, (stateChanges: Array<Diff<IGameState>>) => {
                 Log.l(this.preGameState)
                 this.preGameState = cloneDeep(this.gameState)
@@ -30,10 +25,6 @@ export class BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushTy
             .on(SocketEvent.syncPlayerState_json, (playerState: TPlayerState<IPlayerState>) => {
                 this.prePlayerState = cloneDeep(this.playerState)
                 this.playerState = cloneDeep(playerState)
-            })
-            .on(SocketEvent.syncPlayerState_msgpack, (playerStateBuffer: Array<number>) => {
-                this.prePlayerState = cloneDeep(this.playerState)
-                this.playerState = cloneDeep(decode(playerStateBuffer))
             })
             .on(SocketEvent.changePlayerState_diff, (stateChanges: Array<Diff<IPlayerState>>) => {
                 Log.l(this.prePlayerState)
