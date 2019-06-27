@@ -1,10 +1,10 @@
 import {baseEnum, IEventHandler, IConnection, TOnlineCallback, IMoveCallback} from 'bespoke-core-share'
-import {GameLogic} from '../service/GameLogic'
+import {BaseLogic} from '../service'
 
 export const EventHandler = {
     [baseEnum.SocketEvent.online]: async (connection: IConnection, onlineCallback: TOnlineCallback = () => null) => {
         const {game, actor} = connection,
-            controller = await GameLogic.getGameController(game.id)
+            controller = await BaseLogic.getLogic(game.id)
         onlineCallback(actor)
         connection.join(game.id)
         controller.connections.set(actor.token, connection)
@@ -20,7 +20,7 @@ export const EventHandler = {
     },
 
     [baseEnum.SocketEvent.disconnect]: async ({game, actor}: IConnection) => {
-        const {stateManager} = await GameLogic.getGameController(game.id)
+        const {stateManager} = await BaseLogic.getLogic(game.id)
         if (actor.type === baseEnum.Actor.owner) {
             const gameState = await stateManager.getGameState()
             gameState.connectionId = ''
@@ -32,7 +32,7 @@ export const EventHandler = {
     },
 
     [baseEnum.SocketEvent.move]: async ({actor, game}: IConnection, type: string, params: {}, cb?: IMoveCallback) => {
-        const controller = await GameLogic.getGameController(game.id)
+        const controller = await BaseLogic.getLogic(game.id)
         await controller.moveReducer(actor, type, params, cb || (() => null))
     }
 } as { [s: string]: IEventHandler }

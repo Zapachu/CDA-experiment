@@ -18,37 +18,26 @@ import {StateManager} from './StateManager'
 import {MoveQueue} from './MoveQueue'
 import {RedisCall, SendBackPlayer, SetPhaseResult} from 'elf-protocol'
 
-type AnyController = BaseController<any, any, any, any, any, any, any>
+export type AnyLogic = BaseLogic<any, any, any, any, any, any, any>
 
-export interface ILogicTemplate {
-    Controller: new(...args) => AnyController,
-    sncStrategy?: SyncStrategy
-}
+export class BaseLogic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IRobotMeta = {}> {
+    private static sncStrategy: SyncStrategy
+    private static Controller: new(...args) => AnyLogic
+    private static controllers = new Map<string, AnyLogic>()
 
-export namespace GameLogic {
-    let template: ILogicTemplate
-    export let sncStrategy: SyncStrategy
-
-    export let namespaceController: AnyController
-
-    export function init(logicTemplate: ILogicTemplate) {
-        template = logicTemplate
-        sncStrategy = logicTemplate.sncStrategy || SyncStrategy.default
-        namespaceController = new template.Controller()
+    static init(Controller: new(...args) => AnyLogic, sncStrategy: SyncStrategy = SyncStrategy.default) {
+        this.Controller = Controller
+        this.sncStrategy = sncStrategy
     }
 
-    const controllers = new Map<string, AnyController>()
-
-    export async function getGameController(gameId: string): Promise<AnyController> {
-        if (!controllers.get(gameId)) {
+    static async getLogic(gameId: string): Promise<AnyLogic> {
+        if (!this.controllers.get(gameId)) {
             const game = await GameDAO.getGame(gameId)
-            controllers.set(gameId, await new template.Controller(game).init())
+            this.controllers.set(gameId, await new this.Controller(game).init())
         }
-        return controllers.get(gameId)
+        return this.controllers.get(gameId)
     }
-}
 
-export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IRobotMeta = {}> {
     private moveQueue: MoveQueue<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>
     public connections = new Map<string, IConnection>()
     stateManager: StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>
@@ -57,7 +46,7 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
     }
 
     async init() {
-        this.stateManager = new StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>(GameLogic.sncStrategy, this)
+        this.stateManager = new StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>(BaseLogic.sncStrategy, this)
         this.moveQueue = new MoveQueue(this.game, this.stateManager)
         return this
     }

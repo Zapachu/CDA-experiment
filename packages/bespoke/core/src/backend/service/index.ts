@@ -1,5 +1,5 @@
 export * from './GameDAO'
-export * from './GameLogic'
+export * from './BaseLogic'
 export * from './MailService'
 export * from './MoveQueue'
 export * from './StateManager'

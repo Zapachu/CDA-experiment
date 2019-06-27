@@ -1,14 +1,14 @@
 import {Response, Router} from 'express'
 import nodeXlsx from 'node-xlsx'
 import {resolve} from 'path'
-import {GameLogic, Server} from 'bespoke-server'
+import {BaseLogic, Server} from 'bespoke-server'
 import Controller from './Controller'
 import {FetchRoute, namespace, SheetType} from './config'
 
 const router = Router()
     .get(FetchRoute.getUserMobile, async (req, res: Response) => {
         const {user: {_id: userId, mobile}, params: {gameId}, query: {token, actorType}} = req
-        const {game, stateManager} = await GameLogic.getGameController(gameId)
+        const {game, stateManager} = await BaseLogic.getLogic(gameId)
         if (game.owner.toString() !== userId.toString()) {
             const playerState = await stateManager.getPlayerState({type: actorType, token})
             playerState.mobile = mobile || '-'
@@ -17,7 +17,7 @@ const router = Router()
     })
     .get(FetchRoute.exportXls, async (req, res: Response) => {
         const {params: {gameId}, query: {sheetType}} = req
-        const {game, stateManager} = await GameLogic.getGameController(gameId)
+        const {game, stateManager} = await BaseLogic.getLogic(gameId)
         if (req.user.id !== game.owner) {
             return res.end('Invalid Request')
         }
@@ -39,7 +39,7 @@ const router = Router()
     })
     .get(FetchRoute.exportXlsPlaying, async (req, res: Response) => {
         const {params: {gameId}, query: {sheetType}} = req
-        const controller = await GameLogic.getGameController(gameId) as Controller
+        const controller = await BaseLogic.getLogic(gameId) as Controller
         if (req.user.id !== controller.game.owner) {
             return res.end('Invalid Request')
         }

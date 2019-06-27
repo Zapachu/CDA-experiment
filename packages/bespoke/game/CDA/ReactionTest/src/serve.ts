@@ -1,5 +1,5 @@
 import {resolve} from 'path'
-import {GameLogic, Model, Server} from 'bespoke-server'
+import {BaseLogic, Model, Server} from 'bespoke-server'
 import Controller from './Controller'
 import {FetchRoute, IResult, namespace, SheetType} from './config'
 import {Router} from 'express'
@@ -8,7 +8,7 @@ import nodeXlsx from 'node-xlsx'
 const router = Router()
     .get(FetchRoute.exportXls, async (req, res) => {
             const {params: {gameId}, query: {sheetType}} = req
-            const {game} = await GameLogic.getGameController(gameId)
+            const {game} = await BaseLogic.getLogic(gameId)
             if (req.user.id !== game.owner) {
                 return res.end('Invalid Request')
             }

@@ -7,7 +7,7 @@ import {Log} from 'bespoke-server-util'
 import {CONFIG, RedisKey, Setting, Token} from '../util'
 import {PassportStrategy} from '../interface'
 import {GameModel, MoveLogModel, SimulatePlayerModel, UserDoc, UserModel} from '../model'
-import {GameDAO, GameLogic, UserService} from '../service'
+import {GameDAO, BaseLogic, UserService} from '../service'
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -111,7 +111,7 @@ export class GameCtrl {
         try {
             let game = await GameDAO.getGame(gameId)
             if (!user || user._id.toString() !== game.owner) {
-                game = (await GameLogic.getGameController(gameId)).getGame4Player()
+                game = (await BaseLogic.getLogic(gameId)).getGame4Player()
             }
             res.json({
                 code: baseEnum.ResponseCode.success,
