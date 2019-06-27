@@ -5,8 +5,7 @@ import {
     IConnection,
     IConnectionNamespace,
     IGameWithId,
-    INewRobotParams,
-    ISocketHandshakeQuery,
+    IRobotHandshake,
     SocketEvent,
     UnixSocketEvent
 } from 'bespoke-core-share'
@@ -55,27 +54,26 @@ export class EventIO {
         }
         this.socketRobotServer = new SocketRobotServer()
         createServer(socket => {
-            const socketWrapper: SocketEmitter = new SocketEmitter(Setting.namespace, socket)
-            socketWrapper
-                .on(UnixSocketEvent.mainConnection, () => this.socketRobotServer.mainConnection = socketWrapper)
-                .on(SocketEvent.connection, async ({id, token, gameId}: ISocketHandshakeQuery) => {
-                    const game = await GameDAO.getGame(gameId),
-                        actor: IActor = {token, type: Actor.serverRobot}
+            const socketEmitter: SocketEmitter = new SocketEmitter(Setting.namespace, socket)
+            socketEmitter
+                .on(UnixSocketEvent.daemonConnection, () => this.socketRobotServer.daemonConnection = socketEmitter)
+                .on(SocketEvent.connection, async ({id, actor, game}: IRobotHandshake, cb) => {
                     const socketConnection = new SocketConnection(id, actor, game, socket)
                     subscribeOnConnection(socketConnection)
                     this.socketRobotServer.initNamespace(socketConnection)
+                    cb()
                 })
         }).listen(socketPath)
     }
 
     static socketRobotConnect(id: string, actor: IActor, game: IGameWithId<any>) {
-        this.socketRobotServer.mainConnection.emit(UnixSocketEvent.newRobot, {id, actor, game} as INewRobotParams)
+        this.socketRobotServer.daemonConnection.emit(UnixSocketEvent.newRobot, {id, actor, game} as IRobotHandshake)
     }
 }
 
 class SocketRobotServer {
     private namespaces: { [room: string]: SocketRobotNamespace } = {}
-    mainConnection: SocketEmitter
+    daemonConnection: SocketEmitter
 
     getNamespace(nsp: string): SocketRobotNamespace {
         if (!this.namespaces[nsp]) {

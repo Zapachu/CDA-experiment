@@ -1,2 +1,2 @@
-export * from './unixSocket'
+export * from './SocketEmitter'
 export * from './Log'

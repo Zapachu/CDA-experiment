@@ -21,8 +21,9 @@ export enum SocketEvent {
 }
 
 export enum UnixSocketEvent {
-    mainConnection = 'mainConnection',
-    newRobot = 'newRobot'
+    daemonConnection = 'daemonConnection',
+    newRobot = 'newRobot',
+    callback = 'callback'
 }
 
 export enum CoreMove {

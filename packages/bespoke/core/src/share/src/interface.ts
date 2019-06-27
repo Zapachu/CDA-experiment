@@ -106,13 +106,7 @@ export interface IGameSetting {
     port?: number
 }
 
-export interface ISocketHandshakeQuery {
-    id: string
-    token: string
-    gameId: string
-}
-
-export interface INewRobotParams {
+export interface IRobotHandshake {
     id: string
     actor: IActor
     game: IGameWithId<any>

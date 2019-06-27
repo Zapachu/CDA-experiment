@@ -34,8 +34,7 @@ export class BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushTy
         this.frameEmitter = new FrameEmitter<any, any, any, any>(this.connection)
     }
 
-    async init(): Promise<BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>> {
-        this.connection.emit(SocketEvent.online)
+    async init(): Promise<this> {
         return this
     }
 }

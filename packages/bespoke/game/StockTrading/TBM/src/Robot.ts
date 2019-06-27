@@ -28,7 +28,7 @@ export default class extends BaseRobot<
   IMoveParams,
   IPushParams
 > {
-  async init() {
+  async init():Promise<this> {
     await super.init();
     setTimeout(() => this.frameEmitter.emit(MoveType.join), 1000);
     this.frameEmitter.on(PushType.robotShout, () => {
