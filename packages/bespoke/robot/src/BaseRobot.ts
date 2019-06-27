@@ -4,14 +4,14 @@ import {FrameEmitter, IActor, IGameWithId, SocketEvent, TGameState, TPlayerState
 import {Log} from 'bespoke-server-util'
 import cloneDeep = require('lodash/cloneDeep')
 
-export class BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
+export class BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IRobotMeta = {}> {
     private preGameState?: TGameState<IGameState> = null
     private prePlayerState?: TPlayerState<IPlayerState> = null
     frameEmitter: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
     gameState?: TGameState<IGameState> = null
     playerState?: TPlayerState<IPlayerState> = null
 
-    constructor(public game: IGameWithId<ICreateParams>, public actor: IActor, public connection: EventEmitter) {
+    constructor(public game: IGameWithId<ICreateParams>, public actor: IActor, public connection: EventEmitter, public meta?: IRobotMeta) {
         this.connection
             .on(SocketEvent.syncGameState_json, (gameState: TGameState<IGameState>) => {
                 this.preGameState = cloneDeep(this.gameState)
@@ -35,6 +35,7 @@ export class BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushTy
     }
 
     async init(): Promise<this> {
+        Log.i('RobotInit', this.actor, this.meta)
         return this
     }
 }

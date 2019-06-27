@@ -66,8 +66,8 @@ export class EventIO {
         }).listen(socketPath)
     }
 
-    static socketRobotConnect(id: string, actor: IActor, game: IGameWithId<any>) {
-        this.socketRobotServer.daemonConnection.emit(UnixSocketEvent.newRobot, {id, actor, game} as IRobotHandshake)
+    static socketRobotConnect<IRobotMeta>(id: string, actor: IActor, game: IGameWithId<any>, meta:IRobotMeta) {
+        this.socketRobotServer.daemonConnection.emit(UnixSocketEvent.newRobot, {id, actor, game} as IRobotHandshake, meta)
     }
 }
 

@@ -46,15 +46,9 @@ export namespace GameLogic {
         }
         return controllers.get(gameId)
     }
-
-    export async function startRobot<ICreateParams, IGameState, IPlayerState>(gameId: string, key: string): Promise<void> {
-        const actor: IActor = {token: Token.geneToken(`${gameId}${key}`), type: Actor.serverRobot}
-        const game = await GameDAO.getGame<ICreateParams>(gameId)
-        EventIO.socketRobotConnect(`ROBOT_${Math.random().toString(36).substr(2)}`, actor, game)
-    }
 }
 
-export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
+export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IRobotMeta = {}> {
     private moveQueue: MoveQueue<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>
     public connections = new Map<string, IConnection>()
     stateManager: StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>
@@ -121,8 +115,9 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
         Log.i(actor.token, type, params, cb)
     }
 
-    async startRobot(key) {
-        await GameLogic.startRobot(this.game.id, key)
+    async startRobot(key, meta?: IRobotMeta) {
+        const actor: IActor = {token: Token.geneToken(`${this.game.id}${key}`), type: Actor.serverRobot}
+        EventIO.socketRobotConnect<IRobotMeta>(`ROBOT_${Math.random().toString(36).substr(2)}`, actor, this.game, meta)
     }
 
     //region pushEvent
