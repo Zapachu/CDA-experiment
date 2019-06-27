@@ -104,7 +104,6 @@ export interface IGameSetting {
     staticPath: string
     logPath?: string
     port?: number
-    rpcPort?: number
 }
 
 export interface ISocketHandshakeQuery {
