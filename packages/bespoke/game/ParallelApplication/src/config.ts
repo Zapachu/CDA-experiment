@@ -4,7 +4,8 @@ export enum MoveType {
   join = "join",
   shout = "shout",
   result = "result",
-  back = "back"
+  back = "back",
+  checkVersion = "checkVersion"
 }
 
 export enum PushType {
