@@ -7,16 +7,12 @@ import {Robot} from './Robot'
 import {CreateGame} from 'elf-protocol'
 import {RobotServer} from 'bespoke-robot'
 
-const egretRouter = Express.Router()
+const router = Express.Router()
     .use('/egret/bin-debug', Express.static(resolve(__dirname, '../egret/bin-debug')))
     .use('/egret', Express.static(resolve(__dirname, '../egret'), {maxAge: '10d'}))
     .use('/egret/*', (req, res: Express.Response) => res.redirect(`/${config.rootName}/${namespace}/egret`))
 
-Server.start(
-    {namespace, staticPath: resolve(__dirname, '../dist')},
-    {Controller},
-    egretRouter
-)
+Server.start(namespace, Controller, resolve(__dirname, '../dist'), router)
 
 RobotServer.start(namespace, Robot)
 

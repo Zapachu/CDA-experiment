@@ -7,13 +7,7 @@ import { namespace, ICreateParams } from "./config";
 import {Phase, phaseToNamespace} from "bespoke-game-stock-trading-config";
 import {CreateGame} from 'elf-protocol'
 
-Server.start(
-  {
-    namespace,
-    staticPath: resolve(__dirname, "../dist")
-  },
-  { Controller }
-);
+Server.start(namespace, Controller,resolve(__dirname, "../dist"));
 
 RobotServer.start(namespace, Robot)
 

@@ -99,9 +99,7 @@ export interface IEventHandler {
     (connection: IConnection, ...args: any[]): void
 }
 
-export interface IGameSetting {
-    namespace: string
-    staticPath: string
+export interface IStartOption {
     logPath?: string
     port?: number
     syncStrategy?: SyncStrategy

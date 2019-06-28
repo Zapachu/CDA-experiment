@@ -1,5 +1,5 @@
 import {resolve} from 'path'
-import {Server,Model, BaseLogic} from 'bespoke-server'
+import {BaseLogic, Model, Server} from 'bespoke-server'
 import Controller from './Controller'
 import {FetchRoute, IResult, namespace, SheetType, SURVEY_BASIC, SURVEY_FEEDBACK, SURVEY_TEST} from './config'
 import {Router} from 'express'
@@ -7,7 +7,7 @@ import nodeXlsx from 'node-xlsx'
 
 const router = Router()
     .get(FetchRoute.exportXls, async (req, res) => {
-        const {params:{gameId}, query: {sheetType}} = req
+        const {params: {gameId}, query: {sheetType}} = req
         const {game} = await BaseLogic.getLogic(gameId)
         if (req.user.id !== game.owner) {
             return res.end('Invalid Request')
@@ -47,7 +47,4 @@ const router = Router()
         return res.end(buffer, 'binary')
     })
 
-Server.start({
-    namespace,
-    staticPath: resolve(__dirname, '../dist')
-}, {Controller}, router)
+Server.start(namespace, Controller, resolve(__dirname, '../dist'), router)
