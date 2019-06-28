@@ -136,6 +136,59 @@ html
                 width: 100%;
                 animation: matchLoading 1s infinite;
             }
+            .continueGameModal {
+                display: none;
+            }
+            .continueGameModal .main{
+                background-color: white;
+            }
+            .continueGameModal .content {
+                padding: 1rem;
+            }
+            .continueGameModal .headerBox {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                line-height: 4rem;
+                padding: 0 1.4rem;
+                border-bottom: 1px solid rgba(155, 155, 155, 0.5);
+            }
+
+            .continueGameModal .headerBox .title {
+                font-size: 24px;
+            }
+
+            .continueGameModal .headerBox .close {
+                font-size: 28px;
+                cursor: pointer;
+                color: #676B6F;
+            }
+
+            .continueGameModal .headerBox .close:hover {
+                color: black;
+            }
+
+            .continueGameModal .continueBtn {
+                border: 1px solid #3482e9;
+                background-color: #3482e9;
+                color: white;
+            }
+            .continueGameModal .continueBtn:hover {
+                border: 1px solid #5892de;
+                background-color: #5892de;
+            }
+            .continueGameModal .restartBtn {
+                border: 1px solid #3482e9;
+                color: #3482e9;
+            }
+            .continueGameModal .btns .btnBase + .btnBase {
+                margin-left: 1rem;
+            }
+            .continueGameModal .btns {
+                text-align: right;
+                padding-right: 1rem;
+                padding-bottom: 1rem;
+            }
             @media screen and (max-width: 666px) {
                 .match {
                     width: 90%;
@@ -179,6 +232,15 @@ html
                 div.matchLoading
                     img(src=`${rootname}/static/loading_icon.png`)
                     span.label="匹配中"
+        div.continueGameModal
+            div.main
+                .headerBox
+                    h3(class="title") 提醒
+                    span.close ×
+                div.content 检测到已有实验进行中，是否继续?
+                div.btns
+                    div(class="btnBase continueBtn") 继续
+                    div(class="btnBase restartBtn") 重新开始
         script(type="text/javascript" src="https://qiniu1.anlint.com/js/jquery.min.js")
         script(type="text/javascript" src=`${rootname}/static/js/socket.io.js`)
         script
@@ -203,6 +265,9 @@ html
             var game = JSON.parse(gameObjStr)
             var rootname = '!{rootname}'
             var namespace = '!{namespace}'
+            var continueGameBox = Modal('.continueGameModal', {maskCloseable: true})
+            $('.continueGameModal .close').click(continueGameBox.close)
+
             function connectInit () {
                 connection = io('/', {
                     path: rootname + '/socket'
@@ -227,10 +292,21 @@ html
                     }, 1500)
                 })
                 connection.on(clientSocketListenEvnets.continueGame, ({ playerUrl }) => {
-                    message.warn('检测到已有实验进行中')
-                    setTimeout(function () {
-                        location = playerUrl
-                    }, 1500)
+                    continueGameBox.open()
+                    function restart () {
+                         connection.emit(serverSocketListenEvents.reqStartGame, {
+                            isGroupMode: true, 
+                            gamePhase: game.type,
+                            isForce: true
+                        })
+                    }
+                    function handleContinue () {
+                        setTimeout(function () {
+                            location = playerUrl
+                        }, 1500)
+                    }
+                    $('.continueGameModal .btns .restartBtn').click(restart)
+                    $('.continueGameModal .btns .continueBtn').click(handleContinue)
                 })
                 connection.on(clientSocketListenEvnets.handleError, (data) => {
                     const { eventType, msg } = data
