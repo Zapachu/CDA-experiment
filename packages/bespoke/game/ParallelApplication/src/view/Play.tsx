@@ -108,7 +108,7 @@ export class Play extends Core.Play<
       return "录取结果出来啦";
     }
     if (playerState.schools !== undefined) {
-      return "已投档，等待其他考生";
+      return "投档中, 请等待...";
     }
     if (playerState.score !== undefined) {
       if (!Array.isArray(schools)) {
@@ -326,7 +326,7 @@ export class Play extends Core.Play<
   _renderApplyModal = () => {
     return (
       <div className={style.applyModal}>
-        <p>已投档，等待其他考生...</p>
+        <p>投档中, 请等待......</p>
       </div>
     );
   };
