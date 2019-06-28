@@ -64,7 +64,7 @@ export const InitWork = (app) => {
                 const body = JSON.parse(jsonString)
                 for (let ph of phase.playHash) {
                     if (ph.player === gameServicePlayerHash) {
-                        ph.screen = JSON.stringify({winW: body.winW, winH: body.winH})
+                        ph.screen = JSON.stringify({winW: body.winW, winH: body.winH, ratio: body.ratio})
                         ph.referer = req.headers.referer
                         ph.userAgent = req.headers['user-agent']
                         ph.ipAddress = req.headers['x-forwarded-for'] as string || req.connection.remoteAddress
@@ -167,8 +167,8 @@ export const InitWork = (app) => {
             const screens = (await ThirdPartPhase.findById(phaseId)).playHash
                 .filter(({screen}) => screen)
                 .map(({hash, screen, ipAddress, userAgent, userSystem, userSystemVersion}) => {
-                    const {winW, winH} = JSON.parse(screen)
-                    return {hash, winW, winH, ipAddress, userAgent, userSystem, userSystemVersion}
+                    const {winW, winH, ratio} = JSON.parse(screen)
+                    return {hash, winW, winH, ratio, ipAddress, userAgent, userSystem, userSystemVersion}
                 })
             return okRes().render('previewScreenXlsx', {
                 phaseId,
@@ -177,13 +177,13 @@ export const InitWork = (app) => {
         }
         if (req.url.includes(downloadScreenXlsxRoute)) {
             const [, , phaseId] = req.url.split('/')
-            const data = (await ThirdPartPhase.findById(phaseId)).playHash
+            const data = [['Player', 'ScreenWidth(px)', 'ScreenHeight(px)', 'ScreenRatio', 'IP Address', 'User Agent', 'User System', 'User System Version']]
+            ;(await ThirdPartPhase.findById(phaseId)).playHash
                 .filter(({screen}) => screen)
-                .map(({hash, screen, ipAddress, userAgent, userSystem, userSystemVersion}) => {
-                    const {winW, winH} = JSON.parse(screen)
-                    return [hash, winW, winH, ipAddress, userAgent, userSystem, userSystemVersion]
+                .forEach(({hash, screen, ipAddress, userAgent, userSystem, userSystemVersion}) => {
+                    const {winW, winH, ratio} = JSON.parse(screen)
+                    data.push([hash, winW, winH, ratio, ipAddress, userAgent, userSystem, userSystemVersion])
                 })
-            data.unshift(['Player', 'ScreenWidth(px)', 'ScreenHeight(px)', 'IP Address', 'User Agent', 'User System', 'User System Version'])
             const name = 'ScreenSize'
             let buffer = nodeXlsx.build([{name, data}], {})
             res.setHeader('Content-Type', 'application/vnd.openxmlformats')
