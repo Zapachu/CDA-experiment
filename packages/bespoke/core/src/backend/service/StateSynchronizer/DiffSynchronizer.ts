@@ -10,9 +10,9 @@ export class DiffGameStateSynchronizer<ICreateParams, IGameState, IPlayerState, 
     async syncClientState(wholeState?: boolean) {
         const state = await this.getState(true)
         if (wholeState) {
-            EventIO.emitEvent(this.controller.game.id, baseEnum.SocketEvent.syncGameState_json, cloneDeep(state))
+            EventIO.emitEvent(this.logic.game.id, baseEnum.SocketEvent.syncGameState_json, cloneDeep(state))
         } else {
-            EventIO.emitEvent(this.controller.game.id, baseEnum.SocketEvent.changeGameState_diff, diff(this.stateSnapshot || {}, state))
+            EventIO.emitEvent(this.logic.game.id, baseEnum.SocketEvent.changeGameState_diff, diff(this.stateSnapshot || {}, state))
         }
         this.stateSnapshot = cloneDeep(state)
     }

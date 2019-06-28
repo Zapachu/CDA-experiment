@@ -1,4 +1,4 @@
-import { BaseRobot} from "bespoke-server";
+import { BaseRobot} from "bespoke-robot";
 import {
   MoveType,
   PushType,
@@ -23,17 +23,7 @@ export default class extends BaseRobot<
   IMoveParams,
   IPushParams
 > {
-  async init(): Promise<
-    BaseRobot<
-      ICreateParams,
-      IGameState,
-      IPlayerState,
-      MoveType,
-      PushType,
-      IMoveParams,
-      IPushParams
-    >
-  > {
+  async init(): Promise<this> {
     await super.init()
     this.frameEmitter.on(PushType.robotShout, ({ min, max, startingPrice }) => {
       const { price, bidNum } = this.genPriceAndNum(min, max, startingPrice);

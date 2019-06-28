@@ -1,8 +1,7 @@
-import {EventIO, gameId2PlayUrl, Log, RobotConnection, Token} from '../util'
+import {EventIO, gameId2PlayUrl, Token} from '../util'
 import {
     Actor,
     CoreMove,
-    FrameEmitter,
     GameStatus,
     IActor,
     IConnection,
@@ -13,61 +12,32 @@ import {
     TGameState,
     TPlayerState
 } from 'bespoke-core-share'
+import {Log} from 'bespoke-server-util'
 import {GameDAO} from './GameDAO'
 import {StateManager} from './StateManager'
 import {MoveQueue} from './MoveQueue'
 import {RedisCall, SendBackPlayer, SetPhaseResult} from 'elf-protocol'
-import {decode} from 'msgpack-lite'
-import {applyChange, Diff} from 'deep-diff'
-import cloneDeep = require('lodash/cloneDeep')
 
-type AnyController = BaseController<any, any, any, any, any, any, any>
-type AnyRobot = BaseRobot<any, any, any, any, any, any, any>
+export type AnyLogic = BaseLogic<any, any, any, any, any, any, any>
 
-export interface ILogicTemplate {
-    Controller: new(...args) => AnyController,
-    Robot?: new(...args) => AnyRobot
-    sncStrategy?: SyncStrategy
-}
+export class BaseLogic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IRobotMeta = {}> {
+    private static sncStrategy: SyncStrategy
+    private static Controller: new(...args) => AnyLogic
+    private static controllers = new Map<string, AnyLogic>()
 
-export namespace GameLogic {
-    let template: ILogicTemplate
-    export let sncStrategy: SyncStrategy
-
-    export let namespaceController: AnyController
-
-    export function init(logicTemplate: ILogicTemplate) {
-        template = logicTemplate
-        sncStrategy = logicTemplate.sncStrategy || SyncStrategy.default
-        namespaceController = new template.Controller()
+    static init(Controller: new(...args) => AnyLogic, sncStrategy: SyncStrategy = SyncStrategy.default) {
+        this.Controller = Controller
+        this.sncStrategy = sncStrategy
     }
 
-    const controllers = new Map<string, AnyController>()
-
-    export async function getGameController(gameId: string): Promise<AnyController> {
-        if (!controllers.get(gameId)) {
+    static async getLogic(gameId: string): Promise<AnyLogic> {
+        if (!this.controllers.get(gameId)) {
             const game = await GameDAO.getGame(gameId)
-            controllers.set(gameId, await new template.Controller(game).init())
+            this.controllers.set(gameId, await new this.Controller(game).init())
         }
-        return controllers.get(gameId)
+        return this.controllers.get(gameId)
     }
 
-    const robots = new Map<string, AnyRobot>()
-
-    export async function startRobot<ICreateParams, IGameState, IPlayerState>(gameId: string, key: string): Promise<void> {
-        const actor: IActor = {
-            token: Token.geneToken(`${gameId}${key}`),
-            type: Actor.serverRobot
-        }
-        if (robots.has(actor.token)) {
-            return
-        }
-        const game = await GameDAO.getGame<ICreateParams>(gameId)
-        robots.set(actor.token, await new template.Robot(game, actor).init())
-    }
-}
-
-export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     private moveQueue: MoveQueue<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>
     public connections = new Map<string, IConnection>()
     stateManager: StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>
@@ -76,7 +46,7 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
     }
 
     async init() {
-        this.stateManager = new StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>(GameLogic.sncStrategy, this)
+        this.stateManager = new StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>(BaseLogic.sncStrategy, this)
         this.moveQueue = new MoveQueue(this.game, this.stateManager)
         return this
     }
@@ -134,8 +104,9 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
         Log.i(actor.token, type, params, cb)
     }
 
-    async startRobot(key) {
-        await GameLogic.startRobot(this.game.id, key)
+    async startRobot(key, meta?: IRobotMeta) {
+        const actor: IActor = {token: Token.geneToken(`${this.game.id}${key}`), type: Actor.serverRobot}
+        EventIO.socketRobotConnect<IRobotMeta>(`ROBOT_${Math.random().toString(36).substr(2)}`, actor, this.game, meta)
     }
 
     //region pushEvent
@@ -186,49 +157,4 @@ export class BaseController<ICreateParams, IGameState, IPlayerState, MoveType, P
     }
 
     //endregion
-}
-
-export class BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
-    private readonly connection: RobotConnection
-    private preGameState?: TGameState<IGameState> = null
-    private prePlayerState?: TPlayerState<IPlayerState> = null
-    frameEmitter: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
-    gameState?: TGameState<IGameState> = null
-    playerState?: TPlayerState<IPlayerState> = null
-
-    constructor(public game: IGameWithId<ICreateParams>, public actor: IActor) {
-        this.connection = EventIO.robotConnect(`ROBOT_${Math.random().toString(36).substr(2)}`, this.actor, this.game)
-            .on(SocketEvent.syncGameState_json, (gameState: TGameState<IGameState>) => {
-                this.preGameState = cloneDeep(this.gameState)
-                this.gameState = cloneDeep(gameState)
-            })
-            .on(SocketEvent.syncGameState_msgpack, (gameStateBuffer: Array<number>) => {
-                this.preGameState = cloneDeep(this.gameState)
-                this.gameState = cloneDeep(decode(gameStateBuffer))
-            })
-            .on(SocketEvent.changeGameState_diff, (stateChanges: Array<Diff<IGameState>>) => {
-                Log.d(this.preGameState)
-                this.preGameState = cloneDeep(this.gameState)
-                stateChanges.forEach(change => applyChange(this.gameState, null, change))
-            })
-            .on(SocketEvent.syncPlayerState_json, (playerState: TPlayerState<IPlayerState>) => {
-                this.prePlayerState = cloneDeep(this.playerState)
-                this.playerState = cloneDeep(playerState)
-            })
-            .on(SocketEvent.syncPlayerState_msgpack, (playerStateBuffer: Array<number>) => {
-                this.prePlayerState = cloneDeep(this.playerState)
-                this.playerState = cloneDeep(decode(playerStateBuffer))
-            })
-            .on(SocketEvent.changePlayerState_diff, (stateChanges: Array<Diff<IPlayerState>>) => {
-                Log.d(this.prePlayerState)
-                this.prePlayerState = cloneDeep(this.playerState)
-                stateChanges.forEach(change => applyChange(this.playerState, null, change))
-            })
-        this.frameEmitter = new FrameEmitter<any, any, any, any>(this.connection)
-    }
-
-    async init(): Promise<BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>> {
-        this.connection.emit(SocketEvent.online)
-        return this
-    }
 }

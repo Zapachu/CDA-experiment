@@ -1,7 +1,6 @@
 import * as React from 'react'
 import {baseEnum, config, FrameEmitter, IActor, IGameWithId, TGameState, TPlayerState, TSocket} from 'bespoke-core-share'
 import * as style from './style.scss'
-import {decode} from 'msgpack-lite'
 import {Lang, MaskLoading, TPageProps} from 'elf-component'
 import {Api} from '../util'
 import {connect} from 'socket.io-client'
@@ -79,11 +78,6 @@ export class Play extends React.Component<TPageProps, IPlayState> {
                 }
             }) : this.setState({playerState})
         })
-        socketClient.on(baseEnum.SocketEvent.syncGameState_msgpack, (gameStateBuffer: Array<number>) => {
-            this.setState({gameState: decode(gameStateBuffer)})
-        })
-        socketClient.on(baseEnum.SocketEvent.syncPlayerState_msgpack,
-            (playerStateBuffer: Array<number>, token?: string) => this.applyPlayerState(decode(playerStateBuffer), token))
         socketClient.on(baseEnum.SocketEvent.sendBack, (sendBackUrl: string) => {
             setTimeout(() => {
                 location.href = sendBackUrl

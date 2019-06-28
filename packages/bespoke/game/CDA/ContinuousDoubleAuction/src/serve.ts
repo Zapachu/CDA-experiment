@@ -1,5 +1,5 @@
 import {resolve} from 'path'
-import {Server, Model, GameLogic} from 'bespoke-server'
+import {Server, Model, BaseLogic} from 'bespoke-server'
 import Controller from './Controller'
 import Robot from './Robot'
 import {
@@ -15,11 +15,12 @@ import {
 import {Router} from 'express'
 import {getEnumKeys} from './util'
 import nodeXlsx from 'node-xlsx'
+import {RobotServer} from 'bespoke-robot'
 
 const router = Router()
     .get(FetchRoute.exportXls, async (req, res) => {
         const {params: {gameId}, query: {sheetType}} = req
-        const {game, stateManager} = await GameLogic.getGameController(gameId)
+        const {game, stateManager} = await BaseLogic.getLogic(gameId)
         if (req.user.id !== game.owner) {
             return res.end('Invalid Request')
         }
@@ -74,7 +75,6 @@ const router = Router()
         return res.end(buffer, 'binary')
     })
 
-Server.start({
-    namespace,
-    staticPath: resolve(__dirname, '../dist'),
-}, {Controller, Robot}, router)
+Server.start(namespace, Controller, resolve(__dirname, '../dist'), router)
+
+RobotServer.start(namespace, Robot)

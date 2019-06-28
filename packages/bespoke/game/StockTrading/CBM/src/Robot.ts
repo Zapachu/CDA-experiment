@@ -1,4 +1,5 @@
-import {baseEnum, BaseRobot} from 'bespoke-server'
+import {baseEnum} from 'bespoke-server'
+import {BaseRobot} from 'bespoke-robot'
 import {
     ICreateParams,
     Identity,
@@ -16,7 +17,7 @@ import {
 export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     sleepLoop: NodeJS.Timer
 
-    async init(): Promise<BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>> {
+    async init(): Promise<this> {
         await super.init()
         setTimeout(() => this.frameEmitter.emit(MoveType.getIndex), 1000)
         this.frameEmitter.on(PushType.beginTrading, () => {

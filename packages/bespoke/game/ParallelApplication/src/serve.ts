@@ -4,14 +4,11 @@ import Controller from './Controller'
 import Robot from './Robot'
 import {ICreateParams, namespace} from './config'
 import {CreateGame} from 'elf-protocol'
+import {RobotServer} from 'bespoke-robot'
 
-Server.start(
-  {
-    namespace,
-    staticPath: resolve(__dirname, "../dist")
-  },
-  { Controller, Robot }
-);
+Server.start(namespace, Controller, resolve(__dirname, '../dist'))
+
+RobotServer.start(namespace, Robot)
 
 RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(
   CreateGame.name(namespace),

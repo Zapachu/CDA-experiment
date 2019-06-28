@@ -13,17 +13,18 @@ import * as bodyParser from 'body-parser'
 import * as compression from 'compression'
 import * as morgan from 'morgan'
 import {elfSetting} from 'elf-setting'
-import {gameId2PlayUrl, getOrigin, heartBeat, Log, QCloudSMS, RedisKey, Setting} from './util'
+import {gameId2PlayUrl, getOrigin, heartBeat, QCloudSMS, RedisKey, Setting} from './util'
 import {PassportStrategy} from './interface'
-import {baseEnum, config, IGameConfig, IGameSetting} from 'bespoke-core-share'
+import {baseEnum, config, IGameConfig, IStartOption} from 'bespoke-core-share'
 import {EventDispatcher} from './controller/eventDispatcher'
 import {router} from './controller/requestRouter'
-import {GameDAO, GameLogic, ILogicTemplate} from './service'
+import {AnyLogic, BaseLogic, GameDAO} from './service'
 import {AddressInfo} from 'net'
 import {GameModel, UserDoc, UserModel} from './model'
 import {Strategy} from 'passport-local'
 import * as http from 'http'
 import {NewPhase, PhaseReg, RedisCall, redisClient} from 'elf-protocol'
+import {Log} from 'bespoke-server-util'
 
 export class Server {
     private static sessionMiddleware
@@ -127,7 +128,7 @@ export class Server {
             })
     }
 
-    static withLinker() {
+    private static withLinker() {
         RedisCall.handle<NewPhase.IReq, NewPhase.IRes>(NewPhase.name(Setting.namespace), async ({elfGameId, owner, namespace, param}) => {
             const {id} = await GameModel.create({
                 title: '',
@@ -147,13 +148,13 @@ export class Server {
         heartBeat(PhaseReg.key(Setting.namespace), JSON.stringify(regInfo))
     }
 
-    static start(gameSetting: IGameSetting, logicTemplate: ILogicTemplate, bespokeRouter: Express.Router = Express.Router()) {
-        Setting.init(gameSetting)
+    static start(namespace: string, Logic: new(...args) => AnyLogic, staticPath: string, bespokeRouter: Express.Router = Express.Router(), startOption: IStartOption = {}) {
+        Setting.init(namespace, staticPath, startOption)
         this.initSessionMiddleware()
         this.initMongo()
         this.initPassPort()
         QCloudSMS.init()
-        GameLogic.init(logicTemplate)
+        BaseLogic.init(Logic, startOption.syncStrategy)
         const express = this.initExpress(bespokeRouter),
             server = express.listen(Setting.port)
         EventDispatcher.startGameSocket(server).use(socketIOSession(this.sessionMiddleware))

@@ -17,9 +17,13 @@ export enum SocketEvent {
     syncPlayerState_json = 'SPJ',
     changeGameState_diff = 'CGD',
     changePlayerState_diff = 'CPD',
-    syncGameState_msgpack = 'SGM',
-    syncPlayerState_msgpack = 'SPM',
     //endregion
+}
+
+export enum UnixSocketEvent {
+    daemonConnection = 'daemonConnection',
+    newRobot = 'newRobot',
+    callback = 'callback'
 }
 
 export enum CoreMove {
@@ -271,6 +275,5 @@ export enum NationCode {
 
 export enum SyncStrategy {
     default,
-    msgPack,
     diff
 }

@@ -1,5 +1,5 @@
 {
-  "name": "bespoke-core-share",
+  "name": "bespoke-server-util",
   "version": "1.0.0",
   "main": "build/index",
   "types": "build/index",
@@ -8,6 +8,7 @@
     "tsc-w": "tsc -w"
   },
   "devDependencies": {
+    "bespoke-core-share": "^1.0.0",
     "typescript": "^3.3.3333",
     "elf-setting": "^1.0.0"
   }

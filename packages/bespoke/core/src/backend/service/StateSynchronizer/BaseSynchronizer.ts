@@ -1,6 +1,6 @@
 import {baseEnum, IActor, TGameState, TPlayerState} from 'bespoke-core-share'
 import {GameDAO} from '../GameDAO'
-import {BaseController} from '../GameLogic'
+import {BaseLogic} from '../BaseLogic'
 import {EventIO} from '../../util'
 import isEqual = require('lodash/isEqual')
 import cloneDeep = require('lodash/cloneDeep')
@@ -9,15 +9,15 @@ export class GameStateSynchronizer<ICreateParams, IGameState, IPlayerState, Move
     private _state: TGameState<IGameState>
     private _stateSnapshot: TGameState<IGameState>
 
-    constructor(protected controller: BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {
+    constructor(protected logic: BaseLogic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {
     }
 
     async getState(forClient: boolean): Promise<TGameState<IGameState>> {
         if (!this._state) {
-            this._state = await GameDAO.queryGameState<IGameState>(this.controller.game.id) || this.controller.initGameState()
+            this._state = await GameDAO.queryGameState<IGameState>(this.logic.game.id) || this.logic.initGameState()
         }
         if (forClient) {
-            return this.controller.filterGameState(this._state)
+            return this.logic.filterGameState(this._state)
         } else {
             return this._state
         }
@@ -34,12 +34,12 @@ export class GameStateSynchronizer<ICreateParams, IGameState, IPlayerState, Move
             await this.syncClientState(wholeState)
         }
         this._stateSnapshot = cloneDeep(state)
-        GameDAO.saveGameState(this.controller.game.id, await this.getState(false))
+        GameDAO.saveGameState(this.logic.game.id, await this.getState(false))
     }
 
     async syncClientState(wholeState?: boolean) {
         const state = await this.getState(true)
-        EventIO.emitEvent(this.controller.game.id, baseEnum.SocketEvent.syncGameState_json, state)
+        EventIO.emitEvent(this.logic.game.id, baseEnum.SocketEvent.syncGameState_json, state)
     }
 }
 
@@ -47,7 +47,7 @@ export class PlayerStateSynchronizer<ICreateParams, IGameState, IPlayerState, Mo
     private _state: TPlayerState<IPlayerState>
     private _stateSnapshot: TPlayerState<IPlayerState>
 
-    constructor(public actor: IActor, protected controller: BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {
+    constructor(public actor: IActor, protected controller: BaseLogic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {
     }
 
     async getState(): Promise<TPlayerState<IPlayerState>> {

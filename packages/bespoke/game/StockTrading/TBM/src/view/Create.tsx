@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {ICreateParams} from '../interface'
+import {ICreateParams} from '../config'
 import {Button, Core, Label, RangeInput, Input} from 'elf-component'
 interface ICreateState {
     buyerPriceStart: number
@@ -77,8 +77,8 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
 
     done = () => {
         const {setParams, setSubmitable} = this.props
-        const {groupSize, waitingSeconds, positions, InitMoney} = this.state
-        setParams({groupSize, waitingSeconds, positions, InitMoney})
+        const {groupSize} = this.state
+        setParams({groupSize})
         this.setState({readonly: true})
         setSubmitable(true)
     }

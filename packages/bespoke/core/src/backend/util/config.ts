@@ -1,5 +1,4 @@
-enum LogLevel {log, trace, debug, info, warn, error, fatal}
-
+import {LogLevel} from 'bespoke-server-util'
 export const CONFIG = {
     shareCodeLifeTime: 3 * 24 * 60 * 60,
     memoryCacheLifetime: 3 * 60 * 1000,
