@@ -35,7 +35,7 @@ export class BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushTy
     }
 
     async init(): Promise<this> {
-        Log.i('RobotInit', this.actor, this.meta)
+        Log.i('RobotInit', this.actor.token, this.meta)
         return this
     }
 }

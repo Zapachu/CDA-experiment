@@ -1,7 +1,7 @@
 import {baseEnum, IActor, TGameState, TPlayerState} from 'bespoke-core-share'
 import {GameDAO} from '../GameDAO'
 import {BaseLogic} from '../BaseLogic'
-import {EventIO} from '../../util'
+import {EventIO} from '../EventIO'
 import isEqual = require('lodash/isEqual')
 import cloneDeep = require('lodash/cloneDeep')
 
