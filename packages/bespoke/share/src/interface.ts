@@ -1,4 +1,4 @@
-import {AcademusRole, Actor, GameStatus} from './enum'
+import {AcademusRole, Actor, GameStatus, SyncStrategy} from './enum'
 import {EventEmitter} from 'events'
 import {Socket} from 'socket.io-client'
 import {Diff} from 'deep-diff'
@@ -104,6 +104,7 @@ export interface IGameSetting {
     staticPath: string
     logPath?: string
     port?: number
+    syncStrategy?: SyncStrategy
 }
 
 export interface IRobotHandshake {
