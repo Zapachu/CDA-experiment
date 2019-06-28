@@ -131,6 +131,9 @@
     > li {
       flex-basis: 45%;
       margin: 0 5px 20px 5px;
+      &:active {
+        transform: scale(1.1);
+      }
     }
   }
   .ruleModal {

@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as style from "./style.scss";
 import { Core, Toast } from "elf-component";
+import { useSpring, animated } from "react-spring";
 import {
   MoveType,
   PushType,
@@ -55,6 +56,7 @@ export class Play extends Core.Play<
   };
 
   componentDidMount(): void {
+    document.body.addEventListener("touchstart", function() {});
     this.checkVersion();
     const img = new Image();
     img.src = SCORING;
@@ -73,7 +75,7 @@ export class Play extends Core.Play<
 
   join = () => {
     const { frameEmitter } = this.props;
-    setTimeout(() => frameEmitter.emit(MoveType.join), 4000);
+    setTimeout(() => frameEmitter.emit(MoveType.join), 5000);
   };
 
   apply = (schools: Array<SCHOOL>) => {
@@ -193,26 +195,9 @@ export class Play extends Core.Play<
   };
 
   _renderReady2Choose = (score: number, scores: Array<number>) => {
-    const subjects = ["语文", "数学", "英语", "综合"];
     return (
       <>
-        <div className={style.scoreBoard}>
-          <p className={style.title}>
-            总分: &nbsp;<span className={style.redFont}>{score}</span>
-          </p>
-          <p className={style.name}>姓名: xxx</p>
-          <p className={style.name}>考号: xxx</p>
-          <ul className={style.table}>
-            {subjects.map((subject, index) => {
-              return (
-                <li key={subject}>
-                  <p className={style.subject}>{subject}</p>
-                  <p className={style.score}>{scores[index]}</p>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+        <Ready2Choose score={score} scores={scores} />
         <img className={style.arrow} src={ARROW} />
         <Button
           label="开始填报"
@@ -240,16 +225,15 @@ export class Play extends Core.Play<
             );
           })}
         </ul>
-        {curSchool ? (
-          <Button
-            label={"确定"}
-            onClick={() => {
-              if (curSchool) {
-                this.choose(curSchool, index);
-              }
-            }}
-          />
-        ) : null}
+        <Button
+          label={"确定"}
+          disabled={!curSchool}
+          onClick={() => {
+            if (curSchool) {
+              this.choose(curSchool, index);
+            }
+          }}
+        />
       </>
     );
   };
@@ -388,3 +372,34 @@ export class Play extends Core.Play<
     );
   }
 }
+
+const Ready2Choose: React.SFC<{ score: number; scores: Array<number> }> = ({
+  score,
+  scores
+}) => {
+  const subjects = ["语文", "数学", "英语", "综合"];
+  const props = useSpring({
+    config: { duration: 1000 },
+    opacity: 1,
+    from: { opacity: 0 }
+  });
+  return (
+    <animated.div className={style.scoreBoard} style={props}>
+      <p className={style.title}>
+        总分: &nbsp;<span className={style.redFont}>{score}</span>
+      </p>
+      <p className={style.name}>姓名: xxx</p>
+      <p className={style.name}>考号: xxx</p>
+      <ul className={style.table}>
+        {subjects.map((subject, index) => {
+          return (
+            <li key={subject}>
+              <p className={style.subject}>{subject}</p>
+              <p className={style.score}>{scores[index]}</p>
+            </li>
+          );
+        })}
+      </ul>
+    </animated.div>
+  );
+};
