@@ -191,8 +191,14 @@ const roomManager = new RoomManager(sockerManager);
 
 RedisCall.handle<GameOver.IReq, GameOver.IRes>(GameOver.name, async ({playUrl, onceMore, namespace:phase}) => {
     console.log(`redis handle phase: ${phase} done`, playUrl, onceMore)
-    const uid = await redisTools.getPlayerUrlRecord(playUrl)
     let lobbyUrl = settings.lobbyUrl
+    const uid = await redisTools.getPlayerUrlRecord(playUrl)
+    const userGameData = await redisTools.getUserGameData(uid, phase)
+    const isValid = userGameData.playerUrl === playUrl
+    if (!isValid) {
+        return {lobbyUrl}
+    }
+    
     await redisTools.setUserGameData(uid, phase, {
         status: UserGameStatus.notStarted
     })
@@ -271,7 +277,7 @@ export function handleSocketInit(ioServer: Socket.Server) {
         if (socket.request.user.logged_in) {
             sockerManager.pushUserSocket(user._id, socket.id)
         }
-        socket.on(serverSocketListenEvents.reqStartGame, async function (msg: {isGroupMode: boolean, gamePhase: Phase}) {
+        socket.on(serverSocketListenEvents.reqStartGame, async function (msg: {isGroupMode: boolean, gamePhase: Phase, isForce: boolean}) {
             try {
                 console.log('req Start msg: ');
                 console.log(msg)
@@ -281,10 +287,10 @@ export function handleSocketInit(ioServer: Socket.Server) {
                 console.log(socket.request.isAuthenticated, socket.request.isAuthenticated())
                 console.log(`请求者uid:${socket.request.user._id}`)
                 const uid = socket.request.user._id
-                const {isGroupMode, gamePhase} = msg
+                const {isGroupMode, gamePhase, isForce} = msg
                 const userGameData = await redisTools.getUserGameData(uid, gamePhase)
                 console.log(userGameData, 'gameData', msg)
-                if (userGameData && userGameData.status === UserGameStatus.started) {
+                if (userGameData && userGameData.status === UserGameStatus.started && !isForce) {
                     socket.emit(clientSocketListenEvnets.continueGame, {
                         playerUrl: userGameData.playerUrl
                     })
