@@ -35,21 +35,18 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var path = require("path");
-var fs = require("fs");
+var fs_1 = require("fs");
+var path_1 = require("path");
 var inquirer_1 = require("inquirer");
 var shelljs_1 = require("shelljs");
+inquirer_1.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
 var TaskHelper;
 (function (TaskHelper) {
     TaskHelper.projectName = 'RecentTask';
-    var logPath = path.resolve(__dirname, './help.log');
-    function getGroups() {
-        return fs.existsSync(logPath) ? [TaskHelper.projectName] : [];
-    }
-    TaskHelper.getGroups = getGroups;
+    var logPath = path_1.resolve(__dirname, './help.log');
     function getLogs() {
         try {
-            return fs.readFileSync(logPath).toString().split('\n').map(function (row) { return JSON.parse(row); });
+            return fs_1.readFileSync(logPath).toString().split('\n').map(function (row) { return JSON.parse(row); });
         }
         catch (e) {
             return [];
@@ -64,7 +61,7 @@ var TaskHelper;
             return;
         }
         logs.unshift(newLog);
-        fs.writeFileSync(logPath, logs.slice(0, 5).join('\n'));
+        fs_1.writeFileSync(logPath, logs.slice(0, 5).join('\n'));
     }
     function execTask(task) {
         appendLog(task);
@@ -91,18 +88,38 @@ var ServerTask;
     ServerTask["dist"] = "dist";
     ServerTask["serve"] = "serve";
 })(ServerTask || (ServerTask = {}));
+function getProjects(parentProject, projectSet) {
+    if (parentProject === void 0) { parentProject = '.'; }
+    if (projectSet === void 0) { projectSet = new Set(); }
+    fs_1.readdirSync(path_1.resolve(__dirname, "../" + parentProject + "/")).forEach(function (p) {
+        if (p[0] >= 'a') {
+            return;
+        }
+        var childProject = parentProject + "/" + p;
+        projectSet["delete"](parentProject);
+        projectSet.add(childProject);
+        getProjects(childProject, projectSet);
+    });
+    return Array.from(projectSet, function (p) { return p.slice(2); });
+}
 (function () {
     return __awaiter(this, void 0, void 0, function () {
-        var projectPath, project, taskLog, subProjects, subProject, side, _a, mode, HMR, task, _b, HMR, _c, withProxy, withLinker;
+        var projects, project, taskLog, side, _a, mode, HMR, task, _b, HMR, _c, withProxy, withLinker;
         return __generator(this, function (_d) {
             switch (_d.label) {
-                case 0: return [4 /*yield*/, inquirer_1.prompt([
-                        {
-                            name: 'project',
-                            type: 'list',
-                            choices: TaskHelper.getGroups().concat(fs.readdirSync(path.resolve(__dirname, '../')).filter(function (name) { return name[0] < 'a'; }))
-                        }
-                    ])];
+                case 0:
+                    projects = getProjects();
+                    return [4 /*yield*/, inquirer_1.prompt([
+                            {
+                                name: 'project',
+                                type: 'autocomplete',
+                                message: 'Project:',
+                                source: function (_, input) {
+                                    if (input === void 0) { input = ''; }
+                                    return Promise.resolve(projects.filter(function (p) { return input.toLowerCase().split(' ').every(function (s) { return p.toLowerCase().includes(s); }); }).concat(TaskHelper.projectName));
+                                }
+                            }
+                        ])];
                 case 1:
                     project = (_d.sent()).project;
                     if (!(project === TaskHelper.projectName)) return [3 /*break*/, 3];
@@ -118,23 +135,7 @@ var ServerTask;
                     taskLog = (_d.sent()).taskLog;
                     TaskHelper.execTask(JSON.parse(taskLog));
                     return [2 /*return*/];
-                case 3:
-                    subProjects = fs.readdirSync(path.resolve(__dirname, "../" + project + "/")).filter(function (name) { return name[0] < 'a'; });
-                    if (!!subProjects.length) return [3 /*break*/, 4];
-                    projectPath = project;
-                    return [3 /*break*/, 6];
-                case 4: return [4 /*yield*/, inquirer_1.prompt([
-                        {
-                            name: 'subProject',
-                            type: 'list',
-                            choices: subProjects
-                        }
-                    ])];
-                case 5:
-                    subProject = (_d.sent()).subProject;
-                    projectPath = project + "/" + subProject;
-                    _d.label = 6;
-                case 6: return [4 /*yield*/, inquirer_1.prompt([
+                case 3: return [4 /*yield*/, inquirer_1.prompt([
                         {
                             name: 'side',
                             type: 'list',
@@ -142,35 +143,33 @@ var ServerTask;
                             message: 'Side:'
                         }
                     ])];
-                case 7:
+                case 4:
                     side = (_d.sent()).side;
                     _a = side;
                     switch (_a) {
-                        case Side.client: return [3 /*break*/, 8];
-                        case Side.server: return [3 /*break*/, 12];
-                        case Side.both: return [3 /*break*/, 20];
+                        case Side.client: return [3 /*break*/, 5];
+                        case Side.server: return [3 /*break*/, 9];
+                        case Side.both: return [3 /*break*/, 17];
                     }
-                    return [3 /*break*/, 21];
-                case 8:
-                    shelljs_1.cd(path.resolve(__dirname, '..'));
-                    return [4 /*yield*/, inquirer_1.prompt([
-                            {
-                                name: 'mode',
-                                type: 'list',
-                                choices: [ClientTask.dev, ClientTask.dist, ClientTask.publish],
-                                message: 'Mode:'
-                            }
-                        ])];
-                case 9:
+                    return [3 /*break*/, 18];
+                case 5: return [4 /*yield*/, inquirer_1.prompt([
+                        {
+                            name: 'mode',
+                            type: 'list',
+                            choices: [ClientTask.dev, ClientTask.dist, ClientTask.publish],
+                            message: 'Mode:'
+                        }
+                    ])];
+                case 6:
                     mode = (_d.sent()).mode;
-                    if (!(mode === ClientTask.dev)) return [3 /*break*/, 11];
+                    if (!(mode === ClientTask.dev)) return [3 /*break*/, 8];
                     return [4 /*yield*/, inquirer_1.prompt([
                             {
                                 name: 'HMR',
                                 type: 'confirm'
                             }
                         ])];
-                case 10:
+                case 7:
                     HMR = (_d.sent()).HMR;
                     if (HMR) {
                         TaskHelper.execTask({
@@ -178,18 +177,18 @@ var ServerTask;
                                 BUILD_MODE: mode,
                                 HMR: HMR.toString()
                             },
-                            command: "webpack-dev-server --hot --progress --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + projectPath + "/script/webpack.config.ts"
+                            command: "webpack-dev-server --hot --progress --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + project + "/script/webpack.config.ts"
                         });
-                        return [3 /*break*/, 21];
+                        return [3 /*break*/, 18];
                     }
-                    _d.label = 11;
-                case 11:
+                    _d.label = 8;
+                case 8:
                     TaskHelper.execTask({
                         env: { BUILD_MODE: mode },
-                        command: "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + projectPath + "/script/webpack.config.ts"
+                        command: "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + project + "/script/webpack.config.ts"
                     });
-                    return [3 /*break*/, 21];
-                case 12: return [4 /*yield*/, inquirer_1.prompt([
+                    return [3 /*break*/, 18];
+                case 9: return [4 /*yield*/, inquirer_1.prompt([
                         {
                             name: 'task',
                             type: 'list',
@@ -197,39 +196,39 @@ var ServerTask;
                             message: 'Task:'
                         }
                     ])];
-                case 13:
+                case 10:
                     task = (_d.sent()).task;
                     _b = task;
                     switch (_b) {
-                        case ServerTask.dist: return [3 /*break*/, 14];
-                        case ServerTask.dev: return [3 /*break*/, 15];
-                        case ServerTask.serve: return [3 /*break*/, 17];
+                        case ServerTask.dist: return [3 /*break*/, 11];
+                        case ServerTask.dev: return [3 /*break*/, 12];
+                        case ServerTask.serve: return [3 /*break*/, 14];
                     }
-                    return [3 /*break*/, 19];
-                case 14:
+                    return [3 /*break*/, 16];
+                case 11:
                     {
                         TaskHelper.execTask({
-                            command: "tsc --outDir ./" + projectPath + "/build --listEmittedFiles true ./" + projectPath + "/src/serve.ts"
+                            command: "tsc --outDir ./" + project + "/build --listEmittedFiles true ./" + project + "/src/serve.ts"
                         });
-                        return [3 /*break*/, 19];
+                        return [3 /*break*/, 16];
                     }
-                    _d.label = 15;
-                case 15: return [4 /*yield*/, inquirer_1.prompt([
+                    _d.label = 12;
+                case 12: return [4 /*yield*/, inquirer_1.prompt([
                         {
                             name: 'HMR',
                             type: 'confirm'
                         }
                     ])];
-                case 16:
+                case 13:
                     HMR = (_d.sent()).HMR;
                     TaskHelper.execTask({
                         env: {
                             BESPOKE_HMR: HMR.toString()
                         },
-                        command: "ts-node ./" + projectPath + "/src/serve.ts"
+                        command: "ts-node ./" + project + "/src/serve.ts"
                     });
-                    return [3 /*break*/, 19];
-                case 17: return [4 /*yield*/, inquirer_1.prompt([
+                    return [3 /*break*/, 16];
+                case 14: return [4 /*yield*/, inquirer_1.prompt([
                         {
                             name: 'withProxy',
                             type: 'confirm'
@@ -239,7 +238,7 @@ var ServerTask;
                             type: 'confirm'
                         }
                     ])];
-                case 18:
+                case 15:
                     _c = _d.sent(), withProxy = _c.withProxy, withLinker = _c.withLinker;
                     TaskHelper.execTask({
                         env: {
@@ -247,22 +246,22 @@ var ServerTask;
                             BESPOKE_WITH_LINKER: withLinker,
                             NODE_ENV: 'production'
                         },
-                        command: "node ./" + projectPath + "/build/serve.js"
+                        command: "node ./" + project + "/build/serve.js"
                     });
-                    return [3 /*break*/, 19];
-                case 19: return [3 /*break*/, 21];
-                case 20:
+                    return [3 /*break*/, 16];
+                case 16: return [3 /*break*/, 18];
+                case 17:
                     {
                         TaskHelper.execTask({
                             env: { BUILD_MODE: ClientTask.dist },
-                            command: "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + projectPath + "/script/webpack.config.ts"
+                            command: "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + project + "/script/webpack.config.ts"
                         });
                         TaskHelper.execTask({
-                            command: "tsc --outDir ./" + projectPath + "/build --listEmittedFiles true ./" + projectPath + "/src/serve.ts"
+                            command: "tsc --outDir ./" + project + "/build --listEmittedFiles true ./" + project + "/src/serve.ts"
                         });
                     }
-                    _d.label = 21;
-                case 21: return [2 /*return*/];
+                    _d.label = 18;
+                case 18: return [2 /*return*/];
             }
         });
     });
