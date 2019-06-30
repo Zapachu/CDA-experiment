@@ -25,6 +25,18 @@ const SCORING = require("./components/scoring.gif");
 const CLOSE = require("./components/close.png");
 const SCHOOL_ICON = require("./components/school.png");
 const ADMISSION_PIE = require("./components/admission_pie.png");
+const UNI_ZHONG_SHAN = require("./components/zhongshanUni.jpg");
+const UNI_ZHE_JIANG = require("./components/zhejiangUni.jpg");
+const UNI_XIA_MEN = require("./components/XiamenUni.jpg");
+const UNI_WU_HAN = require("./components/wuhanUni.jpg");
+const UNI_SHANG_JIAO = require("./components/shangjiaoUni.jpg");
+const UNI_REN_MIN = require("./components/renminUni.jpg");
+const UNI_QING_HUA = require("./components/qinghuaUni.jpg");
+const UNI_NAN_KAI = require("./components/nankaiUni.jpg");
+const UNI_NAN_JING = require("./components/nanjingUni.jpg");
+const UNI_HUA_KE = require("./components/huakeUni.jpg");
+const UNI_FU_DAN = require("./components/fudanUni.jpg");
+const UNI_BEI_JING = require("./components/beijingUni.jpg");
 
 interface IPlayState {
   schools: Array<SCHOOL>;
@@ -37,6 +49,21 @@ enum MODAL {
   rule,
   admission
 }
+
+const UNI_IMG = {
+  [SCHOOL.beijingUni]: UNI_BEI_JING,
+  [SCHOOL.qinghuaUni]: UNI_QING_HUA,
+  [SCHOOL.renminUni]: UNI_REN_MIN,
+  [SCHOOL.fudanUni]: UNI_FU_DAN,
+  [SCHOOL.shangjiaoUni]: UNI_SHANG_JIAO,
+  [SCHOOL.zhejiangUni]: UNI_ZHE_JIANG,
+  [SCHOOL.nanjingUni]: UNI_NAN_JING,
+  [SCHOOL.wuhanUni]: UNI_WU_HAN,
+  [SCHOOL.huakeUni]: UNI_HUA_KE,
+  [SCHOOL.nankaiUni]: UNI_NAN_KAI,
+  [SCHOOL.xiamenUni]: UNI_XIA_MEN,
+  [SCHOOL.zhongshanUni]: UNI_ZHONG_SHAN
+};
 
 export class Play extends Core.Play<
   ICreateParams,
@@ -135,25 +162,24 @@ export class Play extends Core.Play<
 
   _renderAdmission = (admission: SCHOOL) => {
     const { frameEmitter } = this.props;
+    let result;
+    if (admission === SCHOOL.none) {
+      result = (
+        <div className={style.resultBoard}>
+          <p>很遗憾</p>
+          <p>您没能被录取</p>
+        </div>
+      );
+    } else {
+      result = (
+        <div>
+          <img className={style.resultImg} src={UNI_IMG[admission]} />
+        </div>
+      );
+    }
     return (
       <>
-        <div className={style.resultBoard}>
-          {admission === SCHOOL.none ? (
-            <>
-              <p>很遗憾</p>
-              <p>您没能被录取</p>
-            </>
-          ) : (
-            <>
-              <p>录取通知书</p>
-              <p>
-                恭喜您被
-                <span className={style.redFont}>{SCHOOL_NAME[admission]}</span>
-                录取了
-              </p>
-            </>
-          )}
-        </div>
+        {result}
         <Button
           label="再来一局"
           onClick={() =>
