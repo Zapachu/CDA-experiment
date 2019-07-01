@@ -1,6 +1,6 @@
 {
   "name": "elf-component",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "dist/index",
   "types": "build/index",
   "scripts": {
@@ -10,9 +10,9 @@
     "dist": "npm run build --buildMode=dist"
   },
   "devDependencies": {
-    "@types/elf-linker": "^1.0.0",
-    "bespoke-core-share": "^1.0.0",
-    "elf-setting": "^1.0.0",
+    "@types/elf-linker": "^1.0.1",
+    "bespoke-core-share": "^1.0.1",
+    "elf-setting": "^1.0.1",
     "typescript": "^3.3.3333",
     "webpack": "^4.29.6"
   }

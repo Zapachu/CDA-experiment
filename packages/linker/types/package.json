@@ -1,8 +1,8 @@
 {
   "name": "@types/elf-linker",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "types": "index",
   "dependencies": {
-    "elf-setting": "^1.0.0"
+    "elf-setting": "^1.0.1"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "thirdparty-phase-proxy",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "repository": " ",
   "scripts": {
     "version": "tsc",
@@ -16,9 +16,9 @@
     "otreeProxy": "ts-node ./lib/phases/otreeProxy/app.ts"
   },
   "devDependencies": {
-    "@types/elf-linker": "^1.0.0",
-    "elf-protocol": "^1.0.0",
-    "elf-setting": "^1.0.0",
+    "@types/elf-linker": "^1.0.1",
+    "elf-protocol": "^1.0.1",
+    "elf-setting": "^1.0.1",
     "ts-node": "^8.0.3",
     "typescript": "^3.3.3333",
     "webpack": "^4.29.6"
