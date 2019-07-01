@@ -4,7 +4,7 @@
   "main": "build/index",
   "types": "build/index",
   "scripts": {
-    "install": "tsc",
+    "version": "tsc",
     "tsc-w": "tsc -w"
   },
   "devDependencies": {
