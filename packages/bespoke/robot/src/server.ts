@@ -1,9 +1,9 @@
 import {IRobotHandshake, SocketEvent, UnixSocketEvent} from 'bespoke-core-share'
 import {IpcConnection} from 'bespoke-server-util'
-import {BaseRobot} from './BaseRobot'
+import {AnyRobot} from './BaseRobot'
 
 export class RobotServer {
-    static start(namespace: string, Robot: new(...args) => BaseRobot<any, any, any, any, any, any, any>) {
+    static start(namespace: string, Robot: new(...args) => AnyRobot) {
         IpcConnection.connect(namespace).then(client =>
             client.on(UnixSocketEvent.startRobot, async (robotHandshake: IRobotHandshake, meta) => {
                 const connection = await IpcConnection.connect(namespace)

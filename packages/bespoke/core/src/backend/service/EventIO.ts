@@ -60,9 +60,9 @@ export class EventIO {
                     Log.i('Robot daemon connection initialized')
                     this.robotIOServer.daemonConnection = ipcConnection
                 })
-                .on(SocketEvent.connection, async ({id, actor, game}: IRobotHandshake, cb) => {
-                    Log.i(`RobotConnect : ${id} ${actor.token}`)
-                    const socketConnection = new RobotIO.Connection(id, actor, game, socket)
+                .on(SocketEvent.connection, async ({actor, game}: IRobotHandshake, cb) => {
+                    Log.i(`RobotConnect : ${actor.token}`)
+                    const socketConnection = new RobotIO.Connection(actor, game, socket)
                     subscribeOnConnection(socketConnection)
                     this.robotIOServer.initNamespace(socketConnection)
                     cb()
@@ -70,11 +70,11 @@ export class EventIO {
         }).listen(socketPath)
     }
 
-    static startRobot<IRobotMeta>(id: string, actor: IActor, game: IGameWithId<any>, meta: IRobotMeta) {
-        if(!this.robotIOServer.daemonConnection){
+    static startRobot<IRobotMeta>(actor: IActor, game: IGameWithId<any>, meta: IRobotMeta) {
+        if (!this.robotIOServer.daemonConnection) {
             Log.w('Robot daemon connection not initialized yet')
         }
-        this.robotIOServer.daemonConnection.emit(UnixSocketEvent.startRobot, {id, actor, game} as IRobotHandshake, meta)
+        this.robotIOServer.daemonConnection.emit(UnixSocketEvent.startRobot, {actor, game} as IRobotHandshake, meta)
     }
 }
 
@@ -121,10 +121,12 @@ namespace RobotIO {
     }
 
     export class Connection extends IpcConnection implements IConnection {
+        id: string
         robotIOServer: Server
 
-        constructor(public id: string, public actor: IActor, public game: IGameWithId<any>, socket: Socket) {
+        constructor(public actor: IActor, public game: IGameWithId<any>, socket: Socket) {
             super(socket)
+            this.id = actor.token
         }
 
         join(nsp: string): Namespace {

@@ -107,7 +107,7 @@ export class BaseLogic<ICreateParams, IGameState, IPlayerState, MoveType, PushTy
 
     async startRobot(key, meta?: IRobotMeta) {
         const actor: IActor = {token: Token.geneToken(`${this.game.id}${key}`), type: Actor.serverRobot}
-        EventIO.startRobot<IRobotMeta>(`ROBOT_${Math.random().toString(36).substr(2)}`, actor, this.game, meta)
+        EventIO.startRobot<IRobotMeta>(actor, this.game, meta)
     }
 
     //region pushEvent
