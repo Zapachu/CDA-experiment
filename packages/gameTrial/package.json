@@ -1,6 +1,6 @@
 {
   "name": "game-trial",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "desc",
   "main": "index.js",
   "scripts": {
@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bespoke-server": "^1.0.0",
+    "bespoke-server": "^1.0.1",
     "elf-protocol": "^1.0.0",
     "mongoose": "^5.6.0",
     "passport.socketio": "^3.7.0",

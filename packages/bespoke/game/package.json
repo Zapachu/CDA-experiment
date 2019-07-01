@@ -1,6 +1,6 @@
 {
   "name": "bespoke-game",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "tsc-w": "tsc -w",
     "install": "tsc bin/help",
@@ -11,7 +11,7 @@
     "bespoke-game-stock-trading-component": "^1.0.0",
     "bespoke-game-stock-trading-config": "^1.0.0",
     "bespoke-robot": "^1.0.0",
-    "bespoke-server": "^1.0.0",
+    "bespoke-server": "^1.0.1",
     "elf-component": "^1.0.0",
     "elf-protocol": "^1.0.0",
     "elf-setting": "^1.0.0",
