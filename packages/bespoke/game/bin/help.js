@@ -113,7 +113,7 @@ function getProjects(parentProject, projectSet) {
                             {
                                 name: 'project',
                                 type: 'autocomplete',
-                                message: 'Project:',
+                                message: "Project(" + projects.length + "):",
                                 source: function (_, input) {
                                     if (input === void 0) { input = ''; }
                                     return Promise.resolve(projects.filter(function (p) { return input.toLowerCase().split(' ').every(function (s) { return p.toLowerCase().includes(s); }); }).concat(TaskHelper.projectName));

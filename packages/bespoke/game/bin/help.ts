@@ -76,7 +76,7 @@ function getProjects(parentProject: string = '.', projectSet = new Set<string>()
         {
             name: 'project',
             type: 'autocomplete',
-            message: 'Project:',
+            message: `Project(${projects.length}):`,
             source: (_, input = ''): Promise<string[]> => Promise.resolve(projects.filter(
                 p => input.toLowerCase().split(' ').every(s => p.toLowerCase().includes(s))
             ).concat(TaskHelper.projectName))
