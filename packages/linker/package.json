@@ -12,11 +12,11 @@
     "client:dist": "npm run client:build --buildMode=dist",
     "server:ts-serve": "ts-node ./src/server/server.ts"
   },
-  "devDependencies":  {
-    "typescript": "^3.3.3333",
-    "webpack": "^4.29.6",
-    "ts-node": "^8.0.3",
+  "devDependencies": {
     "elf-protocol": "^1.0.0",
-    "elf-setting": "^1.0.0"
+    "elf-setting": "^1.0.0",
+    "ts-node": "^8.0.3",
+    "typescript": "^3.3.3333",
+    "webpack": "^4.29.6"
   }
 }
