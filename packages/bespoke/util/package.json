@@ -1,15 +1,15 @@
 {
   "name": "bespoke-server-util",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "main": "build/index",
   "types": "build/index",
   "scripts": {
-    "version": "tsc",
+    "install": "tsc",
     "tsc-w": "tsc -w"
   },
   "devDependencies": {
-    "bespoke-core-share": "^1.0.1",
-    "elf-setting": "^1.0.1",
+    "bespoke-core-share": "^1.0.0",
+    "elf-setting": "^1.0.0",
     "typescript": "^3.3.3333"
   }
 }

@@ -1,10 +1,10 @@
 {
   "name": "bespoke-game-stock-trading-config",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "main": "build/index",
   "types": "lib/index",
   "scripts": {
-    "version": "tsc"
+    "install": "tsc"
   },
   "devDependencies": {
     "typescript": "^3.3.3333"

@@ -1,21 +1,21 @@
 {
   "name": "bespoke-server",
-  "version": "1.0.2",
+  "version": "1.0.0",
   "main": "build/backend/index",
   "types": "build/backend/index",
   "scripts": {
     "tsc-w": "tsc -w",
-    "version": "tsc script/buildGame.ts & tsc & npm run dist",
+    "install": "tsc script/buildGame.ts & tsc & npm run dist",
     "build": "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./script/webpack.config.ts",
     "dist": "npm run build --buildMode=dist",
     "publish": "npm run build --buildMode=publish"
   },
   "devDependencies": {
-    "bespoke-core-share": "^1.0.1",
-    "bespoke-server-util": "^1.0.1",
-    "elf-component": "^1.0.1",
-    "elf-protocol": "^1.0.1",
-    "elf-setting": "^1.0.1",
+    "bespoke-core-share": "^1.0.0",
+    "bespoke-server-util": "^1.0.0",
+    "elf-component": "^1.0.0",
+    "elf-protocol": "^1.0.0",
+    "elf-setting": "^1.0.0",
     "ts-node": "^8.0.3",
     "typescript": "^3.3.3333",
     "webpack": "^4.29.6"
