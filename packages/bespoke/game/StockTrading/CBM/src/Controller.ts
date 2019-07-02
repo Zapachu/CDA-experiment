@@ -96,8 +96,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         const marketRejected = order.role === ROLE.Seller ?
             sellOrderIds[0] && order.price > orders.find(({id}) => id === sellOrderIds[0]).price :
             buyOrderIds[0] && order.price < orders.find(({id}) => id === buyOrderIds[0]).price
-        Log.d('Market rejected : ', {price: order.price, count: order.count, role: order.role})
         if (marketRejected) {
+            Log.d('Market rejected : ', {price: order.price, count: order.count, role: order.role})
             return
         } else {
             await this.cancelOrder(periodIndex, order.playerIndex)
@@ -289,10 +289,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     gamePeriodState = gameState.periods[periodIndex]
                 const {playerIndex} = playerState
                 const {price, count} = params
-                if (count <= 0 ||
-                    (params.role === ROLE.Seller && count > playerState.count) ||
-                    (params.role === ROLE.Buyer && count * price > playerState.money)
-                ) {
+                if (count <= 0) {
                     Log.d('ShoutFailed : ', {
                         role: ROLE[params.role],
                         count: playerState.count,

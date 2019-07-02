@@ -59,6 +59,6 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
         if (marketRejected) {
             return
         }
-        this.frameEmitter.emit(MoveType.submitOrder, {price, count: ~~(maxCount * (.7 * Math.random() + .3)) + 1, role})
+        this.frameEmitter.emit(MoveType.submitOrder, {price, count: ~~(maxCount * (.3 * Math.random() + .2)) + 1, role})
     }
 }
