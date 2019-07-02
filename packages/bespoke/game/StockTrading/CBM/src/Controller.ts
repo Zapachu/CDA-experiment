@@ -94,8 +94,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         const gamePeriodState = (await this.stateManager.getGameState()).periods[periodIndex],
             {buyOrderIds, sellOrderIds, trades, orders} = gamePeriodState
         const marketRejected = order.role === ROLE.Seller ?
-            sellOrderIds[0] && order.price > orders.find(({id}) => id === sellOrderIds[0]).price :
-            buyOrderIds[0] && order.price < orders.find(({id}) => id === buyOrderIds[0]).price
+            sellOrderIds.length && order.price > orders.find(({id}) => id === sellOrderIds[0]).price :
+            buyOrderIds.length && order.price < orders.find(({id}) => id === buyOrderIds[0]).price
         if (marketRejected) {
             Log.d('Market rejected : ', {price: order.price, count: order.count, role: order.role})
             return
@@ -104,8 +104,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             orders.push(order)
         }
         const tradeSuccess = order.role === ROLE.Seller ?
-            buyOrderIds[0] && order.price <= orders.find(({id}) => id === buyOrderIds[0]).price :
-            sellOrderIds[0] && order.price >= orders.find(({id}) => id === sellOrderIds[0]).price
+            buyOrderIds.length && order.price <= orders.find(({id}) => id === buyOrderIds[0]).price :
+            sellOrderIds.length && order.price >= orders.find(({id}) => id === sellOrderIds[0]).price
         if (!tradeSuccess) {
             (order.role === ROLE.Seller ? sellOrderIds : buyOrderIds).unshift(order.id)
             return
