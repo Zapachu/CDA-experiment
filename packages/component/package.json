@@ -10,10 +10,10 @@
     "dist": "npm run build --buildMode=dist"
   },
   "devDependencies": {
-    "typescript": "^3.3.3333",
-    "webpack": "^4.29.6",
     "@types/elf-linker": "^1.0.0",
     "bespoke-core-share": "^1.0.0",
-    "elf-setting": "^1.0.0"
+    "elf-setting": "^1.0.0",
+    "typescript": "^3.3.3333",
+    "webpack": "^4.29.6"
   }
 }

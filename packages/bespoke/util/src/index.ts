@@ -1,2 +1,2 @@
-export * from './SocketEmitter'
+export * from './IpcConnection'
 export * from './Log'

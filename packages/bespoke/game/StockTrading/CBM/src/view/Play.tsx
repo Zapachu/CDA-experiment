@@ -336,15 +336,12 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
             return Toast.warn(lang.invalidBuyPrice)
         }
         let countInvalid = false
-        if (count <= 0) {
-            countInvalid = true
-        }
         if (guarantee) {
-            countInvalid = (role === ROLE.Buyer && _price * +count > playerState.money) ||
-                (role === ROLE.Seller && count > playerState.count)
-        } else {
-            countInvalid = (role === ROLE.Buyer && _price * +count > playerState.money - playerState.guaranteeMoney) ||
+            countInvalid = count <= 0 || (role === ROLE.Buyer && _price * +count > playerState.money - playerState.guaranteeMoney) ||
                 (role === ROLE.Seller && count > playerState.count + ~~(playerState.money / gamePeriodState.closingPrice) - playerState.guaranteeCount)
+        } else {
+            countInvalid = count <= 0 || (role === ROLE.Buyer && _price * +count > playerState.money) ||
+                (role === ROLE.Seller && count > playerState.count)
         }
         if (countInvalid) {
             setCount(0)
@@ -489,7 +486,7 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
                         </div>
                         <div>
                             <label>{lang.guaranteeCountLimit}</label>
-                            <em>{playerState.count - playerState.guaranteeCount}</em>
+                            <em>{~~(playerState.money / gamePeriodState.closingPrice) + playerState.count - playerState.guaranteeCount}</em>
                         </div>
                         <div>
                             <label>{lang.guaranteeMoneyLimit}</label>
@@ -623,7 +620,7 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
                 </thead>
                 <tbody>
                 {
-                    marketOrderIds.map((orderId, i) => {
+                    marketOrderIds.map(orderId => {
                             const orderX = orderDict[orderId],
                                 isMine = orderX.playerIndex === playerState.playerIndex
                             return <tr key={orderId} className={style.orderPrice}>
@@ -631,7 +628,7 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
                                 <td className={style.count}>{orderX.count}</td>
                                 <td>
                                     <a className={style.btnCancel}
-                                       style={{visibility: i && isMine ? 'visible' : 'hidden'}}
+                                       style={{visibility: isMine ? 'visible' : 'hidden'}}
                                        onClick={() => frameEmitter.emit(MoveType.cancelOrder)}>×</a>
                                 </td>
                             </tr>

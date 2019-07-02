@@ -1,7 +1,9 @@
-import * as path from 'path'
-import * as fs from 'fs'
-import {prompt} from 'inquirer'
-import {cd, env, exec} from 'shelljs'
+import {readdirSync, readFileSync, writeFileSync} from 'fs'
+import {resolve} from 'path'
+import {prompt, registerPrompt} from 'inquirer'
+import {env, exec} from 'shelljs'
+
+registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'))
 
 interface Task {
     env?: { [key: string]: string }
@@ -10,15 +12,11 @@ interface Task {
 
 namespace TaskHelper {
     export const projectName = 'RecentTask'
-    const logPath = path.resolve(__dirname, './help.log')
-
-    export function getGroups(): Array<string> {
-        return fs.existsSync(logPath) ? [projectName] : []
-    }
+    const logPath = resolve(__dirname, './help.log')
 
     export function getLogs(): Array<Task> {
         try {
-            return fs.readFileSync(logPath).toString().split('\n').map(row => JSON.parse(row))
+            return readFileSync(logPath).toString().split('\n').map(row => JSON.parse(row))
         } catch (e) {
             return []
         }
@@ -31,7 +29,7 @@ namespace TaskHelper {
             return
         }
         logs.unshift(newLog)
-        fs.writeFileSync(logPath, logs.slice(0, 5).join('\n'))
+        writeFileSync(logPath, logs.slice(0, 5).join('\n'))
     }
 
     export function execTask(task: Task) {
@@ -59,17 +57,30 @@ enum ServerTask {
     serve = 'serve'
 }
 
+function getProjects(parentProject: string = '.', projectSet = new Set<string>()): Array<string> {
+    readdirSync(resolve(__dirname, `../${parentProject}/`)).forEach(p => {
+        if (p[0] >= 'a') {
+            return
+        }
+        const childProject = `${parentProject}/${p}`
+        projectSet.delete(parentProject)
+        projectSet.add(childProject)
+        getProjects(childProject, projectSet)
+    })
+    return Array.from(projectSet, p => p.slice(2))
+}
+
 (async function () {
-    let projectPath: string
+    const projects = getProjects()
     const {project} = (await prompt<{ project: string }>([
         {
             name: 'project',
-            type: 'list',
-            choices: [
-                ...TaskHelper.getGroups(),
-                ...fs.readdirSync(path.resolve(__dirname, '../')).filter(name => name[0] < 'a')
-            ]
-        }
+            type: 'autocomplete',
+            message: `Project(${projects.length}):`,
+            source: (_, input = ''): Promise<string[]> => Promise.resolve(projects.filter(
+                p => input.toLowerCase().split(' ').every(s => p.toLowerCase().includes(s))
+            ).concat(TaskHelper.projectName))
+        } as any
     ]))
     if (project === TaskHelper.projectName) {
         const {taskLog} = (await prompt<{ taskLog: string }>([
@@ -83,19 +94,6 @@ enum ServerTask {
         TaskHelper.execTask(JSON.parse(taskLog))
         return
     }
-    const subProjects = fs.readdirSync(path.resolve(__dirname, `../${project}/`)).filter(name => name[0] < 'a')
-    if (!subProjects.length) {
-        projectPath = project
-    } else {
-        const {subProject} = (await prompt<{ subProject: string }>([
-            {
-                name: 'subProject',
-                type: 'list',
-                choices: subProjects
-            }
-        ]))
-        projectPath = `${project}/${subProject}`
-    }
     const {side} = (await prompt<{ side: Side }>([
         {
             name: 'side',
@@ -106,7 +104,6 @@ enum ServerTask {
     ]))
     switch (side) {
         case Side.client: {
-            cd(path.resolve(__dirname, '..'))
             const {mode} = await prompt<{ mode: ClientTask }>([
                 {
                     name: 'mode',
@@ -128,14 +125,14 @@ enum ServerTask {
                             BUILD_MODE: mode,
                             HMR: HMR.toString()
                         },
-                        command: `webpack-dev-server --hot --progress --env.TS_NODE_PROJECT="tsconfig.json" --config ./${projectPath}/script/webpack.config.ts`
+                        command: `webpack-dev-server --hot --progress --env.TS_NODE_PROJECT="tsconfig.json" --config ./${project}/script/webpack.config.ts`
                     })
                     break
                 }
             }
             TaskHelper.execTask({
                 env: {BUILD_MODE: mode},
-                command: `webpack --env.TS_NODE_PROJECT="tsconfig.json" --config ./${projectPath}/script/webpack.config.ts`
+                command: `webpack --env.TS_NODE_PROJECT="tsconfig.json" --config ./${project}/script/webpack.config.ts`
             })
             break
         }
@@ -151,7 +148,7 @@ enum ServerTask {
             switch (task) {
                 case ServerTask.dist: {
                     TaskHelper.execTask({
-                        command: `tsc --outDir ./${projectPath}/build --listEmittedFiles true ./${projectPath}/src/serve.ts`
+                        command: `tsc --outDir ./${project}/build --listEmittedFiles true ./${project}/src/serve.ts`
                     })
                     break
                 }
@@ -166,7 +163,7 @@ enum ServerTask {
                         env: {
                             BESPOKE_HMR: HMR.toString()
                         },
-                        command: `ts-node ./${projectPath}/src/serve.ts`
+                        command: `ts-node ./${project}/src/serve.ts`
                     })
                     break
                 }
@@ -187,20 +184,20 @@ enum ServerTask {
                             BESPOKE_WITH_LINKER: withLinker,
                             NODE_ENV: 'production'
                         },
-                        command: `node ./${projectPath}/build/serve.js`
+                        command: `node ./${project}/build/serve.js`
                     })
                     break
                 }
             }
             break
         }
-        case Side.both:{
+        case Side.both: {
             TaskHelper.execTask({
                 env: {BUILD_MODE: ClientTask.dist},
-                command: `webpack --env.TS_NODE_PROJECT="tsconfig.json" --config ./${projectPath}/script/webpack.config.ts`
+                command: `webpack --env.TS_NODE_PROJECT="tsconfig.json" --config ./${project}/script/webpack.config.ts`
             })
             TaskHelper.execTask({
-                command: `tsc --outDir ./${projectPath}/build --listEmittedFiles true ./${projectPath}/src/serve.ts`
+                command: `tsc --outDir ./${project}/build --listEmittedFiles true ./${project}/src/serve.ts`
             })
         }
     }
