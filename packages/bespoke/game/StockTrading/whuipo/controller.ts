@@ -208,6 +208,7 @@ export default class RouterController {
             if (!user) {
                 user = new User({
                     unionId: key,
+                    unblockGamePhase: Phase.CBM_Leverage
                 })
                 await user.save()
             }
