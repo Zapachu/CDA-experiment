@@ -308,6 +308,8 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
             }
         </section>
     }
+    const guaranteeMoneyLimit = nonNegative(playerState.money - playerState.guaranteeMoney),
+        guaranteeCountLimit = nonNegative(~~(playerState.money / gamePeriodState.closingPrice) + playerState.count - playerState.guaranteeCount)
     return <section className={style.trading}>
         <div className={style.tradePanel}>
             {
@@ -337,8 +339,8 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
         }
         let countInvalid = false
         if (guarantee) {
-            countInvalid = count <= 0 || (role === ROLE.Buyer && _price * +count > playerState.money - playerState.guaranteeMoney) ||
-                (role === ROLE.Seller && count > playerState.count + ~~(playerState.money / gamePeriodState.closingPrice) - playerState.guaranteeCount)
+            countInvalid = count <= 0 || (role === ROLE.Buyer && _price * +count > guaranteeMoneyLimit) ||
+                (role === ROLE.Seller && count > guaranteeCountLimit)
         } else {
             countInvalid = count <= 0 || (role === ROLE.Buyer && _price * +count > playerState.money) ||
                 (role === ROLE.Seller && count > playerState.count)
@@ -486,11 +488,11 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
                         </div>
                         <div>
                             <label>{lang.guaranteeCountLimit}</label>
-                            <em>{~~(playerState.money / gamePeriodState.closingPrice) + playerState.count - playerState.guaranteeCount}</em>
+                            <em>{guaranteeCountLimit}</em>
                         </div>
                         <div>
                             <label>{lang.guaranteeMoneyLimit}</label>
-                            <em>{playerState.money - playerState.guaranteeMoney}</em>
+                            <em>{guaranteeMoneyLimit}</em>
                         </div>
                     </> : null
                 }
@@ -649,4 +651,8 @@ export function Play(props: TPlayProps) {
     return <section className={style.play}>
         <_Play {...props}/>
     </section>
+}
+
+function nonNegative(n: number) {
+    return n < 0 ? 0 : n
 }
