@@ -1,6 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, Core, Lang, MaskLoading, baseEnum} from 'elf-component'
+import {Button, Lang} from 'elf-component'
+import {Core} from '@bespoke/client-sdk'
 import {GameStage, MoveType, PushType} from '../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 
@@ -10,23 +11,25 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
         startAnswerStage: ['开始答题', 'Start Answer Stage'],
         seatNumber: ['座位号', 'Seat Number'],
         correctNumber: ['正确题数', 'Correct Number'],
-        countDown:['倒计时','Countdown']
+        countDown: ['倒计时', 'Countdown']
     })
 
     render(): React.ReactNode {
         const {lang, props: {frameEmitter, game, gameState, playerStates}} = this
         const playerStatesArr = Object.values(playerStates)
         return <section className={style.play4Owner}>
-            <label className={style.countDown}>{lang.countDown}<em>{game.params.timeLimit - gameState.time + 1}</em></label>
+            <label
+                className={style.countDown}>{lang.countDown}<em>{game.params.timeLimit - gameState.time + 1}</em></label>
             <table className={style.playerStates}>
                 <tbody>
                 <tr>
                     <td>{lang.seatNumber}({
                         playerStatesArr
-                            .map<number>(({seatNumber})=>seatNumber?1:0)
-                            .reduce((m,n)=>m+n,0)}/{
+                            .map<number>(({seatNumber}) => seatNumber ? 1 : 0)
+                            .reduce((m, n) => m + n, 0)}/{
                         playerStatesArr.length
-                    })</td>
+                    })
+                    </td>
                     <td>{lang.correctNumber}</td>
                 </tr>
                 {

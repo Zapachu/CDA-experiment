@@ -1,7 +1,7 @@
 import {EventEmitter} from 'events'
 import {applyChange, Diff} from 'deep-diff'
-import {FrameEmitter, IActor, IGameWithId, SocketEvent, TGameState, TPlayerState} from 'bespoke-core-share'
-import {Log} from 'bespoke-server-util'
+import {FrameEmitter, IActor, IGameWithId, SocketEvent, TGameState, TPlayerState} from '@bespoke/share'
+import {Log} from '@bespoke/server-util'
 import cloneDeep = require('lodash/cloneDeep')
 
 export type AnyRobot = BaseRobot<any, any, any, any, any, any, any>

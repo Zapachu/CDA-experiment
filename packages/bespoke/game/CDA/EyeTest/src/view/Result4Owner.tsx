@@ -1,8 +1,9 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang, Request} from 'elf-component'
+import {Lang, Request} from 'elf-component'
+import {Core} from '@bespoke/client-sdk'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState} from '../interface'
-import {MoveType, SheetType, EYES, FetchRoute, namespace} from '../config'
+import {EYES, FetchRoute, MoveType, namespace, SheetType} from '../config'
 
 export class Result4Owner extends Core.Result4Owner<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams> {
     lang = Lang.extractLang({
@@ -46,7 +47,7 @@ export class Result4Owner extends Core.Result4Owner<ICreateParams, IGameState, I
                     {
                         Object.values(SheetType).map(sheetType =>
                             <a key={sheetType}
-                               href={Request.buildUrl(namespace, FetchRoute.exportXls, {gameId:game.id}, {sheetType})}>
+                               href={Request.buildUrl(namespace, FetchRoute.exportXls, {gameId: game.id}, {sheetType})}>
                                 {lang[SheetType[sheetType]]}</a>)
                     }
                 </div>

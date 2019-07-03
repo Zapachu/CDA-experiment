@@ -1,4 +1,4 @@
-import {SocketEvent, UnixSocketEvent} from 'bespoke-core-share'
+import {SocketEvent, UnixSocketEvent} from '@bespoke/share'
 import {StringDecoder} from 'string_decoder'
 import {EventEmitter} from 'events'
 import * as path from 'path'

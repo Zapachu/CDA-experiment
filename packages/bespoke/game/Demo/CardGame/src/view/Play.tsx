@@ -1,6 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, ButtonProps, Core, Lang, MaskLoading, Dice} from 'elf-component'
+import {Core} from '@bespoke/client-sdk'
+import {Button, ButtonProps, Lang, MaskLoading, Dice} from 'elf-component'
 import {GameType, MoveType, PushType, Role, cardGame, LRGame, PlayerStatus} from '../config'
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import {Header, HistoryTable, Matrix, BtnGroup} from './component'

@@ -1,9 +1,10 @@
 import * as React from 'react'
-import {baseEnum, IGameWithId} from 'bespoke-core-share'
-import {Core, MaskLoading} from 'elf-component'
+import {baseEnum, IGameWithId} from '@bespoke/share'
+import {MaskLoading} from 'elf-component'
+import {Core} from '@bespoke/client-sdk'
 import {Api} from '../../util'
-import cloneDeep = require('lodash/cloneDeep')
 import {applyChange} from 'deep-diff'
+import cloneDeep = require('lodash/cloneDeep')
 
 declare type TTravelState = Core.ITravelState<any, any, any, any>
 

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, MaskLoading, Button, ButtonProps} from 'elf-component'
+import {Core} from '@bespoke/client-sdk'
+import {MaskLoading, Button, ButtonProps} from 'elf-component'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import {MoveType, PushType, NEW_ROUND_TIMER, PlayerStatus, Balls} from '../config'
 

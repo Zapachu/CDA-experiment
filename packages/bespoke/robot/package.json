@@ -1,5 +1,5 @@
 {
-  "name": "bespoke-robot",
+  "name": "@bespoke/robot",
   "version": "1.0.0",
   "main": "build/index",
   "types": "build/index",
@@ -8,8 +8,8 @@
     "tsc-w": "tsc -w"
   },
   "devDependencies": {
-    "bespoke-core-share": "^1.0.0",
-    "bespoke-server-util": "^1.0.0",
+    "@bespoke/share": "^1.0.0",
+    "@bespoke/server-util": "^1.0.0",
     "elf-setting": "^1.0.0",
     "typescript": "^3.3.3333"
   }

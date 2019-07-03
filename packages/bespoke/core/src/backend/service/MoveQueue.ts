@@ -1,6 +1,6 @@
 import Queue, {QueueWorker} from 'queue'
 import {diff} from 'deep-diff'
-import {CoreMove, IActor, IGameWithId, IMoveLog, TGameState, TPlayerState} from 'bespoke-core-share'
+import {CoreMove, IActor, IGameWithId, IMoveLog, TGameState, TPlayerState} from '@bespoke/share'
 import {MoveLogModel} from '../model'
 import {StateManager} from './StateManager'
 import cloneDeep = require('lodash/cloneDeep')

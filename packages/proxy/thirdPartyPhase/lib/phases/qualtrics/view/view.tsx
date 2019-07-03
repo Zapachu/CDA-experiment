@@ -1,10 +1,10 @@
 import * as React from 'react'
-import {BaseCreate, Lang} from '@client-vendor'
+import {Template} from '@elf/client-sdk'
 import * as style from './style.scss'
 
 import {registerOnFramework} from '../../index'
 
-export class Create extends BaseCreate<any> {
+export class Create extends Template.Create<{ qualtricsUrl: string }> {
 
     state = {
         qualtricsUrl: '',
@@ -15,15 +15,11 @@ export class Create extends BaseCreate<any> {
         this.setState({qualtricsUrl: event.target.value})
     }
 
-    hanldeSubmitQualtricsUrl = () => {
+    handleSubmitQualtricsUrl = () => {
         console.log(this.state.qualtricsUrl)
-        const {props: {updatePhase}} = this
+        const {props: {setParams}} = this
         this.setState({isEdit: false})
-        updatePhase([], {qualtricsUrl: this.state.qualtricsUrl})
-    }
-
-    calcSuffixPhaseKeys(newParam) {
-        return Array.from(new Set([newParam.nextPhaseKey].filter(k => k)))
+        setParams({qualtricsUrl: this.state.qualtricsUrl})
     }
 
     toEdit = () => {
@@ -31,24 +27,7 @@ export class Create extends BaseCreate<any> {
     }
 
     render(): React.ReactNode {
-        const {props: {phases, updatePhase, highlightPhases, curPhase}} = this
-        const nextPhase = phases[phases.findIndex(({key}) => key === curPhase.key) + 1]
-        console.log(curPhase)
-        console.log(phases)
-
-        const lang = Lang.extractLang({
-            name: ['结束后跳转至', 'Link To Next Phase'],
-            submit: ['保存', 'Save']
-        })
-
-        if (nextPhase && !curPhase.param.nextPhaseKey) {
-            setTimeout(() => updatePhase([nextPhase.key], {
-                nextPhaseKey: nextPhase.key
-            }), 0)
-        }
-
         return <section className={style.create}>
-
             <div className={style.inputUrl}>
                 <div className={style.inputTip}>输入qualtrics匿名链接</div>
                 {
@@ -56,26 +35,7 @@ export class Create extends BaseCreate<any> {
                         <input onChange={this.handleInputQualtricsUrl}/> :
                         <a onClick={this.toEdit}>{this.state.qualtricsUrl}</a>
                 }
-                <button onClick={this.hanldeSubmitQualtricsUrl}>提交</button>
-            </div>
-
-            <div className={style.case}>
-                <label>{lang.name}</label>
-                <ul className={style.suffixPhases}>
-                    {
-                        phases.map(({key, label}) =>
-                            <li key={key}
-                                className={`${key === curPhase.param.nextPhaseKey ? style.active : ''}`}
-                                onMouseEnter={() => highlightPhases([key])}
-                                onMouseOut={() => highlightPhases([])}
-                                onClick={() => updatePhase(this.calcSuffixPhaseKeys({
-                                    ...curPhase.param, nextPhaseKey: key
-                                }), {nextPhaseKey: key})}>
-                                {label || key}
-                            </li>
-                        )
-                    }
-                </ul>
+                <button onClick={this.handleSubmitQualtricsUrl}>提交</button>
             </div>
         </section>
     }

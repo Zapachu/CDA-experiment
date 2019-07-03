@@ -1,5 +1,5 @@
-import {IRobotHandshake, SocketEvent, UnixSocketEvent} from 'bespoke-core-share'
-import {IpcConnection} from 'bespoke-server-util'
+import {IRobotHandshake, SocketEvent, UnixSocketEvent} from '@bespoke/share'
+import {IpcConnection} from '@bespoke/server-util'
 import {AnyRobot} from './BaseRobot'
 
 export class RobotServer {

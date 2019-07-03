@@ -1,11 +1,6 @@
 import * as React from 'react'
-import {FrameEmitter, IGameWithId, TGameState, TPlayerState, IUserWithId} from 'bespoke-core-share'
-import {RouteComponentProps} from 'react-router-dom'
-
-export type TPageProps = Partial<{
-    gameTemplate: IGameTemplate
-    user: IUserWithId
-} & RouteComponentProps<{ gameId?: string }>>
+import {FrameEmitter, IGameWithId, TGameState, TPlayerState} from '@bespoke/share'
+import {registerPhaseCreate, Template} from '@elf/client-sdk'
 
 export interface IGameTemplate {
     namespace?: string
@@ -18,16 +13,14 @@ export interface IGameTemplate {
     Result4Owner?: Core.Result4OwnerClass
 }
 
-export type TRegisterGame = (gameTemplate: IGameTemplate) => void
-
 export namespace Core {
+    export type ICreateProps<ICreateParams> = Template.ICreateProps<ICreateParams>
 
-    interface ICreateProps<ICreateParams> {
-        params: Partial<ICreateParams>
-        setParams: (newParams: Partial<ICreateParams>) => void
-        submitable?: boolean
-        setSubmitable?: (submitable: boolean) => void
+    export class Create<ICreateParams, S = {}> extends Template.Create<ICreateParams, S> {
     }
+
+    export type CreateSFC<ICreateParams> = Template.CreateSFC<ICreateParams>
+    export type CreateClass = (new(...args) => Create<{}, any>) | CreateSFC<{}>
 
     interface IInfoProps<ICreateParams> {
         game: IGameWithId<ICreateParams>,
@@ -62,13 +55,6 @@ export namespace Core {
         game: IGameWithId<ICreateParams>,
         travelStates: Array<ITravelState<IGameState, IPlayerState, MoveType, IMoveParams>>
     }
-
-
-    export class Create<ICreateParams, S = {}> extends React.Component<ICreateProps<ICreateParams>, S> {
-    }
-
-    export type CreateSFC<ICreateParams> = React.FC<ICreateProps<ICreateParams>>
-
 
     export class Info<ICreateParams, S = {}> extends React.Component<IInfoProps<ICreateParams>, S> {
     }
@@ -106,8 +92,6 @@ export namespace Core {
     export type Result4OwnerSFC<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams> =
         React.FC<IResult4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams>>
 
-    export type CreateClass = (new(...args) => Create<{}, any>) | CreateSFC<{}>
-
     export type InfoClass = (new(...args) => Info<{}>) | InfoSFC<{}>
 
     export type PlayClass = (new(...args) => Play<{}, {}, {}, any, any, {}, {}, any>)
@@ -122,3 +106,12 @@ export namespace Core {
     export type Result4OwnerClass = (new(...args) => Result4Owner<{}, {}, {}, any, {}, any>)
         | Result4OwnerSFC<{}, {}, {}, any, {}>
 }
+
+export function registerGame(namespace: string, gameTemplate: IGameTemplate) {
+    if (window['BespokeServer']) {
+        window['BespokeServer'].registerGame(gameTemplate)
+    }
+    registerPhaseCreate(namespace, {localeNames: [namespace], ...gameTemplate})
+}
+
+export {registerGame as registerOnFramework}

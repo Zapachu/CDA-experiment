@@ -1,7 +1,8 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, ButtonProps, MaskLoading, Core, Lang, Toast, Label, Input, Request} from 'elf-component'
-import {FetchRoute, MoveType, PushType, Stage, namespace} from '../../config'
+import {Button, ButtonProps, Input, Label, Lang, MaskLoading, Request, Toast} from 'elf-component'
+import {Core} from '@bespoke/client-sdk'
+import {FetchRoute, MoveType, namespace, PushType, Stage} from '../../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
 import TestStage from './TestStage'
 import MainStage from './MainStage'
@@ -14,7 +15,7 @@ interface IPlayState {
 export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IPlayState> {
 
     state: IPlayState = {
-      seatNumber: ''
+        seatNumber: ''
     }
     lang = Lang.extractLang({
         confirm: ['确定', 'Confirm'],
@@ -24,13 +25,13 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         wait4StartMainTest: ['等待老师开放实验', 'Wait for teacher to start the experiment'],
         end: ['实验结束', 'Game Over'],
         totalPoint: ['你在本场试验共获得积分 ', 'Total points you have got in this game are '],
-        totalProfit: ['你的最终收益为 ', 'Total profit you have earned in this game is '],
+        totalProfit: ['你的最终收益为 ', 'Total profit you have earned in this game is ']
     })
 
     componentDidMount() {
-      const {playerState:{actor}, frameEmitter, game} = this.props;
-      frameEmitter.emit(MoveType.initPosition);
-      Request.get(namespace, FetchRoute.getUserMobile, {gameId:game.id},{token: actor.token, actorType: actor.type})
+        const {playerState: {actor}, frameEmitter, game} = this.props
+        frameEmitter.emit(MoveType.initPosition)
+        Request.get(namespace, FetchRoute.getUserMobile, {gameId: game.id}, {token: actor.token, actorType: actor.type})
     }
 
     render(): React.ReactNode {
@@ -40,19 +41,19 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 (() => {
                     switch (stage) {
                         case Stage.Seat: {
-                          return this.renderSeatNumberStage()
+                            return this.renderSeatNumberStage()
                         }
                         case Stage.Test: {
-                          return <TestStage {...this.props} />
+                            return <TestStage {...this.props} />
                         }
                         case Stage.Main: {
-                          return <MainStage {...this.props} />
+                            return <MainStage {...this.props} />
                         }
                         case Stage.Survey: {
-                          return <SurveyStage {...this.props} />
+                            return <SurveyStage {...this.props} />
                         }
                         case Stage.End: {
-                          return this.renderEndStage()
+                            return this.renderEndStage()
                         }
                     }
                 })()
@@ -61,31 +62,32 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     }
 
     renderEndStage = () => {
-      const {lang, props: {game: {params: {s,participationFee}}, playerState: {finalProfit}}} = this;
-      return <section className={style.endStage}>
-        <p>{lang.totalPoint}{isNaN(finalProfit)?'-':finalProfit.toFixed(2)}</p>
-        <p>{lang.totalProfit}{isNaN(finalProfit*s+participationFee)?'-':(finalProfit*s+participationFee).toFixed(2)}</p>
-      </section>
+        const {lang, props: {game: {params: {s, participationFee}}, playerState: {finalProfit}}} = this
+        return <section className={style.endStage}>
+            <p>{lang.totalPoint}{isNaN(finalProfit) ? '-' : finalProfit.toFixed(2)}</p>
+            <p>{lang.totalProfit}{isNaN(finalProfit * s + participationFee) ? '-' : (finalProfit * s + participationFee).toFixed(2)}</p>
+        </section>
     }
 
     renderSeatNumberStage = () => {
-      const {lang, props: {frameEmitter, playerState}, state: {seatNumber}} = this
-      return playerState.seatNumber ? <MaskLoading label={lang.wait4StartMainTest}/>:
-          <section className={style.seatStage}>
-              <span>{playerState.seatNumber}</span>
-              <Label label={lang.inputSeatNumberPls}/>
-              <Input {...{
-                  value: seatNumber||'',
-                  onChange: ({target: {value: seatNumber}}) => this.setState({seatNumber})
-              }}/>
-              <Button style={{marginTop:'1rem'}} width={ButtonProps.Width.medium} label={lang.submit} onClick={() => {
-                  frameEmitter.emit(MoveType.inputSeatNumber, {seatNumber}, success => {
-                      if (!success) {
-                          Toast.warn(lang.invalidSeatNumber)
-                      }
-                  })
-              }}/>
-          </section>
-  }
+        const {lang, props: {frameEmitter, playerState}, state: {seatNumber}} = this
+        return playerState.seatNumber ? <MaskLoading label={lang.wait4StartMainTest}/> :
+            <section className={style.seatStage}>
+                <span>{playerState.seatNumber}</span>
+                <Label label={lang.inputSeatNumberPls}/>
+                <Input {...{
+                    value: seatNumber || '',
+                    onChange: ({target: {value: seatNumber}}) => this.setState({seatNumber})
+                }}/>
+                <Button style={{marginTop: '1rem'}} width={ButtonProps.Width.medium} label={lang.submit}
+                        onClick={() => {
+                            frameEmitter.emit(MoveType.inputSeatNumber, {seatNumber}, success => {
+                                if (!success) {
+                                    Toast.warn(lang.invalidSeatNumber)
+                                }
+                            })
+                        }}/>
+            </section>
+    }
 
 }

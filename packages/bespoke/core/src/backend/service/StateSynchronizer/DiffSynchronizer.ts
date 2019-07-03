@@ -1,5 +1,5 @@
 import {diff} from 'deep-diff'
-import {baseEnum, TGameState, TPlayerState} from 'bespoke-core-share'
+import {baseEnum, TGameState, TPlayerState} from '@bespoke/share'
 import {GameStateSynchronizer, PlayerStateSynchronizer} from './BaseSynchronizer'
 import {EventIO} from '../EventIO'
 import cloneDeep = require('lodash/cloneDeep')

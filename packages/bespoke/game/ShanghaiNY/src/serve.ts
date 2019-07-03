@@ -1,7 +1,7 @@
 import {Response, Router} from 'express'
 import nodeXlsx from 'node-xlsx'
 import {resolve} from 'path'
-import {BaseLogic, Server} from 'bespoke-server'
+import {BaseLogic, Server} from '@bespoke/core'
 import Controller from './Controller'
 import {FetchRoute, namespace, SheetType} from './config'
 

@@ -1,6 +1,6 @@
-import {config, IStartOption} from 'bespoke-core-share'
+import {config, IStartOption} from '@bespoke/share'
 import {elfSetting} from 'elf-setting'
-import {Log, LogLevel} from 'bespoke-server-util'
+import {Log, LogLevel} from '@bespoke/server-util'
 import {resolve} from 'path'
 import {readFileSync} from 'fs'
 import * as objHash from 'object-hash'

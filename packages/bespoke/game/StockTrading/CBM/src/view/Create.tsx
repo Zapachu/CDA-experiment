@@ -1,6 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Label, Lang, Switch} from 'elf-component'
+import {Core} from '@bespoke/client-sdk'
+import {Label, Lang, Switch} from 'elf-component'
 import {ICreateParams} from '../config'
 
 type TPlayProps = Core.ICreateProps<ICreateParams>

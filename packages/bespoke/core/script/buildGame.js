@@ -6,7 +6,7 @@ var webpack = require("webpack");
 var QiniuPlugin = require("qiniu-webpack-plugin");
 var ManifestPlugin = require("webpack-manifest-plugin");
 var clean_webpack_plugin_1 = require("clean-webpack-plugin");
-var bespoke_core_share_1 = require("bespoke-core-share");
+var share_1 = require("@bespoke/share");
 var defaultPaths = {
     entry: './src/view',
     output: './dist'
@@ -40,10 +40,10 @@ function geneClientBuilder(_a) {
         devtool: buildMode === 'dev' ? 'cheap-module-eval-source-map' : false,
         devServer: {
             host: '0.0.0.0',
-            port: bespoke_core_share_1.config.devPort.client,
+            port: share_1.config.devPort.client,
             proxy: (_b = {},
-                _b["/" + bespoke_core_share_1.config.rootName] = {
-                    target: "http://" + getIp() + ":" + bespoke_core_share_1.config.devPort.server,
+                _b["/" + share_1.config.rootName] = {
+                    target: "http://" + getIp() + ":" + share_1.config.devPort.server,
                     ws: true
                 },
                 _b)
@@ -55,7 +55,7 @@ function geneClientBuilder(_a) {
         output: {
             path: output,
             filename: "[name]" + (HMR ? '' : '.[hash:4]') + ".js",
-            publicPath: buildMode === 'publish' ? qiNiu.download.jsDomain + "/" + qiNiu.upload.path + "/" + namespace : "/" + bespoke_core_share_1.config.rootName + "/" + namespace + "/static/"
+            publicPath: buildMode === 'publish' ? qiNiu.download.jsDomain + "/" + qiNiu.upload.path + "/" + namespace : "/" + share_1.config.rootName + "/" + namespace + "/static/"
         },
         resolve: {
             extensions: ['.ts', '.tsx', '.js', '.jsx', '.json']

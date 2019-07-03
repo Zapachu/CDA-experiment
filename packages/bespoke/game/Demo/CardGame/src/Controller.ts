@@ -1,4 +1,4 @@
-import {BaseController, baseEnum, IActor, IMoveCallback, TGameState, TPlayerState} from 'bespoke-server'
+import {BaseController, baseEnum, IActor, IMoveCallback, TGameState, TPlayerState} from '@bespoke/core'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
 import {GameType, MoveType, PushType, Role, cardGame, LRGame, PlayerStatus} from './config'
 

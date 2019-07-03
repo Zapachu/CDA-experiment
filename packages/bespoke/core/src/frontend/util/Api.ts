@@ -7,7 +7,7 @@ import {
     IMoveLog,
     ISimulatePlayer,
     IUserWithId
-} from 'bespoke-core-share'
+} from '@bespoke/share'
 import {IHttpRes, Request} from 'elf-component'
 
 export const Api = new class {

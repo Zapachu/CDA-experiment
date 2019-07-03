@@ -1,4 +1,4 @@
-import {BaseController, gameId2PlayUrl, IActor, IMoveCallback, TGameState, TPlayerState} from 'bespoke-server'
+import {BaseController, gameId2PlayUrl, IActor, IMoveCallback, TGameState, TPlayerState} from '@bespoke/core'
 import {GameOver, RedisCall} from 'elf-protocol'
 import {
     Config,

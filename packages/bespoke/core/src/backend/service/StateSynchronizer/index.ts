@@ -1,5 +1,5 @@
-import {baseEnum, IActor} from 'bespoke-core-share'
-import {Log} from 'bespoke-server-util'
+import {baseEnum, IActor} from '@bespoke/share'
+import {Log} from '@bespoke/server-util'
 import {BaseController} from '../..'
 import {GameStateSynchronizer, PlayerStateSynchronizer} from './BaseSynchronizer'
 import {DiffGameStateSynchronizer, DiffPlayerStateSynchronizer} from './DiffSynchronizer'

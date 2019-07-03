@@ -1,9 +1,8 @@
 import * as React from 'react'
 import * as style from './style.scss'
-
-import {IGameWithId} from 'bespoke-core-share'
-import {Button, ButtonProps, Lang, MaskLoading, TPageProps} from 'elf-component'
-import {Api} from '../util'
+import {IGameWithId} from '@bespoke/share'
+import {Button, ButtonProps, Lang, MaskLoading} from 'elf-component'
+import {Api, TPageProps} from '../util'
 
 declare type IConfigurationState = {
     loading: boolean,

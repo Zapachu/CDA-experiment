@@ -1,3 +1,3 @@
-export * from 'bespoke-core-share'
+export * from '@bespoke/share'
 export * from './util'
 export * from './component'

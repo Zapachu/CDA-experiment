@@ -1,4 +1,4 @@
-import {registerOnFramework} from 'elf-component'
+import {registerOnFramework} from '@bespoke/client-sdk'
 import {namespace} from '../config'
 import {Create} from '../../../../Classic/TrustGame/src/view/Create'
 import {Result} from '../../../../Classic/TrustGame/src/view/Result'

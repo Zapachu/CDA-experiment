@@ -1,4 +1,4 @@
-import {registerOnFramework} from 'elf-component'
+import {registerOnFramework} from '@bespoke/client-sdk'
 import {namespace} from '../config'
 import {Play} from './Play'
 import {Create} from './Create'

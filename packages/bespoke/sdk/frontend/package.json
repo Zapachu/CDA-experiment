@@ -1,0 +1,10 @@
+{
+  "name": "@bespoke/client-sdk",
+  "version": "1.0.0",
+  "types": "index",
+  "main": "index",
+  "devDependencies": {
+    "@bespoke/share": "^1.0.0",
+    "@elf/client-sdk": "^1.0.0"
+  }
+}

@@ -10,7 +10,8 @@ import {
   Modal,
   StockInfo
 } from "bespoke-game-stock-trading-component";
-import { Core, Toast } from "elf-component";
+import {Core} from '@bespoke/client-sdk'
+import {Toast } from "elf-component";
 import {
   MoveType,
   PushType,

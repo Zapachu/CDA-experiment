@@ -10,8 +10,8 @@ import {
     SyncStrategy,
     TGameState,
     TPlayerState
-} from 'bespoke-core-share'
-import {Log} from 'bespoke-server-util'
+} from '@bespoke/share'
+import {Log} from '@bespoke/server-util'
 import {RedisCall, SendBackPlayer, SetPhaseResult} from 'elf-protocol'
 import {EventIO} from './EventIO'
 import {GameDAO} from './GameDAO'

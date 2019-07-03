@@ -1,13 +1,14 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang, baseEnum, Label, Switch, BtnGroup} from 'elf-component'
+import {BtnGroup, Label, Lang, Switch} from 'elf-component'
+import {Core} from '@bespoke/client-sdk'
 import {GameType} from '../config'
 import {ICreateParams} from '../interface'
 
-function getEnumKeys<E>(e:{}):Array<string> {
-    const keys:Array<string> = []
-    for(let key in e){
-        if(typeof e[key] === "number"){
+function getEnumKeys<E>(e: {}): Array<string> {
+    const keys: Array<string> = []
+    for (let key in e) {
+        if (typeof e[key] === 'number') {
             keys.push(key)
         }
     }
@@ -27,8 +28,8 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
         gameType: ['游戏类型', 'Game Type'],
         vsRobot: ['VS机器人', 'VS Robot'],
         robotInputSeq: ['机器人输入序列', 'Robot Input Seq'],
-        [GameType[GameType.Card]]:['卡牌实验','Card Game'],
-        [GameType[GameType.LeftRight]]:['左右实验','LeftRight Game'],
+        [GameType[GameType.Card]]: ['卡牌实验', 'Card Game'],
+        [GameType[GameType.LeftRight]]: ['左右实验', 'LeftRight Game']
     })
 
 

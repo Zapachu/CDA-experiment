@@ -1,9 +1,9 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {baseEnum} from 'bespoke-core-share'
-import {CodePanel, Lang, Toast, TPageProps} from 'elf-component'
+import {baseEnum} from '@bespoke/share'
+import {CodePanel, Lang, Toast} from 'elf-component'
 import {Link} from 'react-router-dom'
-import {Api} from '../util'
+import {Api, TPageProps} from '../util'
 
 export function Join({history}: TPageProps) {
     const lang = Lang.extractLang({

@@ -1,6 +1,6 @@
 import * as request from 'request'
 import * as qiniu from 'qiniu'
-import {BaseController, IActor, IMoveCallback, Log} from 'bespoke-server'
+import {BaseController, IActor, IMoveCallback, Log} from '@bespoke/core'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
 import {MoveType, PushType, qiniuTokenLifetime} from './config'
 import {elfSetting} from 'elf-setting'

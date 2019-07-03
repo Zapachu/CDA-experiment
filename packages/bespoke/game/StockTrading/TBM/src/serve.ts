@@ -1,6 +1,6 @@
 import { resolve } from "path";
-import { Server, RedisCall, gameId2PlayUrl } from "bespoke-server";
-import { RobotServer} from 'bespoke-robot'
+import { Server, RedisCall, gameId2PlayUrl } from '@bespoke/core';
+import { RobotServer} from '@bespoke/robot'
 import Controller from "./Controller";
 import Robot from "./Robot";
 import { namespace, ICreateParams } from "./config";

@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as style from "./style.scss";
-import { Core, Lang, Toast } from "elf-component";
+import {Core} from '@bespoke/client-sdk'
+import {Lang, Toast } from "elf-component";
 import {
   MoveType,
   PushType,

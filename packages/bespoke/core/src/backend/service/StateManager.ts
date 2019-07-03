@@ -1,4 +1,4 @@
-import {TGameState, TPlayerState, IActor, baseEnum} from 'bespoke-core-share'
+import {TGameState, TPlayerState, IActor, baseEnum} from '@bespoke/share'
 import {StateSynchronizer, GameStateSynchronizer, PlayerStateSynchronizer} from './StateSynchronizer'
 import {BaseLogic} from './BaseLogic'
 import {GameDAO} from './GameDAO'

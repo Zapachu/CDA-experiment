@@ -7,7 +7,7 @@ import {
   baseEnum,
   RedisCall,
   gameId2PlayUrl
-} from "bespoke-server";
+} from '@bespoke/core';
 import {
   GameState,
   ICreateParams,

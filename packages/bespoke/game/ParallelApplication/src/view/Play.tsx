@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as style from "./style.scss";
-import { Core, Toast } from "elf-component";
+import {Core} from '@bespoke/client-sdk'
+import {Toast } from "elf-component";
 import { useSpring, animated } from "react-spring";
 import {
   MoveType,

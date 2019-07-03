@@ -1,11 +1,11 @@
 import {resolve} from 'path'
 import * as Express from 'express'
 import {namespace} from './config'
-import {config, gameId2PlayUrl, RedisCall, Server} from 'bespoke-server'
+import {config, gameId2PlayUrl, RedisCall, Server} from '@bespoke/core'
 import Controller from './Controller'
 import {Robot} from './Robot'
 import {CreateGame} from 'elf-protocol'
-import {RobotServer} from 'bespoke-robot'
+import {RobotServer} from '@bespoke/robot'
 
 const router = Express.Router()
     .use('/egret/bin-debug', Express.static(resolve(__dirname, '../egret/bin-debug')))

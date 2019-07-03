@@ -1,7 +1,9 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {ICreateParams} from '../interface'
-import {Button, Core, Label, RangeInput, Input, RadioGroup} from 'elf-component'
+import {Button, Input, Label, RadioGroup, RangeInput} from 'elf-component'
+import {Core} from '@bespoke/client-sdk'
+
 interface ICreateState {
     commonValue: number
     deviation: number
@@ -17,7 +19,7 @@ interface ICreateState {
 
 const winnerModes = [
     '最高出价的前 m 位玩家胜利',
-    '出价大于所有玩家出价中位数的 m位玩家胜利',
+    '出价大于所有玩家出价中位数的 m位玩家胜利'
 ]
 
 export class Create extends Core.Create<ICreateParams, ICreateState> {
@@ -30,7 +32,7 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
         positions: [{privatePrice: [101, 98, 102]}, {privatePrice: [97, 99, 103]}],
         winnerNumber: 2,
         readonly: false,
-        mode: winnerModes[0],
+        mode: winnerModes[0]
     }
 
     componentDidMount(): void {

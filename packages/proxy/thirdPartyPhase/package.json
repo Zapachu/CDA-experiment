@@ -16,7 +16,7 @@
     "otreeProxy": "ts-node ./lib/phases/otreeProxy/app.ts"
   },
   "devDependencies": {
-    "@types/elf-linker": "^1.0.0",
+    "@elf/client-sdk": "^1.0.0",
     "elf-protocol": "^1.0.0",
     "elf-setting": "^1.0.0",
     "ts-node": "^8.0.3",

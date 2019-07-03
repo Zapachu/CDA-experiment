@@ -1,4 +1,4 @@
-import {baseEnum, IActor, TGameState, TPlayerState} from 'bespoke-core-share'
+import {baseEnum, IActor, TGameState, TPlayerState} from '@bespoke/share'
 import {GameDAO} from '../GameDAO'
 import {BaseLogic} from '../BaseLogic'
 import {EventIO} from '../EventIO'

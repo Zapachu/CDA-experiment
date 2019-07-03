@@ -1,4 +1,4 @@
-import {IGame, ISimulatePlayer} from 'bespoke-core-share'
+import {IGame, ISimulatePlayer} from '@bespoke/share'
 import {Schema, Document, Model, model} from 'mongoose'
 
 const {Types: {ObjectId, String}} = Schema

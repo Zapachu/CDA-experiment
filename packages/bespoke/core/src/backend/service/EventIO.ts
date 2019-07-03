@@ -8,8 +8,8 @@ import {
     IRobotHandshake,
     SocketEvent,
     UnixSocketEvent
-} from 'bespoke-core-share'
-import {getSocketPath, IpcConnection, Log} from 'bespoke-server-util'
+} from '@bespoke/share'
+import {getSocketPath, IpcConnection, Log} from '@bespoke/server-util'
 import {createServer, Socket} from 'net'
 import {existsSync, unlinkSync} from 'fs'
 import {Server} from 'http'

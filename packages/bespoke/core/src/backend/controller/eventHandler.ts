@@ -1,4 +1,4 @@
-import {baseEnum, IEventHandler, IConnection, TOnlineCallback, IMoveCallback} from 'bespoke-core-share'
+import {baseEnum, IEventHandler, IConnection, TOnlineCallback, IMoveCallback} from '@bespoke/share'
 import {BaseLogic} from '../service'
 
 export const EventHandler = {

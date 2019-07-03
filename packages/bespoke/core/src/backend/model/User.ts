@@ -1,5 +1,5 @@
 import {Schema, Document, Model, model} from 'mongoose'
-import {IUser} from 'bespoke-core-share'
+import {IUser} from '@bespoke/share'
 
 const {Types: {String, Number}} = Schema
 

@@ -6,13 +6,9 @@ import {rootContext} from '@client-context'
 import {Loading} from '@client-component'
 import {Api} from '@client-util'
 import {Route, Switch} from 'react-router'
-import {withSideNav, NAV} from './SideNav'
-import {Phase} from './Phase'
 import {Play} from './Play'
-import {Configuration} from './Configuration'
 import {Info} from './Info'
 import {GameList} from './GameList'
-import {BaseInfo} from './BaseInfo'
 import {PlayerResult} from './Result/Player'
 import {Create} from './Create'
 
@@ -43,11 +39,7 @@ export const Root: React.FunctionComponent = () => {
                 <BrowserRouter basename={config.rootName}>
                     <Switch>
                         <Route path={'/Create/:namespace'} component={Create}/>
-                        <Route path={'/baseInfo/:gameId'} component={withSideNav(BaseInfo, NAV.basic)}/>
-                        <Route path={'/baseInfo'} component={withSideNav(BaseInfo, NAV.basic)}/>
-                        <Route path={'/phase/:gameId'} component={withSideNav(Phase, NAV.phase)}/>
                         <Route path={'/info/:gameId'} component={Info}/>
-                        <Route path={'/configuration/:gameId'} component={Configuration}/>
                         <Route path={'/play/:gameId'} component={Play}/>
                         <Route path={'/playerResult/:gameId/:playerId'} component={PlayerResult}/>
                         <Route path={'/share/:gameId'}

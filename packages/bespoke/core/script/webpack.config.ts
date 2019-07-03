@@ -3,7 +3,7 @@ import {CleanWebpackPlugin} from 'clean-webpack-plugin'
 import * as HtmlWebpackPlugin from 'html-webpack-plugin'
 import * as QiniuPlugin from 'qiniu-webpack-plugin'
 import * as ManifestPlugin from 'webpack-manifest-plugin'
-import {config} from 'bespoke-core-share'
+import {config} from '@bespoke/share'
 import {elfSetting} from 'elf-setting'
 
 const {qiNiu} = elfSetting

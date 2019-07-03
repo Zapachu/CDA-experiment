@@ -1,6 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, ButtonProps, Core, Lang, MaskLoading, RadioGroup, Toast} from 'elf-component'
+import {Button, ButtonProps, Lang, MaskLoading, RadioGroup, Toast} from 'elf-component'
+import {Core} from '@bespoke/client-sdk'
 import {EYE_EXAMPLE, EYES, GameStage, GENDER, MoveType, PushType} from '../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import {getEnumKeys} from '../util'
@@ -95,11 +96,11 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
 
     renderMainTestStage(): React.ReactNode {
         const {lang, props: {frameEmitter, game, gameState: {time}, playerState: {result, anwsers}}, state: {emotion, gender}} = this,
-          timeLeft = game.params.timeLimit*60 - time,
-          timeLeftMin = Math.floor(timeLeft/60),
-          timeLeftSec = timeLeft % 60;
+            timeLeft = game.params.timeLimit * 60 - time,
+            timeLeftMin = Math.floor(timeLeft / 60),
+            timeLeftSec = timeLeft % 60
         if (result) {
-          return <GameResult result={result} total={EYES.length}/>
+            return <GameResult result={result} total={EYES.length}/>
         }
         const curEye = anwsers ? EYES[anwsers.length] : EYE_EXAMPLE
         new Image().src = EYES[anwsers && anwsers.length + 1 < EYES.length ? anwsers.length + 1 : 0].url //preload
@@ -116,7 +117,8 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                         value={lang[GENDER[gender]]}
                         optionStyle={'50%'}
                         onChange={v => {
-                          this.setState({gender: genderOptions.findIndex(o => o === v)})}}
+                            this.setState({gender: genderOptions.findIndex(o => o === v)})
+                        }}
             />
             <label>{lang.theEmotionIs}</label>
             <RadioGroup options={emotionOptions}
@@ -133,10 +135,10 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                             ...anwsers ? {index: anwsers.length} : {}
                         }
                     })
-                    this.setState({gender:undefined, emotion:undefined})
+                    this.setState({gender: undefined, emotion: undefined})
                 }}/>
             </div>
-            <div className={style.desc} dangerouslySetInnerHTML={{__html:curEye.desc}}/>
+            <div className={style.desc} dangerouslySetInnerHTML={{__html: curEye.desc}}/>
         </section>
     }
 
@@ -145,6 +147,6 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         if (!result) {
             return <MaskLoading/>
         }
-        return <GameResult result={result} total={EYES.length}/> 
+        return <GameResult result={result} total={EYES.length}/>
     }
 }

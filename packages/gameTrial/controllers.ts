@@ -2,7 +2,7 @@ import Socket from 'socket.io'
 import passport from 'passport'
 import { Request, Response, NextFunction } from 'express'
 import socketEmitter from 'socket.io-emitter'
-import { RedisCall } from 'bespoke-server'
+import { RedisCall } from 'elf-protocol'
 import Redis from 'ioredis'
 
 import { User } from './models'

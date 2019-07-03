@@ -1,5 +1,5 @@
 import {Schema, Document, Model, model} from 'mongoose'
-import {IMoveLog} from 'bespoke-core-share'
+import {IMoveLog} from '@bespoke/share'
 
 const {Types: {String, Number}} = Schema
 

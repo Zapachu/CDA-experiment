@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {baseEnum, FrameEmitter, IGameWithId, ISimulatePlayer, TGameState, TPlayerState} from 'bespoke-core-share'
+import {baseEnum, FrameEmitter, IGameWithId, ISimulatePlayer, TGameState, TPlayerState} from '@bespoke/share'
 import {Button, ButtonProps, Lang} from 'elf-component'
 import {Api} from '../../util'
 

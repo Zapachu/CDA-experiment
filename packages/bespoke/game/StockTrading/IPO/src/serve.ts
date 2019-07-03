@@ -1,12 +1,12 @@
 import {resolve} from 'path'
-import {Server, RedisCall, gameId2PlayUrl} from 'bespoke-server'
+import {Server, RedisCall, gameId2PlayUrl} from '@bespoke/core'
 import Controller from './Controller'
 import {namespace, IPOType} from './config'
 import {ICreateParams} from './interface'
 import Robot from './Robot'
 import {Phase, phaseToNamespace} from 'bespoke-game-stock-trading-config'
 import {CreateGame} from 'elf-protocol'
-import {RobotServer} from 'bespoke-robot'
+import {RobotServer} from '@bespoke/robot'
 
 Server.start(namespace, Controller, resolve(__dirname, '../dist'))
 

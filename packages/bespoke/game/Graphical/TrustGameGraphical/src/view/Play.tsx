@@ -1,18 +1,13 @@
 import * as React from 'react'
 import Cash from './coms/Cash'
 import Referee from './coms/Referee'
-import PutShadow from "./coms/PutShadow"
+import PutShadow from './coms/PutShadow'
 import Background from './coms/Background'
-import {Core, Lang, MaskLoading, Toast} from 'elf-component'
-import {Stage, span, Input, Button, RoundSwitching} from 'bespoke-game-graphical-util'
-import {
-    ICreateParams,
-    IGameState,
-    IMoveParams,
-    IPlayerState,
-    IPushParams
-} from '../interface'
-import {MoveType, PlayerStatus, PushType, NEW_ROUND_TIMER} from '../config'
+import {Lang, MaskLoading, Toast} from 'elf-component'
+import {Core} from '@bespoke/client-sdk'
+import {Button, Input, RoundSwitching, span, Stage} from 'bespoke-game-graphical-util'
+import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
+import {MoveType, NEW_ROUND_TIMER, PlayerStatus, PushType} from '../config'
 import * as style from './style.scss'
 
 interface IPlayState {
@@ -30,11 +25,11 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
 
     lang = Lang.extractLang({
         hello: ['你好', 'Hello'],
-        shout: ['出价', 'Shout',],
+        shout: ['出价', 'Shout'],
         prepare: ['准备好了', 'Prepared'],
         nextRound: ['下一轮', 'Next Round'],
         matchingPlayer: ['正在匹配玩家', 'Matching Players...'],
-        toNewRound: [n => `${n} 秒后进入下一轮`, n => `Market will enter into next round in ${n}s`],
+        toNewRound: [n => `${n} 秒后进入下一轮`, n => `Market will enter into next round in ${n}s`]
     })
 
     async componentDidMount() {

@@ -1,4 +1,4 @@
-import {UnixSocketEvent} from 'bespoke-core-share'
+import {UnixSocketEvent} from '@bespoke/share'
 import {createServer} from 'net'
 import {getSocketPath, Log, IpcConnection} from '.'
 

@@ -1,7 +1,7 @@
 import {Server} from 'http'
 import * as socketIO from 'socket.io'
-import {Log} from 'bespoke-server-util'
-import {IConnection, IEventHandler} from 'bespoke-core-share'
+import {Log} from '@bespoke/server-util'
+import {IConnection, IEventHandler} from '@bespoke/share'
 import {EventHandler} from './eventHandler'
 import {EventIO} from '../service'
 

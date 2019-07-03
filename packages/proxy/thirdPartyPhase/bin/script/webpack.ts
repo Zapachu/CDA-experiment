@@ -43,7 +43,7 @@ export = () => {
                         {
                             loader: 'sass-loader',
                             options: {
-                                includePaths: [path.resolve(__dirname, '../../lib/core/common/resource')]
+                                includePaths: [path.resolve(__dirname, '../../lib/core/client/resource')]
                             }
                         }
                     ]

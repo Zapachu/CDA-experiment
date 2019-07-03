@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import * as dateFormat from 'dateformat'
-import {baseEnum, IGameConfig, IGameThumb} from 'bespoke-core-share'
+import {baseEnum, IGameConfig, IGameThumb} from '@bespoke/share'
 import {Lang} from 'elf-component'
 import {Api} from '../util'
 

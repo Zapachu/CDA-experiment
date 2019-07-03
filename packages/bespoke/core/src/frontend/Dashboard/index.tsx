@@ -1,8 +1,8 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {baseEnum, IGameThumb} from 'bespoke-core-share'
-import {Button, Lang, TPageProps} from 'elf-component'
-import {Api} from '../util'
+import {baseEnum, IGameThumb} from '@bespoke/share'
+import {Button, Lang} from 'elf-component'
+import {Api, TPageProps} from '../util'
 import * as dateFormat from 'dateformat'
 
 export function Dashboard({history, user}: TPageProps) {

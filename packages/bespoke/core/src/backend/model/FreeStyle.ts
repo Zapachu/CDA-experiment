@@ -1,5 +1,5 @@
 import {Schema, Document, Model, model} from 'mongoose'
-import {IFreeStyle} from 'bespoke-core-share'
+import {IFreeStyle} from '@bespoke/share'
 
 const {Types:{ObjectId, String}} = Schema
 

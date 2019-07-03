@@ -1,5 +1,5 @@
 {
-  "name": "bespoke-core-share",
+  "name": "@bespoke/share",
   "version": "1.0.0",
   "main": "build/index",
   "types": "build/index",

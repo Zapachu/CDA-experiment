@@ -8,7 +8,7 @@ import {
     RedisCall,
     TGameState,
     TPlayerState
-} from 'bespoke-server'
+} from '@bespoke/core'
 import {
     CONFIG,
     GameType,

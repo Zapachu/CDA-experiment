@@ -7,7 +7,7 @@ import {
   RedisCall,
   TGameState,
   TPlayerState
-} from "bespoke-server";
+} from '@bespoke/core';
 import {
   MoveType,
   PushType,

@@ -1,4 +1,4 @@
-import {BaseLogic, IActor, IMoveCallback, Log, TGameState, TPlayerState} from 'bespoke-server'
+import {BaseLogic, IActor, IMoveCallback, Log, TGameState, TPlayerState} from '@bespoke/core'
 import {
     ICreateParams,
     IGameState,

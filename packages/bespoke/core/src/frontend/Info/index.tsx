@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {IGameWithId, IUserWithId} from 'bespoke-core-share'
+import {IGameWithId, IUserWithId} from '@bespoke/share'
 import {Lang, Markdown, MaskLoading} from 'elf-component'
 import {Api} from '../util'
 import {RouteComponentProps} from 'react-router'

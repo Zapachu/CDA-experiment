@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as style from "./style.scss";
-import { Lang, Core } from "elf-component";
+import {Core} from '@bespoke/client-sdk'
+import { Lang } from "elf-component";
 import {
   ICreateParams,
   IGameState,

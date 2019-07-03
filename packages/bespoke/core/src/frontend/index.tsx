@@ -1,8 +1,9 @@
 import './initial.scss'
 import * as React from 'react'
-import {IGameTemplate, Lang, MaskLoading, TPageProps, TRegisterGame} from 'elf-component'
+import {IGameTemplate} from '@bespoke/client-sdk'
+import {Lang, MaskLoading} from 'elf-component'
 import {BrowserRouter, Redirect, Route as ReactRoute, RouteComponentProps, RouteProps, Switch} from 'react-router-dom'
-import {config} from 'bespoke-core-share'
+import {config} from '@bespoke/share'
 import {Login} from './Login'
 import {Dashboard} from './Dashboard'
 import {Create} from './Create'
@@ -12,7 +13,7 @@ import {Join} from './Join'
 import {Play} from './Play'
 import {Configuration} from './Configuration'
 import {render} from 'react-dom'
-import {Api} from './util'
+import {Api, TPageProps} from './util'
 
 function renderRoot(pageProps: TPageProps, rootContainer: HTMLElement) {
     const Route = ({component: Component, ...routeProps}: RouteProps) =>
@@ -38,7 +39,7 @@ function renderRoot(pageProps: TPageProps, rootContainer: HTMLElement) {
     </BrowserRouter>, rootContainer)
 }
 
-export const registerGame: TRegisterGame = (gameTemplate: IGameTemplate) => {
+export function registerGame(gameTemplate: IGameTemplate) {
     const Empty = () => null
     const template = {
         Create: Empty,

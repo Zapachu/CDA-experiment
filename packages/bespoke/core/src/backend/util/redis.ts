@@ -1,4 +1,4 @@
-import {baseEnum} from 'bespoke-core-share'
+import {baseEnum} from '@bespoke/share'
 export const RedisKey = {
     verifyCodeSendTimes: (nationCode: baseEnum.NationCode, phoneNumber: string) => `verifyCodeSendTimes:${nationCode}:${phoneNumber}`,
     verifyCode: (nationCode: baseEnum.NationCode, phoneNumber: string) => `verifyCode:${nationCode}:${phoneNumber}`,
