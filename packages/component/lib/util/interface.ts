@@ -1,5 +1,4 @@
 import * as React from 'react'
-import {IElfCreateProps} from 'elf-linker'
 import {FrameEmitter, IGameWithId, TGameState, TPlayerState, IUserWithId} from 'bespoke-core-share'
 import {RouteComponentProps} from 'react-router-dom'
 
@@ -12,7 +11,6 @@ export interface IGameTemplate {
     namespace?: string
     localeNames?: Array<string>
     Create?: Core.CreateClass
-    CreateOnElf?: Core.CreateOnElfClass
     Info?: Core.InfoClass
     Play: Core.PlayClass
     Play4Owner?: Core.Play4OwnerClass
@@ -123,11 +121,4 @@ export namespace Core {
 
     export type Result4OwnerClass = (new(...args) => Result4Owner<{}, {}, {}, any, {}, any>)
         | Result4OwnerSFC<{}, {}, {}, any, {}>
-
-    //region Elf
-    export class CreateOnElf<ICreateParams, S = {}> extends React.Component<IElfCreateProps<ICreateParams>, S> {
-    }
-
-    export type CreateOnElfClass = (new(...args) => CreateOnElf<{}>)
-    //endregion
 }
