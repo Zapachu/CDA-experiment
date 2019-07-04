@@ -1,6 +1,6 @@
 {
   "name": "elf-linker",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "GuoKan",
   "repository": " ",
   "license": "ISC",
@@ -13,9 +13,9 @@
     "server:ts-serve": "ts-node ./src/server/server.ts"
   },
   "devDependencies": {
-    "@elf/client-sdk": "^1.0.0",
-    "elf-protocol": "^1.0.0",
-    "elf-setting": "^1.0.0",
+    "@elf/client-sdk": "^1.1.0",
+    "elf-protocol": "^1.1.0",
+    "elf-setting": "^1.1.0",
     "ts-node": "^8.0.3",
     "typescript": "^3.3.3333",
     "webpack": "^4.29.6"
