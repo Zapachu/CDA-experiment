@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {MoveType, PushType} from '../../config'
 import {ICreateParams, IMoveParams, IPushParams} from '../../interface'
-import {FrameEmitter, IGame, Button} from 'elf-component'
+import {FrameEmitter, IGame, Button} from '@elf/component'
 
 interface Props {
   correctNumber: number

@@ -2,8 +2,8 @@ import {NextFunction, Request, Response} from 'express'
 import {ErrorPage} from '../../../common/utils'
 import ListMap from '../utils/ListMap'
 import {ThirdPartPhase} from '../../../../core/server/models'
-import {elfSetting as elfSetting} from 'elf-setting'
-import {RedisCall, SendBackPlayer} from 'elf-protocol'
+import {elfSetting as elfSetting} from '@elf/setting'
+import {RedisCall, SendBackPlayer} from '@elf/protocol'
 import nodeXlsx from 'node-xlsx'
 import {
     downloadScreenXlsxRoute,

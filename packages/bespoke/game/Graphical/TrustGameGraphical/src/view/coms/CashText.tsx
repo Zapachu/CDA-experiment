@@ -1,5 +1,5 @@
 import * as React from "react"
-import {span} from 'bespoke-game-graphical-util'
+import {span} from '@bespoke-game/graphical-util'
 
 const CashText = ({val, transform}: { val: string, transform: string }) => {
     return <g transform={transform}>

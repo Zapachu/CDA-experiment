@@ -1,5 +1,5 @@
 import {resolve} from 'path'
-import {Server, Model, BaseLogic} from '@bespoke/core'
+import {Server, Model, BaseLogic} from '@bespoke/server'
 import Controller from './Controller'
 import Robot from './Robot'
 import {

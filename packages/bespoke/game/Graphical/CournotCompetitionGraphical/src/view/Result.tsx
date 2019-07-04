@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Lang} from 'elf-component'
-import {Core} from '@bespoke/client-sdk'
+import {Lang} from '@elf/component'
+import {Core} from '@bespoke/register'
 import {ICreateParams, IGameState, IPlayerState} from '../interface'
 
 export class Result extends Core.Result<ICreateParams, IGameState, IPlayerState> {

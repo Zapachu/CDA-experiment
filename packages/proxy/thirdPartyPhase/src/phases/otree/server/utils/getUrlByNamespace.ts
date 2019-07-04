@@ -1,5 +1,5 @@
 import * as objectHash from 'object-hash'
-import {elfSetting as settings} from 'elf-setting'
+import {elfSetting as settings} from '@elf/setting'
 import {ThirdPartPhase} from '../../../../core/server/models'
 import * as rp from 'request-promise'
 import ListMap from './ListMap'

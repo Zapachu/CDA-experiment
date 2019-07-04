@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {baseEnum, config} from '@bespoke/share'
-import {Lang, Toast} from 'elf-component'
+import {Lang, Toast} from '@elf/component'
 import {Api, TPageProps} from '../util'
 
 declare interface ILoginState {

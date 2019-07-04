@@ -1,8 +1,8 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {ICreateParams} from '../interface'
-import {Input, Label, RangeInput, Toast} from 'elf-component'
-import {Core} from '@bespoke/client-sdk'
+import {Input, Label, RangeInput, Toast} from '@elf/component'
+import {Core} from '@bespoke/register'
 
 interface ICreateState {
     initialFunding: number,

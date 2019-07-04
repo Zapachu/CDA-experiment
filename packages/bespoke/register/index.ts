@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {FrameEmitter, IGameWithId, TGameState, TPlayerState} from '@bespoke/share'
-import {registerPhaseCreate, Template} from '@elf/client-sdk'
+import {registerPhaseCreate, Template} from '@elf/register'
 
 export interface IGameTemplate {
     namespace?: string

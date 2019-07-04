@@ -8,7 +8,7 @@ import {
     ISimulatePlayer,
     IUserWithId
 } from '@bespoke/share'
-import {IHttpRes, Request} from 'elf-component'
+import {IHttpRes, Request} from '@elf/component'
 
 export const Api = new class {
     get: (path: string, params?: {}, query?: {}) => Promise<any>

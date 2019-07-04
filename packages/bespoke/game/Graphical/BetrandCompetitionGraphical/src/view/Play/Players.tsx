@@ -1,4 +1,4 @@
-import {span, ImgLoader, Shadow, Win, Idea} from 'bespoke-game-graphical-util'
+import {span, ImgLoader, Shadow, Win, Idea} from '@bespoke-game/graphical-util'
 import * as React from "react"
 import {PlayerStatus} from '../../config'
 

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Lang, Request} from 'elf-component'
-import {Core} from '@bespoke/client-sdk'
+import {Lang, Request} from '@elf/component'
+import {Core} from '@bespoke/register'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState} from '../interface'
 import {EYES, FetchRoute, MoveType, namespace, SheetType} from '../config'
 

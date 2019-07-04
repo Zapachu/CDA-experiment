@@ -12,7 +12,7 @@ import * as errorHandler from 'errorhandler'
 import * as bodyParser from 'body-parser'
 import * as compression from 'compression'
 import * as morgan from 'morgan'
-import {elfSetting} from 'elf-setting'
+import {elfSetting} from '@elf/setting'
 import {gameId2PlayUrl, getOrigin, heartBeat, QCloudSMS, RedisKey, Setting} from './util'
 import {PassportStrategy} from './interface'
 import {baseEnum, config, IGameConfig, IStartOption} from '@bespoke/share'
@@ -23,7 +23,7 @@ import {AddressInfo} from 'net'
 import {GameModel, UserDoc, UserModel} from './model'
 import {Strategy} from 'passport-local'
 import * as http from 'http'
-import {NewPhase, PhaseReg, RedisCall, redisClient} from 'elf-protocol'
+import {NewPhase, PhaseReg, RedisCall, redisClient} from '@elf/protocol'
 import {Log} from '@bespoke/server-util'
 
 export class Server {
@@ -72,7 +72,7 @@ export class Server {
         })
         express.use(errorHandler())
         express.use(`/${config.rootName}/${Setting.namespace}/static`, Express.static(Setting.staticPath, {maxAge: '10d'}))
-        express.use(`/${config.rootName}/${Setting.namespace}/static`, Express.static(path.join(__dirname, '../../lib/'), {maxAge: '10d'}))
+        express.use(`/${config.rootName}/${Setting.namespace}/static`, Express.static(path.join(__dirname, '../../static/'), {maxAge: '10d'}))
         express.use(`/${config.rootName}/${Setting.namespace}`, bespokeRouter)
         express.use(`/${config.rootName}/${Setting.namespace}`, router)
         return express
@@ -140,7 +140,7 @@ export class Server {
             })
             return {playUrl: gameId2PlayUrl(id)}
         })
-        const elfComponentPath = require('../../lib/index.json')['ElfComponent.js'].replace('static', `${Setting.namespace}/static`)
+        const elfComponentPath = require('../../static/index.json')['ElfComponent.js'].replace('static', `${Setting.namespace}/static`)
         const regInfo: PhaseReg.IRegInfo = {
             namespace: Setting.namespace,
             jsUrl: `${getOrigin()}${elfComponentPath};${getOrigin()}${Setting.getClientPath()}`

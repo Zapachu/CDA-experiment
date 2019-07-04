@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, Lang} from 'elf-component'
-import {Core} from '@bespoke/client-sdk'
+import {Button, Lang} from '@elf/component'
+import {Core} from '@bespoke/register'
 import {EYES, GameStage, MoveType, PushType} from '../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 

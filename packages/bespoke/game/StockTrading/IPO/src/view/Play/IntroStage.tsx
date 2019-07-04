@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as style from "./style.scss";
-import {Core} from '@bespoke/client-sdk'
-import { Lang } from "elf-component";
+import {Core} from '@bespoke/register'
+import { Lang } from "@elf/component";
 import {
   ICreateParams,
   IGameState,
@@ -17,7 +17,7 @@ import {
 import {
   Line,
   Loading
-} from "bespoke-game-stock-trading-component";
+} from "@bespoke-game/stock-trading-component";
 
 interface IPlayState {
   matchTimer: number;

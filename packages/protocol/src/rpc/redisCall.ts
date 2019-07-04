@@ -1,5 +1,5 @@
 import {Log} from '../util'
-import {elfSetting} from 'elf-setting'
+import {elfSetting} from '@elf/setting'
 import * as IORedis from 'ioredis'
 
 const DEFAULT_TTL = 5

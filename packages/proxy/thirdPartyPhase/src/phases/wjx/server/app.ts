@@ -1,5 +1,5 @@
 import * as errorhandler from 'errorhandler'
-import {elfSetting as settings} from 'elf-setting'
+import {elfSetting as settings} from '@elf/setting'
 import '../../common/auth/passport'
 import {routePrefix} from '../../common/config'
 import {getUrlByNamespace, InitWork, ProxyWork} from './utils'

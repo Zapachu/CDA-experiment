@@ -1,5 +1,5 @@
 import {Document, Model, model, Schema} from 'mongoose'
-import {getModels, SetPhaseResult} from 'elf-protocol'
+import {getModels, SetPhaseResult} from '@elf/protocol'
 import {IGame, IGameState, IPlayer, IUser} from '@common'
 
 const {String} = Schema.Types

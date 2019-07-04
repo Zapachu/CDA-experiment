@@ -1,4 +1,4 @@
-import {Model, redisClient} from '@bespoke/core'
+import {Model, redisClient} from '@bespoke/server'
 import {BaseRobot} from '@bespoke/robot'
 import * as dateFormat from 'dateformat'
 import {

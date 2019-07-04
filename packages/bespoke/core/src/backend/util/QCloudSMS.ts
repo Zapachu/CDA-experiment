@@ -1,5 +1,5 @@
 import {baseEnum} from '@bespoke/share'
-import {elfSetting} from 'elf-setting'
+import {elfSetting} from '@elf/setting'
 import {Log} from '@bespoke/server-util'
 import * as QCloudSms from 'qcloudsms_js'
 

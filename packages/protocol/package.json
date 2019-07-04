@@ -1,5 +1,5 @@
 {
-  "name": "elf-protocol",
+  "name": "@elf/protocol",
   "version": "1.1.1",
   "main": "lib/index",
   "types": "src/index",
@@ -8,7 +8,7 @@
     "tsc-w": "tsc -w"
   },
   "devDependencies": {
-    "elf-setting": "^1.1.1",
+    "@elf/setting": "^1.1.1",
     "ts-node": "^8.0.3",
     "typescript": "^3.3.3333"
   }

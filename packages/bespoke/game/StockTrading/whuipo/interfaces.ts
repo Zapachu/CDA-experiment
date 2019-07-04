@@ -1,5 +1,5 @@
 import { Document } from 'mongoose'
-import {Phase} from 'bespoke-game-stock-trading-config'
+import {Phase} from '@bespoke-game/stock-trading-config'
 interface IDocument extends Document {
     updateAt: number;
     createAt: number;

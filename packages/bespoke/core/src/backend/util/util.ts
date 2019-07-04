@@ -1,11 +1,11 @@
 import {config, IStartOption} from '@bespoke/share'
-import {elfSetting} from 'elf-setting'
+import {elfSetting} from '@elf/setting'
 import {Log, LogLevel} from '@bespoke/server-util'
 import {resolve} from 'path'
 import {readFileSync} from 'fs'
 import * as objHash from 'object-hash'
 import {NetworkInterfaceInfo, networkInterfaces} from 'os'
-import {redisClient} from 'elf-protocol'
+import {redisClient} from '@elf/protocol'
 import {CONFIG} from './config'
 
 export class Token {

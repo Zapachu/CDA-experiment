@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {HistoryGame} from './HistoryGame'
-import {Button, ButtonProps, Input, Label, Lang, Markdown, Toast} from 'elf-component'
+import {Button, ButtonProps, Input, Label, Lang, Markdown, Toast} from '@elf/component'
 import {baseEnum, IGameConfig} from '@bespoke/share'
 import {Api, TPageProps} from '../util'
 

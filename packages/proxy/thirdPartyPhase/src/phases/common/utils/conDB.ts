@@ -1,6 +1,6 @@
 'use strict'
 
-import {elfSetting as settings} from 'elf-setting'
+import {elfSetting as settings} from '@elf/setting'
 import {connect as DBConnect, connection as DBConnection} from 'mongoose'
 
 const {mongoUri, mongoUser, mongoPass} = settings

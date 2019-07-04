@@ -1,4 +1,4 @@
-import {baseEnum} from '@bespoke/core'
+import {baseEnum} from '@bespoke/server'
 import {BaseRobot} from '@bespoke/robot'
 import {
     ICreateParams,

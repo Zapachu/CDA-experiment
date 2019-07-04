@@ -3,7 +3,7 @@
 import '../auth/passport'
 import * as passport from 'passport'
 import {model} from 'mongoose'
-import {getModels} from 'elf-protocol'
+import {getModels} from '@elf/protocol'
 
 passport.serializeUser(function (user, done) {
     // @ts-ignore

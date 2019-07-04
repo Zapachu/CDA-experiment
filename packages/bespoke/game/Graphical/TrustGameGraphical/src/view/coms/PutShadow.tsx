@@ -1,4 +1,4 @@
-import {span, Shadow} from 'bespoke-game-graphical-util'
+import {span, Shadow} from '@bespoke-game/graphical-util'
 import * as React from "react";
 
 const PutShadow = ({curPlayer}: { curPlayer: number }) => {

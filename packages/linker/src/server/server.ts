@@ -17,7 +17,7 @@ registerTsConfigPath({
 })
 
 import {config} from '@common'
-import {elfSetting} from 'elf-setting'
+import {elfSetting} from '@elf/setting'
 import * as passport from 'passport'
 import {redisClient, Log} from '@server-util'
 import requestRouter from './controller/requestRouter'

@@ -1,4 +1,4 @@
-import {registerOnFramework} from '@bespoke/client-sdk'
+import {registerOnFramework} from '@bespoke/register'
 import {Create} from './Create'
 import {Play} from './Play'
 import {namespace} from '../config'

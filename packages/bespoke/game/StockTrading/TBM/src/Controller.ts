@@ -7,7 +7,7 @@ import {
   RedisCall,
   TGameState,
   TPlayerState
-} from '@bespoke/core';
+} from '@bespoke/server';
 import {
   MoveType,
   PushType,
@@ -19,8 +19,8 @@ import {
   IPushParams,
   SHOUT_TIMER
 } from "./config";
-import { Phase, STOCKS, phaseToNamespace } from "bespoke-game-stock-trading-config";
-import {GameOver} from 'elf-protocol'
+import { Phase, STOCKS, phaseToNamespace } from "@bespoke-game/stock-trading-config";
+import {GameOver} from '@elf/protocol'
 
 export default class Controller extends BaseController<
   ICreateParams,

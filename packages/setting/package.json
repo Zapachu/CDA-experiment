@@ -1,5 +1,5 @@
 {
-  "name": "elf-setting",
+  "name": "@elf/setting",
   "version": "1.1.1",
   "main": "lib/index",
   "types": "src/index",

@@ -39,10 +39,10 @@ function __export(m) {
 }
 exports.__esModule = true;
 var util_1 = require("../util");
-var elf_setting_1 = require("elf-setting");
+var setting_1 = require("@elf/setting");
 var IORedis = require("ioredis");
 var DEFAULT_TTL = 5;
-exports.redisClient = new IORedis(elf_setting_1.elfSetting.redisPort, elf_setting_1.elfSetting.redisHost);
+exports.redisClient = new IORedis(setting_1.elfSetting.redisPort, setting_1.elfSetting.redisHost);
 var RedisCall;
 (function (RedisCall) {
     function getServiceKey(method) {
@@ -52,7 +52,7 @@ var RedisCall;
         return Math.random().toString(36).substr(2);
     }
     function getBlockRedisClient() {
-        return new IORedis(elf_setting_1.elfSetting.redisPort, elf_setting_1.elfSetting.redisHost);
+        return new IORedis(setting_1.elfSetting.redisPort, setting_1.elfSetting.redisHost);
     }
     function _handle(method, handler, redis) {
         var _this = this;

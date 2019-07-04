@@ -1,6 +1,6 @@
 import {resolve} from 'path'
 import {Request, Response, Router} from 'express'
-import {ResponseCode, Server} from '@bespoke/core'
+import {ResponseCode, Server} from '@bespoke/server'
 import {RobotServer} from '@bespoke/robot'
 import {namespace} from './config'
 import {Logic} from './Logic'

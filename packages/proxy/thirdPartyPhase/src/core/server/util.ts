@@ -1,4 +1,4 @@
-import {NewPhase, PhaseReg, RedisCall, redisClient} from 'elf-protocol'
+import {NewPhase, PhaseReg, RedisCall, redisClient} from '@elf/protocol'
 import * as objectHash from 'object-hash'
 import {readFileSync} from 'fs'
 import {resolve} from 'path'

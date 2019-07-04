@@ -1,8 +1,8 @@
 'use strict'
 
 import {ThirdPartPhase} from "../../../../core/server/models"
-import {elfSetting as settings} from 'elf-setting'
-import {RedisCall, SendBackPlayer} from 'elf-protocol'
+import {elfSetting as settings} from '@elf/setting'
+import {RedisCall, SendBackPlayer} from '@elf/protocol'
 
 const {qualtricsProxy} = settings
 

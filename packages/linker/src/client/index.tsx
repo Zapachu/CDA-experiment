@@ -2,7 +2,7 @@ import {Lang} from '@client-util'
 import * as React from 'react'
 import {render} from 'react-dom'
 import {Root} from './view'
-import {IPhaseTemplate} from '@elf/client-sdk'
+import {IPhaseTemplate} from '@elf/register'
 
 require('./initial.scss')
 

@@ -1,7 +1,7 @@
 import * as Express from 'express'
 import * as errorHandler from 'errorhandler'
 import * as path from 'path'
-import {elfSetting} from 'elf-setting'
+import {elfSetting} from '@elf/setting'
 import {readFileSync} from 'fs'
 import {virtualJsRoute} from './config'
 import '../../common/auth/passport'

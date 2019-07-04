@@ -5,7 +5,7 @@ import * as QiniuPlugin from 'qiniu-webpack-plugin'
 import * as ManifestPlugin from 'webpack-manifest-plugin'
 import {CleanWebpackPlugin} from 'clean-webpack-plugin'
 import {config} from '@bespoke/share'
-import {elfSetting} from 'elf-setting'
+import {elfSetting} from '@elf/setting'
 
 interface IPaths {
     entry?: string
@@ -126,7 +126,7 @@ export function geneClientBuilder(
         externals: {
             'react': 'React',
             'react-dom': 'ReactDOM',
-            'elf-component': 'ElfComponent'
+            '@elf/component': 'ElfComponent'
         },
         plugins: [
             new ManifestPlugin({

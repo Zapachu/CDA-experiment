@@ -1,6 +1,6 @@
 import {IGameConfig, IGameWithId, TGameState, TPlayerState} from '@bespoke/share'
-import {elfSetting} from 'elf-setting'
-import {redisClient} from 'elf-protocol'
+import {elfSetting} from '@elf/setting'
+import {redisClient} from '@elf/protocol'
 import {Log} from '@bespoke/server-util'
 import {cacheResult, RedisKey, Setting} from '../util'
 import {GameDoc, GameModel} from '../model'

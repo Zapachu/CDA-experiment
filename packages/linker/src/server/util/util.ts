@@ -1,7 +1,7 @@
 import {config} from '@common'
 import {colorConsole, dailyfile} from 'tracer'
 import * as objHash from 'object-hash'
-import {elfSetting} from 'elf-setting'
+import {elfSetting} from '@elf/setting'
 import {resolve} from 'path'
 
 export const webpackHmr = process.env.HMR === 'true'

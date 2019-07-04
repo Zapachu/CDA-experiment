@@ -7,7 +7,7 @@ import {
     TPlayerState,
     Log,
     Model
-} from '@bespoke/core'
+} from '@bespoke/server'
 import {
     DBKey,
     EVENT_TYPE,

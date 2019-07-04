@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {baseEnum, config, FrameEmitter, IActor, IGameWithId, TGameState, TPlayerState, TSocket} from '@bespoke/share'
 import * as style from './style.scss'
-import {Lang, MaskLoading} from 'elf-component'
+import {Lang, MaskLoading} from '@elf/component'
 import {Api, TPageProps} from '../util'
 import {connect} from 'socket.io-client'
 import {applyChange, Diff} from 'deep-diff'

@@ -1,6 +1,6 @@
 import {Server} from 'grpc'
-import {ElfAdmin} from 'elf-protocol'
-import {elfSetting} from 'elf-setting'
+import {ElfAdmin} from '@elf/protocol'
+import {elfSetting} from '@elf/setting'
 import {PhaseService} from '../../service'
 
 export function setElfService(server: Server) {

@@ -1,5 +1,5 @@
 import {RouteComponentProps} from 'react-router-dom'
-import {IGameTemplate} from '@bespoke/client-sdk'
+import {IGameTemplate} from '@bespoke/register'
 import {IUserWithId} from '@bespoke/share'
 
 export * from './Api'

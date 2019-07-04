@@ -1,8 +1,8 @@
 import {baseEnum, IGameThumb} from '@bespoke/share'
-import {redisClient} from 'elf-protocol'
+import {redisClient} from '@elf/protocol'
 import {Request, Response} from 'express'
 import * as passport from 'passport'
-import {elfSetting} from 'elf-setting'
+import {elfSetting} from '@elf/setting'
 import {Log} from '@bespoke/server-util'
 import {CONFIG, RedisKey, Setting, Token} from '../util'
 import {PassportStrategy} from '../interface'
@@ -13,7 +13,7 @@ import * as path from 'path'
 
 export class UserCtrl {
     static async renderApp(req, res: Response) {
-        const chunk = fs.readFileSync(path.resolve(__dirname, `../../../lib/index.html`)).toString()
+        const chunk = fs.readFileSync(path.resolve(__dirname, `../../../static/index.html`)).toString()
         res.set('content-type', 'text/html')
         res.end(`<script type="text/javascript">
 Object.assign(window, {

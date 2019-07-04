@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {baseEnum} from '@bespoke/share'
-import {CodePanel, Lang, Toast} from 'elf-component'
+import {CodePanel, Lang, Toast} from '@elf/component'
 import {Link} from 'react-router-dom'
 import {Api, TPageProps} from '../util'
 

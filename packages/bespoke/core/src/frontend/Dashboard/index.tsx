@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {baseEnum, IGameThumb} from '@bespoke/share'
-import {Button, Lang} from 'elf-component'
+import {Button, Lang} from '@elf/component'
 import {Api, TPageProps} from '../util'
 import * as dateFormat from 'dateformat'
 

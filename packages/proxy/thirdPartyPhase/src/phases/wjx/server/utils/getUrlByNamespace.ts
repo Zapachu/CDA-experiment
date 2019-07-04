@@ -1,4 +1,4 @@
-import {elfSetting as setting} from 'elf-setting'
+import {elfSetting as setting} from '@elf/setting'
 import {ThirdPartPhase} from '../../../../core/server/models'
 import {gen32Token} from '../../../../core/server/util'
 

@@ -5,7 +5,7 @@ import {routePrefix} from '../../common/config'
 import {ConDB, PassportMiddleware, SessionSetMiddleware, StaticPathMiddleware} from '../../common/utils'
 import {getUrlByNamespace, InitWork, ProxyWork} from './utils'
 import {withLinker} from '../../../core/server/util'
-import {elfSetting as settings} from 'elf-setting'
+import {elfSetting as settings} from '@elf/setting'
 
 const {qualtricsPort} = settings
 

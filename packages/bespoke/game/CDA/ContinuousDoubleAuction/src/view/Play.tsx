@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {Core} from '@bespoke/client-sdk'
+import {Core} from '@bespoke/register'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import {MoveType, PushType} from '../config'
 import {phaseTemplates} from './phase'

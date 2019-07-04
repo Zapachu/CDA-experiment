@@ -3,8 +3,8 @@
 
 import {ErrorPage} from '../../../common/utils'
 import {ThirdPartPhase} from "../../../../core/server/models"
-import {RedisCall, SendBackPlayer} from 'elf-protocol'
-import {elfSetting as settings} from 'elf-setting'
+import {RedisCall, SendBackPlayer} from '@elf/protocol'
+import {elfSetting as settings} from '@elf/setting'
 import {Request, Response} from 'express'
 import {previewScreenXlsxRoute} from '../config'
 

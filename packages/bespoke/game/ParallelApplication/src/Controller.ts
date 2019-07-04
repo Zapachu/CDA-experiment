@@ -7,8 +7,8 @@ import {
   RedisCall,
   TGameState,
   TPlayerState
-} from '@bespoke/core';
-import { GameOver } from "elf-protocol";
+} from '@bespoke/server';
+import { GameOver } from "@elf/protocol";
 import {
   MoveType,
   PushType,

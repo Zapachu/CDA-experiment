@@ -1,7 +1,7 @@
 import {Log, redisClient} from '@server-util'
-import {elfSetting} from 'elf-setting'
+import {elfSetting} from '@elf/setting'
 import {getAdminService} from '../rpc'
-import {PhaseReg} from 'elf-protocol'
+import {PhaseReg} from '@elf/protocol'
 
 export class PhaseService {
     static async getPhaseTemplates(userId?: string): Promise<Array<PhaseReg.IRegInfo>> {

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Template} from '@elf/client-sdk'
+import {Template} from '@elf/register'
 import {registerOnFramework} from '../../index'
 
 export class Create extends Template.Create<{ wjxUrl: string }> {

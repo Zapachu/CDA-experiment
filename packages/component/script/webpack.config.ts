@@ -1,7 +1,7 @@
 import * as path from 'path'
 import {CleanWebpackPlugin} from 'clean-webpack-plugin'
 import * as QiniuPlugin from 'qiniu-webpack-plugin'
-import {elfSetting} from 'elf-setting'
+import {elfSetting} from '@elf/setting'
 
 const {qiNiu} = elfSetting
 const buildMode = process.env.npm_config_buildMode || 'dev'
