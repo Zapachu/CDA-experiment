@@ -308,6 +308,8 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
             }
         </section>
     }
+    const guaranteeMoneyLimit = nonNegative(playerState.money - playerState.guaranteeMoney),
+        guaranteeCountLimit = nonNegative(~~(playerState.money / gamePeriodState.closingPrice) + playerState.count - playerState.guaranteeCount)
     return <section className={style.trading}>
         <div className={style.tradePanel}>
             {
@@ -336,15 +338,12 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
             return Toast.warn(lang.invalidBuyPrice)
         }
         let countInvalid = false
-        if (count <= 0) {
-            countInvalid = true
-        }
         if (guarantee) {
-            countInvalid = (role === ROLE.Buyer && _price * +count > playerState.money) ||
-                (role === ROLE.Seller && count > playerState.count)
+            countInvalid = count <= 0 || (role === ROLE.Buyer && _price * +count > guaranteeMoneyLimit) ||
+                (role === ROLE.Seller && count > guaranteeCountLimit)
         } else {
-            countInvalid = (role === ROLE.Buyer && _price * +count > playerState.money - playerState.guaranteeMoney) ||
-                (role === ROLE.Seller && count > playerState.count + ~~(playerState.money / gamePeriodState.closingPrice) - playerState.guaranteeCount)
+            countInvalid = count <= 0 || (role === ROLE.Buyer && _price * +count > playerState.money) ||
+                (role === ROLE.Seller && count > playerState.count)
         }
         if (countInvalid) {
             setCount(0)
@@ -489,11 +488,11 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
                         </div>
                         <div>
                             <label>{lang.guaranteeCountLimit}</label>
-                            <em>{playerState.count - playerState.guaranteeCount}</em>
+                            <em>{guaranteeCountLimit}</em>
                         </div>
                         <div>
                             <label>{lang.guaranteeMoneyLimit}</label>
-                            <em>{playerState.money - playerState.guaranteeMoney}</em>
+                            <em>{guaranteeMoneyLimit}</em>
                         </div>
                     </> : null
                 }
@@ -623,7 +622,7 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
                 </thead>
                 <tbody>
                 {
-                    marketOrderIds.map((orderId, i) => {
+                    marketOrderIds.map(orderId => {
                             const orderX = orderDict[orderId],
                                 isMine = orderX.playerIndex === playerState.playerIndex
                             return <tr key={orderId} className={style.orderPrice}>
@@ -631,7 +630,7 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
                                 <td className={style.count}>{orderX.count}</td>
                                 <td>
                                     <a className={style.btnCancel}
-                                       style={{visibility: i && isMine ? 'visible' : 'hidden'}}
+                                       style={{visibility: isMine ? 'visible' : 'hidden'}}
                                        onClick={() => frameEmitter.emit(MoveType.cancelOrder)}>×</a>
                                 </td>
                             </tr>
@@ -652,4 +651,8 @@ export function Play(props: TPlayProps) {
     return <section className={style.play}>
         <_Play {...props}/>
     </section>
+}
+
+function nonNegative(n: number) {
+    return n < 0 ? 0 : n
 }

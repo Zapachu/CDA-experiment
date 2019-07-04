@@ -1,7 +1,7 @@
-import {EventIO} from '../../util'
 import {diff} from 'deep-diff'
 import {baseEnum, TGameState, TPlayerState} from 'bespoke-core-share'
 import {GameStateSynchronizer, PlayerStateSynchronizer} from './BaseSynchronizer'
+import {EventIO} from '../EventIO'
 import cloneDeep = require('lodash/cloneDeep')
 
 export class DiffGameStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> extends GameStateSynchronizer<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {

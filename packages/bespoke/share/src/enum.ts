@@ -21,8 +21,8 @@ export enum SocketEvent {
 }
 
 export enum UnixSocketEvent {
-    daemonConnection = 'daemonConnection',
-    newRobot = 'newRobot',
+    asDaemon = 'asDaemon',
+    startRobot = 'startRobot',
     callback = 'callback'
 }
 

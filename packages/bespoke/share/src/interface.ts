@@ -106,7 +106,6 @@ export interface IStartOption {
 }
 
 export interface IRobotHandshake {
-    id: string
     actor: IActor
     game: IGameWithId<any>
 }

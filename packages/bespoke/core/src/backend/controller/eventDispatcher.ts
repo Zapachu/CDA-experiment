@@ -3,7 +3,7 @@ import * as socketIO from 'socket.io'
 import {Log} from 'bespoke-server-util'
 import {IConnection, IEventHandler} from 'bespoke-core-share'
 import {EventHandler} from './eventHandler'
-import {EventIO} from '../util'
+import {EventIO} from '../service'
 
 export class EventDispatcher {
     private static subscribeOnConnection(clientConn: IConnection) {
@@ -31,7 +31,7 @@ export class EventDispatcher {
 
     static startGameSocket(server: Server): socketIO.Server {
         const socketIOServer = EventIO.initSocketIOServer(server, this.subscribeOnConnection)
-        EventIO.initSocketRobotServer(this.subscribeOnConnection)
+        EventIO.initRobotIOServer(this.subscribeOnConnection)
         return socketIOServer
     }
 }

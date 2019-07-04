@@ -1,4 +1,3 @@
-import {EventIO, gameId2PlayUrl, Token} from '../util'
 import {
     Actor,
     CoreMove,
@@ -13,10 +12,12 @@ import {
     TPlayerState
 } from 'bespoke-core-share'
 import {Log} from 'bespoke-server-util'
+import {RedisCall, SendBackPlayer, SetPhaseResult} from 'elf-protocol'
+import {EventIO} from './EventIO'
 import {GameDAO} from './GameDAO'
 import {StateManager} from './StateManager'
 import {MoveQueue} from './MoveQueue'
-import {RedisCall, SendBackPlayer, SetPhaseResult} from 'elf-protocol'
+import {gameId2PlayUrl, Token} from '../util'
 
 export type AnyLogic = BaseLogic<any, any, any, any, any, any, any>
 
@@ -106,7 +107,7 @@ export class BaseLogic<ICreateParams, IGameState, IPlayerState, MoveType, PushTy
 
     async startRobot(key, meta?: IRobotMeta) {
         const actor: IActor = {token: Token.geneToken(`${this.game.id}${key}`), type: Actor.serverRobot}
-        EventIO.socketRobotConnect<IRobotMeta>(`ROBOT_${Math.random().toString(36).substr(2)}`, actor, this.game, meta)
+        EventIO.startRobot<IRobotMeta>(actor, this.game, meta)
     }
 
     //region pushEvent

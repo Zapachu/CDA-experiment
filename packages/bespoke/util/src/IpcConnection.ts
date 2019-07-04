@@ -4,6 +4,7 @@ import {EventEmitter} from 'events'
 import * as path from 'path'
 import * as os from 'os'
 import * as net from 'net'
+import {Log} from './Log'
 
 export function getSocketPath(namespace): string {
     let socketPath = path.join(os.tmpdir(), namespace)
@@ -39,12 +40,32 @@ class CallbackHelper {
     }
 }
 
-export class SocketEmitter extends EventEmitter {
+export class IpcConnection extends EventEmitter {
     private decoder = new StringDecoder('utf8')
     private jsonBuffer = ''
     private callbackHelper = new CallbackHelper()
 
-    constructor(namespace: string, public socket: net.Socket = net.connect(getSocketPath(namespace))) {
+    //region connect
+    private static readonly CONNECT_TTL = 5
+
+    private static async createConnection(path: string, ttl: number): Promise<net.Socket> {
+        return new Promise<net.Socket>(resolve => {
+            const socket = net.connect(path, () => resolve(socket))
+                .on('error', () => {
+                    Log.e(`Connect to ipc failed, remaining times: ${ttl}`)
+                    ttl === 0 ? process.exit() : setTimeout(() => this.createConnection(path, ttl - 1), 1e3)
+                })
+        })
+    }
+
+    static async connect(namespace: string): Promise<IpcConnection> {
+        const socket = await this.createConnection(getSocketPath(namespace), this.CONNECT_TTL)
+        return new IpcConnection(socket)
+    }
+
+    //endregion
+
+    constructor(public socket: net.Socket) {
         super()
         this.socket.on('data', buf => {
             this.feed(buf)

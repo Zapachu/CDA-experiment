@@ -9,7 +9,7 @@
   },
   "devDependencies": {
     "bespoke-core-share": "^1.0.0",
-    "typescript": "^3.3.3333",
-    "elf-setting": "^1.0.0"
+    "elf-setting": "^1.0.0",
+    "typescript": "^3.3.3333"
   }
 }
