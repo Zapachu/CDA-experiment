@@ -12,7 +12,7 @@
   },
   "devDependencies": {
     "@bespoke/register": "^1.1.1",
-    "@bespoke/server-util": "^1.1.1",
+    "@elf/util": "^1.1.1",
     "@bespoke/share": "^1.1.1",
     "@elf/component": "^1.1.1",
     "@elf/protocol": "^1.1.1",

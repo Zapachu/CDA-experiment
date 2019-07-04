@@ -55,7 +55,7 @@ var __spread = (this && this.__spread) || function () {
     return ar;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var server_util_1 = require("@bespoke/server-util");
+var util_1 = require("@elf/util");
 var eventHandler_1 = require("./eventHandler");
 var service_1 = require("../service");
 var EventDispatcher = /** @class */ (function () {
@@ -72,7 +72,7 @@ var EventDispatcher = /** @class */ (function () {
                 }
                 return __awaiter(_this, void 0, void 0, function () {
                     return __generator(this, function (_a) {
-                        server_util_1.Log.i.apply(server_util_1.Log, __spread([clientConn.actor.token, event], args.filter(function (arg) { return ![null, undefined].includes(arg); }).map(function (arg) {
+                        util_1.Log.i.apply(util_1.Log, __spread([clientConn.actor.token, event], args.filter(function (arg) { return ![null, undefined].includes(arg); }).map(function (arg) {
                             switch (typeof arg) {
                                 case 'function':
                                     return 'CallbackFunction';
@@ -86,7 +86,7 @@ var EventDispatcher = /** @class */ (function () {
                             handler.apply(void 0, __spread([clientConn], args));
                         }
                         catch (err) {
-                            server_util_1.Log.e(err);
+                            util_1.Log.e(err);
                         }
                         return [2 /*return*/];
                     });

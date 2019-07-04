@@ -38,7 +38,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var share_1 = require("@bespoke/share");
 var setting_1 = require("@elf/setting");
 var util_1 = require("../util");
-var server_util_1 = require("@bespoke/server-util");
+var util_2 = require("@elf/util");
 var protocol_1 = require("@elf/protocol");
 var SEND_TIMES_PER_DAY = 3;
 var sendVerifyCodeRes;
@@ -76,7 +76,7 @@ var UserService = /** @class */ (function () {
                                 }];
                         }
                         verifyCode = Math.random().toString().substr(2, 6);
-                        server_util_1.Log.d(verifyCode);
+                        util_2.Log.d(verifyCode);
                         _a = !setting_1.elfSetting.inProductEnv;
                         if (_a) return [3 /*break*/, 4];
                         return [4 /*yield*/, util_1.QCloudSMS.singleSenderWithParam(nationCode, mobile, setting_1.elfSetting.qCloudSMS.templateId.verifyCode, [verifyCode])];

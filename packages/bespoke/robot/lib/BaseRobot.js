@@ -37,7 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var deep_diff_1 = require("deep-diff");
 var share_1 = require("@bespoke/share");
-var server_util_1 = require("@bespoke/server-util");
+var util_1 = require("@elf/util");
 var cloneDeep = require("lodash/cloneDeep");
 var BaseRobot = /** @class */ (function () {
     function BaseRobot(game, actor, connection, meta) {
@@ -56,7 +56,7 @@ var BaseRobot = /** @class */ (function () {
             _this.gameState = cloneDeep(gameState);
         })
             .on(share_1.SocketEvent.changeGameState_diff, function (stateChanges) {
-            server_util_1.Log.l(_this.preGameState);
+            util_1.Log.l(_this.preGameState);
             _this.preGameState = cloneDeep(_this.gameState);
             stateChanges.forEach(function (change) { return deep_diff_1.applyChange(_this.gameState, null, change); });
         })
@@ -65,7 +65,7 @@ var BaseRobot = /** @class */ (function () {
             _this.playerState = cloneDeep(playerState);
         })
             .on(share_1.SocketEvent.changePlayerState_diff, function (stateChanges) {
-            server_util_1.Log.l(_this.prePlayerState);
+            util_1.Log.l(_this.prePlayerState);
             _this.prePlayerState = cloneDeep(_this.playerState);
             stateChanges.forEach(function (change) { return deep_diff_1.applyChange(_this.playerState, null, change); });
         });
@@ -74,7 +74,7 @@ var BaseRobot = /** @class */ (function () {
     BaseRobot.prototype.init = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                server_util_1.Log.i('RobotInit', this.actor.token, this.meta);
+                util_1.Log.i('RobotInit', this.actor.token, this.meta);
                 return [2 /*return*/, this];
             });
         });

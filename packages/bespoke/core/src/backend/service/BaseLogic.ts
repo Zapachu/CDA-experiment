@@ -11,7 +11,7 @@ import {
     TGameState,
     TPlayerState
 } from '@bespoke/share'
-import {Log} from '@bespoke/server-util'
+import {Log} from '@elf/util'
 import {RedisCall, SendBackPlayer, SetPhaseResult} from '@elf/protocol'
 import {EventIO} from './EventIO'
 import {GameDAO} from './GameDAO'

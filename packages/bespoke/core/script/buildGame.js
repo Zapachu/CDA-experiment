@@ -1,28 +1,16 @@
 "use strict";
 exports.__esModule = true;
-var os_1 = require("os");
 var path_1 = require("path");
 var webpack = require("webpack");
 var QiniuPlugin = require("qiniu-webpack-plugin");
 var ManifestPlugin = require("webpack-manifest-plugin");
 var clean_webpack_plugin_1 = require("clean-webpack-plugin");
 var share_1 = require("@bespoke/share");
+var util_1 = require("@elf/util");
 var defaultPaths = {
     entry: './src/view',
     output: './dist'
 };
-function getIp() {
-    var ip = '127.0.0.1';
-    Object.values(os_1.networkInterfaces()).forEach(function (infos) {
-        infos.forEach(function (_a) {
-            var family = _a.family, internal = _a.internal, address = _a.address;
-            if (family === 'IPv4' && !internal) {
-                ip = address;
-            }
-        });
-    });
-    return ip;
-}
 function resolvePaths(basePath, paths) {
     if (paths === void 0) { paths = defaultPaths; }
     var p = {};
@@ -43,7 +31,7 @@ function geneClientBuilder(_a) {
             port: share_1.config.devPort.client,
             proxy: (_b = {},
                 _b["/" + share_1.config.rootName] = {
-                    target: "http://" + getIp() + ":" + share_1.config.devPort.server,
+                    target: "http://" + util_1.NetWork.getIp() + ":" + share_1.config.devPort.server,
                     ws: true
                 },
                 _b)

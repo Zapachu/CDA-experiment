@@ -2,7 +2,7 @@ import {baseEnum, CorePhaseNamespace, IActor, IGameState, IGameWithId, IPhaseCon
 import {GameService} from './GameService'
 import {GameStateDoc, GameStateModel, PhaseResultModel} from '@server-model'
 import {EventDispatcher} from '../controller/eventDispatcher'
-import {Log} from '@server-util'
+import {Log} from '@elf/util'
 import {NewPhase, RedisCall, SetPhaseResult} from '@elf/protocol'
 
 const stateManagers: { [gameId: string]: StateManager } = {}

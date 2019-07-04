@@ -84,12 +84,12 @@ var service_1 = require("./service");
 var model_1 = require("./model");
 var passport_local_1 = require("passport-local");
 var protocol_1 = require("@elf/protocol");
-var server_util_1 = require("@bespoke/server-util");
+var util_2 = require("@elf/util");
 var Server = /** @class */ (function () {
     function Server() {
     }
     Server.initMongo = function () {
-        mongoose_1.connect(setting_1.elfSetting.mongoUri, __assign({}, setting_1.elfSetting.mongoUser ? { user: setting_1.elfSetting.mongoUser, pass: setting_1.elfSetting.mongoPass } : {}, { useNewUrlParser: true, useCreateIndex: true }), function (err) { return err ? server_util_1.Log.e(err) : null; });
+        mongoose_1.connect(setting_1.elfSetting.mongoUri, __assign({}, setting_1.elfSetting.mongoUser ? { user: setting_1.elfSetting.mongoUser, pass: setting_1.elfSetting.mongoPass } : {}, { useNewUrlParser: true, useCreateIndex: true }), function (err) { return err ? util_2.Log.e(err) : null; });
     };
     Server.initSessionMiddleware = function () {
         var RedisStore = connectRedis(expressSession);
@@ -157,7 +157,7 @@ var Server = /** @class */ (function () {
     Server.bindServerListener = function (server, cb) {
         server.on('error', function (error) {
             if (error.syscall !== 'listen') {
-                server_util_1.Log.e(error);
+                util_2.Log.e(error);
             }
             switch (error.code) {
                 case 'EACCES':
@@ -169,7 +169,7 @@ var Server = /** @class */ (function () {
                     process.exit(1);
                     break;
                 default:
-                    server_util_1.Log.e(error);
+                    util_2.Log.e(error);
             }
         })
             .on('listening', function () {
@@ -221,7 +221,7 @@ var Server = /** @class */ (function () {
         var express = this.initExpress(bespokeRouter), server = express.listen(util_1.Setting.port);
         eventDispatcher_1.EventDispatcher.startGameSocket(server).use(socketIOSession(this.sessionMiddleware));
         this.bindServerListener(server, function () {
-            server_util_1.Log.i("Running at\uFF1Ahttp://" + util_1.Setting.ip + ":" + (setting_1.elfSetting.bespokeHmr ? share_1.config.devPort.client : util_1.Setting.port) + "/" + share_1.config.rootName + "/" + util_1.Setting.namespace);
+            util_2.Log.i("Running at\uFF1Ahttp://" + util_1.Setting.ip + ":" + (setting_1.elfSetting.bespokeHmr ? share_1.config.devPort.client : util_1.Setting.port) + "/" + share_1.config.rootName + "/" + util_1.Setting.namespace);
             util_1.heartBeat(util_1.RedisKey.gameServer(util_1.Setting.namespace), util_1.Setting.ip + ":" + util_1.Setting.port);
             if (setting_1.elfSetting.bespokeWithLinker) {
                 _this.withLinker();
@@ -236,7 +236,7 @@ var Server = /** @class */ (function () {
                     case 0:
                         _a = __read(setting_1.elfSetting.adminMobileNumbers, 1), mobile = _a[0];
                         if (!mobile) {
-                            server_util_1.Log.e('未配置管理员账号，无法创建实验');
+                            util_2.Log.e('未配置管理员账号，无法创建实验');
                         }
                         return [4 /*yield*/, model_1.UserModel.findOne({ mobile: mobile })];
                     case 1:

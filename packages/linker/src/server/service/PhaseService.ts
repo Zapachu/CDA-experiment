@@ -1,4 +1,5 @@
-import {Log, redisClient} from '@server-util'
+import {redisClient} from '@server-util'
+import {Log} from '@elf/util'
 import {elfSetting} from '@elf/setting'
 import {getAdminService} from '../rpc'
 import {PhaseReg} from '@elf/protocol'

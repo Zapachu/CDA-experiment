@@ -69,12 +69,12 @@ var __spread = (this && this.__spread) || function () {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var share_1 = require("@bespoke/share");
-var server_util_1 = require("@bespoke/server-util");
+var util_1 = require("@elf/util");
 var net_1 = require("net");
 var fs_1 = require("fs");
 var SocketIO = require("socket.io");
 var GameDAO_1 = require("./GameDAO");
-var util_1 = require("../util");
+var util_2 = require("../util");
 var events_1 = require("events");
 var EventIO = /** @class */ (function () {
     function EventIO() {
@@ -93,7 +93,7 @@ var EventIO = /** @class */ (function () {
     };
     EventIO.initSocketIOServer = function (server, subscribeOnConnection) {
         var _this = this;
-        this.socketIOServer = SocketIO(server, { path: share_1.config.socketPath(util_1.Setting.namespace) });
+        this.socketIOServer = SocketIO(server, { path: share_1.config.socketPath(util_2.Setting.namespace) });
         this.socketIOServer.on(share_1.SocketEvent.connection, function (connection) { return __awaiter(_this, void 0, void 0, function () {
             var _a, _b, token, gameId, _c, user, sessionID, game, actor;
             return __generator(this, function (_d) {
@@ -103,11 +103,11 @@ var EventIO = /** @class */ (function () {
                         return [4 /*yield*/, GameDAO_1.GameDAO.getGame(gameId)];
                     case 1:
                         game = _d.sent();
-                        actor = util_1.Token.checkToken(token) ?
+                        actor = util_2.Token.checkToken(token) ?
                             game.owner === user ? { type: share_1.Actor.clientRobot, token: token } : { type: share_1.Actor.player, token: token } :
                             game.owner === user ?
-                                { type: share_1.Actor.owner, token: util_1.Token.geneToken(user) } :
-                                { type: share_1.Actor.player, token: util_1.Token.geneToken(user || sessionID) };
+                                { type: share_1.Actor.owner, token: util_2.Token.geneToken(user) } :
+                                { type: share_1.Actor.player, token: util_2.Token.geneToken(user || sessionID) };
                         subscribeOnConnection(Object.assign(connection, { actor: actor, game: game }));
                         return [2 /*return*/];
                 }
@@ -117,16 +117,16 @@ var EventIO = /** @class */ (function () {
     };
     EventIO.initRobotIOServer = function (subscribeOnConnection) {
         var _this = this;
-        var socketPath = server_util_1.getSocketPath(util_1.Setting.namespace);
+        var socketPath = util_1.getSocketPath(util_2.Setting.namespace);
         if (fs_1.existsSync(socketPath)) {
             fs_1.unlinkSync(socketPath);
         }
         this.robotIOServer = new RobotIO.Server();
         net_1.createServer(function (socket) {
-            var ipcConnection = new server_util_1.IpcConnection(socket);
+            var ipcConnection = new util_1.IpcConnection(socket);
             ipcConnection
-                .on(share_1.UnixSocketEvent.asDaemon, function () {
-                server_util_1.Log.i('Robot daemon connection initialized');
+                .on(util_1.IpcEvent.asDaemon, function () {
+                util_1.Log.i('Robot daemon connection initialized');
                 _this.robotIOServer.daemonConnection = ipcConnection;
             })
                 .on(share_1.SocketEvent.connection, function (_a, cb) {
@@ -134,7 +134,7 @@ var EventIO = /** @class */ (function () {
                 return __awaiter(_this, void 0, void 0, function () {
                     var socketConnection;
                     return __generator(this, function (_b) {
-                        server_util_1.Log.i("RobotConnect : " + actor.token);
+                        util_1.Log.i("RobotConnect : " + actor.token);
                         socketConnection = new RobotIO.Connection(actor, game, socket);
                         subscribeOnConnection(socketConnection);
                         this.robotIOServer.initNamespace(socketConnection);
@@ -147,9 +147,9 @@ var EventIO = /** @class */ (function () {
     };
     EventIO.startRobot = function (actor, game, meta) {
         if (!this.robotIOServer.daemonConnection) {
-            server_util_1.Log.w('Robot daemon connection not initialized yet');
+            util_1.Log.w('Robot daemon connection not initialized yet');
         }
-        this.robotIOServer.daemonConnection.emit(share_1.UnixSocketEvent.startRobot, { actor: actor, game: game }, meta);
+        this.robotIOServer.daemonConnection.emit(util_1.IpcEvent.startRobot, { actor: actor, game: game }, meta);
     };
     return EventIO;
 }());
@@ -217,7 +217,7 @@ var RobotIO;
             return this.robotIOServer.getNamespace(nsp).addConnection(this);
         };
         return Connection;
-    }(server_util_1.IpcConnection));
+    }(util_1.IpcConnection));
     RobotIO.Connection = Connection;
 })(RobotIO || (RobotIO = {}));
 //# sourceMappingURL=EventIO.js.map

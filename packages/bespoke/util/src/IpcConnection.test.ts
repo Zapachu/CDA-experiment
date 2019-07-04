@@ -1,13 +1,13 @@
-import {UnixSocketEvent} from '@bespoke/share'
 import {createServer} from 'net'
-import {getSocketPath, Log, IpcConnection} from '.'
+import {getSocketPath, IpcConnection, IpcEvent} from './IpcConnection'
+import {Log} from './Log'
 
 const namespace = 'hello'
 
-setTimeout(()=>{
+setTimeout(() => {
     createServer(socket =>
         new IpcConnection(socket)
-            .on(UnixSocketEvent.asDaemon, (name, cb0, cb1, cb2) => {
+            .on(IpcEvent.asDaemon, (name, cb0, cb1, cb2) => {
                 cb0(1)
                 cb1('hello')
                 cb2([1, 2, 3])
@@ -16,5 +16,5 @@ setTimeout(()=>{
 }, 3e3)
 
 IpcConnection.connect(namespace).then(ipcConnection =>
-    ipcConnection.emit(UnixSocketEvent.asDaemon, 'hello', a => Log.d(a), b => Log.d(b), c => Log.d(c))
+    ipcConnection.emit(IpcEvent.asDaemon, 'hello', a => Log.d(a), b => Log.d(b), c => Log.d(c))
 )

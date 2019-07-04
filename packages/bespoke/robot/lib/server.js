@@ -36,19 +36,19 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var share_1 = require("@bespoke/share");
-var server_util_1 = require("@bespoke/server-util");
+var util_1 = require("@elf/util");
 var RobotServer = /** @class */ (function () {
     function RobotServer() {
     }
     RobotServer.start = function (namespace, Robot) {
         var _this = this;
-        server_util_1.IpcConnection.connect(namespace).then(function (client) {
-            return client.on(share_1.UnixSocketEvent.startRobot, function (robotHandshake, meta) { return __awaiter(_this, void 0, void 0, function () {
+        util_1.IpcConnection.connect(namespace).then(function (client) {
+            return client.on(util_1.IpcEvent.startRobot, function (robotHandshake, meta) { return __awaiter(_this, void 0, void 0, function () {
                 var connection;
                 var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, server_util_1.IpcConnection.connect(namespace)];
+                        case 0: return [4 /*yield*/, util_1.IpcConnection.connect(namespace)];
                         case 1:
                             connection = _a.sent();
                             connection.emit(share_1.SocketEvent.connection, robotHandshake, function () {
@@ -63,7 +63,7 @@ var RobotServer = /** @class */ (function () {
                     }
                 });
             }); })
-                .emit(share_1.UnixSocketEvent.asDaemon);
+                .emit(util_1.IpcEvent.asDaemon);
         });
     };
     return RobotServer;

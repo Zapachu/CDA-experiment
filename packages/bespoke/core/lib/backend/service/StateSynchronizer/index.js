@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var share_1 = require("@bespoke/share");
-var server_util_1 = require("@bespoke/server-util");
+var util_1 = require("@elf/util");
 var BaseSynchronizer_1 = require("./BaseSynchronizer");
 exports.GameStateSynchronizer = BaseSynchronizer_1.GameStateSynchronizer;
 exports.PlayerStateSynchronizer = BaseSynchronizer_1.PlayerStateSynchronizer;
@@ -19,7 +19,7 @@ var StateSynchronizer = /** @class */ (function () {
             case share_1.baseEnum.SyncStrategy.diff:
                 return new DiffSynchronizer_1.DiffGameStateSynchronizer(this.controller);
             default:
-                server_util_1.Log.w(UNSUPPORTED_STRATEGY_WARNING);
+                util_1.Log.w(UNSUPPORTED_STRATEGY_WARNING);
         }
     };
     StateSynchronizer.prototype.getPlayerStateSynchronizer = function (actor) {
@@ -29,7 +29,7 @@ var StateSynchronizer = /** @class */ (function () {
             case share_1.baseEnum.SyncStrategy.diff:
                 return new DiffSynchronizer_1.DiffPlayerStateSynchronizer(actor, this.controller);
             default:
-                server_util_1.Log.w(UNSUPPORTED_STRATEGY_WARNING);
+                util_1.Log.w(UNSUPPORTED_STRATEGY_WARNING);
         }
     };
     return StateSynchronizer;

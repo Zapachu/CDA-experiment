@@ -22,12 +22,6 @@ var SocketEvent;
     SocketEvent["changePlayerState_diff"] = "CPD";
     //endregion
 })(SocketEvent = exports.SocketEvent || (exports.SocketEvent = {}));
-var UnixSocketEvent;
-(function (UnixSocketEvent) {
-    UnixSocketEvent["asDaemon"] = "asDaemon";
-    UnixSocketEvent["startRobot"] = "startRobot";
-    UnixSocketEvent["callback"] = "callback";
-})(UnixSocketEvent = exports.UnixSocketEvent || (exports.UnixSocketEvent = {}));
 var CoreMove;
 (function (CoreMove) {
     CoreMove["switchGameStatus"] = "switchGameStatus";

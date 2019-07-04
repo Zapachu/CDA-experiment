@@ -57,11 +57,10 @@ var __spread = (this && this.__spread) || function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var share_1 = require("@bespoke/share");
 var setting_1 = require("@elf/setting");
-var server_util_1 = require("@bespoke/server-util");
+var util_1 = require("@elf/util");
 var path_1 = require("path");
 var fs_1 = require("fs");
 var objHash = require("object-hash");
-var os_1 = require("os");
 var protocol_1 = require("@elf/protocol");
 var config_1 = require("./config");
 var Token = /** @class */ (function () {
@@ -82,7 +81,7 @@ var Token = /** @class */ (function () {
         if (setting_1.elfSetting.bespokeWithLinker) {
             return token.length === 32;
         }
-        chars.length === 32 ? server_util_1.Log.w("Invalid Token: " + token) : null;
+        chars.length === 32 ? util_1.Log.w("Invalid Token: " + token) : null;
         return false;
     };
     return Token;
@@ -134,24 +133,16 @@ var Setting = /** @class */ (function () {
     });
     Setting.setPort = function (port) {
         this._port = port;
-        server_util_1.Log.i("Listening on port " + port);
+        util_1.Log.i("Listening on port " + port);
     };
     Setting.init = function (namespace, staticPath, startOption) {
-        var _this = this;
         this.namespace = namespace;
         this.staticPath = staticPath;
+        this._ip = util_1.NetWork.getIp();
         this._port = startOption.port || (setting_1.elfSetting.inProductEnv ? 0 : share_1.config.devPort.server);
         setting_1.elfSetting.inProductEnv ?
-            server_util_1.Log.setLogPath(startOption.logPath || path_1.resolve(staticPath, '../log'), server_util_1.LogLevel.log) :
-            server_util_1.Log.d('当前为开发环境,短信/邮件发送、游戏状态持久化等可能受影响');
-        Object.values(os_1.networkInterfaces()).forEach(function (infos) {
-            infos.forEach(function (_a) {
-                var family = _a.family, internal = _a.internal, address = _a.address;
-                if (family === 'IPv4' && !internal) {
-                    _this._ip = address;
-                }
-            });
-        });
+            util_1.Log.setLogPath(startOption.logPath || path_1.resolve(staticPath, '../log'), util_1.LogLevel.log) :
+            util_1.Log.d('当前为开发环境,短信/邮件发送、游戏状态持久化等可能受影响');
     };
     Setting.getClientPath = function () {
         var namespace = this.namespace;

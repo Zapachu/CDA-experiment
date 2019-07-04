@@ -20,12 +20,6 @@ export enum SocketEvent {
     //endregion
 }
 
-export enum UnixSocketEvent {
-    asDaemon = 'asDaemon',
-    startRobot = 'startRobot',
-    callback = 'callback'
-}
-
 export enum CoreMove {
     switchGameStatus = 'switchGameStatus'
 }

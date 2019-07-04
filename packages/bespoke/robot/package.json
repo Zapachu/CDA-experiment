@@ -8,7 +8,7 @@
     "libc": "tsc"
   },
   "devDependencies": {
-    "@bespoke/server-util": "^1.1.1",
+    "@elf/util": "^1.1.1",
     "@bespoke/share": "^1.1.1",
     "@elf/setting": "^1.1.1",
     "typescript": "^3.3.3333"

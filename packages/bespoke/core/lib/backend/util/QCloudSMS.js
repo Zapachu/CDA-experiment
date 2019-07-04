@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var setting_1 = require("@elf/setting");
-var server_util_1 = require("@bespoke/server-util");
+var util_1 = require("@elf/util");
 var QCloudSms = require("qcloudsms_js");
 var QCloudSMS = /** @class */ (function () {
     function QCloudSMS() {
@@ -12,7 +12,7 @@ var QCloudSMS = /** @class */ (function () {
             this.singleSender = QCloudSMS.qCloudSMS.SmsSingleSender();
         }
         catch (e) {
-            server_util_1.Log.e('QCloudSMS初始化失败');
+            util_1.Log.e('QCloudSMS初始化失败');
         }
     };
     QCloudSMS.singleSenderWithParam = function (nationCode, phoneNumber, templateId, params) {

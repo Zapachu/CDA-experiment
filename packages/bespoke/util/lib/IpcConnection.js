@@ -48,13 +48,18 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var share_1 = require("@bespoke/share");
 var string_decoder_1 = require("string_decoder");
 var events_1 = require("events");
 var path = require("path");
 var os = require("os");
 var net = require("net");
 var Log_1 = require("./Log");
+var IpcEvent;
+(function (IpcEvent) {
+    IpcEvent["asDaemon"] = "asDaemon";
+    IpcEvent["startRobot"] = "startRobot";
+    IpcEvent["callback"] = "callback";
+})(IpcEvent = exports.IpcEvent || (exports.IpcEvent = {}));
 function getSocketPath(namespace) {
     var socketPath = path.join(os.tmpdir(), namespace);
     if (process.platform === 'win32') {
@@ -149,7 +154,7 @@ var IpcConnection = /** @class */ (function (_super) {
         var _a;
         var _this = this;
         var _b = JSON.parse(msgStr), event = _b[0], args = _b.slice(1);
-        if (event === share_1.UnixSocketEvent.callback) {
+        if (event === IpcEvent.callback) {
             (_a = this.callbackHelper).consume.apply(_a, args);
             return [null];
         }
@@ -162,7 +167,7 @@ var IpcConnection = /** @class */ (function (_super) {
                 for (var _i = 0; _i < arguments.length; _i++) {
                     args[_i] = arguments[_i];
                 }
-                return _this.emit.apply(_this, [share_1.UnixSocketEvent.callback, arg].concat(args));
+                return _this.emit.apply(_this, [IpcEvent.callback, arg].concat(args));
             };
         }));
     };

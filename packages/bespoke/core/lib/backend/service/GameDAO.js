@@ -54,8 +54,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var setting_1 = require("@elf/setting");
 var protocol_1 = require("@elf/protocol");
-var server_util_1 = require("@bespoke/server-util");
-var util_1 = require("../util");
+var util_1 = require("@elf/util");
+var util_2 = require("../util");
 var model_1 = require("../model");
 var GameDAO = /** @class */ (function () {
     function GameDAO() {
@@ -67,7 +67,7 @@ var GameDAO = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, model_1.GameModel.create(__assign({}, gameConfig, { owner: owner, namespace: util_1.Setting.namespace }))];
+                        return [4 /*yield*/, model_1.GameModel.create(__assign({}, gameConfig, { owner: owner, namespace: util_2.Setting.namespace }))];
                     case 1:
                         newGame = _a.sent();
                         return [2 /*return*/, newGame.id];
@@ -102,10 +102,10 @@ var GameDAO = /** @class */ (function () {
     };
     //region persist state
     GameDAO.saveGameState = function (gameId, gameState) {
-        setting_1.elfSetting.inProductEnv && protocol_1.redisClient.set(util_1.RedisKey.gameState(gameId), JSON.stringify(gameState)).catch(function (reason) { return server_util_1.Log.e(reason); });
+        setting_1.elfSetting.inProductEnv && protocol_1.redisClient.set(util_2.RedisKey.gameState(gameId), JSON.stringify(gameState)).catch(function (reason) { return util_1.Log.e(reason); });
     };
     GameDAO.savePlayerState = function (gameId, token, playerState) {
-        setting_1.elfSetting.inProductEnv && protocol_1.redisClient.set(util_1.RedisKey.playerState(gameId, token), JSON.stringify(playerState)).catch(function (reason) { return server_util_1.Log.e(reason); });
+        setting_1.elfSetting.inProductEnv && protocol_1.redisClient.set(util_2.RedisKey.playerState(gameId, token), JSON.stringify(playerState)).catch(function (reason) { return util_1.Log.e(reason); });
     };
     GameDAO.queryGameState = function (gameId) {
         return __awaiter(this, void 0, void 0, function () {
@@ -115,7 +115,7 @@ var GameDAO = /** @class */ (function () {
                     case 0:
                         if (!setting_1.elfSetting.inProductEnv) return [3 /*break*/, 2];
                         _c = (_b = JSON).parse;
-                        return [4 /*yield*/, protocol_1.redisClient.get(util_1.RedisKey.gameState(gameId))];
+                        return [4 /*yield*/, protocol_1.redisClient.get(util_2.RedisKey.gameState(gameId))];
                     case 1:
                         _a = _c.apply(_b, [_d.sent()]);
                         return [3 /*break*/, 3];
@@ -135,7 +135,7 @@ var GameDAO = /** @class */ (function () {
                     case 0:
                         if (!setting_1.elfSetting.inProductEnv) return [3 /*break*/, 2];
                         _c = (_b = JSON).parse;
-                        return [4 /*yield*/, protocol_1.redisClient.get(util_1.RedisKey.playerState(gameId, token))];
+                        return [4 /*yield*/, protocol_1.redisClient.get(util_2.RedisKey.playerState(gameId, token))];
                     case 1:
                         _a = _c.apply(_b, [_d.sent()]);
                         return [3 /*break*/, 3];
@@ -153,7 +153,7 @@ var GameDAO = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        key = util_1.RedisKey.playerStates(gameId);
+                        key = util_2.RedisKey.playerStates(gameId);
                         return [4 /*yield*/, protocol_1.redisClient.keys(key)];
                     case 1:
                         tokens = _a.sent();
@@ -163,7 +163,7 @@ var GameDAO = /** @class */ (function () {
         });
     };
     __decorate([
-        util_1.cacheResult
+        util_2.cacheResult
     ], GameDAO, "getGame", null);
     return GameDAO;
 }());

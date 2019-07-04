@@ -18,8 +18,9 @@ registerTsConfigPath({
 
 import {config} from '@common'
 import {elfSetting} from '@elf/setting'
+import {NetWork, Log} from '@elf/util'
 import * as passport from 'passport'
-import {redisClient, Log} from '@server-util'
+import {redisClient} from '@server-util'
 import requestRouter from './controller/requestRouter'
 import {serve as serveRPC} from './rpc'
 import {EventDispatcher} from './controller/eventDispatcher'
@@ -105,7 +106,7 @@ class Server {
         const express = this.initExpress()
         const server = express.listen(elfSetting.linkerPort)
             .on('listening', () => {
-                console.info(`Listening on ${elfSetting.linkerPort}`)
+                Log.i(`Running at：http://${NetWork.getIp()}:${elfSetting.linkerPort}/${config.rootName}`)
             })
         EventDispatcher.startSocketService(server)
             .use(socketIOSession(this.sessionMiddleware))

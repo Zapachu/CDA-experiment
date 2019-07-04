@@ -1,10 +1,9 @@
 import {config, IStartOption} from '@bespoke/share'
 import {elfSetting} from '@elf/setting'
-import {Log, LogLevel} from '@bespoke/server-util'
+import {Log, LogLevel, NetWork} from '@elf/util'
 import {resolve} from 'path'
 import {readFileSync} from 'fs'
 import * as objHash from 'object-hash'
-import {NetworkInterfaceInfo, networkInterfaces} from 'os'
 import {redisClient} from '@elf/protocol'
 import {CONFIG} from './config'
 
@@ -70,17 +69,11 @@ export class Setting {
     static init(namespace: string, staticPath: string, startOption: IStartOption) {
         this.namespace = namespace
         this.staticPath = staticPath
+        this._ip = NetWork.getIp()
         this._port = startOption.port || (elfSetting.inProductEnv ? 0 : config.devPort.server)
         elfSetting.inProductEnv ?
             Log.setLogPath(startOption.logPath || resolve(staticPath, '../log'), LogLevel.log) :
             Log.d('当前为开发环境,短信/邮件发送、游戏状态持久化等可能受影响')
-        Object.values<NetworkInterfaceInfo[]>(networkInterfaces()).forEach(infos => {
-            infos.forEach(({family, internal, address}) => {
-                if (family === 'IPv4' && !internal) {
-                    this._ip = address
-                }
-            })
-        })
     }
 
     static getClientPath(): string {

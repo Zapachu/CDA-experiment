@@ -1,5 +1,5 @@
 {
-  "name": "@bespoke/server-util",
+  "name": "@elf/util",
   "version": "1.1.1",
   "main": "lib/index",
   "types": "src/index",
@@ -8,8 +8,6 @@
     "libc": "tsc"
   },
   "devDependencies": {
-    "@bespoke/share": "^1.1.1",
-    "@elf/setting": "^1.1.1",
     "typescript": "^3.3.3333"
   }
 }

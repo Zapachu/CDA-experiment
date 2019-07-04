@@ -1,10 +1,15 @@
-import {SocketEvent, UnixSocketEvent} from '@bespoke/share'
 import {StringDecoder} from 'string_decoder'
 import {EventEmitter} from 'events'
 import * as path from 'path'
 import * as os from 'os'
 import * as net from 'net'
 import {Log} from './Log'
+
+export enum IpcEvent {
+    asDaemon = 'asDaemon',
+    startRobot = 'startRobot',
+    callback = 'callback'
+}
 
 export function getSocketPath(namespace): string {
     let socketPath = path.join(os.tmpdir(), namespace)
@@ -16,7 +21,7 @@ export function getSocketPath(namespace): string {
     return socketPath
 }
 
-type TMsgPack = [SocketEvent | UnixSocketEvent, ...any[]]
+type TMsgPack = [string, ...any[]]
 
 class CallbackHelper {
     static readonly prefix = 'cb_'
@@ -84,7 +89,7 @@ export class IpcConnection extends EventEmitter {
 
     decode(msgStr: string): TMsgPack {
         const [event, ...args] = JSON.parse(msgStr) as TMsgPack
-        if (event === UnixSocketEvent.callback) {
+        if (event === IpcEvent.callback) {
             this.callbackHelper.consume(...args as [string, ...any[]])
             return [null]
         }
@@ -92,7 +97,7 @@ export class IpcConnection extends EventEmitter {
             if (!CallbackHelper.isKey(arg)) {
                 return arg
             }
-            return (...args) => this.emit(UnixSocketEvent.callback, arg, ...args)
+            return (...args) => this.emit(IpcEvent.callback, arg, ...args)
         })]
     }
 
@@ -111,7 +116,7 @@ export class IpcConnection extends EventEmitter {
         this.jsonBuffer = jsonBuffer.slice(start)
     }
 
-    on(event: SocketEvent | UnixSocketEvent, listener: (...args: any[]) => void): this {
+    on(event: string, listener: (...args: any[]) => void): this {
         return super.on(event, listener)
     }
 

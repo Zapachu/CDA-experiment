@@ -1,4 +1,3 @@
-import {NetworkInterfaceInfo, networkInterfaces} from 'os'
 import {resolve} from 'path'
 import * as webpack from 'webpack'
 import * as QiniuPlugin from 'qiniu-webpack-plugin'
@@ -6,6 +5,7 @@ import * as ManifestPlugin from 'webpack-manifest-plugin'
 import {CleanWebpackPlugin} from 'clean-webpack-plugin'
 import {config} from '@bespoke/share'
 import {elfSetting} from '@elf/setting'
+import {NetWork} from '@elf/util'
 
 interface IPaths {
     entry?: string
@@ -15,18 +15,6 @@ interface IPaths {
 const defaultPaths: IPaths = {
     entry: './src/view',
     output: './dist'
-}
-
-function getIp() {
-    let ip: string = '127.0.0.1'
-    Object.values<NetworkInterfaceInfo[]>(networkInterfaces()).forEach(infos => {
-        infos.forEach(({family, internal, address}) => {
-            if (family === 'IPv4' && !internal) {
-                ip = address
-            }
-        })
-    })
-    return ip
 }
 
 function resolvePaths(basePath, paths: IPaths = defaultPaths): IPaths {
@@ -61,7 +49,7 @@ export function geneClientBuilder(
             port: config.devPort.client,
             proxy: {
                 [`/${config.rootName}`]: {
-                    target: `http://${getIp()}:${config.devPort.server}`,
+                    target: `http://${NetWork.getIp()}:${config.devPort.server}`,
                     ws: true
                 }
             }

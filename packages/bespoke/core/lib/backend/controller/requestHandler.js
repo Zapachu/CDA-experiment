@@ -39,8 +39,8 @@ var share_1 = require("@bespoke/share");
 var protocol_1 = require("@elf/protocol");
 var passport = require("passport");
 var setting_1 = require("@elf/setting");
-var server_util_1 = require("@bespoke/server-util");
-var util_1 = require("../util");
+var util_1 = require("@elf/util");
+var util_2 = require("../util");
 var interface_1 = require("../interface");
 var model_1 = require("../model");
 var service_1 = require("../service");
@@ -55,9 +55,9 @@ var UserCtrl = /** @class */ (function () {
             return __generator(this, function (_a) {
                 chunk = fs.readFileSync(path.resolve(__dirname, "../../../static/index.html")).toString();
                 res.set('content-type', 'text/html');
-                res.end("<script type=\"text/javascript\">\nObject.assign(window, {\n    NAMESPACE:'" + util_1.Setting.namespace + "',\n    WITH_LINKER:" + setting_1.elfSetting.bespokeWithLinker + ",\n    PRODUCT_ENV:" + setting_1.elfSetting.inProductEnv + "\n})\n</script>" +
-                    chunk.replace(/static/g, util_1.Setting.namespace + "/static") +
-                    ("<script type=\"text/javascript\" src=\"" + util_1.Setting.getClientPath() + "\"></script>"));
+                res.end("<script type=\"text/javascript\">\nObject.assign(window, {\n    NAMESPACE:'" + util_2.Setting.namespace + "',\n    WITH_LINKER:" + setting_1.elfSetting.bespokeWithLinker + ",\n    PRODUCT_ENV:" + setting_1.elfSetting.inProductEnv + "\n})\n</script>" +
+                    chunk.replace(/static/g, util_2.Setting.namespace + "/static") +
+                    ("<script type=\"text/javascript\" src=\"" + util_2.Setting.getClientPath() + "\"></script>"));
                 return [2 /*return*/];
             });
         });
@@ -105,7 +105,7 @@ var UserCtrl = /** @class */ (function () {
                 switch (_b.label) {
                     case 0:
                         _a = req.body, nationCode = _a.nationCode, mobile = _a.mobile, verifyCode = _a.verifyCode, returnToUrl = req.session.returnToUrl;
-                        return [4 /*yield*/, protocol_1.redisClient.get(util_1.RedisKey.verifyCode(nationCode, mobile))];
+                        return [4 /*yield*/, protocol_1.redisClient.get(util_2.RedisKey.verifyCode(nationCode, mobile))];
                     case 1:
                         _verifyCode = _b.sent();
                         if (setting_1.elfSetting.inProductEnv && verifyCode !== _verifyCode) {
@@ -200,7 +200,7 @@ var GameCtrl = /** @class */ (function () {
                         return [3 /*break*/, 6];
                     case 5:
                         e_1 = _a.sent();
-                        server_util_1.Log.e(e_1);
+                        util_1.Log.e(e_1);
                         res.json({
                             code: share_1.baseEnum.ResponseCode.notFound
                         });
@@ -238,7 +238,7 @@ var GameCtrl = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         gameId = req.params.gameId;
-                        return [4 /*yield*/, protocol_1.redisClient.get(util_1.RedisKey.share_GameCode(gameId))];
+                        return [4 /*yield*/, protocol_1.redisClient.get(util_2.RedisKey.share_GameCode(gameId))];
                     case 1:
                         shareCode = _a.sent();
                         return [4 /*yield*/, service_1.GameDAO.getGame(gameId)];
@@ -255,10 +255,10 @@ var GameCtrl = /** @class */ (function () {
                         _a.label = 3;
                     case 3:
                         _a.trys.push([3, 6, , 7]);
-                        return [4 /*yield*/, protocol_1.redisClient.setex(util_1.RedisKey.share_GameCode(gameId), util_1.CONFIG.shareCodeLifeTime, shareCode)];
+                        return [4 /*yield*/, protocol_1.redisClient.setex(util_2.RedisKey.share_GameCode(gameId), util_2.CONFIG.shareCodeLifeTime, shareCode)];
                     case 4:
                         _a.sent();
-                        return [4 /*yield*/, protocol_1.redisClient.setex(util_1.RedisKey.share_CodeGame(shareCode), util_1.CONFIG.shareCodeLifeTime, gameId)];
+                        return [4 /*yield*/, protocol_1.redisClient.setex(util_2.RedisKey.share_CodeGame(shareCode), util_2.CONFIG.shareCodeLifeTime, gameId)];
                     case 5:
                         _a.sent();
                         res.json({
@@ -285,7 +285,7 @@ var GameCtrl = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         code = req.body.code;
-                        return [4 /*yield*/, protocol_1.redisClient.get(util_1.RedisKey.share_CodeGame(code))];
+                        return [4 /*yield*/, protocol_1.redisClient.get(util_2.RedisKey.share_CodeGame(code))];
                     case 1:
                         gameId = _a.sent();
                         res.json(gameId ? {
@@ -329,7 +329,7 @@ var GameCtrl = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         gameId = req.params.gameId, name = req.body.name;
-                        token = util_1.Token.geneToken(Math.random());
+                        token = util_2.Token.geneToken(Math.random());
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 3, , 4]);
@@ -372,7 +372,7 @@ var GameCtrl = /** @class */ (function () {
                         return [3 /*break*/, 4];
                     case 3:
                         err_1 = _a.sent();
-                        server_util_1.Log.e(err_1);
+                        util_1.Log.e(err_1);
                         res.json({
                             code: share_1.baseEnum.ResponseCode.serverError
                         });
@@ -394,9 +394,9 @@ var GameCtrl = /** @class */ (function () {
                         _a.trys.push([1, 3, , 4]);
                         return [4 /*yield*/, model_1.GameModel.find({
                                 owner: user.id,
-                                namespace: util_1.Setting.namespace
+                                namespace: util_2.Setting.namespace
                             })
-                                .limit(util_1.CONFIG.historyGamesListSize)
+                                .limit(util_2.CONFIG.historyGamesListSize)
                                 .sort({ createAt: -1 })];
                     case 2:
                         historyGameThumbs = (_a.sent()).map(function (_a) {

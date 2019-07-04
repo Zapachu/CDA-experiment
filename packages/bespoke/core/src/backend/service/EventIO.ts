@@ -6,10 +6,9 @@ import {
     IConnectionNamespace,
     IGameWithId,
     IRobotHandshake,
-    SocketEvent,
-    UnixSocketEvent
+    SocketEvent
 } from '@bespoke/share'
-import {getSocketPath, IpcConnection, Log} from '@bespoke/server-util'
+import {getSocketPath, IpcConnection, Log, IpcEvent} from '@elf/util'
 import {createServer, Socket} from 'net'
 import {existsSync, unlinkSync} from 'fs'
 import {Server} from 'http'
@@ -22,7 +21,7 @@ export class EventIO {
     private static robotIOServer: RobotIO.Server
     private static socketIOServer: SocketIO.Server
 
-    static emitEvent(nspId: string, event: SocketEvent | UnixSocketEvent, ...args) {
+    static emitEvent(nspId: string, event: SocketEvent | IpcEvent, ...args) {
         if (!(nspId && event && args.length)) {
             return
         }
@@ -56,7 +55,7 @@ export class EventIO {
         createServer(socket => {
             const ipcConnection: IpcConnection = new IpcConnection(socket)
             ipcConnection
-                .on(UnixSocketEvent.asDaemon, () => {
+                .on(IpcEvent.asDaemon, () => {
                     Log.i('Robot daemon connection initialized')
                     this.robotIOServer.daemonConnection = ipcConnection
                 })
@@ -74,7 +73,7 @@ export class EventIO {
         if (!this.robotIOServer.daemonConnection) {
             Log.w('Robot daemon connection not initialized yet')
         }
-        this.robotIOServer.daemonConnection.emit(UnixSocketEvent.startRobot, {actor, game} as IRobotHandshake, meta)
+        this.robotIOServer.daemonConnection.emit(IpcEvent.startRobot, {actor, game} as IRobotHandshake, meta)
     }
 }
 
@@ -109,7 +108,7 @@ namespace RobotIO {
             return this
         }
 
-        emit(event: SocketEvent | UnixSocketEvent, ...args): boolean {
+        emit(event: SocketEvent | IpcEvent, ...args): boolean {
             let success = true
             for (let id in this.connections) {
                 if (!this.connections[id].emit(event, ...args)) {

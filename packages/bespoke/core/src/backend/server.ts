@@ -24,7 +24,7 @@ import {GameModel, UserDoc, UserModel} from './model'
 import {Strategy} from 'passport-local'
 import * as http from 'http'
 import {NewPhase, PhaseReg, RedisCall, redisClient} from '@elf/protocol'
-import {Log} from '@bespoke/server-util'
+import {Log} from '@elf/util'
 
 export class Server {
     private static sessionMiddleware

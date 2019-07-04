@@ -36,13 +36,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var share_1 = require("@bespoke/share");
-var server_util_1 = require("@bespoke/server-util");
+var util_1 = require("@elf/util");
 var protocol_1 = require("@elf/protocol");
 var EventIO_1 = require("./EventIO");
 var GameDAO_1 = require("./GameDAO");
 var StateManager_1 = require("./StateManager");
 var MoveQueue_1 = require("./MoveQueue");
-var util_1 = require("../util");
+var util_2 = require("../util");
 var BaseLogic = /** @class */ (function () {
     function BaseLogic(game) {
         this.game = game;
@@ -156,7 +156,7 @@ var BaseLogic = /** @class */ (function () {
     BaseLogic.prototype.playerMoveReducer = function (actor, type, params, cb) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                server_util_1.Log.i(actor.token, type, params, cb);
+                util_1.Log.i(actor.token, type, params, cb);
                 return [2 /*return*/];
             });
         });
@@ -164,7 +164,7 @@ var BaseLogic = /** @class */ (function () {
     BaseLogic.prototype.teacherMoveReducer = function (actor, type, params, cb) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                server_util_1.Log.i(actor.token, type, params, cb);
+                util_1.Log.i(actor.token, type, params, cb);
                 return [2 /*return*/];
             });
         });
@@ -173,7 +173,7 @@ var BaseLogic = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             var actor;
             return __generator(this, function (_a) {
-                actor = { token: util_1.Token.geneToken("" + this.game.id + key), type: share_1.Actor.serverRobot };
+                actor = { token: util_2.Token.geneToken("" + this.game.id + key), type: share_1.Actor.serverRobot };
                 EventIO_1.EventIO.startRobot(actor, this.game, meta);
                 return [2 /*return*/];
             });
@@ -188,7 +188,7 @@ var BaseLogic = /** @class */ (function () {
                 EventIO_1.EventIO.emitEvent(_this.connections.get(actor.token).id, share_1.SocketEvent.push, type, params);
             }
             catch (e) {
-                server_util_1.Log.e(e);
+                util_1.Log.e(e);
             }
         }); }, 0);
     };
@@ -200,28 +200,28 @@ var BaseLogic = /** @class */ (function () {
     //region elf
     BaseLogic.prototype.setPhaseResult = function (playerToken, phaseResult) {
         if (!this.game.elfGameId) {
-            return server_util_1.Log.w('Bespoke单独部署，game未关联至Elf group');
+            return util_1.Log.w('Bespoke单独部署，game未关联至Elf group');
         }
         protocol_1.RedisCall.call(protocol_1.SetPhaseResult.name, {
-            playUrl: util_1.gameId2PlayUrl(this.game.id),
+            playUrl: util_2.gameId2PlayUrl(this.game.id),
             playerToken: playerToken,
             elfGameId: this.game.elfGameId,
             phaseResult: phaseResult
-        }).catch(function (e) { return server_util_1.Log.e(e); });
+        }).catch(function (e) { return util_1.Log.e(e); });
     };
     BaseLogic.prototype.sendBackPlayer = function (playerToken, phaseResult, nextPhaseKey) {
         var _this = this;
         if (!this.game.elfGameId) {
-            return server_util_1.Log.w('Bespoke单独部署，game未关联至Elf group');
+            return util_1.Log.w('Bespoke单独部署，game未关联至Elf group');
         }
         protocol_1.RedisCall.call(protocol_1.SendBackPlayer.name, {
-            playUrl: util_1.gameId2PlayUrl(this.game.id),
+            playUrl: util_2.gameId2PlayUrl(this.game.id),
             playerToken: playerToken,
             elfGameId: this.game.elfGameId,
             phaseResult: phaseResult,
             nextPhaseKey: nextPhaseKey
         })
-            .catch(function (e) { return server_util_1.Log.e(e); })
+            .catch(function (e) { return util_1.Log.e(e); })
             .then(function (_a) {
             var sendBackUrl = _a.sendBackUrl;
             return EventIO_1.EventIO.emitEvent(_this.connections.get(playerToken).id, share_1.SocketEvent.sendBack, sendBackUrl);
