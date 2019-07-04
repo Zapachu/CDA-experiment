@@ -1,10 +1,10 @@
 {
   "name": "elf-setting",
   "version": "1.0.0",
-  "main": "build/index",
-  "types": "build/index",
+  "main": "lib/index",
+  "types": "src/index",
   "scripts": {
-    "install": "tsc"
+    "version": "tsc"
   },
   "dependencies": {
     "typescript": "^3.3.3333"

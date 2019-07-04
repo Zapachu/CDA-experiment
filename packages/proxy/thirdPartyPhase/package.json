@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "repository": " ",
   "scripts": {
-    "install": "tsc",
+    "version": "tsc",
     "build": "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./bin/script/webpack.ts",
     "wjx:dist": "npm run build --phase=wjx --buildMode=dist",
     "qqwj:dist": "npm run build --phase=qqwj --buildMode=dist",

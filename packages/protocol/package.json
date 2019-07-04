@@ -1,11 +1,11 @@
 {
   "name": "elf-protocol",
   "version": "1.0.0",
-  "main": "build/index",
-  "types": "build/index",
+  "main": "lib/index",
+  "types": "src/index",
   "scripts": {
-    "tsc-w": "tsc -w",
-    "install": "tsc && ts-node ./bin/copyDTS.ts"
+    "version": "tsc && ts-node ./bin/copyDTS.ts",
+    "tsc-w": "tsc -w"
   },
   "devDependencies": {
     "elf-setting": "^1.0.0",

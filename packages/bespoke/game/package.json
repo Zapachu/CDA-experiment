@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "tsc-w": "tsc -w",
-    "install": "tsc bin/help",
+    "version": "tsc bin/help",
     "help": "node bin/help"
   },
   "dependencies": {

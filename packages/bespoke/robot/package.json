@@ -1,11 +1,11 @@
 {
   "name": "@bespoke/robot",
   "version": "1.0.0",
-  "main": "build/index",
-  "types": "build/index",
+  "main": "lib/index",
+  "types": "src/index",
   "scripts": {
-    "install": "tsc",
-    "tsc-w": "tsc -w"
+    "tsc-w": "tsc -w",
+    "version": "tsc"
   },
   "devDependencies": {
     "@bespoke/share": "^1.0.0",

@@ -72,7 +72,7 @@ export class Server {
         })
         express.use(errorHandler())
         express.use(`/${config.rootName}/${Setting.namespace}/static`, Express.static(Setting.staticPath, {maxAge: '10d'}))
-        express.use(`/${config.rootName}/${Setting.namespace}/static`, Express.static(path.join(__dirname, '../../dist/'), {maxAge: '10d'}))
+        express.use(`/${config.rootName}/${Setting.namespace}/static`, Express.static(path.join(__dirname, '../../lib/'), {maxAge: '10d'}))
         express.use(`/${config.rootName}/${Setting.namespace}`, bespokeRouter)
         express.use(`/${config.rootName}/${Setting.namespace}`, router)
         return express
@@ -140,7 +140,7 @@ export class Server {
             })
             return {playUrl: gameId2PlayUrl(id)}
         })
-        const elfComponentPath = require('../../dist/index.json')['ElfComponent.js'].replace('static', `${Setting.namespace}/static`)
+        const elfComponentPath = require('../../lib/index.json')['ElfComponent.js'].replace('static', `${Setting.namespace}/static`)
         const regInfo: PhaseReg.IRegInfo = {
             namespace: Setting.namespace,
             jsUrl: `${getOrigin()}${elfComponentPath};${getOrigin()}${Setting.getClientPath()}`

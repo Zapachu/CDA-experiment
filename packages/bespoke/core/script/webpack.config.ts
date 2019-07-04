@@ -5,6 +5,7 @@ import * as QiniuPlugin from 'qiniu-webpack-plugin'
 import * as ManifestPlugin from 'webpack-manifest-plugin'
 import {config} from '@bespoke/share'
 import {elfSetting} from 'elf-setting'
+const {version} = require('../package.json')
 
 const {qiNiu} = elfSetting
 const buildMode = process.env.npm_config_buildMode || 'dev'
@@ -17,15 +18,15 @@ export = {
         poll: true
     },
     entry: {
-        ElfComponent:path.resolve(__dirname, '../node_modules/elf-component/dist/index.js'),
-        BespokeServer:path.resolve(__dirname, '../src/frontend/index.tsx')
+        ElfComponent: path.resolve(__dirname, '../node_modules/elf-component/lib/index.js'),
+        BespokeServer: path.resolve(__dirname, '../src/frontend/index.tsx')
     },
     output: {
-        path: path.resolve(__dirname, '../dist'),
-        filename: `[name].[hash:4]${buildMode === 'dev' ? '' : '.min'}.js`,
+        path: path.resolve(__dirname, '../lib'),
+        filename: `[name].${version}${buildMode === 'dev' ? '' : '.min'}.js`,
         publicPath: buildMode === 'publish' ? `${qiNiu.download.jsDomain}/${qiNiu.upload.path}/` : `/${config.rootName}/static/`,
         library: '[name]',
-        libraryTarget: 'umd',
+        libraryTarget: 'umd'
     },
     resolve: {
         extensions: ['.ts', '.tsx', '.js', '.jsx', '.json']
@@ -34,7 +35,17 @@ export = {
         rules: [
             {
                 test: /\.(ts|tsx)$/,
-                use: 'ts-loader',
+                use: [
+                    {
+                        loader: 'ts-loader',
+                        options: {
+                            transpileOnly: true,
+                            compilerOptions: {
+                                noEmit: false
+                            }
+                        }
+                    }
+                ],
                 exclude: /node_modules/
             },
             {
@@ -76,7 +87,7 @@ export = {
             filename: 'index.html',
             template: path.resolve(__dirname, './index.html')
         }),
-        new CleanWebpackPlugin(),
+        new CleanWebpackPlugin()
     ].concat(buildMode === 'publish' ? [
         new QiniuPlugin(qiNiu.upload)
     ] : [])

@@ -1,13 +1,12 @@
 {
   "compilerOptions": {
-    "outDir": "./build",
+    "outDir": "./lib",
     "module": "commonjs",
     "target": "es5",
     "lib": [
       "esnext",
       "dom"
     ],
-    "declaration": true,
     "noUnusedLocals": true
   }
 }

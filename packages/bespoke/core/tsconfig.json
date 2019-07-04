@@ -8,13 +8,13 @@
       "dom",
       "scripthost"
     ],
-    "declaration": true,
     "sourceMap": true,
     "experimentalDecorators": true,
     "noUnusedLocals": true,
     "resolveJsonModule": true,
     "downlevelIteration": true,
-    "jsx": "react"
+    "jsx": "react",
+    "noEmit": true
   },
   "include": [
     "src/backend",

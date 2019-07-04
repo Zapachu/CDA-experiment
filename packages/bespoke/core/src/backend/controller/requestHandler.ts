@@ -13,7 +13,7 @@ import * as path from 'path'
 
 export class UserCtrl {
     static async renderApp(req, res: Response) {
-        const chunk = fs.readFileSync(path.resolve(__dirname, `../../../dist/index.html`)).toString()
+        const chunk = fs.readFileSync(path.resolve(__dirname, `../../../lib/index.html`)).toString()
         res.set('content-type', 'text/html')
         res.end(`<script type="text/javascript">
 Object.assign(window, {

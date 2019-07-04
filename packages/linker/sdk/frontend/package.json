@@ -1,11 +1,11 @@
 {
   "name": "@elf/client-sdk",
   "version": "1.0.0",
-  "main": "build/index",
-  "types": "build/index",
+  "main": "lib/index",
+  "types": "src/index",
   "scripts": {
-    "install": "tsc",
-    "tsc-w": "tsc -w"
+    "tsc-w": "tsc -w",
+    "version": "tsc"
   },
   "devDependencies": {
     "typescript": "^3.3.3333"

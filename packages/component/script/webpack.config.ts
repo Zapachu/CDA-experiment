@@ -13,11 +13,11 @@ export = {
     watchOptions: {
         poll: true
     },
-    entry: path.resolve(__dirname, '../lib/index.ts'),
+    entry: path.resolve(__dirname, '../src/index.ts'),
     output: {
-        path: path.resolve(__dirname, '../dist'),
+        path: path.resolve(__dirname, '../lib'),
         filename: 'index.js',
-        libraryTarget: 'commonjs',
+        libraryTarget: 'commonjs'
     },
     resolve: {
         extensions: ['.ts', '.tsx', '.js', '.jsx']
@@ -27,17 +27,15 @@ export = {
             {
                 test: /\.(ts|tsx)$/,
                 loader: 'ts-loader',
-                options:{
-                    compilerOptions:{
-                        "emitDeclarationOnly": false,
-                    }
+                options: {
+                    transpileOnly: true
                 },
                 exclude: /node_modules/
             },
             {
                 test: /\.(scss|sass)$/,
                 include: [
-                    path.resolve(__dirname, '../lib/component/Switch')
+                    path.resolve(__dirname, '../src/component/Switch')
                 ],
                 use: [
                     'style-loader',
@@ -53,7 +51,7 @@ export = {
                     {
                         loader: 'sass-loader',
                         options: {
-                            includePaths: [path.resolve(__dirname, '../lib/resource')]
+                            includePaths: [path.resolve(__dirname, '../src/resource')]
                         }
                     }
                 ]
@@ -62,7 +60,7 @@ export = {
                 test: /\.(scss|sass)$/,
                 exclude: [
                     /node_modules/,
-                    path.resolve(__dirname, '../lib/component/Switch')
+                    path.resolve(__dirname, '../src/component/Switch')
                 ],
                 use: [
                     'style-loader',
@@ -78,7 +76,7 @@ export = {
                     {
                         loader: 'sass-loader',
                         options: {
-                            includePaths: [path.resolve(__dirname, '../lib/resource')]
+                            includePaths: [path.resolve(__dirname, '../src/resource')]
                         }
                     }
                 ]

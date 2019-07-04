@@ -7,7 +7,6 @@
       "esnext",
       "dom"
     ],
-    "declaration": true,
     "sourceMap": true,
     "experimentalDecorators": true,
     "jsx": "react",
@@ -40,6 +39,6 @@
     }
   },
   "include": [
-    "lib"
+    "src"
   ]
 }
