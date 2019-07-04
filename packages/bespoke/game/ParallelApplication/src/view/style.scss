@@ -64,8 +64,24 @@
       }
     }
   }
+  .resultLetter {
+    background: url("./components/result_letter.png") no-repeat;
+    background-size: 100% 100%;
+    width: 300px;
+    box-sizing: border-box;
+    padding: 20px;
+    margin: 5px 0 20px 0;
+  }
   .resultImg {
     width: 300px;
+    margin-bottom: 20px;
+  }
+  .resultQrImg {
+    width: 100px;
+    margin: 20px 0 0 0;
+  }
+  .resultQrMsg {
+    font-size: 12px;
   }
   .resultBoard {
     background: url("./components/result_board.png") no-repeat;

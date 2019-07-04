@@ -116,7 +116,14 @@ app.use(
     parameterLimit: 30000
   })
 );
-// app.use(validator());
+
+// server静态文件
+const staticPath = process.env.NODE_ENV === 'production' ? path.resolve(__dirname, '../dist') : path.join(__dirname, './dist')
+app.use(
+  settings.rootname + '/static',
+  express.static(staticPath, { maxAge: '10d' })
+);
+
 
 const sessionStore = new RedisStore({
   client: redisClient as any,
@@ -162,12 +169,7 @@ app.use((req, res, next) => {
 });
 
 
-// server静态文件
-const staticPath = process.env.NODE_ENV === 'production' ? path.resolve(__dirname, '../dist') : path.join(__dirname, './dist')
-app.use(
-  settings.rootname + '/static',
-  express.static(staticPath, { maxAge: '10d' })
-);
+
 
 
 //routes
@@ -186,7 +188,6 @@ let server = http.createServer(app);
 
 const io = socket(server)
 io.adapter(socketRedis({ host: settings.redishost, port: settings.redisport }))
-// io.path(settings.socketPath)
 io.use(socketSession(sessionMiddleWare, {
   autoSave: true
 }))
