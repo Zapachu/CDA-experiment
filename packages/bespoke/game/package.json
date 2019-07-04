@@ -7,7 +7,7 @@
     "help": "node bin/help"
   },
   "dependencies": {
-    "@bespoke/client-sdk": "^1.1.1",
+    "@bespoke/register": "^1.1.1",
     "@bespoke/robot": "^1.1.1",
     "@bespoke/server": "^1.1.1",
     "bespoke-game-graphical-util": "^1.0.0",

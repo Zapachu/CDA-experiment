@@ -11,7 +11,7 @@
     "publish": "npm run build --buildMode=publish"
   },
   "devDependencies": {
-    "@bespoke/client-sdk": "^1.1.1",
+    "@bespoke/register": "^1.1.1",
     "@bespoke/server-util": "^1.1.1",
     "@bespoke/share": "^1.1.1",
     "elf-component": "^1.1.1",
