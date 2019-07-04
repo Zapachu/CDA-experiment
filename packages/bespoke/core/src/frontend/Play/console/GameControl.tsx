@@ -21,11 +21,11 @@ export class GameControl extends React.Component<IGameControlProps> {
         notStarted: ['未开始', 'Not Started'],
         started: ['进行中', 'Playing'],
         paused: ['已暂停', 'Paused'],
-        over: ['已结束', 'Over'],
+        over: ['已关闭', 'Closed'],
         start: ['开始', 'START'],
         pause: ['暂停', 'PAUSE'],
         resume: ['恢复', 'RESUME'],
-        stop: ['结束', 'OVER'],
+        stop: ['关闭', 'CLOSE'],
         GameOver: ['实验结束', 'GAME OVER'],
         onlinePlayers: ['当前在线人数', 'Online Players'],
         players: ['实验成员', 'Players']

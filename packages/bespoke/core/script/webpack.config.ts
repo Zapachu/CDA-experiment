@@ -5,7 +5,6 @@ import * as QiniuPlugin from 'qiniu-webpack-plugin'
 import * as ManifestPlugin from 'webpack-manifest-plugin'
 import {config} from '@bespoke/share'
 import {elfSetting} from 'elf-setting'
-const {version} = require('../package.json')
 
 const {qiNiu} = elfSetting
 const buildMode = process.env.npm_config_buildMode || 'dev'
@@ -23,7 +22,7 @@ export = {
     },
     output: {
         path: path.resolve(__dirname, '../lib'),
-        filename: `[name].${version}${buildMode === 'dev' ? '' : '.min'}.js`,
+        filename: `[name]${buildMode === 'dev' ? '' : '.min'}.js`,
         publicPath: buildMode === 'publish' ? `${qiNiu.download.jsDomain}/${qiNiu.upload.path}/` : `/${config.rootName}/static/`,
         library: '[name]',
         libraryTarget: 'umd'

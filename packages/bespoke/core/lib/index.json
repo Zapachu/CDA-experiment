@@ -1,5 +1,5 @@
 {
-  "BespokeServer.js": "/bespoke/static/BespokeServer.1.0.0.min.js",
-  "ElfComponent.js": "/bespoke/static/ElfComponent.1.0.0.min.js",
+  "BespokeServer.js": "/bespoke/static/BespokeServer.min.js",
+  "ElfComponent.js": "/bespoke/static/ElfComponent.min.js",
   "index.html": "/bespoke/static/index.html"
 }

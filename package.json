@@ -2,7 +2,8 @@
   "name": "elf",
   "private": true,
   "scripts": {
-    "install": "lerna bootstrap"
+    "install": "lerna bootstrap",
+    "libc": "lerna run libc"
   },
   "devDependencies": {
     "@ant-design/icons": "~2.1.0",

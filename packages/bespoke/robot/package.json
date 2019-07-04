@@ -1,16 +1,16 @@
 {
   "name": "@bespoke/robot",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "main": "lib/index",
   "types": "src/index",
   "scripts": {
     "tsc-w": "tsc -w",
-    "version": "tsc"
+    "libc": "tsc"
   },
   "devDependencies": {
-    "@bespoke/server-util": "^1.1.0",
-    "@bespoke/share": "^1.1.0",
-    "elf-setting": "^1.1.0",
+    "@bespoke/server-util": "^1.1.1",
+    "@bespoke/share": "^1.1.1",
+    "elf-setting": "^1.1.1",
     "typescript": "^3.3.3333"
   }
 }

@@ -1,9 +1,9 @@
 {
   "name": "thirdparty-phase-proxy",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "repository": " ",
   "scripts": {
-    "version": "tsc",
+    "tsc": "tsc",
     "build": "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./bin/script/webpack.ts",
     "wjx:dist": "npm run build --phase=wjx --buildMode=dist",
     "qqwj:dist": "npm run build --phase=qqwj --buildMode=dist",
@@ -16,9 +16,9 @@
     "otreeProxy": "ts-node ./lib/phases/otreeProxy/app.ts"
   },
   "devDependencies": {
-    "@elf/client-sdk": "^1.1.0",
-    "elf-protocol": "^1.1.0",
-    "elf-setting": "^1.1.0",
+    "@elf/client-sdk": "^1.1.1",
+    "elf-protocol": "^1.1.1",
+    "elf-setting": "^1.1.1",
     "ts-node": "^8.0.3",
     "typescript": "^3.3.3333",
     "webpack": "^4.29.6"
