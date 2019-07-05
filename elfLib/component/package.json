@@ -5,7 +5,7 @@
   "types": "src/index",
   "scripts": {
     "tsc-w": "tsc -w",
-    "libc": "ts-node bin/copyResource.ts",
+    "libc": "npm run dist & ts-node bin/copyResource.ts",
     "build": "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./script/webpack.config.ts",
     "dist": "npm run build --buildMode=dist"
   },

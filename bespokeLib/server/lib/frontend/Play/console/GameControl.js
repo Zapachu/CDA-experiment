@@ -91,7 +91,6 @@ var GameControl = /** @class */ (function (_super) {
         var _a;
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.lang = component_1.Lang.extractLang({
-            gameTitle: ['实验名称', 'Game Name'],
             gameStatus: ['实验状态', 'Game Status'],
             notStarted: ['未开始', 'Not Started'],
             started: ['进行中', 'Playing'],
@@ -154,10 +153,9 @@ var GameControl = /** @class */ (function (_super) {
                         _a[over] = lang.over,
                         _a)[gameState.status])),
                 React.createElement("div", { className: style.gameTitle },
-                    React.createElement("label", null, lang.gameTitle),
                     React.createElement("span", null, game.title)),
                 React.createElement("div", { className: style.btnGroup },
-                    React.createElement(component_1.Button, __assign({}, btnProps, { icon: component_1.ButtonProps.Icon.home, onClick: function () { return historyPush("/dashboard"); } })),
+                    WITH_LINKER ? null : React.createElement(component_1.Button, __assign({}, btnProps, { icon: component_1.ButtonProps.Icon.home, onClick: function () { return historyPush("/dashboard"); } })),
                     React.createElement(component_1.Button, __assign({}, btnProps, { icon: component_1.ButtonProps.Icon.parameter, onClick: function () { return historyPush("/configuration/" + game.id); } })),
                     WITH_LINKER ? null : React.createElement(component_1.Button, __assign({}, btnProps, { icon: component_1.ButtonProps.Icon.share, onClick: function () { return historyPush("/share/" + game.id); } })))),
             React.createElement("section", { className: style.players },

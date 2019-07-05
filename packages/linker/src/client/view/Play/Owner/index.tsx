@@ -1,10 +1,10 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {connCtx, Lang} from '@client-util'
-import {baseEnum, IPlayerState} from '@common'
+import {baseEnum} from '@common'
 import {playContext, rootContext, TPlayContext, TRootContext} from '@client-context'
-import {Card, List, Button} from '@antd-component'
-import {Breadcrumb, Title} from '@client-component'
+import {Link} from 'react-router-dom'
+import {Affix, Dropdown, Button, Menu} from '@antd-component'
 import {History} from 'history'
 
 const {PhaseStatus, PlayerStatus} = baseEnum
@@ -13,9 +13,7 @@ const {PhaseStatus, PlayerStatus} = baseEnum
 @connCtx(playContext)
 export class Play4Owner extends React.Component<TRootContext & TPlayContext & { history: History }> {
     lang = Lang.extractLang({
-        gameConfiguration: ['实验配置信息', 'GameConfiguration'],
         share: ['分享', 'Share'],
-        gameList: ['实验列表', 'GameList'],
         playerList: ['玩家列表', 'PlayerList'],
         console: ['控制台', 'Console'],
         [PhaseStatus[PhaseStatus.playing]]: ['进行中', 'Playing'],
@@ -31,69 +29,22 @@ export class Play4Owner extends React.Component<TRootContext & TPlayContext & { 
     })
 
     render(): React.ReactNode {
-        const {props: {game, gameState, history}, lang} = this
-        console.log(gameState)
+        const {props: {game, gameState}, lang} = this
         return <section className={style.console}>
-            <Breadcrumb history={history} links={[
-                {label: lang.gameList, to: `/`},
-                {label: lang.gameConfiguration, to: `/configuration/${game.id}`},
-                {label: lang.playerList, to: `/player/${game.id}`},
-                {label: lang.share, to: `/share/${game.id}`}
-            ]}/>
-            {
-                gameState.phaseStates.length > 1 ?
-                    <>
-                        <Title label={lang.playerStatus}/>
-                        <List
-                            dataSource={gameState.phaseStates}
-                            grid={{gutter: 12, column: 2}}
-                            renderItem={(phaseState, i) =>
-                                <List.Item>
-                                    <Card key={i}
-                                          title={game.phaseConfigs.find(({key}) => key === phaseState.key).title}
-                                          extra={lang[PhaseStatus[phaseState.status]]}
-                                          actions={[<Button onClick={
-                                              () => window.open(phaseState.playUrl, '_blank')
-                                          }>{lang.console}</Button>]}
-                                    >
-                                        <List dataSource={Object.entries(phaseState.playerState)}
-                                              grid={{gutter: 12, column: 3}}
-                                              renderItem={
-                                                  ([playerToken, {actor, status, phaseResult = {}}]: [string, IPlayerState]) =>
-                                                      <List.Item>
-                                                          <List.Item.Meta
-                                                              title={`${actor.userName}:${lang[PlayerStatus[status]] || ''}`}
-                                                              description={
-                                                                  <div className={style.phaseResult}>
-                                                                      {
-                                                                          phaseResult.point ?
-                                                                              <span>{lang.point}&nbsp;&nbsp;{phaseResult.point}</span> : null
-                                                                      }
-                                                                      {
-                                                                          phaseResult.uniKey ?
-                                                                              <span>{lang.uniKey}&nbsp;&nbsp;{phaseResult.uniKey}</span> : null
-                                                                      }
-                                                                      {
-                                                                          phaseResult.detailIframeUrl ?
-                                                                              <a href={phaseResult.detailIframeUrl}
-                                                                                 target='_blank'>{lang.detail}</a> : null
-                                                                      }
-                                                                  </div>
-                                                              }/>
-                                                      </List.Item>
-                                              }>
-                                        </List>
-                                    </Card>
-                                </List.Item>
-                            }/>
-                    </> :
-                    <iframe style={{
-                        width: '100%',
-                        height:'80vh',
-                        position:'fixed',
-                        border: 'none'
-                    }} src={gameState.phaseStates[0].playUrl}/>
-            }
+            <Affix style={{position: 'absolute', right: 32}} offsetTop={64}>
+                <Dropdown overlay={<Menu>
+                    <Menu.Item>
+                        <Link to={`/player/${game.id}`}>{lang.playerList}</Link>
+                    </Menu.Item>
+                    <Menu.Item>
+                        <Link to={`/share/${game.id}`}>{lang.share}</Link>
+                    </Menu.Item>
+                </Menu>}>
+                    <Button type='primary' shape="circle" icon="bars" />
+                </Dropdown>
+            </Affix>
+            <iframe className={style.playIframe}
+                    src={`${gameState.phaseStates[0].playUrl}?${Lang.key}=${Lang.activeLanguage}`}/>
         </section>
     }
 }

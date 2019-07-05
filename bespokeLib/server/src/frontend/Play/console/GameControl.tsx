@@ -16,7 +16,6 @@ declare interface IGameControlProps {
 
 export class GameControl extends React.Component<IGameControlProps> {
     lang = Lang.extractLang({
-        gameTitle: ['实验名称', 'Game Name'],
         gameStatus: ['实验状态', 'Game Status'],
         notStarted: ['未开始', 'Not Started'],
         started: ['进行中', 'Playing'],
@@ -78,11 +77,13 @@ export class GameControl extends React.Component<IGameControlProps> {
                     }[gameState.status]}</span>
                 </div>
                 <div className={style.gameTitle}>
-                    <label>{lang.gameTitle}</label>
                     <span>{game.title}</span>
                 </div>
                 <div className={style.btnGroup}>
-                    <Button {...btnProps} icon={ButtonProps.Icon.home} onClick={() => historyPush(`/dashboard`)}/>
+                    {
+                        WITH_LINKER ? null : <Button {...btnProps} icon={ButtonProps.Icon.home}
+                                                     onClick={() => historyPush(`/dashboard`)}/>
+                    }
                     <Button {...btnProps} icon={ButtonProps.Icon.parameter}
                             onClick={() => historyPush(`/configuration/${game.id}`)}/>
                     {

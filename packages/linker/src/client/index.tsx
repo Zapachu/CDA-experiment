@@ -20,5 +20,5 @@ export function registerOnElf(namespace: string, phaseTemplate: IPhaseTemplate) 
 const rootContainer = document.body.appendChild(document.createElement('div'))
 render(<Root/>, rootContainer)
 Lang.switchListeners.push(() => {
-    render(<Root key={Lang.languageName}/>, rootContainer)
+    render(<Root key={Lang.activeLanguage}/>, rootContainer)
 })
