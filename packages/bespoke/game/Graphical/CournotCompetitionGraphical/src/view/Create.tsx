@@ -1,6 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Label, Lang, RangeInput} from 'elf-component'
+import {Label, Lang, RangeInput} from '@elf/component'
+import {Core} from '@bespoke/register'
 import {ICreateParams} from '../interface'
 
 interface ICreateState {
@@ -13,7 +14,7 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
         groupSize: ['每组人数', 'GroupSize'],
         quota: ['总量', 'Quota'],
         edit: ['编辑', 'EDIT'],
-        done: ['完成', 'DONE'],
+        done: ['完成', 'DONE']
     })
 
     componentDidMount(): void {
@@ -54,7 +55,7 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
     renderBaseFields() {
         const {
             lang,
-            props: {params: {round, groupSize, quota}, setParams},
+            props: {params: {round, groupSize, quota}, setParams}
         } = this
         return <ul className={style.configFields}>
             <li>
@@ -69,7 +70,7 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
                 <RangeInput value={groupSize}
                             min={2}
                             max={2}
-                            disabled={true} />
+                            disabled={true}/>
             </li>
             <li>
                 <Label label={lang.quota}/>

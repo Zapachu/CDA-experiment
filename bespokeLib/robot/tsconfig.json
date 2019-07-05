@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "outDir": "./lib",
+    "module": "commonjs",
+    "target": "es5",
+    "lib": [
+      "esnext"
+    ],
+    "noUnusedLocals": true,
+    "skipLibCheck": true,
+    "sourceMap": true
+  },
+  "include": [
+    "src"
+  ]
+}

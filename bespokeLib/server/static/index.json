@@ -1,0 +1,5 @@
+{
+  "BespokeServer.js": "/bespoke/static/BespokeServer.min.js",
+  "ElfComponent.js": "/bespoke/static/ElfComponent.min.js",
+  "index.html": "/bespoke/static/index.html"
+}

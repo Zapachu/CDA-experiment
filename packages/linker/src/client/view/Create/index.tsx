@@ -119,11 +119,10 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
                             onChange={({target: {value: desc}}) => this.setState({desc})}/>
             <br/><br/>
             <Create {...{
-                key: phaseConfig ? phaseConfig.key : '',
-                phases: [],
-                curPhase: phaseConfig,
-                updatePhase: (suffixPhaseKeys: Array<string>, param: {}) => this.updatePhase(param),
-                highlightPhases: () => console.log('highlight')
+                submitable:true,
+                setSubmitable:()=>null,
+                params:phaseConfig.param,
+                setParams:params=>this.updatePhase(params)
             }}/>
             <div style={{textAlign: 'center'}}>
                 <Button type='primary' onClick={() => this.handleSubmit()}>{lang.submit}</Button>

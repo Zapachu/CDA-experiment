@@ -1,7 +1,9 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {ICreateParams} from '../interface'
-import {Core, Label, RangeInput, Input, Button} from 'elf-component'
+import {Button, Input, Label, RangeInput} from '@elf/component'
+import {Core} from '@bespoke/register'
+
 interface ICreateState {
     startingPrice: number
     maxPrivatePrice: number
@@ -21,7 +23,7 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
         positions: [{privatePrice: [101, 98, 102]}, {privatePrice: [97, 99, 103]}],
         round: 3,
         groupSize: 2,
-        readonly: false,
+        readonly: false
     }
 
     componentDidMount(): void {

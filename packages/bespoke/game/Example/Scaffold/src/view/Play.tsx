@@ -1,6 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, Core, Lang} from 'elf-component'
+import {Button, Lang} from '@elf/component'
+import {Core} from '@bespoke/register'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, MoveType, PushType} from '../config'
 
 export function Play({game: {params}, gameState, playerState, frameEmitter}: Core.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {

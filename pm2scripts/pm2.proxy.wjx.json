@@ -1,9 +1,0 @@
-{
-  "script": "../packages/proxy/thirdPartyPhase/lib/phases/wjx/server/app.ts",
-  "name": "proxywjx",
-  "env": {
-    "NODE_ENV": "production",
-    "PORT": 3072
-  },
-  "log_date_format": "YYYY-MM-DD HH:mm Z"
-}

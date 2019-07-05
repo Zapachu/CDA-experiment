@@ -1,6 +1,6 @@
 import {PhaseStatus, PlayerStatus, Actor, AcademusRole} from './baseEnum'
 import {Socket} from 'socket.io-client'
-import {SetPhaseResult} from 'elf-protocol'
+import {SetPhaseResult} from '@elf/protocol'
 import {baseEnum} from '@common'
 
 export type TSocket = typeof Socket

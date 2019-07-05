@@ -1,4 +1,4 @@
-@import "~elf-component/lib/resource/public";
+@import "~@elf/component/lib/public";
 
 .blankMsg {
   @include blankMsg;
@@ -49,10 +49,6 @@
     margin: 0;
     padding: 0;
   }
-}
-
-.createOnElf {
-  margin: 1rem 1.5rem;
 }
 
 .player4Owner {

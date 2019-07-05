@@ -1,22 +1,23 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang, MaskLoading, Toast} from 'elf-component'
+import {Lang, MaskLoading, Toast} from '@elf/component'
+import {Core} from '@bespoke/register'
 import {animated, useSpring} from 'react-spring'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
 import {MoveType, NEW_ROUND_TIMER, PlayerStatus, PushType} from '../../config'
 import {
-    span,
-    Stage,
-    ImgLoader,
-    Host,
     Button,
-    Input,
+    Host,
     Idea,
+    ImgLoader,
+    Input,
     Paint,
     RoundSwitching,
     Shadow,
+    span,
+    Stage,
     Win
-} from 'bespoke-game-graphical-util'
+} from '@bespoke-game/graphical-util'
 
 function Player({playerStatus, direction, privatePrice}: {
     privatePrice?: number
@@ -110,6 +111,7 @@ const PlayersCfg: Array<{
         role: Role.other
     }
 ]
+
 //endregion
 
 interface IPlayState {

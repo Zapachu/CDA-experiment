@@ -25,9 +25,7 @@ const apiRouter = Router()
 
 export default Router()
     .use(`/${apiPrefix}`, apiRouter)
-    .get(/baseInfo/, UserCtrl.loggedIn, UserCtrl.isTeacher, UserCtrl.renderApp)
     .get('/create/:namespace', UserCtrl.loggedIn, UserCtrl.isTeacher, UserCtrl.isTemplateAccessible, UserCtrl.renderApp)
-    .get('/configuration/:gameId', UserCtrl.loggedIn, UserCtrl.isTeacher, UserCtrl.renderApp)
     .get('/play/:gameId', UserCtrl.loggedIn, UserCtrl.isGameAccessible, UserCtrl.renderApp)
     .get('/*', UserCtrl.loggedIn, UserCtrl.renderApp)
 

@@ -1,7 +1,8 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, ButtonProps, Core, Lang, MaskLoading, Toast, RadioGroup, Input} from 'elf-component'
-import {GameStage, MoveType, PushType, SURVEY_STAGE, SURVEY_BASIC, SURVEY_FEEDBACK, SURVEY_TEST} from '../config'
+import {Button, ButtonProps, Input, Lang, MaskLoading, RadioGroup, Toast} from '@elf/component'
+import {Core} from '@bespoke/register'
+import {GameStage, MoveType, PushType, SURVEY_BASIC, SURVEY_FEEDBACK, SURVEY_STAGE, SURVEY_TEST} from '../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 
 interface IPlayState {
@@ -19,7 +20,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         inputSeatNumberPls: ['请输入座位号', 'Input your seat number please'],
         submit: ['提交', 'Submit'],
         invalidSeatNumber: ['座位号有误或已被占用', 'Your seat number is invalid or has been occupied'],
-        wait4StartMainTest: ['等待老师开放实验', 'Wait for teacher to start the experiment'],
+        wait4StartMainTest: ['等待老师开放实验', 'Wait for teacher to start the experiment']
     })
 
     render(): React.ReactNode {
@@ -48,7 +49,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         return <section className={style.seatNumberStage}>
             <label>{lang.inputSeatNumberPls}</label>
             <input type='number'
-                   value={seatNumber||''}
+                   value={seatNumber || ''}
                    onChange={({target: {value: seatNumber}}) => this.setState({seatNumber: seatNumber.substr(0, 4)} as any)}/>
             <Button width={ButtonProps.Width.medium} label={lang.submit} onClick={() => {
                 if (isNaN(Number(seatNumber))) {
@@ -109,7 +110,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
 
     renderMainTestStage(): React.ReactNode {
         const {lang, props: {frameEmitter, playerState: {surveyStage}}, state: {inputs}} = this
-        if(surveyStage === SURVEY_STAGE.over) {
+        if (surveyStage === SURVEY_STAGE.over) {
             return <section className={style.mainTestStage}>问卷结束</section>
         }
         let survey
@@ -142,11 +143,11 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                                                         if (j === 0) return <span>{w}</span>
                                                         else return <span>
                                                             <input value={inputs[i * n + j] || ''}
-                                                                    onChange={e => {
-                                                                        const newInputs = [...inputs]
-                                                                        newInputs[i * n + j] = e.target.value
-                                                                        this.setState({inputs: newInputs})
-                                                                    }}
+                                                                   onChange={e => {
+                                                                       const newInputs = [...inputs]
+                                                                       newInputs[i * n + j] = e.target.value
+                                                                       this.setState({inputs: newInputs})
+                                                                   }}
                                                             />
                                                             {w}
                                                         </span>
@@ -164,11 +165,11 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                                     <li>
                                         <p className={style.title}>3. {SURVEY_FEEDBACK[l2].title}</p>
                                         <textarea value={inputs[SURVEY_FEEDBACK[l2].index] || ''}
-                                                    onChange={e => {
-                                                        const newInputs = [...inputs]
-                                                        newInputs[SURVEY_FEEDBACK[l2].index] = e.target.value
-                                                        this.setState({inputs: newInputs})
-                                                    }}
+                                                  onChange={e => {
+                                                      const newInputs = [...inputs]
+                                                      newInputs[SURVEY_FEEDBACK[l2].index] = e.target.value
+                                                      this.setState({inputs: newInputs})
+                                                  }}
                                         />
                                     </li>
                                 )

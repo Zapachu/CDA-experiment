@@ -1,5 +1,5 @@
 import * as React from "react"
-import {span} from 'bespoke-game-graphical-util'
+import {span} from '@bespoke-game/graphical-util'
 import {PlayerStatus} from '../../config'
 
 interface ITip {

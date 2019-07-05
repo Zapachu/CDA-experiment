@@ -1,6 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang, Toast} from 'elf-component'
+import {Core} from '@bespoke/register'
+import {Lang, Toast} from '@elf/component'
 
 import {
     CONFIG,
@@ -16,7 +17,7 @@ import {
     PushType,
     ROLE
 } from '../config'
-import {Button, Input, Line, Modal, Tabs} from 'bespoke-game-stock-trading-component'
+import {Button, Input, Line, Modal, Tabs} from '@bespoke-game/stock-trading-component'
 
 function Border({background = `radial-gradient(at 50% 0%, #67e968 1rem, transparent 70%)`, borderRadius = '1rem', children, style}: {
     background?: string,

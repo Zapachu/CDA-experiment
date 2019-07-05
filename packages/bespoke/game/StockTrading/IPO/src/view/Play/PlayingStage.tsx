@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as style from "./style.scss";
-import { Core, Lang, Toast } from "elf-component";
+import {Core} from '@bespoke/register'
+import {Lang, Toast } from "@elf/component";
 import {
   MoveType,
   PushType,
@@ -26,7 +27,7 @@ import {
   Modal,
   StockInfo,
   Loading
-} from "bespoke-game-stock-trading-component";
+} from "@bespoke-game/stock-trading-component";
 
 enum ModalType {
   None,

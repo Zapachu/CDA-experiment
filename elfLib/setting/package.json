@@ -1,0 +1,12 @@
+{
+  "name": "@elf/setting",
+  "version": "1.1.1",
+  "main": "lib/index",
+  "types": "src/index",
+  "scripts": {
+    "libc": "tsc"
+  },
+  "dependencies": {
+    "typescript": "^3.3.3333"
+  }
+}

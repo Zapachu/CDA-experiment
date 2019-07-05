@@ -1,9 +1,0 @@
-{
-  "script": "../packages/proxy/thirdPartyPhase/lib/phases/qualtrics/server/app.ts",
-  "name": "proxyqual",
-  "env": {
-    "NODE_ENV": "production",
-    "PORT": 3071
-  },
-  "log_date_format": "YYYY-MM-DD HH:mm Z"
-}

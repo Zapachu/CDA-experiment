@@ -1,10 +1,11 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang, MaskLoading} from 'elf-component'
-import {DragDropContext, Droppable, Draggable} from 'react-beautiful-dnd'
-import {Button, Host, ImgLoader, RoundSwitching, Shadow, span, Stage, spanDom} from 'bespoke-game-graphical-util'
-import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, GameState} from '../../interface'
-import { MoveType, PlayerStatus, PushType, NEW_ROUND_TIMER} from '../../config'
+import {Lang, MaskLoading} from '@elf/component'
+import {Core} from '@bespoke/register'
+import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd'
+import {Button, Host, ImgLoader, RoundSwitching, Shadow, span, spanDom, Stage} from '@bespoke-game/graphical-util'
+import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
+import {MoveType, NEW_ROUND_TIMER, PlayerStatus, PushType} from '../../config'
 
 function Player({active, showBack, matched}: {
     active: boolean

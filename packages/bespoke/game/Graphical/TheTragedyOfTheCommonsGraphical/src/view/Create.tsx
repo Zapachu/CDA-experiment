@@ -1,7 +1,8 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {ICreateParams} from '../interface'
-import {Core, Label, RangeInput, Toast} from 'elf-component'
+import {Label, RangeInput, Toast} from '@elf/component'
+import {Core} from '@bespoke/register'
 
 interface ICreateState {
     fishCount: number
@@ -18,7 +19,7 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
         magnification: '2',
         round: 3,
         groupSize: 2,
-        readonly: false,
+        readonly: false
     }
 
     componentDidMount(): void {

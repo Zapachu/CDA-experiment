@@ -1,5 +1,5 @@
 import {resolve} from 'path'
-import {BaseLogic, Model, Server} from 'bespoke-server'
+import {BaseLogic, Model, Server} from '@bespoke/server'
 import Controller from './Controller'
 import {FetchRoute, IResult, namespace, SheetType} from './config'
 import {Router} from 'express'

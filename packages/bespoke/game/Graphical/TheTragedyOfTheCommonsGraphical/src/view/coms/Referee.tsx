@@ -1,4 +1,4 @@
-import {span, Host} from 'bespoke-game-graphical-util'
+import {span, Host} from '@bespoke-game/graphical-util'
 import {PlayerStatus} from '../../config'
 import * as React from "react"
 

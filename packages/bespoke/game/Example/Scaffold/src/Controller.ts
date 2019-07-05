@@ -1,4 +1,4 @@
-import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from 'bespoke-server'
+import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from '@bespoke/server'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, MoveType, PushType} from './config'
 
 export class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {

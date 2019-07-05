@@ -1,7 +1,9 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {ICreateParams} from '../config'
-import {Button, Core, Label, RangeInput, Input} from 'elf-component'
+import {Label} from '@elf/component'
+import {Core} from '@bespoke/register'
+
 interface ICreateState {
     groupSize: number
 }
@@ -9,7 +11,7 @@ interface ICreateState {
 export class Create extends Core.Create<ICreateParams, ICreateState> {
 
     state: ICreateState = {
-        groupSize: 20,
+        groupSize: 20
     }
 
     componentDidMount(): void {

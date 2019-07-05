@@ -1,6 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang, Button, MaskLoading, baseEnum} from 'elf-component'
+import {Core} from '@bespoke/register'
+import {Lang, Button} from '@elf/component'
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import {MoveType, phaseNames, PlayerStatus, PushType, ROLE} from '../config'
 import {TradeChart} from './phase/mainGame'

@@ -1,8 +1,9 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang, Request} from 'elf-component'
+import {Lang, Request} from '@elf/component'
+import {Core} from '@bespoke/register'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState} from '../interface'
-import {MoveType, SheetType, SURVEY_STAGE, namespace, FetchRoute} from '../config'
+import {FetchRoute, MoveType, namespace, SheetType, SURVEY_STAGE} from '../config'
 
 export class Result4Owner extends Core.Result4Owner<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams> {
     lang = Lang.extractLang({
@@ -12,7 +13,7 @@ export class Result4Owner extends Core.Result4Owner<ICreateParams, IGameState, I
         correctNumber: ['正确题数', 'Correct Number'],
         export: ['导出', 'Export'],
         unknown: ['???', '???'],
-        [SheetType[SheetType.result]]: ['结果', 'Result'],
+        [SheetType[SheetType.result]]: ['结果', 'Result']
     })
 
     render(): React.ReactNode {
@@ -40,7 +41,7 @@ export class Result4Owner extends Core.Result4Owner<ICreateParams, IGameState, I
                     {
                         Object.values(SheetType).map(sheetType =>
                             <a key={sheetType}
-                               href={Request.buildUrl(namespace, FetchRoute.exportXls, {gameId:game.id}, {sheetType})}>
+                               href={Request.buildUrl(namespace, FetchRoute.exportXls, {gameId: game.id}, {sheetType})}>
                                 {lang[SheetType[sheetType]]}</a>)
                     }
                 </div>

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, ButtonProps} from 'elf-component'
+import {Button, ButtonProps} from '@elf/component'
 
 export function BtnGroup({options, activeIndex, onChange, onConfirm}) {
     return <section className={style.subBtnGroup}>

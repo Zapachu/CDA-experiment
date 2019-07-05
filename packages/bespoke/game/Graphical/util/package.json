@@ -1,5 +1,5 @@
 {
-  "name": "bespoke-game-graphical-util",
+  "name": "@bespoke-game/graphical-util",
   "version": "1.0.0",
   "main": "lib/index",
   "types": "lib/index",

@@ -1,4 +1,4 @@
-import {BaseController, IActor, IMoveCallback, TGameState, Model} from 'bespoke-server'
+import {BaseController, IActor, IMoveCallback, TGameState, Model} from '@bespoke/server'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
 import {MoveType, GameStage, PushType, SheetType, IResult, SURVEY_STAGE, SURVEY_BASIC, SURVEY_FEEDBACK, SURVEY_TEST} from './config'
 

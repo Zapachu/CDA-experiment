@@ -1,9 +1,10 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {phaseTemplates, localePhaseNames} from './phase'
+import {localePhaseNames, phaseTemplates} from './phase'
 import {CreateParams, ICreateParams} from '../interface'
-import {Core, Lang} from 'elf-component'
-import {IDENTITY, phaseNames, ROLE, ReactionType} from '../config'
+import {Lang} from '@elf/component'
+import {Core} from '@bespoke/register'
+import {IDENTITY, phaseNames, ReactionType, ROLE} from '../config'
 import cloneDeep = require('lodash/cloneDeep')
 
 export class Create extends Core.Create<ICreateParams> {
@@ -25,7 +26,7 @@ export class Create extends Core.Create<ICreateParams> {
                 exchangeRate: 1,
                 k: 1,
                 role: ROLE.Seller,
-                reactionType:ReactionType.TradeAndOrder
+                reactionType: ReactionType.TradeAndOrder
             })),
             ...Array(6).fill(null).map(() => ({
                 identity: IDENTITY.ZipRobot,
@@ -33,7 +34,7 @@ export class Create extends Core.Create<ICreateParams> {
                 exchangeRate: 1,
                 k: 1,
                 role: ROLE.Buyer,
-                reactionType:ReactionType.TradeAndOrder
+                reactionType: ReactionType.TradeAndOrder
             }))
         ]
         const phases = [{

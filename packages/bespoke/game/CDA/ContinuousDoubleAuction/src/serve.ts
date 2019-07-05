@@ -1,5 +1,5 @@
 import {resolve} from 'path'
-import {Server, Model, BaseLogic} from 'bespoke-server'
+import {Server, Model, BaseLogic} from '@bespoke/server'
 import Controller from './Controller'
 import Robot from './Robot'
 import {
@@ -15,7 +15,7 @@ import {
 import {Router} from 'express'
 import {getEnumKeys} from './util'
 import nodeXlsx from 'node-xlsx'
-import {RobotServer} from 'bespoke-robot'
+import {RobotServer} from '@bespoke/robot'
 
 const router = Router()
     .get(FetchRoute.exportXls, async (req, res) => {

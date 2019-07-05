@@ -1,6 +1,6 @@
 import {IBaseGame, IGameWithId, IGameToUpdate, IGame} from '@common'
 import {GameModel, PhaseResultModel} from '@server-model'
-import {SetPhaseResult} from 'elf-protocol'
+import {SetPhaseResult} from '@elf/protocol'
 
 export class GameService {
     static async getGameList(owner: string, page: number, pageSize: number): Promise<{ gameList: Array<IGameWithId>, count: number }> {

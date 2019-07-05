@@ -7,7 +7,7 @@ import {
   baseEnum,
   RedisCall,
   gameId2PlayUrl
-} from "bespoke-server";
+} from '@bespoke/server';
 import {
   GameState,
   ICreateParams,
@@ -30,8 +30,8 @@ import {
   SHOUT_TIMER,
   namespace
 } from "./config";
-import { Phase, STOCKS, phaseToNamespace} from "bespoke-game-stock-trading-config";
-import {GameOver} from 'elf-protocol'
+import { Phase, STOCKS, phaseToNamespace} from "@bespoke-game/stock-trading-config";
+import {GameOver} from '@elf/protocol'
 
 export default class Controller extends BaseController<
   ICreateParams,

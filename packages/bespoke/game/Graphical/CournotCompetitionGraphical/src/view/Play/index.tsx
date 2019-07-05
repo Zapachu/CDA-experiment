@@ -1,6 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang, MaskLoading, Toast} from 'elf-component'
+import {Core} from '@bespoke/register'
+import {Lang, MaskLoading, Toast} from '@elf/component'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
 import {MoveType, NEW_ROUND_TIMER, PlayerStatus, PushType} from '../../config'
 import {
@@ -10,7 +11,7 @@ import {
     Button,
     Input,
     RoundSwitching,
-} from 'bespoke-game-graphical-util'
+} from '@bespoke-game/graphical-util'
 import Players from './Players'
 import Fishpond from './Fishpond'
 

@@ -1,8 +1,9 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Lang, Tabs, RangeInput, Request} from 'elf-component'
+import {Lang, RangeInput, Request, Tabs} from '@elf/component'
+import {Core} from '@bespoke/register'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState} from '../interface'
-import {MoveType, SheetType, namespace, FetchRoute} from '../config'
+import {FetchRoute, MoveType, namespace, SheetType} from '../config'
 import {Play4Owner} from './Play4Owner'
 
 declare interface IResult4OwnerState {
@@ -65,8 +66,8 @@ export class Result4Owner extends Core.Result4Owner<ICreateParams, IGameState, I
                             {
                                 Object.values(SheetType).map(sheetType =>
                                     <a key={sheetType}
-                                       href={Request.buildUrl(namespace, FetchRoute.exportXls, {gameId:game.id}, {sheetType})}>
-                                    {lang[SheetType[sheetType]]}</a>)
+                                       href={Request.buildUrl(namespace, FetchRoute.exportXls, {gameId: game.id}, {sheetType})}>
+                                        {lang[SheetType[sheetType]]}</a>)
                             }
                         </div>
                     </div>

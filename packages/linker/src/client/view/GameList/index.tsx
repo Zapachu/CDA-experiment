@@ -1,9 +1,9 @@
-import React, {FunctionComponent, Fragment, useState, useEffect} from 'react'
+import React, {Fragment, FunctionComponent, useEffect, useState} from 'react'
 import * as style from './style.scss'
 import {Api, Lang} from '@client-util'
 import {RouteComponentProps} from 'react-router'
 import {baseEnum, IGameWithId, IUserWithId} from '@common'
-import {Button, Icon, List, Pagination} from '@antd-component'
+import {List, Pagination} from '@antd-component'
 import {Breadcrumb} from '@client-component'
 
 const {Item: ListItem} = List, {Meta: ListItemMeta} = ListItem
@@ -15,7 +15,6 @@ export const GameList: FunctionComponent<RouteComponentProps & { user: IUserWith
     }
     const lang = Lang.extractLang({
         join: ['快速加入', 'Join'],
-        create: ['创建', 'CREATE'],
         title: ['标题', 'Title'],
         desc: ['详情', 'Description'],
         cancel: ['取消', 'Cancel'],
@@ -40,25 +39,18 @@ export const GameList: FunctionComponent<RouteComponentProps & { user: IUserWith
         ]}/>
         <List
             grid={{gutter: 24, xl: 4, md: 3, sm: 2, xs: 1}}
-            dataSource={[{} as any].concat(gameList)}
+            dataSource={gameList}
             renderItem={({id, title, desc, published}) => <ListItem key={id}>
                 <section
                     className={style.gameItem}
                     onClick={() => history.push(id ? `/info/${id}` : '/baseInfo')}>
-                    {
-                        id ? <Fragment>
-                                <ListItemMeta title={title}
-                                              description={desc.slice(0, 50) + (desc.length > 50 ? '...' : '')}/>
-                                <label style={{color: published ? 'green' : ''}}>{
-                                    published ? lang.published : lang.unpublished
-                                }</label>
-                            </Fragment> :
-                            <Button type="dashed" className={style.btnAdd}
-                                    onClick={() => {
-                                    }}>
-                                <Icon type="plus"/> {lang.create}
-                            </Button>
-                    }
+                    <Fragment>
+                        <ListItemMeta title={title}
+                                      description={desc.slice(0, 50) + (desc.length > 50 ? '...' : '')}/>
+                        <label style={{color: published ? 'green' : ''}}>{
+                            published ? lang.published : lang.unpublished
+                        }</label>
+                    </Fragment>
                 </section>
             </ListItem>}>
         </List>

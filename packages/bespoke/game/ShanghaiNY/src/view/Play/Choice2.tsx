@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import { GameType, Choice, Version} from '../../config'
-import {Lang, Radio} from 'elf-component'
+import {Lang, Radio} from '@elf/component'
 
 interface PropsType {
   c1: number,

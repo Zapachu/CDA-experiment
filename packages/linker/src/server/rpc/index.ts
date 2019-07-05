@@ -1,7 +1,7 @@
-import {elfSetting} from 'elf-setting'
+import {elfSetting} from '@elf/setting'
 import {Server, ServerCredentials} from 'grpc'
 import {setElfService} from './service/ElfAdmin'
-import {RedisCall, SendBackPlayer, SetPhaseResult} from 'elf-protocol'
+import {RedisCall, SendBackPlayer, SetPhaseResult} from '@elf/protocol'
 import {StateManager} from '@server-service'
 import {buildPlayUrl} from '@server-util'
 

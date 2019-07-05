@@ -4,7 +4,7 @@ import {
   IMoveCallback,
   TGameState,
   TPlayerState
-} from 'bespoke-server'
+} from '@bespoke/server'
 import {
   MoveType,
   PushType,

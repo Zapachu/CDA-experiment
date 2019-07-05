@@ -1,5 +1,5 @@
 import {resolve} from 'path'
-import {Server, Model, BaseLogic} from 'bespoke-server'
+import {Server, Model, BaseLogic} from '@bespoke/server'
 import {Controller, QUESTION_ANSWERS} from './Controller'
 import nodeXlsx from 'node-xlsx'
 import {namespace, FetchRoute, SheetType, IResult} from './config'

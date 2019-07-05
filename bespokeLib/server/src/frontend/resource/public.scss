@@ -1,0 +1,72 @@
+/*************** variables ******************/
+$color-background: #f0f2f5;
+$color-blue: #4285f4;
+$color-red: #E27B6A;
+$color-black: #314659;
+$color-green: #2e8b57;
+//fontSize
+$fontSize-small: 1rem;
+$fontSize-middle: 1.25rem;
+$fontSize-large: 1.4rem;
+//border
+$borderLine: 1px solid rgba($color-black, .1);
+$border-radius: 3px;
+@mixin cardEdge {
+  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.14);
+  border-radius: $border-radius;
+}
+
+//shadow
+$shadow-normal: 0px 3px 5px -1px rgba(0, 0, 0, 0.2), 0px 6px 10px 0px rgba(0, 0, 0, 0.14), 0px 1px 18px 0px rgba(0, 0, 0, 0.12);
+//layout宽度
+$layout-mediaWidth: 962px;
+$layout-mainContentWidth: 80%;
+//transition
+$transition-normal: all .2s ease-in-out;
+
+/*************** keyframe ******************/
+@keyframes easyIn {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/*************** mixin ******************/
+@function calcSlotWidth($power:0) {
+  $result: 1px;
+  @for $i from 0 through $power {
+    $result: $result * 2;
+  }
+  @return $result
+}
+
+/*************** function ******************/
+@mixin mainContent {
+  width: $layout-mainContentWidth;
+  margin: auto;
+  @media (max-width: $layout-mediaWidth) {
+    width: 100%;
+  }
+}
+
+@mixin blankMsg {
+  margin: 1rem auto;
+  text-align: center;
+  font-size: $fontSize-large;
+  color: rgba($color-black, .3);
+  cursor: default;
+  user-select: none;
+}
+
+@mixin secondarySection {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-bottom: calcSlotWidth(2);
+  border-radius: 2px;
+}

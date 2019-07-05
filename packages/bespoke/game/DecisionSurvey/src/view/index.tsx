@@ -1,11 +1,9 @@
-import { registerOnFramework } from "elf-component";
-import { Create } from "./Create";
+import { registerOnFramework } from "@bespoke/register";
 import { Play } from "./Play";
 import { Play4Owner } from "./Play4Owner";
 
-registerOnFramework("ParallelApplication", {
-  localeNames: ["平行志愿", "Parallel Application"],
-  Create,
+registerOnFramework("DecisionSurvey", {
+  localeNames: ["DecisionSurvey", "DecisionSurvey"],
   Play,
   Play4Owner
 });

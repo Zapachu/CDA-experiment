@@ -1,4 +1,4 @@
-import {BaseController, IActor, IMoveCallback, TGameState, IGameWithId} from 'bespoke-server'
+import {BaseController, IActor, IMoveCallback, TGameState, IGameWithId} from '@bespoke/server'
 import {ICreateParams, IGameState, IPlayerState, IPushParams, IMoveParams, GameState} from './interface'
 import {MoveType, PushType, PlayerStatus, DEAL_TIMER, NEW_ROUND_TIMER} from './config'
 import cloneDeep = require('lodash/cloneDeep')

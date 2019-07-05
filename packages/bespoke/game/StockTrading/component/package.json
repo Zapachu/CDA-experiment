@@ -1,9 +1,9 @@
 {
-  "name": "bespoke-game-stock-trading-component",
-  "version": "1.0.0",
+  "name": "@bespoke-game/stock-trading-component",
+  "version": "1.1.1",
   "main": "lib/index",
   "types": "lib/index",
   "dependencies": {
-    "bespoke-game-stock-trading-config": "^1.0.0"
+    "@bespoke-game/stock-trading-config": "^1.1.1"
   }
 }

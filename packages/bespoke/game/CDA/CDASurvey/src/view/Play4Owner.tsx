@@ -1,7 +1,8 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, Core, Lang, MaskLoading, baseEnum} from 'elf-component'
-import {MoveType, PushType, SURVEY_STAGE, GameStage} from '../config'
+import {Button, Lang} from '@elf/component'
+import {Core} from '@bespoke/register'
+import {GameStage, MoveType, PushType, SURVEY_STAGE} from '../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 
 export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
@@ -22,10 +23,11 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
                 <tr>
                     <td>{lang.seatNumber}({
                         playerStatesArr
-                            .map<number>(({seatNumber})=>seatNumber?1:0)
-                            .reduce((m,n)=>m+n,0)}/{
+                            .map<number>(({seatNumber}) => seatNumber ? 1 : 0)
+                            .reduce((m, n) => m + n, 0)}/{
                         playerStatesArr.length
-                    })</td>
+                    })
+                    </td>
                     <td>{lang.surveyStage}</td>
                 </tr>
                 {
