@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {FrameEmitter, IGameWithId, TGameState, TPlayerState} from '@bespoke/share'
-import {registerPhaseCreate, Template} from '@elf/register'
+import {registerOnElf, Template} from '@elf/register'
 
 export interface IGameTemplate {
     namespace?: string
@@ -107,11 +107,11 @@ export namespace Core {
         | Result4OwnerSFC<{}, {}, {}, any, {}>
 }
 
-export function registerGame(namespace: string, gameTemplate: IGameTemplate) {
+export function registerOnBespoke(namespace: string, gameTemplate: IGameTemplate) {
     if (window['BespokeServer']) {
-        window['BespokeServer'].registerGame(gameTemplate)
+        window['BespokeServer'].registerOnBespoke(gameTemplate)
     }
-    registerPhaseCreate(namespace, {localeNames: [namespace], ...gameTemplate})
+    registerOnElf(namespace, {localeNames: [namespace], ...gameTemplate})
 }
 
-export {registerGame as registerOnFramework}
+export {registerOnBespoke as registerOnFramework}

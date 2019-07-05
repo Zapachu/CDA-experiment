@@ -58,7 +58,7 @@ function renderRoot(pageProps, rootContainer) {
             React.createElement(Route, { path: '/*' },
                 React.createElement(react_router_dom_1.Redirect, { to: '/' })))), rootContainer);
 }
-function registerGame(gameTemplate) {
+function registerOnBespoke(gameTemplate) {
     var Empty = function () { return null; };
     var template = __assign({ Create: Empty, Info: Empty, Play4Owner: function () { return React.createElement(component_1.MaskLoading, { label: component_1.Lang.extractLang({ label: ['实验进行中', 'Playing...'] }).label }); }, Result: Empty, Result4Owner: Empty }, gameTemplate);
     util_1.Api.getUser().then(function (_a) {
@@ -68,5 +68,5 @@ function registerGame(gameTemplate) {
         component_1.Lang.switchListeners.push(function () { return renderRoot(props, rootContainer); });
     });
 }
-exports.registerGame = registerGame;
+exports.registerOnBespoke = registerOnBespoke;
 //# sourceMappingURL=index.js.map

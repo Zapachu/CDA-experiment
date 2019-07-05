@@ -39,7 +39,7 @@ function renderRoot(pageProps: TPageProps, rootContainer: HTMLElement) {
     </BrowserRouter>, rootContainer)
 }
 
-export function registerGame(gameTemplate: IGameTemplate) {
+export function registerOnBespoke(gameTemplate: IGameTemplate) {
     const Empty = () => null
     const template = {
         Create: Empty,

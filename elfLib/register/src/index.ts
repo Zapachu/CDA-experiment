@@ -23,8 +23,8 @@ export interface IPhaseTemplate {
     Create?: Template.CreateClass
 }
 
-export function registerPhaseCreate(namespace: string, phaseTemplate: IPhaseTemplate) {
+export function registerOnElf(namespace: string, phaseTemplate: IPhaseTemplate) {
     if (window['ElfLinker']) {
-        window['ElfLinker'].registerPhaseCreate(namespace, phaseTemplate)
+        window['ElfLinker'].registerOnElf(namespace, phaseTemplate)
     }
 }

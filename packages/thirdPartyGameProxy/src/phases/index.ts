@@ -1,6 +1,6 @@
-import {registerPhaseCreate, IPhaseTemplate} from '@elf/register'
+import {registerOnElf, IPhaseTemplate} from '@elf/register'
 
 export function registerOnFramework(namespace: string, phaseTemplate: IPhaseTemplate) {
     phaseTemplate.namespace = namespace
-    registerPhaseCreate(namespace, phaseTemplate)
+    registerOnElf(namespace, phaseTemplate)
 }

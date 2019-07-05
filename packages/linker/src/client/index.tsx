@@ -13,9 +13,8 @@ export const phaseTemplates: {
     [phase: string]: IPhaseTemplate
 } = {}
 
-export function registerPhaseCreate(namespace: string, phaseTemplate: IPhaseTemplate) {
-    phaseTemplate.namespace = namespace
-    phaseTemplates[namespace] = phaseTemplate
+export function registerOnElf(namespace: string, phaseTemplate: IPhaseTemplate) {
+    phaseTemplates[namespace] = {namespace, Create: () => null, ...phaseTemplate}
 }
 
 const rootContainer = document.body.appendChild(document.createElement('div'))

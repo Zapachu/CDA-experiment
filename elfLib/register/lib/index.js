@@ -25,9 +25,9 @@ var Template;
     }(React.Component));
     Template.Create = Create;
 })(Template = exports.Template || (exports.Template = {}));
-function registerPhaseCreate(namespace, phaseTemplate) {
+function registerOnElf(namespace, phaseTemplate) {
     if (window['ElfLinker']) {
-        window['ElfLinker'].registerPhaseCreate(namespace, phaseTemplate);
+        window['ElfLinker'].registerOnElf(namespace, phaseTemplate);
     }
 }
-exports.registerPhaseCreate = registerPhaseCreate;
+exports.registerOnElf = registerOnElf;
