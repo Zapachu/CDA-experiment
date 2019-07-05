@@ -1,6 +1,6 @@
 {
-  "script": "packages/bespoke/game/CDA/ContinuousDoubleAuction/src/serve.ts",
-  "name": "ContinuousDoubleAuction",
+  "script": "../packages/bespoke/game/Graphical/TrustGameGraphical/build/serve.js",
+  "name": "TrustGameGraphical",
   "env": {
     "NODE_ENV": "production",
     "BESPOKE_WITH_PROXY": "true",
