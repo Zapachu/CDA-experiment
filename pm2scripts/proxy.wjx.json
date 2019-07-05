@@ -1,5 +1,5 @@
 {
-  "script": "../packages/thirdPartyPhase/src/phases/wjx/server/app.ts",
+  "script": "../packages/thirdPartyGameProxy/src/phases/wjx/server/app.ts",
   "name": "Proxy-wjx",
   "env": {
     "NODE_ENV": "production"

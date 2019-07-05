@@ -3,6 +3,7 @@ import * as style from './initial.scss'
 import {BrowserRouter, RouteComponentProps} from 'react-router-dom'
 import {config, IUserWithId} from '@common'
 import {rootContext} from '@client-context'
+import {Lang, Language} from '@elf/component'
 import {Loading} from '@client-component'
 import {Api} from '@client-util'
 import {Route, Switch} from 'react-router'
@@ -11,6 +12,7 @@ import {Info} from './Info'
 import {GameList} from './GameList'
 import {PlayerResult} from './Result/Player'
 import {Create} from './Create'
+import {Affix, Button} from '@antd-component'
 
 interface IToV5Props extends RouteComponentProps<{ gameId?: string }> {
 }
@@ -33,9 +35,11 @@ export const Root: React.FunctionComponent = () => {
     return user ?
         <section className={style.rootView}>
             <rootContext.Provider value={{user}}>
-                <div className={style.languageSwitcherWrapper}>
-                    {/*<LanguageSwitcher/>*/}
-                </div>
+                <Affix style={{position: 'absolute', right: 32}} offsetTop={16}>
+                    <Button size='small'
+                            onClick={() => Lang.switchLang(Lang.activeLanguage === Language.en ? Language.zh : Language.en)}>
+                        {Lang.activeLanguage === Language.en ? '中文' : 'English'}</Button>
+                </Affix>
                 <BrowserRouter basename={config.rootName}>
                     <Switch>
                         <Route path={'/Create/:namespace'} component={Create}/>

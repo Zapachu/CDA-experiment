@@ -11,7 +11,7 @@ export const config = {
             login: '/login',
             share: gameId => `/share?id=${gameId}&type=10`,
             join: '/subject/fastJoin',
-            member: (orgCode, gameId) => `/org/${orgCode}/task/game/item/members/${gameId}`
+            member: (orgCode, gameId) => `/org/${orgCode}/task/game/item/${gameId}/members`
         }
     },
     cookieKey: {

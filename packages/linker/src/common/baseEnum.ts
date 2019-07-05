@@ -1,9 +1,4 @@
 //region common
-export enum Language {
-    chinese = 'chinese',
-    english = 'english'
-}
-
 export enum AcademusRole {
     student = 0,
     teacher = 1

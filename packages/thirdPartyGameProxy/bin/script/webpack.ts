@@ -1,4 +1,3 @@
-import {CleanWebpackPlugin} from 'clean-webpack-plugin'
 const fs = require('fs')
 const path = require('path')
 const  ManifestPlugin = require('webpack-manifest-plugin'),
@@ -43,7 +42,7 @@ export = () => {
                         {
                             loader: 'sass-loader',
                             options: {
-                                includePaths: [path.resolve(__dirname, '../../lib/core/client/resource')]
+                                includePaths: [path.resolve(__dirname, '../../src/core/client/resource')]
                             }
                         }
                     ]
@@ -56,7 +55,7 @@ export = () => {
             ]
         },
         entry: {
-            [phase]: path.resolve(__dirname, `../../lib/phases/${phase}/view/view.tsx`)
+            [phase]: path.resolve(__dirname, `../../src/phases/${phase}/view/view.tsx`)
         },
         output: {
             path: path.resolve(__dirname, `../../dist/phase`),
@@ -78,8 +77,7 @@ export = () => {
                     }
                     return files.reduce((manifest, {name, path}) => ({...manifest, [name]: path}), seed)
                 }
-            }),
-            new CleanWebpackPlugin()
+            })
         ]
     }
 }

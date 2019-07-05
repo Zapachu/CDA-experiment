@@ -7,8 +7,7 @@
 .gameControl {
   padding: 1rem 2rem 2rem;
   background: white;
-  border: $borderLine;
-  border-radius: .5rem;
+  border-bottom: $borderLine;
 
   .headBar {
     display: flex;
