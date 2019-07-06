@@ -1,4 +1,4 @@
-import {readdirSync, readFileSync, writeFileSync} from 'fs'
+import {readdirSync, readFileSync, statSync, writeFileSync} from 'fs'
 import {resolve} from 'path'
 import {prompt, registerPrompt} from 'inquirer'
 import {env, exec} from 'shelljs'
@@ -60,6 +60,9 @@ enum ServerTask {
 function getProjects(parentProject: string = '.', projectSet = new Set<string>()): Array<string> {
     readdirSync(resolve(__dirname, `../${parentProject}/`)).forEach(p => {
         if (p[0] >= 'a') {
+            return
+        }
+        if(!statSync(resolve(__dirname, `../${parentProject}/${p}`)).isDirectory()){
             return
         }
         const childProject = `${parentProject}/${p}`

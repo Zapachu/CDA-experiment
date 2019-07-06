@@ -95,6 +95,9 @@ function getProjects(parentProject, projectSet) {
         if (p[0] >= 'a') {
             return;
         }
+        if (!fs_1.statSync(path_1.resolve(__dirname, "../" + parentProject + "/" + p)).isDirectory()) {
+            return;
+        }
         var childProject = parentProject + "/" + p;
         projectSet["delete"](parentProject);
         projectSet.add(childProject);

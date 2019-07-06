@@ -11,6 +11,7 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "skipLibCheck": true,
+    "downlevelIteration": true,
     "jsx": "react"
   },
   "include": [
