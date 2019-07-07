@@ -58,9 +58,16 @@ function renderRoot(pageProps, rootContainer) {
             React.createElement(Route, { path: '/*' },
                 React.createElement(react_router_dom_1.Redirect, { to: '/' })))), rootContainer);
 }
+function emptyPage(label) {
+    return function () { return React.createElement("div", { style: {
+            fontSize: '2rem',
+            margin: '2rem',
+            textAlign: 'center',
+            color: '#999'
+        } }, label); };
+}
 function registerOnBespoke(gameTemplate) {
-    var Empty = function () { return null; };
-    var template = __assign({ Create: Empty, Info: Empty, Play4Owner: function () { return React.createElement(component_1.MaskLoading, { label: component_1.Lang.extractLang({ label: ['实验进行中', 'Playing...'] }).label }); }, Result: Empty, Result4Owner: Empty }, gameTemplate);
+    var template = __assign({ Create: emptyPage(component_1.Lang.extractLang({ label: ['无可配置参数', 'No parameters to config'] }).label), Info: emptyPage(component_1.Lang.extractLang({ label: ['无配置', 'No Configuration'] }).label), Play4Owner: emptyPage(component_1.Lang.extractLang({ label: ['实验进行中', 'Playing...'] }).label), Result: emptyPage(component_1.Lang.extractLang({ label: ['实验已结束', 'GAME OVER'] }).label), Result4Owner: emptyPage(component_1.Lang.extractLang({ label: ['实验已结束', 'GAME OVER'] }).label) }, gameTemplate);
     util_1.Api.getUser().then(function (_a) {
         var user = _a.user;
         var rootContainer = document.body.appendChild(document.createElement('div')), props = { gameTemplate: template, user: user };
