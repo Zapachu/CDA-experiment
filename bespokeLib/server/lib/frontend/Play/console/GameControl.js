@@ -100,7 +100,6 @@ var GameControl = /** @class */ (function (_super) {
             pause: ['暂停', 'PAUSE'],
             resume: ['恢复', 'RESUME'],
             stop: ['关闭', 'CLOSE'],
-            GameOver: ['实验结束', 'GAME OVER'],
             onlinePlayers: ['当前在线人数', 'Online Players'],
             players: ['实验成员', 'Players']
         });
@@ -165,20 +164,17 @@ var GameControl = /** @class */ (function (_super) {
                         React.createElement("label", null, lang.onlinePlayers),
                         React.createElement("span", null, Object.values(playerStates).length)))),
             React.createElement("div", { className: style.statusSwitcher },
-                React.createElement("div", { className: style.switcherWrapper },
-                    (this.gameStatusMachine[gameState.status] || [])
-                        .map(function (_a) {
-                        var status = _a.status, label = _a.label, _b = _a.type, type = _b === void 0 ? component_1.ButtonProps.Type.primary : _b, _c = _a.color, color = _c === void 0 ? component_1.ButtonProps.Color.blue : _c, _d = _a.width, width = _d === void 0 ? component_1.ButtonProps.Width.medium : _d;
-                        return React.createElement(component_1.Button, __assign({ key: label }, {
-                            label: label,
-                            color: color,
-                            type: type,
-                            width: width,
-                            onClick: function () { return frameEmitter.emit(share_1.baseEnum.CoreMove.switchGameStatus, { status: status }); }
-                        }));
-                    }),
-                    gameState.status === share_1.baseEnum.GameStatus.over ?
-                        React.createElement("div", { className: style.blankMsg }, this.lang.GameOver) : null)));
+                React.createElement("div", { className: style.switcherWrapper }, (this.gameStatusMachine[gameState.status] || [])
+                    .map(function (_a) {
+                    var status = _a.status, label = _a.label, _b = _a.type, type = _b === void 0 ? component_1.ButtonProps.Type.primary : _b, _c = _a.color, color = _c === void 0 ? component_1.ButtonProps.Color.blue : _c, _d = _a.width, width = _d === void 0 ? component_1.ButtonProps.Width.medium : _d;
+                    return React.createElement(component_1.Button, __assign({ key: label }, {
+                        label: label,
+                        color: color,
+                        type: type,
+                        width: width,
+                        onClick: function () { return frameEmitter.emit(share_1.baseEnum.CoreMove.switchGameStatus, { status: status }); }
+                    }));
+                }))));
     };
     return GameControl;
 }(React.Component));

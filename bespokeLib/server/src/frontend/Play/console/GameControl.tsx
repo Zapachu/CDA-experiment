@@ -25,7 +25,6 @@ export class GameControl extends React.Component<IGameControlProps> {
         pause: ['暂停', 'PAUSE'],
         resume: ['恢复', 'RESUME'],
         stop: ['关闭', 'CLOSE'],
-        GameOver: ['实验结束', 'GAME OVER'],
         onlinePlayers: ['当前在线人数', 'Online Players'],
         players: ['实验成员', 'Players']
     })
@@ -114,10 +113,6 @@ export class GameControl extends React.Component<IGameControlProps> {
                                     onClick: () => frameEmitter.emit(baseEnum.CoreMove.switchGameStatus, {status})
                                 }}/>
                             )
-                    }
-                    {
-                        gameState.status === baseEnum.GameStatus.over ?
-                            <div className={style.blankMsg}>{this.lang.GameOver}</div> : null
                     }
                 </div>
             </div>

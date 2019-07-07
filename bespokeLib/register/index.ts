@@ -22,7 +22,7 @@ export namespace Core {
     export type CreateSFC<ICreateParams> = Template.CreateSFC<ICreateParams>
     export type CreateClass = (new(...args) => Create<{}, any>) | CreateSFC<{}>
 
-    interface IInfoProps<ICreateParams> {
+    export interface IInfoProps<ICreateParams> {
         game: IGameWithId<ICreateParams>,
     }
 
@@ -32,12 +32,12 @@ export namespace Core {
         playerState: TPlayerState<IPlayerState>
     }
 
-    interface IPlay4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> extends Partial<ITravelState<IGameState, IPlayerState, MoveType, IMoveParams>> {
+    export interface IPlay4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> extends Partial<ITravelState<IGameState, IPlayerState, MoveType, IMoveParams>> {
         game: IGameWithId<ICreateParams>,
         frameEmitter?: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
     }
 
-    interface IResult4PlayerProps<ICreateParams, IGameState, IPlayerState> {
+    export interface IResult4PlayerProps<ICreateParams, IGameState, IPlayerState> {
         game: IGameWithId<ICreateParams>
         gameState: TGameState<IGameState>,
         playerState: TPlayerState<IPlayerState>
@@ -51,7 +51,7 @@ export namespace Core {
         playerStates: { [token: string]: TPlayerState<IPlayerState> }
     }
 
-    interface IResult4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams> {
+    export interface IResult4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams> {
         game: IGameWithId<ICreateParams>,
         travelStates: Array<ITravelState<IGameState, IPlayerState, MoveType, IMoveParams>>
     }
