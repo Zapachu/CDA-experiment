@@ -6,9 +6,7 @@ exports.ElfGame = new mongoose_1.Schema({
     orgCode: String,
     title: String,
     desc: String,
-    phaseConfigs: Object,
-    published: { type: Boolean, "default": false },
-    mode: String,
-    createAt: { type: Date, "default": Date.now },
-    updateAt: { type: Date, "default": Date.now }
+    namespace: String,
+    param: Object,
+    createAt: { type: Date, "default": Date.now }
 }, { minimize: false });

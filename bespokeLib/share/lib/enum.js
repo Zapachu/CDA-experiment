@@ -8,7 +8,6 @@ var SocketEvent;
     SocketEvent["online"] = "online";
     SocketEvent["move"] = "move";
     SocketEvent["push"] = "push";
-    SocketEvent["sendBack"] = "sendBack";
     //endregion
     //region stateEvent
     SocketEvent["syncGameState_json"] = "SGJ";

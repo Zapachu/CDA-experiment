@@ -131,7 +131,7 @@ export class BaseLogic<ICreateParams, IGameState, IPlayerState, MoveType, PushTy
     //region elf
     protected setPhaseResult(playerToken: string, result: SetPlayerResult.IResult) {
         if (!this.game.elfGameId) {
-            return Log.w('Bespoke单独部署，game未关联至Elf group')
+            return Log.w('Bespoke单独部署，game未关联至Linker')
         }
         RedisCall.call<SetPlayerResult.IReq, SetPlayerResult.IRes>(SetPlayerResult.name, {
             playUrl: gameId2PlayUrl(this.game.id),
