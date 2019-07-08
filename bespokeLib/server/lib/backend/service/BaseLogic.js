@@ -198,34 +198,16 @@ var BaseLogic = /** @class */ (function () {
     };
     //endregion
     //region elf
-    BaseLogic.prototype.setPhaseResult = function (playerToken, phaseResult) {
+    BaseLogic.prototype.setPhaseResult = function (playerToken, result) {
         if (!this.game.elfGameId) {
             return util_1.Log.w('Bespoke单独部署，game未关联至Elf group');
         }
-        protocol_1.RedisCall.call(protocol_1.SetPhaseResult.name, {
+        protocol_1.RedisCall.call(protocol_1.SetPlayerResult.name, {
             playUrl: util_2.gameId2PlayUrl(this.game.id),
             playerToken: playerToken,
             elfGameId: this.game.elfGameId,
-            phaseResult: phaseResult
+            result: result
         }).catch(function (e) { return util_1.Log.e(e); });
-    };
-    BaseLogic.prototype.sendBackPlayer = function (playerToken, phaseResult, nextPhaseKey) {
-        var _this = this;
-        if (!this.game.elfGameId) {
-            return util_1.Log.w('Bespoke单独部署，game未关联至Elf group');
-        }
-        protocol_1.RedisCall.call(protocol_1.SendBackPlayer.name, {
-            playUrl: util_2.gameId2PlayUrl(this.game.id),
-            playerToken: playerToken,
-            elfGameId: this.game.elfGameId,
-            phaseResult: phaseResult,
-            nextPhaseKey: nextPhaseKey
-        })
-            .catch(function (e) { return util_1.Log.e(e); })
-            .then(function (_a) {
-            var sendBackUrl = _a.sendBackUrl;
-            return EventIO_1.EventIO.emitEvent(_this.connections.get(playerToken).id, share_1.SocketEvent.sendBack, sendBackUrl);
-        });
     };
     BaseLogic.controllers = new Map();
     return BaseLogic;

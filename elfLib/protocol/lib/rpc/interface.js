@@ -10,14 +10,10 @@ var NewPhase;
 (function (NewPhase) {
     NewPhase.name = function (namespace) { return "Elf:NewPhase:" + namespace; };
 })(NewPhase = exports.NewPhase || (exports.NewPhase = {}));
-var SetPhaseResult;
-(function (SetPhaseResult) {
-    SetPhaseResult.name = 'Elf:SetPhaseResult';
-})(SetPhaseResult = exports.SetPhaseResult || (exports.SetPhaseResult = {}));
-var SendBackPlayer;
-(function (SendBackPlayer) {
-    SendBackPlayer.name = 'Elf:SendBackPlayer';
-})(SendBackPlayer = exports.SendBackPlayer || (exports.SendBackPlayer = {}));
+var SetPlayerResult;
+(function (SetPlayerResult) {
+    SetPlayerResult.name = 'Elf:SetPlayerResult';
+})(SetPlayerResult = exports.SetPlayerResult || (exports.SetPlayerResult = {}));
 //endregion
 //region Trial
 var CreateGame;

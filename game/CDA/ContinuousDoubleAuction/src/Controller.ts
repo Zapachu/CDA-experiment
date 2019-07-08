@@ -222,9 +222,9 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 break
             }
             case MoveType.sendBackPlayer: {
-                this.sendBackPlayer(actor.token, {
+                this.setPhaseResult(actor.token, {
                     point: playerState.point
-                }, this.game.params.nextPhaseKey)
+                })
                 break
             }
         }

@@ -1,10 +1,10 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {connCtx, Lang} from '@client-util'
-import {PlayerStatus, PhaseStatus} from '@common'
+import {PhaseStatus, PlayerStatus} from '@common'
 import {playContext, rootContext, TPlayContext, TRootContext} from '@client-context'
 import {Link} from 'react-router-dom'
-import {Affix, Dropdown, Button, Menu} from '@antd-component'
+import {Affix, Button, Dropdown, Menu} from '@antd-component'
 import {History} from 'history'
 
 @connCtx(rootContext)
@@ -38,11 +38,11 @@ export class Play4Owner extends React.Component<TRootContext & TPlayContext & { 
                         <Link to={`/share/${game.id}`}>{lang.share}</Link>
                     </Menu.Item>
                 </Menu>}>
-                    <Button type='primary' shape="circle" icon="bars" />
+                    <Button type='primary' shape="circle" icon="bars"/>
                 </Dropdown>
             </Affix>
             <iframe className={style.playIframe}
-                    src={`${gameState.phaseStates[0].playUrl}?${Lang.key}=${Lang.activeLanguage}`}/>
+                    src={`${gameState.playUrl}?${Lang.key}=${Lang.activeLanguage}`}/>
         </section>
     }
 }

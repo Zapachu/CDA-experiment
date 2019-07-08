@@ -12,7 +12,7 @@ import {
     TPlayerState
 } from '@bespoke/share'
 import {Log, Token} from '@elf/util'
-import {RedisCall, SendBackPlayer, SetPhaseResult} from '@elf/protocol'
+import {RedisCall, SetPlayerResult} from '@elf/protocol'
 import {EventIO} from './EventIO'
 import {GameDAO} from './GameDAO'
 import {StateManager} from './StateManager'
@@ -129,32 +129,16 @@ export class BaseLogic<ICreateParams, IGameState, IPlayerState, MoveType, PushTy
     //endregion
 
     //region elf
-    protected setPhaseResult(playerToken: string, phaseResult: SetPhaseResult.IPhaseResult) {
+    protected setPhaseResult(playerToken: string, result: SetPlayerResult.IResult) {
         if (!this.game.elfGameId) {
             return Log.w('Bespoke单独部署，game未关联至Elf group')
         }
-        RedisCall.call<SetPhaseResult.IReq, SetPhaseResult.IRes>(SetPhaseResult.name, {
+        RedisCall.call<SetPlayerResult.IReq, SetPlayerResult.IRes>(SetPlayerResult.name, {
             playUrl: gameId2PlayUrl(this.game.id),
             playerToken,
             elfGameId: this.game.elfGameId,
-            phaseResult
+            result
         }).catch(e => Log.e(e))
-    }
-
-    protected sendBackPlayer(playerToken: string, phaseResult?: SetPhaseResult.IPhaseResult, nextPhaseKey?: string) {
-        if (!this.game.elfGameId) {
-            return Log.w('Bespoke单独部署，game未关联至Elf group')
-        }
-        RedisCall.call<SendBackPlayer.IReq, SendBackPlayer.IRes>(SendBackPlayer.name, {
-            playUrl: gameId2PlayUrl(this.game.id),
-            playerToken,
-            elfGameId: this.game.elfGameId,
-            phaseResult,
-            nextPhaseKey
-        })
-            .catch(e => Log.e(e))
-            .then(({sendBackUrl}) =>
-                EventIO.emitEvent(this.connections.get(playerToken).id, SocketEvent.sendBack, sendBackUrl))
     }
 
     //endregion

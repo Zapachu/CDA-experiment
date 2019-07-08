@@ -89,11 +89,6 @@ export class Play extends React.Component<TPageProps, IPlayState> {
                 }
             }) : this.setState({playerState})
         })
-        socketClient.on(SocketEvent.sendBack, (sendBackUrl: string) => {
-            setTimeout(() => {
-                location.href = sendBackUrl
-            }, 1000)
-        })
     }
 
     applyPlayerState(playerState: TPlayerState<{}>, token?: string) {

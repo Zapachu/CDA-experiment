@@ -1,9 +1,8 @@
 import {elfSetting} from '@elf/setting'
 import {Server, ServerCredentials} from 'grpc'
 import {setElfService} from './service/ElfAdmin'
-import {RedisCall, SendBackPlayer, SetPhaseResult} from '@elf/protocol'
+import {RedisCall, SetPlayerResult} from '@elf/protocol'
 import {StateManager} from '@server-service'
-import {buildPlayUrl} from '@server-util'
 
 export {getAdminService} from './service/ElfAdmin'
 
@@ -14,18 +13,11 @@ export function serve() {
     server.start()
 }
 
-RedisCall.handle<SetPhaseResult.IReq, SetPhaseResult.IRes>(SetPhaseResult.name,
-    async ({elfGameId, playUrl, playerToken, phaseResult}) => {
+RedisCall.handle<SetPlayerResult.IReq, SetPlayerResult.IRes>(SetPlayerResult.name,
+    async ({elfGameId, playUrl, playerToken, result}) => {
         const stageManger = await StateManager.getManager(elfGameId)
-        await stageManger.setPhaseResult(playUrl, playerToken, phaseResult)
+        await stageManger.setPlayerResult(playUrl, playerToken, result)
         return null
-    })
-
-RedisCall.handle<SendBackPlayer.IReq, SendBackPlayer.IRes>(SendBackPlayer.name,
-    async ({elfGameId, playUrl, playerToken, phaseResult, nextPhaseKey}) => {
-        const stageManger = await StateManager.getManager(elfGameId)
-        await stageManger.sendBackPlayer(playUrl, playerToken, nextPhaseKey, phaseResult)
-        return {sendBackUrl: buildPlayUrl(elfGameId, playerToken)}
     })
 
 

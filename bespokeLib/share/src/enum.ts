@@ -5,7 +5,6 @@ export enum SocketEvent {
     online = 'online',
     move = 'move',
     push = 'push',
-    sendBack = 'sendBack',
     //endregion
     //region stateEvent
     syncGameState_json = 'SGJ',

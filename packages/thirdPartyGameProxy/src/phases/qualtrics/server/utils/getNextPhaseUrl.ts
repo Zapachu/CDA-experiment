@@ -2,7 +2,7 @@
 
 import {ThirdPartPhase} from "../../../../core/server/models"
 import {elfSetting as settings} from '@elf/setting'
-import {RedisCall, SendBackPlayer} from '@elf/protocol'
+import {RedisCall, SetPlayerResult} from '@elf/protocol'
 
 const {qualtricsProxy} = settings
 
@@ -26,8 +26,8 @@ const getNextPhaseUrl = async (req) => {
         playUrl: `${qualtricsProxy}/init/jfe/form/${qualtricsPhase._id.toString()}`,
     }
 
-    const {sendBackUrl} = await RedisCall.call<SendBackPlayer.IReq, SendBackPlayer.IRes>(SendBackPlayer.name, request)
-    return sendBackUrl
+    await RedisCall.call<SetPlayerResult.IReq, SetPlayerResult.IRes>(SetPlayerResult.name, request)
+    return '#'
 }
 
 export {

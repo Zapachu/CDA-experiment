@@ -141,11 +141,6 @@ var Play = /** @class */ (function (_super) {
                 playerStates: __assign({}, playerStates, (_a = {}, _a[token] = playerState, _a))
             }) : _this.setState({ playerState: playerState });
         });
-        socketClient.on(share_1.SocketEvent.sendBack, function (sendBackUrl) {
-            setTimeout(function () {
-                location.href = sendBackUrl;
-            }, 1000);
-        });
     };
     Play.prototype.applyPlayerState = function (playerState, token) {
         var _a;

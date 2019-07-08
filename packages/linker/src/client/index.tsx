@@ -7,7 +7,6 @@ import {IPhaseTemplate} from '@elf/register'
 require('./initial.scss')
 
 export {Lang} from '@client-util'
-export {IPhaseConfig, CorePhaseNamespace} from '@common'
 
 export const phaseTemplates: {
     [phase: string]: IPhaseTemplate
