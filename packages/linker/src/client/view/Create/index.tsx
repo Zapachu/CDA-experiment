@@ -2,10 +2,11 @@ import React from 'react'
 import {Api, connCtx, genePhaseKey, Lang, loadScript} from '@client-util'
 import {Loading} from '@client-component'
 import {RouteComponentProps} from 'react-router'
-import {baseEnum, CorePhaseNamespace, IPhaseConfig} from '@common'
+import {CorePhaseNamespace, GameMode, IPhaseConfig} from '@common'
 import {phaseTemplates} from '../../index'
 import {Button, Input, message} from '@antd-component'
 import {rootContext, TRootContext} from '@client-context'
+import {ResponseCode} from '@elf/share'
 
 interface ICreateState {
     loading: boolean
@@ -41,8 +42,8 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
     }
 
     async componentDidMount() {
-        const {code, templates} = await Api.getPhaseTemplates(this.props.user.orgCode)
-        if (code !== baseEnum.ResponseCode.success) {
+        const {code, templates} = await Api.getPhaseTemplates()
+        if (code !== ResponseCode.success) {
             return
         }
         const template = templates.find(({namespace}) => namespace === this.props.match.params.namespace)
@@ -77,8 +78,8 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
         }
         phaseConfig.suffixPhaseKeys = [endPhase.key]
         const phaseConfigs = [startPhase, phaseConfig, endPhase]
-        const {code, gameId} = await Api.postNewGame(title, desc, baseEnum.GameMode.easy, phaseConfigs)
-        if (code === baseEnum.ResponseCode.success) {
+        const {code, gameId} = await Api.postNewGame(title, desc, GameMode.easy, phaseConfigs)
+        if (code === ResponseCode.success) {
             message.success(lang.createSuccess)
             history.push(`/info/${gameId}`)
         } else {
@@ -103,8 +104,8 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
         return <section style={{
             maxWidth: '64rem',
             margin: '1rem auto',
-            padding:'1rem 1.5rem',
-            background:'white'
+            padding: '1rem 1.5rem',
+            background: 'white'
         }}>
             <br/>
             <Input value={title}
@@ -119,10 +120,10 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
                             onChange={({target: {value: desc}}) => this.setState({desc})}/>
             <br/><br/>
             <Create {...{
-                submitable:true,
-                setSubmitable:()=>null,
-                params:phaseConfig.param,
-                setParams:params=>this.updatePhase(params)
+                submitable: true,
+                setSubmitable: () => null,
+                params: phaseConfig.param,
+                setParams: params => this.updatePhase(params)
             }}/>
             <div style={{textAlign: 'center'}}>
                 <Button type='primary' onClick={() => this.handleSubmit()}>{lang.submit}</Button>

@@ -1,38 +1,40 @@
 'use strict'
 
-import {ThirdPartPhase} from "../../../../core/server/models"
+import {ThirdPartPhase} from '../../../../core/server/models'
 import {elfSetting as settings} from '@elf/setting'
-import {ErrorPage} from '../../../common/utils'
-import {Request, Response, NextFunction} from 'express'
+import {sendErrorPage} from '../../../common/utils'
+import {NextFunction, Request, Response} from 'express'
+import {IActor} from '@elf/share'
+
 
 const InitWork = (app) => {
     app.use(async (req: Request, res: Response, next: NextFunction) => {
 
         console.log(`${req.method}  ${req.url}`)
 
-        if (!req.user) return ErrorPage(res, "Not Login");
+        if (!req.user) return sendErrorPage(res, 'Not Login')
 
         const isInit = req.url.includes('/init/qqwj/')
         const isMoPush = req.url.includes('/sur/mo_push')
         const isSubmit = req.url.includes('sur/collect_answer')
 
         if (isInit) {
-            const currentUserElfGameHash = req.session.token
+            const actor:IActor = req.session.actor
             const currentPhaseId = req.url.split('/init/qqwj/')[1].slice(0, 24)
             try {
 
-                const currentPhase:any = await ThirdPartPhase.findById(currentPhaseId)
+                const currentPhase: any = await ThirdPartPhase.findById(currentPhaseId)
                 const currentPhaseParamsJson = JSON.parse(currentPhase.param)
                 const currentPhaseQQWJHash = currentPhaseParamsJson.qqwjHash
 
-                if (!currentPhase) return ErrorPage(res, "Phase Not Exist")
+                if (!currentPhase) return sendErrorPage(res, 'Phase Not Exist')
 
                 req.session.qqwjPhaseId = currentPhase._id
 
                 const {playHash} = currentPhase
 
                 // Admin Url
-                if (currentPhase.ownerToken.toString() === currentUserElfGameHash.toString()) {
+                if (currentPhase.ownerToken.toString() === actor.token) {
                     const phaseParam = JSON.parse(currentPhase.param)
                     return res.redirect(phaseParam.adminUrl)
                 }
@@ -40,7 +42,7 @@ const InitWork = (app) => {
                 let redirectTo = null
 
                 for (let i = 0; i < playHash.length; i++) {
-                    if (playHash[i].player.toString() === currentUserElfGameHash.toString()) {
+                    if (playHash[i].player.toString() === actor.token) {
                         redirectTo = `${settings.qqwjProxy}${currentPhaseQQWJHash}`
                     }
                 }
@@ -50,7 +52,7 @@ const InitWork = (app) => {
                 }
 
                 // 新加入成员
-                playHash.push({hash: currentPhaseQQWJHash, player: currentUserElfGameHash})
+                playHash.push({hash: currentPhaseQQWJHash, player: actor.token})
                 currentPhase.playHash = playHash
                 currentPhase.markModified('playHash')
                 await currentPhase.save()
@@ -58,7 +60,7 @@ const InitWork = (app) => {
             } catch (err) {
                 if (err) {
                     console.trace(err)
-                    return ErrorPage(res, "Error")
+                    return sendErrorPage(res, 'Error')
                 }
             }
             next()
@@ -70,7 +72,7 @@ const InitWork = (app) => {
                 'accept-encoding': 'gzip, deflate, br',
                 'accept-language': 'zh-CN,zh;q=0.9',
                 'origin': 'https://wj.qq.com',
-                'referer': `https://wj.qq.com${req.url.split('wj.qq.com')[1]}`,
+                'referer': `https://wj.qq.com${req.url.split('wj.qq.com')[1]}`
             })
         }
 

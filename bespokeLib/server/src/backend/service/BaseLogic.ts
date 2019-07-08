@@ -11,13 +11,13 @@ import {
     TGameState,
     TPlayerState
 } from '@bespoke/share'
-import {Log} from '@elf/util'
+import {Log, Token} from '@elf/util'
 import {RedisCall, SendBackPlayer, SetPhaseResult} from '@elf/protocol'
 import {EventIO} from './EventIO'
 import {GameDAO} from './GameDAO'
 import {StateManager} from './StateManager'
 import {MoveQueue} from './MoveQueue'
-import {gameId2PlayUrl, Token} from '../util'
+import {gameId2PlayUrl} from '../util'
 
 export type AnyLogic = BaseLogic<any, any, any, any, any, any, any>
 

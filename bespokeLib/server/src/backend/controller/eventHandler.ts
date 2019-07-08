@@ -1,14 +1,14 @@
-import {baseEnum, IEventHandler, IConnection, TOnlineCallback, IMoveCallback} from '@bespoke/share'
+import {Actor, IConnection, IEventHandler, IMoveCallback, SocketEvent, TOnlineCallback} from '@bespoke/share'
 import {BaseLogic} from '../service'
 
 export const EventHandler = {
-    [baseEnum.SocketEvent.online]: async (connection: IConnection, onlineCallback: TOnlineCallback = () => null) => {
+    [SocketEvent.online]: async (connection: IConnection, onlineCallback: TOnlineCallback = () => null) => {
         const {game, actor} = connection,
             controller = await BaseLogic.getLogic(game.id)
         onlineCallback(actor)
         connection.join(game.id)
         controller.connections.set(actor.token, connection)
-        if (actor.type === baseEnum.Actor.owner) {
+        if (actor.type === Actor.owner) {
             const gameState = await controller.stateManager.getGameState()
             gameState.connectionId = connection.id
             await controller.stateManager.syncState(true)
@@ -19,9 +19,9 @@ export const EventHandler = {
         }
     },
 
-    [baseEnum.SocketEvent.disconnect]: async ({game, actor}: IConnection) => {
+    [SocketEvent.disconnect]: async ({game, actor}: IConnection) => {
         const {stateManager} = await BaseLogic.getLogic(game.id)
-        if (actor.type === baseEnum.Actor.owner) {
+        if (actor.type === Actor.owner) {
             const gameState = await stateManager.getGameState()
             gameState.connectionId = ''
         } else {
@@ -31,7 +31,7 @@ export const EventHandler = {
         await stateManager.syncState()
     },
 
-    [baseEnum.SocketEvent.move]: async ({actor, game}: IConnection, type: string, params: {}, cb?: IMoveCallback) => {
+    [SocketEvent.move]: async ({actor, game}: IConnection, type: string, params: {}, cb?: IMoveCallback) => {
         const controller = await BaseLogic.getLogic(game.id)
         await controller.moveReducer(actor, type, params, cb || (() => null))
     }

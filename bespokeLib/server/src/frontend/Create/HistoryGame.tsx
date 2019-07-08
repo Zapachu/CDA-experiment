@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import * as dateFormat from 'dateformat'
-import {baseEnum, IGameConfig, IGameThumb} from '@bespoke/share'
+import {IGameConfig, IGameThumb, ResponseCode} from '@bespoke/share'
 import {Lang} from '@elf/component'
 import {Api} from '../util'
 
@@ -23,14 +23,14 @@ export class HistoryGame extends React.Component<IHistoryGameProps, IHistoryGame
 
     async componentDidMount() {
         const {code, historyGameThumbs} = await Api.getHistoryGames()
-        if (code === baseEnum.ResponseCode.success) {
+        if (code === ResponseCode.success) {
             this.setState({historyGameThumbs})
         }
     }
 
     async chooseHistoryGame(gameId) {
         const {code, game} = await Api.getGame(gameId)
-        if (code === baseEnum.ResponseCode.success) {
+        if (code === ResponseCode.success) {
             this.props.applyHistoryGame(game)
         }
     }

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import {RouteComponentProps} from 'react-router-dom'
-import {baseEnum, config} from '@common'
+import {config} from '@common'
+import {ResponseCode} from '@elf/share'
 import {Api, Lang} from '@client-util'
 import {message} from '@antd-component'
 import * as QrCode from 'qrcode.react'
@@ -27,7 +28,7 @@ export class Share extends React.Component<RouteComponentProps<{ gameId: string 
 
     async componentDidMount() {
         const {code, shareCode, title} = await Api.shareGame(this.props.match.params.gameId)
-        if (code === baseEnum.ResponseCode.success) {
+        if (code === ResponseCode.success) {
             this.setState({shareCode, title})
         } else {
             message.warn(this.lang.failed2GeneShareCode)

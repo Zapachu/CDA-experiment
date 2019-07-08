@@ -173,7 +173,7 @@ var BaseLogic = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             var actor;
             return __generator(this, function (_a) {
-                actor = { token: util_2.Token.geneToken("" + this.game.id + key), type: share_1.Actor.serverRobot };
+                actor = { token: util_1.Token.geneToken("" + this.game.id + key), type: share_1.Actor.serverRobot };
                 EventIO_1.EventIO.startRobot(actor, this.game, meta);
                 return [2 /*return*/];
             });

@@ -2,14 +2,13 @@
 
 import {ThirdPartPhase} from "../../../../core/server/models"
 import {elfSetting as settings} from '@elf/setting'
+import {IActor} from '@elf/share'
 
 const {qualtricsProxy} = settings
 
 const InitWork = (app) => {
     app.use(async (req, res, next) => {
-
-        console.info(`${req.method} ${req.url}`)
-
+        const actor:IActor = req.session.actor
         const isUser = req.user
         const isGet = req.method === 'GET'
         const isInit = req.url.includes('/init')
@@ -17,9 +16,8 @@ const InitWork = (app) => {
         if (!isUser) return res.redirect('https://ancademy.org')
 
         if (isInit && isGet) {
-            const currentUserElfGameHash = req.session.token
             console.log('log > Starting init.....')
-            console.log('log > current Elf hash ....', currentUserElfGameHash)
+            console.log('log > current Elf hash ....', actor.token)
             const currentPhaseId = req.url.split('/jfe/form/')[1].slice(0, 24)
             try {
                 const currentPhase: any = await
@@ -35,7 +33,7 @@ const InitWork = (app) => {
                 req.session.qualtricsPhaseId = currentPhase._id
 
                 // Admin Url
-                if (currentPhase.ownerToken.toString() === currentUserElfGameHash.toString()) {
+                if (currentPhase.ownerToken.toString() === actor.token) {
                     const phaseParam = JSON.parse(currentPhase.param)
                     return res.redirect(phaseParam.adminUrl)
                 }
@@ -45,14 +43,14 @@ const InitWork = (app) => {
                 let redirectTo = null
 
                 for (let i = 0; i < playHash.length; i++) {
-                    if (playHash[i].player.toString() === currentUserElfGameHash.toString()) {
+                    if (playHash[i].player.toString() === actor.token) {
                         redirectTo = `${qualtricsProxy}/jfe/form/${currentPhaseSurveyId}`
                     }
                 }
 
                 if (redirectTo) return res.redirect(redirectTo)
 
-                playHash.push({hash: currentPhaseSurveyId, player: currentUserElfGameHash})
+                playHash.push({hash: currentPhaseSurveyId, player: actor.token})
                 currentPhase.playHash = playHash
                 currentPhase.markModified('playHash')
                 await currentPhase.save()

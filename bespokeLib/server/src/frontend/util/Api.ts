@@ -1,12 +1,12 @@
 import {
-    baseEnum,
     config,
     IGameConfig,
     IGameThumb,
     IGameWithId,
     IMoveLog,
     ISimulatePlayer,
-    IUserWithId
+    IUserWithId,
+    NationCode
 } from '@bespoke/share'
 import {IHttpRes, Request} from '@elf/component'
 
@@ -20,11 +20,11 @@ export const Api = new class {
     }
 
     //region user
-    async getVerifyCode(nationCode: baseEnum.NationCode, mobile: string): Promise<IHttpRes & { msg: string }> {
+    async getVerifyCode(nationCode: NationCode, mobile: string): Promise<IHttpRes & { msg: string }> {
         return await this.get('/user/verifyCode', null, {nationCode, mobile})
     }
 
-    async login(nationCode: baseEnum.NationCode, mobile: string, verifyCode: string): Promise<IHttpRes & { returnToUrl: string }> {
+    async login(nationCode: NationCode, mobile: string, verifyCode: string): Promise<IHttpRes & { returnToUrl: string }> {
         return await this.post('/user/login', null, null, {nationCode, mobile, verifyCode})
     }
 

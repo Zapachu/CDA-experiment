@@ -1,4 +1,4 @@
-import {baseEnum, config} from '@bespoke/share'
+import {config, NationCode} from '@bespoke/share'
 import {elfSetting} from '@elf/setting'
 import {QCloudSMS, RedisKey} from '../util'
 import {Log} from '@elf/util'
@@ -16,7 +16,7 @@ enum sendVerifyCodeRes {
 export class UserService {
     static sendVerifyCodeResCode = sendVerifyCodeRes
 
-    static async sendVerifyCode(nationCode: baseEnum.NationCode, mobile: string): Promise<{
+    static async sendVerifyCode(nationCode: NationCode, mobile: string): Promise<{
         code: sendVerifyCodeRes,
         msg?: string
     }> {

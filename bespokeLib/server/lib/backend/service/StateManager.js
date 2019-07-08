@@ -97,7 +97,7 @@ var StateManager = /** @class */ (function () {
                         tokens = _d.sent();
                         tokens.forEach(function (token) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
                             switch (_a.label) {
-                                case 0: return [4 /*yield*/, this.getPlayerManager({ token: token, type: share_1.baseEnum.Actor.player })];
+                                case 0: return [4 /*yield*/, this.getPlayerManager({ token: token, type: share_1.Actor.player })];
                                 case 1: return [2 /*return*/, _a.sent()];
                             }
                         }); }); });

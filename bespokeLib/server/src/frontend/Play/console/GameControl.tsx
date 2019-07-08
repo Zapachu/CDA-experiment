@@ -1,10 +1,18 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {baseEnum, FrameEmitter, IGameWithId, ISimulatePlayer, TGameState, TPlayerState} from '@bespoke/share'
+import {
+    CoreMove,
+    FrameEmitter,
+    GameStatus,
+    IGameWithId,
+    ISimulatePlayer,
+    TGameState,
+    TPlayerState
+} from '@bespoke/share'
 import {Button, ButtonProps, Lang} from '@elf/component'
 import {Api} from '../../util'
 
-const {started, paused, over} = baseEnum.GameStatus
+const {started, paused, over} = GameStatus
 
 declare interface IGameControlProps {
     game: IGameWithId<{}>
@@ -104,13 +112,13 @@ export class GameControl extends React.Component<IGameControlProps> {
                 <div className={style.switcherWrapper}>
                     {
                         (this.gameStatusMachine[gameState.status] || [])
-                            .map(({status, label, type = ButtonProps.Type.primary, color = ButtonProps.Color.blue, width = ButtonProps.Width.medium}) =>
+                            .map(({status, label, color = ButtonProps.Color.blue, width = ButtonProps.Width.medium}) =>
                                 <Button key={label} {...{
+                                    type: ButtonProps.Type.primary,
                                     label,
                                     color,
-                                    type,
                                     width,
-                                    onClick: () => frameEmitter.emit(baseEnum.CoreMove.switchGameStatus, {status})
+                                    onClick: () => frameEmitter.emit(CoreMove.switchGameStatus, {status})
                                 }}/>
                             )
                     }

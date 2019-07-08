@@ -84,7 +84,7 @@ var style = require("./style.scss");
 var share_1 = require("@bespoke/share");
 var component_1 = require("@elf/component");
 var util_1 = require("../../util");
-var _a = share_1.baseEnum.GameStatus, started = _a.started, paused = _a.paused, over = _a.over;
+var started = share_1.GameStatus.started, paused = share_1.GameStatus.paused, over = share_1.GameStatus.over;
 var GameControl = /** @class */ (function (_super) {
     __extends(GameControl, _super);
     function GameControl() {
@@ -166,13 +166,13 @@ var GameControl = /** @class */ (function (_super) {
             React.createElement("div", { className: style.statusSwitcher },
                 React.createElement("div", { className: style.switcherWrapper }, (this.gameStatusMachine[gameState.status] || [])
                     .map(function (_a) {
-                    var status = _a.status, label = _a.label, _b = _a.type, type = _b === void 0 ? component_1.ButtonProps.Type.primary : _b, _c = _a.color, color = _c === void 0 ? component_1.ButtonProps.Color.blue : _c, _d = _a.width, width = _d === void 0 ? component_1.ButtonProps.Width.medium : _d;
+                    var status = _a.status, label = _a.label, _b = _a.color, color = _b === void 0 ? component_1.ButtonProps.Color.blue : _b, _c = _a.width, width = _c === void 0 ? component_1.ButtonProps.Width.medium : _c;
                     return React.createElement(component_1.Button, __assign({ key: label }, {
+                        type: component_1.ButtonProps.Type.primary,
                         label: label,
                         color: color,
-                        type: type,
                         width: width,
-                        onClick: function () { return frameEmitter.emit(share_1.baseEnum.CoreMove.switchGameStatus, { status: status }); }
+                        onClick: function () { return frameEmitter.emit(share_1.CoreMove.switchGameStatus, { status: status }); }
                     }));
                 }))));
     };

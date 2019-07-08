@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {baseEnum, IGameWithId} from '@bespoke/share'
+import {IGameWithId, ResponseCode} from '@bespoke/share'
 import {MaskLoading} from '@elf/component'
 import {Core} from '@bespoke/register'
 import {Api} from '../../util'
@@ -26,7 +26,7 @@ export class GameResult extends React.Component<IGameResultProps, IGameResultSta
 
     componentDidMount(): void {
         Api.getMoveLogs(this.props.game.id).then(async ({code, moveLogs}) => {
-            if (code !== baseEnum.ResponseCode.success) {
+            if (code !== ResponseCode.success) {
                 return
             }
             const travelStates: Array<TTravelState> = []

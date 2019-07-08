@@ -95,19 +95,19 @@ var EventIO = /** @class */ (function () {
         var _this = this;
         this.socketIOServer = SocketIO(server, { path: share_1.config.socketPath(util_2.Setting.namespace) });
         this.socketIOServer.on(share_1.SocketEvent.connection, function (connection) { return __awaiter(_this, void 0, void 0, function () {
-            var _a, _b, token, gameId, _c, user, sessionID, game, actor;
-            return __generator(this, function (_d) {
-                switch (_d.label) {
+            var _a, _b, token, gameId, _c, _d, user, linkerActor, sessionID, game, actor;
+            return __generator(this, function (_e) {
+                switch (_e.label) {
                     case 0:
-                        _a = connection.handshake, _b = _a.query, token = _b.token, gameId = _b.gameId, _c = _a.session.passport, user = (_c === void 0 ? { user: undefined } : _c).user, sessionID = _a.sessionID;
+                        _a = connection.handshake, _b = _a.query, token = _b.token, gameId = _b.gameId, _c = _a.session, _d = _c.passport, user = (_d === void 0 ? { user: undefined } : _d).user, linkerActor = _c.actor, sessionID = _a.sessionID;
                         return [4 /*yield*/, GameDAO_1.GameDAO.getGame(gameId)];
                     case 1:
-                        game = _d.sent();
-                        actor = util_2.Token.checkToken(token) ?
+                        game = _e.sent();
+                        actor = util_1.Token.checkToken(token) ?
                             game.owner === user ? { type: share_1.Actor.clientRobot, token: token } : { type: share_1.Actor.player, token: token } :
                             game.owner === user ?
-                                { type: share_1.Actor.owner, token: util_2.Token.geneToken(user) } :
-                                { type: share_1.Actor.player, token: util_2.Token.geneToken(user || sessionID) };
+                                { type: share_1.Actor.owner, token: util_1.Token.geneToken(user) } :
+                                linkerActor || { type: share_1.Actor.player, token: util_1.Token.geneToken(user || sessionID) };
                         subscribeOnConnection(Object.assign(connection, { actor: actor, game: game }));
                         return [2 /*return*/];
                 }

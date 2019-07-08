@@ -1,6 +1,6 @@
 import * as React from "react";
 import {RouteComponentProps} from "react-router";
-import {config, baseEnum, IGameState, IGameWithId, TSocket, NFrame, IActor} from "@common";
+import {config, IGameState, IGameWithId, TSocket, NFrame, IActor, SocketEvent} from "@common";
 import {Api, connCtx} from "@client-util";
 import {connect} from "socket.io-client"
 import {rootContext, TRootContext, playContext} from "@client-context";
@@ -8,6 +8,7 @@ import {Play4Owner} from './Owner'
 import {Play4Player} from './Player'
 import * as queryString from 'query-string'
 import {Loading} from '@client-component'
+import {Actor} from '@elf/share'
 
 declare interface IPlayState {
     game?: IGameWithId,
@@ -37,11 +38,11 @@ export class Play extends React.Component<TRootContext & RouteComponentProps<{ g
             game,
             actor,
             socketClient
-        }, () => socketClient.emit(baseEnum.SocketEvent.upFrame, NFrame.UpFrame.joinRoom))
+        }, () => socketClient.emit(SocketEvent.upFrame, NFrame.UpFrame.joinRoom))
     }
 
     private registerStateReducer(socketClient: TSocket) {
-        socketClient.on(baseEnum.SocketEvent.downFrame, (frame: NFrame.DownFrame, data: {}) => {
+        socketClient.on(SocketEvent.downFrame, (frame: NFrame.DownFrame, data: {}) => {
             switch (frame) {
                 case NFrame.DownFrame.syncGameState: {
                     this.setState({
@@ -59,7 +60,7 @@ export class Play extends React.Component<TRootContext & RouteComponentProps<{ g
         }
         return <playContext.Provider value={{gameState, socketClient, game, actor}}>
             {
-                actor.type === baseEnum.Actor.owner ?
+                actor.type === Actor.owner ?
                     <Play4Owner history={history}/> :
                     <Play4Player/>
             }

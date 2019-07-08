@@ -104,7 +104,7 @@ var Play = /** @class */ (function (_super) {
                             socketClient: socketClient,
                             frameEmitter: new share_1.FrameEmitter(socketClient)
                         }); }, function () {
-                            return socketClient.emit(share_1.baseEnum.SocketEvent.online, function (actor) {
+                            return socketClient.emit(share_1.SocketEvent.online, function (actor) {
                                 if (token && (actor.token !== token)) {
                                     location.href = "" + location.origin + location.pathname + "?token=" + actor.token;
                                 }
@@ -123,16 +123,16 @@ var Play = /** @class */ (function (_super) {
     };
     Play.prototype.registerStateReducer = function (socketClient) {
         var _this = this;
-        socketClient.on(share_1.baseEnum.SocketEvent.syncGameState_json, function (gameState) {
+        socketClient.on(share_1.SocketEvent.syncGameState_json, function (gameState) {
             _this.setState({ gameState: gameState });
         });
-        socketClient.on(share_1.baseEnum.SocketEvent.changeGameState_diff, function (stateChanges) {
+        socketClient.on(share_1.SocketEvent.changeGameState_diff, function (stateChanges) {
             var gameState = cloneDeep(_this.state.gameState) || {};
             stateChanges.forEach(function (change) { return deep_diff_1.applyChange(gameState, null, change); });
             _this.setState({ gameState: gameState });
         });
-        socketClient.on(share_1.baseEnum.SocketEvent.syncPlayerState_json, function (playerState, token) { return _this.applyPlayerState(playerState, token); });
-        socketClient.on(share_1.baseEnum.SocketEvent.changePlayerState_diff, function (stateChanges, token) {
+        socketClient.on(share_1.SocketEvent.syncPlayerState_json, function (playerState, token) { return _this.applyPlayerState(playerState, token); });
+        socketClient.on(share_1.SocketEvent.changePlayerState_diff, function (stateChanges, token) {
             var _a;
             var playerStates = _this.state.playerStates;
             var playerState = cloneDeep(token ? playerStates[token] : _this.state.playerState) || {};
@@ -141,7 +141,7 @@ var Play = /** @class */ (function (_super) {
                 playerStates: __assign({}, playerStates, (_a = {}, _a[token] = playerState, _a))
             }) : _this.setState({ playerState: playerState });
         });
-        socketClient.on(share_1.baseEnum.SocketEvent.sendBack, function (sendBackUrl) {
+        socketClient.on(share_1.SocketEvent.sendBack, function (sendBackUrl) {
             setTimeout(function () {
                 location.href = sendBackUrl;
             }, 1000);
@@ -163,7 +163,7 @@ var Play = /** @class */ (function (_super) {
         if (!PRODUCT_ENV) {
             console.log(gameState, playerState || playerStates);
         }
-        if (actor.type === share_1.baseEnum.Actor.owner) {
+        if (actor.type === share_1.Actor.owner) {
             return React.createElement("section", { className: style.play4owner },
                 React.createElement(GameControl_1.GameControl, __assign({}, {
                     game: game,
@@ -172,7 +172,7 @@ var Play = /** @class */ (function (_super) {
                     frameEmitter: frameEmitter,
                     historyPush: function (path) { return history.push(path); }
                 })),
-                gameState.status === share_1.baseEnum.GameStatus.over ?
+                gameState.status === share_1.GameStatus.over ?
                     React.createElement(GameResult_1.GameResult, __assign({}, { game: game, Result4Owner: Result4Owner })) :
                     React.createElement(Play4Owner, __assign({}, {
                         game: game,
@@ -185,11 +185,11 @@ var Play = /** @class */ (function (_super) {
             return React.createElement(component_1.MaskLoading, null);
         }
         switch (gameState.status) {
-            case share_1.baseEnum.GameStatus.paused:
+            case share_1.GameStatus.paused:
                 return React.createElement(component_1.MaskLoading, { label: lang.Mask_GamePaused });
-            case share_1.baseEnum.GameStatus.started:
+            case share_1.GameStatus.started:
                 return React.createElement(Play, __assign({}, { game: game, gameState: gameState, playerState: playerState, frameEmitter: frameEmitter }));
-            case share_1.baseEnum.GameStatus.over:
+            case share_1.GameStatus.over:
                 return React.createElement(Result, __assign({}, { game: game, gameState: gameState, playerState: playerState }));
         }
     };

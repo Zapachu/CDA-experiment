@@ -1,7 +1,8 @@
 import {
+    Actor,
     BaseController,
-    baseEnum,
     gameId2PlayUrl,
+    GameStatus,
     IActor,
     IMoveCallback,
     Log,
@@ -28,7 +29,7 @@ import {
     PushType,
     ROLE
 } from './config'
-import {phaseToNamespace, Phase} from '@bespoke-game/stock-trading-config'
+import {Phase, phaseToNamespace} from '@bespoke-game/stock-trading-config'
 import {CreateGame, GameOver} from '@elf/protocol'
 import {getBalanceIndex, getEnumKeys, random} from './util'
 
@@ -193,12 +194,12 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 }
                 playerState.playerIndex = gameState.playerIndex++
                 switch (true) {
-                    case actor.type === baseEnum.Actor.serverRobot && playerStates.every(({identity}) => identity != Identity.moneyGuarantor):
+                    case actor.type === Actor.serverRobot && playerStates.every(({identity}) => identity != Identity.moneyGuarantor):
                         playerState.identity = Identity.moneyGuarantor
                         playerState.count = 0
                         playerState.money = gameState.initialAsset.money * CreateGame.playerLimit
                         break
-                    case actor.type === baseEnum.Actor.serverRobot && playerStates.every(({identity}) => identity != Identity.stockGuarantor):
+                    case actor.type === Actor.serverRobot && playerStates.every(({identity}) => identity != Identity.stockGuarantor):
                         playerState.identity = Identity.stockGuarantor
                         playerState.count = gameState.initialAsset.count * CreateGame.playerLimit
                         playerState.money = 0
@@ -213,7 +214,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 }
                 let countDown = 1
                 const timer = global.setInterval(async () => {
-                    if (gameState.status !== baseEnum.GameStatus.started) {
+                    if (gameState.status !== GameStatus.started) {
                         return
                     }
                     const {periodIndex} = gameState

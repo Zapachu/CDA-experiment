@@ -6,7 +6,8 @@ import {
   IMoveCallback,
   RedisCall,
   TGameState,
-  TPlayerState
+  TPlayerState,
+  Actor
 } from '@bespoke/server';
 import { GameOver } from "@elf/protocol";
 import {
@@ -67,7 +68,7 @@ export default class Controller extends BaseController<
           return;
         }
         this.initPlayer(playerState);
-        if ((playerState.actor.type = baseEnum.Actor.serverRobot)) {
+        if ((playerState.actor.type = Actor.serverRobot)) {
           this.push(playerState.actor, PushType.robotShout);
         }
         break;

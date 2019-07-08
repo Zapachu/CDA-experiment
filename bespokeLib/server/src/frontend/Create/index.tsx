@@ -1,8 +1,8 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {HistoryGame} from './HistoryGame'
-import {Button, ButtonProps, Input, Label, Lang, Markdown, Toast} from '@elf/component'
-import {baseEnum, IGameConfig} from '@bespoke/share'
+import {AcademusRole, Button, ButtonProps, Input, Label, Lang, Markdown, ResponseCode, Toast} from '@elf/component'
+import {IGameConfig} from '@bespoke/share'
 import {Api, TPageProps} from '../util'
 
 const SubmitBarHeight = '5rem'
@@ -20,7 +20,7 @@ export function Create({user, history, gameTemplate: {Create: GameCreate}}: TPag
         [params, setParams] = React.useState({}),
         [submitable, setSubmitable] = React.useState(true)
     React.useEffect(() => {
-        if (user && user.role === baseEnum.AcademusRole.teacher) {
+        if (user && user.role === AcademusRole.teacher) {
             return
         }
         history.push('/join')
@@ -28,7 +28,7 @@ export function Create({user, history, gameTemplate: {Create: GameCreate}}: TPag
 
     async function submit() {
         const {code, gameId} = await Api.newGame({title, desc, params})
-        if (code === baseEnum.ResponseCode.success) {
+        if (code === ResponseCode.success) {
             Toast.success(lang.CreateSuccess)
             setTimeout(() => history.push(`/play/${gameId}`), 1000)
         } else {

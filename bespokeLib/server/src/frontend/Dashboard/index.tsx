@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {baseEnum, IGameThumb} from '@bespoke/share'
+import {AcademusRole, IGameThumb, ResponseCode} from '@bespoke/share'
 import {Button, Lang} from '@elf/component'
 import {Api, TPageProps} from '../util'
 import * as dateFormat from 'dateformat'
@@ -12,8 +12,8 @@ export function Dashboard({history, user}: TPageProps) {
     })
     const [historyGameThumbs, setHistoryGameThumbs] = React.useState<Array<IGameThumb>>([])
     React.useEffect(() => {
-        if (user && user.role === baseEnum.AcademusRole.teacher) {
-            Api.getHistoryGames().then(({code, historyGameThumbs}) => code === baseEnum.ResponseCode.success ? setHistoryGameThumbs(historyGameThumbs) : null)
+        if (user && user.role === AcademusRole.teacher) {
+            Api.getHistoryGames().then(({code, historyGameThumbs}) => code === ResponseCode.success ? setHistoryGameThumbs(historyGameThumbs) : null)
         } else {
             history.push('/join')
         }

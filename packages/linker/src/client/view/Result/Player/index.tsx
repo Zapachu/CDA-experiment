@@ -1,7 +1,8 @@
 import * as React from 'react'
 import {RouteComponentProps} from 'react-router-dom'
 import {Api, Lang} from '@client-util'
-import {baseEnum, TApiPlayerResults} from '@common'
+import {TApiPlayerResults} from '@common'
+import {ResponseCode} from '@elf/share'
 import * as style from './style.scss'
 
 interface IState {
@@ -20,7 +21,7 @@ export class PlayerResult extends React.Component<RouteComponentProps<{ gameId: 
     async componentDidMount(): Promise<void> {
         const {props: {match: {params: {gameId, playerId}}}} = this
         const {code, results} = await Api.getPlayerResult(gameId, playerId)
-        if (code === baseEnum.ResponseCode.success) {
+        if (code === ResponseCode.success) {
             this.setState({results})
         }
     }

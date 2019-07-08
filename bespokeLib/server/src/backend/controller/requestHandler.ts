@@ -1,13 +1,13 @@
-import {baseEnum, IGameThumb} from '@bespoke/share'
+import {AcademusRole, IGameThumb, ResponseCode} from '@bespoke/share'
 import {redisClient} from '@elf/protocol'
 import {Request, Response} from 'express'
 import * as passport from 'passport'
 import {elfSetting} from '@elf/setting'
-import {Log} from '@elf/util'
-import {CONFIG, RedisKey, Setting, Token} from '../util'
+import {Log, Token} from '@elf/util'
+import {CONFIG, RedisKey, Setting} from '../util'
 import {PassportStrategy} from '../interface'
 import {GameModel, MoveLogModel, SimulatePlayerModel, UserDoc, UserModel} from '../model'
-import {GameDAO, BaseLogic, UserService} from '../service'
+import {BaseLogic, GameDAO, UserService} from '../service'
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -33,20 +33,20 @@ Object.assign(window, {
             case UserService.sendVerifyCodeResCode.tooManyTimes:
             case UserService.sendVerifyCodeResCode.countingDown: {
                 res.json({
-                    code: baseEnum.ResponseCode.invalidInput,
+                    code: ResponseCode.invalidInput,
                     msg: sendResult.msg
                 })
                 break
             }
             case UserService.sendVerifyCodeResCode.sendError: {
                 res.json({
-                    code: baseEnum.ResponseCode.serverError
+                    code: ResponseCode.serverError
                 })
                 break
             }
             case UserService.sendVerifyCodeResCode.success: {
                 res.json({
-                    code: baseEnum.ResponseCode.success
+                    code: ResponseCode.success
                 })
             }
         }
@@ -57,27 +57,27 @@ Object.assign(window, {
         const _verifyCode = await redisClient.get(RedisKey.verifyCode(nationCode, mobile))
         if (elfSetting.inProductEnv && verifyCode !== _verifyCode) {
             return res.json({
-                code: baseEnum.ResponseCode.notFound
+                code: ResponseCode.notFound
             })
         }
         let user = await UserModel.findOne({mobile})
         if (!user) {
             await new UserModel({
                 mobile,
-                role: baseEnum.AcademusRole.teacher
+                role: AcademusRole.teacher
             }).save()
         }
         passport.authenticate(PassportStrategy.local, function (err, user) {
             if (err || !user) {
                 res.json({
-                    code: baseEnum.ResponseCode.notFound
+                    code: ResponseCode.notFound
                 })
             }
             req.logIn(user, err => {
                 res.json(err ? {
-                    code: baseEnum.ResponseCode.notFound
+                    code: ResponseCode.notFound
                 } : {
-                    code: baseEnum.ResponseCode.success,
+                    code: ResponseCode.success,
                     returnToUrl
                 })
             })
@@ -87,19 +87,19 @@ Object.assign(window, {
     static async handleLogout(req: Express.Request, res: Response) {
         req.logOut()
         res.json({
-            code: baseEnum.ResponseCode.success
+            code: ResponseCode.success
         })
     }
 
     static getUser(req, res: Response) {
         if (!req.user) {
             return res.json({
-                code: baseEnum.ResponseCode.notFound
+                code: ResponseCode.notFound
             })
         }
         const {id, mobile, role} = req.user as UserDoc
         res.json({
-            code: baseEnum.ResponseCode.success,
+            code: ResponseCode.success,
             user: {id, mobile, role}
         })
     }
@@ -114,13 +114,13 @@ export class GameCtrl {
                 game = (await BaseLogic.getLogic(gameId)).getGame4Player()
             }
             res.json({
-                code: baseEnum.ResponseCode.success,
+                code: ResponseCode.success,
                 game
             })
         } catch (e) {
             Log.e(e)
             res.json({
-                code: baseEnum.ResponseCode.notFound
+                code: ResponseCode.notFound
             })
         }
     }
@@ -129,10 +129,10 @@ export class GameCtrl {
         const {game} = req.body, owner = req.user
         const gameId = await GameDAO.newGame(owner, game)
         res.json(gameId ? {
-            code: baseEnum.ResponseCode.success,
+            code: ResponseCode.success,
             gameId
         } : {
-            code: baseEnum.ResponseCode.serverError
+            code: ResponseCode.serverError
         })
     }
 
@@ -142,7 +142,7 @@ export class GameCtrl {
         const {title} = await GameDAO.getGame(gameId)
         if (shareCode) {
             return res.json({
-                code: baseEnum.ResponseCode.success,
+                code: ResponseCode.success,
                 title,
                 shareCode
             })
@@ -152,13 +152,13 @@ export class GameCtrl {
             await redisClient.setex(RedisKey.share_GameCode(gameId), CONFIG.shareCodeLifeTime, shareCode)
             await redisClient.setex(RedisKey.share_CodeGame(shareCode), CONFIG.shareCodeLifeTime, gameId)
             res.json({
-                code: baseEnum.ResponseCode.success,
+                code: ResponseCode.success,
                 title,
                 shareCode
             })
         } catch (e) {
             res.js({
-                code: baseEnum.ResponseCode.serverError
+                code: ResponseCode.serverError
             })
         }
     }
@@ -167,10 +167,10 @@ export class GameCtrl {
         const {body: {code}} = req
         const gameId = await redisClient.get(RedisKey.share_CodeGame(code))
         res.json(gameId ? {
-            code: baseEnum.ResponseCode.success,
+            code: ResponseCode.success,
             gameId
         } : {
-            code: baseEnum.ResponseCode.notFound
+            code: ResponseCode.notFound
         })
     }
 
@@ -179,7 +179,7 @@ export class GameCtrl {
         const simulatePlayers = (await SimulatePlayerModel.find({gameId}))
             .map(({gameId, token, name}) => ({gameId, token, name}))
         res.json({
-            code: baseEnum.ResponseCode.success,
+            code: ResponseCode.success,
             simulatePlayers
         })
     }
@@ -190,12 +190,12 @@ export class GameCtrl {
         try {
             await new SimulatePlayerModel({gameId, token, name}).save()
             res.json({
-                code: baseEnum.ResponseCode.success,
+                code: ResponseCode.success,
                 token
             })
         } catch (e) {
             res.json({
-                code: baseEnum.ResponseCode.serverError
+                code: ResponseCode.serverError
             })
         }
     }
@@ -205,13 +205,13 @@ export class GameCtrl {
         try {
             const moveLogs = await MoveLogModel.find({gameId}).lean()
             res.json({
-                code: baseEnum.ResponseCode.success,
+                code: ResponseCode.success,
                 moveLogs
             })
         } catch (err) {
             Log.e(err)
             res.json({
-                code: baseEnum.ResponseCode.serverError
+                code: ResponseCode.serverError
             })
         }
     }
@@ -226,12 +226,12 @@ export class GameCtrl {
                 .limit(CONFIG.historyGamesListSize)
                 .sort({createAt: -1})).map(({id, namespace, title, createAt}) => ({id, namespace, title, createAt}))
             res.json({
-                code: baseEnum.ResponseCode.success,
+                code: ResponseCode.success,
                 historyGameThumbs
             })
         } catch (err) {
             res.json({
-                code: baseEnum.ResponseCode.serverError
+                code: ResponseCode.serverError
             })
         }
     }

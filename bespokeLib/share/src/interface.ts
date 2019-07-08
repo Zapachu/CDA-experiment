@@ -1,7 +1,8 @@
-import {AcademusRole, Actor, GameStatus, SyncStrategy} from './enum'
+import {GameStatus, SyncStrategy} from './enum'
 import {EventEmitter} from 'events'
 import {Socket} from 'socket.io-client'
 import {Diff} from 'deep-diff'
+import {AcademusRole, IActor} from '@elf/share'
 
 export type TSocket = typeof Socket
 
@@ -12,11 +13,6 @@ export interface IUser {
 
 export interface IUserWithId extends IUser {
     id: string
-}
-
-export interface IActor {
-    token: string
-    type: Actor
 }
 
 export interface ISimulatePlayer {
