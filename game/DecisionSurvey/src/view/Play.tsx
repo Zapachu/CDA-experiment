@@ -1,19 +1,16 @@
 import * as React from "react";
-import {
-  Button,
-  Container,
-  Col,
-  Row,
-  InputGroup,
-  Form,
-  FormControl
-} from "react-bootstrap";
-// const ButtonBS = require("react-bootstrap/Button");
-// const Button = require("react-bootstrap/Button");
-// const InputGroup = require("react-bootstrap/InputGroup");
-import "bootstrap/dist/css/bootstrap.min.css";
+// import { Col, Row, Input, Radio } from "antd";
+import Button from "antd/es/button";
+import Row from "antd/es/row";
+import Input from "antd/es/input";
+import Radio from "antd/es/radio";
+import "antd/es/button/style";
+import "antd/es/radio/style";
+import "antd/es/row/style";
+import "antd/es/input/style";
+
 import * as style from "./style.scss";
-import { Input, Radio, Request, Toast } from "@elf/component";
+import { Request, Toast } from "@elf/component";
 import { Core } from "@bespoke/register";
 import {
   CARD,
@@ -40,6 +37,8 @@ interface IPlayState {
   age: string;
   institute: string;
   grade: string;
+  name: string;
+  timer: number;
 }
 
 enum STAGE {
@@ -52,6 +51,7 @@ enum STAGE {
 enum STATUS {
   playing,
   info,
+  random,
   waiting,
   result
 }
@@ -84,6 +84,7 @@ export class Play extends Core.Play<
   IPushParams,
   IPlayState
 > {
+  private interval: NodeJS.Timer;
   constructor(props) {
     super(props);
     const len = Object.values(props.playerState.answer).length;
@@ -100,7 +101,9 @@ export class Play extends Core.Play<
       gender: undefined,
       age: undefined,
       institute: undefined,
-      grade: undefined
+      grade: undefined,
+      name: undefined,
+      timer: this.getTimer(stage)
     };
   }
 
@@ -115,15 +118,44 @@ export class Play extends Core.Play<
       { gameId: game.id },
       { token: actor.token, actorType: actor.type }
     );
+    this.ticking(this.state.timer);
   }
+
+  getTimer = (stage: STAGE): number => {
+    switch (stage) {
+      case STAGE.beginning:
+      case STAGE.instruction14:
+      case STAGE.instruction56: {
+        return 20;
+      }
+      case STAGE.playing: {
+        return 40;
+      }
+    }
+  };
+
+  ticking = (duration: number) => {
+    clearInterval(this.interval);
+    this.setState({ timer: duration });
+    this.interval = setInterval(() => {
+      if (this.state.timer > 0) {
+        this.setState(({ timer }) => ({ timer: timer - 1 }));
+      } else {
+        clearInterval(this.interval);
+      }
+    }, 1000);
+  };
 
   getPlayerStatus = (): STATUS => {
     const { playerState, gameState } = this.props;
     if (gameState.card !== undefined) {
       return STATUS.result;
     }
+    // if (playerState.profitDecision56) {
+    //   return STATUS.waiting;
+    // }
     if (playerState.info) {
-      return STATUS.waiting;
+      return STATUS.random;
     }
     if (playerState.answer.hasOwnProperty(DECISION.six)) {
       return STATUS.info;
@@ -132,7 +164,16 @@ export class Play extends Core.Play<
   };
 
   renderPlaying = () => {
-    const { answer, card, gender, age, institute, grade } = this.state;
+    const {
+      answer,
+      card,
+      gender,
+      age,
+      institute,
+      grade,
+      name,
+      timer
+    } = this.state;
     const { playerState, gameState, frameEmitter } = this.props;
     const status = this.getPlayerStatus();
     switch (status) {
@@ -156,42 +197,33 @@ export class Play extends Core.Play<
               })}
             {page.questions.map(({ title, options }, i) => {
               return (
-                <div key={i}>
+                <div key={i} className={style.question}>
                   <Row>{title}</Row>
-                  {/* <Radio
-                    value={i === 0 ? answer : card}
-                    options={options}
-                    onChange={val => {
+                  <Radio.Group
+                    onChange={e => {
                       i === 0
-                        ? this.setState({ answer: "" + val })
-                        : this.setState({ card: val as CARD });
+                        ? this.setState({ answer: "" + e.target.value })
+                        : this.setState({ card: e.target.value as CARD });
                     }}
-                  /> */}
-                  <Form.Group>
+                    value={i === 0 ? answer : card}
+                  >
                     {options.map(({ label, value }) => {
                       return (
-                        <Form.Check
-                          type="radio"
+                        <Radio
+                          className={style.radio}
                           key={value}
-                          id={value}
-                          label={label}
-                          name={`radio-${i}`}
-                          value={i === 0 ? answer : card}
-                          onChange={() => {
-                            i === 0
-                              ? this.setState({ answer: "" + value })
-                              : this.setState({ card: value as CARD });
-                          }}
-                        />
+                          value={value}
+                        >
+                          {label}
+                        </Radio>
                       );
                     })}
-                  </Form.Group>
+                  </Radio.Group>
                 </div>
               );
             })}
             <Button
-              variant="primary"
-              size="sm"
+              disabled={timer > 0}
               onClick={() => {
                 if (page.required.some(required => !this.state[required])) {
                   return Toast.warn("请选择");
@@ -205,16 +237,18 @@ export class Play extends Core.Play<
                   }
                 );
                 if (decision === DECISION.four) {
+                  this.ticking(20);
                   return this.setState({
                     stage: STAGE.instruction56,
                     answer: undefined,
                     card: undefined
                   });
                 }
+                this.ticking(40);
                 this.setState({ answer: undefined, card: undefined });
               }}
             >
-              确定
+              确定{timer > 0 ? `(${timer}s)` : ""}
             </Button>
           </div>
         );
@@ -225,96 +259,56 @@ export class Play extends Core.Play<
             <Row>
               问卷决策环节到此结束，下面请填写你的个人信息（我们将严格保密）。
             </Row>
-            <Row>
-              <Col md={6}>
-                <InputGroup size="sm">
-                  <InputGroup.Prepend>
-                    <InputGroup.Text>性别</InputGroup.Text>
-                  </InputGroup.Prepend>
-                  <FormControl
-                    value={gender}
-                    onChange={val => this.setState({ gender: val as GENDER })}
-                  />
-                </InputGroup>
-              </Col>
-            </Row>
-            <Row>
-              <Col md={6}>
-                <InputGroup size="sm">
-                  <InputGroup.Prepend>
-                    <InputGroup.Text>年龄</InputGroup.Text>
-                  </InputGroup.Prepend>
-                  <FormControl
-                    value={age}
-                    onChange={e => this.setState({ age: "" + e.target.value })}
-                  />
-                </InputGroup>
-              </Col>
-            </Row>
-            <Row>
-              <Col md={6}>
-                <InputGroup size="sm">
-                  <InputGroup.Prepend>
-                    <InputGroup.Text>专业</InputGroup.Text>
-                  </InputGroup.Prepend>
-                  <FormControl
-                    value={institute}
-                    onChange={e =>
-                      this.setState({ institute: "" + e.target.value })
-                    }
-                  />
-                </InputGroup>
-              </Col>
-            </Row>
-            <Row>
-              <Col md={6}>
-                <InputGroup size="sm">
-                  <InputGroup.Prepend>
-                    <InputGroup.Text>年级</InputGroup.Text>
-                  </InputGroup.Prepend>
-                  <FormControl
-                    value={grade}
-                    onChange={e =>
-                      this.setState({ grade: "" + e.target.value })
-                    }
-                  />
-                </InputGroup>
-              </Col>
-            </Row>
-            {/* <div>
+            <div className={style.info}>
               <label>性别</label>
-              <Radio
+              <Radio.Group
+                onChange={e =>
+                  this.setState({ gender: e.target.value as GENDER })
+                }
                 value={gender}
-                options={[GENDER.male, GENDER.female]}
-                onChange={val => this.setState({ gender: val as GENDER })}
-              />
+              >
+                <Radio value={GENDER.male}>男</Radio>
+                <Radio value={GENDER.female}>女</Radio>
+              </Radio.Group>
             </div>
-            <div>
+            <div className={style.info}>
               <label>年龄</label>
               <Input
                 value={age}
                 onChange={e => this.setState({ age: "" + e.target.value })}
               />
             </div>
-            <div>
-              <label>院系</label>
+            <div className={style.info}>
+              <label>姓名</label>
+              <Input
+                value={name}
+                onChange={e => this.setState({ name: "" + e.target.value })}
+              />
+            </div>
+            <div className={style.info}>
+              <label>专业</label>
               <Input
                 value={institute}
                 onChange={e =>
                   this.setState({ institute: "" + e.target.value })
                 }
               />
-            </div> */}
+            </div>
+            <div className={style.info}>
+              <label>年级</label>
+              <Input
+                value={grade}
+                onChange={e => this.setState({ grade: "" + e.target.value })}
+              />
+            </div>
             <Button
-              variant="primary"
-              size="sm"
               onClick={() => {
                 if (!gender || !age || !institute || !grade) {
                   return Toast.warn("请填写个人信息");
                 }
                 frameEmitter.emit(
                   MoveType.info,
-                  { gender, age, institute, grade },
+                  { gender, age, institute, grade, name },
                   error => {
                     Toast.warn(error);
                   }
@@ -326,13 +320,78 @@ export class Play extends Core.Play<
           </div>
         );
       }
-      case STATUS.waiting: {
+      case STATUS.random: {
         return (
-          <div>
-            <p>等待老师结束实验</p>
+          <div className={style.stage}>
+            <Row>
+              请首先在1-4之间随机抽取一个数字决定第一部分中用于支付的问题。（如果你抽中的问题涉及抽牌，我们将在实验结束后安排现场抽牌，根据抽中的牌的颜色以及你在相应问题中猜测的颜色决定你的最终收益）
+            </Row>
+            <Row>
+              {!playerState.profitDecision14 ? (
+                <Button
+                  onClick={() => {
+                    frameEmitter.emit(MoveType.random, {
+                      randomKey: "profitDecision14"
+                    });
+                  }}
+                >
+                  抽取
+                </Button>
+              ) : (
+                `已抽取决策${playerState.profitDecision14}`
+              )}
+            </Row>
+            <Row>
+              对于第二部分，请先在1-100中随机抽取一个数字（你抽取的数字和你的配对者抽取的数字中更大的一方将被选中）
+            </Row>
+            <Row>
+              {!playerState.random100 ? (
+                <Button
+                  disabled={!playerState.profitDecision14}
+                  onClick={() => {
+                    frameEmitter.emit(MoveType.random, {
+                      randomKey: "random100"
+                    });
+                  }}
+                >
+                  抽取
+                </Button>
+              ) : (
+                `已抽取数字${playerState.random100}`
+              )}
+            </Row>
+            <Row>
+              再从5和6之中随机抽取一个数字（我们将根据被选中方最终抽取的数字决定你们双方在第二部分的最终收益）
+            </Row>
+            <Row>
+              {!playerState.random56 ? (
+                <Button
+                  disabled={!playerState.random100}
+                  onClick={() => {
+                    frameEmitter.emit(MoveType.random, {
+                      randomKey: "random56"
+                    });
+                  }}
+                >
+                  抽取
+                </Button>
+              ) : (
+                `已抽取决策${playerState.random56}`
+              )}
+            </Row>
+            {playerState.random56 ? (
+              <Row>等待老师结束实验并计算收益...</Row>
+            ) : null}
           </div>
         );
       }
+      // case STATUS.waiting: {
+      //   return (
+      //     <div>
+      //       <p>等待老师结束实验</p>
+      //     </div>
+      //   );
+      // }
       case STATUS.result: {
         return (
           <div>
@@ -372,30 +431,30 @@ export class Play extends Core.Play<
 
   renderStage = () => {
     // const { playerState, gameState } = this.props;
-    const { stage } = this.state;
+    const { stage, timer } = this.state;
     switch (stage) {
       case STAGE.beginning: {
         return (
           <div className={style.stage}>
-            <Row className="justify-content-center">问卷说明</Row>
-            <Row className="justify-content-center">
+            <Row>问卷说明</Row>
+            <Row>
               欢迎参加本次的决策问卷，你在本问卷中的所有信息都将被严格保密。
             </Row>
-            <Row className="justify-content-center">
+            <Row>
               本次问卷共包含6个决策问题，1-4为个人决策问题，5-6为涉及他人的决策问题。
             </Row>
-            <Row className="justify-content-center">
+            <Row>
               我们将根据你在问卷中的决策实现你的收益（通过微信转账）。每个决策都有一定的机会被选中，因此，请认真对待每个决策，并根据你的真实偏好做出选择。
             </Row>
-            <Row className="justify-content-center">
+            <Row>
               <Button
-                variant="primary"
-                size="sm"
+                disabled={timer > 0}
                 onClick={() => {
                   this.setState({ stage: STAGE.instruction14 });
+                  this.ticking(20);
                 }}
               >
-                下一页
+                下一页{timer > 0 ? `(${timer}s)` : ""}
               </Button>
             </Row>
           </div>
@@ -403,43 +462,23 @@ export class Play extends Core.Play<
       }
       case STAGE.instruction14: {
         return (
-          // <div>
-          //   <p>以下为实验第一部分，包括决策问题1-4。</p>
-          //   <p>
-          //     决策问题1-4涉及个人决策，最终我们将在4组问题中随机选择1组，并根据你在该组中的选择实现你的最终收益。
-          //   </p>
-          //   <p>
-          //     在这份问卷里，你共需做出5组决策。最后，我们会随机选择6组决策中的一组，并根据你在该决策中的选择实现你最终的收益。每组问题有相同的概率被选中，请认真对待每组决策。
-          //   </p>
-          //   <Button
-          //     variant="primary"
-          //     size="sm"
-          //     onClick={() => {
-          //       this.setState({ stage: STAGE.playing });
-          //     }}
-          //   >
-          //     下一页
-          //   </Button>
-          // </div>
           <div className={style.stage}>
-            <Row className="justify-content-center">
-              以下为问卷第一部分，包括决策问题1-4。
-            </Row>
-            <Row className="justify-content-center">
+            <Row>以下为问卷第一部分，包括决策问题1-4。</Row>
+            <Row>
               4组决策问题均为个人决策，每组决策中你需要在七个选项中选择一个。
             </Row>
-            <Row className="justify-content-center">
+            <Row>
               最终我们将在4组问题中随机选择1组，并根据你在该组中的选择实现你的最终收益。
             </Row>
-            <Row className="justify-content-center">
+            <Row>
               <Button
-                variant="primary"
-                size="sm"
+                disabled={timer > 0}
                 onClick={() => {
                   this.setState({ stage: STAGE.playing });
+                  this.ticking(40);
                 }}
               >
-                下一页
+                下一页{timer > 0 ? `(${timer}s)` : ""}
               </Button>
             </Row>
           </div>
@@ -447,45 +486,24 @@ export class Play extends Core.Play<
       }
       case STAGE.instruction56: {
         return (
-          // <div>
-          //   <p>实验第一部分到此结束，下面开始实验第二部分，包括决策问题5-6。</p>
-          //   <p>
-          //     决策问题5-6涉及他人，具体来说，你将相应的问题中将决定甲乙双方的收益，其中甲方是你自己，乙方为调查员中随机与你配对的另外一个人（我们已经根据所有调查员的ID号完成随机配对）。与你配对这个人是匿名的，意味着你无法知道他或她的身份。
-          //   </p>
-          //   <p>
-          //     最终，我们会从每一组配对的甲乙双方中随机选择一位，并从其两组决策中随机选择一组，根据其在对应的选择中的决策决定你们双方各自的收入。即：如果你的某一次选择被选中，则你在该选择中的甲方对应你自己的收入，乙方对应与你配对的人的收入。如果与你配对的人的某次选择被选中，则她在该选择中的甲方对应她的收入，乙方对应你的收入。
-          //   </p>
-          //   <p>下面请开始你的选择。</p>
-          //   <Button
-          //     variant="primary"
-          //     size="sm"
-          //     onClick={() => {
-          //       this.setState({ stage: STAGE.playing });
-          //     }}
-          //   >
-          //     下一页
-          //   </Button>
-          // </div>
           <div className={style.stage}>
-            <Row className="justify-content-center">
-              问卷第一部分到此结束，下面开始第二部分，包括决策问题5-6。
-            </Row>
-            <Row className="justify-content-center">
+            <Row>问卷第一部分到此结束，下面开始第二部分，包括决策问题5-6。</Row>
+            <Row>
               这两组决策问题涉及他人，具体来说，你在决策中将决定甲乙双方的收益，其中甲方是你自己，乙方为调查员中随机与你配对的另外一个人（我们已经根据所有调查员的ID号完成随机配对）。与你配对这个人是匿名的，意味着你无法知道他或她的身份。
             </Row>
-            <Row className="justify-content-center">
+            <Row>
               最终，我们会从每一组配对的甲乙双方中随机选择一位，并从其两组决策中随机选择一组，根据其在对应的选择中的决策决定你们双方各自的收入。即：如果你的某一次决策被选中，则你在该决策中的选择将决定甲方（你自己）和乙方（与你配对的人）的收入。如果与你配对的人的某次决策被选中，则她在该决策中的选择将决定甲方（她）和乙方（你）的收入。
             </Row>
-            <Row className="justify-content-center">下面请开始你的选择。</Row>
-            <Row className="justify-content-center">
+            <Row>下面请开始你的选择。</Row>
+            <Row>
               <Button
-                variant="primary"
-                size="sm"
+                disabled={timer > 0}
                 onClick={() => {
                   this.setState({ stage: STAGE.playing });
+                  this.ticking(40);
                 }}
               >
-                下一页
+                下一页{timer > 0 ? `(${timer}s)` : ""}
               </Button>
             </Row>
           </div>
@@ -499,10 +517,6 @@ export class Play extends Core.Play<
 
   render() {
     const content = this.renderStage();
-    return (
-      <section className={style.play}>
-        <Container>{content}</Container>
-      </section>
-    );
+    return <section className={style.play}>{content}</section>;
   }
 }
