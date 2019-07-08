@@ -11,7 +11,7 @@ import {
     SocketEvent
 } from '@common'
 import {GameService} from './GameService'
-import {GameStateDoc, GameStateModel, PhaseResultModel} from '@server-model'
+import {GameStateDoc, GameStateModel, PlayerModel} from '@server-model'
 import {EventDispatcher} from '../controller/eventDispatcher'
 import {Log} from '@elf/util'
 import {NewPhase, RedisCall, SetPhaseResult} from '@elf/protocol'
@@ -95,21 +95,18 @@ export class StateManager {
     }
 
     async setPhaseResult(playUrl: string, playerToken: string, phaseResult: SetPhaseResult.IPhaseResult): Promise<void> {
-        const {game: {phaseConfigs}, gameState: {phaseStates}} = this
+        const {gameState: {phaseStates}} = this
         const curPhaseState = phaseStates.find(phaseState => phaseState.playUrl === playUrl),
-            curPhaseCfgIndex = phaseConfigs.findIndex(phaseCfg => phaseCfg.key === curPhaseState.key),
             playerCurPhaseState = curPhaseState.playerState[playerToken]
+        if(!playerCurPhaseState){
+            return
+        }
         playerCurPhaseState.phaseResult = {...playerCurPhaseState.phaseResult, ...phaseResult}
         if (!playerCurPhaseState || playerCurPhaseState.status === PlayerStatus.left) {
             Log.w('玩家不在此环节中')
         }
-        const query = {gameId: this.game.id, playerId: playerCurPhaseState.actor.playerId}
-        await PhaseResultModel.findOneAndUpdate(query, {
-            ...query,
-            phaseName: phaseConfigs[curPhaseCfgIndex].title,
-            ...playerCurPhaseState.phaseResult
-        }, {
-            upsert: true
+        PlayerModel.findByIdAndUpdate(playerCurPhaseState.actor.playerId, {
+            result:phaseResult
         })
     }
 

@@ -18,7 +18,6 @@ const apiRouter = Router()
         .post('/joinWithShareCode', GameCtrl.joinWithShareCode)
         .post('/join/:gameId', GameCtrl.joinGame)
         .get('/baseInfo/:gameId', GameCtrl.getBaseGame)
-        .get('/playerResult', GameCtrl.getPlayerResult)
         .get('/:gameId', GameCtrl.getGame)
     )
 

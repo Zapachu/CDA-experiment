@@ -74,6 +74,7 @@ export interface IPlayer {
     gameId: string
     userId: string
     reward: string
+    result?: SetPhaseResult.IPhaseResult
 }
 
 export interface IPlayerWithId {
@@ -117,6 +118,4 @@ export type TApiPlayers = Array<{
     userId: string,
     name: string
 }>
-
-export type TApiPlayerResults = Array<{ phaseName: string } & SetPhaseResult.IPhaseResult>
 //endregion
