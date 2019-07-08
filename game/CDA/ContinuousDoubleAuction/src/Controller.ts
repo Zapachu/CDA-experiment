@@ -6,7 +6,7 @@ import {
     TGameState,
     TPlayerState,
     Log,
-    Model
+    Model, GameStatus, Actor
 } from '@bespoke/server'
 import {
     DBKey,
@@ -92,7 +92,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         switch (type) {
             case MoveType.assignPosition: {
                 Object.values(playerStates).forEach(async playerState => {
-                    const positionIndex = (playerState.actor.type === baseEnum.Actor.serverRobot ?
+                    const positionIndex = (playerState.actor.type === Actor.serverRobot ?
                         this.positionStack.robot : this.positionStack.player).pop()
                     if (positionIndex === undefined) {
                         return Log.d('角色已分配完')
@@ -120,7 +120,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         let periodCountDown = 0
         this.broadcast(PushType.periodCountDown, {periodCountDown})
         const timer = global.setInterval(async () => {
-            if (gameState.status !== baseEnum.GameStatus.started) {
+            if (gameState.status !== GameStatus.started) {
                 return
             }
             const {durationOfEachPeriod, time2ReadInfo} = this.game.params.phases[gameState.gamePhaseIndex].params
@@ -223,7 +223,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             }
             case MoveType.sendBackPlayer: {
                 this.sendBackPlayer(actor.token, {
-                    point: playerState.point.toString()
+                    point: playerState.point
                 }, this.game.params.nextPhaseKey)
                 break
             }

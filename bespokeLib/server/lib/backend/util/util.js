@@ -34,61 +34,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-var __spread = (this && this.__spread) || function () {
-    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-    return ar;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 var share_1 = require("@bespoke/share");
 var setting_1 = require("@elf/setting");
 var util_1 = require("@elf/util");
 var path_1 = require("path");
 var fs_1 = require("fs");
-var objHash = require("object-hash");
 var protocol_1 = require("@elf/protocol");
 var config_1 = require("./config");
-var Token = /** @class */ (function () {
-    function Token() {
-    }
-    Token.geneCheckCode = function (chars) {
-        return String.fromCharCode(chars.map(function (c) { return c.charCodeAt(0); }).reduce(function (pre, cur) { return pre + cur; }) % 26 + 97);
-    };
-    Token.geneToken = function (obj) {
-        var token = objHash(obj, { algorithm: 'md5' });
-        return this.geneCheckCode(__spread(token)) + token;
-    };
-    Token.checkToken = function (token) {
-        var _a = __read(token), checkCode = _a[0], chars = _a.slice(1);
-        if (chars.length === 32 && checkCode === this.geneCheckCode(chars)) {
-            return true;
-        }
-        if (setting_1.elfSetting.bespokeWithLinker) {
-            return token.length === 32;
-        }
-        chars.length === 32 ? util_1.Log.w("Invalid Token: " + token) : null;
-        return false;
-    };
-    return Token;
-}());
-exports.Token = Token;
 function gameId2PlayUrl(gameId, keyOrToken) {
-    var query = keyOrToken ? "?token=" + (Token.checkToken(keyOrToken) ? keyOrToken : Token.geneToken(keyOrToken)) : '';
+    var query = keyOrToken ? "?token=" + (util_1.Token.checkToken(keyOrToken) ? keyOrToken : util_1.Token.geneToken(keyOrToken)) : '';
     return getOrigin() + "/" + share_1.config.rootName + "/" + Setting.namespace + "/play/" + gameId + query;
 }
 exports.gameId2PlayUrl = gameId2PlayUrl;

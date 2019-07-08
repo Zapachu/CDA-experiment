@@ -5,6 +5,7 @@ function __export(m) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var baseEnum = require("./enum");
 exports.baseEnum = baseEnum;
+__export(require("@elf/share"));
 __export(require("./enum"));
 __export(require("./class"));
 __export(require("./config"));

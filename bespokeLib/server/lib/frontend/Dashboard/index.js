@@ -30,10 +30,10 @@ function Dashboard(_a) {
     });
     var _b = __read(React.useState([]), 2), historyGameThumbs = _b[0], setHistoryGameThumbs = _b[1];
     React.useEffect(function () {
-        if (user && user.role === share_1.baseEnum.AcademusRole.teacher) {
+        if (user && user.role === share_1.AcademusRole.teacher) {
             util_1.Api.getHistoryGames().then(function (_a) {
                 var code = _a.code, historyGameThumbs = _a.historyGameThumbs;
-                return code === share_1.baseEnum.ResponseCode.success ? setHistoryGameThumbs(historyGameThumbs) : null;
+                return code === share_1.ResponseCode.success ? setHistoryGameThumbs(historyGameThumbs) : null;
             });
         }
         else {

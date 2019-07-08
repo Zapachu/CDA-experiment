@@ -8,13 +8,13 @@ import {
     IRobotHandshake,
     SocketEvent
 } from '@bespoke/share'
-import {getSocketPath, IpcConnection, Log, IpcEvent} from '@elf/util'
+import {getSocketPath, IpcConnection, IpcEvent, Log, Token} from '@elf/util'
 import {createServer, Socket} from 'net'
 import {existsSync, unlinkSync} from 'fs'
 import {Server} from 'http'
 import * as SocketIO from 'socket.io'
 import {GameDAO} from './GameDAO'
-import {Setting, Token} from '../util'
+import {Setting} from '../util'
 import {EventEmitter} from 'events'
 
 export class EventIO {
@@ -34,13 +34,13 @@ export class EventIO {
     static initSocketIOServer(server: Server, subscribeOnConnection: (connection: IConnection) => void): SocketIO.Server {
         this.socketIOServer = SocketIO(server, {path: config.socketPath(Setting.namespace)})
         this.socketIOServer.on(SocketEvent.connection, async (connection: SocketIO.Socket) => {
-            const {query: {token, gameId}, session: {passport: {user} = {user: undefined}}, sessionID} = connection.handshake
+            const {query: {token, gameId}, session: {passport: {user} = {user: undefined}, actor: linkerActor}, sessionID} = connection.handshake
             const game = await GameDAO.getGame(gameId)
             const actor: IActor = Token.checkToken(token) ?
                 game.owner === user ? {type: Actor.clientRobot, token} : {type: Actor.player, token} :
                 game.owner === user ?
                     {type: Actor.owner, token: Token.geneToken(user)} :
-                    {type: Actor.player, token: Token.geneToken(user || sessionID)}
+                    linkerActor || {type: Actor.player, token: Token.geneToken(user || sessionID)}
             subscribeOnConnection(Object.assign(connection, {actor, game}) as any)
         })
         return this.socketIOServer

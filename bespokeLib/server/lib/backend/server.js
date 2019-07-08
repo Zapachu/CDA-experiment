@@ -94,7 +94,7 @@ var Server = /** @class */ (function () {
     Server.initSessionMiddleware = function () {
         var RedisStore = connectRedis(expressSession);
         this.sessionMiddleware = expressSession({
-            name: 'academy.sid',
+            name: setting_1.elfSetting.sessionName,
             resave: true,
             saveUninitialized: true,
             secret: setting_1.elfSetting.sessionSecret,
@@ -243,7 +243,7 @@ var Server = /** @class */ (function () {
                         owner = _b.sent();
                         if (!!owner) return [3 /*break*/, 3];
                         return [4 /*yield*/, model_1.UserModel.create({
-                                role: share_1.baseEnum.AcademusRole.teacher,
+                                role: share_1.AcademusRole.teacher,
                                 mobile: mobile
                             })];
                     case 2:

@@ -76,20 +76,20 @@ var UserCtrl = /** @class */ (function () {
                             case service_1.UserService.sendVerifyCodeResCode.tooManyTimes:
                             case service_1.UserService.sendVerifyCodeResCode.countingDown: {
                                 res.json({
-                                    code: share_1.baseEnum.ResponseCode.invalidInput,
+                                    code: share_1.ResponseCode.invalidInput,
                                     msg: sendResult.msg
                                 });
                                 break;
                             }
                             case service_1.UserService.sendVerifyCodeResCode.sendError: {
                                 res.json({
-                                    code: share_1.baseEnum.ResponseCode.serverError
+                                    code: share_1.ResponseCode.serverError
                                 });
                                 break;
                             }
                             case service_1.UserService.sendVerifyCodeResCode.success: {
                                 res.json({
-                                    code: share_1.baseEnum.ResponseCode.success
+                                    code: share_1.ResponseCode.success
                                 });
                             }
                         }
@@ -110,7 +110,7 @@ var UserCtrl = /** @class */ (function () {
                         _verifyCode = _b.sent();
                         if (setting_1.elfSetting.inProductEnv && verifyCode !== _verifyCode) {
                             return [2 /*return*/, res.json({
-                                    code: share_1.baseEnum.ResponseCode.notFound
+                                    code: share_1.ResponseCode.notFound
                                 })];
                         }
                         return [4 /*yield*/, model_1.UserModel.findOne({ mobile: mobile })];
@@ -119,7 +119,7 @@ var UserCtrl = /** @class */ (function () {
                         if (!!user) return [3 /*break*/, 4];
                         return [4 /*yield*/, new model_1.UserModel({
                                 mobile: mobile,
-                                role: share_1.baseEnum.AcademusRole.teacher
+                                role: share_1.AcademusRole.teacher
                             }).save()];
                     case 3:
                         _b.sent();
@@ -128,14 +128,14 @@ var UserCtrl = /** @class */ (function () {
                         passport.authenticate(interface_1.PassportStrategy.local, function (err, user) {
                             if (err || !user) {
                                 res.json({
-                                    code: share_1.baseEnum.ResponseCode.notFound
+                                    code: share_1.ResponseCode.notFound
                                 });
                             }
                             req.logIn(user, function (err) {
                                 res.json(err ? {
-                                    code: share_1.baseEnum.ResponseCode.notFound
+                                    code: share_1.ResponseCode.notFound
                                 } : {
-                                    code: share_1.baseEnum.ResponseCode.success,
+                                    code: share_1.ResponseCode.success,
                                     returnToUrl: returnToUrl
                                 });
                             });
@@ -150,7 +150,7 @@ var UserCtrl = /** @class */ (function () {
             return __generator(this, function (_a) {
                 req.logOut();
                 res.json({
-                    code: share_1.baseEnum.ResponseCode.success
+                    code: share_1.ResponseCode.success
                 });
                 return [2 /*return*/];
             });
@@ -159,12 +159,12 @@ var UserCtrl = /** @class */ (function () {
     UserCtrl.getUser = function (req, res) {
         if (!req.user) {
             return res.json({
-                code: share_1.baseEnum.ResponseCode.notFound
+                code: share_1.ResponseCode.notFound
             });
         }
         var _a = req.user, id = _a.id, mobile = _a.mobile, role = _a.role;
         res.json({
-            code: share_1.baseEnum.ResponseCode.success,
+            code: share_1.ResponseCode.success,
             user: { id: id, mobile: mobile, role: role }
         });
     };
@@ -194,7 +194,7 @@ var GameCtrl = /** @class */ (function () {
                         _a.label = 4;
                     case 4:
                         res.json({
-                            code: share_1.baseEnum.ResponseCode.success,
+                            code: share_1.ResponseCode.success,
                             game: game
                         });
                         return [3 /*break*/, 6];
@@ -202,7 +202,7 @@ var GameCtrl = /** @class */ (function () {
                         e_1 = _a.sent();
                         util_1.Log.e(e_1);
                         res.json({
-                            code: share_1.baseEnum.ResponseCode.notFound
+                            code: share_1.ResponseCode.notFound
                         });
                         return [3 /*break*/, 6];
                     case 6: return [2 /*return*/];
@@ -221,10 +221,10 @@ var GameCtrl = /** @class */ (function () {
                     case 1:
                         gameId = _a.sent();
                         res.json(gameId ? {
-                            code: share_1.baseEnum.ResponseCode.success,
+                            code: share_1.ResponseCode.success,
                             gameId: gameId
                         } : {
-                            code: share_1.baseEnum.ResponseCode.serverError
+                            code: share_1.ResponseCode.serverError
                         });
                         return [2 /*return*/];
                 }
@@ -246,7 +246,7 @@ var GameCtrl = /** @class */ (function () {
                         title = (_a.sent()).title;
                         if (shareCode) {
                             return [2 /*return*/, res.json({
-                                    code: share_1.baseEnum.ResponseCode.success,
+                                    code: share_1.ResponseCode.success,
                                     title: title,
                                     shareCode: shareCode
                                 })];
@@ -262,7 +262,7 @@ var GameCtrl = /** @class */ (function () {
                     case 5:
                         _a.sent();
                         res.json({
-                            code: share_1.baseEnum.ResponseCode.success,
+                            code: share_1.ResponseCode.success,
                             title: title,
                             shareCode: shareCode
                         });
@@ -270,7 +270,7 @@ var GameCtrl = /** @class */ (function () {
                     case 6:
                         e_2 = _a.sent();
                         res.js({
-                            code: share_1.baseEnum.ResponseCode.serverError
+                            code: share_1.ResponseCode.serverError
                         });
                         return [3 /*break*/, 7];
                     case 7: return [2 /*return*/];
@@ -289,10 +289,10 @@ var GameCtrl = /** @class */ (function () {
                     case 1:
                         gameId = _a.sent();
                         res.json(gameId ? {
-                            code: share_1.baseEnum.ResponseCode.success,
+                            code: share_1.ResponseCode.success,
                             gameId: gameId
                         } : {
-                            code: share_1.baseEnum.ResponseCode.notFound
+                            code: share_1.ResponseCode.notFound
                         });
                         return [2 /*return*/];
                 }
@@ -314,7 +314,7 @@ var GameCtrl = /** @class */ (function () {
                             return ({ gameId: gameId, token: token, name: name });
                         });
                         res.json({
-                            code: share_1.baseEnum.ResponseCode.success,
+                            code: share_1.ResponseCode.success,
                             simulatePlayers: simulatePlayers
                         });
                         return [2 /*return*/];
@@ -329,7 +329,7 @@ var GameCtrl = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         gameId = req.params.gameId, name = req.body.name;
-                        token = util_2.Token.geneToken(Math.random());
+                        token = util_1.Token.geneToken(Math.random());
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 3, , 4]);
@@ -337,14 +337,14 @@ var GameCtrl = /** @class */ (function () {
                     case 2:
                         _a.sent();
                         res.json({
-                            code: share_1.baseEnum.ResponseCode.success,
+                            code: share_1.ResponseCode.success,
                             token: token
                         });
                         return [3 /*break*/, 4];
                     case 3:
                         e_3 = _a.sent();
                         res.json({
-                            code: share_1.baseEnum.ResponseCode.serverError
+                            code: share_1.ResponseCode.serverError
                         });
                         return [3 /*break*/, 4];
                     case 4: return [2 /*return*/];
@@ -366,7 +366,7 @@ var GameCtrl = /** @class */ (function () {
                     case 2:
                         moveLogs = _a.sent();
                         res.json({
-                            code: share_1.baseEnum.ResponseCode.success,
+                            code: share_1.ResponseCode.success,
                             moveLogs: moveLogs
                         });
                         return [3 /*break*/, 4];
@@ -374,7 +374,7 @@ var GameCtrl = /** @class */ (function () {
                         err_1 = _a.sent();
                         util_1.Log.e(err_1);
                         res.json({
-                            code: share_1.baseEnum.ResponseCode.serverError
+                            code: share_1.ResponseCode.serverError
                         });
                         return [3 /*break*/, 4];
                     case 4: return [2 /*return*/];
@@ -404,14 +404,14 @@ var GameCtrl = /** @class */ (function () {
                             return ({ id: id, namespace: namespace, title: title, createAt: createAt });
                         });
                         res.json({
-                            code: share_1.baseEnum.ResponseCode.success,
+                            code: share_1.ResponseCode.success,
                             historyGameThumbs: historyGameThumbs
                         });
                         return [3 /*break*/, 4];
                     case 3:
                         err_2 = _a.sent();
                         res.json({
-                            code: share_1.baseEnum.ResponseCode.serverError
+                            code: share_1.ResponseCode.serverError
                         });
                         return [3 /*break*/, 4];
                     case 4: return [2 /*return*/];

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {baseEnum} from '@bespoke/share'
+import {ResponseCode} from '@bespoke/share'
 import {CodePanel, Lang, Toast} from '@elf/component'
 import {Link} from 'react-router-dom'
 import {Api, TPageProps} from '../util'
@@ -15,7 +15,7 @@ export function Join({history}: TPageProps) {
     async function joinGame(code: string) {
         const res = await Api.joinGameWithCode(code)
         switch (res.code) {
-            case baseEnum.ResponseCode.success: {
+            case ResponseCode.success: {
                 history.push(`/info/${res.gameId}`)
                 break
             }

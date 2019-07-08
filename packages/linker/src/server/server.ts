@@ -40,7 +40,7 @@ class Server {
     private static initSessionMiddleware() {
         const RedisStore = connectRedis(expressSession)
         this.sessionMiddleware = expressSession({
-            name: 'academy.sid',
+            name: elfSetting.sessionName,
             resave: true,
             saveUninitialized: true,
             secret: elfSetting.sessionSecret,

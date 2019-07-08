@@ -4,7 +4,7 @@ import * as zlib from "zlib"
 const {Gzip} = require('zlib')
 import {generateInsertScript} from "./generateInsertScript"
 import {getNextPhaseUrl} from "./getNextPhaseUrl"
-import {ErrorPage} from '../../../common/utils'
+import {sendErrorPage} from '../../../common/utils'
 
 const rewriteResBuffers = async (proxyRes, req, res) => {
     const isInit = req.url.includes('/init')
@@ -17,7 +17,7 @@ const rewriteResBuffers = async (proxyRes, req, res) => {
 
         const phaseId = req.session.qualtricsPhaseId
 
-        if (!phaseId) return ErrorPage(res, 'Phase Error')
+        if (!phaseId) return sendErrorPage(res, 'Phase Error')
 
         console.log('Rewrite Buffer')
         const originWrite = res.write

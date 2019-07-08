@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from 'express'
-import {ErrorPage} from '../../../common/utils'
+import {sendErrorPage} from '../../../common/utils'
 import ListMap from '../utils/ListMap'
 import {ThirdPartPhase} from '../../../../core/server/models'
 import {elfSetting as elfSetting} from '@elf/setting'
@@ -15,6 +15,8 @@ import {
     virtualJsRoute
 } from '../config'
 import * as path from 'path'
+import {IActor} from '@elf/share'
+
 
 const START_SIGN = 'InitializeParticipant'
 const {oTreeProxy} = elfSetting
@@ -49,10 +51,10 @@ export const InitWork = (app) => {
 
         if (req.url.includes(reportScreenRoute)) {
             const phaseId = req.session.oTreePhaseId
-            const gameServicePlayerHash = req.session.token
+            const actor:IActor = req.session.actor
             const phase = await ThirdPartPhase.findById(phaseId)
-            const curPlayer = phase.playHash.filter(p => p.player.toString() === gameServicePlayerHash.toString())[0]
-            if (!curPlayer.hash) return ErrorPage(res, 'Wrong Player')
+            const curPlayer = phase.playHash.filter(p => p.player.toString() === actor.token)[0]
+            if (!curPlayer.hash) return sendErrorPage(res, 'Wrong Player')
 
             let jsonString = '', playerOtreeHash = ''
             playerOtreeHash = curPlayer.hash
@@ -63,7 +65,7 @@ export const InitWork = (app) => {
             req.on('end', async () => {
                 const body = JSON.parse(jsonString)
                 for (let ph of phase.playHash) {
-                    if (ph.player === gameServicePlayerHash) {
+                    if (ph.player === actor.token) {
                         ph.screen = JSON.stringify({winW: body.winW, winH: body.winH, ratio: body.ratio})
                         ph.referer = req.headers.referer
                         ph.userAgent = req.headers['user-agent']
@@ -105,7 +107,7 @@ export const InitWork = (app) => {
                 await RedisCall.call<SendBackPlayer.IReq, SendBackPlayer.IRes>(SendBackPlayer.name, {
                     elfGameId: phase.elfGameId,
                     playUrl: `${oTreeProxy}/init/${START_SIGN}/${phase._id}`,
-                    playerToken: gameServicePlayerHash,
+                    playerToken: actor.token,
                     phaseResult: {
                         uniKey: playerOtreeHash,
                         detailIframeUrl: `${oTreeProxy}${previewScreenXlsxRoute}/${phaseId}`
@@ -121,35 +123,35 @@ export const InitWork = (app) => {
 
         if (req.url.includes(initRoute)) {
             let findHash: string
-            const gameServicePlayerHash = req.session.token
+            const actor:IActor = req.session.actor
             const phaseId = req.path.split(`${START_SIGN}/`)[1]
 
             try {
                 const phase = await ThirdPartPhase.findById(phaseId).exec()
 
                 if (!phase) {
-                    return ErrorPage(okRes(), 'Phase Not Found')
+                    return sendErrorPage(okRes(), 'Phase Not Found')
                 }
 
                 req.session.oTreePhaseId = phase._id
 
-                if (phase.ownerToken.toString() === gameServicePlayerHash.toString()) {
+                if (phase.ownerToken.toString() === actor.token) {
                     const phaseParam = JSON.parse(phase.param)
                     return okRes().redirect(phaseParam.adminUrl)
                 }
 
-                const findExistOne = phase.playHash.filter(h => h.player === gameServicePlayerHash)
+                const findExistOne = phase.playHash.filter(h => h.player === actor.token)
                 if (findExistOne.length > 0) {
                     return okRes().redirect(`${elfSetting.oTreeProxy}/${START_SIGN}/${findExistOne[0].hash}`)
                 } else {
                     for (let ph of phase.playHash) {
                         if (ph.player === 'wait') {
                             findHash = ph.hash
-                            ph.player = gameServicePlayerHash
+                            ph.player = actor.token
                             break
                         }
                     }
-                    if (!findHash) return ErrorPage(okRes(), 'member full')
+                    if (!findHash) return sendErrorPage(okRes(), 'member full')
                     phase.markModified('playHash')
                     await phase.save()
                     return okRes().redirect(`${elfSetting.oTreeProxy}/${START_SIGN}/${findHash}`)
@@ -157,7 +159,7 @@ export const InitWork = (app) => {
             } catch (err) {
                 if (err) {
                     console.trace(err)
-                    return ErrorPage(okRes(), err)
+                    return sendErrorPage(okRes(), err)
                 }
             }
         }

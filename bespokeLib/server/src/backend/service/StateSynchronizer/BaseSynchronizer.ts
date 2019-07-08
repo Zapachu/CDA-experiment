@@ -1,4 +1,4 @@
-import {baseEnum, IActor, TGameState, TPlayerState} from '@bespoke/share'
+import {IActor, SocketEvent, TGameState, TPlayerState} from '@bespoke/share'
 import {GameDAO} from '../GameDAO'
 import {BaseLogic} from '../BaseLogic'
 import {EventIO} from '../EventIO'
@@ -39,7 +39,7 @@ export class GameStateSynchronizer<ICreateParams, IGameState, IPlayerState, Move
 
     async syncClientState(wholeState?: boolean) {
         const state = await this.getState(true)
-        EventIO.emitEvent(this.logic.game.id, baseEnum.SocketEvent.syncGameState_json, state)
+        EventIO.emitEvent(this.logic.game.id, SocketEvent.syncGameState_json, state)
     }
 }
 
@@ -75,7 +75,7 @@ export class PlayerStateSynchronizer<ICreateParams, IGameState, IPlayerState, Mo
     async syncClientState(wholeState?: boolean) {
         const gameState = await this.controller.stateManager.getGameState()
         const state = await this.getState()
-        EventIO.emitEvent(state.connectionId, baseEnum.SocketEvent.syncPlayerState_json, state)
-        EventIO.emitEvent(gameState.connectionId, baseEnum.SocketEvent.syncPlayerState_json, state, this.actor.token)
+        EventIO.emitEvent(state.connectionId, SocketEvent.syncPlayerState_json, state)
+        EventIO.emitEvent(gameState.connectionId, SocketEvent.syncPlayerState_json, state, this.actor.token)
     }
 }

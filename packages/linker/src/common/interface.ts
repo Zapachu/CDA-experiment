@@ -1,7 +1,8 @@
-import {PhaseStatus, PlayerStatus, Actor, AcademusRole} from './baseEnum'
+import {PhaseStatus, PlayerStatus} from './baseEnum'
 import {Socket} from 'socket.io-client'
 import {SetPhaseResult} from '@elf/protocol'
-import {baseEnum} from '@common'
+import {GameMode} from '@common'
+import {AcademusRole, Actor, IActor} from '@elf/share'
 
 export type TSocket = typeof Socket
 
@@ -17,11 +18,11 @@ export interface IUserWithId extends IUser {
     id: string
 }
 
-export interface IActor {
-    userId: string
-    userName: string
+export interface ILinkerActor extends IActor {
     token: string
     type: Actor
+    userId: string
+    userName: string
     playerId: string
 }
 
@@ -34,7 +35,7 @@ export interface IPhaseConfig<ICreateParam = {}> {
 }
 
 export interface IPlayerState {
-    actor: IActor
+    actor: ILinkerActor
     status: PlayerStatus
     phaseResult?: SetPhaseResult.IPhaseResult
 }
@@ -54,7 +55,7 @@ export interface IBaseGame {
     owner?: string
     orgCode?: string
     published?: boolean
-    mode: baseEnum.GameMode
+    mode: GameMode
 }
 
 export interface IBaseGameWithId extends IBaseGame {
@@ -69,17 +70,11 @@ export interface IGameWithId extends IGame {
     id: string
 }
 
-export interface IGameToUpdate {
-    // title?: string
-    // desc?: string
-    phaseConfigs?: Array<IPhaseConfig<{}>>
-    published?: boolean
-}
-
 export interface IPlayer {
     gameId: string
     userId: string
     reward: string
+    result?: SetPhaseResult.IPhaseResult
 }
 
 export interface IPlayerWithId {
@@ -123,6 +118,4 @@ export type TApiPlayers = Array<{
     userId: string,
     name: string
 }>
-
-export type TApiPlayerResults = Array<{ phaseName: string } & SetPhaseResult.IPhaseResult>
 //endregion

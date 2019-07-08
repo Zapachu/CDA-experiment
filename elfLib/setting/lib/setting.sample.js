@@ -8,6 +8,7 @@ exports["default"] = {
     mongoPass: '',
     redisHost: '127.0.0.1',
     redisPort: 6379,
+    sessionName: 'academy.sid',
     sessionSecret: 'sessionsecret',
     qiNiu: {
         upload: {

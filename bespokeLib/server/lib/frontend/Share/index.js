@@ -76,7 +76,7 @@ var Share = /** @class */ (function (_super) {
                     case 0: return [4 /*yield*/, util_1.Api.shareGame(this.props.match.params.gameId)];
                     case 1:
                         _a = _b.sent(), code = _a.code, shareCode = _a.shareCode, title = _a.title;
-                        if (code === share_1.baseEnum.ResponseCode.success) {
+                        if (code === share_1.ResponseCode.success) {
                             this.setState({ shareCode: shareCode, title: title });
                         }
                         else {

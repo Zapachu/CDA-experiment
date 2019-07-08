@@ -57,7 +57,7 @@ function Join(_a) {
                     case 1:
                         res = _a.sent();
                         switch (res.code) {
-                            case share_1.baseEnum.ResponseCode.success: {
+                            case share_1.ResponseCode.success: {
                                 history.push("/info/" + res.gameId);
                                 break;
                             }

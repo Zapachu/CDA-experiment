@@ -1,5 +1,5 @@
 import {Server} from 'http'
-import {config, baseEnum, IActor, IGameWithId} from '@common'
+import {config, IGameWithId, ILinkerActor, SocketEvent} from '@common'
 import * as socketIO from 'socket.io'
 import {EventHandler} from './eventHandler'
 import {Log} from '@elf/util'
@@ -9,7 +9,7 @@ import {UserModel} from '@server-model'
 
 export interface IConnection extends EventEmitter {
     id: string
-    actor: IActor
+    actor: ILinkerActor
     game: IGameWithId
 
     on(eventType: string, handler: IEventHandler): this
@@ -39,12 +39,12 @@ export class EventDispatcher {
 
     static startSocketService(server: Server): socketIO.Server {
         this.socket = socketIO(server, {path: config.socketPath})
-        this.socket.on(baseEnum.SocketEvent.connection, async (connection: socketIO.Socket) => {
+        this.socket.on(SocketEvent.connection, async (connection: socketIO.Socket) => {
             const {token, type, gameId, playerId} = connection.handshake.query
             const userId = connection.handshake.session.passport.user
             const game = await GameService.getGame(gameId)
             const {name} = await UserModel.findById(userId)
-            const actor: IActor = {token, type, userId, userName: name, playerId}
+            const actor: ILinkerActor = {token, type, userId, userName: name, playerId}
             this.subscribeOnConnection(Object.assign(connection, {actor, game}) as any)
         })
         return this.socket

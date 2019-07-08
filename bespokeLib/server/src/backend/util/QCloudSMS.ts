@@ -1,4 +1,4 @@
-import {baseEnum} from '@bespoke/share'
+import {NationCode} from '@bespoke/share'
 import {elfSetting} from '@elf/setting'
 import {Log} from '@elf/util'
 import * as QCloudSms from 'qcloudsms_js'
@@ -17,7 +17,7 @@ export class QCloudSMS {
     }
 
     static singleSenderWithParam(
-        nationCode: baseEnum.NationCode,
+        nationCode: NationCode,
         phoneNumber: string,
         templateId: string,
         params: Array<string>) {

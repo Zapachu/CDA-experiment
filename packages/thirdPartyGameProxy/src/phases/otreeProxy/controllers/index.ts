@@ -1,7 +1,8 @@
 import * as httpProxy from 'http-proxy'
 import {ThirdPartPhase} from "../../../core/server/models"
-import {ErrorPage} from "../../common/utils"
+import {sendErrorPage} from "../../common/utils"
 import {configs} from '../config'
+import {IActor} from '@elf/share'
 
 const proxy = httpProxy.createProxyServer({toProxy: true})
 
@@ -32,19 +33,19 @@ export class Ctrl {
         req.session.otreePort = port
 
         // recover router
+        const actor:IActor = req.session.actor
         let findHash: string
-        const gameServicePlayerHash = req.session.token
         const phase = await ThirdPartPhase.findById(phaseId).exec()
         if (!phase) {
-            return ErrorPage(res, 'Phase Not Found')
+            return sendErrorPage(res, 'Phase Not Found')
         }
         req.session.oTreePhaseId = phase._id
-        if (phase.ownerToken.toString() === gameServicePlayerHash.toString()) {
+        if (phase.ownerToken.toString() === actor.token.toString()) {
             const phaseParam = JSON.parse(phase.param)
             return res.redirect(phaseParam.adminUrl)
         }
 
-        const findExistOne = phase.playHash.filter(h => h.player === gameServicePlayerHash)
+        const findExistOne = phase.playHash.filter(h => h.player === actor.token)
 
         if (findExistOne.length > 0) {
 
@@ -55,13 +56,13 @@ export class Ctrl {
             for (let ph of phase.playHash) {
                 if (ph.player === 'wait') {
                     findHash = ph.hash
-                    ph.player = gameServicePlayerHash
+                    ph.player = actor.token
                     break
                 }
             }
 
             if (!findHash) {
-                return ErrorPage(res, 'member full')
+                return sendErrorPage(res, 'member full')
             }
 
             phase.markModified('playHash')

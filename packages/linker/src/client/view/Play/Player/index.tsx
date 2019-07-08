@@ -1,7 +1,7 @@
 import {connCtx} from "@client-util";
 import {playContext, rootContext, TPlayContext, TRootContext} from "@client-context";
 import * as React from "react";
-import {baseEnum, CorePhaseNamespace, IPhaseState} from '@common'
+import {CorePhaseNamespace, IPhaseState, PlayerStatus} from '@common'
 import {Loading} from '@client-component'
 
 @connCtx(rootContext)
@@ -28,11 +28,11 @@ export class Play4Player extends React.Component<TRootContext & TPlayContext> {
             return <h2>GAME OVER</h2>
         }
         switch (curPhaseState.playerState[actor.token].status) {
-            case baseEnum.PlayerStatus.playing: {
-                window.location.href = `${curPhaseState.playUrl}?token=${actor.token}`
+            case PlayerStatus.playing: {
+                window.location.href = curPhaseState.playUrl
                 return null
             }
-            case baseEnum.PlayerStatus.left: {
+            case PlayerStatus.left: {
                 return 'left'
             }
             default: {

@@ -29,7 +29,7 @@ export namespace SetPhaseResult {
 
     export interface IPhaseResult {
         uniKey?: string
-        point?: string
+        point?: number
         detailIframeUrl?: string
     }
 

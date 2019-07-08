@@ -47,6 +47,26 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spread = (this && this.__spread) || function () {
+    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
+    return ar;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var string_decoder_1 = require("string_decoder");
 var events_1 = require("events");
@@ -89,7 +109,7 @@ var CallbackHelper = /** @class */ (function () {
         }
         var cursor = +key.replace(CallbackHelper.prefix, '');
         var fn = this.cbMap.get(cursor);
-        fn.apply(void 0, args);
+        fn.apply(void 0, __spread(args));
         this.cbMap.delete(cursor);
     };
     CallbackHelper.prefix = 'cb_';
@@ -142,8 +162,8 @@ var IpcConnection = /** @class */ (function (_super) {
         for (var _i = 0; _i < arguments.length; _i++) {
             msgPack[_i] = arguments[_i];
         }
-        var event = msgPack[0], args = msgPack.slice(1);
-        return JSON.stringify([event].concat(args.map(function (arg) {
+        var _a = __read(msgPack), event = _a[0], args = _a.slice(1);
+        return JSON.stringify(__spread([event], args.map(function (arg) {
             if (typeof arg !== 'function') {
                 return arg;
             }
@@ -153,12 +173,12 @@ var IpcConnection = /** @class */ (function (_super) {
     IpcConnection.prototype.decode = function (msgStr) {
         var _a;
         var _this = this;
-        var _b = JSON.parse(msgStr), event = _b[0], args = _b.slice(1);
+        var _b = __read(JSON.parse(msgStr)), event = _b[0], args = _b.slice(1);
         if (event === IpcEvent.callback) {
-            (_a = this.callbackHelper).consume.apply(_a, args);
+            (_a = this.callbackHelper).consume.apply(_a, __spread(args));
             return [null];
         }
-        return [event].concat(args.map(function (arg) {
+        return __spread([event], args.map(function (arg) {
             if (!CallbackHelper.isKey(arg)) {
                 return arg;
             }
@@ -167,7 +187,7 @@ var IpcConnection = /** @class */ (function (_super) {
                 for (var _i = 0; _i < arguments.length; _i++) {
                     args[_i] = arguments[_i];
                 }
-                return _this.emit.apply(_this, [IpcEvent.callback, arg].concat(args));
+                return _this.emit.apply(_this, __spread([IpcEvent.callback, arg], args));
             };
         }));
     };
@@ -177,9 +197,9 @@ var IpcConnection = /** @class */ (function (_super) {
         var i, start = 0;
         while ((i = jsonBuffer.indexOf('\n', start)) >= 0) {
             var json = jsonBuffer.slice(start, i);
-            var _a = this.decode(json), event_1 = _a[0], args = _a.slice(1);
+            var _a = __read(this.decode(json)), event_1 = _a[0], args = _a.slice(1);
             if (this.eventNames().includes(event_1)) {
-                _super.prototype.emit.apply(this, [event_1].concat(args));
+                _super.prototype.emit.apply(this, __spread([event_1], args));
             }
             start = i + 1;
         }
@@ -193,7 +213,7 @@ var IpcConnection = /** @class */ (function (_super) {
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
-        return this.socket.write(this.encode.apply(this, args) + "\n");
+        return this.socket.write(this.encode.apply(this, __spread(args)) + "\n");
     };
     //region connect
     IpcConnection.CONNECT_TTL = 5;

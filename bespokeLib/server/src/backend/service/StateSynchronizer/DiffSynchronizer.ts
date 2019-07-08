@@ -1,5 +1,5 @@
 import {diff} from 'deep-diff'
-import {baseEnum, TGameState, TPlayerState} from '@bespoke/share'
+import {SocketEvent, TGameState, TPlayerState} from '@bespoke/share'
 import {GameStateSynchronizer, PlayerStateSynchronizer} from './BaseSynchronizer'
 import {EventIO} from '../EventIO'
 import cloneDeep = require('lodash/cloneDeep')
@@ -10,9 +10,9 @@ export class DiffGameStateSynchronizer<ICreateParams, IGameState, IPlayerState, 
     async syncClientState(wholeState?: boolean) {
         const state = await this.getState(true)
         if (wholeState) {
-            EventIO.emitEvent(this.logic.game.id, baseEnum.SocketEvent.syncGameState_json, cloneDeep(state))
+            EventIO.emitEvent(this.logic.game.id, SocketEvent.syncGameState_json, cloneDeep(state))
         } else {
-            EventIO.emitEvent(this.logic.game.id, baseEnum.SocketEvent.changeGameState_diff, diff(this.stateSnapshot || {}, state))
+            EventIO.emitEvent(this.logic.game.id, SocketEvent.changeGameState_diff, diff(this.stateSnapshot || {}, state))
         }
         this.stateSnapshot = cloneDeep(state)
     }
@@ -26,12 +26,12 @@ export class DiffPlayerStateSynchronizer<ICreateParams, IGameState, IPlayerState
         const state = await this.getState()
         if (wholeState) {
             const stateCopy = cloneDeep(state)
-            EventIO.emitEvent(state.connectionId, baseEnum.SocketEvent.syncPlayerState_json, stateCopy)
-            EventIO.emitEvent(gameState.connectionId, baseEnum.SocketEvent.syncPlayerState_json, stateCopy, this.actor.token)
+            EventIO.emitEvent(state.connectionId, SocketEvent.syncPlayerState_json, stateCopy)
+            EventIO.emitEvent(gameState.connectionId, SocketEvent.syncPlayerState_json, stateCopy, this.actor.token)
         } else {
             const stateChanges = diff(this.stateSnapshot || {}, state)
-            EventIO.emitEvent(state.connectionId, baseEnum.SocketEvent.changePlayerState_diff, stateChanges)
-            EventIO.emitEvent(gameState.connectionId, baseEnum.SocketEvent.changePlayerState_diff, stateChanges, this.actor.token)
+            EventIO.emitEvent(state.connectionId, SocketEvent.changePlayerState_diff, stateChanges)
+            EventIO.emitEvent(gameState.connectionId, SocketEvent.changePlayerState_diff, stateChanges, this.actor.token)
         }
         this.stateSnapshot = cloneDeep(state)
     }

@@ -1,4 +1,4 @@
-import {BaseController, baseEnum, IActor, IMoveCallback, TGameState, Model} from '@bespoke/server'
+import {BaseController, baseEnum, IActor, IMoveCallback, TGameState, Model, GameStatus} from '@bespoke/server'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
 import {GameStage, IResult, MoveType, PushType, SheetType} from './config'
 
@@ -71,7 +71,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             case MoveType.startMainTest: {
                 gameState.gameStage = GameStage.mainTest
                 this.timer = global.setInterval(async () => {
-                    if (gameState.status !== baseEnum.GameStatus.started) {
+                    if (gameState.status !== GameStatus.started) {
                         return
                     }
                     if (gameState.time++ >= timeLimit) {

@@ -1,11 +1,11 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {baseEnum, config} from '@bespoke/share'
+import {config, NationCode, ResponseCode} from '@bespoke/share'
 import {Lang, Toast} from '@elf/component'
 import {Api, TPageProps} from '../util'
 
 declare interface ILoginState {
-    nationCode: baseEnum.NationCode
+    nationCode: NationCode
     mobileNumber: string
     verifyCode: string
     counter: number
@@ -25,7 +25,7 @@ export class Login extends React.Component<TPageProps, ILoginState> {
     })
 
     state: ILoginState = {
-        nationCode: baseEnum.NationCode.China,
+        nationCode: NationCode.China,
         mobileNumber: '',
         verifyCode: '',
         counter: 0
@@ -63,10 +63,10 @@ export class Login extends React.Component<TPageProps, ILoginState> {
         const {nationCode, mobileNumber} = this.state
         const res = await Api.getVerifyCode(nationCode, mobileNumber)
         switch (res.code) {
-            case baseEnum.ResponseCode.success: {
+            case ResponseCode.success: {
                 return this.setState({counter: config.vcodeLifetime}, () => this.countDown())
             }
-            case baseEnum.ResponseCode.notFound: {
+            case ResponseCode.notFound: {
                 return Toast.warn(this.lang.accountNotExist)
             }
             default: {
@@ -81,7 +81,7 @@ export class Login extends React.Component<TPageProps, ILoginState> {
             return
         }
         const {code, returnToUrl} = await Api.login(nationCode, mobileNumber, verifyCode)
-        if (code === baseEnum.ResponseCode.success) {
+        if (code === ResponseCode.success) {
             location.href = returnToUrl || location.href
         } else {
             Toast.warn(this.lang.loginFailed)
@@ -138,9 +138,9 @@ export class Login extends React.Component<TPageProps, ILoginState> {
 }
 
 declare interface IMobileCodeInputProps {
-    nationCode: baseEnum.NationCode
+    nationCode: NationCode
     mobileNumber: string
-    changeNationCode: (nationCode: baseEnum.NationCode) => void,
+    changeNationCode: (nationCode: NationCode) => void,
     changeMobileNumber: (mobileNumber: string) => void
 }
 
@@ -170,7 +170,7 @@ class MobileNumberInput extends React.Component<IMobileCodeInputProps, IMobileCo
                 this.state.showNationSelector &&
                 <ul className={style.nationCodeSelector}>
                     {
-                        Object.entries(baseEnum.NationCode).map(([label, code]) => isNaN(Number(code)) ? null :
+                        Object.entries(NationCode).map(([label, code]) => isNaN(Number(code)) ? null :
                             <li key={label} onClick={() => {
                                 changeNationCode(code)
                                 this.setState({showNationSelector: false})

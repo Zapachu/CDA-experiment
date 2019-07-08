@@ -1,5 +1,16 @@
 import * as React from 'react'
-import {baseEnum, config, FrameEmitter, IActor, IGameWithId, TGameState, TPlayerState, TSocket} from '@bespoke/share'
+import {
+    Actor,
+    config,
+    FrameEmitter,
+    GameStatus,
+    IActor,
+    IGameWithId,
+    SocketEvent,
+    TGameState,
+    TPlayerState,
+    TSocket
+} from '@bespoke/share'
 import * as style from './style.scss'
 import {Lang, MaskLoading} from '@elf/component'
 import {Api, TPageProps} from '../util'
@@ -43,7 +54,7 @@ export class Play extends React.Component<TPageProps, IPlayState> {
             socketClient,
             frameEmitter: new FrameEmitter(socketClient as any)
         }), () =>
-            socketClient.emit(baseEnum.SocketEvent.online, (actor: IActor) => {
+            socketClient.emit(SocketEvent.online, (actor: IActor) => {
                 if (token && (actor.token !== token)) {
                     location.href = `${location.origin}${location.pathname}?token=${actor.token}`
                 } else {
@@ -57,17 +68,17 @@ export class Play extends React.Component<TPageProps, IPlayState> {
     }
 
     private registerStateReducer(socketClient: TSocket) {
-        socketClient.on(baseEnum.SocketEvent.syncGameState_json, (gameState: TGameState<{}>) => {
+        socketClient.on(SocketEvent.syncGameState_json, (gameState: TGameState<{}>) => {
             this.setState({gameState})
         })
-        socketClient.on(baseEnum.SocketEvent.changeGameState_diff, (stateChanges: Array<Diff<any>>) => {
+        socketClient.on(SocketEvent.changeGameState_diff, (stateChanges: Array<Diff<any>>) => {
             let gameState = cloneDeep(this.state.gameState) || {} as any
             stateChanges.forEach(change => applyChange(gameState, null, change))
             this.setState({gameState})
         })
-        socketClient.on(baseEnum.SocketEvent.syncPlayerState_json,
+        socketClient.on(SocketEvent.syncPlayerState_json,
             (playerState: TPlayerState<{}>, token?: string) => this.applyPlayerState(playerState, token))
-        socketClient.on(baseEnum.SocketEvent.changePlayerState_diff, (stateChanges: Array<Diff<any>>, token?: string) => {
+        socketClient.on(SocketEvent.changePlayerState_diff, (stateChanges: Array<Diff<any>>, token?: string) => {
             const {state: {playerStates}} = this
             let playerState: TPlayerState<{}> = cloneDeep(token ? playerStates[token] : this.state.playerState) || {} as any
             stateChanges.forEach(change => applyChange(playerState, null, change))
@@ -78,7 +89,7 @@ export class Play extends React.Component<TPageProps, IPlayState> {
                 }
             }) : this.setState({playerState})
         })
-        socketClient.on(baseEnum.SocketEvent.sendBack, (sendBackUrl: string) => {
+        socketClient.on(SocketEvent.sendBack, (sendBackUrl: string) => {
             setTimeout(() => {
                 location.href = sendBackUrl
             }, 1000)
@@ -108,7 +119,7 @@ export class Play extends React.Component<TPageProps, IPlayState> {
         if (!PRODUCT_ENV) {
             console.log(gameState, playerState || playerStates)
         }
-        if (actor.type === baseEnum.Actor.owner) {
+        if (actor.type === Actor.owner) {
             return <section className={style.play4owner}>
                 <GameControl {...{
                     game,
@@ -118,7 +129,7 @@ export class Play extends React.Component<TPageProps, IPlayState> {
                     historyPush: path => history.push(path)
                 }}/>
                 {
-                    gameState.status === baseEnum.GameStatus.over ?
+                    gameState.status === GameStatus.over ?
                         <GameResult {...{game, Result4Owner}}/> :
                         <Play4Owner {...{
                             game,
@@ -133,11 +144,11 @@ export class Play extends React.Component<TPageProps, IPlayState> {
             return <MaskLoading/>
         }
         switch (gameState.status) {
-            case baseEnum.GameStatus.paused:
+            case GameStatus.paused:
                 return <MaskLoading label={lang.Mask_GamePaused}/>
-            case baseEnum.GameStatus.started:
+            case GameStatus.started:
                 return <Play {...{game, gameState, playerState, frameEmitter}}/>
-            case baseEnum.GameStatus.over:
+            case GameStatus.over:
                 return <Result {...{game, gameState, playerState}}/>
         }
     }

@@ -109,7 +109,7 @@ var GameStateSynchronizer = /** @class */ (function () {
                     case 0: return [4 /*yield*/, this.getState(true)];
                     case 1:
                         state = _a.sent();
-                        EventIO_1.EventIO.emitEvent(this.logic.game.id, share_1.baseEnum.SocketEvent.syncGameState_json, state);
+                        EventIO_1.EventIO.emitEvent(this.logic.game.id, share_1.SocketEvent.syncGameState_json, state);
                         return [2 /*return*/];
                 }
             });
@@ -187,8 +187,8 @@ var PlayerStateSynchronizer = /** @class */ (function () {
                         return [4 /*yield*/, this.getState()];
                     case 2:
                         state = _a.sent();
-                        EventIO_1.EventIO.emitEvent(state.connectionId, share_1.baseEnum.SocketEvent.syncPlayerState_json, state);
-                        EventIO_1.EventIO.emitEvent(gameState.connectionId, share_1.baseEnum.SocketEvent.syncPlayerState_json, state, this.actor.token);
+                        EventIO_1.EventIO.emitEvent(state.connectionId, share_1.SocketEvent.syncPlayerState_json, state);
+                        EventIO_1.EventIO.emitEvent(gameState.connectionId, share_1.SocketEvent.syncPlayerState_json, state, this.actor.token);
                         return [2 /*return*/];
                 }
             });

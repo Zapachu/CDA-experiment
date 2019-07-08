@@ -67,10 +67,10 @@ var DiffGameStateSynchronizer = /** @class */ (function (_super) {
                     case 1:
                         state = _a.sent();
                         if (wholeState) {
-                            EventIO_1.EventIO.emitEvent(this.logic.game.id, share_1.baseEnum.SocketEvent.syncGameState_json, cloneDeep(state));
+                            EventIO_1.EventIO.emitEvent(this.logic.game.id, share_1.SocketEvent.syncGameState_json, cloneDeep(state));
                         }
                         else {
-                            EventIO_1.EventIO.emitEvent(this.logic.game.id, share_1.baseEnum.SocketEvent.changeGameState_diff, deep_diff_1.diff(this.stateSnapshot || {}, state));
+                            EventIO_1.EventIO.emitEvent(this.logic.game.id, share_1.SocketEvent.changeGameState_diff, deep_diff_1.diff(this.stateSnapshot || {}, state));
                         }
                         this.stateSnapshot = cloneDeep(state);
                         return [2 /*return*/];
@@ -99,13 +99,13 @@ var DiffPlayerStateSynchronizer = /** @class */ (function (_super) {
                         state = _a.sent();
                         if (wholeState) {
                             stateCopy = cloneDeep(state);
-                            EventIO_1.EventIO.emitEvent(state.connectionId, share_1.baseEnum.SocketEvent.syncPlayerState_json, stateCopy);
-                            EventIO_1.EventIO.emitEvent(gameState.connectionId, share_1.baseEnum.SocketEvent.syncPlayerState_json, stateCopy, this.actor.token);
+                            EventIO_1.EventIO.emitEvent(state.connectionId, share_1.SocketEvent.syncPlayerState_json, stateCopy);
+                            EventIO_1.EventIO.emitEvent(gameState.connectionId, share_1.SocketEvent.syncPlayerState_json, stateCopy, this.actor.token);
                         }
                         else {
                             stateChanges = deep_diff_1.diff(this.stateSnapshot || {}, state);
-                            EventIO_1.EventIO.emitEvent(state.connectionId, share_1.baseEnum.SocketEvent.changePlayerState_diff, stateChanges);
-                            EventIO_1.EventIO.emitEvent(gameState.connectionId, share_1.baseEnum.SocketEvent.changePlayerState_diff, stateChanges, this.actor.token);
+                            EventIO_1.EventIO.emitEvent(state.connectionId, share_1.SocketEvent.changePlayerState_diff, stateChanges);
+                            EventIO_1.EventIO.emitEvent(gameState.connectionId, share_1.SocketEvent.changePlayerState_diff, stateChanges, this.actor.token);
                         }
                         this.stateSnapshot = cloneDeep(state);
                         return [2 /*return*/];

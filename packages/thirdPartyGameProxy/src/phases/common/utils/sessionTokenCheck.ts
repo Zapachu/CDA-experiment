@@ -1,63 +1,23 @@
-'use strict'
+import {Express, NextFunction, Request, Response} from 'express'
+import {sendErrorPage} from './sendErrorPage'
 
-import {ErrorPage} from './errorPage'
-import {gen32Token} from './gen32Token'
+const EXCLUDE = [
+    'static',
+    '/phases/list'
+]
 
-const SessionTokenCheck = (app) => {
-    app.use((req, res, next) => {
-        console.log(req.url)
-
-        const excludes = [
-            'static',
-            '/phases/list'
-        ]
-
-        let ignore = false
-        let requrl = req.originalUrl
-
-        console.log(requrl)
-
-        console.log(excludes)
-
-        for (let url of excludes) {
-            if (requrl.includes(url)) {
-                ignore = true
-                break
-            }
-        }
-
-        if (ignore) {
+export function SessionTokenCheck(app: Express) {
+    app.use((req: Request, res: Response, next: NextFunction) => {
+        const {originalUrl, user, session} = req
+        if (EXCLUDE.some(route => originalUrl.includes(route))) {
             return next()
         }
-
-        if (req.user) {
-            const sessionToken = req.session.token
-            const sessionPlayerId = req.session.playerId
-            const convertToken = gen32Token(req.user._id.toString())
-
-            console.log(sessionToken)
-            console.log(sessionPlayerId)
-            console.log(convertToken)
-
-            if (sessionToken === convertToken) {
-                return next()
-            }
-
-            if (sessionPlayerId) {
-                const playerToken = gen32Token(sessionPlayerId)
-                console.log(playerToken)
-                if (playerToken === sessionToken) {
-                    return next()
-                }
-            }
-
-            return ErrorPage(res, 'Token Missing')
-        } else {
-            return ErrorPage(res, 'Not Login')
+        if (!user) {
+            return sendErrorPage(res, 'Not Login')
         }
+        if (!session.actor) {
+            return sendErrorPage(res, 'Token Missing')
+        }
+        next()
     })
-}
-
-export {
-    SessionTokenCheck
 }
