@@ -15,7 +15,7 @@ import * as morgan from 'morgan'
 import {elfSetting} from '@elf/setting'
 import {gameId2PlayUrl, getOrigin, heartBeat, QCloudSMS, RedisKey, Setting} from './util'
 import {PassportStrategy} from './interface'
-import {baseEnum, config, IGameConfig, IStartOption} from '@bespoke/share'
+import {AcademusRole, config, IGameConfig, IStartOption} from '@bespoke/share'
 import {EventDispatcher} from './controller/eventDispatcher'
 import {router} from './controller/requestRouter'
 import {AnyLogic, BaseLogic, GameDAO} from './service'
@@ -40,7 +40,7 @@ export class Server {
     private static initSessionMiddleware() {
         const RedisStore = connectRedis(expressSession)
         this.sessionMiddleware = expressSession({
-            name: 'academy.sid',
+            name: elfSetting.sessionName,
             resave: true,
             saveUninitialized: true,
             secret: elfSetting.sessionSecret,
@@ -175,7 +175,7 @@ export class Server {
         let owner: UserDoc = await UserModel.findOne({mobile})
         if (!owner) {
             owner = await UserModel.create({
-                role: baseEnum.AcademusRole.teacher,
+                role: AcademusRole.teacher,
                 mobile: mobile
             })
         }

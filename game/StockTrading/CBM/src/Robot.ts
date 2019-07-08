@@ -1,4 +1,4 @@
-import {baseEnum} from '@bespoke/server'
+import {baseEnum, GameStatus} from '@bespoke/server'
 import {BaseRobot} from '@bespoke/robot'
 import {
     ICreateParams,
@@ -25,7 +25,7 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
                 if (this.gameState.periodIndex === PERIOD - 1 && this.gameState.periods[this.gameState.periodIndex].stage === PeriodStage.result) {
                     global.clearInterval(this.sleepLoop)
                 }
-                if (this.gameState.status !== baseEnum.GameStatus.started) {
+                if (this.gameState.status !== GameStatus.started) {
                     return
                 }
                 this.wakeUp()

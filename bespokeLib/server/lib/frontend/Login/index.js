@@ -96,7 +96,7 @@ var Login = /** @class */ (function (_super) {
             loginFailed: ['登录失败', 'Login Failed']
         });
         _this.state = {
-            nationCode: share_1.baseEnum.NationCode.China,
+            nationCode: share_1.NationCode.China,
             mobileNumber: '',
             verifyCode: '',
             counter: 0
@@ -155,10 +155,10 @@ var Login = /** @class */ (function (_super) {
                     case 1:
                         res = _b.sent();
                         switch (res.code) {
-                            case share_1.baseEnum.ResponseCode.success: {
+                            case share_1.ResponseCode.success: {
                                 return [2 /*return*/, this.setState({ counter: share_1.config.vcodeLifetime }, function () { return _this.countDown(); })];
                             }
-                            case share_1.baseEnum.ResponseCode.notFound: {
+                            case share_1.ResponseCode.notFound: {
                                 return [2 /*return*/, component_1.Toast.warn(this.lang.accountNotExist)];
                             }
                             default: {
@@ -183,7 +183,7 @@ var Login = /** @class */ (function (_super) {
                         return [4 /*yield*/, util_1.Api.login(nationCode, mobileNumber, verifyCode)];
                     case 1:
                         _b = _c.sent(), code = _b.code, returnToUrl = _b.returnToUrl;
-                        if (code === share_1.baseEnum.ResponseCode.success) {
+                        if (code === share_1.ResponseCode.success) {
                             location.href = returnToUrl || location.href;
                         }
                         else {
@@ -257,7 +257,7 @@ var MobileNumberInput = /** @class */ (function (_super) {
                     return changeMobileNumber(value);
                 } }),
             this.state.showNationSelector &&
-                React.createElement("ul", { className: style.nationCodeSelector }, Object.entries(share_1.baseEnum.NationCode).map(function (_a) {
+                React.createElement("ul", { className: style.nationCodeSelector }, Object.entries(share_1.NationCode).map(function (_a) {
                     var _b = __read(_a, 2), label = _b[0], code = _b[1];
                     return isNaN(Number(code)) ? null :
                         React.createElement("li", { key: label, onClick: function () {

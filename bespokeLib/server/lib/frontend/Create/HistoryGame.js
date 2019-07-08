@@ -74,7 +74,7 @@ var HistoryGame = /** @class */ (function (_super) {
                     case 0: return [4 /*yield*/, util_1.Api.getHistoryGames()];
                     case 1:
                         _a = _b.sent(), code = _a.code, historyGameThumbs = _a.historyGameThumbs;
-                        if (code === share_1.baseEnum.ResponseCode.success) {
+                        if (code === share_1.ResponseCode.success) {
                             this.setState({ historyGameThumbs: historyGameThumbs });
                         }
                         return [2 /*return*/];
@@ -90,7 +90,7 @@ var HistoryGame = /** @class */ (function (_super) {
                     case 0: return [4 /*yield*/, util_1.Api.getGame(gameId)];
                     case 1:
                         _a = _b.sent(), code = _a.code, game = _a.game;
-                        if (code === share_1.baseEnum.ResponseCode.success) {
+                        if (code === share_1.ResponseCode.success) {
                             this.props.applyHistoryGame(game);
                         }
                         return [2 /*return*/];

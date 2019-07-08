@@ -1,13 +1,11 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {connCtx, Lang} from '@client-util'
-import {baseEnum} from '@common'
+import {PlayerStatus, PhaseStatus} from '@common'
 import {playContext, rootContext, TPlayContext, TRootContext} from '@client-context'
 import {Link} from 'react-router-dom'
 import {Affix, Dropdown, Button, Menu} from '@antd-component'
 import {History} from 'history'
-
-const {PhaseStatus, PlayerStatus} = baseEnum
 
 @connCtx(rootContext)
 @connCtx(playContext)

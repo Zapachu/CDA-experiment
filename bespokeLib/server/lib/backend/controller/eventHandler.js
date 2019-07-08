@@ -40,7 +40,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var share_1 = require("@bespoke/share");
 var service_1 = require("../service");
 exports.EventHandler = (_a = {},
-    _a[share_1.baseEnum.SocketEvent.online] = function (connection, onlineCallback) {
+    _a[share_1.SocketEvent.online] = function (connection, onlineCallback) {
         if (onlineCallback === void 0) { onlineCallback = function () { return null; }; }
         return __awaiter(_this, void 0, void 0, function () {
             var game, actor, controller, gameState, playerState;
@@ -54,7 +54,7 @@ exports.EventHandler = (_a = {},
                         onlineCallback(actor);
                         connection.join(game.id);
                         controller.connections.set(actor.token, connection);
-                        if (!(actor.type === share_1.baseEnum.Actor.owner)) return [3 /*break*/, 4];
+                        if (!(actor.type === share_1.Actor.owner)) return [3 /*break*/, 4];
                         return [4 /*yield*/, controller.stateManager.getGameState()];
                     case 2:
                         gameState = _a.sent();
@@ -76,7 +76,7 @@ exports.EventHandler = (_a = {},
             });
         });
     },
-    _a[share_1.baseEnum.SocketEvent.disconnect] = function (_a) {
+    _a[share_1.SocketEvent.disconnect] = function (_a) {
         var game = _a.game, actor = _a.actor;
         return __awaiter(_this, void 0, void 0, function () {
             var stateManager, gameState, playerState;
@@ -85,7 +85,7 @@ exports.EventHandler = (_a = {},
                     case 0: return [4 /*yield*/, service_1.BaseLogic.getLogic(game.id)];
                     case 1:
                         stateManager = (_b.sent()).stateManager;
-                        if (!(actor.type === share_1.baseEnum.Actor.owner)) return [3 /*break*/, 3];
+                        if (!(actor.type === share_1.Actor.owner)) return [3 /*break*/, 3];
                         return [4 /*yield*/, stateManager.getGameState()];
                     case 2:
                         gameState = _b.sent();
@@ -104,7 +104,7 @@ exports.EventHandler = (_a = {},
             });
         });
     },
-    _a[share_1.baseEnum.SocketEvent.move] = function (_a, type, params, cb) {
+    _a[share_1.SocketEvent.move] = function (_a, type, params, cb) {
         var actor = _a.actor, game = _a.game;
         return __awaiter(_this, void 0, void 0, function () {
             var controller;

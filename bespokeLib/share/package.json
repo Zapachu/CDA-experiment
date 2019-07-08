@@ -8,6 +8,7 @@
     "libc": "tsc"
   },
   "devDependencies": {
+    "@elf/share": "^1.1.1",
     "typescript": "^3.3.3333"
   }
 }

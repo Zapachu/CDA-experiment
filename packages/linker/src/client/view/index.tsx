@@ -10,7 +10,6 @@ import {Route, Switch} from 'react-router'
 import {Play} from './Play'
 import {Info} from './Info'
 import {GameList} from './GameList'
-import {PlayerResult} from './Result/Player'
 import {Create} from './Create'
 import {Affix, Button} from '@antd-component'
 
@@ -45,7 +44,6 @@ export const Root: React.FunctionComponent = () => {
                         <Route path={'/Create/:namespace'} component={Create}/>
                         <Route path={'/info/:gameId'} component={Info}/>
                         <Route path={'/play/:gameId'} component={Play}/>
-                        <Route path={'/playerResult/:gameId/:playerId'} component={PlayerResult}/>
                         <Route path={'/share/:gameId'}
                                component={toV5(gameId => `${academusRoute.prefix}${academusRoute.share(gameId)}`)}/>
                         <Route path={'/join'}

@@ -82,7 +82,7 @@ var GameResult = /** @class */ (function (_super) {
             return __awaiter(_this, void 0, void 0, function () {
                 var travelStates;
                 return __generator(this, function (_b) {
-                    if (code !== share_1.baseEnum.ResponseCode.success) {
+                    if (code !== share_1.ResponseCode.success) {
                         return [2 /*return*/];
                     }
                     travelStates = [];

@@ -14,9 +14,9 @@ var StateSynchronizer = /** @class */ (function () {
     }
     StateSynchronizer.prototype.getGameStateSynchronizer = function () {
         switch (this.strategy) {
-            case share_1.baseEnum.SyncStrategy.default:
+            case share_1.SyncStrategy.default:
                 return new BaseSynchronizer_1.GameStateSynchronizer(this.controller);
-            case share_1.baseEnum.SyncStrategy.diff:
+            case share_1.SyncStrategy.diff:
                 return new DiffSynchronizer_1.DiffGameStateSynchronizer(this.controller);
             default:
                 util_1.Log.w(UNSUPPORTED_STRATEGY_WARNING);
@@ -24,9 +24,9 @@ var StateSynchronizer = /** @class */ (function () {
     };
     StateSynchronizer.prototype.getPlayerStateSynchronizer = function (actor) {
         switch (this.strategy) {
-            case share_1.baseEnum.SyncStrategy.default:
+            case share_1.SyncStrategy.default:
                 return new BaseSynchronizer_1.PlayerStateSynchronizer(actor, this.controller);
-            case share_1.baseEnum.SyncStrategy.diff:
+            case share_1.SyncStrategy.diff:
                 return new DiffSynchronizer_1.DiffPlayerStateSynchronizer(actor, this.controller);
             default:
                 util_1.Log.w(UNSUPPORTED_STRATEGY_WARNING);

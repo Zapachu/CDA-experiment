@@ -7,6 +7,7 @@ export enum MoveType {
   back = "back",
   checkVersion = "checkVersion",
   info = "info",
+  random = "random",
   //teacher
   dealCard = "dealCard"
 }
@@ -24,8 +25,10 @@ export interface IMoveParams {
   decision: DECISION;
   gender: GENDER;
   age: string;
-  institute: string;
+  institute: string; //专业
+  name: string;
   grade: string;
+  randomKey: string;
 }
 
 export interface IPushParams {
@@ -37,10 +40,10 @@ export interface IGameState {
 }
 
 export enum DATE {
-  jul5 = "7月5日",
-  aug4 = "8月4日",
-  oct13 = "10月13日",
-  nov12 = "11月12日"
+  jul5 = "7月11日",
+  aug4 = "8月10日",
+  oct13 = "10月19日",
+  nov12 = "11月18日"
 }
 
 export interface IPlayerState {
@@ -49,11 +52,13 @@ export interface IPlayerState {
     [decision: string]: Array<string>;
   };
   pair: string;
+  extraPair: string;
   info: {
     gender: GENDER;
     age: string;
     institute: string;
-    grade?: string;
+    grade: string;
+    name: string;
   };
   profit: {
     [DATE.jul5]: number;
@@ -63,6 +68,8 @@ export interface IPlayerState {
   };
   profitDecision14: DECISION;
   profitDecision56: DECISION;
+  random56: DECISION;
+  random100: number;
 }
 
 export const SHOUT_TIMER = 60;
@@ -178,8 +185,9 @@ export const PAGE = {
   [DECISION.three]: {
     questions: [
       {
-        title:
-          "考虑如下两个时间点，今天（7月5日）和三十天以后（8月4日），在两个时间点上你可以分别获取一定的收益，请在以下的收益组合中选取一项：",
+        title: `考虑如下两个时间点，今天（${DATE.jul5}）和三十天以后（${
+          DATE.aug4
+        }），在两个时间点上你可以分别获取一定的收益，请在以下的收益组合中选取一项：`,
         options: [
           { label: "今天获得22，三十天以后获得2", value: "22:2" },
           { label: "今天获得17，三十天以后获得8", value: "17:8" },
@@ -196,8 +204,11 @@ export const PAGE = {
   [DECISION.four]: {
     questions: [
       {
-        title:
-          "考虑如下两个时间点，一百天以后（10月13日）和一百三十天以后（11月12日），在两个时间点上你可以分别获取一定的收益，请在以下的收益组合中选取一项：",
+        title: `考虑如下两个时间点，一百天以后（${
+          DATE.oct13
+        }）和一百三十天以后（${
+          DATE.nov12
+        }），在两个时间点上你可以分别获取一定的收益，请在以下的收益组合中选取一项：`,
         options: [
           { label: "一百天以后获得22，一百三十天以后获得2", value: "22:2" },
           { label: "一百天以后获得17，一百三十天以后获得8", value: "17:8" },

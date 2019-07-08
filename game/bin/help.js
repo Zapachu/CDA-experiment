@@ -211,7 +211,7 @@ function getProjects(parentProject, projectSet) {
                 case 11:
                     {
                         TaskHelper.execTask({
-                            command: "tsc --outDir ./" + project + "/build --listEmittedFiles true ./" + project + "/src/serve.ts"
+                            command: "tsc -t ES5 --downlevelIteration --experimentalDecorators --listEmittedFiles --outDir ./" + project + "/build ./" + project + "/src/serve.ts"
                         });
                         return [3 /*break*/, 16];
                     }
@@ -260,7 +260,7 @@ function getProjects(parentProject, projectSet) {
                             command: "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + project + "/script/webpack.config.ts"
                         });
                         TaskHelper.execTask({
-                            command: "tsc --outDir ./" + project + "/build --listEmittedFiles true ./" + project + "/src/serve.ts"
+                            command: "tsc -t ES5 --downlevelIteration --experimentalDecorators --listEmittedFiles --outDir ./" + project + "/build ./" + project + "/src/serve.ts"
                         });
                     }
                     _d.label = 18;

@@ -1,7 +1,7 @@
 'use strict'
 
 
-import {ErrorPage} from '../../../common/utils'
+import {sendErrorPage} from '../../../common/utils'
 import {ThirdPartPhase} from "../../../../core/server/models"
 import {RedisCall, SendBackPlayer} from '@elf/protocol'
 import {elfSetting as settings} from '@elf/setting'
@@ -16,7 +16,7 @@ const END_SIGN = 'OutOfRangeNotification'
 
 export const rewriteResBuffers = async (proxyRes, req: Request, res: Response) => {
 
-    if (!req.session.oTreePhaseId) return ErrorPage(res, 'Error In Rewrite Buffer')
+    if (!req.session.oTreePhaseId) return sendErrorPage(res, 'Error In Rewrite Buffer')
 
     const isEnd = req.url.includes(END_SIGN)
 

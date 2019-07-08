@@ -1,34 +1,10 @@
 import {config, IStartOption} from '@bespoke/share'
 import {elfSetting} from '@elf/setting'
-import {Log, LogLevel, NetWork} from '@elf/util'
+import {Log, LogLevel, NetWork, Token} from '@elf/util'
 import {resolve} from 'path'
 import {readFileSync} from 'fs'
-import * as objHash from 'object-hash'
 import {redisClient} from '@elf/protocol'
 import {CONFIG} from './config'
-
-export class Token {
-    private static geneCheckCode(chars: string[]) {
-        return String.fromCharCode(chars.map(c => c.charCodeAt(0)).reduce((pre, cur) => pre + cur) % 26 + 97)
-    }
-
-    static geneToken(obj: any): string {
-        const token = objHash(obj, {algorithm: 'md5'})
-        return this.geneCheckCode([...token]) + token
-    }
-
-    static checkToken(token: string): boolean {
-        const [checkCode, ...chars] = token
-        if (chars.length === 32 && checkCode === this.geneCheckCode(chars)) {
-            return true
-        }
-        if (elfSetting.bespokeWithLinker) {
-            return token.length === 32
-        }
-        chars.length === 32 ? Log.w(`Invalid Token: ${token}`) : null
-        return false
-    }
-}
 
 export function gameId2PlayUrl(gameId: string, keyOrToken?: string): string {
     const query = keyOrToken ? `?token=${Token.checkToken(keyOrToken) ? keyOrToken : Token.geneToken(keyOrToken)}` : ''

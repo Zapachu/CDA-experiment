@@ -66,7 +66,6 @@ var React = require("react");
 var style = require("./style.scss");
 var HistoryGame_1 = require("./HistoryGame");
 var component_1 = require("@elf/component");
-var share_1 = require("@bespoke/share");
 var util_1 = require("../util");
 var SubmitBarHeight = '5rem';
 function Create(_a) {
@@ -80,7 +79,7 @@ function Create(_a) {
     });
     var _b = __read(React.useState(''), 2), title = _b[0], setTitle = _b[1], _c = __read(React.useState(''), 2), desc = _c[0], setDesc = _c[1], _d = __read(React.useState({}), 2), params = _d[0], setParams = _d[1], _e = __read(React.useState(true), 2), submitable = _e[0], setSubmitable = _e[1];
     React.useEffect(function () {
-        if (user && user.role === share_1.baseEnum.AcademusRole.teacher) {
+        if (user && user.role === component_1.AcademusRole.teacher) {
             return;
         }
         history.push('/join');
@@ -93,7 +92,7 @@ function Create(_a) {
                     case 0: return [4 /*yield*/, util_1.Api.newGame({ title: title, desc: desc, params: params })];
                     case 1:
                         _a = _b.sent(), code = _a.code, gameId = _a.gameId;
-                        if (code === share_1.baseEnum.ResponseCode.success) {
+                        if (code === component_1.ResponseCode.success) {
                             component_1.Toast.success(lang.CreateSuccess);
                             setTimeout(function () { return history.push("/play/" + gameId); }, 1000);
                         }

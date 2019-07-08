@@ -2,17 +2,17 @@
 'use strict'
 
 import * as expressSession from "express-session"
-import {elfSetting as settings} from '@elf/setting'
+import {elfSetting} from '@elf/setting'
 
 const redis = require('redis')
 const RedisStore = require('connect-redis')(expressSession)
-const redisClient = redis.createClient(settings.redisPort, settings.redisHost)
+const redisClient = redis.createClient(elfSetting.redisPort, elfSetting.redisHost)
 
 const SessionSet = {
-    name: "academy.sid",
+    name: elfSetting.sessionName,
     resave: true,
     saveUninitialized: true,
-    secret: settings.sessionSecret,
+    secret: elfSetting.sessionSecret,
     store: new RedisStore({
         client: redisClient,
         ttl: 60 * 60 * 24 * 7,

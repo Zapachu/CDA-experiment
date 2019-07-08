@@ -1,11 +1,12 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {IBaseGameWithId, baseEnum} from '@common'
+import {IBaseGameWithId} from '@common'
 import {Api, connCtx, Lang} from '@client-util'
 import {RouteComponentProps} from 'react-router'
 import {Button, Card, message} from '@antd-component'
 import {rootContext, TRootContext} from '@client-context'
 import {Loading} from '@client-component'
+import {ResponseCode} from '@elf/share'
 
 declare interface IInfoState {
     loading: boolean
@@ -65,7 +66,7 @@ export class Info extends React.Component<TRootContext & RouteComponentProps<{ g
                 type={'primary'}
                 onClick={async () => {
                     const {code} = await Api.joinGame(game.id)
-                    if (code === baseEnum.ResponseCode.success) {
+                    if (code === ResponseCode.success) {
                         await message.success(lang.joinSuccess)
                         history.push(`/play/${game.id}`)
                     }
