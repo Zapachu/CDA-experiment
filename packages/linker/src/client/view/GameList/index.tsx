@@ -18,9 +18,7 @@ export const GameList: FunctionComponent<RouteComponentProps & { user: IUserWith
         title: ['标题', 'Title'],
         desc: ['详情', 'Description'],
         cancel: ['取消', 'Cancel'],
-        submit: ['提交', 'Submit'],
-        published: ['已发布', 'Published'],
-        unpublished: ['未发布', 'Unpublished']
+        submit: ['提交', 'Submit']
     })
     const [count, setCount] = useState(0)
     const [gameList, setGameList] = useState<Array<IGameWithId>>([])
@@ -38,16 +36,13 @@ export const GameList: FunctionComponent<RouteComponentProps & { user: IUserWith
         <List
             grid={{gutter: 24, xl: 4, md: 3, sm: 2, xs: 1}}
             dataSource={gameList}
-            renderItem={({id, title, desc, published}) => <ListItem key={id}>
+            renderItem={({id, title, desc}) => <ListItem key={id}>
                 <section
                     className={style.gameItem}
                     onClick={() => history.push(id ? `/info/${id}` : '/baseInfo')}>
                     <Fragment>
                         <ListItemMeta title={title}
                                       description={desc.slice(0, 50) + (desc.length > 50 ? '...' : '')}/>
-                        <label style={{color: published ? 'green' : ''}}>{
-                            published ? lang.published : lang.unpublished
-                        }</label>
                     </Fragment>
                 </section>
             </ListItem>}>

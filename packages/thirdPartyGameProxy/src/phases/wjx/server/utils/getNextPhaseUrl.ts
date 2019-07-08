@@ -2,7 +2,7 @@
 
 import {ThirdPartPhase} from '../../../../core/server/models'
 import {elfSetting as settings} from '@elf/setting'
-import {RedisCall, SendBackPlayer} from '@elf/protocol'
+import {RedisCall, SetPlayerResult} from '@elf/protocol'
 
 const {wjxProxy} = settings
 
@@ -18,6 +18,6 @@ export const getNextPhaseUrl = async (wjxHash, wjxPhaseId, jidx) => {
         playUrl: `${wjxProxy}/init/jq/${wjxPhase._id.toString()}`,
         phaseResult: {uniKey: jidx}
     }
-    const {sendBackUrl} = await RedisCall.call<SendBackPlayer.IReq, SendBackPlayer.IRes>(SendBackPlayer.name, request)
-    return sendBackUrl
+    await RedisCall.call<SetPlayerResult.IReq, SetPlayerResult.IRes>(SetPlayerResult.name, request)
+    return '#'
 }

@@ -24,10 +24,10 @@ export namespace NewPhase {
     }
 }
 
-export namespace SetPhaseResult {
-    export const name = 'Elf:SetPhaseResult'
+export namespace SetPlayerResult {
+    export const name = 'Elf:SetPlayerResult'
 
-    export interface IPhaseResult {
+    export interface IResult {
         uniKey?: string
         point?: number
         detailIframeUrl?: string
@@ -37,22 +37,10 @@ export namespace SetPhaseResult {
         elfGameId: string
         playUrl: string
         playerToken: string
-        phaseResult?: IPhaseResult
+        result?: IResult
     }
 
     export type IRes = null
-}
-
-export namespace SendBackPlayer {
-    export const name = 'Elf:SendBackPlayer'
-
-    export interface IReq extends SetPhaseResult.IReq {
-        nextPhaseKey?: string
-    }
-
-    export interface IRes {
-        sendBackUrl: string
-    }
 }
 //endregion
 

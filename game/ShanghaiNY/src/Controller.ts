@@ -348,7 +348,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
     Object.keys(playerStates).forEach(token => {
       const ps = playerStates[token];
       const point = participationFee+(ps.finalProfit*s||0);
-      this.sendBackPlayer(token, {point, uniKey: ps.seatNumber||'-'});
+      this.setPhaseResult(token, {point, uniKey: ps.seatNumber||'-'});
     })
   }
 }

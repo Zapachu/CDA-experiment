@@ -1,13 +1,4 @@
-import {
-    config,
-    GameMode,
-    IBaseGameWithId,
-    IGameWithId,
-    ILinkerActor,
-    IPhaseConfig,
-    IUserWithId,
-    RequestMethod
-} from '@common'
+import {config, IBaseGameWithId, IGameWithId, ILinkerActor, IUserWithId, RequestMethod} from '@common'
 import {getCookie} from '@client-util'
 import * as queryString from 'query-string'
 import {ResponseCode} from '@elf/share'
@@ -99,11 +90,11 @@ export class Request {
         return await GET('/game/phaseTemplates')
     }
 
-    static async postNewGame(title: string, desc: string, mode: GameMode, phaseConfigs?: Array<IPhaseConfig<{}>>): Promise<IHttpRes & {
+    static async postNewGame(title: string, desc: string, namespace: string, param: {}): Promise<IHttpRes & {
         gameId: string
     }> {
         return await POST('/game/create', null, null, {
-            title, desc, mode, phaseConfigs
+            title, desc, namespace, param
         })
     }
 

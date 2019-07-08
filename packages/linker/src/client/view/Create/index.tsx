@@ -1,8 +1,7 @@
 import React from 'react'
-import {Api, connCtx, genePhaseKey, Lang, loadScript} from '@client-util'
+import {Api, connCtx, Lang, loadScript} from '@client-util'
 import {Loading} from '@client-component'
 import {RouteComponentProps} from 'react-router'
-import {CorePhaseNamespace, GameMode, IPhaseConfig} from '@common'
 import {phaseTemplates} from '../../index'
 import {Button, Input, message} from '@antd-component'
 import {rootContext, TRootContext} from '@client-context'
@@ -12,7 +11,8 @@ interface ICreateState {
     loading: boolean
     title: string
     desc: string
-    phaseConfig: IPhaseConfig
+    namespace: string
+    param: {}
 }
 
 @connCtx(rootContext)
@@ -32,13 +32,8 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
         loading: true,
         title: '',
         desc: '',
-        phaseConfig: {
-            key: genePhaseKey(),
-            title: ``,
-            namespace: this.props.match.params.namespace,
-            param: {},
-            suffixPhaseKeys: []
-        }
+        namespace: this.props.match.params.namespace,
+        param: {}
     }
 
     async componentDidMount() {
@@ -58,27 +53,11 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
     }
 
     async handleSubmit() {
-        const {lang, props: {history}, state: {phaseConfig, title, desc}} = this
+        const {lang, props: {history}, state: {title, desc, namespace, param}} = this
         if (!title || !desc) {
             return message.warn(lang.invalidBaseInfo)
         }
-        const startPhase = {
-            key: CorePhaseNamespace.start,
-            title: lang.start,
-            namespace: CorePhaseNamespace.start,
-            param: {firstPhaseKey: phaseConfig.key},
-            suffixPhaseKeys: [phaseConfig.key]
-        }
-        const endPhase = {
-            key: CorePhaseNamespace.end,
-            title: lang.end,
-            namespace: CorePhaseNamespace.end,
-            param: {},
-            suffixPhaseKeys: []
-        }
-        phaseConfig.suffixPhaseKeys = [endPhase.key]
-        const phaseConfigs = [startPhase, phaseConfig, endPhase]
-        const {code, gameId} = await Api.postNewGame(title, desc, GameMode.easy, phaseConfigs)
+        const {code, gameId} = await Api.postNewGame(title, desc, namespace, param)
         if (code === ResponseCode.success) {
             message.success(lang.createSuccess)
             history.push(`/info/${gameId}`)
@@ -87,20 +66,18 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
         }
     }
 
-    updatePhase(param: {}) {
-        const {state: {phaseConfig: config}} = this
-        const phaseConfig = {...config, param: {...config.param, ...param}}
-        this.setState({
-            phaseConfig
-        })
+    updatePhase(newParam: {}) {
+        this.setState(({param}) => ({
+            param: {...param, ...newParam}
+        }))
     }
 
     render(): React.ReactNode {
-        const {lang, state: {loading, phaseConfig, title, desc}} = this
+        const {lang, state: {loading, namespace, param, title, desc}} = this
         if (loading) {
             return <Loading/>
         }
-        const {Create} = phaseTemplates[phaseConfig.namespace]
+        const {Create} = phaseTemplates[namespace]
         return <section style={{
             maxWidth: '64rem',
             margin: '1rem auto',
@@ -122,7 +99,7 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
             <Create {...{
                 submitable: true,
                 setSubmitable: () => null,
-                params: phaseConfig.param,
+                params: param,
                 setParams: params => this.updatePhase(params)
             }}/>
             <div style={{textAlign: 'center'}}>

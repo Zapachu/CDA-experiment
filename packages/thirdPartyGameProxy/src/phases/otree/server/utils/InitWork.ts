@@ -3,7 +3,7 @@ import {sendErrorPage} from '../../../common/utils'
 import ListMap from '../utils/ListMap'
 import {ThirdPartPhase} from '../../../../core/server/models'
 import {elfSetting as elfSetting} from '@elf/setting'
-import {RedisCall, SendBackPlayer} from '@elf/protocol'
+import {RedisCall, SetPlayerResult} from '@elf/protocol'
 import nodeXlsx from 'node-xlsx'
 import {
     downloadScreenXlsxRoute,
@@ -104,11 +104,11 @@ export const InitWork = (app) => {
                 }
                 phase.markModified('playHash')
                 await phase.save()
-                await RedisCall.call<SendBackPlayer.IReq, SendBackPlayer.IRes>(SendBackPlayer.name, {
+                await RedisCall.call<SetPlayerResult.IReq, SetPlayerResult.IRes>(SetPlayerResult.name, {
                     elfGameId: phase.elfGameId,
                     playUrl: `${oTreeProxy}/init/${START_SIGN}/${phase._id}`,
                     playerToken: actor.token,
-                    phaseResult: {
+                    result: {
                         uniKey: playerOtreeHash,
                         detailIframeUrl: `${oTreeProxy}${previewScreenXlsxRoute}/${phaseId}`
                     }
