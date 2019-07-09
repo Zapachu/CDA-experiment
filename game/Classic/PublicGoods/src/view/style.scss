@@ -1,0 +1,133 @@
+@import "~@elf/component/lib/public";
+
+.create {
+  margin: 1.5rem;
+  display: flex;
+  flex-direction: column;
+
+  .configFields {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .privatePriceTable {
+    color: $color-black;
+    text-align: center;
+
+    td {
+      border: $borderLine;
+      height: 3rem;
+
+      input {
+        width: 3rem;
+      }
+
+      &.readonly input {
+        border-bottom-color: transparent;
+      }
+    }
+  }
+
+  .KWrapper {
+    display: flex;
+    margin-top: 1.5rem;
+    justify-content: center;
+
+    &.readonly input {
+      border-bottom-color: transparent;
+    }
+  }
+
+  .btnSwitch {
+    margin-top: 1rem;
+    text-align: center;
+
+    a {
+      transition: $transition-normal;
+      color: rgba($color-blue, .6);
+
+      &:hover {
+        color: $color-blue;
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.play {
+  text-align: center;
+  color: $color-black;
+  max-width: 40rem;
+  margin: auto;
+
+  .gameDesc {
+    margin: 1rem;
+
+    p {
+      margin: 1rem;
+      line-height: 1.5rem;
+      text-align: left;
+      color: rgba($color-black, .8);
+    }
+  }
+
+  .roundInfo {
+    em {
+      margin: .5rem;
+      color: $color-red;
+    }
+  }
+
+  .inputTips {
+    font-size: $fontSize-middle;
+    margin: 2rem;
+    text-align: left;
+
+    em {
+      margin: .5rem;
+      font-size: 2rem;
+      color: $color-red;
+    }
+  }
+
+  .input {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .result {
+    text-align: left;
+
+    .resultTitle {
+      font-size: $fontSize-middle;
+      color: rgba($color-black, .8);
+      margin: 1rem 2rem 0;
+    }
+
+    table {
+      color: $color-black;
+      margin: 1rem auto;
+
+      td {
+        padding: .5rem;
+        border: 1px solid;
+        text-align: center;
+      }
+    }
+
+    .toNewRound {
+      @extend .inputTips;
+      text-align: center;
+    }
+  }
+}
+
+.play4owner {
+  position: relative;
+  margin: 1rem;
+  .tabsWrapper{
+    height: 3rem;
+  }
+}
