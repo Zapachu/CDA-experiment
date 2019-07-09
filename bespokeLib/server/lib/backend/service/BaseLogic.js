@@ -200,7 +200,7 @@ var BaseLogic = /** @class */ (function () {
     //region elf
     BaseLogic.prototype.setPhaseResult = function (playerToken, result) {
         if (!this.game.elfGameId) {
-            return util_1.Log.w('Bespoke单独部署，game未关联至Elf group');
+            return util_1.Log.w('Bespoke单独部署，game未关联至Linker');
         }
         protocol_1.RedisCall.call(protocol_1.SetPlayerResult.name, {
             playUrl: util_2.gameId2PlayUrl(this.game.id),
