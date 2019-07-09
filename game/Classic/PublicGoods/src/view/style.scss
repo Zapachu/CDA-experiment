@@ -1,45 +1,55 @@
 @import "~@elf/component/lib/public";
+
+body{
+  background: white;
+}
 .create {
   margin: 1.5rem;
   display: flex;
   flex-direction: column;
+
   .configFields {
     margin-top: 1rem;
     display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    li {
-      margin: .8rem;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+    justify-content: center;
   }
+
   .privatePriceTable {
-    margin-top: 3rem;
     color: $color-black;
     text-align: center;
+
     td {
       border: $borderLine;
-      width: 5rem;
       height: 3rem;
-      a {
-        margin: 0 .3rem;
-      }
+
       input {
-        width: 4rem;
+        width: 3rem;
       }
+
       &.readonly input {
         border-bottom-color: transparent;
       }
     }
   }
+
+  .KWrapper {
+    display: flex;
+    margin-top: 1.5rem;
+    justify-content: center;
+
+    &.readonly input {
+      border-bottom-color: transparent;
+    }
+  }
+
   .btnSwitch {
-    margin-top: 2rem;
+    margin-top: 1rem;
     text-align: center;
+
     a {
       transition: $transition-normal;
-      color: rgba($color-blue, .9);
+      color: rgba($color-blue, .6);
+
       &:hover {
         color: $color-blue;
         text-decoration: underline;
@@ -47,69 +57,92 @@
     }
   }
 }
+
 .play {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  .line {
-    border-bottom: 1px solid rgba(49, 70, 89, 0.1);
-    width: 95%;
-    font-size: 1.3rem;
-    padding: .5rem;
+  text-align: center;
+  color: $color-black;
+  max-width: 40rem;
+  margin: auto;
+
+  .gameDesc {
+    padding: 1rem;
+
+    p {
+      margin: 1rem;
+      line-height: 1.5rem;
+      text-align: left;
+      color: rgba($color-black, .8);
+    }
+  }
+
+  .roundInfo {
+    em {
+      margin: .5rem;
+      color: $color-red;
+    }
+  }
+
+  .inputTips {
+    font-size: $fontSize-middle;
+    margin: 2rem;
+    text-align: left;
+
+    em {
+      margin: .5rem;
+      font-size: 2rem;
+      color: $color-red;
+    }
+  }
+
+  .input {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
   }
-  .highlight {
-    color: #4285f4;;
-  }
-  .title {
-    font-size: 2rem;
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1rem;
-  }
-  .profits {
-    margin-top: 3rem;
-    color: $color-black;
-    text-align: center;
-    td {
-      border: $borderLine;
-      width: 5rem;
-      height: 3rem;
-      a {
-        margin: 0 .3rem;
+
+  .result {
+    text-align: left;
+
+    .resultTitle {
+      font-size: $fontSize-middle;
+      color: rgba($color-black, .8);
+      margin: 1rem 2rem 0;
+    }
+
+    table {
+      color: $color-black;
+      margin: 1rem auto;
+
+      td {
+        padding: .5rem;
+        border: 1px solid;
+        text-align: center;
       }
-      input {
-        width: 4rem;
-      }
-      &.readonly input {
-        border-bottom-color: transparent;
-      }
+    }
+
+    .roundOverInfo {
+      @extend .inputTips;
+      text-align: center;
     }
   }
 }
 
-.result {
-  margin: 2rem auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: $fontSize-middle;
+.play4owner {
+  position: relative;
+  margin: 1rem;
+  .tabsWrapper{
+    height: 3rem;
+  }
+}
 
-  .resultTable {
-    margin: 1rem;
-
-    tr {
-      border-bottom: $borderLine;
-      height: 2.5rem;
-      text-align: center;
-
-      td {
-        width: 10rem;
-      }
-    }
+.result, .result4Owner{
+  max-width: 64rem;
+  margin: auto;
+  .desc{
+    display: block;
+    margin: 2rem 0;
+    text-align: center;
+    font-size: $fontSize-middle;
+    color: $color-black;
   }
 }

@@ -1,8 +1,8 @@
 export const namespace = 'PublicGoods'
 
 export enum MoveType {
-    shout = 'shout',
     getPosition = 'getPosition',
+    submit = 'submit'
 }
 
 export enum PushType {
@@ -11,9 +11,14 @@ export enum PushType {
 
 export enum PlayerStatus {
     prepared,
-    timeToShout,
-    shouted,
-    gameOver
+    submitted,
+    result
 }
 
-export const NEW_ROUND_TIMER = 3
+export enum FetchRoute {
+    exportXls = "/exportXls/:gameId:",
+    exportXlsPlaying = "/exportXlsPlaying/:gameId",
+    getUserInfo = "/getUserInfo/:gameId"
+}
+
+export const NEW_ROUND_TIMER = 5

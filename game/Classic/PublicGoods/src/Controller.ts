@@ -1,91 +1,102 @@
-import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from '@bespoke/server';
-import {ICreateParams, IGameState, IPlayerState, IPushParams, IMoveParams} from "./interface";
-import {MoveType, PushType} from './config'
-import {GameState} from "./interface";
-import {NEW_ROUND_TIMER, PlayerStatus} from "./config";
+import {BaseController, IActor, IGameWithId, IMoveCallback, TGameState, TPlayerState} from '@bespoke/server'
+import {
+    ICreateParams,
+    IGameState,
+    IGroupRoundState,
+    IGroupState,
+    IMoveParams,
+    IPlayerState,
+    IPushParams
+} from './interface'
+import {MoveType, NEW_ROUND_TIMER, PlayerStatus, PushType} from './config'
+import cloneDeep = require('lodash/cloneDeep')
 
 export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
+
     initGameState(): TGameState<IGameState> {
         const gameState = super.initGameState()
         gameState.groups = []
+        gameState.logs = []
         return gameState
     }
 
     async initPlayerState(actor: IActor): Promise<TPlayerState<IPlayerState>> {
-        const {game: {params: {round}}} = this
         const playerState = await super.initPlayerState(actor)
-        playerState.prices = Array(round).fill(null)
-        playerState.profits = Array(round).fill(0)
+        playerState.userInfo = {}
         return playerState
     }
 
+    getGame4Player(): IGameWithId<ICreateParams> {
+        const game = cloneDeep(this.game)
+        game.params.groupParams = []
+        return game
+    }
+
     protected async playerMoveReducer(actor: IActor, type: string, params: IMoveParams, cb: IMoveCallback): Promise<void> {
-        const {game: {params: {groupSize, round, initialFunding, returnOnInvestment}}} = this
+        const {game: {params: {group, groupSize, round, groupParams}}} = this
         const playerState = await this.stateManager.getPlayerState(actor),
             gameState = await this.stateManager.getGameState(),
             playerStates = await this.stateManager.getPlayerStates()
         switch (type) {
-            case MoveType.getPosition:
+            case MoveType.getPosition: {
                 if (playerState.groupIndex !== undefined) {
                     break
                 }
                 let groupIndex = gameState.groups.findIndex(({playerNum}) => playerNum < groupSize)
                 if (groupIndex === -1) {
-                    const group: GameState.IGroup = {
+                    const newGroup: IGroupState = {
                         roundIndex: 0,
                         playerNum: 0,
-                        rounds: Array(round).fill(null).map<GameState.Group.IRound>(() => ({
+                        rounds: Array(round).fill(null).map<IGroupRoundState>((_, i) => ({
                             playerStatus: Array(groupSize).fill(PlayerStatus.prepared)
                         }))
                     }
-                    groupIndex = gameState.groups.push(group) - 1
+                    if (gameState.groups.length >= group) {
+                        break
+                    }
+                    groupIndex = gameState.groups.push(newGroup) - 1
                 }
                 playerState.groupIndex = groupIndex
                 playerState.positionIndex = gameState.groups[groupIndex].playerNum++
-                const {rounds, roundIndex} = gameState.groups[groupIndex]
-                if (rounds[roundIndex].playerStatus.every(s => s === PlayerStatus.prepared)) {
-                    if (!rounds[roundIndex].currentPlayer) {
-                        rounds[roundIndex].currentPlayer = 0
-                        rounds[roundIndex].playerStatus[rounds[roundIndex].currentPlayer] = PlayerStatus.timeToShout
-                    }
-                }
+                playerState.rounds = Array(round).fill(null).map((_, i) => ({
+                        initialMoney: groupParams[groupIndex].roundParams[i].playerInitialMoney[playerState.positionIndex]
+                    })
+                )
                 break
-            case MoveType.shout: {
-                const {groupIndex, positionIndex} = playerState,
+            }
+            case MoveType.submit: {
+                const {groups} = gameState
+                const {groupIndex, positionIndex, rounds: playerRounds} = playerState,
                     groupState = gameState.groups[groupIndex],
-                    {rounds, roundIndex} = groupState,
-                    {playerStatus} = rounds[roundIndex],
+                    {roundIndex, rounds: groupRounds} = groups[groupIndex],
+                    groupRoundState = groupRounds[roundIndex],
+                    {playerStatus} = groupRoundState,
                     groupPlayerStates = Object.values(playerStates).filter(s => s.groupIndex === groupIndex)
-                playerStatus[positionIndex] = PlayerStatus.shouted
-                playerState.prices[roundIndex] = params.price
-                rounds[roundIndex].currentPlayer += 1
-                if (rounds[roundIndex].currentPlayer < groupSize) {
-                    rounds[roundIndex].playerStatus[rounds[roundIndex].currentPlayer] = PlayerStatus.timeToShout
-                }
-                if (playerStatus.every(status => status === PlayerStatus.shouted)) {
-                    const share = returnOnInvestment * groupPlayerStates.map(p => p.prices[roundIndex]).reduce((p, c) => p + c) / groupSize
-                    groupPlayerStates.map(p => p.profits[roundIndex] = initialFunding - p.prices[roundIndex] + share)
-                    await this.stateManager.syncState()
-                    if (roundIndex == rounds.length - 1) {
-                        for (let i in playerStatus) playerStatus[i] = PlayerStatus.gameOver
+                playerStatus[positionIndex] = PlayerStatus.submitted
+                playerRounds[roundIndex].submitMoney = params.money
+                gameState.logs.push([groupIndex, roundIndex, positionIndex, params.money, new Date().getTime()])
+                if (playerStatus.every(status => status === PlayerStatus.submitted)) {
+                    setTimeout(async () => {
+                        groupRounds[roundIndex].playerStatus = playerStatus.map(() => PlayerStatus.result)
+                        groupRoundState.returnMoney = ~~((groupPlayerStates.map(({rounds}) => rounds[roundIndex].submitMoney).reduce((m, n) => m + n, 0)) / groupPlayerStates.length)
                         await this.stateManager.syncState()
-                        return
-                    }
-                    let newRoundTimer = 1
-                    const newRoundInterval = global.setInterval(async () => {
-                        groupPlayerStates.forEach(({actor}) => this.push(actor, PushType.newRoundTimer, {
-                            roundIndex,
-                            newRoundTimer
-                        }))
-                        if (newRoundTimer++ < NEW_ROUND_TIMER) {
+                        if (roundIndex == this.game.params.round - 1) {
                             return
                         }
-                        global.clearInterval(newRoundInterval)
-                        groupState.roundIndex++
-                        rounds[groupState.roundIndex].currentPlayer = 0
-                        rounds[groupState.roundIndex].playerStatus[0] = PlayerStatus.timeToShout
-                        await this.stateManager.syncState()
-                    }, 1000)
+                        let newRoundTimer = 1
+                        const newRoundInterval = global.setInterval(async () => {
+                            groupPlayerStates.forEach(({actor}) => this.push(actor, PushType.newRoundTimer, {
+                                roundIndex,
+                                newRoundTimer
+                            }))
+                            if (newRoundTimer++ < NEW_ROUND_TIMER) {
+                                return
+                            }
+                            global.clearInterval(newRoundInterval)
+                            groupState.roundIndex++
+                            await this.stateManager.syncState()
+                        }, 1000)
+                    }, 2000)
                 }
             }
         }
