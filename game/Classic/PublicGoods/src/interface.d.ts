@@ -39,8 +39,8 @@ export interface IGameState {
 
 export interface IPlayerState {
     userInfo?:{
-        mobile:string,
-        name:string
+        mobile?:string,
+        name?:string
     }
     groupIndex: number;
     positionIndex: number;

@@ -1,4 +1,4 @@
-import {BaseController, IActor, IGameWithId, IMoveCallback, TGameState} from '@bespoke/server'
+import {BaseController, IActor, IGameWithId, IMoveCallback, TGameState, TPlayerState} from '@bespoke/server'
 import {
     ICreateParams,
     IGameState,
@@ -18,6 +18,12 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         gameState.groups = []
         gameState.logs = []
         return gameState
+    }
+
+    async initPlayerState(actor: IActor): Promise<TPlayerState<IPlayerState>> {
+        const playerState = await super.initPlayerState(actor)
+        playerState.userInfo = {}
+        return playerState
     }
 
     getGame4Player(): IGameWithId<ICreateParams> {
@@ -52,8 +58,10 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 }
                 playerState.groupIndex = groupIndex
                 playerState.positionIndex = gameState.groups[groupIndex].playerNum++
-                playerState.rounds = groupParams[groupIndex].roundParams
-                    .map(({playerInitialMoney}) => ({initialMoney: playerInitialMoney[playerState.positionIndex]}))
+                playerState.rounds = Array(round).fill(null).map((_, i) => ({
+                        initialMoney: groupParams[groupIndex].roundParams[i].playerInitialMoney[playerState.positionIndex]
+                    })
+                )
                 break
             }
             case MoveType.submit: {

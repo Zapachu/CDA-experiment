@@ -23,7 +23,7 @@ export function Play4Owner({game: {}, playerStates, gameState: {logs, groups}}: 
     })
     const [activeTabKey, setActiveTabKey] = React.useState(lang.members)
     const playerNames = []
-    Object.values(playerStates).forEach(({positionIndex, userInfo = {} as any}) => playerNames[positionIndex] = userInfo.name)
+    Object.values(playerStates).forEach(({positionIndex, userInfo}) => playerNames[positionIndex] = userInfo.name)
     return <section className={style.play4owner}>
         <div className={style.tabsWrapper}>
             <Tabs defaultActiveKey={activeTabKey} onChange={setActiveTabKey}>
@@ -34,7 +34,7 @@ export function Play4Owner({game: {}, playerStates, gameState: {logs, groups}}: 
                             name: userInfo.name,
                             mobile: userInfo.mobile,
                             group: groupIndex + 1,
-                            round: groups[groupIndex].roundIndex
+                            round: groups[groupIndex]? groups[groupIndex].roundIndex : null
                         })
                     )} columns={[
                         {

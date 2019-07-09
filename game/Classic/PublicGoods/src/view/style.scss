@@ -1,5 +1,8 @@
 @import "~@elf/component/lib/public";
 
+body{
+  background: white;
+}
 .create {
   margin: 1.5rem;
   display: flex;
@@ -62,7 +65,7 @@
   margin: auto;
 
   .gameDesc {
-    margin: 1rem;
+    padding: 1rem;
 
     p {
       margin: 1rem;
@@ -117,7 +120,7 @@
       }
     }
 
-    .toNewRound {
+    .roundOverInfo {
       @extend .inputTips;
       text-align: center;
     }
@@ -129,5 +132,17 @@
   margin: 1rem;
   .tabsWrapper{
     height: 3rem;
+  }
+}
+
+.result, .result4Owner{
+  max-width: 64rem;
+  margin: auto;
+  .desc{
+    display: block;
+    margin: 2rem 0;
+    text-align: center;
+    font-size: $fontSize-middle;
+    color: $color-black;
   }
 }

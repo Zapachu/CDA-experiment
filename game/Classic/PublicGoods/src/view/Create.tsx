@@ -7,11 +7,11 @@ import cloneDeep = require('lodash/cloneDeep')
 
 const RANGE = {
     group: {
-        min: 3,
+        min: 2,
         max: 6
     },
     round: {
-        min: 1,
+        min: 2,
         max: 6
     },
     groupSize: {
@@ -60,9 +60,9 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
 
     componentDidMount(): void {
         let defaultParams: ICreateParams = {
-            group: RANGE.group.max,
-            groupSize: RANGE.groupSize.max,
-            round: RANGE.round.max
+            group: RANGE.group.min,
+            groupSize: RANGE.groupSize.min,
+            round: RANGE.round.min
         }
         defaultParams.groupParams = this.geneGroupParams(defaultParams)
         this.props.setParams(defaultParams)
@@ -147,22 +147,16 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
             <li>
                 <Label label={lang.group}/>
                 <RangeInput {...RANGE.group} value={group}
-                            onChange={({target: {value}}) => {
-                                setParams({group: +value})
-                                if (value < activeGroupIndex) {
-                                    this.setState({activeGroupIndex: +value})
-                                }
-                            }}/>
+                            onChange={({target: {value}}) =>
+                                this.setState({activeGroupIndex: value < activeGroupIndex ? +value : activeGroupIndex}, () => setParams({group: +value}))
+                            }/>
             </li>
             <li>
                 <Label label={lang.groupSize}/>
                 <RangeInput {...RANGE.groupSize} value={groupSize}
-                            onChange={({target: {value}}) => {
-                                setParams({groupSize: +value})
-                                if (value < activeRoundIndex) {
-                                    this.setState({activeRoundIndex: +value})
-                                }
-                            }}/>
+                            onChange={({target: {value}}) =>
+                                this.setState({activeRoundIndex: value < activeRoundIndex ? +value : activeRoundIndex}, () => setParams({groupSize: +value}))
+                            }/>
             </li>
             <li>
                 <Label label={lang.round}/>

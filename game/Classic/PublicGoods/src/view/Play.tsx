@@ -24,11 +24,13 @@ export function Play({game: {id: gameId, params: {round}}, playerState, gameStat
         submit: ['提交', 'Submit'],
         waiting4input: ['等待其它玩家提交...', 'Waiting for other players to submit'],
         roundResult: ['本轮结果', 'Round Result'],
+        round:['轮次','Round'],
         input: ['投入'],
         return: ['回报'],
         fund: ['结余'],
         toNewRound1: ['实验将在'],
         toNewRound2: ['秒后进入下一轮'],
+        gameOver: ['实验结束，等待老师关闭实验'],
         history: ['成交记录']
     })
     const [money, setMoney] = React.useState(''),
@@ -67,6 +69,7 @@ export function Play({game: {id: gameId, params: {round}}, playerState, gameStat
                 return <div className={style.result}>
                     <div className={style.resultTitle}>{lang.roundResult}</div>
                     <table>
+                        <tbody>
                         <tr>
                             <td>{lang.initialMoney}</td>
                             <td>{lang.input}</td>
@@ -79,9 +82,13 @@ export function Play({game: {id: gameId, params: {round}}, playerState, gameStat
                             <td>{returnMoney}</td>
                             <td>{initialMoney - submitMoney + returnMoney}</td>
                         </tr>
+                        </tbody>
                     </table>
-                    <p className={style.toNewRound}>{lang.toNewRound1}<em>{NEW_ROUND_TIMER - (newRoundTimers[roundIndex] || 0)}</em>{lang.toNewRound2}
-                    </p>
+                    {
+                        roundIndex === round - 1 ?
+                            <p className={style.roundOverInfo}>{lang.gameOver}</p> :
+                            <p className={style.roundOverInfo}>{lang.toNewRound1}<em>{NEW_ROUND_TIMER - (newRoundTimers[roundIndex] || 0)}</em>{lang.toNewRound2}</p>
+                    }
                 </div>
             case PlayerStatus.submitted:
                 return <MaskLoading label={lang.waiting4input}/>
@@ -108,11 +115,17 @@ export function Play({game: {id: gameId, params: {round}}, playerState, gameStat
             <Table dataSource={playerState.rounds.map(({initialMoney, submitMoney}, i) =>
                 ({
                     key: i,
+                    round: i+1,
                     initialMoney,
                     submitMoney,
                     returnMoney: gameRounds[i].returnMoney,
-                    fund: gameRounds[i].returnMoney? initialMoney + gameRounds[i].returnMoney - submitMoney:null
+                    fund: gameRounds[i].returnMoney ? initialMoney + gameRounds[i].returnMoney - submitMoney : null
                 }))} columns={[
+                {
+                    title: lang.round,
+                    dataIndex: 'round',
+                    key: 'round'
+                },
                 {
                     title: lang.initialMoney,
                     dataIndex: 'initialMoney',
