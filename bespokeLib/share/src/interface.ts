@@ -9,6 +9,7 @@ export type TSocket = typeof Socket
 export interface IUser {
     mobile: string
     role: AcademusRole
+    name: string
 }
 
 export interface IUserWithId extends IUser {
