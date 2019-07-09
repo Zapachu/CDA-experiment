@@ -12,7 +12,8 @@ interface ICreateState {
     title: string
     desc: string
     namespace: string
-    param: {}
+    param: {},
+    submitable: boolean
 }
 
 @connCtx(rootContext)
@@ -33,7 +34,8 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
         title: '',
         desc: '',
         namespace: this.props.match.params.namespace,
-        param: {}
+        param: {},
+        submitable: true
     }
 
     async componentDidMount() {
@@ -73,7 +75,7 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
     }
 
     render(): React.ReactNode {
-        const {lang, state: {loading, namespace, param, title, desc}} = this
+        const {lang, state: {loading, namespace, param, title, desc, submitable}} = this
         if (loading) {
             return <Loading/>
         }
@@ -97,14 +99,17 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
                             onChange={({target: {value: desc}}) => this.setState({desc})}/>
             <br/><br/>
             <Create {...{
-                submitable: true,
-                setSubmitable: () => null,
+                submitable,
+                setSubmitable: submitable => this.setState({submitable}),
                 params: param,
                 setParams: params => this.updatePhase(params)
             }}/>
-            <div style={{textAlign: 'center'}}>
-                <Button type='primary' onClick={() => this.handleSubmit()}>{lang.submit}</Button>
-            </div>
+            {
+                submitable ?
+                    <div style={{textAlign: 'center'}}>
+                        <Button type='primary' onClick={() => this.handleSubmit()}>{lang.submit}</Button>
+                    </div> : null
+            }
         </section>
     }
 }
