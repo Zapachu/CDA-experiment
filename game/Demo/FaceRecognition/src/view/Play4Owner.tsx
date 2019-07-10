@@ -30,7 +30,7 @@ export function Play4Owner({playerStates}: Core.IPlay4OwnerProps<ICreateParams, 
             title: lang.emotion,
             dataIndex: 'emotion',
             key: 'emotion',
-            render: emotion => <span>{
+            render: (emotion={}) => <span>{
                 Object.entries(emotion).sort(([, v1], [, v2]) => +v2 - +v1).map(
                     ([tag, v]) => v > .01 ?
                         <Tag color={v > .5 ? 'green' : v > .3 ? 'blue' : ''} key={tag}>{tag}[{v}]</Tag> : null
