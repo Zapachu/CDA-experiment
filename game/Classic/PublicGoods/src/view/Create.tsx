@@ -3,7 +3,7 @@ import * as style from './style.scss'
 import {Core} from '@bespoke/register'
 import {Label, Lang, MaskLoading, Toast} from '@elf/component'
 import {ICreateParams, IGroupParams} from '../interface'
-import {Button, InputNumber, Slider, Tab, Table} from './antd'
+import {Button, Collapse, InputNumber, Slider, Tab, Table} from './antd'
 import cloneDeep = require('lodash/cloneDeep')
 
 const RANGE = {
@@ -53,6 +53,7 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
         K: ['回报率', 'Return Rate'],
         generate: ['随机生成', 'Generate'],
         player: ['玩家', 'Player'],
+        configuration: ['实验参数', 'Configuration'],
         checkInitialMoneyPls: [
             (g, r, p) => `玩家心理价格有误，请检查：第${g + 1}组:第${r + 1}轮:玩家${p + 1}`,
             (g, r, p) => `Private prices of players are invalid, check them please : Group${g + 1}:Round${r + 1}:Player${p + 1}`
@@ -158,52 +159,57 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
             props: {params: {group, groupSize, round}, setParams, submitable},
             state: {activeGroupIndex, activeRoundIndex, minInitialMoney, maxInitialMoney}
         } = this
-        return <section className={style.baseFields} style={submitable ? {visibility: 'hidden', opacity: 0} : {}}>
-            <ul className={style.configFields}>
-                <li>
-                    <Label label={lang.group}/>
-                    <Slider {...RANGE.group} value={group}
-                            onChange={value =>
-                                this.setState({activeGroupIndex: value < activeGroupIndex ? +value : activeGroupIndex}, () => setParams({group: +value}))
-                            }/>
-                </li>
-                <li>
-                    <Label label={lang.groupSize}/>
-                    <Slider {...RANGE.groupSize} value={groupSize}
-                            onChange={value =>
-                                this.setState({activeRoundIndex: value < activeRoundIndex ? +value : activeRoundIndex}, () => setParams({groupSize: +value}))
-                            }/>
-                </li>
-                <li>
-                    <Label label={lang.round}/>
-                    <Slider {...RANGE.round} value={round}
-                            onChange={value => setParams({round: +value})}/>
-                </li>
-                <li>
-                    <Label label={lang.minInitialMoney}/>
-                    <Slider  {...RANGE.minInitialMoney} value={minInitialMoney}
-                             onChange={value => {
-                                 this.setState({minInitialMoney: +value})
-                                 if (value > maxInitialMoney) {
-                                     this.setState({maxInitialMoney: +value})
-                                 }
-                             }}/>
-                </li>
-                <li>
-                    <Label label={lang.maxInitialMoney}/>
-                    <Slider  {...RANGE.maxInitialMoney} value={maxInitialMoney}
-                             onChange={value => {
-                                 this.setState({maxInitialMoney: +value})
-                                 if (value < minInitialMoney) {
-                                     this.setState({minInitialMoney: +value})
-                                 }
-                             }}/>
-                </li>
-            </ul>
-            <div className={style.geneBtnWrapper}>
-                <Button type='primary' onClick={() => this.updatePrivatePrice()}>{lang.generate}</Button>
-            </div>
-        </section>
+        const KEY = 'baseFields'
+        return <Collapse activeKey={submitable ? null : KEY}>
+            <Collapse.Panel key={KEY} header={lang.configuration}>
+                <section className={style.baseFields}>
+                    <ul className={style.configFields}>
+                        <li>
+                            <Label label={lang.group}/>
+                            <Slider {...RANGE.group} value={group}
+                                    onChange={value =>
+                                        this.setState({activeGroupIndex: value < activeGroupIndex ? +value : activeGroupIndex}, () => setParams({group: +value}))
+                                    }/>
+                        </li>
+                        <li>
+                            <Label label={lang.groupSize}/>
+                            <Slider {...RANGE.groupSize} value={groupSize}
+                                    onChange={value =>
+                                        this.setState({activeRoundIndex: value < activeRoundIndex ? +value : activeRoundIndex}, () => setParams({groupSize: +value}))
+                                    }/>
+                        </li>
+                        <li>
+                            <Label label={lang.round}/>
+                            <Slider {...RANGE.round} value={round}
+                                    onChange={value => setParams({round: +value})}/>
+                        </li>
+                        <li>
+                            <Label label={lang.minInitialMoney}/>
+                            <Slider  {...RANGE.minInitialMoney} value={minInitialMoney}
+                                     onChange={value => {
+                                         this.setState({minInitialMoney: +value})
+                                         if (value > maxInitialMoney) {
+                                             this.setState({maxInitialMoney: +value})
+                                         }
+                                     }}/>
+                        </li>
+                        <li>
+                            <Label label={lang.maxInitialMoney}/>
+                            <Slider  {...RANGE.maxInitialMoney} value={maxInitialMoney}
+                                     onChange={value => {
+                                         this.setState({maxInitialMoney: +value})
+                                         if (value < minInitialMoney) {
+                                             this.setState({minInitialMoney: +value})
+                                         }
+                                     }}/>
+                        </li>
+                    </ul>
+                    <div className={style.geneBtnWrapper}>
+                        <Button type='primary' onClick={() => this.updatePrivatePrice()}>{lang.generate}</Button>
+                    </div>
+                </section>
+            </Collapse.Panel>
+        </Collapse>
     }
 
     render(): React.ReactNode {
