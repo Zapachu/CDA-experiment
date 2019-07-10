@@ -23,7 +23,8 @@ import {
 } from "../config";
 
 interface IPlay4OwnerState {
-  card: CARD;
+  card1: CARD;
+  card2: CARD;
 }
 
 export class Play4Owner extends Core.Play4Owner<
@@ -37,7 +38,8 @@ export class Play4Owner extends Core.Play4Owner<
   IPlay4OwnerState
 > {
   state: IPlay4OwnerState = {
-    card: undefined
+    card1: undefined,
+    card2: undefined
   };
 
   getPlayersData = (playerStates: {
@@ -57,7 +59,7 @@ export class Play4Owner extends Core.Play4Owner<
     const {
       props: { game, playerStates, gameState, frameEmitter }
     } = this;
-    const { card } = this.state;
+    const { card1, card2 } = this.state;
     return (
       <section className={style.play4Owner}>
         <a
@@ -71,26 +73,43 @@ export class Play4Owner extends Core.Play4Owner<
         >
           导出结果
         </a>
-        {gameState.card ? (
-          <p>现场抽牌颜色为{gameState.card}, 收益计算已完成, 可导出结果查看</p>
+        {gameState.card1 && gameState.card2 ? (
+          <p>
+            现场抽牌决策1的颜色为{gameState.card1}，决策2的颜色为
+            {gameState.card2}。收益计算已完成，可导出结果查看
+          </p>
         ) : (
           <div>
-            <label style={{ marginRight: "1rem" }}>选择现场抽牌的颜色</label>
-            <Radio.Group
-              onChange={e => this.setState({ card: e.target.value as CARD })}
-              value={card}
-            >
-              <Radio value={CARD.black}>黑色</Radio>
-              <Radio value={CARD.red}>红色</Radio>
-            </Radio.Group>
+            <div>
+              <label style={{ marginRight: "1rem" }}>选择决策1抽牌的颜色</label>
+              <Radio.Group
+                onChange={e => this.setState({ card1: e.target.value as CARD })}
+                value={card1}
+              >
+                <Radio value={CARD.black}>黑色</Radio>
+                <Radio value={CARD.red}>红色</Radio>
+              </Radio.Group>
+            </div>
+            <div>
+              <label style={{ marginRight: "1rem" }}>选择决策2抽牌的颜色</label>
+              <Radio.Group
+                onChange={e => this.setState({ card2: e.target.value as CARD })}
+                value={card2}
+              >
+                <Radio value={CARD.black}>黑色</Radio>
+                <Radio value={CARD.red}>红色</Radio>
+              </Radio.Group>
+            </div>
             <div className={style.btnContainer}>
               <Button
                 onClick={() => {
-                  if (!card) {
+                  if (!card1 || !card2) {
                     return Toast.warn("请先选择抽牌颜色");
                   }
-                  frameEmitter.emit(MoveType.dealCard, { card }, error =>
-                    Toast.warn(error)
+                  frameEmitter.emit(
+                    MoveType.dealCard,
+                    { card1, card2 },
+                    error => Toast.warn(error)
                   );
                 }}
               >
