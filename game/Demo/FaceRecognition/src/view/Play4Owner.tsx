@@ -1,8 +1,7 @@
 import * as React from 'react'
 import {Core} from '@bespoke/register'
 import {Lang} from '@elf/component'
-import Table from 'antd/es/table'
-import Tag from 'antd/es/tag'
+import {Table, Tag} from './Antd'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, MoveType, PushType} from '../config'
 
 export function Play4Owner({playerStates}: Core.IPlay4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {

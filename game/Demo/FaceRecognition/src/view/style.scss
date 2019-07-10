@@ -5,9 +5,10 @@
 }
 
 .play {
-  $videoWidth: 48rem;
+  $videoWidth: 24rem;
+  max-width: 48rem;
+  margin: auto;
   padding: 2rem;
-  display: flex;
 
   .mainContent {
     .videoWrapper {
@@ -43,17 +44,6 @@
       button{
         margin: .5rem;
       }
-    }
-  }
-
-  .result {
-    flex-grow: 1;
-    margin-left: 1rem;
-
-    .title {
-      color: $color-black;
-      font-size: $fontSize-middle;
-      padding: 0 1.5rem;
     }
   }
 }

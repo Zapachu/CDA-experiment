@@ -5,6 +5,7 @@ import {Core} from '@bespoke/register'
 import Button from 'antd/es/button'
 import {Lang} from '@elf/component'
 import {
+    Gender,
     ICreateParams,
     IGameState,
     IMoveParams,
@@ -16,6 +17,7 @@ import {
     recognizeInterval,
     TResultItem
 } from '../config'
+import {List, Tag} from './Antd'
 
 interface IPlayState {
     recognizing: boolean
@@ -36,12 +38,61 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
         start: ['开始', 'START'],
         pause: ['暂停', 'PAUSE'],
         recognize: ['识别', 'RECOGNIZE'],
-        result: ['结果', 'Result']
+        result: ['结果', 'Result'],
+        age: ['年龄', 'Age'],
+        gender: ['性别', 'Gender'],
+        emotion: ['情绪', 'Emotion']
     })
 
     state: IPlayState = {
         recognizing: false,
-        resultArray: [{"faceId":"e36b54d7-0b40-4e05-ad7b-78f8ff2d67f4","faceRectangle":{"top":205,"left":287,"width":287,"height":274},"faceLandmarks":{"pupilLeft":{"x":367.6,"y":281},"pupilRight":{"x":484.7,"y":284.3},"noseTip":{"x":440,"y":349.7},"mouthLeft":{"x":373.7,"y":420.2},"mouthRight":{"x":488,"y":421.3},"eyebrowLeftOuter":{"x":309.1,"y":255.2},"eyebrowLeftInner":{"x":405.2,"y":240.7},"eyeLeftOuter":{"x":345.5,"y":285.3},"eyeLeftTop":{"x":365.3,"y":275.9},"eyeLeftBottom":{"x":366.4,"y":289.8},"eyeLeftInner":{"x":386,"y":283.5},"eyebrowRightInner":{"x":451.7,"y":240},"eyebrowRightOuter":{"x":530.9,"y":252.1},"eyeRightInner":{"x":468.2,"y":286.5},"eyeRightTop":{"x":484.8,"y":279.6},"eyeRightBottom":{"x":486.6,"y":291.4},"eyeRightOuter":{"x":502.8,"y":286.7},"noseRootLeft":{"x":412.2,"y":285.2},"noseRootRight":{"x":447.3,"y":284.2},"noseLeftAlarTop":{"x":401.6,"y":337.7},"noseRightAlarTop":{"x":466.9,"y":331.8},"noseLeftAlarOutTip":{"x":389.6,"y":363.7},"noseRightAlarOutTip":{"x":479.6,"y":358},"upperLipTop":{"x":438.9,"y":409.2},"upperLipBottom":{"x":439.4,"y":423.4},"underLipTop":{"x":438.4,"y":430.8},"underLipBottom":{"x":438.4,"y":449.2}},"faceAttributes":{"gender":"male","age":21,"emotion":{"anger":0,"contempt":0.002,"disgust":0,"fear":0,"happiness":0.052,"neutral":0.942,"sadness":0.003,"surprise":0}}}] as any
+        resultArray: [{
+            'faceId': 'e36b54d7-0b40-4e05-ad7b-78f8ff2d67f4',
+            'faceRectangle': {'top': 205, 'left': 287, 'width': 287, 'height': 274},
+            'faceLandmarks': {
+                'pupilLeft': {'x': 367.6, 'y': 281},
+                'pupilRight': {'x': 484.7, 'y': 284.3},
+                'noseTip': {'x': 440, 'y': 349.7},
+                'mouthLeft': {'x': 373.7, 'y': 420.2},
+                'mouthRight': {'x': 488, 'y': 421.3},
+                'eyebrowLeftOuter': {'x': 309.1, 'y': 255.2},
+                'eyebrowLeftInner': {'x': 405.2, 'y': 240.7},
+                'eyeLeftOuter': {'x': 345.5, 'y': 285.3},
+                'eyeLeftTop': {'x': 365.3, 'y': 275.9},
+                'eyeLeftBottom': {'x': 366.4, 'y': 289.8},
+                'eyeLeftInner': {'x': 386, 'y': 283.5},
+                'eyebrowRightInner': {'x': 451.7, 'y': 240},
+                'eyebrowRightOuter': {'x': 530.9, 'y': 252.1},
+                'eyeRightInner': {'x': 468.2, 'y': 286.5},
+                'eyeRightTop': {'x': 484.8, 'y': 279.6},
+                'eyeRightBottom': {'x': 486.6, 'y': 291.4},
+                'eyeRightOuter': {'x': 502.8, 'y': 286.7},
+                'noseRootLeft': {'x': 412.2, 'y': 285.2},
+                'noseRootRight': {'x': 447.3, 'y': 284.2},
+                'noseLeftAlarTop': {'x': 401.6, 'y': 337.7},
+                'noseRightAlarTop': {'x': 466.9, 'y': 331.8},
+                'noseLeftAlarOutTip': {'x': 389.6, 'y': 363.7},
+                'noseRightAlarOutTip': {'x': 479.6, 'y': 358},
+                'upperLipTop': {'x': 438.9, 'y': 409.2},
+                'upperLipBottom': {'x': 439.4, 'y': 423.4},
+                'underLipTop': {'x': 438.4, 'y': 430.8},
+                'underLipBottom': {'x': 438.4, 'y': 449.2}
+            },
+            'faceAttributes': {
+                'gender': 'male',
+                'age': 21,
+                'emotion': {
+                    'anger': 0,
+                    'contempt': 0.002,
+                    'disgust': 0,
+                    'fear': 0,
+                    'happiness': 0.052,
+                    'neutral': 0.942,
+                    'sadness': 0.003,
+                    'surprise': 0
+                }
+            }
+        }] as any
     }
 
     componentDidMount(): void {
@@ -157,48 +208,22 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                     }
                 </div>
             </div>
-            <ul className={style.result}>
-                <h3 className={style.title}>{lang.result}</h3>
-                {
-                    resultArray.map((resultItem, i) => <ResultItem key={i} {...resultItem}/>)
-                }
-            </ul>
+            <List dataSource={resultArray} renderItem={({faceAttributes: {age, gender, emotion}}: TResultItem) =>
+                <List.Item>
+                    <List.Item.Meta
+                        title={`${lang.gender} : ${gender}   ${lang.age} : ${age}`}
+                        description={
+                            <span>{
+                                Object.entries(emotion).sort(([, v1], [, v2]) => +v2 - +v1).map(
+                                    ([tag, v]) => v > .01 ?
+                                        <Tag color={v > .5 ? 'green' : v > .3 ? 'blue' : ''}
+                                             key={tag}>{tag}[{v}]</Tag> : null
+                                )}
+      </span>
+                        }
+                    />
+                </List.Item>
+            }/>
         </section>
     }
-}
-
-const ResultItem: React.FC<TResultItem> = resultItem => {
-    const {faceAttributes: {age, gender, emotion}} = resultItem
-    const lang = Lang.extractLang({
-        age: ['年龄', 'Age'],
-        gender: ['性别', 'Gender'],
-        emotion: ['情绪', 'Emotion']
-    })
-    const emotionNames: Array<string> = [],
-        emotionPoints: Array<number> = []
-    Object.entries(emotion).forEach(([name, value]) => {
-        emotionPoints.push(value)
-        emotionNames.push(name)
-    })
-    return <li className={style.resultItem}>
-        <div>
-            <p>{lang.age}<em>{age}</em></p>
-            <p>{lang.gender}<em>{gender}</em></p>
-        </div>
-        <div>
-            <p>{lang.emotion}</p>
-            <table className={style.emotion}>
-                <tr>
-                    {
-                        emotionNames.map((name, i) => <td key={i}>{name}</td>)
-                    }
-                </tr>
-                <tr>
-                    {
-                        emotionPoints.map((point, i) => <td key={i}>{point}</td>)
-                    }
-                </tr>
-            </table>
-        </div>
-    </li>
 }
