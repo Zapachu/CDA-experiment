@@ -2,7 +2,7 @@ import {config, IStartOption} from '@bespoke/share'
 import {elfSetting} from '@elf/setting'
 import {Log, LogLevel, NetWork, Token} from '@elf/util'
 import {resolve} from 'path'
-import {readFileSync} from 'fs'
+import {existsSync, readFileSync} from 'fs'
 import {redisClient} from '@elf/protocol'
 import {CONFIG} from './config'
 
@@ -16,9 +16,9 @@ export function getOrigin(): string {
         `http://${Setting.ip}:${elfSetting.bespokeHmr ? config.devPort.client : Setting.port}`
 }
 
-export function heartBeat(key: string, value: string, seconds: number = CONFIG.heartBeatSeconds) {
+export function heartBeat(key: string, getValue: () => string, seconds: number = CONFIG.heartBeatSeconds) {
     (async function foo() {
-        await redisClient.setex(key, seconds + 1, value)
+        await redisClient.setex(key, seconds + 1, getValue())
         setTimeout(foo, seconds * 1e3)
     })()
 }
@@ -54,8 +54,12 @@ export class Setting {
 
     static getClientPath(): string {
         const {namespace} = this
+        const manifestPath = resolve(this.staticPath, `${namespace}.json`)
+        if (!existsSync(manifestPath)) {
+            return ''
+        }
         return elfSetting.bespokeHmr ?
             `http://localhost:${config.devPort.client}/${config.rootName}/${namespace}/static/${namespace}.js` :
-            JSON.parse(readFileSync(resolve(this.staticPath, `${namespace}.json`)).toString())[`${namespace}.js`]
+            JSON.parse(readFileSync(manifestPath).toString())[`${namespace}.js`]
     }
 }

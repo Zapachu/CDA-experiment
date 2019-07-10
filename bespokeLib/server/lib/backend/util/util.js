@@ -52,13 +52,13 @@ function getOrigin() {
         "http://" + Setting.ip + ":" + (setting_1.elfSetting.bespokeHmr ? share_1.config.devPort.client : Setting.port);
 }
 exports.getOrigin = getOrigin;
-function heartBeat(key, value, seconds) {
+function heartBeat(key, getValue, seconds) {
     if (seconds === void 0) { seconds = config_1.CONFIG.heartBeatSeconds; }
     (function foo() {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, protocol_1.redisClient.setex(key, seconds + 1, value)];
+                    case 0: return [4 /*yield*/, protocol_1.redisClient.setex(key, seconds + 1, getValue())];
                     case 1:
                         _a.sent();
                         setTimeout(foo, seconds * 1e3);
@@ -101,9 +101,13 @@ var Setting = /** @class */ (function () {
     };
     Setting.getClientPath = function () {
         var namespace = this.namespace;
+        var manifestPath = path_1.resolve(this.staticPath, namespace + ".json");
+        if (!fs_1.existsSync(manifestPath)) {
+            return '';
+        }
         return setting_1.elfSetting.bespokeHmr ?
             "http://localhost:" + share_1.config.devPort.client + "/" + share_1.config.rootName + "/" + namespace + "/static/" + namespace + ".js" :
-            JSON.parse(fs_1.readFileSync(path_1.resolve(this.staticPath, namespace + ".json")).toString())[namespace + ".js"];
+            JSON.parse(fs_1.readFileSync(manifestPath).toString())[namespace + ".js"];
     };
     return Setting;
 }());
