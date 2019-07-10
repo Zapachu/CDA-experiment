@@ -295,13 +295,13 @@ export class Play extends Core.Play<
                 <Radio value={GENDER.female}>女</Radio>
               </Radio.Group>
             </div>
-            <div className={style.info}>
+            {/* <div className={style.info}>
               <label>年龄</label>
               <Input
                 value={age}
                 onChange={e => this.setState({ age: "" + e.target.value })}
               />
-            </div>
+            </div> */}
             <div className={style.info}>
               <label>姓名</label>
               <Input
@@ -309,7 +309,7 @@ export class Play extends Core.Play<
                 onChange={e => this.setState({ name: "" + e.target.value })}
               />
             </div>
-            <div className={style.info}>
+            {/* <div className={style.info}>
               <label>专业</label>
               <Input
                 value={institute}
@@ -317,22 +317,22 @@ export class Play extends Core.Play<
                   this.setState({ institute: "" + e.target.value })
                 }
               />
-            </div>
-            <div className={style.info}>
+            </div> */}
+            {/* <div className={style.info}>
               <label>年级</label>
               <Input
                 value={grade}
                 onChange={e => this.setState({ grade: "" + e.target.value })}
               />
-            </div>
+            </div> */}
             <Button
               onClick={() => {
-                if (!gender || !age || !institute || !grade) {
+                if (!gender || !name) {
                   return Toast.warn("请填写个人信息");
                 }
                 frameEmitter.emit(
                   MoveType.info,
-                  { gender, age, institute, grade, name },
+                  { gender, name },
                   error => {
                     Toast.warn(error);
                   }

@@ -116,10 +116,10 @@ export default class Controller extends BaseController<
         }
         playerState.info = {
           gender,
-          age,
-          institute,
+          // age,
+          // institute,
           name,
-          grade
+          // grade
         };
         break;
       }
@@ -225,10 +225,10 @@ export default class Controller extends BaseController<
         `${DATE.oct13}收益`,
         `${DATE.nov12}收益`,
         "性别",
-        "年龄",
+        // "年龄",
         "姓名",
-        "专业",
-        "年级"
+        // "专业",
+        // "年级"
       ]
     ];
     const playerStateArray = Object.values(playerStates);
@@ -277,10 +277,10 @@ export default class Controller extends BaseController<
         ps.profit[DATE.oct13],
         ps.profit[DATE.nov12],
         ps.info ? ps.info.gender : "-",
-        ps.info ? ps.info.age : "-",
+        // ps.info ? ps.info.age : "-",
         ps.info ? ps.info.name : "-",
-        ps.info ? ps.info.institute : "-",
-        ps.info ? ps.info.grade : "-"
+        // ps.info ? ps.info.institute : "-",
+        // ps.info ? ps.info.grade : "-"
       ];
       resultData.push(row);
     });
