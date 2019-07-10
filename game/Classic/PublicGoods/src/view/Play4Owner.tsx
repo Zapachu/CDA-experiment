@@ -65,7 +65,7 @@ export function Play4Owner({game: {}, playerStates, gameState: {logs, groups}}: 
                             key: time,
                             group: group + 1,
                             round: round + 1,
-                            player: playerNames[position],
+                            name: playerNames[position],
                             money,
                             time: dateFormat(time, 'HH:MM:ss')
                         }))} columns={[
