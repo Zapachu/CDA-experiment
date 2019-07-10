@@ -3,7 +3,6 @@ import * as style from './style.scss'
 import * as qiniu from 'qiniu-js'
 import {Core} from '@bespoke/register'
 import Button from 'antd/es/button'
-import 'antd/es/button/style'
 import {Lang} from '@elf/component'
 import {
     ICreateParams,

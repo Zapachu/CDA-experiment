@@ -5,8 +5,6 @@ import {Core} from '@bespoke/register'
 import {Lang} from '@elf/component'
 import Tabs from 'antd/es/tabs'
 import Table from 'antd/es/table'
-import 'antd/es/tabs/style'
-import 'antd/es/table/style'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import {MoveType, PushType} from '../config'
 
