@@ -43,6 +43,18 @@ export default class Controller extends BaseController<
       [DATE.oct13]: 0,
       [DATE.nov12]: 0
     };
+    playerState.profit14 = {
+      [DATE.jul5]: 0,
+      [DATE.aug4]: 0,
+      [DATE.oct13]: 0,
+      [DATE.nov12]: 0
+    };
+    playerState.profit56 = {
+      [DATE.jul5]: 0,
+      [DATE.aug4]: 0,
+      [DATE.oct13]: 0,
+      [DATE.nov12]: 0
+    };
     playerState.answer = {};
     return playerState;
   }
@@ -57,7 +69,7 @@ export default class Controller extends BaseController<
     const gameState = await this.stateManager.getGameState();
     switch (type) {
       case MoveType.dealCard: {
-        if (gameState.card !== undefined) {
+        if (gameState.card1 !== undefined) {
           return;
         }
         const playerStateArray = Object.values(playerStates);
@@ -67,9 +79,10 @@ export default class Controller extends BaseController<
         if (!playerStateArray.every(ps => !!ps.random56)) {
           return cb("还有被试未完成问卷");
         }
-        const { card } = params;
-        gameState.card = card;
-        this.processProfit(card, playerStates);
+        const { card1, card2 } = params;
+        gameState.card1 = card1;
+        gameState.card2 = card2;
+        this.processProfit(card1, card2, playerStates);
         break;
       }
     }
@@ -156,13 +169,14 @@ export default class Controller extends BaseController<
   }
 
   private processProfit(
-    card: CARD,
+    card1: CARD,
+    card2: CARD,
     playerStates: { [token: string]: TPlayerState<IPlayerState> }
   ) {
     const playerStateArray = Object.values(playerStates);
     this._makePairs(playerStateArray);
     this._chooseDecisions(playerStates);
-    this._calcProfits(card, playerStates);
+    this._calcProfits(card1, card2, playerStates);
     playerStateArray.forEach(ps => {
       this.setPhaseResult(ps.actor.token, {
         point: ps.profit[DATE.jul5],
@@ -257,7 +271,7 @@ export default class Controller extends BaseController<
           : "",
         ps.pair ? playerStates[ps.pair].mobile : "-",
         ps.profitDecision14 || "-",
-        ps.profitDecision56 || "-",
+        ps.won56 ? ps.profitDecision56 : `对方${ps.profitDecision56}`,
         ps.profit[DATE.jul5],
         ps.profit[DATE.aug4],
         ps.profit[DATE.oct13],
@@ -306,26 +320,28 @@ export default class Controller extends BaseController<
         const rand14 = genRandomInt(0, decision14.length - 1);
         ps.profitDecision14 = decision14[rand14];
       }
-      let luckyOne;
       if (ps.random100) {
         const pair = playerStates[ps.pair];
-        luckyOne = ps.random100 - pair.random100 >= 0 ? ps : pair;
+        if (ps.random100 === pair.random100) {
+          ps.won56 = pair.won56 !== undefined ? !pair.won56 : true;
+        } else {
+          ps.won56 = ps.random100 - pair.random100 > 0;
+        }
+        ps.profitDecision56 = ps.won56 ? ps.random56 : pair.random56;
       } else {
         // 兼容旧数据
+        let luckyOne;
         const isMe = genRandomInt(0, 1);
         luckyOne = isMe ? ps : playerStates[ps.pair];
-      }
-      if (!luckyOne.random56) {
-        // 兼容旧数据
         const rand56 = genRandomInt(0, decision56.length - 1);
         luckyOne.profitDecision56 = rand56;
       }
-      luckyOne.profitDecision56 = luckyOne.random56;
     });
   }
 
   private _calcProfits(
-    card: CARD,
+    card1: CARD,
+    card2: CARD,
     playerStates: { [token: string]: TPlayerState<IPlayerState> }
   ) {
     const playerStateArray = Object.values(playerStates);
@@ -333,26 +349,29 @@ export default class Controller extends BaseController<
       const decision14 = ps.profitDecision14;
       const answer14 = ps.answer[decision14];
       const calc14 = CALC_PROFIT[decision14];
-      const profit14 = calc14(answer14, card);
-      this._addProfit(ps.profit, profit14 as PROFIT);
+      const profit14 = calc14(answer14, card1, card2) as Partial<PROFIT>;
+      this._addProfit(ps.profit14, profit14);
+      this._addProfit(ps.profit, profit14);
       const decision56 = ps.profitDecision56;
-      console.log("14, ", ps.profit);
-      if (decision56) {
-        const answer56 = ps.answer[decision56];
-        const calc56 = CALC_PROFIT[decision56];
-        const profit56 = calc56(answer56);
+      const calc56 = CALC_PROFIT[decision56];
+      if (ps.won56) {
+        const profit56 = calc56(ps.answer[decision56]) as Array<
+          Partial<PROFIT>
+        >;
+        this._addProfit(ps.profit56, profit56[0]);
         this._addProfit(ps.profit, profit56[0]);
-        this._addProfit(playerStates[ps.pair].profit, profit56[1]);
-        if (ps.extraPair) {
-          this._addProfit(ps.profit, profit56[0]);
-          this._addProfit(playerStates[ps.extraPair].profit, profit56[1]);
-        }
-        console.log("56, ", ps.profit);
+      } else {
+        const pair = playerStates[ps.pair];
+        const profit56 = calc56(pair.answer[decision56]) as Array<
+          Partial<PROFIT>
+        >;
+        this._addProfit(ps.profit56, profit56[1]);
+        this._addProfit(ps.profit, profit56[1]);
       }
     });
   }
 
-  private _addProfit(profit: PROFIT, increment: PROFIT) {
+  private _addProfit(profit: PROFIT, increment: Partial<PROFIT>) {
     if (increment[DATE.jul5]) {
       profit[DATE.jul5] += increment[DATE.jul5];
     }
@@ -368,50 +387,54 @@ export default class Controller extends BaseController<
   }
 }
 interface PROFIT {
-  [DATE.jul5]?: number;
-  [DATE.aug4]?: number;
-  [DATE.oct13]?: number;
-  [DATE.nov12]?: number;
+  [DATE.jul5]: number;
+  [DATE.aug4]: number;
+  [DATE.oct13]: number;
+  [DATE.nov12]: number;
 }
 
 const CALC_PROFIT = {
-  [DECISION.one]: (answer: Array<string>, card?: CARD): PROFIT => {
+  [DECISION.one]: (answer: Array<string>, card1?: CARD): Partial<PROFIT> => {
     const start = 20;
     const invest = +answer[0].split(":")[0];
     const chosenCard = answer[1];
-    let profit;
-    if (chosenCard === card) {
+    let profit: number;
+    if (chosenCard === card1) {
       profit = start - invest + invest * 2.5;
     } else {
       profit = start - invest;
     }
     return { [DATE.jul5]: profit };
   },
-  [DECISION.two]: (answer: Array<string>, card?: CARD): PROFIT => {
+  [DECISION.two]: (
+    answer: Array<string>,
+    card1?: CARD,
+    card2?: CARD
+  ): Partial<PROFIT> => {
     const start = 20;
     const invest = +answer[0].split(":")[0];
     const chosenCard = answer[1];
-    let profit;
-    if (chosenCard === card) {
+    let profit: number;
+    if (chosenCard === card2) {
       profit = start - invest + invest * 2.5;
     } else {
       profit = start - invest;
     }
     return { [DATE.jul5]: profit };
   },
-  [DECISION.three]: (answer: Array<string>): PROFIT => {
+  [DECISION.three]: (answer: Array<string>): Partial<PROFIT> => {
     const profits = answer[0].split(":");
     return { [DATE.jul5]: +profits[0], [DATE.aug4]: +profits[1] };
   },
-  [DECISION.four]: (answer: Array<string>): PROFIT => {
+  [DECISION.four]: (answer: Array<string>): Partial<PROFIT> => {
     const profits = answer[0].split(":");
     return { [DATE.oct13]: +profits[0], [DATE.nov12]: +profits[1] };
   },
-  [DECISION.five]: (answer: Array<string>): Array<PROFIT> => {
+  [DECISION.five]: (answer: Array<string>): Array<Partial<PROFIT>> => {
     const profits = answer[0].split(":");
     return [{ [DATE.jul5]: +profits[0] }, { [DATE.jul5]: +profits[1] }];
   },
-  [DECISION.six]: (answer: Array<string>): Array<PROFIT> => {
+  [DECISION.six]: (answer: Array<string>): Array<Partial<PROFIT>> => {
     const profits = answer[0].split(":");
     return [{ [DATE.jul5]: +profits[0] }, { [DATE.jul5]: +profits[1] }];
   }

@@ -20,7 +20,8 @@ export enum PushType {
 export interface ICreateParams {}
 
 export interface IMoveParams {
-  card: CARD;
+  card1: CARD;
+  card2: CARD;
   answer: Array<string>;
   decision: DECISION;
   gender: GENDER;
@@ -36,7 +37,8 @@ export interface IPushParams {
 }
 
 export interface IGameState {
-  card: CARD;
+  card1: CARD;
+  card2: CARD;
 }
 
 export enum DATE {
@@ -66,8 +68,21 @@ export interface IPlayerState {
     [DATE.oct13]: number;
     [DATE.nov12]: number;
   };
+  profit14: {
+    [DATE.jul5]: number;
+    [DATE.aug4]: number;
+    [DATE.oct13]: number;
+    [DATE.nov12]: number;
+  };
+  profit56: {
+    [DATE.jul5]: number;
+    [DATE.aug4]: number;
+    [DATE.oct13]: number;
+    [DATE.nov12]: number;
+  };
   profitDecision14: DECISION;
-  profitDecision56: DECISION;
+  profitDecision56: DECISION; //计算收益使用的决策
+  won56: boolean; //56题是否抽中了自己
   random56: DECISION;
   random100: number;
 }
@@ -146,7 +161,7 @@ export const PAGE = {
   [DECISION.two]: {
     instructions: [
       "考虑如下收益不确定的资产，其收益的产生过程涉及从一堆牌中抽取一张。",
-      "资产：给定一堆10张的牌，红色和黑色的数量未知，即红色牌数量可能是0到10的任一数字，黑色牌同理。你猜测一个颜色，并从牌堆中抽取一张牌。如果猜测准确获得投资额的2.5倍，如果不准确失去所有投资额。",
+      "资产：给定一堆10张的牌，红色和黑色的$bold$数量未知$bold$，即红色牌数量可能是0到10的任一数字，黑色牌同理。你猜测一个颜色，并从牌堆中抽取一张牌。如果猜测准确获得投资额的2.5倍，如果不准确失去所有投资额。",
       "给定20元的总投资额，你可以选择在该资产上的投资额度。剩下的不投资，即为确定性的收益。",
       {
         text: "例：如果你选择投资14元，并猜测红色，则",
@@ -190,12 +205,12 @@ export const PAGE = {
         }），在两个时间点上你可以分别获取一定的收益，请在以下的收益组合中选取一项：`,
         options: [
           { label: "今天获得22，三十天以后获得2", value: "22:2" },
-          { label: "今天获得17，三十天以后获得8", value: "17:8" },
-          { label: "今天获得14，三十天以后获得12", value: "14:12" },
-          { label: "今天获得12，三十天以后获得14", value: "12:14" },
-          { label: "今天获得10，三十天以后获得16.4", value: "10:16.4" },
-          { label: "今天获得7，三十天以后获得20", value: "7:20" },
-          { label: "今天获得2，三十天以后获得26", value: "2:26" }
+          { label: "今天获得18，三十天以后获得6.4", value: "18:6.4" },
+          { label: "今天获得15，三十天以后获得9.7", value: "15:9.7" },
+          { label: "今天获得12，三十天以后获得13", value: "12:13" },
+          { label: "今天获得9，三十天以后获得16.3", value: "9:16.3" },
+          { label: "今天获得6，三十天以后获得19.6", value: "6:19.6" },
+          { label: "今天获得2，三十天以后获得24", value: "2:24" }
         ]
       }
     ],
@@ -211,15 +226,12 @@ export const PAGE = {
         }），在两个时间点上你可以分别获取一定的收益，请在以下的收益组合中选取一项：`,
         options: [
           { label: "一百天以后获得22，一百三十天以后获得2", value: "22:2" },
-          { label: "一百天以后获得17，一百三十天以后获得8", value: "17:8" },
-          { label: "一百天以后获得14，一百三十天以后获得12", value: "14:12" },
-          { label: "一百天以后获得12，一百三十天以后获得14", value: "12:14" },
-          {
-            label: "一百天以后获得10，一百三十天以后获得16.4",
-            value: "10:16.4"
-          },
-          { label: "一百天以后获得7，一百三十天以后获得20", value: "7:20" },
-          { label: "一百天以后获得2，一百三十天以后获得26", value: "2:26" }
+          { label: "一百天以后获得18，一百三十天以后获得6.4", value: "18:6.4" },
+          { label: "一百天以后获得15，一百三十天以后获得9.7", value: "15:9.7" },
+          { label: "一百天以后获得12，一百三十天以后获得13", value: "12:13" },
+          { label: "一百天以后获得9，一百三十天以后获得16.3", value: "9:16.3" },
+          { label: "一百天以后获得6，一百三十天以后获得19.6", value: "6:19.6" },
+          { label: "一百天以后获得2，一百三十天以后获得24", value: "2:24" }
         ]
       }
     ],

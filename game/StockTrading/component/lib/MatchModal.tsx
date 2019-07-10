@@ -2,8 +2,9 @@ import * as React from "react";
 import * as style from "./style.scss";
 import Modal from "./Modal";
 import Line from "./Line";
-const PLAYER_EMPTY = require("./player_empty.svg");
-const PLAYER_FOUND = require("./player_found.svg");
+import PlayerIcon from "./PlayerIcon";
+// const PLAYER_EMPTY = require("./player_empty.svg");
+// const PLAYER_FOUND = require("./player_found.svg");
 const LOADING = require("./loading.png");
 
 const MatchModal: React.SFC<PropType> = ({
@@ -23,7 +24,12 @@ const MatchModal: React.SFC<PropType> = ({
             .map((_, i) => {
               return (
                 <li key={i}>
-                  <img src={i < matchNum ? PLAYER_FOUND : PLAYER_EMPTY} />
+                  {i < matchNum ? (
+                    <PlayerIcon className={style.playerIcon} />
+                  ) : (
+                    <PlayerIcon className={style.playerIcon} opacity={0.3} />
+                  )}
+                  {/* <img src={i < matchNum ? PLAYER_FOUND : PLAYER_EMPTY} /> */}
                 </li>
               );
             })}
