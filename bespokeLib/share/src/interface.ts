@@ -24,7 +24,6 @@ export interface ISimulatePlayer {
 
 export interface IGameConfig<ICreateParams> {
     title: string
-    desc: string
     params: ICreateParams
 }
 

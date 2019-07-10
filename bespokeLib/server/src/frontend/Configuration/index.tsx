@@ -33,9 +33,6 @@ export class Configuration extends React.Component<TPageProps, IConfigurationSta
         }
         const {Info} = gameTemplate
         return <section className={style.configuration}>
-            <div className={style.gameInfo}>
-                <p>{game.desc}</p>
-            </div>
             <ul className={style.phaseList}>
                 <Info {...{game}}/>
                 <li style={{margin: '2rem auto 0'}}>

@@ -5,7 +5,6 @@ var _a = mongoose_1.Schema.Types, ObjectId = _a.ObjectId, String = _a.String;
 var GameSchema = new mongoose_1.Schema({
     elfGameId: String,
     title: String,
-    desc: String,
     namespace: String,
     params: { type: Object, default: ({}) },
     owner: { type: ObjectId, ref: 'User' },

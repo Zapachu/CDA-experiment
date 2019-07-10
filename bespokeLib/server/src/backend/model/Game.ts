@@ -11,7 +11,6 @@ export interface GameDoc<ICreateParams> extends IGame<ICreateParams>, Document {
 const GameSchema = new Schema({
     elfGameId:String,
     title: String,
-    desc: String,
     namespace: String,
     params: {type: Object, default: ({})},
     owner: {type: ObjectId, ref: 'User'},

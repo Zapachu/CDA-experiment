@@ -5,72 +5,14 @@
 }
 
 .create {
-  display: flex;
-  flex-wrap: wrap;
-  .baseInfoWrapper {
-    flex-basis: 33%;
-    @media (max-width: $layout-mediaWidth) {
-      width: 100%;
-    }
-    .gameInfo {
-      @include secondarySection;
-      .gameFieldWrapper {
-        margin: 1rem 2.5rem;
-        overflow: hidden;
-        padding: 0 1rem;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        @media (max-width: $layout-mediaWidth) {
-          margin: 1rem;
-        }
-      }
-    }
-
-    .loadFromHistory {
-      .tips {
-        margin: 1rem 0;
-        color: rgba($color-black, .4);
-        font-size: $fontSize-small;
-        display: block;
-        text-align: center;
-      }
-      .historyGameThumbs {
-        display: flex;
-        flex-wrap: wrap;
-        margin: .5rem 1.5rem;
-        li {
-          display: inline-block;
-          width: calc(25% - 10px);
-          margin: 1px;
-          padding: 1rem 4px;
-          background: $color-background;
-          color: rgba($color-black, .8);
-          text-align: center;
-          cursor: pointer;
-          opacity: .7;
-          transition: all 150ms linear;
-          span {
-            width: 100%;
-            display: inline-block;
-            overflow: hidden;
-            user-select: none;
-            &:last-child {
-              font-size: .8rem;
-            }
-          }
-          &:hover {
-            opacity: 1;
-            color: $color-blue;
-          }
-          @media (max-width: $layout-mediaWidth) {
-            width: calc(50% - 10px);
-          }
-        }
-      }
-    }
+  max-width: 48rem;
+  margin: auto;
+  .titleWrapper{
+    padding: 2rem 4rem;
+  }
+  .historyGameBtnWrapper{
+    text-align: right;
+    margin-right: 1rem;
   }
   .bespokeWrapper {
     flex-basis: 66%;

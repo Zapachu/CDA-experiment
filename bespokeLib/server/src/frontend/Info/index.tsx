@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {IGameWithId, IUserWithId} from '@bespoke/share'
-import {Lang, Markdown, MaskLoading} from '@elf/component'
+import {Lang, MaskLoading} from '@elf/component'
 import {Api} from '../util'
 import {RouteComponentProps} from 'react-router'
 
@@ -16,20 +16,17 @@ export function Info({history, match: {params: {gameId}}}: RouteComponentProps<{
         Api.getGame(gameId).then(({game}) => setGame(game))
         Api.getUser().then(({user}) => setUser(user))
     }, [])
-    if (!game || !user) {
+    if (!game) {
         return <MaskLoading/>
     }
     return <div className={style.info}>
-        <section className={style.desc}>
-            <Markdown editable={false} value={game.desc}/>
-        </section>
         <ul className={style.featureButtons}>
             <li {...{
                 style: {
                     backgroundColor: '#ff888e'
                 },
                 onClick: () => history.push(`/play/${gameId}${location.search}`)
-            }}>{game.owner === user.id ? lang.enterRoom : lang.joinGame}</li>
+            }}>{user && (game.owner === user.id) ? lang.enterRoom : lang.joinGame}</li>
         </ul>
     </div>
 }

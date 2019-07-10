@@ -1,7 +1,7 @@
 import './initial.scss'
 import * as React from 'react'
 import {IGameTemplate} from '@bespoke/register'
-import {Lang} from '@elf/component'
+import {Lang, Language} from '@elf/component'
 import {BrowserRouter, Redirect, Route as ReactRoute, RouteComponentProps, RouteProps, Switch} from 'react-router-dom'
 import {config} from '@bespoke/share'
 import {Login} from './Login'
@@ -13,7 +13,7 @@ import {Join} from './Join'
 import {Play} from './Play'
 import {Configuration} from './Configuration'
 import {render} from 'react-dom'
-import {Api, TPageProps} from './util'
+import {Api, Button, TPageProps} from './util'
 
 function renderRoot(pageProps: TPageProps, rootContainer: HTMLElement) {
     const Route = ({component: Component, ...routeProps}: RouteProps) =>
@@ -21,30 +21,40 @@ function renderRoot(pageProps: TPageProps, rootContainer: HTMLElement) {
             <Component {...pageProps} {...props}/>
         }/>
 
-    render(<BrowserRouter key={Lang.activeLanguage} basename={`${config.rootName}/${NAMESPACE}`}>
-        <Switch>
-            <Route exact path="/" component={Dashboard}/>
-            <Route path='/create' component={Create}/>
-            <Route path='/play/:gameId' component={Play}/>
-            <Route path='/configuration/:gameId' component={Configuration}/>
-            <Route path='/login' component={Login}/>
-            <Route path='/dashboard' component={Dashboard}/>
-            <Route path='/info/:gameId' component={Info}/>
-            <Route path='/share/:gameId' component={Share}/>
-            <Route path='/join' component={Join}/>
-            <Route path='/*'>
-                <Redirect to='/'/>
-            </Route>
-        </Switch>
-    </BrowserRouter>, rootContainer)
+    render(<section>
+        <BrowserRouter key={Lang.activeLanguage} basename={`${config.rootName}/${NAMESPACE}`}>
+            <Switch>
+                <Route exact path="/" component={Dashboard}/>
+                <Route path='/create' component={Create}/>
+                <Route path='/play/:gameId' component={Play}/>
+                <Route path='/configuration/:gameId' component={Configuration}/>
+                <Route path='/login' component={Login}/>
+                <Route path='/dashboard' component={Dashboard}/>
+                <Route path='/info/:gameId' component={Info}/>
+                <Route path='/share/:gameId' component={Share}/>
+                <Route path='/join' component={Join}/>
+                <Route path='/*'>
+                    <Redirect to='/'/>
+                </Route>
+            </Switch>
+        </BrowserRouter>
+        {
+            WITH_LINKER ? null :
+                <div style={{position: 'absolute', right: 32, top: 16}}>
+                    <Button size='small'
+                            onClick={() => Lang.switchLang(Lang.activeLanguage === Language.en ? Language.zh : Language.en)}>
+                        {Lang.activeLanguage === Language.en ? '中文' : 'English'}</Button>
+                </div>
+        }
+    </section>, rootContainer)
 }
 
 function emptyPage(label: string) {
-    return ()=><div style={{
-        fontSize:'2rem',
-        margin:'2rem',
-        textAlign:'center',
-        color:'#999'
+    return () => <div style={{
+        fontSize: '2rem',
+        margin: '2rem',
+        textAlign: 'center',
+        color: '#999'
     }}>{label}</div>
 }
 

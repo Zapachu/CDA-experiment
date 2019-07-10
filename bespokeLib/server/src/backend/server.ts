@@ -132,7 +132,6 @@ export class Server {
         RedisCall.handle<NewPhase.IReq, NewPhase.IRes>(NewPhase.name(Setting.namespace), async ({elfGameId, owner, namespace, param}) => {
             const {id} = await GameModel.create({
                 title: '',
-                desc: '',
                 owner,
                 elfGameId,
                 namespace,

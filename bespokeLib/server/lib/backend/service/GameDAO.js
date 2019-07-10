@@ -81,18 +81,17 @@ var GameDAO = /** @class */ (function () {
     };
     GameDAO.getGame = function (gameId) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, id, owner, namespace, title, desc, params, elfGameId;
+            var _a, id, owner, namespace, title, params, elfGameId;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0: return [4 /*yield*/, model_1.GameModel.findById(gameId)];
                     case 1:
-                        _a = _b.sent(), id = _a.id, owner = _a.owner, namespace = _a.namespace, title = _a.title, desc = _a.desc, params = _a.params, elfGameId = _a.elfGameId;
+                        _a = _b.sent(), id = _a.id, owner = _a.owner, namespace = _a.namespace, title = _a.title, params = _a.params, elfGameId = _a.elfGameId;
                         return [2 /*return*/, {
                                 id: id,
                                 owner: owner.toString(),
                                 namespace: namespace,
                                 title: title,
-                                desc: desc,
                                 params: params,
                                 elfGameId: elfGameId
                             }];

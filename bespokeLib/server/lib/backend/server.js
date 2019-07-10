@@ -188,7 +188,6 @@ var Server = /** @class */ (function () {
                     switch (_b.label) {
                         case 0: return [4 /*yield*/, model_1.GameModel.create({
                                 title: '',
-                                desc: '',
                                 owner: owner,
                                 elfGameId: elfGameId,
                                 namespace: namespace,
