@@ -2,9 +2,21 @@ import * as React from 'react'
 import * as style from './style.scss'
 import * as qiniu from 'qiniu-js'
 import {Core} from '@bespoke/register'
-import {Lang, Button, ButtonProps} from '@elf/component'
-import {MoveType, PushType, TResultItem, Point, recognizeInterval} from '../config'
-import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
+import Button from 'antd/es/button'
+import 'antd/es/button/style'
+import {Lang} from '@elf/component'
+import {
+    ICreateParams,
+    IGameState,
+    IMoveParams,
+    IPlayerState,
+    IPushParams,
+    MoveType,
+    Point,
+    PushType,
+    recognizeInterval,
+    TResultItem
+} from '../config'
 
 interface IPlayState {
     recognizing: boolean
@@ -24,6 +36,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     lang = Lang.extractLang({
         start: ['开始', 'START'],
         pause: ['暂停', 'PAUSE'],
+        recognize: ['识别', 'RECOGNIZE'],
         result: ['结果', 'Result']
     })
 
@@ -102,19 +115,26 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                                             mouthLeft, mouthRight,
                                             noseTip, noseLeftAlarTop, noseLeftAlarOutTip, noseRootLeft, noseRootRight, noseRightAlarOutTip, noseRightAlarTop,
                                             pupilLeft, pupilRight,
-                                            upperLipBottom, upperLipTop, underLipBottom, underLipTop,
+                                            upperLipBottom, upperLipTop, underLipBottom, underLipTop
                                         }
                                                      }, i) =>
                                         <React.Fragment key={i}>
                                             <polygon
                                                 points={`${left},${top} ${left},${top + height} ${left + width},${top + height} ${left + width},${top}`}/>
-                                            <polygon points={this.serializePoints([eyeLeftBottom, eyeLeftInner, eyeLeftTop, eyeLeftOuter])}/>
-                                            <polygon points={this.serializePoints([eyeRightBottom, eyeRightInner, eyeRightTop, eyeRightOuter])}/>
-                                            <polygon points={this.serializePoints([eyebrowLeftOuter, eyebrowLeftInner])}/>
-                                            <polygon points={this.serializePoints([eyebrowRightOuter, eyebrowRightInner])}/>
-                                            <polygon points={this.serializePoints([noseTip, noseLeftAlarTop, noseLeftAlarOutTip, noseRootLeft, noseRootRight, noseRightAlarOutTip, noseRightAlarTop])}/>
-                                            <polygon points={this.serializePoints([mouthLeft, upperLipBottom, mouthRight, upperLipTop])}/>
-                                            <polygon points={this.serializePoints([mouthLeft, underLipBottom, mouthRight, underLipTop])}/>
+                                            <polygon
+                                                points={this.serializePoints([eyeLeftBottom, eyeLeftInner, eyeLeftTop, eyeLeftOuter])}/>
+                                            <polygon
+                                                points={this.serializePoints([eyeRightBottom, eyeRightInner, eyeRightTop, eyeRightOuter])}/>
+                                            <polygon
+                                                points={this.serializePoints([eyebrowLeftOuter, eyebrowLeftInner])}/>
+                                            <polygon
+                                                points={this.serializePoints([eyebrowRightOuter, eyebrowRightInner])}/>
+                                            <polygon
+                                                points={this.serializePoints([noseTip, noseLeftAlarTop, noseLeftAlarOutTip, noseRootLeft, noseRootRight, noseRightAlarOutTip, noseRightAlarTop])}/>
+                                            <polygon
+                                                points={this.serializePoints([mouthLeft, upperLipBottom, mouthRight, upperLipTop])}/>
+                                            <polygon
+                                                points={this.serializePoints([mouthLeft, underLipBottom, mouthRight, underLipTop])}/>
                                             <circle cx={pupilLeft.x} cy={pupilLeft.y} r={2}/>
                                             <circle cx={pupilRight.x} cy={pupilRight.y} r={2}/>
                                         </React.Fragment>)
@@ -130,8 +150,11 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                 <div className={style.btnWrapper}>
                     {
                         recognizing ?
-                            <Button label={lang.pause} color={ButtonProps.Color.red} onClick={() => this.stopRecognize()}/> :
-                            <Button label={lang.start} onClick={() => this.startRecognize()}/>
+                            <>
+                                <Button type='danger' onClick={() => this.stopRecognize()}>{lang.pause}</Button>
+                                <Button onClick={() => this.recognize()}>{lang.recognize}</Button>
+                            </> :
+                            <Button type='primary' onClick={() => this.startRecognize()}>{lang.start}</Button>
                     }
                 </div>
             </div>
@@ -145,10 +168,8 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     }
 }
 
-const ResultItem: React.SFC<TResultItem> = resultItem => {
-    console.log(resultItem)
+const ResultItem: React.FC<TResultItem> = resultItem => {
     const {faceAttributes: {age, gender, emotion}} = resultItem
-    console.log(resultItem)
     const lang = Lang.extractLang({
         age: ['年龄', 'Age'],
         gender: ['性别', 'Gender'],

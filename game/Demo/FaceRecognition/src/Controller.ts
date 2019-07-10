@@ -1,8 +1,16 @@
 import * as request from 'request'
 import * as qiniu from 'qiniu'
-import {BaseController, IActor, IMoveCallback, Log} from '@bespoke/server'
-import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
-import {MoveType, PushType, qiniuTokenLifetime} from './config'
+import {BaseController, IActor, IMoveCallback, Log, TPlayerState} from '@bespoke/server'
+import {
+    ICreateParams,
+    IGameState,
+    IMoveParams,
+    IPlayerState,
+    IPushParams,
+    MoveType,
+    PushType,
+    qiniuTokenLifetime, TResultItem
+} from './config'
 import {elfSetting} from '@elf/setting'
 
 const {qiNiu} = elfSetting
@@ -29,7 +37,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 break
             }
             case MoveType.recognize: {
-                request.post({
+                await request.post({
                     uri: elfSetting.ocpApim.gateWay,
                     qs: {
                         returnFaceId: true,
@@ -43,12 +51,17 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         'Content-Type': 'application/json',
                         'Ocp-Apim-Subscription-Key': elfSetting.ocpApim.subscriptionKey
                     }
-                }, (error, response, body) => {
-                    if (error) {
-                        Log.e(error)
-                        return cb([])
+                }, async (error, response, body) => {
+                    let resultItems: TResultItem[] = []
+                    const result = JSON.parse(body)
+                    if (error || result.error) {
+                        Log.e(error || result.error)
+                    } else {
+                        resultItems = result
                     }
-                    cb(JSON.parse(body))
+                    cb(resultItems)
+                    const playerState = await this.stateManager.getPlayerState(actor)
+                    playerState.result = resultItems[0]
                 })
                 break
             }
