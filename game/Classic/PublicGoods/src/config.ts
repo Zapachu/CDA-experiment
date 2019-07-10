@@ -15,10 +15,4 @@ export enum PlayerStatus {
     result
 }
 
-export enum FetchRoute {
-    exportXls = "/exportXls/:gameId:",
-    exportXlsPlaying = "/exportXlsPlaying/:gameId",
-    getUserInfo = "/getUserInfo/:gameId"
-}
-
 export const NEW_ROUND_TIMER = 5

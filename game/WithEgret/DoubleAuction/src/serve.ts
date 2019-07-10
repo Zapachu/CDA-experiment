@@ -21,7 +21,6 @@ RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(
     async ({keys}) => {
         const gameId = await Server.newGame({
             title: `DoubleAuction:${new Date().toUTCString()}`,
-            desc: '',
             params: {}
         })
         return {playUrls: keys.map(key => gameId2PlayUrl(gameId, key))}

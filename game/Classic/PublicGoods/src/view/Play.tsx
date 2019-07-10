@@ -1,15 +1,15 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Input, Lang, MaskLoading, Request} from '@elf/component'
+import {Input, Lang, MaskLoading} from '@elf/component'
 import {Core} from '@bespoke/register'
 import Affix from 'antd/es/affix'
 import Button from 'antd/es/button'
 import Modal from 'antd/es/modal'
 import Table from 'antd/es/table'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
-import {FetchRoute, MoveType, namespace, NEW_ROUND_TIMER, PlayerStatus, PushType} from '../config'
+import {MoveType, NEW_ROUND_TIMER, PlayerStatus, PushType} from '../config'
 
-export function Play({game: {id: gameId, params: {round}}, playerState, gameState, frameEmitter}: Core.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {
+export function Play({game: {params: {round}}, playerState, gameState, frameEmitter}: Core.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {
     const lang = Lang.extractLang({
         getPosition: ['匹配中...', 'Matching...'],
         roundInfo1: ['第', 'Round '],
@@ -21,7 +21,7 @@ export function Play({game: {id: gameId, params: {round}}, playerState, gameStat
         submit: ['提交', 'Submit'],
         waiting4input: ['等待其它玩家提交...', 'Waiting for other players to submit'],
         roundResult: ['本轮结果', 'Round Result'],
-        round:['轮次','Round'],
+        round: ['轮次', 'Round'],
         input: ['投入'],
         return: ['回报'],
         fund: ['结余'],
@@ -34,7 +34,6 @@ export function Play({game: {id: gameId, params: {round}}, playerState, gameStat
         [newRoundTimers, setNewRoundTimers] = React.useState([] as number[]),
         [showHistory, setShowHistory] = React.useState(false)
     React.useEffect(() => {
-        Request.get(namespace, FetchRoute.getUserInfo, {gameId}, playerState.actor)
         frameEmitter.on(PushType.newRoundTimer, ({roundIndex, newRoundTimer}) => {
             const t = newRoundTimers.slice()
             t[roundIndex] = newRoundTimer
@@ -84,7 +83,8 @@ export function Play({game: {id: gameId, params: {round}}, playerState, gameStat
                     {
                         roundIndex === round - 1 ?
                             <p className={style.roundOverInfo}>{lang.gameOver}</p> :
-                            <p className={style.roundOverInfo}>{lang.toNewRound1}<em>{NEW_ROUND_TIMER - (newRoundTimers[roundIndex] || 0)}</em>{lang.toNewRound2}</p>
+                            <p className={style.roundOverInfo}>{lang.toNewRound1}<em>{NEW_ROUND_TIMER - (newRoundTimers[roundIndex] || 0)}</em>{lang.toNewRound2}
+                            </p>
                     }
                 </div>
             case PlayerStatus.submitted:
@@ -112,7 +112,7 @@ export function Play({game: {id: gameId, params: {round}}, playerState, gameStat
             <Table dataSource={playerState.rounds.map(({initialMoney, submitMoney}, i) =>
                 ({
                     key: i,
-                    round: i+1,
+                    round: i + 1,
                     initialMoney,
                     submitMoney,
                     returnMoney: gameRounds[i].returnMoney,

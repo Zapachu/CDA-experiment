@@ -15,7 +15,6 @@ RobotServer.start(namespace, Robot)
 RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(CreateGame.name(phaseToNamespace(Phase.IPO_TopK)), async ({keys}) => {
     const gameId = await Server.newGame<ICreateParams>({
         title: `${Phase.IPO_TopK}:${new Date().toUTCString()}`,
-        desc: '',
         params: {
             groupSize: 6,
             total: 10000,
@@ -27,7 +26,6 @@ RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(CreateGame.name(phaseToNamesp
 RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(CreateGame.name(phaseToNamespace(Phase.IPO_Median)), async ({keys}) => {
     const gameId = await Server.newGame<ICreateParams>({
         title: `${Phase.IPO_Median}:${new Date().toUTCString()}`,
-        desc: '',
         params: {
             groupSize: 6,
             total: 10000,

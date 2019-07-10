@@ -15,7 +15,6 @@ RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(
   async ({ keys }) => {
     const gameId = await Server.newGame<ICreateParams>({
       title: `ParallelApplication:${new Date().toUTCString()}`,
-      desc: "",
       params: {
         groupSize: 20
       }
