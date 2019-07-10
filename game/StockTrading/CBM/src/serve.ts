@@ -14,7 +14,6 @@ RobotServer.start(namespace, Robot)
 RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(CreateGame.name(phaseToNamespace(Phase.CBM)), async ({keys}) => {
     const gameId = await Server.newGame<ICreateParams>({
         title: `${Phase.CBM}:${new Date().toUTCString()}`,
-        desc: '',
         params: {
             allowLeverage: false
         }
@@ -24,7 +23,6 @@ RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(CreateGame.name(phaseToNamesp
 RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(CreateGame.name(phaseToNamespace(Phase.CBM_Leverage)), async ({keys}) => {
     const gameId = await Server.newGame<ICreateParams>({
         title: `${Phase.CBM}:${new Date().toUTCString()}`,
-        desc: '',
         params: {
             allowLeverage: true
         }

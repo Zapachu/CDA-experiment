@@ -1,7 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {Core} from '@bespoke/register'
-import 'antd/es/table/style'
 import Table from 'antd/es/table'
 import {ICreateParams, IGameState, IPlayerState} from '../interface'
 import {Lang} from '@elf/component'

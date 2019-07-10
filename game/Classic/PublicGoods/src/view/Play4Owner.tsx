@@ -5,8 +5,6 @@ import {Core} from '@bespoke/register'
 import {Lang} from '@elf/component'
 import Tabs from 'antd/es/tabs'
 import Table from 'antd/es/table'
-import 'antd/es/tabs/style'
-import 'antd/es/table/style'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import {MoveType, PushType} from '../config'
 
@@ -23,16 +21,16 @@ export function Play4Owner({game: {}, playerStates, gameState: {logs, groups}}: 
     })
     const [activeTabKey, setActiveTabKey] = React.useState(lang.members)
     const playerNames = []
-    Object.values(playerStates).forEach(({positionIndex, userInfo}) => playerNames[positionIndex] = userInfo.name)
+    Object.values(playerStates).forEach(({positionIndex, user}) => playerNames[positionIndex] = user.name)
     return <section className={style.play4owner}>
         <div className={style.tabsWrapper}>
             <Tabs defaultActiveKey={activeTabKey} onChange={setActiveTabKey}>
                 <Tabs.TabPane tab={lang.members} key={lang.members}>
-                    <Table dataSource={Object.entries(playerStates).map(([token, {groupIndex, userInfo}]) =>
+                    <Table dataSource={Object.entries(playerStates).map(([token, {groupIndex, user}]) =>
                         ({
                             key: token,
-                            name: userInfo.name,
-                            mobile: userInfo.mobile,
+                            name: user.name,
+                            mobile: user.mobile,
                             group: groupIndex + 1,
                             round: groups[groupIndex]? groups[groupIndex].roundIndex : null
                         })
@@ -65,7 +63,7 @@ export function Play4Owner({game: {}, playerStates, gameState: {logs, groups}}: 
                             key: time,
                             group: group + 1,
                             round: round + 1,
-                            player: playerNames[position],
+                            name: playerNames[position],
                             money,
                             time: dateFormat(time, 'HH:MM:ss')
                         }))} columns={[

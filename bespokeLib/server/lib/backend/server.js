@@ -188,7 +188,6 @@ var Server = /** @class */ (function () {
                     switch (_b.label) {
                         case 0: return [4 /*yield*/, model_1.GameModel.create({
                                 title: '',
-                                desc: '',
                                 owner: owner,
                                 elfGameId: elfGameId,
                                 namespace: namespace,
@@ -202,11 +201,13 @@ var Server = /** @class */ (function () {
             });
         });
         var elfComponentPath = require('../../static/index.json')['ElfComponent.js'].replace('static', util_1.Setting.namespace + "/static");
-        var regInfo = {
-            namespace: util_1.Setting.namespace,
-            jsUrl: "" + util_1.getOrigin() + elfComponentPath + ";" + util_1.getOrigin() + util_1.Setting.getClientPath()
-        };
-        util_1.heartBeat(protocol_1.PhaseReg.key(util_1.Setting.namespace), JSON.stringify(regInfo));
+        util_1.heartBeat(protocol_1.PhaseReg.key(util_1.Setting.namespace), function () {
+            var regInfo = {
+                namespace: util_1.Setting.namespace,
+                jsUrl: "" + util_1.getOrigin() + elfComponentPath + ";" + util_1.getOrigin() + util_1.Setting.getClientPath()
+            };
+            return JSON.stringify(regInfo);
+        });
     };
     Server.start = function (namespace, Logic, staticPath, bespokeRouter, startOption) {
         var _this = this;
@@ -222,7 +223,7 @@ var Server = /** @class */ (function () {
         eventDispatcher_1.EventDispatcher.startGameSocket(server).use(socketIOSession(this.sessionMiddleware));
         this.bindServerListener(server, function () {
             util_2.Log.i("Running at\uFF1Ahttp://" + util_1.Setting.ip + ":" + (setting_1.elfSetting.bespokeHmr ? share_1.config.devPort.client : util_1.Setting.port) + "/" + share_1.config.rootName + "/" + util_1.Setting.namespace);
-            util_1.heartBeat(util_1.RedisKey.gameServer(util_1.Setting.namespace), util_1.Setting.ip + ":" + util_1.Setting.port);
+            util_1.heartBeat(util_1.RedisKey.gameServer(util_1.Setting.namespace), function () { return util_1.Setting.ip + ":" + util_1.Setting.port; });
             if (setting_1.elfSetting.bespokeWithLinker) {
                 _this.withLinker();
             }

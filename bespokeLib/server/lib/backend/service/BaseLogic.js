@@ -96,9 +96,12 @@ var BaseLogic = /** @class */ (function () {
     };
     BaseLogic.prototype.initPlayerState = function (actor) {
         return __awaiter(this, void 0, void 0, function () {
+            var connection;
             return __generator(this, function (_a) {
+                connection = this.connections.get(actor.token);
                 return [2 /*return*/, {
-                        actor: actor
+                        actor: actor,
+                        user: connection ? connection.user || {} : {}
                     }];
             });
         });

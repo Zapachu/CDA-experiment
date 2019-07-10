@@ -1,6 +1,6 @@
 export interface IGroupParams {
     roundParams: Array<{
-        K:number
+        K: number
         playerInitialMoney: Array<number>
     }>
 }
@@ -38,10 +38,6 @@ export interface IGameState {
 }
 
 export interface IPlayerState {
-    userInfo?:{
-        mobile?:string,
-        name?:string
-    }
     groupIndex: number;
     positionIndex: number;
     rounds?: Array<{

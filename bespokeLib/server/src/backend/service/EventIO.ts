@@ -6,6 +6,7 @@ import {
     IConnectionNamespace,
     IGameWithId,
     IRobotHandshake,
+    IUserWithId,
     SocketEvent
 } from '@bespoke/share'
 import {getSocketPath, IpcConnection, IpcEvent, Log, Token} from '@elf/util'
@@ -16,6 +17,7 @@ import * as SocketIO from 'socket.io'
 import {GameDAO} from './GameDAO'
 import {Setting} from '../util'
 import {EventEmitter} from 'events'
+import {UserModel} from '../model'
 
 export class EventIO {
     private static robotIOServer: RobotIO.Server
@@ -34,14 +36,19 @@ export class EventIO {
     static initSocketIOServer(server: Server, subscribeOnConnection: (connection: IConnection) => void): SocketIO.Server {
         this.socketIOServer = SocketIO(server, {path: config.socketPath(Setting.namespace)})
         this.socketIOServer.on(SocketEvent.connection, async (connection: SocketIO.Socket) => {
-            const {query: {token, gameId}, session: {passport: {user} = {user: undefined}, actor: linkerActor}, sessionID} = connection.handshake
+            const {query: {token, gameId}, session: {passport: {user: userId} = {user: undefined}, actor: linkerActor}, sessionID} = connection.handshake
             const game = await GameDAO.getGame(gameId)
             const actor: IActor = Token.checkToken(token) ?
-                game.owner === user ? {type: Actor.clientRobot, token} : {type: Actor.player, token} :
-                game.owner === user ?
-                    {type: Actor.owner, token: Token.geneToken(user)} :
-                    linkerActor || {type: Actor.player, token: Token.geneToken(user || sessionID)}
-            subscribeOnConnection(Object.assign(connection, {actor, game}) as any)
+                game.owner === userId ? {type: Actor.clientRobot, token} : {type: Actor.player, token} :
+                game.owner === userId ?
+                    {type: Actor.owner, token: Token.geneToken(userId)} :
+                    linkerActor || {type: Actor.player, token: Token.geneToken(userId || sessionID)}
+            let user: IUserWithId = null
+            if (userId) {
+                const {id, mobile, name, role} = await UserModel.findById(userId)
+                user = {id, mobile, name, role}
+            }
+            subscribeOnConnection(Object.assign(connection, {actor, game, user}) as any)
         })
         return this.socketIOServer
     }

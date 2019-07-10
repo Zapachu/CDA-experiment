@@ -65,7 +65,15 @@ function geneClientBuilder(_a) {
                 },
                 {
                     test: /\.css$/,
-                    use: ['style-loader', 'css-loader']
+                    use: ["style-loader", "css-loader"]
+                },
+                {
+                    test: /\.less$/,
+                    use: [
+                        "style-loader",
+                        "css-loader",
+                        { loader: "less-loader", options: { javascriptEnabled: true } }
+                    ]
                 },
                 {
                     test: /\.(scss|sass)$/,

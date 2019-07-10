@@ -44,19 +44,23 @@ function renderRoot(pageProps, rootContainer) {
                 return React.createElement(Component, __assign({}, pageProps, props));
             } }));
     };
-    react_dom_1.render(React.createElement(react_router_dom_1.BrowserRouter, { key: component_1.Lang.activeLanguage, basename: share_1.config.rootName + "/" + NAMESPACE },
-        React.createElement(react_router_dom_1.Switch, null,
-            React.createElement(Route, { exact: true, path: "/", component: Dashboard_1.Dashboard }),
-            React.createElement(Route, { path: '/create', component: Create_1.Create }),
-            React.createElement(Route, { path: '/play/:gameId', component: Play_1.Play }),
-            React.createElement(Route, { path: '/configuration/:gameId', component: Configuration_1.Configuration }),
-            React.createElement(Route, { path: '/login', component: Login_1.Login }),
-            React.createElement(Route, { path: '/dashboard', component: Dashboard_1.Dashboard }),
-            React.createElement(Route, { path: '/info/:gameId', component: Info_1.Info }),
-            React.createElement(Route, { path: '/share/:gameId', component: Share_1.Share }),
-            React.createElement(Route, { path: '/join', component: Join_1.Join }),
-            React.createElement(Route, { path: '/*' },
-                React.createElement(react_router_dom_1.Redirect, { to: '/' })))), rootContainer);
+    react_dom_1.render(React.createElement("section", null,
+        React.createElement(react_router_dom_1.BrowserRouter, { key: component_1.Lang.activeLanguage, basename: share_1.config.rootName + "/" + NAMESPACE },
+            React.createElement(react_router_dom_1.Switch, null,
+                React.createElement(Route, { exact: true, path: "/", component: Dashboard_1.Dashboard }),
+                React.createElement(Route, { path: '/create', component: Create_1.Create }),
+                React.createElement(Route, { path: '/play/:gameId', component: Play_1.Play }),
+                React.createElement(Route, { path: '/configuration/:gameId', component: Configuration_1.Configuration }),
+                React.createElement(Route, { path: '/login', component: Login_1.Login }),
+                React.createElement(Route, { path: '/dashboard', component: Dashboard_1.Dashboard }),
+                React.createElement(Route, { path: '/info/:gameId', component: Info_1.Info }),
+                React.createElement(Route, { path: '/share/:gameId', component: Share_1.Share }),
+                React.createElement(Route, { path: '/join', component: Join_1.Join }),
+                React.createElement(Route, { path: '/*' },
+                    React.createElement(react_router_dom_1.Redirect, { to: '/' })))),
+        WITH_LINKER ? null :
+            React.createElement("div", { style: { position: 'absolute', right: 32, top: 16 } },
+                React.createElement(util_1.Button, { size: 'small', onClick: function () { return component_1.Lang.switchLang(component_1.Lang.activeLanguage === component_1.Language.en ? component_1.Language.zh : component_1.Language.en); } }, component_1.Lang.activeLanguage === component_1.Language.en ? '中文' : 'English'))), rootContainer);
 }
 function emptyPage(label) {
     return function () { return React.createElement("div", { style: {

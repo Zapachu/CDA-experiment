@@ -48,19 +48,17 @@ function Info(_a) {
             return setUser(user);
         });
     }, []);
-    if (!game || !user) {
+    if (!game) {
         return React.createElement(component_1.MaskLoading, null);
     }
     return React.createElement("div", { className: style.info },
-        React.createElement("section", { className: style.desc },
-            React.createElement(component_1.Markdown, { editable: false, value: game.desc })),
         React.createElement("ul", { className: style.featureButtons },
             React.createElement("li", __assign({}, {
                 style: {
                     backgroundColor: '#ff888e'
                 },
                 onClick: function () { return history.push("/play/" + gameId + location.search); }
-            }), game.owner === user.id ? lang.enterRoom : lang.joinGame)));
+            }), user && (game.owner === user.id) ? lang.enterRoom : lang.joinGame)));
 }
 exports.Info = Info;
 //# sourceMappingURL=index.js.map

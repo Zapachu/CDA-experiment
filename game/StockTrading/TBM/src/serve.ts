@@ -16,7 +16,6 @@ RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(
   async ({ keys }) => {
     const gameId = await Server.newGame<ICreateParams>({
       title: `${Phase.TBM}:${new Date().toUTCString()}`,
-      desc: "",
       params: {
         groupSize: 12,
         buyerCapitalMin: 50000,

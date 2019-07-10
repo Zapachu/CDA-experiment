@@ -1,7 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {Core} from '@bespoke/register'
-import 'antd/es/table/style'
 import Table from 'antd/es/table'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState} from '../interface'
 import {MoveType} from '../config'
@@ -32,11 +31,11 @@ export function Result4Owner({game: {params: {round, group, groupParams}}, trave
             return null
         }
         const {returnMoney} = gameState.groups[groupIndex].rounds[roundIndex]
-        return <Table dataSource={Object.entries(playerStates).map(([token, {rounds, userInfo}]) => {
+        return <Table dataSource={Object.entries(playerStates).map(([token, {rounds, user}]) => {
             const {initialMoney, submitMoney} = rounds[roundIndex]
             return {
                 key: token,
-                name: userInfo.name,
+                name: user.name,
                 initialMoney,
                 submitMoney,
                 K,

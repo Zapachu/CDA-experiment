@@ -132,7 +132,6 @@ export class Server {
         RedisCall.handle<NewPhase.IReq, NewPhase.IRes>(NewPhase.name(Setting.namespace), async ({elfGameId, owner, namespace, param}) => {
             const {id} = await GameModel.create({
                 title: '',
-                desc: '',
                 owner,
                 elfGameId,
                 namespace,
@@ -141,11 +140,13 @@ export class Server {
             return {playUrl: gameId2PlayUrl(id)}
         })
         const elfComponentPath = require('../../static/index.json')['ElfComponent.js'].replace('static', `${Setting.namespace}/static`)
-        const regInfo: PhaseReg.IRegInfo = {
-            namespace: Setting.namespace,
-            jsUrl: `${getOrigin()}${elfComponentPath};${getOrigin()}${Setting.getClientPath()}`
-        }
-        heartBeat(PhaseReg.key(Setting.namespace), JSON.stringify(regInfo))
+        heartBeat(PhaseReg.key(Setting.namespace), ()=>{
+            const regInfo: PhaseReg.IRegInfo = {
+                namespace: Setting.namespace,
+                jsUrl: `${getOrigin()}${elfComponentPath};${getOrigin()}${Setting.getClientPath()}`
+            }
+            return JSON.stringify(regInfo)
+        })
     }
 
     static start(namespace: string, Logic: new(...args) => AnyLogic, staticPath: string, bespokeRouter: Express.Router = Express.Router(), startOption: IStartOption = {}) {
@@ -160,7 +161,7 @@ export class Server {
         EventDispatcher.startGameSocket(server).use(socketIOSession(this.sessionMiddleware))
         this.bindServerListener(server, () => {
             Log.i(`Running at：http://${Setting.ip}:${elfSetting.bespokeHmr ? config.devPort.client : Setting.port}/${config.rootName}/${Setting.namespace}`)
-            heartBeat(RedisKey.gameServer(Setting.namespace), `${Setting.ip}:${Setting.port}`)
+            heartBeat(RedisKey.gameServer(Setting.namespace), ()=>`${Setting.ip}:${Setting.port}`)
             if (elfSetting.bespokeWithLinker) {
                 this.withLinker()
             }

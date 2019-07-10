@@ -4,4 +4,5 @@ function __export(m) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./Api"));
+__export(require("./Antd"));
 //# sourceMappingURL=index.js.map

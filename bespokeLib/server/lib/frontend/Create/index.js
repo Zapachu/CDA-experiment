@@ -64,20 +64,21 @@ var __read = (this && this.__read) || function (o, n) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
 var style = require("./style.scss");
-var HistoryGame_1 = require("./HistoryGame");
 var component_1 = require("@elf/component");
 var util_1 = require("../util");
+var dateFormat = require("dateformat");
 var SubmitBarHeight = '5rem';
 function Create(_a) {
     var user = _a.user, history = _a.history, GameCreate = _a.gameTemplate.Create;
     var lang = component_1.Lang.extractLang({
-        GameTitle: ['实验标题', 'Title'],
-        GameDesc: ['实验详情', 'Description'],
+        title: ['实验标题', 'Title'],
+        loadFromHistory: ['点击从历史实验加载实验配置', 'Click to load configuration from history game'],
+        loadSuccess: ['加载成功', 'Load success'],
         Submit: ['提交', 'Submit'],
         CreateSuccess: ['实验创建成功', 'Create success'],
         CreateFailed: ['实验创建失败', 'Create Failed']
     });
-    var _b = __read(React.useState(''), 2), title = _b[0], setTitle = _b[1], _c = __read(React.useState(''), 2), desc = _c[0], setDesc = _c[1], _d = __read(React.useState({}), 2), params = _d[0], setParams = _d[1], _e = __read(React.useState(true), 2), submitable = _e[0], setSubmitable = _e[1];
+    var _b = __read(React.useState(''), 2), title = _b[0], setTitle = _b[1], _c = __read(React.useState({}), 2), params = _c[0], setParams = _c[1], _d = __read(React.useState(true), 2), submitable = _d[0], setSubmitable = _d[1];
     React.useEffect(function () {
         if (user && user.role === component_1.AcademusRole.teacher) {
             return;
@@ -89,7 +90,7 @@ function Create(_a) {
             var _a, code, gameId;
             return __generator(this, function (_b) {
                 switch (_b.label) {
-                    case 0: return [4 /*yield*/, util_1.Api.newGame({ title: title, desc: desc, params: params })];
+                    case 0: return [4 /*yield*/, util_1.Api.newGame({ title: title || '---', params: params })];
                     case 1:
                         _a = _b.sent(), code = _a.code, gameId = _a.gameId;
                         if (code === component_1.ResponseCode.success) {
@@ -105,27 +106,27 @@ function Create(_a) {
         });
     }
     return React.createElement("section", { className: style.create, style: { marginBottom: SubmitBarHeight } },
-        React.createElement("div", { className: style.baseInfoWrapper },
-            React.createElement("section", { className: style.gameInfo },
-                React.createElement("div", { className: style.gameFieldWrapper },
-                    React.createElement(component_1.Input, { value: title, placeholder: lang.GameTitle, onChange: function (_a) {
-                            var title = _a.target.value;
-                            return setTitle(title);
-                        } })),
-                React.createElement("div", { className: style.gameFieldWrapper },
-                    React.createElement(component_1.Label, { label: lang.GameDesc }),
-                    React.createElement(component_1.Markdown, { editable: true, value: desc, onChange: function (_a) {
-                            var desc = _a.target.value;
-                            return setDesc(desc);
-                        } }))),
-            React.createElement(HistoryGame_1.HistoryGame, __assign({}, {
-                applyHistoryGame: function (_a) {
-                    var title = _a.title, desc = _a.desc, params = _a.params;
-                    setTitle(title);
-                    setDesc(desc);
-                    setParams(params);
-                }
-            }))),
+        React.createElement("div", { className: style.titleWrapper },
+            React.createElement(util_1.Input, { size: 'large', value: title, placeholder: lang.title, onChange: function (_a) {
+                    var title = _a.target.value;
+                    return setTitle(title);
+                } })),
+        React.createElement("div", { className: style.historyGameBtnWrapper },
+            React.createElement(util_1.Button, { size: 'small', icon: "folder-open", onClick: function () {
+                    var modal = util_1.Modal.info({
+                        title: lang.loadFromHistory,
+                        content: React.createElement("div", { style: { marginTop: '1rem' } },
+                            React.createElement(HistoryGame, __assign({}, {
+                                applyHistoryGame: function (_a) {
+                                    var title = _a.title, params = _a.params;
+                                    setTitle(title);
+                                    setParams(params);
+                                    modal.destroy();
+                                    util_1.message.success(lang.loadSuccess);
+                                }
+                            })))
+                    });
+                } })),
         React.createElement("div", { className: style.bespokeWrapper },
             React.createElement(GameCreate, __assign({}, {
                 params: params,
@@ -133,7 +134,41 @@ function Create(_a) {
                 submitable: submitable,
                 setSubmitable: function (submitable) { return setSubmitable(submitable); }
             }))),
-        React.createElement("div", { className: style.submitBtnWrapper, style: { height: SubmitBarHeight } }, submitable ? React.createElement(component_1.Button, { width: component_1.ButtonProps.Width.medium, label: lang.Submit, onClick: function () { return submit(); } }) : null));
+        React.createElement("div", { className: style.submitBtnWrapper, style: { height: SubmitBarHeight } },
+            React.createElement(util_1.Button, { type: 'primary', disabled: !submitable, onClick: function () { return submit(); } }, lang.Submit)));
 }
 exports.Create = Create;
+function HistoryGame(_a) {
+    var _this = this;
+    var applyHistoryGame = _a.applyHistoryGame;
+    var _b = __read(React.useState([]), 2), historyGameThumbs = _b[0], setHistoryGameThumbs = _b[1];
+    React.useEffect(function () {
+        util_1.Api.getHistoryGames().then(function (_a) {
+            var historyGameThumbs = _a.historyGameThumbs;
+            return setHistoryGameThumbs(historyGameThumbs);
+        });
+    }, []);
+    return React.createElement(util_1.List, { dataSource: historyGameThumbs, grid: {
+            gutter: 16,
+            md: 2
+        }, renderItem: function (_a) {
+            var id = _a.id, title = _a.title, createAt = _a.createAt;
+            return React.createElement(util_1.List.Item, null,
+                React.createElement("div", { style: { cursor: 'pointer' }, onClick: function () { return __awaiter(_this, void 0, void 0, function () {
+                        var _a, code, game;
+                        return __generator(this, function (_b) {
+                            switch (_b.label) {
+                                case 0: return [4 /*yield*/, util_1.Api.getGame(id)];
+                                case 1:
+                                    _a = _b.sent(), code = _a.code, game = _a.game;
+                                    if (code === component_1.ResponseCode.success) {
+                                        applyHistoryGame(game);
+                                    }
+                                    return [2 /*return*/];
+                            }
+                        });
+                    }); } },
+                    React.createElement(util_1.List.Item.Meta, { title: title, description: dateFormat(createAt, 'yyyy-mm-dd') })));
+        } });
+}
 //# sourceMappingURL=index.js.map

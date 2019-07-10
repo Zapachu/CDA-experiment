@@ -41,8 +41,9 @@
     }
     .iconWrapper {
       display: inline-block;
+      box-sizing: content-box;
       width: $fontSize-large;
-      padding: .5rem .5rem 0;
+      padding: .5rem;
       path {
         fill: rgba(white, .9);
       }
