@@ -148,7 +148,7 @@ export class Play extends Core.Play<
 
   getPlayerStatus = (): STATUS => {
     const { playerState, gameState } = this.props;
-    if (gameState.card !== undefined) {
+    if (gameState.card1 !== undefined) {
       return STATUS.result;
     }
     // if (playerState.profitDecision56) {
@@ -161,6 +161,40 @@ export class Play extends Core.Play<
       return STATUS.info;
     }
     return STATUS.playing;
+  };
+
+  renderInstruction = (
+    instructions: Array<string | { text: string; style: object }>
+  ) => {
+    if (!instructions) return null;
+    return instructions.map((word, i) => {
+      if (typeof word === "string") {
+        return <Row key={i}>{this.renderWord(word)}</Row>;
+      }
+      return (
+        <Row key={i} style={word.style}>
+          {this.renderWord(word.text)}
+        </Row>
+      );
+    });
+  };
+
+  renderWord = (word: string) => {
+    const words = word.split("$bold$");
+    if (words.length === 1) {
+      return words[0];
+    }
+    return (
+      <p>
+        {words.map((w, i) => {
+          return (
+            <span key={i} style={i % 2 === 1 ? { fontWeight: "bolder" } : {}}>
+              {w}
+            </span>
+          );
+        })}
+      </p>
+    );
   };
 
   renderPlaying = () => {
@@ -184,17 +218,7 @@ export class Play extends Core.Play<
         return (
           <div className={style.stage}>
             <Row>决策{decision}</Row>
-            {page.instructions &&
-              page.instructions.map((word, i) => {
-                if (typeof word === "string") {
-                  return <Row key={i}>{word}</Row>;
-                }
-                return (
-                  <Row key={i} style={word.style}>
-                    {word.text}
-                  </Row>
-                );
-              })}
+            {this.renderInstruction(page.instructions)}
             {page.questions.map(({ title, options }, i) => {
               return (
                 <div key={i} className={style.question}>
@@ -396,15 +420,19 @@ export class Play extends Core.Play<
         return (
           <div>
             <p>感谢参加。</p>
-            <p>第一部分抽题为 {DECISION_LABEL[playerState.profitDecision14]}</p>
             <p>
-              {playerState.profitDecision56
-                ? `你抽中了第二部分，抽题为 ${
-                    DECISION_LABEL[playerState.profitDecision56]
-                  }`
-                : "你没有抽中第二部分"}
+              你在第一部分抽中的题目是
+              {DECISION_LABEL[playerState.profitDecision14]}，收益是
+              {this.renderProfit(playerState.profit14)}
             </p>
-            <p>收益为 {this.renderProfit(playerState.profit)}</p>
+            <p>
+              你在第二部分抽中的题目是
+              {playerState.won56
+                ? DECISION_LABEL[playerState.profitDecision56]
+                : `对方的${DECISION_LABEL[playerState.profitDecision56]}`}
+              ，收益是{this.renderProfit(playerState.profit56)}
+            </p>
+            <p>最终收益为 {this.renderProfit(playerState.profit)}</p>
           </div>
         );
       }
