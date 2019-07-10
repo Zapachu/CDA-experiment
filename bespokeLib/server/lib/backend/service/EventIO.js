@@ -76,6 +76,7 @@ var SocketIO = require("socket.io");
 var GameDAO_1 = require("./GameDAO");
 var util_2 = require("../util");
 var events_1 = require("events");
+var model_1 = require("../model");
 var EventIO = /** @class */ (function () {
     function EventIO() {
     }
@@ -95,20 +96,28 @@ var EventIO = /** @class */ (function () {
         var _this = this;
         this.socketIOServer = SocketIO(server, { path: share_1.config.socketPath(util_2.Setting.namespace) });
         this.socketIOServer.on(share_1.SocketEvent.connection, function (connection) { return __awaiter(_this, void 0, void 0, function () {
-            var _a, _b, token, gameId, _c, _d, user, linkerActor, sessionID, game, actor;
-            return __generator(this, function (_e) {
-                switch (_e.label) {
+            var _a, _b, token, gameId, _c, _d, userId, linkerActor, sessionID, game, actor, user, _e, id, mobile, name_1, role;
+            return __generator(this, function (_f) {
+                switch (_f.label) {
                     case 0:
-                        _a = connection.handshake, _b = _a.query, token = _b.token, gameId = _b.gameId, _c = _a.session, _d = _c.passport, user = (_d === void 0 ? { user: undefined } : _d).user, linkerActor = _c.actor, sessionID = _a.sessionID;
+                        _a = connection.handshake, _b = _a.query, token = _b.token, gameId = _b.gameId, _c = _a.session, _d = _c.passport, userId = (_d === void 0 ? { user: undefined } : _d).user, linkerActor = _c.actor, sessionID = _a.sessionID;
                         return [4 /*yield*/, GameDAO_1.GameDAO.getGame(gameId)];
                     case 1:
-                        game = _e.sent();
+                        game = _f.sent();
                         actor = util_1.Token.checkToken(token) ?
-                            game.owner === user ? { type: share_1.Actor.clientRobot, token: token } : { type: share_1.Actor.player, token: token } :
-                            game.owner === user ?
-                                { type: share_1.Actor.owner, token: util_1.Token.geneToken(user) } :
-                                linkerActor || { type: share_1.Actor.player, token: util_1.Token.geneToken(user || sessionID) };
-                        subscribeOnConnection(Object.assign(connection, { actor: actor, game: game }));
+                            game.owner === userId ? { type: share_1.Actor.clientRobot, token: token } : { type: share_1.Actor.player, token: token } :
+                            game.owner === userId ?
+                                { type: share_1.Actor.owner, token: util_1.Token.geneToken(userId) } :
+                                linkerActor || { type: share_1.Actor.player, token: util_1.Token.geneToken(userId || sessionID) };
+                        user = null;
+                        if (!userId) return [3 /*break*/, 3];
+                        return [4 /*yield*/, model_1.UserModel.findById(userId)];
+                    case 2:
+                        _e = _f.sent(), id = _e.id, mobile = _e.mobile, name_1 = _e.name, role = _e.role;
+                        user = { id: id, mobile: mobile, name: name_1, role: role };
+                        _f.label = 3;
+                    case 3:
+                        subscribeOnConnection(Object.assign(connection, { actor: actor, game: game, user: user }));
                         return [2 /*return*/];
                 }
             });

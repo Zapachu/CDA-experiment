@@ -101,8 +101,6 @@ var Configuration = /** @class */ (function (_super) {
         }
         var Info = gameTemplate.Info;
         return React.createElement("section", { className: style.configuration },
-            React.createElement("div", { className: style.gameInfo },
-                React.createElement("p", null, game.desc)),
             React.createElement("ul", { className: style.phaseList },
                 React.createElement(Info, __assign({}, { game: game })),
                 React.createElement("li", { style: { margin: '2rem auto 0' } },

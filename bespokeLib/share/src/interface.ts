@@ -51,6 +51,7 @@ export type TGameState<IGameState> = IGameState & {
 
 export type TPlayerState<IPlayerState> = IPlayerState & {
     actor: IActor
+    user: IUserWithId
     connectionId?: string
 }
 
@@ -85,6 +86,7 @@ export interface IConnection extends EventEmitter {
     id: string
     actor: IActor
     game: IGameWithId<any>
+    user?: IUserWithId
 
     on(eventType: string, handler: IEventHandler): this
 

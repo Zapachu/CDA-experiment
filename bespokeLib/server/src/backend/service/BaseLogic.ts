@@ -67,8 +67,10 @@ export class BaseLogic<ICreateParams, IGameState, IPlayerState, MoveType, PushTy
     }
 
     async initPlayerState(actor: IActor): Promise<TPlayerState<IPlayerState>> {
+        const connection = this.connections.get(actor.token)
         return {
-            actor
+            actor,
+            user: connection ? connection.user || {} : {}
         } as any
     }
 
