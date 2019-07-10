@@ -89,7 +89,7 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
             <br/>
             <Input value={title}
                    placeholder={lang.title}
-                   maxLength={20}
+                   maxLength='20'
                    onChange={({target: {value: title}}) => this.setState({title})}/>
             <br/><br/>
             <Input.TextArea value={desc}

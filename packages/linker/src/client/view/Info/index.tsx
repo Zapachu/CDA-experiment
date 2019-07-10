@@ -45,40 +45,20 @@ export class Info extends React.Component<TRootContext & RouteComponentProps<{ g
         if (loading || !user) {
             return <Loading/>
         }
-        const btn4Teacher = <ul>
-                <li>
-                    <Button type={'primary'}
-                            block={true}
-                            onClick={() => history.push(`/play/${game.id}`)}>{lang.enterPlayRoom}</Button>
-                </li>
-                <li>
-                    <Button type={'primary'}
-                            block={true}
-                            onClick={() => history.push(`/player/${game.id}`)}>{lang.playerList}</Button>
-                </li>
-                <li>
-                    <Button type={'primary'}
-                            block={true}
-                            onClick={() => history.push(`/share/${game.id}`)}>{lang.share}</Button>
-                </li>
-            </ul>,
-            btn4Student = <Button
-                type={'primary'}
-                onClick={async () => {
-                    const {code} = await Api.joinGame(game.id)
-                    if (code === ResponseCode.success) {
-                        await message.success(lang.joinSuccess)
-                        history.push(`/play/${game.id}`)
-                    }
-                }}>{lang.joinGame}</Button>
         return <section className={style.info}>
             <Card title={game.title}>
                 {game.desc}
             </Card>
             <div className={style.buttonWrapper}>
-                {
-                    user.id === game.owner ? btn4Teacher : btn4Student
-                }
+                <Button
+                    type={'primary'}
+                    onClick={async () => {
+                        const {code} = await Api.joinGame(game.id)
+                        if (code === ResponseCode.success) {
+                            await message.success(lang.joinSuccess)
+                            history.push(`/play/${game.id}`)
+                        }
+                    }}>{lang.joinGame}</Button>
             </div>
         </section>
     }
