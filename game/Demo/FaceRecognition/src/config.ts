@@ -1,14 +1,5 @@
 export const namespace = 'FaceRecognition'
 
-export enum MoveType {
-    getQiniuConfig = 'getQiniuConfig',
-    recognize = 'recognize'
-}
-
-export enum PushType {
-}
-
-/**-----------------------------------------------------------------------**/
 export const recognizeInterval = 3000
 
 export const qiniuTokenLifetime = 7200
@@ -35,6 +26,7 @@ export type Point = {
 }
 
 export type TResultItem = {
+    faceId: string,
     faceRectangle: {
         top: number,
         left: number,
@@ -42,7 +34,7 @@ export type TResultItem = {
         height: number
     },
     faceAttributes: {
-        gender: Gender,
+        gender: Gender | string,
         age: number,
         emotion: Emotion
     },
@@ -75,4 +67,29 @@ export type TResultItem = {
         upperLipBottom: Point
         upperLipTop: Point
     }
+}
+
+export enum MoveType {
+    getQiniuConfig = 'getQiniuConfig',
+    recognize = 'recognize'
+}
+
+export enum PushType {
+}
+
+export interface IMoveParams {
+    imageName: string
+}
+
+export interface IPushParams {
+}
+
+export interface ICreateParams {
+}
+
+export interface IGameState {
+}
+
+export interface IPlayerState {
+    result: TResultItem
 }

@@ -4,42 +4,29 @@ body{
   background: white;
 }
 .create {
-  margin: 1.5rem;
+  max-width: 48rem;
+  margin: auto;
   display: flex;
   flex-direction: column;
 
-  .configFields {
-    margin-top: 1rem;
-    display: flex;
-    justify-content: center;
-  }
-
-  .privatePriceTable {
-    color: $color-black;
-    text-align: center;
-
-    td {
-      border: $borderLine;
-      height: 3rem;
-
-      input {
-        width: 3rem;
+  .baseFields{
+    .configFields {
+      margin-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      li{
+        flex-basis: 8rem;
+        margin: 0 .5rem;
       }
-
-      &.readonly input {
-        border-bottom-color: transparent;
-      }
+    }
+    .geneBtnWrapper{
+      text-align: center;
     }
   }
 
-  .KWrapper {
-    display: flex;
-    margin-top: 1.5rem;
-    justify-content: center;
-
-    &.readonly input {
-      border-bottom-color: transparent;
-    }
+  .kLabel{
+    margin-right: 1rem;
   }
 
   .btnSwitch {
