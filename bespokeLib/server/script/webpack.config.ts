@@ -83,6 +83,7 @@ export = {
             fileName: `index.json`
         }),
         new HtmlWebpackPlugin({
+            hash:true,
             filename: 'index.html',
             template: path.resolve(__dirname, './index.html')
         }),
