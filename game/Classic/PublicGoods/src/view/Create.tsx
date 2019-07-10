@@ -1,22 +1,33 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {Core} from '@bespoke/register'
-import {Button, Input, Label, Lang, MaskLoading, RangeInput, Tabs, Toast} from '@elf/component'
+import {Label, Lang, MaskLoading, Toast} from '@elf/component'
 import {ICreateParams, IGroupParams} from '../interface'
+import {Button, InputNumber, Slider, Tab, Table} from './antd'
 import cloneDeep = require('lodash/cloneDeep')
 
 const RANGE = {
     group: {
-        min: 2,
-        max: 6
+        min: 1,
+        max: 8
     },
     round: {
-        min: 2,
-        max: 6
+        min: 1,
+        max: 8
     },
     groupSize: {
         min: 2,
         max: 8
+    },
+    minInitialMoney: {
+        min: 10,
+        max: 50,
+        step: 5
+    },
+    maxInitialMoney: {
+        min: 50,
+        max: 100,
+        step: 5
     }
 }
 
@@ -54,17 +65,21 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
     state: ICreateState = {
         activeGroupIndex: 0,
         activeRoundIndex: 0,
-        minInitialMoney: 50,
-        maxInitialMoney: 100
+        minInitialMoney: 20,
+        maxInitialMoney: 80
     }
 
     componentDidMount(): void {
         let defaultParams: ICreateParams = {
-            group: RANGE.group.min,
-            groupSize: RANGE.groupSize.min,
-            round: RANGE.round.min
+            group: 2,
+            groupSize: 3,
+            round: 3
         }
-        defaultParams.groupParams = this.geneGroupParams(defaultParams)
+        defaultParams.groupParams = this.geneGroupParams({
+            group: RANGE.group.max,
+            groupSize: RANGE.group.max,
+            round: RANGE.group.max
+        })
         this.props.setParams(defaultParams)
     }
 
@@ -143,49 +158,52 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
             props: {params: {group, groupSize, round}, setParams, submitable},
             state: {activeGroupIndex, activeRoundIndex, minInitialMoney, maxInitialMoney}
         } = this
-        return <ul className={style.configFields} style={{visibility: submitable ? 'hidden' : 'visible'}}>
-            <li>
-                <Label label={lang.group}/>
-                <RangeInput {...RANGE.group} value={group}
-                            onChange={({target: {value}}) =>
+        return <section className={style.baseFields} style={submitable ? {visibility: 'hidden', opacity: 0} : {}}>
+            <ul className={style.configFields}>
+                <li>
+                    <Label label={lang.group}/>
+                    <Slider {...RANGE.group} value={group}
+                            onChange={value =>
                                 this.setState({activeGroupIndex: value < activeGroupIndex ? +value : activeGroupIndex}, () => setParams({group: +value}))
                             }/>
-            </li>
-            <li>
-                <Label label={lang.groupSize}/>
-                <RangeInput {...RANGE.groupSize} value={groupSize}
-                            onChange={({target: {value}}) =>
+                </li>
+                <li>
+                    <Label label={lang.groupSize}/>
+                    <Slider {...RANGE.groupSize} value={groupSize}
+                            onChange={value =>
                                 this.setState({activeRoundIndex: value < activeRoundIndex ? +value : activeRoundIndex}, () => setParams({groupSize: +value}))
                             }/>
-            </li>
-            <li>
-                <Label label={lang.round}/>
-                <RangeInput {...RANGE.round} value={round}
-                            onChange={({target: {value}}) => setParams({round: +value})}/>
-            </li>
-            <li>
-                <Label label={lang.minInitialMoney}/>
-                <RangeInput value={minInitialMoney}
-                            onChange={({target: {value}}) => {
-                                this.setState({minInitialMoney: +value})
-                                if (value > maxInitialMoney) {
-                                    this.setState({maxInitialMoney: +value})
-                                }
-                            }}/>
-            </li>
-            <li>
-                <Label label={lang.maxInitialMoney}/>
-                <RangeInput value={maxInitialMoney}
-                            onChange={({target: {value}}) => {
-                                this.setState({maxInitialMoney: +value})
-                                if (value < minInitialMoney) {
-                                    this.setState({minInitialMoney: +value})
-                                }
-                            }}/>
-            </li>
-            <Button label={lang.generate}
-                    onClick={async () => await this.updatePrivatePrice()}/>
-        </ul>
+                </li>
+                <li>
+                    <Label label={lang.round}/>
+                    <Slider {...RANGE.round} value={round}
+                            onChange={value => setParams({round: +value})}/>
+                </li>
+                <li>
+                    <Label label={lang.minInitialMoney}/>
+                    <Slider  {...RANGE.minInitialMoney} value={minInitialMoney}
+                             onChange={value => {
+                                 this.setState({minInitialMoney: +value})
+                                 if (value > maxInitialMoney) {
+                                     this.setState({maxInitialMoney: +value})
+                                 }
+                             }}/>
+                </li>
+                <li>
+                    <Label label={lang.maxInitialMoney}/>
+                    <Slider  {...RANGE.maxInitialMoney} value={maxInitialMoney}
+                             onChange={value => {
+                                 this.setState({maxInitialMoney: +value})
+                                 if (value < minInitialMoney) {
+                                     this.setState({minInitialMoney: +value})
+                                 }
+                             }}/>
+                </li>
+            </ul>
+            <div className={style.geneBtnWrapper}>
+                <Button type='primary' onClick={() => this.updatePrivatePrice()}>{lang.generate}</Button>
+            </div>
+        </section>
     }
 
     render(): React.ReactNode {
@@ -199,23 +217,26 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
             {
                 this.renderBaseFields()
             }
-            <Tabs labels={groupIterator.map((_, i) => lang.groupIndex(i))}
-                  activeTabIndex={activeGroupIndex}
-                  switchTab={i => this.setState({activeGroupIndex: i})}
-            >
+            <Tab defaultActiveKey={activeGroupIndex.toString()}
+                 onChange={key => this.setState({activeGroupIndex: +key})}>
                 {
                     groupIterator.map((_, i) =>
-                        <Tabs key={i} labels={roundIterator.map((_, i) => lang.roundIndex(i))}
-                              activeTabIndex={activeRoundIndex}
-                              switchTab={i => this.setState({activeRoundIndex: i})}
-                              vertical={true}
-                        >
-                            {
-                                roundIterator.map((_, j) => this.renderGroupRound(i, j))
-                            }
-                        </Tabs>)
+                        <Tab.TabPane tab={lang.groupIndex(i)} key={i.toString()}>
+                            <Tab tabPosition='left' defaultActiveKey={activeRoundIndex.toString()}
+                                 onChange={key => this.setState({activeRoundIndex: +key})}>
+                                {
+                                    roundIterator.map((_, j) =>
+                                        <Tab.TabPane tab={lang.roundIndex(j)} key={j.toString()}>
+                                            {
+                                                this.renderGroupRound(i, j)
+                                            }
+                                        </Tab.TabPane>)
+                                }
+                            </Tab>
+                        </Tab.TabPane>
+                    )
                 }
-            </Tabs>
+            </Tab>
             <div className={style.btnSwitch}>
                 {
                     submitable ? <a onClick={() => this.edit()}>{lang.edit}</a> :
@@ -229,48 +250,46 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
         const {lang, props: {submitable, params: {groupParams, groupSize}, setParams}} = this,
             {playerInitialMoney, K} = groupParams[groupIndex].roundParams[roundIndex]
         return <>
-            <table key={`${groupIndex}-${roundIndex}`} className={style.privatePriceTable}>
-                <tbody>
-                <tr>
-                    <td>{lang.player}</td>
-                    {
-                        Array(groupSize).fill(null).map((_, r) => <td>{r + 1}</td>)
-                    }
-                </tr>
-                <tr>
-                    <td>{lang.initialMoney}</td>
-                    {
-                        Array(groupSize).fill(null).map((_, r) => <td className={submitable ? style.readonly : null}>
-                            <Input value={playerInitialMoney[r]}
-                                   onChange={({target: {value}}) => {
-                                       if (submitable) {
-                                           return
-                                       }
-                                       const _groupParams = cloneDeep(groupParams)
-                                       _groupParams[groupIndex].roundParams[roundIndex].playerInitialMoney[r] = value as any
-                                       setParams({groupParams: _groupParams})
-                                   }}
+            <Table size="small" key={`${groupIndex}-${roundIndex}`} dataSource={
+                Array(groupSize).fill(null).map((_, i) => ({
+                    i,
+                    player: i + 1
+                }))
+            } columns={[
+                {
+                    title: lang.player,
+                    dataIndex: 'player',
+                    key: 'player'
+                },
+                {
+                    title: lang.initialMoney,
+                    dataIndex: 'i',
+                    key: 'initialMoney',
+                    render: i => <InputNumber value={playerInitialMoney[i]}
+                                              onChange={value => {
+                                                  if (submitable) {
+                                                      return
+                                                  }
+                                                  const _groupParams = cloneDeep(groupParams)
+                                                  _groupParams[groupIndex].roundParams[roundIndex].playerInitialMoney[i] = value as any
+                                                  setParams({groupParams: _groupParams})
+                                              }}
 
-                            />
-                        </td>)
-                    }
-                </tr>
-                </tbody>
-            </table>
-            <div className={`${style.KWrapper} ${submitable ? style.readonly : null}`}>
-                <Label label={lang.K}/>
-                <Input value={K}
-                       onChange={({target: {value}}) => {
-                           if (submitable) {
-                               return
-                           }
-                           const _groupParams = cloneDeep(groupParams)
-                           _groupParams[groupIndex].roundParams[roundIndex].K = value as any
-                           setParams({groupParams: _groupParams})
-                       }}
+                    />
+                }
+            ]}/>
+            <label className={style.kLabel}>{lang.K}</label>
+            <InputNumber value={K}
+                         onChange={value => {
+                             if (submitable) {
+                                 return
+                             }
+                             const _groupParams = cloneDeep(groupParams)
+                             _groupParams[groupIndex].roundParams[roundIndex].K = value as any
+                             setParams({groupParams: _groupParams})
+                         }}
 
-                />
-            </div>
+            />
         </>
     }
 }
