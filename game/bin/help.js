@@ -40,9 +40,13 @@ var path_1 = require("path");
 var inquirer_1 = require("inquirer");
 var shelljs_1 = require("shelljs");
 inquirer_1.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
+var SpecialProject;
+(function (SpecialProject) {
+    SpecialProject["RecentTask"] = "RecentTask";
+    SpecialProject["DistAllGame"] = "DistAllGame";
+})(SpecialProject || (SpecialProject = {}));
 var TaskHelper;
 (function (TaskHelper) {
-    TaskHelper.projectName = 'RecentTask';
     var logPath = path_1.resolve(__dirname, './help.log');
     function getLogs() {
         try {
@@ -69,6 +73,19 @@ var TaskHelper;
         shelljs_1.exec(task.command);
     }
     TaskHelper.execTask = execTask;
+    function distServer(project) {
+        execTask({
+            command: "tsc -t ES5 --downlevelIteration --experimentalDecorators --listEmittedFiles --outDir ./" + project + "/dist ./" + project + "/src/serve.ts"
+        });
+    }
+    TaskHelper.distServer = distServer;
+    function distClient(project) {
+        execTask({
+            env: { BUILD_MODE: ClientTask.dist },
+            command: "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + project + "/script/webpack.config.ts"
+        });
+    }
+    TaskHelper.distClient = distClient;
 })(TaskHelper || (TaskHelper = {}));
 var Side;
 (function (Side) {
@@ -119,13 +136,15 @@ function getProjects(parentProject, projectSet) {
                                 message: "Project(" + projects.length + "):",
                                 source: function (_, input) {
                                     if (input === void 0) { input = ''; }
-                                    return Promise.resolve(projects.filter(function (p) { return input.toLowerCase().split(' ').every(function (s) { return p.toLowerCase().includes(s); }); }).concat(TaskHelper.projectName));
+                                    return Promise.resolve(input == ' ' ?
+                                        [SpecialProject.RecentTask, SpecialProject.DistAllGame] :
+                                        projects.filter(function (p) { return input.toLowerCase().split(' ').every(function (s) { return p.toLowerCase().includes(s); }); }));
                                 }
                             }
                         ])];
                 case 1:
                     project = (_d.sent()).project;
-                    if (!(project === TaskHelper.projectName)) return [3 /*break*/, 3];
+                    if (!(project === SpecialProject.RecentTask)) return [3 /*break*/, 3];
                     return [4 /*yield*/, inquirer_1.prompt([
                             {
                                 name: 'taskLog',
@@ -138,14 +157,24 @@ function getProjects(parentProject, projectSet) {
                     taskLog = (_d.sent()).taskLog;
                     TaskHelper.execTask(JSON.parse(taskLog));
                     return [2 /*return*/];
-                case 3: return [4 /*yield*/, inquirer_1.prompt([
-                        {
-                            name: 'side',
-                            type: 'list',
-                            choices: [Side.client, Side.server, Side.both],
-                            message: 'Side:'
-                        }
-                    ])];
+                case 3:
+                    if (project === SpecialProject.DistAllGame) {
+                        projects.forEach(function (project) {
+                            if (Object.values(SpecialProject).includes(project)) {
+                                return;
+                            }
+                            TaskHelper.distClient(project);
+                            TaskHelper.distServer(project);
+                        });
+                    }
+                    return [4 /*yield*/, inquirer_1.prompt([
+                            {
+                                name: 'side',
+                                type: 'list',
+                                choices: [Side.client, Side.server, Side.both],
+                                message: 'Side:'
+                            }
+                        ])];
                 case 4:
                     side = (_d.sent()).side;
                     _a = side;
@@ -210,9 +239,7 @@ function getProjects(parentProject, projectSet) {
                     return [3 /*break*/, 16];
                 case 11:
                     {
-                        TaskHelper.execTask({
-                            command: "tsc -t ES5 --downlevelIteration --experimentalDecorators --listEmittedFiles --outDir ./" + project + "/dist ./" + project + "/src/serve.ts"
-                        });
+                        TaskHelper.distServer(project);
                         return [3 /*break*/, 16];
                     }
                     _d.label = 12;
@@ -255,13 +282,8 @@ function getProjects(parentProject, projectSet) {
                 case 16: return [3 /*break*/, 18];
                 case 17:
                     {
-                        TaskHelper.execTask({
-                            env: { BUILD_MODE: ClientTask.dist },
-                            command: "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + project + "/script/webpack.config.ts"
-                        });
-                        TaskHelper.execTask({
-                            command: "tsc -t ES5 --downlevelIteration --experimentalDecorators --listEmittedFiles --outDir ./" + project + "/dist ./" + project + "/src/serve.ts"
-                        });
+                        TaskHelper.distClient(project);
+                        TaskHelper.distServer(project);
                     }
                     _d.label = 18;
                 case 18: return [2 /*return*/];

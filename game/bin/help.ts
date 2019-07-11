@@ -10,8 +10,12 @@ interface Task {
     command: string,
 }
 
+enum SpecialProject {
+    RecentTask = 'RecentTask',
+    DistAllGame = 'DistAllGame'
+}
+
 namespace TaskHelper {
-    export const projectName = 'RecentTask'
     const logPath = resolve(__dirname, './help.log')
 
     export function getLogs(): Array<Task> {
@@ -36,6 +40,20 @@ namespace TaskHelper {
         appendLog(task)
         Object.assign(env, task.env)
         exec(task.command)
+    }
+
+    export function distServer(project: string) {
+        execTask({
+                command: `tsc -t ES5 --downlevelIteration --experimentalDecorators --listEmittedFiles --outDir ./${project}/dist ./${project}/src/serve.ts`
+            }
+        )
+    }
+
+    export function distClient(project: string) {
+        execTask({
+            env: {BUILD_MODE: ClientTask.dist},
+            command: `webpack --env.TS_NODE_PROJECT="tsconfig.json" --config ./${project}/script/webpack.config.ts`
+        })
     }
 }
 
@@ -62,7 +80,7 @@ function getProjects(parentProject: string = '.', projectSet = new Set<string>()
         if (p[0] >= 'a') {
             return
         }
-        if(!statSync(resolve(__dirname, `../${parentProject}/${p}`)).isDirectory()){
+        if (!statSync(resolve(__dirname, `../${parentProject}/${p}`)).isDirectory()) {
             return
         }
         const childProject = `${parentProject}/${p}`
@@ -80,12 +98,12 @@ function getProjects(parentProject: string = '.', projectSet = new Set<string>()
             name: 'project',
             type: 'autocomplete',
             message: `Project(${projects.length}):`,
-            source: (_, input = ''): Promise<string[]> => Promise.resolve(projects.filter(
-                p => input.toLowerCase().split(' ').every(s => p.toLowerCase().includes(s))
-            ).concat(TaskHelper.projectName))
+            source: (_, input = ''): Promise<string[]> => Promise.resolve(input == ' ' ?
+                [SpecialProject.RecentTask, SpecialProject.DistAllGame] :
+                projects.filter(p => input.toLowerCase().split(' ').every(s => p.toLowerCase().includes(s))))
         } as any
     ]))
-    if (project === TaskHelper.projectName) {
+    if (project === SpecialProject.RecentTask) {
         const {taskLog} = (await prompt<{ taskLog: string }>([
             {
                 name: 'taskLog',
@@ -97,6 +115,15 @@ function getProjects(parentProject: string = '.', projectSet = new Set<string>()
         TaskHelper.execTask(JSON.parse(taskLog))
         return
     }
+    if (project === SpecialProject.DistAllGame) {
+        projects.forEach(project => {
+            if (Object.values(SpecialProject).includes(project)) {
+                return
+            }
+            TaskHelper.distClient(project)
+            TaskHelper.distServer(project)
+        })
+    }
     const {side} = (await prompt<{ side: Side }>([
         {
             name: 'side',
@@ -105,6 +132,7 @@ function getProjects(parentProject: string = '.', projectSet = new Set<string>()
             message: 'Side:'
         }
     ]))
+
     switch (side) {
         case Side.client: {
             const {mode} = await prompt<{ mode: ClientTask }>([
@@ -150,9 +178,7 @@ function getProjects(parentProject: string = '.', projectSet = new Set<string>()
             ])
             switch (task) {
                 case ServerTask.dist: {
-                    TaskHelper.execTask({
-                        command: `tsc -t ES5 --downlevelIteration --experimentalDecorators --listEmittedFiles --outDir ./${project}/dist ./${project}/src/serve.ts`
-                    })
+                    TaskHelper.distServer(project)
                     break
                 }
                 case ServerTask.dev: {
@@ -195,13 +221,8 @@ function getProjects(parentProject: string = '.', projectSet = new Set<string>()
             break
         }
         case Side.both: {
-            TaskHelper.execTask({
-                env: {BUILD_MODE: ClientTask.dist},
-                command: `webpack --env.TS_NODE_PROJECT="tsconfig.json" --config ./${project}/script/webpack.config.ts`
-            })
-            TaskHelper.execTask({
-                command: `tsc -t ES5 --downlevelIteration --experimentalDecorators --listEmittedFiles --outDir ./${project}/dist ./${project}/src/serve.ts`
-            })
+            TaskHelper.distClient(project)
+            TaskHelper.distServer(project)
         }
     }
 })()
