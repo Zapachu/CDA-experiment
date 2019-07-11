@@ -59,7 +59,7 @@ function renderRoot(pageProps, rootContainer) {
                 React.createElement(Route, { path: '/*' },
                     React.createElement(react_router_dom_1.Redirect, { to: '/' })))),
         WITH_LINKER ? null :
-            React.createElement("div", { style: { position: 'absolute', right: 32, top: 16 } },
+            React.createElement("div", { style: { position: 'absolute', right: 32, top: 16, zIndex: 1000 } },
                 React.createElement(util_1.Button, { size: 'small', onClick: function () { return component_1.Lang.switchLang(component_1.Lang.activeLanguage === component_1.Language.en ? component_1.Language.zh : component_1.Language.en); } }, component_1.Lang.activeLanguage === component_1.Language.en ? '中文' : 'English'))), rootContainer);
 }
 function emptyPage(label) {

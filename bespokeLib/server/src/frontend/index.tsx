@@ -40,7 +40,7 @@ function renderRoot(pageProps: TPageProps, rootContainer: HTMLElement) {
         </BrowserRouter>
         {
             WITH_LINKER ? null :
-                <div style={{position: 'absolute', right: 32, top: 16}}>
+                <div style={{position: 'absolute', right: 32, top: 16, zIndex: 1000}}>
                     <Button size='small'
                             onClick={() => Lang.switchLang(Lang.activeLanguage === Language.en ? Language.zh : Language.en)}>
                         {Lang.activeLanguage === Language.en ? '中文' : 'English'}</Button>
