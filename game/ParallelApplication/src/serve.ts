@@ -20,13 +20,13 @@ import { GameOver } from "@elf/protocol";
 const { FreeStyleModel } = Model;
 
 const resultHtmlStr = fs
-  .readFileSync(resolve(__dirname, "../static/result.html"))
+  .readFileSync(resolve(__dirname, "../asset/result.html"))
   .toString();
 
 const router = Router()
   .use(
     "/result/static",
-    Express.static(resolve(__dirname, "../static"), { maxAge: "10d" })
+    Express.static(resolve(__dirname, "../asset"), { maxAge: "10d" })
   )
   .get("/result/:gameId", async (req, res: Response) => {
     const {

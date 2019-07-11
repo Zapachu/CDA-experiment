@@ -49,8 +49,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var server_1 = require("@bespoke/server");
+var share_1 = require("@bespoke/share");
 var protocol_1 = require("@elf/protocol");
 var config_1 = require("./config");
+var FreeStyleModel = server_1.Model.FreeStyleModel;
 var Controller = /** @class */ (function (_super) {
     __extends(Controller, _super);
     function Controller() {
@@ -89,13 +91,13 @@ var Controller = /** @class */ (function (_super) {
                             case config_1.MoveType.join: return [3 /*break*/, 6];
                             case config_1.MoveType.shout: return [3 /*break*/, 7];
                             case config_1.MoveType.result: return [3 /*break*/, 8];
-                            case config_1.MoveType.back: return [3 /*break*/, 9];
+                            case config_1.MoveType.back: return [3 /*break*/, 11];
                         }
-                        return [3 /*break*/, 11];
+                        return [3 /*break*/, 13];
                     case 4: return [4 /*yield*/, this.checkOldVersion(gameState, actor.token, cb)];
                     case 5:
                         _b.sent();
-                        return [3 /*break*/, 11];
+                        return [3 /*break*/, 13];
                     case 6:
                         {
                             if (playerState.score !== undefined) {
@@ -105,7 +107,7 @@ var Controller = /** @class */ (function (_super) {
                             if ((playerState.actor.type = server_1.Actor.serverRobot)) {
                                 this.push(playerState.actor, config_1.PushType.robotShout);
                             }
-                            return [3 /*break*/, 11];
+                            return [3 /*break*/, 13];
                         }
                         _b.label = 7;
                     case 7:
@@ -127,33 +129,42 @@ var Controller = /** @class */ (function (_super) {
                                 playerStateArray.every(function (ps) { return ps.schools !== undefined; })) {
                                 this.processGameState(gameState, playerStateArray);
                             }
-                            return [3 /*break*/, 11];
+                            return [3 /*break*/, 13];
                         }
                         _b.label = 8;
                     case 8:
-                        {
-                            if (playerState.admission !== undefined) {
-                                return [2 /*return*/];
-                            }
-                            token_1 = playerState.actor.token;
-                            me = gameState.sortedPlayers.find(function (item) { return item.token === token_1; });
-                            playerState.admission = me && me.admission;
-                            cb();
-                            return [3 /*break*/, 11];
+                        if (playerState.admission !== undefined) {
+                            return [2 /*return*/];
                         }
-                        _b.label = 9;
+                        token_1 = playerState.actor.token;
+                        me = gameState.sortedPlayers.find(function (item) { return item.token === token_1; });
+                        playerState.admission = me && me.admission;
+                        if (!(playerState.admission !== undefined)) return [3 /*break*/, 10];
+                        return [4 /*yield*/, new FreeStyleModel({
+                                game: this.game.id,
+                                key: playerState.userId,
+                                data: {
+                                    admission: playerState.admission
+                                }
+                            }).save()];
                     case 9:
+                        _b.sent();
+                        _b.label = 10;
+                    case 10:
+                        cb("/" + share_1.config.rootName + "/" + config_1.namespace + "/result/" + this.game.id);
+                        return [3 /*break*/, 13];
+                    case 11:
                         onceMore = params.onceMore;
                         return [4 /*yield*/, server_1.RedisCall.call(protocol_1.GameOver.name, {
                                 playUrl: server_1.gameId2PlayUrl(this.game.id, actor.token),
                                 onceMore: onceMore,
                                 namespace: config_1.namespace
                             })];
-                    case 10:
+                    case 12:
                         res = _b.sent();
                         res ? cb(res.lobbyUrl) : null;
-                        return [3 /*break*/, 11];
-                    case 11: return [2 /*return*/];
+                        return [3 /*break*/, 13];
+                    case 13: return [2 /*return*/];
                 }
             });
         });
