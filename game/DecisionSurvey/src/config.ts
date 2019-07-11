@@ -57,9 +57,9 @@ export interface IPlayerState {
   extraPair: string;
   info: {
     gender: GENDER;
-    age: string;
-    institute: string;
-    grade: string;
+    // age: string;
+    // institute: string;
+    // grade: string;
     name: string;
   };
   profit: {

@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as style from "./style.scss";
-import {Core} from '@bespoke/register'
-import {Toast } from "@elf/component";
+import { Core } from "@bespoke/register";
+import { Toast, Request } from "@elf/component";
 import { useSpring, animated } from "react-spring";
 import {
   MoveType,
@@ -13,7 +13,8 @@ import {
   IPushParams,
   SCHOOL,
   APPLICATION_NUM,
-  SCHOOL_NAME
+  SCHOOL_NAME,
+  namespace
 } from "../config";
 import Teacher from "./components/Teacher";
 import Button from "./components/Button";
@@ -131,6 +132,7 @@ export class Play extends Core.Play<
   componentDidMount(): void {
     document.body.addEventListener("touchstart", function() {});
     this.checkVersion();
+    this.getUserId();
     const img = new Image();
     img.src = SCORING;
     img.onload = this.join;
@@ -138,6 +140,19 @@ export class Play extends Core.Play<
     //   this.setState({ shoutTime });
     // });
   }
+
+  getUserId = () => {
+    const {
+      game,
+      playerState: { actor }
+    } = this.props;
+    Request.get(
+      namespace,
+      "/getUserId/:gameId",
+      { gameId: game.id },
+      { token: actor.token, actorType: actor.type }
+    );
+  };
 
   checkVersion = () => {
     const { frameEmitter } = this.props;
@@ -168,10 +183,12 @@ export class Play extends Core.Play<
     this.setState({ showModal: MODAL.admission, admission: school }, () => {
       setTimeout(
         () =>
-          frameEmitter.emit(MoveType.result, {}, () =>
-            this.setState({ showModal: undefined })
+          frameEmitter.emit(
+            MoveType.result,
+            {},
+            url => (window.location.href = url)
           ),
-        1000
+        2000
       );
     });
   };
@@ -308,9 +325,9 @@ export class Play extends Core.Play<
   getPlayerStatus = (): STATUS => {
     const { playerState, gameState } = this.props;
     const { schools } = this.state;
-    if (playerState.admission !== undefined) {
-      return STATUS.result;
-    }
+    // if (playerState.admission !== undefined) {
+    //   return STATUS.result;
+    // }
     if (gameState.sortedPlayers && gameState.sortedPlayers.length) {
       return STATUS.applying;
     }
@@ -383,15 +400,15 @@ export class Play extends Core.Play<
           />
         );
       }
-      case STATUS.result: {
-        if (playerState.admission === SCHOOL.none) {
-          msg = "录取结果出来啦";
-          content = this._renderNoneAdmission();
-        } else {
-          return this._renderAdmission(playerState.admission);
-        }
-        break;
-      }
+      // case STATUS.result: {
+      //   if (playerState.admission === SCHOOL.none) {
+      //     msg = "录取结果出来啦";
+      //     content = this._renderNoneAdmission();
+      //   } else {
+      //     return this._renderAdmission(playerState.admission);
+      //   }
+      //   break;
+      // }
     }
     return (
       <>
