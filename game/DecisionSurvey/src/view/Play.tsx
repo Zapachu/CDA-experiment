@@ -330,13 +330,9 @@ export class Play extends Core.Play<
                 if (!gender || !name) {
                   return Toast.warn("请填写个人信息");
                 }
-                frameEmitter.emit(
-                  MoveType.info,
-                  { gender, name },
-                  error => {
-                    Toast.warn(error);
-                  }
-                );
+                frameEmitter.emit(MoveType.info, { gender, name }, error => {
+                  Toast.warn(error);
+                });
               }}
             >
               确定
@@ -417,6 +413,13 @@ export class Play extends Core.Play<
       //   );
       // }
       case STATUS.result: {
+        if (!playerState.random56) {
+          return (
+            <div>
+              <p>你未完成实验。</p>
+            </div>
+          );
+        }
         return (
           <div>
             <p>感谢参加。</p>

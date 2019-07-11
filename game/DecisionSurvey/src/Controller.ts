@@ -76,13 +76,16 @@ export default class Controller extends BaseController<
         if (playerStateArray.length < 2) {
           return cb("被试数量不足");
         }
-        if (!playerStateArray.every(ps => !!ps.random56)) {
-          return cb("还有被试未完成问卷");
-        }
+        // if (!playerStateArray.every(ps => !!ps.random56)) {
+        //   return cb("还有被试未完成问卷");
+        // }
         const { card1, card2 } = params;
         gameState.card1 = card1;
         gameState.card2 = card2;
-        this.processProfit(card1, card2, playerStates);
+        const validPlayerStateArray = playerStateArray.filter(
+          ps => !!ps.random56
+        );
+        this.processProfit(card1, card2, playerStates, validPlayerStateArray);
         break;
       }
     }
@@ -95,10 +98,13 @@ export default class Controller extends BaseController<
     cb: IMoveCallback
   ): Promise<void> {
     const playerState = await this.stateManager.getPlayerState(actor);
-    // gameState = await this.stateManager.getGameState(),
+    const gameState = await this.stateManager.getGameState();
     // playerStates = await this.stateManager.getPlayerStates();
     switch (type) {
       case MoveType.shout: {
+        if (gameState.card1 !== undefined) {
+          return;
+        }
         const { answer, decision } = params;
         if (!Array.isArray(answer) || !answer.length || !decision) {
           return cb("请选择一项再提交");
@@ -110,6 +116,9 @@ export default class Controller extends BaseController<
         break;
       }
       case MoveType.info: {
+        if (gameState.card1 !== undefined) {
+          return;
+        }
         const { gender, age, institute, name, grade } = params;
         if (playerState.info) {
           return;
@@ -118,12 +127,15 @@ export default class Controller extends BaseController<
           gender,
           // age,
           // institute,
-          name,
+          name
           // grade
         };
         break;
       }
       case MoveType.random: {
+        if (gameState.card1 !== undefined) {
+          return;
+        }
         const { randomKey } = params;
         if (playerState[randomKey]) {
           return;
@@ -171,12 +183,12 @@ export default class Controller extends BaseController<
   private processProfit(
     card1: CARD,
     card2: CARD,
-    playerStates: { [token: string]: TPlayerState<IPlayerState> }
+    playerStates: { [token: string]: TPlayerState<IPlayerState> },
+    playerStateArray: Array<TPlayerState<IPlayerState>>
   ) {
-    const playerStateArray = Object.values(playerStates);
     this._makePairs(playerStateArray);
-    this._chooseDecisions(playerStates);
-    this._calcProfits(card1, card2, playerStates);
+    this._chooseDecisions(playerStates, playerStateArray);
+    this._calcProfits(card1, card2, playerStates, playerStateArray);
     playerStateArray.forEach(ps => {
       this.setPhaseResult(ps.actor.token, {
         point: ps.profit[DATE.jul5],
@@ -226,7 +238,7 @@ export default class Controller extends BaseController<
         `${DATE.nov12}收益`,
         "性别",
         // "年龄",
-        "姓名",
+        "姓名"
         // "专业",
         // "年级"
       ]
@@ -278,7 +290,7 @@ export default class Controller extends BaseController<
         ps.profit[DATE.nov12],
         ps.info ? ps.info.gender : "-",
         // ps.info ? ps.info.age : "-",
-        ps.info ? ps.info.name : "-",
+        ps.info ? ps.info.name : "-"
         // ps.info ? ps.info.institute : "-",
         // ps.info ? ps.info.grade : "-"
       ];
@@ -303,9 +315,12 @@ export default class Controller extends BaseController<
     }
   }
 
-  private _chooseDecisions(playerStates: {
-    [token: string]: TPlayerState<IPlayerState>;
-  }) {
+  private _chooseDecisions(
+    playerStates: {
+      [token: string]: TPlayerState<IPlayerState>;
+    },
+    playerStateArray: Array<TPlayerState<IPlayerState>>
+  ) {
     const decision14 = [
       DECISION.one,
       DECISION.two,
@@ -313,7 +328,6 @@ export default class Controller extends BaseController<
       DECISION.four
     ];
     const decision56 = [DECISION.five, DECISION.six];
-    const playerStateArray = Object.values(playerStates);
     playerStateArray.forEach(ps => {
       if (!ps.profitDecision14) {
         // 兼容旧数据
@@ -342,9 +356,9 @@ export default class Controller extends BaseController<
   private _calcProfits(
     card1: CARD,
     card2: CARD,
-    playerStates: { [token: string]: TPlayerState<IPlayerState> }
+    playerStates: { [token: string]: TPlayerState<IPlayerState> },
+    playerStateArray: Array<TPlayerState<IPlayerState>>
   ) {
-    const playerStateArray = Object.values(playerStates);
     playerStateArray.forEach(ps => {
       const decision14 = ps.profitDecision14;
       const answer14 = ps.answer[decision14];
