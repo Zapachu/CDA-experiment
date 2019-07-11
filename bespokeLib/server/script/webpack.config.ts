@@ -22,7 +22,7 @@ export = {
     },
     output: {
         path: path.resolve(__dirname, '../static'),
-        filename: `[name]${buildMode === 'dev' ? '' : '.min'}.js`,
+        filename: `[name].min.js`,
         publicPath: buildMode === 'publish' ? `${qiNiu.download.jsDomain}/${qiNiu.upload.path}/` : `/${config.rootName}/static/`,
         library: '[name]',
         libraryTarget: 'umd'
@@ -76,7 +76,8 @@ export = {
     externals: {
         'react': 'React',
         'react-dom': 'ReactDOM',
-        '@elf/component': 'ElfComponent'
+        '@elf/component': 'ElfComponent',
+        'antd':'antd'
     },
     plugins: [
         new ManifestPlugin({
@@ -85,6 +86,7 @@ export = {
         new HtmlWebpackPlugin({
             hash:true,
             filename: 'index.html',
+            favicon:path.resolve(__dirname, './favicon.ico'),
             template: path.resolve(__dirname, './index.html')
         }),
         new CleanWebpackPlugin()
