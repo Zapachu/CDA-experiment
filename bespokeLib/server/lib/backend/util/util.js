@@ -95,9 +95,8 @@ var Setting = /** @class */ (function () {
         this.staticPath = staticPath;
         this._ip = util_1.NetWork.getIp();
         this._port = startOption.port || (setting_1.elfSetting.inProductEnv ? 0 : share_1.config.devPort.server);
-        setting_1.elfSetting.inProductEnv ?
-            util_1.Log.setLogPath(startOption.logPath || path_1.resolve(staticPath, '../log'), util_1.LogLevel.log) :
-            util_1.Log.d('当前为开发环境,短信/邮件发送、游戏状态持久化等可能受影响');
+        setting_1.elfSetting.inProductEnv || util_1.Log.d('当前为开发环境,短信/邮件发送、游戏状态持久化等可能受影响');
+        // Log.setLogPath(startOption.logPath || resolve(staticPath, '../log'), LogLevel.log) 由pm2管理日志
     };
     Setting.getClientPath = function () {
         var namespace = this.namespace;

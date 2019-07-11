@@ -1,6 +1,6 @@
 import {config, IStartOption} from '@bespoke/share'
 import {elfSetting} from '@elf/setting'
-import {Log, LogLevel, NetWork, Token} from '@elf/util'
+import {Log, NetWork, Token} from '@elf/util'
 import {resolve} from 'path'
 import {existsSync, readFileSync} from 'fs'
 import {redisClient} from '@elf/protocol'
@@ -47,9 +47,8 @@ export class Setting {
         this.staticPath = staticPath
         this._ip = NetWork.getIp()
         this._port = startOption.port || (elfSetting.inProductEnv ? 0 : config.devPort.server)
-        elfSetting.inProductEnv ?
-            Log.setLogPath(startOption.logPath || resolve(staticPath, '../log'), LogLevel.log) :
-            Log.d('当前为开发环境,短信/邮件发送、游戏状态持久化等可能受影响')
+        elfSetting.inProductEnv || Log.d('当前为开发环境,短信/邮件发送、游戏状态持久化等可能受影响')
+        // Log.setLogPath(startOption.logPath || resolve(staticPath, '../log'), LogLevel.log) 由pm2管理日志
     }
 
     static getClientPath(): string {
