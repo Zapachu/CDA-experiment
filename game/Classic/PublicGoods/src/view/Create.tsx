@@ -3,7 +3,7 @@ import * as style from './style.scss'
 import {Core} from '@bespoke/register'
 import {Label, Lang, MaskLoading, Toast} from '@elf/component'
 import {ICreateParams, IGroupParams} from '../interface'
-import {Button, Collapse, InputNumber, Slider, Tab, Table} from './antd'
+import {Button, Collapse, InputNumber, Slider, Tabs, Table} from 'antd'
 import cloneDeep = require('lodash/cloneDeep')
 
 const RANGE = {
@@ -223,26 +223,26 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
             {
                 this.renderBaseFields()
             }
-            <Tab defaultActiveKey={activeGroupIndex.toString()}
+            <Tabs defaultActiveKey={activeGroupIndex.toString()}
                  onChange={key => this.setState({activeGroupIndex: +key})}>
                 {
                     groupIterator.map((_, i) =>
-                        <Tab.TabPane tab={lang.groupIndex(i)} key={i.toString()}>
-                            <Tab tabPosition='left' defaultActiveKey={activeRoundIndex.toString()}
+                        <Tabs.TabPane tab={lang.groupIndex(i)} key={i.toString()}>
+                            <Tabs tabPosition='left' defaultActiveKey={activeRoundIndex.toString()}
                                  onChange={key => this.setState({activeRoundIndex: +key})}>
                                 {
                                     roundIterator.map((_, j) =>
-                                        <Tab.TabPane tab={lang.roundIndex(j)} key={j.toString()}>
+                                        <Tabs.TabPane tab={lang.roundIndex(j)} key={j.toString()}>
                                             {
                                                 this.renderGroupRound(i, j)
                                             }
-                                        </Tab.TabPane>)
+                                        </Tabs.TabPane>)
                                 }
-                            </Tab>
-                        </Tab.TabPane>
+                            </Tabs>
+                        </Tabs.TabPane>
                     )
                 }
-            </Tab>
+            </Tabs>
             <div className={style.btnSwitch}>
                 {
                     submitable ? <a onClick={() => this.edit()}>{lang.edit}</a> :

@@ -126,7 +126,8 @@ export function geneClientBuilder(
     externals: {
       'react': 'React',
       'react-dom': 'ReactDOM',
-      '@elf/component': 'ElfComponent'
+      '@elf/component': 'ElfComponent',
+      'antd':'antd'
     },
     plugins: [
       new ManifestPlugin({

@@ -1,6 +1,0 @@
-export {default as Tab} from 'antd/es/tabs'
-export {default as InputNumber} from 'antd/es/input-number'
-export {default as Table} from 'antd/es/table'
-export {default as Slider} from 'antd/es/slider'
-export {default as Button} from 'antd/es/button'
-export {default as Collapse} from 'antd/es/collapse'

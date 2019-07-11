@@ -88,12 +88,15 @@ export = ({webpackHmr}: { webpackHmr: boolean }) => {
         },
         externals: {
             'react': 'React',
-            'react-dom': 'ReactDOM'
+            'react-dom': 'ReactDOM',
+            'antd':'antd'
         },
         plugins: [
             new CleanWebpackPlugin(),
             new HtmlWebpackPlugin({
+                hash:true,
                 filename: 'index.html',
+                favicon:path.resolve(__dirname, './favicon.ico'),
                 template: path.resolve(__dirname, './index.html')
             })
         ].concat(buildMode === 'dist' ? [
