@@ -7,8 +7,10 @@ import {
   RedisCall,
   TGameState,
   TPlayerState,
-  Actor
-} from '@bespoke/server';
+  Actor,
+  Model
+} from "@bespoke/server";
+import { config } from "@bespoke/share";
 import { GameOver } from "@elf/protocol";
 import {
   MoveType,
@@ -24,6 +26,8 @@ import {
   namespace,
   QUOTA
 } from "./config";
+
+const { FreeStyleModel } = Model;
 
 export default class Controller extends BaseController<
   ICreateParams,
@@ -102,7 +106,16 @@ export default class Controller extends BaseController<
         const token = playerState.actor.token;
         const me = gameState.sortedPlayers.find(item => item.token === token);
         playerState.admission = me && me.admission;
-        cb();
+        if (playerState.admission !== undefined) {
+          await new FreeStyleModel({
+            game: this.game.id,
+            key: playerState.userId,
+            data: {
+              admission: playerState.admission
+            }
+          }).save();
+        }
+        cb(`/${config.rootName}/${namespace}/result/${this.game.id}`);
         break;
       }
       case MoveType.back: {
@@ -254,7 +267,6 @@ export default class Controller extends BaseController<
       );
       res ? cb(res.lobbyUrl) : null;
     }
-    
   }
 
   private _getScores(): Array<number> {

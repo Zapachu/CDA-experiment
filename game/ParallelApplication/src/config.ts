@@ -40,6 +40,7 @@ export interface IPlayerState {
   scores: Array<number>;
   schools: Array<SCHOOL>;
   admission: SCHOOL;
+  userId: string;
 }
 
 export const SHOUT_TIMER = 60;
