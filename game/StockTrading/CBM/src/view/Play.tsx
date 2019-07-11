@@ -43,7 +43,7 @@ function Border({background = `radial-gradient(at 50% 0%, #67e968 1rem, transpar
     </div>
 }
 
-function TradeChart({
+export function TradeChart({
                         tradeList, color = {
         scalePlate: '#999',
         line: '#999',
@@ -250,6 +250,7 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
         invalidSellPrice: ['订单价格需低于市场当前最低卖价', 'Order price must be higher than the lowest buy price in the market'],
         invalidCount: ['超出可交易物品数量', 'Exceed the number of tradable units'],
         invalidMoney: ['金额有误，请检查', 'Invalid Money'],
+        marketOrders:['市场订单','Market Orders'],
         sellOrders: ['卖家订单', 'SellOrders'],
         buyOrders: ['买家订单', 'BuyOrders'],
         yourTrades: ['交易记录', 'Your Trades'],
@@ -399,70 +400,69 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
             <br/>
             {inputCount}
         </>
-        return <Border style={{flexBasis: '40rem'}} background={STYLE.mainPanelBorder}>
-            <div className={style.orderPanel}>
-                <section className={style.orderBook}>
+        return <div className={style.orderPanel}>
+            <Line text={lang.marketOrders} style={STYLE.titleLineStyle}/>
+            <section className={style.orderBook}>
+                {
+                    renderOrderList(buyOrderIds, ROLE.Buyer)
+                }
+                {
+                    renderOrderList(sellOrderIds, ROLE.Seller)
+                }
+            </section>
+            {
+                <section className={style.orderSubmission}>
                     {
-                        renderOrderList(buyOrderIds, ROLE.Buyer)
-                    }
-                    {
-                        renderOrderList(sellOrderIds, ROLE.Seller)
+                        gamePeriodState.stage === PeriodStage.trading ?
+                            <section className={style.newOrder}>
+                                <label className={style.subLabel}>
+                                    {lang.timeLeft(gameState.periodIndex + 1, countDown < prepareTime ? '' : timeLeft > 0 ? timeLeft : 0)}</label>
+                                <label className={style.label}>{lang.valuation}<em>{privatePrice}</em></label>
+                                <Tabs labels={[lang.buy, lang.sell]}
+                                      activeTabIndex={orderTabIndex} switchTab={setOrderTabIndex}>
+                                    <div className={style.orderInputWrapper}>
+                                        {
+                                            inputFragment
+                                        }
+                                        <div className={style.submitBtnWrapper}>
+                                            <Button {...{
+                                                label: lang.buy,
+                                                onClick: () => submitOrder(ROLE.Buyer)
+                                            }}/>&nbsp;
+                                            {
+                                                allowLeverage ? <Button {...{
+                                                    label: lang.guaranteeBuy,
+                                                    onClick: () => submitOrder(ROLE.Buyer, true)
+                                                }}/> : null
+                                            }
+                                        </div>
+                                    </div>
+                                    <div className={style.orderInputWrapper}>
+                                        {
+                                            inputFragment
+                                        }
+                                        <div className={style.submitBtnWrapper}>
+                                            <Button {...{
+                                                label: lang.sell,
+                                                onClick: () => submitOrder(ROLE.Seller)
+                                            }}/>&nbsp;
+                                            {
+                                                allowLeverage ? <Button {...{
+                                                    label: lang.guaranteeSell,
+                                                    onClick: () => submitOrder(ROLE.Seller, true)
+                                                }}/> : null
+                                            }
+                                        </div>
+                                    </div>
+                                </Tabs>
+                            </section> : prepareTime > countDown ?
+                            <p className={style.marketWillOpen}>{lang.marketWillOpen1}
+                                <em>{prepareTime - countDown}</em> {(lang.marketWillOpen2 as Function)(prepareTime - countDown)}
+                            </p> : null
                     }
                 </section>
-                {
-                    <section className={style.orderSubmission}>
-                        {
-                            gamePeriodState.stage === PeriodStage.trading ?
-                                <section className={style.newOrder}>
-                                    <label className={style.subLabel}>
-                                        {lang.timeLeft(gameState.periodIndex + 1, countDown < prepareTime ? '' : timeLeft > 0 ? timeLeft : 0)}</label>
-                                    <label className={style.label}>{lang.valuation}<em>{privatePrice}</em></label>
-                                    <Tabs labels={[lang.buy, lang.sell]}
-                                          activeTabIndex={orderTabIndex} switchTab={setOrderTabIndex}>
-                                        <div className={style.orderInputWrapper}>
-                                            {
-                                                inputFragment
-                                            }
-                                            <div className={style.submitBtnWrapper}>
-                                                <Button {...{
-                                                    label: lang.buy,
-                                                    onClick: () => submitOrder(ROLE.Buyer)
-                                                }}/>&nbsp;
-                                                {
-                                                    allowLeverage ? <Button {...{
-                                                        label: lang.guaranteeBuy,
-                                                        onClick: () => submitOrder(ROLE.Buyer, true)
-                                                    }}/> : null
-                                                }
-                                            </div>
-                                        </div>
-                                        <div className={style.orderInputWrapper}>
-                                            {
-                                                inputFragment
-                                            }
-                                            <div className={style.submitBtnWrapper}>
-                                                <Button {...{
-                                                    label: lang.sell,
-                                                    onClick: () => submitOrder(ROLE.Seller)
-                                                }}/>&nbsp;
-                                                {
-                                                    allowLeverage ? <Button {...{
-                                                        label: lang.guaranteeSell,
-                                                        onClick: () => submitOrder(ROLE.Seller, true)
-                                                    }}/> : null
-                                                }
-                                            </div>
-                                        </div>
-                                    </Tabs>
-                                </section> : prepareTime > countDown ?
-                                <p className={style.marketWillOpen}>{lang.marketWillOpen1}
-                                    <em>{prepareTime - countDown}</em> {(lang.marketWillOpen2 as Function)(prepareTime - countDown)}
-                                </p> : null
-                        }
-                    </section>
-                }
-            </div>
-        </Border>
+            }
+        </div>
     }
 
     function renderAsset() {

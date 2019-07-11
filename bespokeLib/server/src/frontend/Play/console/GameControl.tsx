@@ -83,9 +83,12 @@ export class GameControl extends React.Component<IGameControlProps> {
                         [over]: lang.over
                     }[gameState.status]}</span>
                 </div>
-                <div className={style.gameTitle}>
-                    <span>{game.title}</span>
-                </div>
+                {
+                    WITH_LINKER ? null :
+                        <div className={style.gameTitle}>
+                            <span>{game.title}</span>
+                        </div>
+                }
                 <div className={style.btnGroup}>
                     {
                         WITH_LINKER ? null : <Button {...btnProps} icon={ButtonProps.Icon.home}
