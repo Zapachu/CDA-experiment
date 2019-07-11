@@ -31,7 +31,7 @@ export function Play4Owner({game: {}, playerStates, gameState: {logs, groups}}: 
                             name: user.name,
                             mobile: user.mobile,
                             group: groupIndex + 1,
-                            round: groups[groupIndex]? groups[groupIndex].roundIndex : null
+                            round: groups[groupIndex]? groups[groupIndex].roundIndex+1 : null
                         })
                     )} columns={[
                         {
