@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var path_1 = require("path");
 var webpack = require("webpack");
@@ -9,7 +20,7 @@ var share_1 = require("@bespoke/share");
 var util_1 = require("@elf/util");
 var defaultPaths = {
     entry: './src/view',
-    output: './dist'
+    output: './static'
 };
 function resolvePaths(basePath, paths) {
     if (paths === void 0) { paths = defaultPaths; }
@@ -42,7 +53,7 @@ function geneClientBuilder(_a) {
         entry: (_c = {}, _c[namespace] = entry, _c),
         output: {
             path: output,
-            filename: "[name]" + (HMR ? '' : '.[hash:4]') + ".js",
+            filename: "[name].js",
             publicPath: buildMode === 'publish' ? qiNiu.download.jsDomain + "/" + qiNiu.upload.path + "/" + namespace : "/" + share_1.config.rootName + "/" + namespace + "/static/"
         },
         resolve: {
@@ -65,14 +76,14 @@ function geneClientBuilder(_a) {
                 },
                 {
                     test: /\.css$/,
-                    use: ["style-loader", "css-loader"]
+                    use: ['style-loader', 'css-loader']
                 },
                 {
                     test: /\.less$/,
                     use: [
-                        "style-loader",
-                        "css-loader",
-                        { loader: "less-loader", options: { javascriptEnabled: true } }
+                        'style-loader',
+                        'css-loader',
+                        { loader: 'less-loader', options: { javascriptEnabled: true } }
                     ]
                 },
                 {
@@ -113,15 +124,23 @@ function geneClientBuilder(_a) {
         },
         plugins: [
             new ManifestPlugin({
-                fileName: namespace + ".json"
+                fileName: namespace + ".json",
+                filter: function (descriptor) { return descriptor.isInitial; },
+                generate: function (seed, files) {
+                    return files.reduce(function (manifest, _a) {
+                        var _b;
+                        var name = _a.name, path = _a.path, chunk = _a.chunk;
+                        return __assign({}, manifest, (_b = {}, _b[name] = path + (chunk ? "?" + chunk.hash : ''), _b));
+                    }, seed);
+                }
             })
         ].concat(buildMode === 'publish' ? [
             new QiniuPlugin(qiNiu.upload)
         ] : buildMode === 'dist' ? [
             new clean_webpack_plugin_1.CleanWebpackPlugin()
-        ] : [
+        ] : HMR ? [
             new webpack.HotModuleReplacementPlugin()
-        ])
+        ] : [])
     };
 }
 exports.geneClientBuilder = geneClientBuilder;

@@ -1,5 +1,5 @@
 {
-  "script": "../game/Classic/PublicGoods/build/serve.js",
+  "script": "../game/Classic/PublicGoods/dist/serve.js",
   "name": "PublicGoods",
   "env": {
     "NODE_ENV": "production",

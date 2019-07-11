@@ -100,13 +100,16 @@ var Setting = /** @class */ (function () {
     };
     Setting.getClientPath = function () {
         var namespace = this.namespace;
+        if (setting_1.elfSetting.bespokeHmr) {
+            return "http://localhost:" + share_1.config.devPort.client + "/" + share_1.config.rootName + "/" + namespace + "/static/" + namespace + ".js";
+        }
         var manifestPath = path_1.resolve(this.staticPath, namespace + ".json");
         if (!fs_1.existsSync(manifestPath)) {
             return '';
         }
-        return setting_1.elfSetting.bespokeHmr ?
-            "http://localhost:" + share_1.config.devPort.client + "/" + share_1.config.rootName + "/" + namespace + "/static/" + namespace + ".js" :
-            JSON.parse(fs_1.readFileSync(manifestPath).toString())[namespace + ".js"];
+        else {
+            return JSON.parse(fs_1.readFileSync(manifestPath).toString())[namespace + ".js"];
+        }
     };
     return Setting;
 }());

@@ -24,7 +24,7 @@ export class WebpackHmr {
 
     static sendIndexHtml(res: Response, next: NextFunction) {
         if (!webpackHmr) {
-            return res.sendFile(path.resolve(__dirname, '../../../dist/index.html'))
+            return res.sendFile(path.resolve(__dirname, '../../../static/index.html'))
         }
         WebpackHmr.compiler.outputFileSystem.readFile(path.join(WebpackHmr.compiler.outputPath, 'index.html'), (err, result) => {
             if (err) {

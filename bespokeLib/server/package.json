@@ -5,10 +5,9 @@
   "types": "src/backend/index",
   "scripts": {
     "tsc-w": "tsc -w",
-    "libc": "tsc --downlevelIteration script/buildGame.ts -t ES5 & tsc & npm run dist",
-    "build": "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./script/webpack.config.ts",
-    "dist": "npm run build --buildMode=dist",
-    "publish": "npm run build --buildMode=publish"
+    "client:build": "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./script/webpack.config.ts",
+    "client:dist": "npm run client:build --buildMode=dist",
+    "dist": "tsc --downlevelIteration script/buildGame.ts -t ES5 & tsc & npm run client:dist"
   },
   "devDependencies": {
     "@bespoke/register": "^1.1.1",

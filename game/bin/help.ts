@@ -151,7 +151,7 @@ function getProjects(parentProject: string = '.', projectSet = new Set<string>()
             switch (task) {
                 case ServerTask.dist: {
                     TaskHelper.execTask({
-                        command: `tsc -t ES5 --downlevelIteration --experimentalDecorators --listEmittedFiles --outDir ./${project}/build ./${project}/src/serve.ts`
+                        command: `tsc -t ES5 --downlevelIteration --experimentalDecorators --listEmittedFiles --outDir ./${project}/dist ./${project}/src/serve.ts`
                     })
                     break
                 }
@@ -187,7 +187,7 @@ function getProjects(parentProject: string = '.', projectSet = new Set<string>()
                             BESPOKE_WITH_LINKER: withLinker,
                             NODE_ENV: 'production'
                         },
-                        command: `node ./${project}/build/serve.js`
+                        command: `node ./${project}/dist/serve.js`
                     })
                     break
                 }
@@ -200,7 +200,7 @@ function getProjects(parentProject: string = '.', projectSet = new Set<string>()
                 command: `webpack --env.TS_NODE_PROJECT="tsconfig.json" --config ./${project}/script/webpack.config.ts`
             })
             TaskHelper.execTask({
-                command: `tsc -t ES5 --downlevelIteration --experimentalDecorators --listEmittedFiles --outDir ./${project}/build ./${project}/src/serve.ts`
+                command: `tsc -t ES5 --downlevelIteration --experimentalDecorators --listEmittedFiles --outDir ./${project}/dist ./${project}/src/serve.ts`
             })
         }
     }

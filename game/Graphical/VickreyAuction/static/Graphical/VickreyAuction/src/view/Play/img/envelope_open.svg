@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="106px" height="113px" viewBox="0 0 106 113" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
+    <title>信封1</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="密封拍卖2" transform="translate(-445.000000, -794.000000)" fill-rule="nonzero" stroke="#333333" stroke-width="4">
+            <g id="信封1" transform="translate(445.000000, 790.000000)">
+                <rect id="矩形" fill="#7B7B7B" x="2" y="56" width="102" height="59" rx="8"></rect>
+                <path d="M6.0218269,59.3112472 C5.71265567,59.1274945 5.35965527,59.0305115 5,59.0305115 C3.8954305,59.0305115 3,59.9259421 3,61.0305115 L3,109 C3,112.313708 5.6862915,115 9,115 L99.7203633,115 L6.0218269,59.3112472 Z" id="矩形-copy-3" fill="#FFFFFF"></path>
+                <path d="M25.0218269,59.3112472 C24.7126557,59.1274945 24.3596553,59.0305115 24,59.0305115 C22.8954305,59.0305115 22,59.9259421 22,61.0305115 L22,109 C22,112.313708 24.6862915,115 28,115 L118.720363,115 L25.0218269,59.3112472 Z" id="矩形-copy-4" fill="#FFFFFF" transform="translate(62.441347, 85.500000) scale(-1, 1) translate(-62.441347, -85.500000) "></path>
+                <path d="M53.1748328,85.9376089 L97.7557924,114.729142" id="路径-24" stroke-linecap="round"></path>
+                <path d="M7.01858567,2 C6.7611459,2 6.51362358,2.09928444 6.32754262,2.2771864 C5.92834369,2.65883894 5.91411953,3.29184413 6.29577207,3.69104305 L46.9190478,46.1819645 C46.9712755,46.2365933 47.0242747,46.2904793 47.0780294,46.3436062 C50.220522,49.4493945 55.2857544,49.4196398 58.3915427,46.2771472 L102.151534,2 L7.01858567,2 Z" id="矩形-copy-6" fill="#FFFFFF" transform="translate(53.470066, 27.500000) scale(1, -1) translate(-53.470066, -27.500000) "></path>
+            </g>
+        </g>
+    </g>
+</svg>

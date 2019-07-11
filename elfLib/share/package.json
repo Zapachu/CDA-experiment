@@ -5,7 +5,7 @@
   "types": "src/index",
   "scripts": {
     "tsc-w": "tsc -w",
-    "libc": "tsc"
+    "dist": "tsc"
   },
   "devDependencies": {
     "typescript": "^3.3.3333"

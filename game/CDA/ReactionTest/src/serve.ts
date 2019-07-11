@@ -34,4 +34,4 @@ const router = Router()
         }
     )
 
-Server.start(namespace, Controller, resolve(__dirname, '../dist'), router)
+Server.start(namespace, Controller, resolve(__dirname, '../static'), router)

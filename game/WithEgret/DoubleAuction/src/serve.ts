@@ -12,7 +12,7 @@ const router = Express.Router()
     .use('/egret', Express.static(resolve(__dirname, '../egret'), {maxAge: '10d'}))
     .use('/egret/*', (req, res: Express.Response) => res.redirect(`/${config.rootName}/${namespace}/egret`))
 
-Server.start(namespace, Controller, resolve(__dirname, '../dist'), router)
+Server.start(namespace, Controller, resolve(__dirname, '../static'), router)
 
 RobotServer.start(namespace, Robot)
 

@@ -1,5 +1,5 @@
 {
-  "script": "../game/Graphical/VickreyAuction/build/serve.js",
+  "script": "../game/Graphical/VickreyAuction/dist/serve.js",
   "name": "VickreyAuction",
   "env": {
     "NODE_ENV": "production",

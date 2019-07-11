@@ -53,12 +53,14 @@ export class Setting {
 
     static getClientPath(): string {
         const {namespace} = this
+        if (elfSetting.bespokeHmr) {
+            return `http://localhost:${config.devPort.client}/${config.rootName}/${namespace}/static/${namespace}.js`
+        }
         const manifestPath = resolve(this.staticPath, `${namespace}.json`)
         if (!existsSync(manifestPath)) {
             return ''
+        } else {
+            return JSON.parse(readFileSync(manifestPath).toString())[`${namespace}.js`]
         }
-        return elfSetting.bespokeHmr ?
-            `http://localhost:${config.devPort.client}/${config.rootName}/${namespace}/static/${namespace}.js` :
-            JSON.parse(readFileSync(manifestPath).toString())[`${namespace}.js`]
     }
 }

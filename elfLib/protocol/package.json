@@ -4,7 +4,7 @@
   "main": "lib/index",
   "types": "src/index",
   "scripts": {
-    "libc": "tsc && ts-node ./bin/copyDTS.ts",
+    "dist": "tsc && ts-node ./bin/copyDTS.ts",
     "tsc-w": "tsc -w"
   },
   "devDependencies": {

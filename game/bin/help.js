@@ -211,7 +211,7 @@ function getProjects(parentProject, projectSet) {
                 case 11:
                     {
                         TaskHelper.execTask({
-                            command: "tsc -t ES5 --downlevelIteration --experimentalDecorators --listEmittedFiles --outDir ./" + project + "/build ./" + project + "/src/serve.ts"
+                            command: "tsc -t ES5 --downlevelIteration --experimentalDecorators --listEmittedFiles --outDir ./" + project + "/dist ./" + project + "/src/serve.ts"
                         });
                         return [3 /*break*/, 16];
                     }
@@ -249,7 +249,7 @@ function getProjects(parentProject, projectSet) {
                             BESPOKE_WITH_LINKER: withLinker,
                             NODE_ENV: 'production'
                         },
-                        command: "node ./" + project + "/build/serve.js"
+                        command: "node ./" + project + "/dist/serve.js"
                     });
                     return [3 /*break*/, 16];
                 case 16: return [3 /*break*/, 18];
@@ -260,7 +260,7 @@ function getProjects(parentProject, projectSet) {
                             command: "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + project + "/script/webpack.config.ts"
                         });
                         TaskHelper.execTask({
-                            command: "tsc -t ES5 --downlevelIteration --experimentalDecorators --listEmittedFiles --outDir ./" + project + "/build ./" + project + "/src/serve.ts"
+                            command: "tsc -t ES5 --downlevelIteration --experimentalDecorators --listEmittedFiles --outDir ./" + project + "/dist ./" + project + "/src/serve.ts"
                         });
                     }
                     _d.label = 18;

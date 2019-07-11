@@ -6,7 +6,7 @@ import {ICreateParams, namespace} from './config'
 import {CreateGame} from '@elf/protocol'
 import {RobotServer} from '@bespoke/robot'
 
-Server.start(namespace, Controller, resolve(__dirname, '../dist'))
+Server.start(namespace, Controller, resolve(__dirname, '../static'))
 
 RobotServer.start(namespace, Robot)
 

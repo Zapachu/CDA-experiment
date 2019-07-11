@@ -5,7 +5,7 @@
   "types": "src/index",
   "scripts": {
     "tsc-w": "tsc -w",
-    "libc": "tsc"
+    "dist": "tsc"
   },
   "devDependencies": {
     "@elf/share": "^1.1.1",

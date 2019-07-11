@@ -4,7 +4,7 @@
   "main": "lib/index",
   "types": "src/index",
   "scripts": {
-    "libc": "tsc"
+    "dist": "tsc"
   },
   "dependencies": {
     "typescript": "^3.3.3333"

@@ -1,5 +1,5 @@
 {
-  "script": "../game/Graphical/TrustGameGraphical/build/serve.js",
+  "script": "../game/Graphical/TrustGameGraphical/dist/serve.js",
   "name": "TrustGameGraphical",
   "env": {
     "NODE_ENV": "production",
