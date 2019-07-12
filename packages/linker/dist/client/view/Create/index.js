@@ -91,7 +91,7 @@ var Create = /** @class */ (function (_super) {
             title: '',
             desc: '',
             namespace: _this.props.match.params.namespace,
-            param: {},
+            params: {},
             submitable: true
         };
         return _this;
@@ -127,15 +127,15 @@ var Create = /** @class */ (function (_super) {
     };
     Create.prototype.handleSubmit = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, lang, history, _b, title, desc, namespace, param, _c, code, gameId;
+            var _a, lang, history, _b, title, desc, namespace, params, _c, code, gameId;
             return __generator(this, function (_d) {
                 switch (_d.label) {
                     case 0:
-                        _a = this, lang = _a.lang, history = _a.props.history, _b = _a.state, title = _b.title, desc = _b.desc, namespace = _b.namespace, param = _b.param;
+                        _a = this, lang = _a.lang, history = _a.props.history, _b = _a.state, title = _b.title, desc = _b.desc, namespace = _b.namespace, params = _b.params;
                         if (!title || !desc) {
                             return [2 /*return*/, _antd_component_1.message.warn(lang.invalidBaseInfo)];
                         }
-                        return [4 /*yield*/, _client_util_1.Api.postNewGame(title, desc, namespace, param)];
+                        return [4 /*yield*/, _client_util_1.Api.postNewGame(title, desc, namespace, params)];
                     case 1:
                         _c = _d.sent(), code = _c.code, gameId = _c.gameId;
                         if (code === share_1.ResponseCode.success) {
@@ -152,15 +152,15 @@ var Create = /** @class */ (function (_super) {
     };
     Create.prototype.updatePhase = function (newParam) {
         this.setState(function (_a) {
-            var param = _a.param;
+            var params = _a.params;
             return ({
-                param: __assign({}, param, newParam)
+                params: __assign({}, params, newParam)
             });
         });
     };
     Create.prototype.render = function () {
         var _this = this;
-        var _a = this, lang = _a.lang, _b = _a.state, loading = _b.loading, namespace = _b.namespace, param = _b.param, title = _b.title, desc = _b.desc, submitable = _b.submitable;
+        var _a = this, lang = _a.lang, _b = _a.state, loading = _b.loading, namespace = _b.namespace, params = _b.params, title = _b.title, desc = _b.desc, submitable = _b.submitable;
         if (loading) {
             return react_1.default.createElement(_client_component_1.Loading, null);
         }
@@ -187,7 +187,7 @@ var Create = /** @class */ (function (_super) {
             react_1.default.createElement(Create, __assign({}, {
                 submitable: submitable,
                 setSubmitable: function (submitable) { return _this.setState({ submitable: submitable }); },
-                params: param,
+                params: params,
                 setParams: function (params) { return _this.updatePhase(params); }
             })),
             submitable ?

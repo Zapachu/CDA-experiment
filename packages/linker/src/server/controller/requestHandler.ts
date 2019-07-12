@@ -74,14 +74,14 @@ export class GameCtrl {
     }
 
     static async saveNewGame(req: Request, res: Response) {
-        const {body: {title, desc, namespace, param}, user: {id: owner, orgCode}, session} = req
+        const {body: {title, desc, namespace, params}, user: {id: owner, orgCode}, session} = req
         const gameId = await GameService.saveGame({
             owner,
             orgCode: session.orgCode || orgCode,
             title,
             desc,
             namespace,
-            param
+            params
         })
         res.json({
             code: ResponseCode.success,
@@ -101,7 +101,7 @@ export class GameCtrl {
 
     static async getBaseGame(req: Request, res: Response) {
         const {gameId} = req.params
-        const {param, ...game} = await GameService.getGame(gameId)
+        const {params, ...game} = await GameService.getGame(gameId)
         res.json({
             code: ResponseCode.success,
             game

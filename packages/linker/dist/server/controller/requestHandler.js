@@ -158,18 +158,18 @@ var GameCtrl = /** @class */ (function () {
     };
     GameCtrl.saveNewGame = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, title, desc, namespace, param, _b, owner, orgCode, session, gameId;
+            var _a, title, desc, namespace, params, _b, owner, orgCode, session, gameId;
             return __generator(this, function (_c) {
                 switch (_c.label) {
                     case 0:
-                        _a = req.body, title = _a.title, desc = _a.desc, namespace = _a.namespace, param = _a.param, _b = req.user, owner = _b.id, orgCode = _b.orgCode, session = req.session;
+                        _a = req.body, title = _a.title, desc = _a.desc, namespace = _a.namespace, params = _a.params, _b = req.user, owner = _b.id, orgCode = _b.orgCode, session = req.session;
                         return [4 /*yield*/, _server_service_1.GameService.saveGame({
                                 owner: owner,
                                 orgCode: session.orgCode || orgCode,
                                 title: title,
                                 desc: desc,
                                 namespace: namespace,
-                                param: param
+                                params: params
                             })];
                     case 1:
                         gameId = _c.sent();
@@ -204,14 +204,14 @@ var GameCtrl = /** @class */ (function () {
     };
     GameCtrl.getBaseGame = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var gameId, _a, param, game;
+            var gameId, _a, params, game;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         gameId = req.params.gameId;
                         return [4 /*yield*/, _server_service_1.GameService.getGame(gameId)];
                     case 1:
-                        _a = _b.sent(), param = _a.param, game = __rest(_a, ["param"]);
+                        _a = _b.sent(), params = _a.params, game = __rest(_a, ["params"]);
                         res.json({
                             code: share_1.ResponseCode.success,
                             game: game

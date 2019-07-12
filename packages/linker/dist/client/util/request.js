@@ -188,12 +188,12 @@ var Request = /** @class */ (function () {
             });
         });
     };
-    Request.postNewGame = function (title, desc, namespace, param) {
+    Request.postNewGame = function (title, desc, namespace, params) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, POST('/game/create', null, null, {
-                            title: title, desc: desc, namespace: namespace, param: param
+                            title: title, desc: desc, namespace: namespace, params: params
                         })];
                     case 1: return [2 /*return*/, _a.sent()];
                 }

@@ -6,6 +6,6 @@ export const ElfGame = new Schema({
     title: String,
     desc: String,
     namespace: String,
-    param: Object,
+    params: Object,
     createAt: {type: Date, default: Date.now}
 }, {minimize: false})

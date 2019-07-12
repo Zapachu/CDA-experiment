@@ -50,13 +50,13 @@ var GameService = /** @class */ (function () {
                         return [4 /*yield*/, _server_model_1.GameModel.find({ owner: owner }).sort('-createAt').skip(page * pageSize).limit(pageSize)];
                     case 2:
                         _gameList = _a.sent(), gameList = _gameList.map(function (_a) {
-                            var id = _a.id, title = _a.title, desc = _a.desc, namespace = _a.namespace, param = _a.param;
+                            var id = _a.id, title = _a.title, desc = _a.desc, namespace = _a.namespace, params = _a.params;
                             return ({
                                 id: id,
                                 title: title,
                                 desc: desc,
                                 namespace: namespace,
-                                param: param
+                                params: params
                             });
                         });
                         return [2 /*return*/, { count: count, gameList: gameList }];
@@ -79,13 +79,13 @@ var GameService = /** @class */ (function () {
     };
     GameService.getGame = function (gameId) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, id, title, desc, owner, namespace, param;
+            var _a, id, title, desc, owner, namespace, params;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0: return [4 /*yield*/, _server_model_1.GameModel.findById(gameId)];
                     case 1:
-                        _a = _b.sent(), id = _a.id, title = _a.title, desc = _a.desc, owner = _a.owner, namespace = _a.namespace, param = _a.param;
-                        return [2 /*return*/, { id: id, title: title, desc: desc, namespace: namespace, param: param, owner: owner }];
+                        _a = _b.sent(), id = _a.id, title = _a.title, desc = _a.desc, owner = _a.owner, namespace = _a.namespace, params = _a.params;
+                        return [2 /*return*/, { id: id, title: title, desc: desc, namespace: namespace, params: params, owner: owner }];
                 }
             });
         });

@@ -90,11 +90,11 @@ export class Request {
         return await GET('/game/phaseTemplates')
     }
 
-    static async postNewGame(title: string, desc: string, namespace: string, param: {}): Promise<IHttpRes & {
+    static async postNewGame(title: string, desc: string, namespace: string, params: {}): Promise<IHttpRes & {
         gameId: string
     }> {
         return await POST('/game/create', null, null, {
-            title, desc, namespace, param
+            title, desc, namespace, params
         })
     }
 

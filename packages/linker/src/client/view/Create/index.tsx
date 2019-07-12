@@ -12,7 +12,7 @@ interface ICreateState {
     title: string
     desc: string
     namespace: string
-    param: {},
+    params: {},
     submitable: boolean
 }
 
@@ -34,7 +34,7 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
         title: '',
         desc: '',
         namespace: this.props.match.params.namespace,
-        param: {},
+        params: {},
         submitable: true
     }
 
@@ -55,11 +55,11 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
     }
 
     async handleSubmit() {
-        const {lang, props: {history}, state: {title, desc, namespace, param}} = this
+        const {lang, props: {history}, state: {title, desc, namespace, params}} = this
         if (!title || !desc) {
             return message.warn(lang.invalidBaseInfo)
         }
-        const {code, gameId} = await Api.postNewGame(title, desc, namespace, param)
+        const {code, gameId} = await Api.postNewGame(title, desc, namespace, params)
         if (code === ResponseCode.success) {
             message.success(lang.createSuccess)
             history.push(`/info/${gameId}`)
@@ -69,13 +69,13 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
     }
 
     updatePhase(newParam: {}) {
-        this.setState(({param}) => ({
-            param: {...param, ...newParam}
+        this.setState(({params}) => ({
+            params: {...params, ...newParam}
         }))
     }
 
     render(): React.ReactNode {
-        const {lang, state: {loading, namespace, param, title, desc, submitable}} = this
+        const {lang, state: {loading, namespace, params, title, desc, submitable}} = this
         if (loading) {
             return <Loading/>
         }
@@ -101,7 +101,7 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
             <Create {...{
                 submitable,
                 setSubmitable: submitable => this.setState({submitable}),
-                params: param,
+                params,
                 setParams: params => this.updatePhase(params)
             }}/>
             {

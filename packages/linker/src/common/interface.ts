@@ -44,7 +44,7 @@ export interface IBaseGameWithId extends IBaseGame {
 
 export interface IGame<ICreateParam = {}> extends IBaseGame {
     namespace: string
-    param: ICreateParam
+    params: ICreateParam
 }
 
 export interface IGameWithId extends IGame {

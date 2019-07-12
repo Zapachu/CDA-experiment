@@ -92,7 +92,7 @@ var StateManager = /** @class */ (function () {
     };
     StateManager.prototype.initState = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var gameStateDoc, _a, namespace, param, playUrl;
+            var gameStateDoc, _a, namespace, params, playUrl;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0: return [4 /*yield*/, _server_model_1.GameStateModel.findOne({ gameId: this.game.id })];
@@ -102,11 +102,11 @@ var StateManager = /** @class */ (function () {
                             this.gameState = gameStateDoc.data;
                             return [2 /*return*/];
                         }
-                        _a = this.game, namespace = _a.namespace, param = _a.param;
+                        _a = this.game, namespace = _a.namespace, params = _a.params;
                         return [4 /*yield*/, protocol_1.RedisCall.call(protocol_1.Linker.Create.name(namespace), {
                                 owner: this.game.owner,
                                 elfGameId: this.game.id,
-                                params: param
+                                params: params
                             })];
                     case 2:
                         playUrl = (_b.sent()).playUrl;

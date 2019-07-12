@@ -32,11 +32,11 @@ export class StateManager {
             this.gameState = gameStateDoc.data
             return
         }
-        const {namespace, param} = this.game
+        const {namespace, params} = this.game
         const {playUrl} = await RedisCall.call<Linker.Create.IReq, Linker.Create.IRes>(Linker.Create.name(namespace), {
             owner: this.game.owner,
             elfGameId: this.game.id,
-            params: param
+            params
         })
         this.gameState = {
             gameId: this.game.id,
