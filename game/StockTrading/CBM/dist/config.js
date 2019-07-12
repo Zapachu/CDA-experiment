@@ -55,3 +55,4 @@ var Identity;
     Identity[Identity["moneyGuarantor"] = 1] = "moneyGuarantor";
     Identity[Identity["stockGuarantor"] = 2] = "stockGuarantor";
 })(Identity = exports.Identity || (exports.Identity = {}));
+exports.playerLimit = 12;

@@ -123,3 +123,5 @@ export type IPushParams = Partial<{
     resOrderId: number
     tradeCount: number
 }>
+
+export const playerLimit = 12

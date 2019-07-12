@@ -105,20 +105,15 @@ var router = express_1.Router()
     });
 }); })
     .get("/onceMore/:gameId", function (req, res) { return __awaiter(_this, void 0, void 0, function () {
-    var gameId, game, result;
+    var result;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0:
-                gameId = req.params.gameId;
-                return [4 /*yield*/, server_1.BaseLogic.getLogic(gameId)];
+            case 0: return [4 /*yield*/, server_1.RedisCall.call(protocol_1.Trial.Done.name, {
+                    userId: req.session.user.id,
+                    onceMore: true,
+                    namespace: config_1.namespace
+                })];
             case 1:
-                game = (_a.sent()).game;
-                return [4 /*yield*/, server_1.RedisCall.call(protocol_1.GameOver.name, {
-                        playUrl: server_1.gameId2PlayUrl(game.id),
-                        onceMore: true,
-                        namespace: config_1.namespace
-                    })];
-            case 2:
                 result = _a.sent();
                 if (result) {
                     return [2 /*return*/, res.json({ code: 0, url: result.lobbyUrl })];
@@ -129,22 +124,19 @@ var router = express_1.Router()
 }); });
 server_1.Server.start(config_1.namespace, Controller_1.default, path_1.resolve(__dirname, "../static"), router);
 robot_1.RobotServer.start(config_1.namespace, Robot_1.default);
-server_1.RedisCall.handle(protocol_1.CreateGame.name(config_1.namespace), function (_a) {
-    var keys = _a.keys;
-    return __awaiter(_this, void 0, void 0, function () {
-        var gameId;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
-                case 0: return [4 /*yield*/, server_1.Server.newGame({
-                        title: "ParallelApplication:" + new Date().toUTCString(),
-                        params: {
-                            groupSize: 20
-                        }
-                    })];
-                case 1:
-                    gameId = _b.sent();
-                    return [2 /*return*/, { playUrls: keys.map(function (key) { return server_1.gameId2PlayUrl(gameId); }) }];
-            }
-        });
+server_1.RedisCall.handle(protocol_1.Trial.Create.name(config_1.namespace), function () { return __awaiter(_this, void 0, void 0, function () {
+    var gameId;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, server_1.Server.newGame({
+                    title: "ParallelApplication:" + new Date().toUTCString(),
+                    params: {
+                        groupSize: 20
+                    }
+                })];
+            case 1:
+                gameId = _a.sent();
+                return [2 /*return*/, { playUrl: server_1.gameId2PlayUrl(gameId) }];
+        }
     });
-});
+}); });

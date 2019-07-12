@@ -11,7 +11,7 @@ import {
   Model
 } from "@bespoke/server";
 import { config } from "@bespoke/share";
-import { GameOver } from "@elf/protocol";
+import { Trial } from "@elf/protocol";
 import {
   MoveType,
   PushType,
@@ -64,7 +64,7 @@ export default class Controller extends BaseController<
       playerStates = await this.stateManager.getPlayerStates();
     switch (type) {
       case MoveType.checkVersion: {
-        await this.checkOldVersion(gameState, actor.token, cb);
+        await this.checkOldVersion(gameState, playerState.userId, cb);
         break;
       }
       case MoveType.join: {
@@ -120,10 +120,10 @@ export default class Controller extends BaseController<
       }
       case MoveType.back: {
         const { onceMore } = params;
-        const res = await RedisCall.call<GameOver.IReq, GameOver.IRes>(
-          GameOver.name,
+        const res = await RedisCall.call<Trial.Done.IReq, Trial.Done.IRes>(
+          Trial.Done.name,
           {
-            playUrl: gameId2PlayUrl(this.game.id, actor.token),
+            userId: playerState.user.id,
             onceMore,
             namespace
           }
@@ -253,14 +253,14 @@ export default class Controller extends BaseController<
 
   private async checkOldVersion(
     gameState: TGameState<IGameState>,
-    token: string,
+    userId: string,
     cb: IMoveCallback
   ) {
     if (!gameState.sortedPlayers) {
-      const res = await RedisCall.call<GameOver.IReq, GameOver.IRes>(
-        GameOver.name,
+      const res = await RedisCall.call<Trial.Done.IReq, Trial.Done.IRes>(
+        Trial.Done.name,
         {
-          playUrl: gameId2PlayUrl(this.game.id, token),
+          userId,
           onceMore: true,
           namespace
         }

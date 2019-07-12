@@ -94,7 +94,7 @@ var Controller = /** @class */ (function (_super) {
                             case config_1.MoveType.back: return [3 /*break*/, 11];
                         }
                         return [3 /*break*/, 13];
-                    case 4: return [4 /*yield*/, this.checkOldVersion(gameState, actor.token, cb)];
+                    case 4: return [4 /*yield*/, this.checkOldVersion(gameState, playerState.userId, cb)];
                     case 5:
                         _b.sent();
                         return [3 /*break*/, 13];
@@ -155,8 +155,8 @@ var Controller = /** @class */ (function (_super) {
                         return [3 /*break*/, 13];
                     case 11:
                         onceMore = params.onceMore;
-                        return [4 /*yield*/, server_1.RedisCall.call(protocol_1.GameOver.name, {
-                                playUrl: server_1.gameId2PlayUrl(this.game.id, actor.token),
+                        return [4 /*yield*/, server_1.RedisCall.call(protocol_1.Trial.Done.name, {
+                                userId: playerState.user.id,
                                 onceMore: onceMore,
                                 namespace: config_1.namespace
                             })];
@@ -274,15 +274,15 @@ var Controller = /** @class */ (function (_super) {
     //   this.processProfits(gameState, shoutedPlayerStates);
     //   await this.stateManager.syncState();
     // }
-    Controller.prototype.checkOldVersion = function (gameState, token, cb) {
+    Controller.prototype.checkOldVersion = function (gameState, userId, cb) {
         return __awaiter(this, void 0, void 0, function () {
             var res;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         if (!!gameState.sortedPlayers) return [3 /*break*/, 2];
-                        return [4 /*yield*/, server_1.RedisCall.call(protocol_1.GameOver.name, {
-                                playUrl: server_1.gameId2PlayUrl(this.game.id, token),
+                        return [4 /*yield*/, server_1.RedisCall.call(protocol_1.Trial.Done.name, {
+                                userId: userId,
                                 onceMore: true,
                                 namespace: config_1.namespace
                             })];

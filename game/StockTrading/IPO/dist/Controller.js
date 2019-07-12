@@ -218,8 +218,8 @@ var Controller = /** @class */ (function (_super) {
                             return [2 /*return*/];
                         }
                         onceMore = params.onceMore;
-                        return [4 /*yield*/, server_1.RedisCall.call(protocol_1.GameOver.name, {
-                                playUrl: server_1.gameId2PlayUrl(this.game.id, actor.token),
+                        return [4 /*yield*/, server_1.RedisCall.call(protocol_1.Trial.Done.name, {
+                                userId: playerState.user.id,
                                 onceMore: onceMore,
                                 namespace: stock_trading_config_1.phaseToNamespace(this.game.params.type == config_1.IPOType.Median ? stock_trading_config_1.Phase.IPO_Median : stock_trading_config_1.Phase.IPO_TopK)
                             })];

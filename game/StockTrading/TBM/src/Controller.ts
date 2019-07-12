@@ -20,7 +20,7 @@ import {
   SHOUT_TIMER
 } from './config'
 import {Phase, phaseToNamespace, STOCKS} from '@bespoke-game/stock-trading-config'
-import {GameOver} from '@elf/protocol'
+import {Trial} from '@elf/protocol'
 
 export default class Controller extends BaseController<ICreateParams,
     IGameState,
@@ -97,10 +97,10 @@ export default class Controller extends BaseController<ICreateParams,
       }
       case MoveType.nextStage: {
         const {onceMore} = params
-        const res = await RedisCall.call<GameOver.IReq, GameOver.IRes>(
-            GameOver.name,
+        const res = await RedisCall.call<Trial.Done.IReq, Trial.Done.IRes>(
+            Trial.Done.name,
             {
-              playUrl: gameId2PlayUrl(this.game.id, actor.token),
+              userId: playerState.user.id,
               onceMore,
               namespace: phaseToNamespace(Phase.TBM)
             }

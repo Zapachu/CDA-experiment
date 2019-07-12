@@ -1,5 +1,5 @@
-import {BaseController, gameId2PlayUrl, IActor, IMoveCallback, TGameState, TPlayerState} from '@bespoke/server'
-import {GameOver, RedisCall} from '@elf/protocol'
+import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from '@bespoke/server'
+import {Trial, RedisCall} from '@elf/protocol'
 import {
     Config,
     GameScene,
@@ -116,8 +116,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 break
             }
             case MoveType.onceMore: {
-                const res = await RedisCall.call<GameOver.IReq, GameOver.IRes>(GameOver.name, {
-                    playUrl: gameId2PlayUrl(this.game.id, actor.token),
+                const res = await RedisCall.call<Trial.Done.IReq, Trial.Done.IRes>(Trial.Done.name, {
+                    userId: playerState.user.id,
                     onceMore: true,
                     namespace
                 })

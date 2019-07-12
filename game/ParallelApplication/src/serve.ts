@@ -12,7 +12,7 @@ import {
 import Controller from "./Controller";
 import Robot from "./Robot";
 import { ICreateParams, namespace } from "./config";
-import { CreateGame, GameOver } from "@elf/protocol";
+import { Trial} from "@elf/protocol";
 import { elfSetting } from "@elf/setting";
 import { RobotServer } from "@bespoke/robot";
 // import { config } from "@bespoke/share";
@@ -71,12 +71,10 @@ const router = Router()
     return res.end();
   })
   .get("/onceMore/:gameId", async (req, res: Response) => {
-    const { gameId } = req.params;
-    const { game } = await BaseLogic.getLogic(gameId);
-    const result = await RedisCall.call<GameOver.IReq, GameOver.IRes>(
-      GameOver.name,
+    const result = await RedisCall.call<Trial.Done.IReq, Trial.Done.IRes>(
+      Trial.Done.name,
       {
-        playUrl: gameId2PlayUrl(game.id),
+        userId: req.session.user.id,
         onceMore: true,
         namespace
       }
@@ -91,15 +89,15 @@ Server.start(namespace, Controller, resolve(__dirname, "../static"), router);
 
 RobotServer.start(namespace, Robot);
 
-RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(
-  CreateGame.name(namespace),
-  async ({ keys }) => {
+RedisCall.handle<Trial.Create.IReq, Trial.Create.IRes>(
+  Trial.Create.name(namespace),
+  async () => {
     const gameId = await Server.newGame<ICreateParams>({
       title: `ParallelApplication:${new Date().toUTCString()}`,
       params: {
         groupSize: 20
       }
     });
-    return { playUrls: keys.map(key => gameId2PlayUrl(gameId)) };
+    return { playUrl:gameId2PlayUrl(gameId)};
   }
 );

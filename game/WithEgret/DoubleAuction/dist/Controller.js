@@ -226,8 +226,8 @@ var Controller = /** @class */ (function (_super) {
                             return [3 /*break*/, 9];
                         }
                         _c.label = 7;
-                    case 7: return [4 /*yield*/, protocol_1.RedisCall.call(protocol_1.GameOver.name, {
-                            playUrl: server_1.gameId2PlayUrl(this.game.id, actor.token),
+                    case 7: return [4 /*yield*/, protocol_1.RedisCall.call(protocol_1.Trial.Done.name, {
+                            userId: playerState.user.id,
                             onceMore: true,
                             namespace: config_1.namespace
                         })];
