@@ -20,6 +20,6 @@ var apiRouter = express_1.Router()
 exports.default = express_1.Router()
     .use("/" + apiPrefix, apiRouter)
     .get('/create/:namespace', requestHandler_1.UserCtrl.loggedIn, requestHandler_1.UserCtrl.isTeacher, requestHandler_1.UserCtrl.isTemplateAccessible, requestHandler_1.UserCtrl.renderApp)
-    .get('/play/:gameId', requestHandler_1.UserCtrl.loggedIn, requestHandler_1.UserCtrl.isGameAccessible, requestHandler_1.UserCtrl.renderApp)
+    .get('/play/:gameId', requestHandler_1.UserCtrl.loggedIn, requestHandler_1.UserCtrl.mobileValid, requestHandler_1.UserCtrl.isGameAccessible, requestHandler_1.UserCtrl.renderApp)
     .get('/*', requestHandler_1.UserCtrl.loggedIn, requestHandler_1.UserCtrl.renderApp);
 //# sourceMappingURL=requestRouter.js.map

@@ -180,18 +180,18 @@ var Server = /** @class */ (function () {
     };
     Server.withLinker = function () {
         var _this = this;
-        protocol_1.RedisCall.handle(protocol_1.NewPhase.name(util_1.Setting.namespace), function (_a) {
-            var elfGameId = _a.elfGameId, owner = _a.owner, namespace = _a.namespace, param = _a.param;
+        protocol_1.RedisCall.handle(protocol_1.Linker.Create.name(util_1.Setting.namespace), function (_a) {
+            var elfGameId = _a.elfGameId, owner = _a.owner, params = _a.params;
             return __awaiter(_this, void 0, void 0, function () {
                 var id;
                 return __generator(this, function (_b) {
                     switch (_b.label) {
                         case 0: return [4 /*yield*/, model_1.GameModel.create({
-                                title: '',
-                                owner: owner,
+                                namespace: util_1.Setting.namespace,
+                                title: protocol_1.Linker.Create.name(util_1.Setting.namespace),
                                 elfGameId: elfGameId,
-                                namespace: namespace,
-                                params: JSON.parse(param)
+                                owner: owner,
+                                params: params
                             })];
                         case 1:
                             id = (_b.sent()).id;
@@ -201,7 +201,7 @@ var Server = /** @class */ (function () {
             });
         });
         var elfComponentPath = require('../../static/index.json')['ElfComponent.js'].replace('static', util_1.Setting.namespace + "/static");
-        util_1.heartBeat(protocol_1.PhaseReg.key(util_1.Setting.namespace), function () {
+        util_1.heartBeat(protocol_1.Linker.HeartBeat.key(util_1.Setting.namespace), function () {
             var regInfo = {
                 namespace: util_1.Setting.namespace,
                 jsUrl: "" + util_1.getOrigin() + elfComponentPath + ";" + util_1.getOrigin() + util_1.Setting.getClientPath()

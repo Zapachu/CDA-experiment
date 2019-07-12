@@ -1,56 +1,56 @@
-export declare namespace PhaseReg {
-    const intervalSeconds = 10;
-    const key: (namespace: any) => string;
-    interface IRegInfo {
-        namespace: string;
-        jsUrl: string;
+export declare namespace Linker {
+    namespace HeartBeat {
+        const intervalSeconds = 10;
+        const key: (namespace: any) => string;
+        interface IHeartBeat {
+            namespace: string;
+            jsUrl: string;
+        }
+    }
+    namespace Create {
+        const name: (namespace: any) => string;
+        interface IReq {
+            elfGameId: string;
+            owner: string;
+            params: any;
+        }
+        interface IRes {
+            playUrl: string;
+        }
+    }
+    namespace Result {
+        const name = "Linker:Result";
+        interface IResult {
+            uniKey?: string;
+            point?: number;
+            detailIframeUrl?: string;
+        }
+        interface IReq {
+            elfGameId: string;
+            playerToken: string;
+            result?: IResult;
+        }
+        type IRes = null;
     }
 }
-export declare namespace NewPhase {
-    const name: (namespace: any) => string;
-    interface IReq {
-        elfGameId: string;
-        namespace: string;
-        param: string;
-        owner: string;
+export declare namespace Trial {
+    namespace Create {
+        const name: (namespace: string) => string;
+        interface IReq {
+        }
+        interface IRes {
+            playUrl: string;
+        }
     }
-    interface IRes {
-        playUrl: string;
-    }
-}
-export declare namespace SetPlayerResult {
-    const name = "Elf:SetPlayerResult";
-    interface IResult {
-        uniKey?: string;
-        point?: number;
-        detailIframeUrl?: string;
-    }
-    interface IReq {
-        elfGameId: string;
-        playUrl: string;
-        playerToken: string;
-        result?: IResult;
-    }
-    type IRes = null;
-}
-export declare namespace CreateGame {
-    const name: (namespace: string) => string;
-    const playerLimit = 12;
-    interface IReq {
-        keys: string[];
-    }
-    interface IRes {
-        playUrls: string[];
-    }
-}
-export declare namespace GameOver {
-    const name = "Trial:GameOver";
-    interface IReq {
-        playUrl: string;
-        onceMore: boolean;
-        namespace: string;
-    }
-    interface IRes {
-        lobbyUrl: string;
+    namespace Done {
+        const name = "Trial:Done";
+        interface IReq {
+            namespace: string;
+            userId: string;
+            onceMore?: boolean;
+        }
+        interface IRes {
+            lobbyUrl: string;
+        }
     }
 }

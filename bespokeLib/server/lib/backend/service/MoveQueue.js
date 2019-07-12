@@ -38,7 +38,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var queue_1 = require("queue");
 var deep_diff_1 = require("deep-diff");
 var model_1 = require("../model");
-var setting_1 = require("@elf/setting");
 var cloneDeep = require("lodash/cloneDeep");
 var MoveQueue = /** @class */ (function () {
     function MoveQueue(game, stateManager) {
@@ -62,21 +61,21 @@ var MoveQueue = /** @class */ (function () {
             params: params
         };
         this.queue.push(function () { return __awaiter(_this, void 0, void 0, function () {
-            var gameState, playerStates, gameStateChanges, playerStatesChanges, _a;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            var gameState, playerStates, gameStateChanges, playerStatesChanges;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
                     case 0: return [4 /*yield*/, moveHandler()];
                     case 1:
-                        _b.sent();
+                        _a.sent();
                         return [4 /*yield*/, this.stateManager.syncState()];
                     case 2:
-                        _b.sent();
+                        _a.sent();
                         return [4 /*yield*/, this.stateManager.getGameState()];
                     case 3:
-                        gameState = _b.sent();
+                        gameState = _a.sent();
                         return [4 /*yield*/, this.stateManager.getPlayerStates()];
                     case 4:
-                        playerStates = _b.sent();
+                        playerStates = _a.sent();
                         if (!this.gameState) {
                             Object.assign(moveLog, {
                                 gameState: gameState,
@@ -92,16 +91,9 @@ var MoveQueue = /** @class */ (function () {
                         }
                         this.gameState = cloneDeep(gameState);
                         this.playerStates = cloneDeep(playerStates);
-                        if (!setting_1.elfSetting.inProductEnv) return [3 /*break*/, 6];
                         return [4 /*yield*/, model_1.MoveLogModel.create(moveLog)];
                     case 5:
-                        _a = _b.sent();
-                        return [3 /*break*/, 7];
-                    case 6:
-                        _a = null;
-                        _b.label = 7;
-                    case 7:
-                        _a;
+                        _a.sent();
                         return [2 /*return*/];
                 }
             });

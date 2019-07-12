@@ -1,16 +1,13 @@
-import * as objectHash from 'object-hash'
-import {elfSetting as settings} from '@elf/setting'
+import {elfSetting} from '@elf/setting'
 import {ThirdPartPhase} from '../../../../core/server/models'
 import * as rp from 'request-promise'
+import {Token} from '@elf/util'
 import ListMap from './ListMap'
+import {Linker} from '@elf/protocol'
 
-const oTreeList = `${settings.oTreeServer}/demo/`
+const oTreeList = `${elfSetting.oTreeServer}/demo/`
 const playerUrl = 'InitializeParticipant/'
-const oTreeProxy = settings.oTreeProxy
-
-const gen32Token = (source) => {
-    return objectHash(source, {algorithm: 'md5'})
-}
+const oTreeProxy = elfSetting.oTreeProxy
 
 // get demo list
 export const getDemoList = async (namespace) => {
@@ -47,13 +44,12 @@ const syncWaitingForCreated = async (uri) => {
 }
 
 // get play link
-export const getUrlByNamespace = async ({elfGameId, namespace, param, owner}): Promise<string> => {
+export const getUrlByNamespace = async ({elfGameId, params, owner}: Linker.Create.IReq): Promise<string> => {
     let handleBody = ''
     const playHash = []
-    const paramJson = JSON.parse(param)
     const initOptions = {
         method: 'GET',
-        uri: `${oTreeList}${paramJson.otreeName}`,
+        uri: `${oTreeList}${params.otreeName}`,
         resolveWithFullResponse: true
     }
     const initRes = await rp(initOptions)
@@ -72,13 +68,13 @@ export const getUrlByNamespace = async ({elfGameId, namespace, param, owner}): P
     })
     const playHashConf = []
     playHash.map(hash => playHashConf.push({hash: hash, player: 'wait'}))
-    paramJson.adminUrl = initRes.request.uri.path
+    params.adminUrl = initRes.request.uri.path
     const newOTreePhase = await new ThirdPartPhase({
-        param: JSON.stringify(paramJson),
+        param: JSON.stringify(params),
         elfGameId: elfGameId,
-        namespace: namespace,
+        namespace: elfSetting.oTreeNamespace,
         playHash: playHashConf,
-        ownerToken: gen32Token(owner.toString())
+        ownerToken: Token.geneToken(owner)
     }).save()
 
     const phaseId = newOTreePhase._id.toString()

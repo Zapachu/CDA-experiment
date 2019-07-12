@@ -1,5 +1,5 @@
 import { CoreMove, GameStatus, IActor, IConnection, IGameWithId, IMoveCallback, SyncStrategy, TGameState, TPlayerState } from '@bespoke/share';
-import { SetPlayerResult } from '@elf/protocol';
+import { Linker } from '@elf/protocol';
 import { StateManager } from './StateManager';
 export declare type AnyLogic = BaseLogic<any, any, any, any, any, any, any>;
 export declare class BaseLogic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IRobotMeta = {}> {
@@ -27,5 +27,5 @@ export declare class BaseLogic<ICreateParams, IGameState, IPlayerState, MoveType
     startRobot(key: any, meta?: IRobotMeta): Promise<void>;
     protected push(actors: IActor | IActor[], type: PushType, params?: Partial<IPushParams>): void;
     protected broadcast(type: PushType, params?: Partial<IPushParams>): void;
-    protected setPhaseResult(playerToken: string, result: SetPlayerResult.IResult): import("tracer").Tracer.LogOutput;
+    protected setPhaseResult(playerToken: string, result: Linker.Result.IResult): import("tracer").Tracer.LogOutput;
 }

@@ -1,10 +1,10 @@
 'use strict'
 
 import {ThirdPartPhase} from "../../../../core/server/models"
-import {elfSetting as settings} from '@elf/setting'
+import {elfSetting} from '@elf/setting'
 import {IActor} from '@elf/share'
 
-const {qualtricsProxy} = settings
+const {qualtricsProxy} = elfSetting
 
 const InitWork = (app) => {
     app.use(async (req, res, next) => {

@@ -87,6 +87,7 @@ var Play = /** @class */ (function (_super) {
                         if (!actor) {
                             this.props.history.push('/join');
                         }
+                        document.title = game.title;
                         socketClient = socket_io_client_1.connect('/', {
                             path: _common_1.config.socketPath,
                             query: "gameId=" + gameId + "&userId=" + user.id + "&token=" + actor.token + "&type=" + actor.type + "&playerId=" + actor.playerId

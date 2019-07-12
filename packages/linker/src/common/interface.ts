@@ -1,6 +1,6 @@
 import {PhaseStatus, PlayerStatus} from './baseEnum'
 import {Socket} from 'socket.io-client'
-import {SetPlayerResult} from '@elf/protocol'
+import {Linker} from '@elf/protocol'
 import {AcademusRole, Actor, IActor} from '@elf/share'
 
 export type TSocket = typeof Socket
@@ -28,7 +28,7 @@ export interface ILinkerActor extends IActor {
 export interface IPlayerState {
     actor: ILinkerActor
     status: PlayerStatus
-    result?: SetPlayerResult.IResult
+    result?: Linker.Result.IResult
 }
 
 export interface IBaseGame {
@@ -55,7 +55,7 @@ export interface IPlayer {
     gameId: string
     userId: string
     reward: string
-    result?: SetPlayerResult.IResult
+    result?: Linker.Result.IResult
 }
 
 export interface IPlayerWithId {

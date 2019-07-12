@@ -1,7 +1,5 @@
-'use strict'
-
 import {ThirdPartPhase} from "../../../../core/server/models"
-import {elfSetting as settings} from '@elf/setting'
+import {elfSetting} from '@elf/setting'
 import {getNextPhaseUrl} from './getNextPhaseUrl'
 import {sendErrorPage} from '../../../common/utils'
 import {Request} from 'express'
@@ -55,7 +53,7 @@ const InitWork = (app) => {
                 let redirectTo = null
                 for (let i = 0; i < playHash.length; i++) {
                     if (playHash[i].player.toString() === actor.token) {
-                        redirectTo = `${settings.wjxProxy}/jq/${currentPhaseWjxHash}.aspx`
+                        redirectTo = `${elfSetting.wjxProxy}/jq/${currentPhaseWjxHash}.aspx`
                     }
                 }
 
@@ -66,7 +64,7 @@ const InitWork = (app) => {
                 currentPhase.playHash = playHash
                 currentPhase.markModified('playHash')
                 await currentPhase.save()
-                return res.redirect(`${settings.wjxProxy}/jq/${currentPhaseWjxHash}.aspx`)
+                return res.redirect(`${elfSetting.wjxProxy}/jq/${currentPhaseWjxHash}.aspx`)
             } catch (err) {
                 if (err) {
                     console.trace(err)

@@ -3,7 +3,7 @@ import {GameService} from './GameService'
 import {GameStateDoc, GameStateModel, PlayerModel} from '@server-model'
 import {EventDispatcher} from '../controller/eventDispatcher'
 import {Log} from '@elf/util'
-import {NewPhase, RedisCall, SetPlayerResult} from '@elf/protocol'
+import {Linker, RedisCall} from '@elf/protocol'
 
 const stateManagers: { [gameId: string]: StateManager } = {}
 
@@ -33,11 +33,10 @@ export class StateManager {
             return
         }
         const {namespace, param} = this.game
-        const {playUrl} = await RedisCall.call<NewPhase.IReq, NewPhase.IRes>(NewPhase.name(namespace), {
+        const {playUrl} = await RedisCall.call<Linker.Create.IReq, Linker.Create.IRes>(Linker.Create.name(namespace), {
             owner: this.game.owner,
             elfGameId: this.game.id,
-            namespace,
-            param: JSON.stringify(param)
+            params: param
         })
         this.gameState = {
             gameId: this.game.id,
@@ -58,7 +57,7 @@ export class StateManager {
         }
     }
 
-    async setPlayerResult(playUrl: string, playerToken: string, result: SetPlayerResult.IResult): Promise<void> {
+    async setPlayerResult(playerToken: string, result: Linker.Result.IResult): Promise<void> {
         const {gameState} = this
         const playerCurPhaseState = gameState.playerState[playerToken]
         if (!playerCurPhaseState) {

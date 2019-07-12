@@ -50,6 +50,7 @@ var util_1 = require("@elf/util");
 var setting_1 = require("@elf/setting");
 var rpc_1 = require("../rpc");
 var protocol_1 = require("@elf/protocol");
+var HeartBeat = protocol_1.Linker.HeartBeat;
 var PhaseService = /** @class */ (function () {
     function PhaseService() {
     }
@@ -61,7 +62,7 @@ var PhaseService = /** @class */ (function () {
                 switch (_f.label) {
                     case 0:
                         phaseTemplates = [];
-                        return [4 /*yield*/, _server_util_1.redisClient.keys(protocol_1.PhaseReg.key('*'))];
+                        return [4 /*yield*/, _server_util_1.redisClient.keys(HeartBeat.key('*'))];
                     case 1:
                         registeredPhaseKeys = _f.sent();
                         _f.label = 2;

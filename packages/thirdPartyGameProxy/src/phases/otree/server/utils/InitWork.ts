@@ -2,8 +2,8 @@ import {NextFunction, Request, Response} from 'express'
 import {sendErrorPage} from '../../../common/utils'
 import ListMap from '../utils/ListMap'
 import {ThirdPartPhase} from '../../../../core/server/models'
-import {elfSetting as elfSetting} from '@elf/setting'
-import {RedisCall, SetPlayerResult} from '@elf/protocol'
+import {elfSetting} from '@elf/setting'
+import {Linker, RedisCall} from '@elf/protocol'
 import nodeXlsx from 'node-xlsx'
 import {
     downloadScreenXlsxRoute,
@@ -51,7 +51,7 @@ export const InitWork = (app) => {
 
         if (req.url.includes(reportScreenRoute)) {
             const phaseId = req.session.oTreePhaseId
-            const actor:IActor = req.session.actor
+            const actor: IActor = req.session.actor
             const phase = await ThirdPartPhase.findById(phaseId)
             const curPlayer = phase.playHash.filter(p => p.player.toString() === actor.token)[0]
             if (!curPlayer.hash) return sendErrorPage(res, 'Wrong Player')
@@ -104,9 +104,8 @@ export const InitWork = (app) => {
                 }
                 phase.markModified('playHash')
                 await phase.save()
-                await RedisCall.call<SetPlayerResult.IReq, SetPlayerResult.IRes>(SetPlayerResult.name, {
+                await RedisCall.call<Linker.Result.IReq, Linker.Result.IRes>(Linker.Result.name, {
                     elfGameId: phase.elfGameId,
-                    playUrl: `${oTreeProxy}/init/${START_SIGN}/${phase._id}`,
                     playerToken: actor.token,
                     result: {
                         uniKey: playerOtreeHash,
@@ -123,7 +122,7 @@ export const InitWork = (app) => {
 
         if (req.url.includes(initRoute)) {
             let findHash: string
-            const actor:IActor = req.session.actor
+            const actor: IActor = req.session.actor
             const phaseId = req.path.split(`${START_SIGN}/`)[1]
 
             try {

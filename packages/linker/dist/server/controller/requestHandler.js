@@ -70,6 +70,11 @@ var UserCtrl = /** @class */ (function () {
         var _a = _common_1.config.academus.route, prefix = _a.prefix, login = _a.login;
         req.isAuthenticated() ? next() : res.redirect("" + prefix + login);
     };
+    UserCtrl.mobileValid = function (req, res, next) {
+        var _a = _common_1.config.academus.route, prefix = _a.prefix, profileMobile = _a.profileMobile;
+        var mobile = req.user.mobile;
+        mobile && !mobile.startsWith('null') ? next() : res.redirect("" + prefix + profileMobile);
+    };
     UserCtrl.isTeacher = function (req, res, next) {
         req.user.role === share_1.AcademusRole.teacher ? next() : res.redirect("/" + _common_1.config.rootName + "/join");
     };

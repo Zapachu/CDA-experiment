@@ -3,11 +3,11 @@ import * as errorhandler from 'errorhandler'
 import '../../common/auth/passport'
 import {routePrefix} from '../../common/config'
 import {ConDB, PassportMiddleware, SessionSetMiddleware, StaticPathMiddleware} from '../../common/utils'
-import {getUrlByNamespace, InitWork, ProxyWork} from './utils'
+import {getUrlByNamespace, InitWork, NAMESPACE, ProxyWork} from './utils'
 import {withLinker} from '../../../core/server/util'
-import {elfSetting as settings} from '@elf/setting'
+import {elfSetting} from '@elf/setting'
 
-const {qualtricsPort} = settings
+const {qualtricsPort} = elfSetting
 
 
 ConDB()
@@ -20,7 +20,7 @@ StaticPathMiddleware(app, routePrefix.qualtricsStaticNamespace)
 
 InitWork(app)
 ProxyWork(app)
-withLinker('qualtrics', settings.qualtricsProxy, getUrlByNamespace)
+withLinker(NAMESPACE, elfSetting.qualtricsProxy, getUrlByNamespace)
 
 app.use(errorhandler())
 app.listen(qualtricsPort, () => {

@@ -103,11 +103,10 @@ var StateManager = /** @class */ (function () {
                             return [2 /*return*/];
                         }
                         _a = this.game, namespace = _a.namespace, param = _a.param;
-                        return [4 /*yield*/, protocol_1.RedisCall.call(protocol_1.NewPhase.name(namespace), {
+                        return [4 /*yield*/, protocol_1.RedisCall.call(protocol_1.Linker.Create.name(namespace), {
                                 owner: this.game.owner,
                                 elfGameId: this.game.id,
-                                namespace: namespace,
-                                param: JSON.stringify(param)
+                                params: param
                             })];
                     case 2:
                         playUrl = (_b.sent()).playUrl;
@@ -140,7 +139,7 @@ var StateManager = /** @class */ (function () {
             });
         });
     };
-    StateManager.prototype.setPlayerResult = function (playUrl, playerToken, result) {
+    StateManager.prototype.setPlayerResult = function (playerToken, result) {
         return __awaiter(this, void 0, void 0, function () {
             var gameState, playerCurPhaseState;
             return __generator(this, function (_a) {

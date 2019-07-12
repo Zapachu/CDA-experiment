@@ -142,13 +142,7 @@ let sessionSet = {
   }
 };
 const sessionMiddleWare = session(sessionSet)
-app.use((req, res, next) => {
-  if(req.method === 'HEAD') { // 腾讯云心跳检查 导致一直新建session
-    res.end();
-  } else {
-    sessionMiddleWare(req, res, next);
-  }
-});
+app.use(sessionMiddleWare);
 
 /**csrf whitelist*/
 // const csrfExclude = [];

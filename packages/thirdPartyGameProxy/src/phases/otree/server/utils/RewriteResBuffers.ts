@@ -1,16 +1,12 @@
-'use strict'
-
-
 import {sendErrorPage} from '../../../common/utils'
-import {ThirdPartPhase} from "../../../../core/server/models"
-import {RedisCall, SetPlayerResult} from '@elf/protocol'
-import {elfSetting as settings} from '@elf/setting'
+import {ThirdPartPhase} from '../../../../core/server/models'
+import {Linker, RedisCall} from '@elf/protocol'
+import {elfSetting} from '@elf/setting'
 import {Request, Response} from 'express'
 import {previewScreenXlsxRoute} from '../config'
 
-const {oTreeProxy} = settings
+const {oTreeProxy} = elfSetting
 
-const START_SIGN = 'InitializeParticipant'
 const END_SIGN = 'OutOfRangeNotification'
 
 
@@ -44,10 +40,12 @@ export const rewriteResBuffers = async (proxyRes, req: Request, res: Response) =
                 }
             })
             const elfGameId: string = otreePhase.elfGameId
-            const playUrl: string = `${oTreeProxy}/init/${START_SIGN}/${otreePhase._id}`
-            await RedisCall.call<SetPlayerResult.IReq, SetPlayerResult.IRes>(SetPlayerResult.name, {
-                elfGameId, playUrl, playerToken,
-                result: {uniKey: playerOtreeHash, detailIframeUrl:`${oTreeProxy}${previewScreenXlsxRoute}/${otreePhase.id}`}
+            await RedisCall.call<Linker.Result.IReq, Linker.Result.IRes>(Linker.Result.name, {
+                elfGameId, playerToken,
+                result: {
+                    uniKey: playerOtreeHash,
+                    detailIframeUrl: `${oTreeProxy}${previewScreenXlsxRoute}/${otreePhase.id}`
+                }
             })
             return okRes().redirect('#')
         } catch (err) {

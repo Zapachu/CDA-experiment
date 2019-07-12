@@ -12,12 +12,11 @@ import {
     TPlayerState
 } from '@bespoke/share'
 import {Log, Token} from '@elf/util'
-import {RedisCall, SetPlayerResult} from '@elf/protocol'
+import {Linker, RedisCall} from '@elf/protocol'
 import {EventIO} from './EventIO'
 import {GameDAO} from './GameDAO'
 import {StateManager} from './StateManager'
 import {MoveQueue} from './MoveQueue'
-import {gameId2PlayUrl} from '../util'
 
 export type AnyLogic = BaseLogic<any, any, any, any, any, any, any>
 
@@ -131,12 +130,11 @@ export class BaseLogic<ICreateParams, IGameState, IPlayerState, MoveType, PushTy
     //endregion
 
     //region elf
-    protected setPhaseResult(playerToken: string, result: SetPlayerResult.IResult) {
+    protected setPhaseResult(playerToken: string, result: Linker.Result.IResult) {
         if (!this.game.elfGameId) {
             return Log.w('Bespoke单独部署，game未关联至Linker')
         }
-        RedisCall.call<SetPlayerResult.IReq, SetPlayerResult.IRes>(SetPlayerResult.name, {
-            playUrl: gameId2PlayUrl(this.game.id),
+        RedisCall.call<Linker.Result.IReq, Linker.Result.IRes>(Linker.Result.name, {
             playerToken,
             elfGameId: this.game.elfGameId,
             result

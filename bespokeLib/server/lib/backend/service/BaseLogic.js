@@ -42,7 +42,6 @@ var EventIO_1 = require("./EventIO");
 var GameDAO_1 = require("./GameDAO");
 var StateManager_1 = require("./StateManager");
 var MoveQueue_1 = require("./MoveQueue");
-var util_2 = require("../util");
 var BaseLogic = /** @class */ (function () {
     function BaseLogic(game) {
         this.game = game;
@@ -205,8 +204,7 @@ var BaseLogic = /** @class */ (function () {
         if (!this.game.elfGameId) {
             return util_1.Log.w('Bespoke单独部署，game未关联至Linker');
         }
-        protocol_1.RedisCall.call(protocol_1.SetPlayerResult.name, {
-            playUrl: util_2.gameId2PlayUrl(this.game.id),
+        protocol_1.RedisCall.call(protocol_1.Linker.Result.name, {
             playerToken: playerToken,
             elfGameId: this.game.elfGameId,
             result: result
