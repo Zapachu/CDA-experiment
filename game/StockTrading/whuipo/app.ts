@@ -130,7 +130,7 @@ const sessionStore = new RedisStore({
   ttl: 60 * 24 * 60 * 30 // expire time in seconds
 })
 let sessionSet = {
-  name: settings.sessionId || 'whuipo.sid',
+  name: settings.sessionId,
   resave: true,
   saveUninitialized: true,
   secret: settings.sessionSecret,
@@ -187,7 +187,7 @@ io.use(socketSession(sessionMiddleWare, {
 }))
 io.use(socketPassport.authorize({
   cookieParser: cookieParser,
-  key: settings.sessionId || 'whuipo.sid',
+  key: settings.sessionId,
   secret: settings.sessionSecret,
   store: sessionStore,
   success: handleSocketPassportSuccess,

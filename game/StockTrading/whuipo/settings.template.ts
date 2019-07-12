@@ -1,9 +1,9 @@
 export default {
-    mongouri: process.env.MONGODB || 'mongodb://127.0.0.1:27017/whuipo',
+    mongouri: process.env.MONGODB || 'mongodb://127.0.0.1:27017/academy',
     mongouser: '',
     mongopass: '',
 
-    sessionId: 'whuipo.sid',
+    sessionId: 'academy.sid',
     cookieSecret: 'academy',
     redishost: process.env.REDIS || 'localhost',
     redisport: 6379,
