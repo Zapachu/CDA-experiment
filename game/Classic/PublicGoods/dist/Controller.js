@@ -130,7 +130,7 @@ var Controller = /** @class */ (function (_super) {
                                                     groupRoundState_1.returnMoney = ~~((groupPlayerStates_1.map(function (_a) {
                                                         var rounds = _a.rounds;
                                                         return rounds[roundIndex_1].submitMoney;
-                                                    }).reduce(function (m, n) { return m + n; }, 0)) / groupPlayerStates_1.length);
+                                                    }).reduce(function (m, n) { return m + n; }, 0)) / groupPlayerStates_1.length * groupParams[groupIndex_2].roundParams[roundIndex_1].K);
                                                     return [4 /*yield*/, this.stateManager.syncState()];
                                                 case 1:
                                                     _a.sent();
