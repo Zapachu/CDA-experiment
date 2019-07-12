@@ -29,6 +29,7 @@ export class Play extends React.Component<TRootContext & RouteComponentProps<{ g
         if (!actor) {
             this.props.history.push('/join')
         }
+        document.title = game.title
         const socketClient = connect('/', {
             path: config.socketPath,
             query: `gameId=${gameId}&userId=${user.id}&token=${actor.token}&type=${actor.type}&playerId=${actor.playerId}`

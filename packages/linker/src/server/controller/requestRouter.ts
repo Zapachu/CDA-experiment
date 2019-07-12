@@ -1,7 +1,7 @@
 import {Router} from 'express'
 import {config} from '@common'
 
-import {UserCtrl, GameCtrl} from './requestHandler'
+import {GameCtrl, UserCtrl} from './requestHandler'
 
 const {apiPrefix} = config
 
@@ -24,7 +24,7 @@ const apiRouter = Router()
 export default Router()
     .use(`/${apiPrefix}`, apiRouter)
     .get('/create/:namespace', UserCtrl.loggedIn, UserCtrl.isTeacher, UserCtrl.isTemplateAccessible, UserCtrl.renderApp)
-    .get('/play/:gameId', UserCtrl.loggedIn, UserCtrl.isGameAccessible, UserCtrl.renderApp)
+    .get('/play/:gameId', UserCtrl.loggedIn, UserCtrl.mobileValid, UserCtrl.isGameAccessible, UserCtrl.renderApp)
     .get('/*', UserCtrl.loggedIn, UserCtrl.renderApp)
 
 

@@ -20,6 +20,12 @@ export class UserCtrl {
         req.isAuthenticated() ? next() : res.redirect(`${prefix}${login}`)
     }
 
+    static mobileValid(req, res: Response, next) {
+        const {prefix, profileMobile} = config.academus.route
+        const {mobile} = req.user
+        mobile && !mobile.startsWith('null') ? next() : res.redirect(`${prefix}${profileMobile}`)
+    }
+
     static isTeacher(req, res: Response, next) {
         req.user.role === AcademusRole.teacher ? next() : res.redirect(`/${config.rootName}/join`)
     }

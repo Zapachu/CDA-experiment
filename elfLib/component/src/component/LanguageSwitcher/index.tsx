@@ -18,13 +18,14 @@ export class Lang {
     static switchListeners: Array<() => void> = []
 
     static extractLang<TLangDict>(LangDict: TLangDict): { [K in keyof TLangDict]: (string & ((...args: any[]) => string)) } {
+        const defaultLanguageIndex = Lang.languages.indexOf(Lang.defaultLanguage)
         let activeLanguageIndex = Lang.languages.indexOf(this.activeLanguage)
         if (activeLanguageIndex === -1) {
-            activeLanguageIndex = Lang.languages.indexOf(Lang.defaultLanguage)
+            activeLanguageIndex = defaultLanguageIndex
         }
         const lang = {} as any
         Object.getOwnPropertyNames(LangDict).forEach(k => {
-            lang[k] = LangDict[k][activeLanguageIndex]
+            lang[k] = LangDict[k][activeLanguageIndex]||LangDict[k][defaultLanguageIndex]
         })
         return lang
     }

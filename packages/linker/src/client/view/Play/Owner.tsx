@@ -28,7 +28,7 @@ export class Play4Owner extends React.Component<TRootContext & TPlayContext & { 
 
     render(): React.ReactNode {
         const {props: {game, gameState}, lang} = this
-        return <section className={style.console}>
+        return <section>
             <Affix style={{position: 'absolute', right: 32, top: 64, zIndex: 1000}}>
                 <Dropdown overlay={<Menu>
                     <Menu.Item>
