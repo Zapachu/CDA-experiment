@@ -44,11 +44,12 @@ var server_1 = require("@bespoke/server");
 var Controller_1 = require("./Controller");
 var Robot_1 = require("./Robot");
 var config_1 = require("./config");
-var settings_1 = require("./settings");
 var protocol_1 = require("@elf/protocol");
+var setting_1 = require("@elf/setting");
 var robot_1 = require("@bespoke/robot");
-var protocol_2 = require("@elf/protocol");
+// import { config } from "@bespoke/share";
 var FreeStyleModel = server_1.Model.FreeStyleModel;
+var ROOTNAME = "gametrial";
 var resultHtmlStr = fs
     .readFileSync(path_1.resolve(__dirname, "../asset/result.html"))
     .toString();
@@ -77,7 +78,7 @@ var router = express_1.Router()
                     return [2 /*return*/, res.end(scriptStr + resultHtmlStr)];
                 }
                 _a.label = 2;
-            case 2: return [2 /*return*/, res.redirect(settings_1.default.entryUrl)];
+            case 2: return [2 /*return*/, res.redirect(setting_1.elfSetting.proxyOrigin + "/" + ROOTNAME + "/game/" + config_1.namespace)];
         }
     });
 }); })
@@ -112,7 +113,7 @@ var router = express_1.Router()
                 return [4 /*yield*/, server_1.BaseLogic.getLogic(gameId)];
             case 1:
                 game = (_a.sent()).game;
-                return [4 /*yield*/, server_1.RedisCall.call(protocol_2.GameOver.name, {
+                return [4 /*yield*/, server_1.RedisCall.call(protocol_1.GameOver.name, {
                         playUrl: server_1.gameId2PlayUrl(game.id),
                         onceMore: true,
                         namespace: config_1.namespace
