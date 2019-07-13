@@ -18,6 +18,7 @@ import {GameDAO} from './GameDAO'
 import {Setting} from '../util'
 import {EventEmitter} from 'events'
 import {UserModel} from '../model'
+import {elfSetting} from '@elf/setting'
 
 export class EventIO {
     private static robotIOServer: RobotIO.Server
@@ -40,15 +41,16 @@ export class EventIO {
             const game = await GameDAO.getGame(gameId)
             const actor: IActor = Token.checkToken(token) ?
                 game.owner === userId ? {type: Actor.clientRobot, token} : {type: Actor.player, token} :
-                game.owner === userId ?
-                    {type: Actor.owner, token: Token.geneToken(userId)} :
-                    linkerActor || {type: Actor.player, token: Token.geneToken(userId || sessionID)}
+                game.owner === userId ? {type: Actor.owner, token: Token.geneToken(userId)} :
+                    elfSetting.bespokeWithLinker ? linkerActor :
+                        {type: Actor.player, token: Token.geneToken(userId || sessionID)}
             let user: IUserWithId = null
             if (userId) {
                 const {id, mobile, name, role} = await UserModel.findById(userId)
                 user = {id, mobile, name, role}
             }
             subscribeOnConnection(Object.assign(connection, {actor, game, user}) as any)
+            connection.emit(SocketEvent.connection, actor)
         })
         return this.socketIOServer
     }

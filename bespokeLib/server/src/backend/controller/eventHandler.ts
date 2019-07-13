@@ -1,13 +1,13 @@
-import {Actor, IConnection, IEventHandler, IMoveCallback, SocketEvent, TOnlineCallback} from '@bespoke/share'
+import {Actor, IConnection, IEventHandler, IMoveCallback, SocketEvent} from '@bespoke/share'
 import {BaseLogic} from '../service'
 
 export const EventHandler = {
-    [SocketEvent.online]: async (connection: IConnection, onlineCallback: TOnlineCallback = () => null) => {
+    [SocketEvent.online]: async (connection: IConnection, cb: () => void = () => null) => {
         const {game, actor} = connection,
             controller = await BaseLogic.getLogic(game.id)
-        onlineCallback(actor)
         connection.join(game.id)
         controller.connections.set(actor.token, connection)
+        cb()
         if (actor.type === Actor.owner) {
             const gameState = await controller.stateManager.getGameState()
             gameState.connectionId = connection.id

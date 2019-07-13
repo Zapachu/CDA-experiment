@@ -6,6 +6,7 @@ import {
     GameStatus,
     IActor,
     IGameWithId,
+    ResponseCode,
     SocketEvent,
     TGameState,
     TPlayerState,
@@ -42,32 +43,42 @@ export class Play extends React.Component<TPageProps, IPlayState> {
     }
 
     async componentDidMount() {
-        const {token, props: {match: {params: {gameId}}}} = this
-        const {game} = await Api.getGame(gameId)
+        const {token, props: {history, match: {params: {gameId}}}} = this
+        const {code, game} = await Api.getGame(gameId)
+        if (code !== ResponseCode.success) {
+            history.push('/404')
+            return
+        }
         const socketClient = connect('/', {
             path: config.socketPath(NAMESPACE),
             query: `gameId=${gameId}&token=${token}`
         })
-        this.registerStateReducer(socketClient)
-        this.setState(() => ({
+        this.setState({
             game,
             socketClient,
             frameEmitter: new FrameEmitter(socketClient as any)
-        }), () =>
-            socketClient.emit(SocketEvent.online, (actor: IActor) => {
-                if (token && (actor.token !== token)) {
-                    location.href = `${location.origin}${location.pathname}?token=${actor.token}`
-                } else {
-                    this.setState({actor})
-                }
-            }))
+        }, () => this.registerStateReducer())
     }
 
     componentWillUnmount(): void {
-        this.state.socketClient.close()
+        if (this.state.socketClient) {
+            this.state.socketClient.close()
+        }
     }
 
-    private registerStateReducer(socketClient: TSocket) {
+    private registerStateReducer() {
+        const {token, props: {history}, state: {socketClient}} = this
+        socketClient.on(SocketEvent.connection, (actor: IActor) => {
+            if (!actor) {
+                return history.push('/404')
+            }
+            if (token && (actor.token !== token)) {
+                location.href = `${location.origin}${location.pathname}`
+            } else {
+                this.setState({actor})
+            }
+            socketClient.emit(SocketEvent.online)
+        })
         socketClient.on(SocketEvent.syncGameState_json, (gameState: TGameState<{}>) => {
             this.setState({gameState})
         })

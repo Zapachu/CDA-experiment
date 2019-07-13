@@ -55,8 +55,6 @@ export type TPlayerState<IPlayerState> = IPlayerState & {
     connectionId?: string
 }
 
-export type TOnlineCallback = (actor: IActor) => void
-
 export interface IMoveCallback {
     (...args: any[]): void
 }

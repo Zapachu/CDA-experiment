@@ -72,6 +72,9 @@ var EventDispatcher = /** @class */ (function () {
                 }
                 return __awaiter(_this, void 0, void 0, function () {
                     return __generator(this, function (_a) {
+                        if (!clientConn.actor) {
+                            return [2 /*return*/];
+                        }
                         util_1.Log.i.apply(util_1.Log, __spread([clientConn.actor.token, event], args.filter(function (arg) { return ![null, undefined].includes(arg); }).map(function (arg) {
                             switch (typeof arg) {
                                 case 'function':

@@ -77,6 +77,7 @@ var GameDAO_1 = require("./GameDAO");
 var util_2 = require("../util");
 var events_1 = require("events");
 var model_1 = require("../model");
+var setting_1 = require("@elf/setting");
 var EventIO = /** @class */ (function () {
     function EventIO() {
     }
@@ -106,9 +107,9 @@ var EventIO = /** @class */ (function () {
                         game = _f.sent();
                         actor = util_1.Token.checkToken(token) ?
                             game.owner === userId ? { type: share_1.Actor.clientRobot, token: token } : { type: share_1.Actor.player, token: token } :
-                            game.owner === userId ?
-                                { type: share_1.Actor.owner, token: util_1.Token.geneToken(userId) } :
-                                linkerActor || { type: share_1.Actor.player, token: util_1.Token.geneToken(userId || sessionID) };
+                            game.owner === userId ? { type: share_1.Actor.owner, token: util_1.Token.geneToken(userId) } :
+                                setting_1.elfSetting.bespokeWithLinker ? linkerActor :
+                                    { type: share_1.Actor.player, token: util_1.Token.geneToken(userId || sessionID) };
                         user = null;
                         if (!userId) return [3 /*break*/, 3];
                         return [4 /*yield*/, model_1.UserModel.findById(userId)];
@@ -118,6 +119,7 @@ var EventIO = /** @class */ (function () {
                         _f.label = 3;
                     case 3:
                         subscribeOnConnection(Object.assign(connection, { actor: actor, game: game, user: user }));
+                        connection.emit(share_1.SocketEvent.connection, actor);
                         return [2 /*return*/];
                 }
             });

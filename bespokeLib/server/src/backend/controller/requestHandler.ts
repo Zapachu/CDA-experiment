@@ -118,7 +118,7 @@ export class GameCtrl {
                 game
             })
         } catch (e) {
-            Log.e(e)
+            Log.e(`Unknown GameId : ${gameId}`)
             res.json({
                 code: ResponseCode.notFound
             })
