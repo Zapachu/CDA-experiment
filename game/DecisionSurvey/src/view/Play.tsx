@@ -10,8 +10,8 @@ import "antd/es/row/style";
 import "antd/es/input/style";
 
 import * as style from "./style.scss";
-import { Request, Toast } from "@elf/component";
-import { Core } from "@bespoke/register";
+import { Toast } from "@elf/component";
+import { Core, Request } from "@bespoke/register";
 import {
   CARD,
   DATE,
@@ -112,8 +112,7 @@ export class Play extends Core.Play<
       playerState: { actor },
       game
     } = this.props;
-    Request.get(
-      namespace,
+    Request.instance(namespace).get(
       FetchRoute.getUserMobile,
       { gameId: game.id },
       { token: actor.token, actorType: actor.type }

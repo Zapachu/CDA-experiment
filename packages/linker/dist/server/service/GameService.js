@@ -34,8 +34,23 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __values = (this && this.__values) || function (o) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+    if (m) return m.call(o);
+    return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-var _server_model_1 = require("@server-model");
+var model_1 = require("../model");
+var util_1 = require("@elf/util");
+var setting_1 = require("@elf/setting");
+var rpc_1 = require("../rpc");
+var protocol_1 = require("@elf/protocol");
+var HeartBeat = protocol_1.Linker.HeartBeat;
 var GameService = /** @class */ (function () {
     function GameService() {
     }
@@ -44,10 +59,10 @@ var GameService = /** @class */ (function () {
             var count, _gameList, gameList;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, _server_model_1.GameModel.countDocuments({ owner: owner })];
+                    case 0: return [4 /*yield*/, model_1.GameModel.countDocuments({ owner: owner })];
                     case 1:
                         count = _a.sent();
-                        return [4 /*yield*/, _server_model_1.GameModel.find({ owner: owner }).sort('-createAt').skip(page * pageSize).limit(pageSize)];
+                        return [4 /*yield*/, model_1.GameModel.find({ owner: owner }).sort('-createAt').skip(page * pageSize).limit(pageSize)];
                     case 2:
                         _gameList = _a.sent(), gameList = _gameList.map(function (_a) {
                             var id = _a.id, title = _a.title, desc = _a.desc, namespace = _a.namespace, params = _a.params;
@@ -69,7 +84,7 @@ var GameService = /** @class */ (function () {
             var id;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, new _server_model_1.GameModel(game).save()];
+                    case 0: return [4 /*yield*/, new model_1.GameModel(game).save()];
                     case 1:
                         id = (_a.sent()).id;
                         return [2 /*return*/, id];
@@ -82,10 +97,69 @@ var GameService = /** @class */ (function () {
             var _a, id, title, desc, owner, namespace, params;
             return __generator(this, function (_b) {
                 switch (_b.label) {
-                    case 0: return [4 /*yield*/, _server_model_1.GameModel.findById(gameId)];
+                    case 0: return [4 /*yield*/, model_1.GameModel.findById(gameId)];
                     case 1:
                         _a = _b.sent(), id = _a.id, title = _a.title, desc = _a.desc, owner = _a.owner, namespace = _a.namespace, params = _a.params;
                         return [2 /*return*/, { id: id, title: title, desc: desc, namespace: namespace, params: params, owner: owner }];
+                }
+            });
+        });
+    };
+    GameService.getHeartBeats = function (userId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var heartBeats, registeredPhaseKeys, registeredPhaseKeys_1, registeredPhaseKeys_1_1, key, _a, _b, _c, _d, e_1_1;
+            var e_1, _e;
+            return __generator(this, function (_f) {
+                switch (_f.label) {
+                    case 0:
+                        heartBeats = [];
+                        return [4 /*yield*/, protocol_1.redisClient.keys(HeartBeat.key('*'))];
+                    case 1:
+                        registeredPhaseKeys = _f.sent();
+                        _f.label = 2;
+                    case 2:
+                        _f.trys.push([2, 7, 8, 9]);
+                        registeredPhaseKeys_1 = __values(registeredPhaseKeys), registeredPhaseKeys_1_1 = registeredPhaseKeys_1.next();
+                        _f.label = 3;
+                    case 3:
+                        if (!!registeredPhaseKeys_1_1.done) return [3 /*break*/, 6];
+                        key = registeredPhaseKeys_1_1.value;
+                        _b = (_a = heartBeats).push;
+                        _d = (_c = JSON).parse;
+                        return [4 /*yield*/, protocol_1.redisClient.get(key)];
+                    case 4:
+                        _b.apply(_a, [_d.apply(_c, [_f.sent()])]);
+                        _f.label = 5;
+                    case 5:
+                        registeredPhaseKeys_1_1 = registeredPhaseKeys_1.next();
+                        return [3 /*break*/, 3];
+                    case 6: return [3 /*break*/, 9];
+                    case 7:
+                        e_1_1 = _f.sent();
+                        e_1 = { error: e_1_1 };
+                        return [3 /*break*/, 9];
+                    case 8:
+                        try {
+                            if (registeredPhaseKeys_1_1 && !registeredPhaseKeys_1_1.done && (_e = registeredPhaseKeys_1.return)) _e.call(registeredPhaseKeys_1);
+                        }
+                        finally { if (e_1) throw e_1.error; }
+                        return [7 /*endfinally*/];
+                    case 9:
+                        if (!setting_1.elfSetting.inProductEnv || !userId) {
+                            return [2 /*return*/, heartBeats];
+                        }
+                        return [2 /*return*/, new Promise(function (resolve) {
+                                rpc_1.getAdminService().getAuthorizedTemplates({ userId: userId }, function (err, response) {
+                                    if (err) {
+                                        util_1.Log.e(err);
+                                        return resolve([]);
+                                    }
+                                    resolve(heartBeats.filter(function (_a) {
+                                        var namespace = _a.namespace;
+                                        return response.namespaces.includes(namespace);
+                                    }));
+                                });
+                            })];
                 }
             });
         });

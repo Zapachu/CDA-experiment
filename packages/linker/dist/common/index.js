@@ -4,8 +4,7 @@ function __export(m) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("@elf/share"));
-__export(require("./interface"));
 var config_1 = require("./config");
 exports.config = config_1.config;
-__export(require("./baseEnum"));
+__export(require("./enum"));
 //# sourceMappingURL=index.js.map

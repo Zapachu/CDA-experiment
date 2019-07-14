@@ -116,7 +116,7 @@ var Server = /** @class */ (function () {
         express.use(bodyParser.json());
         express.use(bodyParser.urlencoded({ extended: true, limit: '30mb', parameterLimit: 30000 }));
         express.use(this.sessionMiddleware);
-        express.use(function (req, res, next) { return lusca_1.csrf({ cookie: share_1.config.cookieKey.csrf })(req, res, next); });
+        express.use(function (req, res, next) { return lusca_1.csrf({ cookie: share_1.csrfCookieKey })(req, res, next); });
         express.use(passport.initialize());
         express.use(passport.session());
         express.use(function (req, res, next) {

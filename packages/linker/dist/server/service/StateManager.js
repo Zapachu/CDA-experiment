@@ -1,15 +1,4 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -46,9 +35,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var _common_1 = require("@common");
+var linker_share_1 = require("linker-share");
 var GameService_1 = require("./GameService");
-var _server_model_1 = require("@server-model");
+var model_1 = require("../model");
 var eventDispatcher_1 = require("../controller/eventDispatcher");
 var util_1 = require("@elf/util");
 var protocol_1 = require("@elf/protocol");
@@ -95,7 +84,7 @@ var StateManager = /** @class */ (function () {
             var gameStateDoc, _a, namespace, params, playUrl;
             return __generator(this, function (_b) {
                 switch (_b.label) {
-                    case 0: return [4 /*yield*/, _server_model_1.GameStateModel.findOne({ gameId: this.game.id })];
+                    case 0: return [4 /*yield*/, model_1.GameStateModel.findOne({ gameId: this.game.id })];
                     case 1:
                         gameStateDoc = _b.sent();
                         if (gameStateDoc) {
@@ -112,11 +101,10 @@ var StateManager = /** @class */ (function () {
                         playUrl = (_b.sent()).playUrl;
                         this.gameState = {
                             gameId: this.game.id,
-                            status: _common_1.PhaseStatus.playing,
                             playUrl: playUrl,
                             playerState: {}
                         };
-                        return [4 /*yield*/, new _server_model_1.GameStateModel({ gameId: this.game.id, data: this.gameState }).save()];
+                        return [4 /*yield*/, new model_1.GameStateModel({ gameId: this.game.id, data: this.gameState }).save()];
                     case 3:
                         _b.sent();
                         return [2 /*return*/];
@@ -131,8 +119,7 @@ var StateManager = /** @class */ (function () {
                 playerState = this.gameState.playerState;
                 if (playerState[actor.token] === undefined) {
                     playerState[actor.token] = {
-                        actor: actor,
-                        status: _common_1.PlayerStatus.playing
+                        actor: actor
                     };
                 }
                 return [2 /*return*/];
@@ -148,11 +135,7 @@ var StateManager = /** @class */ (function () {
                 if (!playerCurPhaseState) {
                     return [2 /*return*/];
                 }
-                playerCurPhaseState.result = __assign({}, playerCurPhaseState.result, result);
-                if (!playerCurPhaseState || playerCurPhaseState.status === _common_1.PlayerStatus.left) {
-                    util_1.Log.w('玩家不在此环节中');
-                }
-                _server_model_1.PlayerModel.findByIdAndUpdate(playerCurPhaseState.actor.playerId, {
+                model_1.PlayerModel.findByIdAndUpdate(playerCurPhaseState.actor.playerId, {
                     result: result
                 }, function (err) { return err && util_1.Log.e(err); });
                 return [2 /*return*/];
@@ -162,8 +145,8 @@ var StateManager = /** @class */ (function () {
     StateManager.prototype.broadcastState = function () {
         util_1.Log.d(JSON.stringify(this.gameState));
         eventDispatcher_1.EventDispatcher.socket.in(this.game.id)
-            .emit(_common_1.SocketEvent.downFrame, _common_1.NFrame.DownFrame.syncGameState, this.gameState);
-        _server_model_1.GameStateModel.findOneAndUpdate({ gameId: this.game.id }, {
+            .emit(linker_share_1.SocketEvent.syncGameState, this.gameState);
+        model_1.GameStateModel.findOneAndUpdate({ gameId: this.game.id }, {
             $set: {
                 data: this.gameState,
                 updateAt: Date.now()

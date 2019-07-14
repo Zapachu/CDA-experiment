@@ -51,11 +51,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
 var _common_1 = require("@common");
 var share_1 = require("@elf/share");
-var _client_util_1 = require("@client-util");
-var _antd_component_1 = require("@antd-component");
+var util_1 = require("../../util");
+var antd_1 = require("antd");
 var QrCode = require("qrcode.react");
 var style = require("./style.scss");
-var _client_component_1 = require("@client-component");
+var component_1 = require("../../component");
 var Share = /** @class */ (function (_super) {
     __extends(Share, _super);
     function Share() {
@@ -64,7 +64,7 @@ var Share = /** @class */ (function (_super) {
             title: '',
             shareCode: ''
         };
-        _this.lang = _client_util_1.Lang.extractLang({
+        _this.lang = util_1.Lang.extractLang({
             info: ['实验信息', 'Game Info'],
             console: ['控制台', 'Console'],
             shareCode: ['快速加入码', 'QuickAccessCode'],
@@ -77,14 +77,14 @@ var Share = /** @class */ (function (_super) {
             var _a, code, shareCode, title;
             return __generator(this, function (_b) {
                 switch (_b.label) {
-                    case 0: return [4 /*yield*/, _client_util_1.Api.shareGame(this.props.match.params.gameId)];
+                    case 0: return [4 /*yield*/, util_1.Api.shareGame(this.props.match.params.gameId)];
                     case 1:
                         _a = _b.sent(), code = _a.code, shareCode = _a.shareCode, title = _a.title;
                         if (code === share_1.ResponseCode.success) {
                             this.setState({ shareCode: shareCode, title: title });
                         }
                         else {
-                            _antd_component_1.message.warn(this.lang.failed2GeneShareCode);
+                            antd_1.message.warn(this.lang.failed2GeneShareCode);
                         }
                         return [2 /*return*/];
                 }
@@ -94,7 +94,7 @@ var Share = /** @class */ (function (_super) {
     Share.prototype.render = function () {
         var _a = this, lang = _a.lang, _b = _a.props, history = _b.history, gameId = _b.match.params.gameId, state = _a.state;
         return React.createElement("section", { className: style.share },
-            React.createElement(_client_component_1.Breadcrumb, { history: history, links: [
+            React.createElement(component_1.Breadcrumb, { history: history, links: [
                     { label: lang.info, to: "/info/" + gameId },
                     { label: lang.console, to: "/play/" + gameId }
                 ] }),

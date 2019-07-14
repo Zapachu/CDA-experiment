@@ -50,15 +50,15 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
 var style = require("./style.scss");
-var _client_util_1 = require("@client-util");
+var util_1 = require("../../util");
 var share_1 = require("@elf/share");
-var _antd_component_1 = require("@antd-component");
-var _client_component_1 = require("@client-component");
+var antd_1 = require("antd");
+var component_1 = require("../../component");
 var Join = /** @class */ (function (_super) {
     __extends(Join, _super);
     function Join() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.lang = _client_util_1.Lang.extractLang({
+        _this.lang = util_1.Lang.extractLang({
             notFound: ['未找到对应实验', 'Experiment not Found'],
             tips: ['输入6位数字快速加入实验', 'Input a 6-digit number to join an experiment']
         });
@@ -71,7 +71,7 @@ var Join = /** @class */ (function (_super) {
                 switch (_b.label) {
                     case 0:
                         _a = this, lang = _a.lang, history = _a.props.history;
-                        return [4 /*yield*/, _client_util_1.Api.joinGameWithCode(code)];
+                        return [4 /*yield*/, util_1.Api.joinGameWithCode(code)];
                     case 1:
                         res = _b.sent();
                         switch (res.code) {
@@ -80,7 +80,7 @@ var Join = /** @class */ (function (_super) {
                                 break;
                             }
                             default: {
-                                _antd_component_1.message.error(lang.notFound);
+                                antd_1.message.error(lang.notFound);
                             }
                         }
                         return [2 /*return*/];
@@ -92,7 +92,7 @@ var Join = /** @class */ (function (_super) {
         var _this = this;
         return React.createElement("section", { className: style.Join },
             React.createElement("div", { className: style.tips }, this.lang.tips),
-            React.createElement(_client_component_1.CodePanel, { number: 6, onFinish: function (code) { return _this.joinGame(code); }, goBack: function () { return _this.props.history.goBack(); } }));
+            React.createElement(component_1.CodePanel, { number: 6, onFinish: function (code) { return _this.joinGame(code); }, goBack: function () { return _this.props.history.goBack(); } }));
     };
     return Join;
 }(React.Component));

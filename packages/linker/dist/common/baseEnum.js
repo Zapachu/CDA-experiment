@@ -14,18 +14,7 @@ var SocketEvent;
 (function (SocketEvent) {
     SocketEvent["connection"] = "connection";
     SocketEvent["disconnect"] = "disconnect";
-    SocketEvent["upFrame"] = "upFrame";
-    SocketEvent["downFrame"] = "downFrame";
+    SocketEvent["joinRoom"] = "joinRoom";
+    SocketEvent["syncGameState"] = "syncGameState";
 })(SocketEvent = exports.SocketEvent || (exports.SocketEvent = {}));
-var PhaseStatus;
-(function (PhaseStatus) {
-    PhaseStatus[PhaseStatus["playing"] = 0] = "playing";
-    PhaseStatus[PhaseStatus["paused"] = 1] = "paused";
-    PhaseStatus[PhaseStatus["closed"] = 2] = "closed";
-})(PhaseStatus = exports.PhaseStatus || (exports.PhaseStatus = {}));
-var PlayerStatus;
-(function (PlayerStatus) {
-    PlayerStatus[PlayerStatus["playing"] = 0] = "playing";
-    PlayerStatus[PlayerStatus["left"] = 1] = "left";
-})(PlayerStatus = exports.PlayerStatus || (exports.PlayerStatus = {}));
 //# sourceMappingURL=baseEnum.js.map

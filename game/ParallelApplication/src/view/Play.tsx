@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as style from "./style.scss";
-import { Core } from "@bespoke/register";
-import { Toast, Request } from "@elf/component";
+import { Core, Request } from "@bespoke/register";
+import { Toast} from "@elf/component";
 import { useSpring, animated } from "react-spring";
 import {
   MoveType,
@@ -146,8 +146,7 @@ export class Play extends Core.Play<
       game,
       playerState: { actor }
     } = this.props;
-    Request.get(
-      namespace,
+    Request.instance(namespace).get(
       "/getUserId/:gameId",
       { gameId: game.id },
       { token: actor.token, actorType: actor.type }

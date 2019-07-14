@@ -6,8 +6,8 @@ import Radio from "antd/es/radio";
 import "antd/es/button/style";
 import "antd/es/radio/style";
 import "antd/es/table/style";
-import { Request, Toast } from "@elf/component";
-import { Core } from "@bespoke/register";
+import { Toast } from "@elf/component";
+import { Core, Request } from "@bespoke/register";
 import {
   CARD,
   FetchRoute,
@@ -64,8 +64,7 @@ export class Play4Owner extends Core.Play4Owner<
       <section className={style.play4Owner}>
         <a
           className={style.exportBtn}
-          href={Request.buildUrl(
-            namespace,
+          href={Request.instance(namespace).buildUrl(
             FetchRoute.exportXlsPlaying,
             { gameId: game.id },
             { sheetType: SheetType.result }

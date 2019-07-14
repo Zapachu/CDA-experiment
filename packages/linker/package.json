@@ -7,7 +7,7 @@
   "scripts": {
     "tsc-w": "tsc -w",
     "dist": "tsc & npm run client:dist",
-    "client:build": "webpack  --env.TS_NODE_PROJECT=\"tsconfig.json\"  --config ./src/client/script/webpack.ts",
+    "client:build": "webpack  --env.TS_NODE_PROJECT=\"tsconfig.json\"  --config ./script/webpack.config.ts",
     "client:dist": "npm run client:build --buildMode=dist",
     "start": "ts-node ./src/server/server.ts"
   },
@@ -18,6 +18,7 @@
     "@elf/util": "^1.1.1",
     "@elf/protocol": "^1.1.1",
     "@elf/setting": "^1.1.1",
+    "linker-share": "^1.1.1",
     "ts-node": "^8.0.3",
     "typescript": "^3.3.3333",
     "webpack": "^4.29.6"

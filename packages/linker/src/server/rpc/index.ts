@@ -2,7 +2,7 @@ import {elfSetting} from '@elf/setting'
 import {Server, ServerCredentials} from 'grpc'
 import {setElfService} from './service/ElfAdmin'
 import {RedisCall, Linker} from '@elf/protocol'
-import {StateManager} from '@server-service'
+import {StateManager} from '../service'
 
 export {getAdminService} from './service/ElfAdmin'
 

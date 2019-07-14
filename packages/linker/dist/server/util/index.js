@@ -1,8 +1,7 @@
 "use strict";
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
 Object.defineProperty(exports, "__esModule", { value: true });
-__export(require("./util"));
-__export(require("./redis"));
+exports.RedisKey = {
+    share_GameCode: function (gameId) { return "shareGameCode:" + gameId; },
+    share_CodeGame: function (code) { return "shareCodeGame:" + code; }
+};
 //# sourceMappingURL=index.js.map

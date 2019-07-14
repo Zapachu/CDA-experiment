@@ -1,18 +1,18 @@
-import {config, IActor} from '@common'
-import {redisClient, RedisKey} from '@server-util'
+import {config, IActor} from 'linker-share'
+import * as path from 'path'
+import {RedisKey} from '../util'
 import {NextFunction, Request, Response} from 'express'
 import {Token} from '@elf/util'
+import {redisClient} from '@elf/protocol'
 import {AcademusRole, Actor, ResponseCode} from '@elf/share'
-import {GameService, PhaseService} from '@server-service'
-import {WebpackHmr} from '../util/WebpackHmr'
-import {PlayerService} from '../service/PlayerService'
+import {GameService, PlayerService} from '../service'
 
 const SECONDS_PER_DAY = 86400
 const DEFAULT_PAGE_SIZE = 11
 
 export class UserCtrl {
-    static async renderApp(req: Request, res: Response, next: NextFunction) {
-        WebpackHmr.sendIndexHtml(res, next)
+    static async renderApp(req: Request, res: Response) {
+        res.sendFile(path.resolve(__dirname, '../../../static/index.html'))
     }
 
     static loggedIn(req, res: Response, next: NextFunction) {
@@ -30,9 +30,9 @@ export class UserCtrl {
         req.user.role === AcademusRole.teacher ? next() : res.redirect(`/${config.rootName}/join`)
     }
 
-    static async isTemplateAccessible(req, res: Response, next) {
-        const templates = await PhaseService.getPhaseTemplates(req.user._id.toString())
-        templates.some(({namespace}) => namespace === req.params.namespace) ? next() : res.redirect(`/${config.rootName}`)
+    static async isNamespaceAccessible(req, res: Response, next) {
+        const gameServers = await GameService.getHeartBeats(req.user._id.toString())
+        gameServers.some(({namespace}) => namespace === req.params.namespace) ? next() : res.redirect(`/${config.rootName}`)
     }
 
     static async isGameAccessible(req, res: Response, next: NextFunction) {
@@ -65,11 +65,14 @@ export class UserCtrl {
 }
 
 export class GameCtrl {
-    static async getPhaseTemplates(req, res: Response) {
-        const templates = await PhaseService.getPhaseTemplates(req.user._id.toString())
-        res.json({
+    static async getJsUrl(req: Request, res: Response) {
+        const {params:{namespace}} = req
+        const heartBeat = (await GameService.getHeartBeats()).find(s=>s.namespace === namespace)
+        res.json(heartBeat?{
             code: ResponseCode.success,
-            templates
+            jsUrl: heartBeat.jsUrl
+        }:{
+            code: ResponseCode.notFound
         })
     }
 

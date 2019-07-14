@@ -1,11 +1,11 @@
 import {Server} from 'http'
-import {config, IGameWithId, ILinkerActor, SocketEvent} from '@common'
+import {config, IGameWithId, ILinkerActor, SocketEvent} from 'linker-share'
 import * as socketIO from 'socket.io'
 import {EventHandler} from './eventHandler'
 import {Log} from '@elf/util'
 import {EventEmitter} from 'events'
-import {GameService} from '@server-service'
-import {UserModel} from '@server-model'
+import {GameService} from '../service'
+import {UserModel} from '../model'
 
 export interface IConnection extends EventEmitter {
     id: string
@@ -24,19 +24,6 @@ export interface IEventHandler {
 export class EventDispatcher {
     static socket: socketIO.Server
 
-    private static subscribeOnConnection(clientConn: IConnection) {
-        Object.entries<IEventHandler>(EventHandler).forEach(([event, handler]) => {
-            clientConn.on(event, async (...args) => {
-                Log.d(event, ...args.filter(arg => typeof arg !== 'function'))
-                try {
-                    handler(clientConn, ...args)
-                } catch (err) {
-                    Log.e(err)
-                }
-            })
-        })
-    }
-
     static startSocketService(server: Server): socketIO.Server {
         this.socket = socketIO(server, {path: config.socketPath})
         this.socket.on(SocketEvent.connection, async (connection: socketIO.Socket) => {
@@ -48,5 +35,18 @@ export class EventDispatcher {
             this.subscribeOnConnection(Object.assign(connection, {actor, game}) as any)
         })
         return this.socket
+    }
+
+    private static subscribeOnConnection(clientConn: IConnection) {
+        Object.entries<IEventHandler>(EventHandler).forEach(([event, handler]) => {
+            clientConn.on(event, async (...args) => {
+                Log.d(event, ...args.filter(arg => typeof arg !== 'function'))
+                try {
+                    handler(clientConn, ...args)
+                } catch (err) {
+                    Log.e(err)
+                }
+            })
+        })
     }
 }

@@ -7,27 +7,33 @@ import * as connectRedis from 'connect-redis'
 import * as expressSession from 'express-session'
 import * as socketIOSession from 'express-socket.io-session'
 import * as morgan from 'morgan'
-
-const {compilerOptions: {paths}} = require(path.join(__dirname, '../../tsconfig.json'))
-import {register as registerTsConfigPath} from 'tsconfig-paths'
-
-registerTsConfigPath({
-    baseUrl: path.resolve(__dirname, '../'),
-    paths
-})
-
-import {config} from '@common'
+import {config} from 'linker-share'
 import {elfSetting} from '@elf/setting'
-import {NetWork, Log} from '@elf/util'
+import {Log, NetWork} from '@elf/util'
+import {csrfCookieKey} from '@elf/share'
 import * as passport from 'passport'
-import {redisClient} from '@server-util'
+import {redisClient} from '@elf/protocol'
 import requestRouter from './controller/requestRouter'
 import {serve as serveRPC} from './rpc'
 import {EventDispatcher} from './controller/eventDispatcher'
-import {UserDoc, UserModel} from '@server-model'
+import {UserDoc, UserModel} from './model'
 
 class Server {
     private static sessionMiddleware
+
+    static start() {
+        this.initSessionMiddleware()
+        this.initMongo()
+        this.initPassPort()
+        const express = this.initExpress()
+        const server = express.listen(elfSetting.linkerPort)
+            .on('listening', () => {
+                Log.i(`Running at：http://${NetWork.getIp()}:${elfSetting.linkerPort}/${config.rootName}`)
+            })
+        EventDispatcher.startSocketService(server)
+            .use(socketIOSession(this.sessionMiddleware))
+        serveRPC()
+    }
 
     private static initMongo() {
         connectMongo(elfSetting.mongoUri, {
@@ -67,17 +73,7 @@ class Server {
         ))
 
         express.use(this.sessionMiddleware)
-        const csrfWhitelist = [`/${config.rootName}/${config.apiPrefix}/game/phaseTemplates`]
-        express.use((req: Express.Request, res: Express.Response, next: Express.NextFunction) => {
-            if (csrfWhitelist.includes(req.path)) {
-                return next()
-            }
-            csrf(
-                {
-                    cookie: config.cookieKey.csrf
-                }
-            )(req, res, next)
-        })
+        express.use(csrf({cookie: csrfCookieKey}))
         express.use(passport.initialize())
         express.use(passport.session())
         express.use((req, res, next) => {
@@ -97,20 +93,6 @@ class Server {
                 done(err, user)
             })
         })
-    }
-
-    static start() {
-        this.initSessionMiddleware()
-        this.initMongo()
-        this.initPassPort()
-        const express = this.initExpress()
-        const server = express.listen(elfSetting.linkerPort)
-            .on('listening', () => {
-                Log.i(`Running at：http://${NetWork.getIp()}:${elfSetting.linkerPort}/${config.rootName}`)
-            })
-        EventDispatcher.startSocketService(server)
-            .use(socketIOSession(this.sessionMiddleware))
-        serveRPC()
     }
 }
 

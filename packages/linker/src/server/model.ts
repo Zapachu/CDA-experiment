@@ -1,6 +1,6 @@
 import {Document, Model, model, Schema} from 'mongoose'
 import {getModels} from '@elf/protocol'
-import {IGame, IGameState, IPlayer, IUser} from '@common'
+import {IGame, IGameState, IPlayer, IUser} from 'linker-share'
 
 const {String} = Schema.Types
 

@@ -12,12 +12,6 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -56,16 +50,15 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
 var style = require("./style.scss");
-var _client_util_1 = require("@client-util");
-var _antd_component_1 = require("@antd-component");
-var _client_context_1 = require("@client-context");
-var _client_component_1 = require("@client-component");
+var util_1 = require("../../util");
+var antd_1 = require("antd");
+var component_1 = require("../../component");
 var share_1 = require("@elf/share");
 var Info = /** @class */ (function (_super) {
     __extends(Info, _super);
     function Info() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.lang = _client_util_1.Lang.extractLang({
+        _this.lang = util_1.Lang.extractLang({
             enterPlayRoom: ['进入实验', 'Enter play room'],
             joinGame: ['加入实验', 'Join Game'],
             joinSuccess: ['加入成功，即将进入实验房间', 'Join success, enter to play room now'],
@@ -84,7 +77,7 @@ var Info = /** @class */ (function (_super) {
                 switch (_b.label) {
                     case 0:
                         _a = this.props, history = _a.history, user = _a.user, gameId = _a.match.params.gameId;
-                        return [4 /*yield*/, _client_util_1.Api.getBaseGame(gameId)];
+                        return [4 /*yield*/, util_1.Api.getBaseGame(gameId)];
                     case 1:
                         game = (_b.sent()).game;
                         if (game.owner === user.id) {
@@ -104,20 +97,20 @@ var Info = /** @class */ (function (_super) {
         var _this = this;
         var _a = this, lang = _a.lang, _b = _a.props, history = _b.history, user = _b.user, _c = _a.state, loading = _c.loading, game = _c.game;
         if (loading || !user) {
-            return React.createElement(_client_component_1.Loading, null);
+            return React.createElement(component_1.Loading, null);
         }
         return React.createElement("section", { className: style.info },
-            React.createElement(_antd_component_1.Card, { title: game.title }, game.desc),
+            React.createElement(antd_1.Card, { title: game.title }, game.desc),
             React.createElement("div", { className: style.buttonWrapper },
-                React.createElement(_antd_component_1.Button, { type: 'primary', onClick: function () { return __awaiter(_this, void 0, void 0, function () {
+                React.createElement(antd_1.Button, { type: 'primary', onClick: function () { return __awaiter(_this, void 0, void 0, function () {
                         var code;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
-                                case 0: return [4 /*yield*/, _client_util_1.Api.joinGame(game.id)];
+                                case 0: return [4 /*yield*/, util_1.Api.joinGame(game.id)];
                                 case 1:
                                     code = (_a.sent()).code;
                                     if (!(code === share_1.ResponseCode.success)) return [3 /*break*/, 3];
-                                    return [4 /*yield*/, _antd_component_1.message.success(lang.joinSuccess)];
+                                    return [4 /*yield*/, antd_1.message.success(lang.joinSuccess)];
                                 case 2:
                                     _a.sent();
                                     history.push("/play/" + game.id);
@@ -127,9 +120,6 @@ var Info = /** @class */ (function (_super) {
                         });
                     }); } }, lang.joinGame)));
     };
-    Info = __decorate([
-        _client_util_1.connCtx(_client_context_1.rootContext)
-    ], Info);
     return Info;
 }(React.Component));
 exports.Info = Info;

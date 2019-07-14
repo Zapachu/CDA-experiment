@@ -1,8 +1,7 @@
 import { IGameConfig, IGameThumb, IGameWithId, IMoveLog, ISimulatePlayer, IUserWithId, NationCode } from '@bespoke/share';
 import { IHttpRes } from '@elf/component';
 export declare const Api: {
-    get: (path: string, params?: {}, query?: {}) => Promise<any>;
-    post: (path: string, params?: {}, query?: {}, data?: {}) => Promise<any>;
+    buildUrl(path: string, params?: {}, query?: {}): string;
     getVerifyCode(nationCode: NationCode, mobile: string): Promise<IHttpRes & {
         msg: string;
     }>;
@@ -38,4 +37,6 @@ export declare const Api: {
     getMoveLogs(gameId: string): Promise<IHttpRes & {
         moveLogs: IMoveLog<any, any, any, any>[];
     }>;
+    get(path: string, params?: {}, query?: {}): Promise<any>;
+    post(path: string, params?: {}, query?: {}, data?: {}): Promise<any>;
 };

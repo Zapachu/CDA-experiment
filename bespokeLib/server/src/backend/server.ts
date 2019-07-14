@@ -15,7 +15,7 @@ import * as morgan from 'morgan'
 import {elfSetting} from '@elf/setting'
 import {gameId2PlayUrl, getOrigin, heartBeat, QCloudSMS, RedisKey, Setting} from './util'
 import {PassportStrategy} from './interface'
-import {AcademusRole, config, IGameConfig, IStartOption} from '@bespoke/share'
+import {AcademusRole, config, IGameConfig, IStartOption, csrfCookieKey} from '@bespoke/share'
 import {EventDispatcher} from './controller/eventDispatcher'
 import {router} from './controller/requestRouter'
 import {AnyLogic, BaseLogic, GameDAO} from './service'
@@ -63,7 +63,7 @@ export class Server {
         express.use(bodyParser.json())
         express.use(bodyParser.urlencoded({extended: true, limit: '30mb', parameterLimit: 30000}))
         express.use(this.sessionMiddleware)
-        express.use((req, res, next) => csrf({cookie: config.cookieKey.csrf})(req, res, next))
+        express.use((req, res, next) => csrf({cookie: csrfCookieKey})(req, res, next))
         express.use(passport.initialize())
         express.use(passport.session())
         express.use((req, res, next) => {

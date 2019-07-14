@@ -1,4 +1,17 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -37,22 +50,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var share_1 = require("@bespoke/share");
 var component_1 = require("@elf/component");
-exports.Api = new /** @class */ (function () {
+exports.Api = new /** @class */ (function (_super) {
+    __extends(class_1, _super);
     function class_1() {
-        var _this = this;
-        this.get = function (path, params, query) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, component_1.Request.get(NAMESPACE, "/" + share_1.config.apiPrefix + path, params, query)];
-                case 1: return [2 /*return*/, _a.sent()];
-            }
-        }); }); };
-        this.post = function (path, params, query, data) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, component_1.Request.post(NAMESPACE, "/" + share_1.config.apiPrefix + path, params, query, data)];
-                case 1: return [2 /*return*/, _a.sent()];
-            }
-        }); }); };
+        return _super !== null && _super.apply(this, arguments) || this;
     }
+    class_1.prototype.buildUrl = function (path, params, query) {
+        if (params === void 0) { params = {}; }
+        if (query === void 0) { query = {}; }
+        return _super.prototype.buildUrl.call(this, "/" + share_1.config.rootName + "/" + NAMESPACE + "/" + share_1.config.apiPrefix + path, params, query);
+    };
     //region user
     class_1.prototype.getVerifyCode = function (nationCode, mobile) {
         return __awaiter(this, void 0, void 0, function () {
@@ -174,5 +181,5 @@ exports.Api = new /** @class */ (function () {
         });
     };
     return class_1;
-}());
+}(component_1.BaseRequest));
 //# sourceMappingURL=Api.js.map

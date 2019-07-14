@@ -45,7 +45,6 @@ var __values = (this && this.__values) || function (o) {
     };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var _server_util_1 = require("@server-util");
 var util_1 = require("@elf/util");
 var setting_1 = require("@elf/setting");
 var rpc_1 = require("../rpc");
@@ -62,7 +61,7 @@ var PhaseService = /** @class */ (function () {
                 switch (_f.label) {
                     case 0:
                         phaseTemplates = [];
-                        return [4 /*yield*/, _server_util_1.redisClient.keys(HeartBeat.key('*'))];
+                        return [4 /*yield*/, protocol_1.redisClient.keys(HeartBeat.key('*'))];
                     case 1:
                         registeredPhaseKeys = _f.sent();
                         _f.label = 2;
@@ -75,7 +74,7 @@ var PhaseService = /** @class */ (function () {
                         key = registeredPhaseKeys_1_1.value;
                         _b = (_a = phaseTemplates).push;
                         _d = (_c = JSON).parse;
-                        return [4 /*yield*/, _server_util_1.redisClient.get(key)];
+                        return [4 /*yield*/, protocol_1.redisClient.get(key)];
                     case 4:
                         _b.apply(_a, [_d.apply(_c, [_f.sent()])]);
                         _f.label = 5;

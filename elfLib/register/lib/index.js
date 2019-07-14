@@ -25,9 +25,9 @@ var Template;
     }(React.Component));
     Template.Create = Create;
 })(Template = exports.Template || (exports.Template = {}));
-function registerOnElf(namespace, phaseTemplate) {
+function registerOnElf(namespace, gameTemplate) {
     if (window['ElfLinker']) {
-        window['ElfLinker'].registerOnElf(namespace, phaseTemplate);
+        window['ElfLinker'].registerOnElf(namespace, gameTemplate);
     }
 }
 exports.registerOnElf = registerOnElf;

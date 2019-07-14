@@ -13,9 +13,6 @@ exports.config = {
             join: '/subject/fastJoin',
             member: function (orgCode, gameId) { return "/org/" + orgCode + "/task/game/item/" + gameId + "/members"; }
         }
-    },
-    cookieKey: {
-        csrf: '_csrf'
     }
 };
 //# sourceMappingURL=config.js.map

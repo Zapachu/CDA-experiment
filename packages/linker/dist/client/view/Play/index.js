@@ -12,11 +12,16 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
 };
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -56,14 +61,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
 var _common_1 = require("@common");
-var _client_util_1 = require("@client-util");
+var util_1 = require("../../util");
 var socket_io_client_1 = require("socket.io-client");
-var _client_context_1 = require("@client-context");
-var Owner_1 = require("./Owner");
-var Player_1 = require("./Player");
 var queryString = require("query-string");
-var _client_component_1 = require("@client-component");
-var share_1 = require("@elf/share");
+var component_1 = require("../../component");
+var style = require("./style.scss");
+var react_router_dom_1 = require("react-router-dom");
+var antd_1 = require("antd");
 var Play = /** @class */ (function (_super) {
     __extends(Play, _super);
     function Play() {
@@ -78,10 +82,10 @@ var Play = /** @class */ (function (_super) {
                 switch (_c.label) {
                     case 0:
                         _a = this.props, gameId = _a.match.params.gameId, search = _a.location.search, user = _a.user, _b = queryString.parse(search).token, token = _b === void 0 ? '' : _b;
-                        return [4 /*yield*/, _client_util_1.Api.getGame(gameId)];
+                        return [4 /*yield*/, util_1.Api.getGame(gameId)];
                     case 1:
                         game = (_c.sent()).game;
-                        return [4 /*yield*/, _client_util_1.Api.getActor(gameId, token)];
+                        return [4 /*yield*/, util_1.Api.getActor(gameId, token)];
                     case 2:
                         actor = (_c.sent()).actor;
                         if (!actor) {
@@ -97,7 +101,7 @@ var Play = /** @class */ (function (_super) {
                             game: game,
                             actor: actor,
                             socketClient: socketClient
-                        }, function () { return socketClient.emit(_common_1.SocketEvent.upFrame, _common_1.NFrame.UpFrame.joinRoom); });
+                        }, function () { return socketClient.emit(_common_1.SocketEvent.joinRoom); });
                         return [2 /*return*/];
                 }
             });
@@ -105,29 +109,51 @@ var Play = /** @class */ (function (_super) {
     };
     Play.prototype.registerStateReducer = function (socketClient) {
         var _this = this;
-        socketClient.on(_common_1.SocketEvent.downFrame, function (frame, data) {
-            switch (frame) {
-                case _common_1.NFrame.DownFrame.syncGameState: {
-                    _this.setState({
-                        gameState: data
-                    });
-                }
-            }
+        socketClient.on(_common_1.SocketEvent.syncGameState, function (gameState) {
+            _this.setState({ gameState: gameState });
         });
     };
     Play.prototype.render = function () {
-        var _a = this, history = _a.props.history, _b = _a.state, game = _b.game, actor = _b.actor, socketClient = _b.socketClient, gameState = _b.gameState;
+        var _a = this.state, game = _a.game, actor = _a.actor, gameState = _a.gameState;
         if (!gameState) {
-            return React.createElement(_client_component_1.Loading, null);
+            return React.createElement(component_1.Loading, null);
         }
-        return React.createElement(_client_context_1.playContext.Provider, { value: { gameState: gameState, socketClient: socketClient, game: game, actor: actor } }, actor.type === share_1.Actor.owner ?
-            React.createElement(Owner_1.Play4Owner, { history: history }) :
-            React.createElement(Player_1.Play4Player, null));
+        if (actor.type === _common_1.Actor.owner) {
+            return React.createElement(Play4Owner, __assign({}, { gameState: gameState, game: game }));
+        }
+        return React.createElement("iframe", { className: style.playIframe, src: gameState.playUrl + "?" + util_1.Lang.key + "=" + util_1.Lang.activeLanguage });
     };
-    Play = __decorate([
-        _client_util_1.connCtx(_client_context_1.rootContext)
-    ], Play);
     return Play;
 }(React.Component));
 exports.Play = Play;
+var Play4Owner = /** @class */ (function (_super) {
+    __extends(Play4Owner, _super);
+    function Play4Owner() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.lang = util_1.Lang.extractLang({
+            share: ['分享', 'Share'],
+            playerList: ['玩家列表', 'PlayerList'],
+            console: ['控制台', 'Console'],
+            playerStatus: ['玩家状态', 'Player Status'],
+            point: ['得分', 'Point'],
+            uniKey: ['唯一标识', 'UniKey'],
+            detail: ['详情', 'Detail'],
+            reward: ['奖励', 'Reward']
+        });
+        return _this;
+    }
+    Play4Owner.prototype.render = function () {
+        var _a = this, _b = _a.props, game = _b.game, gameState = _b.gameState, lang = _a.lang;
+        return React.createElement("section", null,
+            React.createElement(antd_1.Affix, { style: { position: 'absolute', right: 32, top: 64, zIndex: 1000 } },
+                React.createElement(antd_1.Dropdown, { overlay: React.createElement(antd_1.Menu, null,
+                        React.createElement(antd_1.Menu.Item, null,
+                            React.createElement(react_router_dom_1.Link, { to: "/player/" + game.id }, lang.playerList)),
+                        React.createElement(antd_1.Menu.Item, null,
+                            React.createElement(react_router_dom_1.Link, { to: "/share/" + game.id }, lang.share))) },
+                    React.createElement(antd_1.Button, { type: 'primary', shape: "circle", icon: "bars" }))),
+            React.createElement("iframe", { className: style.playIframe, src: gameState.playUrl + "?" + util_1.Lang.key + "=" + util_1.Lang.activeLanguage }));
+    };
+    return Play4Owner;
+}(React.Component));
 //# sourceMappingURL=index.js.map

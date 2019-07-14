@@ -7,41 +7,13 @@
       "esnext",
       "dom"
     ],
-    "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "experimentalDecorators": true,
     "downlevelIteration": true,
     "noUnusedLocals": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "jsx": "react",
-    "baseUrl": "src",
-    "paths": {
-      "@common": [
-        "common"
-      ],
-      "@client-util": [
-        "client/util"
-      ],
-      "@client-component": [
-        "client/component"
-      ],
-      "@antd-component": [
-        "client/component/AntDesign.tsx"
-      ],
-      "@client-context": [
-        "client/context"
-      ],
-      "@server-util": [
-        "server/util"
-      ],
-      "@server-service": [
-        "server/service"
-      ],
-      "@server-model": [
-        "server/model"
-      ]
-    }
+    "jsx": "react"
   },
   "include": [
     "src"

@@ -46,50 +46,50 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var _common_1 = require("@common");
-var _server_util_1 = require("@server-util");
-var util_1 = require("@elf/util");
+var linker_share_1 = require("linker-share");
+var path = require("path");
+var util_1 = require("../util");
+var util_2 = require("@elf/util");
+var protocol_1 = require("@elf/protocol");
 var share_1 = require("@elf/share");
-var _server_service_1 = require("@server-service");
-var WebpackHmr_1 = require("../util/WebpackHmr");
-var PlayerService_1 = require("../service/PlayerService");
+var service_1 = require("../service");
 var SECONDS_PER_DAY = 86400;
 var DEFAULT_PAGE_SIZE = 11;
 var UserCtrl = /** @class */ (function () {
     function UserCtrl() {
     }
-    UserCtrl.renderApp = function (req, res, next) {
+    UserCtrl.renderApp = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                WebpackHmr_1.WebpackHmr.sendIndexHtml(res, next);
+                res.sendFile(path.resolve(__dirname, '../../../static/index.html'));
                 return [2 /*return*/];
             });
         });
     };
     UserCtrl.loggedIn = function (req, res, next) {
-        var _a = _common_1.config.academus.route, prefix = _a.prefix, login = _a.login;
+        var _a = linker_share_1.config.academus.route, prefix = _a.prefix, login = _a.login;
         req.isAuthenticated() ? next() : res.redirect("" + prefix + login);
     };
     UserCtrl.mobileValid = function (req, res, next) {
-        var _a = _common_1.config.academus.route, prefix = _a.prefix, profileMobile = _a.profileMobile;
+        var _a = linker_share_1.config.academus.route, prefix = _a.prefix, profileMobile = _a.profileMobile;
         var mobile = req.user.mobile;
         mobile && !mobile.startsWith('null') ? next() : res.redirect("" + prefix + profileMobile);
     };
     UserCtrl.isTeacher = function (req, res, next) {
-        req.user.role === share_1.AcademusRole.teacher ? next() : res.redirect("/" + _common_1.config.rootName + "/join");
+        req.user.role === share_1.AcademusRole.teacher ? next() : res.redirect("/" + linker_share_1.config.rootName + "/join");
     };
-    UserCtrl.isTemplateAccessible = function (req, res, next) {
+    UserCtrl.isNamespaceAccessible = function (req, res, next) {
         return __awaiter(this, void 0, void 0, function () {
-            var templates;
+            var gameServers;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, _server_service_1.PhaseService.getPhaseTemplates(req.user._id.toString())];
+                    case 0: return [4 /*yield*/, service_1.GameService.getHeartBeats(req.user._id.toString())];
                     case 1:
-                        templates = _a.sent();
-                        templates.some(function (_a) {
+                        gameServers = _a.sent();
+                        gameServers.some(function (_a) {
                             var namespace = _a.namespace;
                             return namespace === req.params.namespace;
-                        }) ? next() : res.redirect("/" + _common_1.config.rootName);
+                        }) ? next() : res.redirect("/" + linker_share_1.config.rootName);
                         return [2 /*return*/];
                 }
             });
@@ -102,20 +102,20 @@ var UserCtrl = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         _id = req.user._id, gameId = req.params.gameId, userId = _id.toString();
-                        return [4 /*yield*/, _server_service_1.GameService.getGame(gameId)];
+                        return [4 /*yield*/, service_1.GameService.getGame(gameId)];
                     case 1:
                         owner = (_a.sent()).owner;
                         if (owner === userId) {
                             return [2 /*return*/, next()];
                         }
-                        return [4 /*yield*/, PlayerService_1.PlayerService.findPlayerId(gameId, userId)];
+                        return [4 /*yield*/, service_1.PlayerService.findPlayerId(gameId, userId)];
                     case 2:
                         player = _a.sent();
                         console.log(player);
                         if (player) {
                             return [2 /*return*/, next()];
                         }
-                        res.redirect("/" + _common_1.config.rootName + "/info/" + gameId);
+                        res.redirect("/" + linker_share_1.config.rootName + "/info/" + gameId);
                         return [2 /*return*/];
                 }
             });
@@ -139,17 +139,21 @@ exports.UserCtrl = UserCtrl;
 var GameCtrl = /** @class */ (function () {
     function GameCtrl() {
     }
-    GameCtrl.getPhaseTemplates = function (req, res) {
+    GameCtrl.getJsUrl = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var templates;
+            var namespace, heartBeat;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, _server_service_1.PhaseService.getPhaseTemplates(req.user._id.toString())];
+                    case 0:
+                        namespace = req.params.namespace;
+                        return [4 /*yield*/, service_1.GameService.getHeartBeats()];
                     case 1:
-                        templates = _a.sent();
-                        res.json({
+                        heartBeat = (_a.sent()).find(function (s) { return s.namespace === namespace; });
+                        res.json(heartBeat ? {
                             code: share_1.ResponseCode.success,
-                            templates: templates
+                            jsUrl: heartBeat.jsUrl
+                        } : {
+                            code: share_1.ResponseCode.notFound
                         });
                         return [2 /*return*/];
                 }
@@ -163,7 +167,7 @@ var GameCtrl = /** @class */ (function () {
                 switch (_c.label) {
                     case 0:
                         _a = req.body, title = _a.title, desc = _a.desc, namespace = _a.namespace, params = _a.params, _b = req.user, owner = _b.id, orgCode = _b.orgCode, session = req.session;
-                        return [4 /*yield*/, _server_service_1.GameService.saveGame({
+                        return [4 /*yield*/, service_1.GameService.saveGame({
                                 owner: owner,
                                 orgCode: session.orgCode || orgCode,
                                 title: title,
@@ -189,7 +193,7 @@ var GameCtrl = /** @class */ (function () {
                 switch (_e.label) {
                     case 0:
                         _id = req.user._id, _a = req.query, _b = _a.page, page = _b === void 0 ? 0 : _b, _c = _a.pageSize, pageSize = _c === void 0 ? DEFAULT_PAGE_SIZE : _c;
-                        return [4 /*yield*/, _server_service_1.GameService.getGameList(_id, +page, +pageSize)];
+                        return [4 /*yield*/, service_1.GameService.getGameList(_id, +page, +pageSize)];
                     case 1:
                         _d = _e.sent(), count = _d.count, gameList = _d.gameList;
                         res.json({
@@ -209,7 +213,7 @@ var GameCtrl = /** @class */ (function () {
                 switch (_b.label) {
                     case 0:
                         gameId = req.params.gameId;
-                        return [4 /*yield*/, _server_service_1.GameService.getGame(gameId)];
+                        return [4 /*yield*/, service_1.GameService.getGame(gameId)];
                     case 1:
                         _a = _b.sent(), params = _a.params, game = __rest(_a, ["params"]);
                         res.json({
@@ -228,7 +232,7 @@ var GameCtrl = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         gameId = req.params.gameId;
-                        return [4 /*yield*/, _server_service_1.GameService.getGame(gameId)];
+                        return [4 /*yield*/, service_1.GameService.getGame(gameId)];
                     case 1:
                         game = _a.sent();
                         res.json({
@@ -247,10 +251,10 @@ var GameCtrl = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         gameId = req.params.gameId;
-                        return [4 /*yield*/, _server_util_1.redisClient.get(_server_util_1.RedisKey.share_GameCode(gameId))];
+                        return [4 /*yield*/, protocol_1.redisClient.get(util_1.RedisKey.share_GameCode(gameId))];
                     case 1:
                         shareCode = _a.sent();
-                        return [4 /*yield*/, _server_service_1.GameService.getGame(gameId)];
+                        return [4 /*yield*/, service_1.GameService.getGame(gameId)];
                     case 2:
                         title = (_a.sent()).title;
                         if (shareCode) {
@@ -264,10 +268,10 @@ var GameCtrl = /** @class */ (function () {
                         _a.label = 3;
                     case 3:
                         _a.trys.push([3, 6, , 7]);
-                        return [4 /*yield*/, _server_util_1.redisClient.setex(_server_util_1.RedisKey.share_GameCode(gameId), SECONDS_PER_DAY, shareCode)];
+                        return [4 /*yield*/, protocol_1.redisClient.setex(util_1.RedisKey.share_GameCode(gameId), SECONDS_PER_DAY, shareCode)];
                     case 4:
                         _a.sent();
-                        return [4 /*yield*/, _server_util_1.redisClient.setex(_server_util_1.RedisKey.share_CodeGame(shareCode), SECONDS_PER_DAY, gameId)];
+                        return [4 /*yield*/, protocol_1.redisClient.setex(util_1.RedisKey.share_CodeGame(shareCode), SECONDS_PER_DAY, gameId)];
                     case 5:
                         _a.sent();
                         res.json({
@@ -294,7 +298,7 @@ var GameCtrl = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         code = req.body.code;
-                        return [4 /*yield*/, _server_util_1.redisClient.get(_server_util_1.RedisKey.share_CodeGame(code))];
+                        return [4 /*yield*/, protocol_1.redisClient.get(util_1.RedisKey.share_CodeGame(code))];
                     case 1:
                         gameId = _a.sent();
                         res.json(gameId ? {
@@ -318,11 +322,11 @@ var GameCtrl = /** @class */ (function () {
                         _a.label = 1;
                     case 1:
                         _a.trys.push([1, 5, , 6]);
-                        return [4 /*yield*/, PlayerService_1.PlayerService.findPlayerId(gameId, userId)];
+                        return [4 /*yield*/, service_1.PlayerService.findPlayerId(gameId, userId)];
                     case 2:
                         playerId = _a.sent();
                         if (!!playerId) return [3 /*break*/, 4];
-                        return [4 /*yield*/, PlayerService_1.PlayerService.savePlayer(gameId, userId)];
+                        return [4 /*yield*/, service_1.PlayerService.savePlayer(gameId, userId)];
                     case 3:
                         _a.sent();
                         _a.label = 4;
@@ -346,13 +350,13 @@ var GameCtrl = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         user = req.user, gameId = req.params.gameId, userId = user._id.toString();
-                        return [4 /*yield*/, _server_service_1.GameService.getGame(gameId)];
+                        return [4 /*yield*/, service_1.GameService.getGame(gameId)];
                     case 1:
                         game = _a.sent();
-                        return [4 /*yield*/, PlayerService_1.PlayerService.findPlayerId(gameId, userId)];
+                        return [4 /*yield*/, service_1.PlayerService.findPlayerId(gameId, userId)];
                     case 2:
                         playerId = _a.sent();
-                        token = util_1.Token.geneToken(userId === game.owner ? userId : playerId), type = userId === game.owner ? share_1.Actor.owner : share_1.Actor.player;
+                        token = util_2.Token.geneToken(userId === game.owner ? userId : playerId), type = userId === game.owner ? share_1.Actor.owner : share_1.Actor.player;
                         req.session.actor = {
                             token: token,
                             type: type

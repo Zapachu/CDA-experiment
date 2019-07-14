@@ -9,8 +9,5 @@ exports.config = {
         server: 8081
     },
     minMoveInterval: 500,
-    vcodeLifetime: 60,
-    cookieKey: {
-        csrf: '_csrf'
-    }
+    vcodeLifetime: 60
 };

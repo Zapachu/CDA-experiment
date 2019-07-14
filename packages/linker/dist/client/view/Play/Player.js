@@ -19,11 +19,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var _client_util_1 = require("@client-util");
-var _client_context_1 = require("@client-context");
+var util_1 = require("../../util");
+var context_1 = require("../../context");
 var React = require("react");
 var _common_1 = require("@common");
-var _client_component_1 = require("@client-component");
+var component_1 = require("../../component");
 var style = require("./style.scss");
 var Play4Player = /** @class */ (function (_super) {
     __extends(Play4Player, _super);
@@ -34,19 +34,18 @@ var Play4Player = /** @class */ (function (_super) {
         var _a = this.props, actor = _a.actor, _b = _a.gameState, playerState = _b.playerState, playUrl = _b.playUrl;
         switch (playerState[actor.token].status) {
             case _common_1.PlayerStatus.playing: {
-                return React.createElement("iframe", { className: style.playIframe, src: playUrl + "?" + _client_util_1.Lang.key + "=" + _client_util_1.Lang.activeLanguage });
+                return React.createElement("iframe", { className: style.playIframe, src: playUrl + "?" + util_1.Lang.key + "=" + util_1.Lang.activeLanguage });
             }
             case _common_1.PlayerStatus.left: {
                 return 'left';
             }
             default: {
-                return React.createElement(_client_component_1.Loading, null);
+                return React.createElement(component_1.Loading, null);
             }
         }
     };
     Play4Player = __decorate([
-        _client_util_1.connCtx(_client_context_1.rootContext),
-        _client_util_1.connCtx(_client_context_1.playContext)
+        util_1.connCtx(context_1.playContext)
     ], Play4Player);
     return Play4Player;
 }(React.Component));

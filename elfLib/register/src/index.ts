@@ -17,14 +17,14 @@ export namespace Template {
     export type CreateClass = (new(...args) => Create<{}, any>) | CreateSFC<{}>
 }
 
-export interface IPhaseTemplate {
+export interface IGameTemplate {
     namespace?: string
     localeNames: Array<string>
     Create?: Template.CreateClass
 }
 
-export function registerOnElf(namespace: string, phaseTemplate: IPhaseTemplate) {
+export function registerOnElf(namespace: string, gameTemplate: IGameTemplate) {
     if (window['ElfLinker']) {
-        window['ElfLinker'].registerOnElf(namespace, phaseTemplate)
+        window['ElfLinker'].registerOnElf(namespace, gameTemplate)
     }
 }
