@@ -1,17 +1,17 @@
 import Socket from 'socket.io'
 import passport from 'passport'
-import { Request, Response, NextFunction } from 'express'
+import {NextFunction, Request, Response} from 'express'
 import socketEmitter from 'socket.io-emitter'
-import { RedisCall } from '@elf/protocol'
+import {RedisCall, Trial} from '@elf/protocol'
 import Redis from 'ioredis'
 
-import { User } from './models'
-import { UserDoc } from './interface'
+import {User} from './models'
+import {UserDoc} from './interface'
 import settings from './settings'
-import { CreateGame, GameOver } from '@elf/protocol'
-import { ResCode, serverSocketListenEvents, clientSocketListenEvnets, UserGameStatus } from './enums'
+import {clientSocketListenEvnets, ResCode, serverSocketListenEvents, UserGameStatus} from './enums'
 import areaCode from './config/areaCode'
 import gameConfig from './config/gameConfig'
+
 type Phase = string
 
 const ioEmitter = socketEmitter({ host: settings.redishost, port: settings.redisport })
@@ -166,13 +166,10 @@ class SocketManager {
     }
 
     async emitMatchSuccess(gamePhase: Phase, uids = []) {
-        const { playUrls: playerUrls } = await RedisCall.call<CreateGame.IReq, CreateGame.IRes>(CreateGame.name(gamePhase), {
-            keys: uids
-        })
-        console.log(playerUrls, 'urls')
-        uids.forEach(async (uid, index) => {
+        const { playUrl } = await RedisCall.call<Trial.Create.IReq, Trial.Create.IRes>(Trial.Create.name(gamePhase), {})
+        uids.forEach(async uid=> {
             const arr = this.userSocketMap[uid] || []
-            const playerUrl = playerUrls[index]
+            const playerUrl = playUrl
             arr.forEach(socketId => {
                 ioEmitter.to(socketId).emit(clientSocketListenEvnets.startGame, { playerUrl })
             })
@@ -189,17 +186,9 @@ const redisTools = new RedisTools(redisCli);
 const sockerManager = new SocketManager(redisTools);
 const roomManager = new RoomManager(sockerManager);
 
-RedisCall.handle<GameOver.IReq, GameOver.IRes>(GameOver.name, async ({ playUrl, onceMore, namespace: phase }) => {
-    console.log(`redis handle phase: ${phase} done`, playUrl, onceMore)
+RedisCall.handle<Trial.Done.IReq, Trial.Done.IRes>(Trial.Done.name, async ({ userId, onceMore, namespace: phase }) => {
     let lobbyUrl = settings.lobbyUrl
-    const uid = await redisTools.getPlayerUrlRecord(playUrl)
-    const userGameData = await redisTools.getUserGameData(uid, phase)
-    const isValid = userGameData.playerUrl === playUrl
-    if (!isValid) {
-        return { lobbyUrl }
-    }
-
-    await redisTools.setUserGameData(uid, phase, {
+    await redisTools.setUserGameData(userId, phase, {
         status: UserGameStatus.notStarted
     })
     if (onceMore) {

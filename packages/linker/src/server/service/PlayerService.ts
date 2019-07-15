@@ -1,5 +1,5 @@
-import {PlayerModel} from '@server-model'
-import {TApiPlayers} from '@common'
+import {PlayerModel} from '../model'
+import {TApiPlayers} from 'linker-share'
 
 export class PlayerService {
     static async savePlayer(gameId: string, userId: string): Promise<string> {

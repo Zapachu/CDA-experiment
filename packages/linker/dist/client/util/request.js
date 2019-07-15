@@ -47,8 +47,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var _common_1 = require("@common");
-var _client_util_1 = require("@client-util");
 var queryString = require("query-string");
+var share_1 = require("@elf/share");
+function getCookie(key) {
+    return decodeURIComponent(document.cookie).split('; ')
+        .find(function (str) { return str.startsWith(key + "="); }).substring(key.length + 1);
+}
 var baseFetchOption = {
     credentials: 'include',
     method: _common_1.RequestMethod.get,
@@ -107,17 +111,17 @@ function POST(url, params, query, data) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, request(buildPath(url, params) + "?" + queryString.stringify(query), _common_1.RequestMethod.post, __assign({}, data, { _csrf: _client_util_1.getCookie(_common_1.config.cookieKey.csrf) }))];
+                case 0: return [4 /*yield*/, request(buildPath(url, params) + "?" + queryString.stringify(query), _common_1.RequestMethod.post, __assign({}, data, { _csrf: getCookie(share_1.csrfCookieKey) }))];
                 case 1: return [2 /*return*/, _a.sent()];
             }
         });
     });
 }
 exports.POST = POST;
-var Request = /** @class */ (function () {
-    function Request() {
+var Api = /** @class */ (function () {
+    function Api() {
     }
-    Request.getUser = function () {
+    Api.getUser = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -127,7 +131,7 @@ var Request = /** @class */ (function () {
             });
         });
     };
-    Request.getBaseGame = function (gameId) {
+    Api.getBaseGame = function (gameId) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -137,7 +141,7 @@ var Request = /** @class */ (function () {
             });
         });
     };
-    Request.getGame = function (gameId) {
+    Api.getGame = function (gameId) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -147,7 +151,7 @@ var Request = /** @class */ (function () {
             });
         });
     };
-    Request.joinGameWithCode = function (code) {
+    Api.joinGameWithCode = function (code) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -157,7 +161,7 @@ var Request = /** @class */ (function () {
             });
         });
     };
-    Request.joinGame = function (gameId) {
+    Api.joinGame = function (gameId) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -167,7 +171,7 @@ var Request = /** @class */ (function () {
             });
         });
     };
-    Request.getGameList = function (page) {
+    Api.getGameList = function (page) {
         if (page === void 0) { page = 0; }
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
@@ -178,7 +182,7 @@ var Request = /** @class */ (function () {
             });
         });
     };
-    Request.getPhaseTemplates = function () {
+    Api.getPhaseTemplates = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -188,19 +192,19 @@ var Request = /** @class */ (function () {
             });
         });
     };
-    Request.postNewGame = function (title, desc, namespace, param) {
+    Api.postNewGame = function (title, desc, namespace, params) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, POST('/game/create', null, null, {
-                            title: title, desc: desc, namespace: namespace, param: param
+                            title: title, desc: desc, namespace: namespace, params: params
                         })];
                     case 1: return [2 /*return*/, _a.sent()];
                 }
             });
         });
     };
-    Request.shareGame = function (gameId) {
+    Api.shareGame = function (gameId) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -210,7 +214,7 @@ var Request = /** @class */ (function () {
             });
         });
     };
-    Request.getActor = function (gameId, token) {
+    Api.getActor = function (gameId, token) {
         if (token === void 0) { token = ''; }
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
@@ -221,7 +225,7 @@ var Request = /** @class */ (function () {
             });
         });
     };
-    return Request;
+    return Api;
 }());
-exports.Request = Request;
+exports.Api = Api;
 //# sourceMappingURL=request.js.map

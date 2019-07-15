@@ -85,44 +85,53 @@ var Play = /** @class */ (function (_super) {
     }
     Play.prototype.componentDidMount = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, token, gameId, game, socketClient;
+            var _a, token, _b, history, gameId, _c, code, game, socketClient;
             var _this = this;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            return __generator(this, function (_d) {
+                switch (_d.label) {
                     case 0:
-                        _a = this, token = _a.token, gameId = _a.props.match.params.gameId;
+                        _a = this, token = _a.token, _b = _a.props, history = _b.history, gameId = _b.match.params.gameId;
                         return [4 /*yield*/, util_1.Api.getGame(gameId)];
                     case 1:
-                        game = (_b.sent()).game;
+                        _c = _d.sent(), code = _c.code, game = _c.game;
+                        if (code !== share_1.ResponseCode.success) {
+                            history.push('/404');
+                            return [2 /*return*/];
+                        }
                         socketClient = socket_io_client_1.connect('/', {
                             path: share_1.config.socketPath(NAMESPACE),
                             query: "gameId=" + gameId + "&token=" + token
                         });
-                        this.registerStateReducer(socketClient);
-                        this.setState(function () { return ({
+                        this.setState({
                             game: game,
                             socketClient: socketClient,
                             frameEmitter: new share_1.FrameEmitter(socketClient)
-                        }); }, function () {
-                            return socketClient.emit(share_1.SocketEvent.online, function (actor) {
-                                if (token && (actor.token !== token)) {
-                                    location.href = "" + location.origin + location.pathname + "?token=" + actor.token;
-                                }
-                                else {
-                                    _this.setState({ actor: actor });
-                                }
-                            });
-                        });
+                        }, function () { return _this.registerStateReducer(); });
                         return [2 /*return*/];
                 }
             });
         });
     };
     Play.prototype.componentWillUnmount = function () {
-        this.state.socketClient.close();
+        if (this.state.socketClient) {
+            this.state.socketClient.close();
+        }
     };
-    Play.prototype.registerStateReducer = function (socketClient) {
+    Play.prototype.registerStateReducer = function () {
         var _this = this;
+        var _a = this, token = _a.token, history = _a.props.history, socketClient = _a.state.socketClient;
+        socketClient.on(share_1.SocketEvent.connection, function (actor) {
+            if (!actor) {
+                return history.push('/404');
+            }
+            if (token && (actor.token !== token)) {
+                location.href = "" + location.origin + location.pathname;
+            }
+            else {
+                _this.setState({ actor: actor });
+            }
+            socketClient.emit(share_1.SocketEvent.online);
+        });
         socketClient.on(share_1.SocketEvent.syncGameState_json, function (gameState) {
             _this.setState({ gameState: gameState });
         });

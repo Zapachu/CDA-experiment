@@ -1,2 +1,2 @@
 export * from './fileLoader'
-export * from './request'
+export * from './baseRequest'

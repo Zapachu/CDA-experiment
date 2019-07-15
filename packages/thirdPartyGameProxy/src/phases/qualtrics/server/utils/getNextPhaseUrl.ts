@@ -1,10 +1,8 @@
-'use strict'
+import {ThirdPartPhase} from '../../../../core/server/models'
+import {elfSetting} from '@elf/setting'
+import {Linker, RedisCall} from '@elf/protocol'
 
-import {ThirdPartPhase} from "../../../../core/server/models"
-import {elfSetting as settings} from '@elf/setting'
-import {RedisCall, SetPlayerResult} from '@elf/protocol'
-
-const {qualtricsProxy} = settings
+const {qualtricsProxy} = elfSetting
 
 const getNextPhaseUrl = async (req) => {
 
@@ -23,10 +21,10 @@ const getNextPhaseUrl = async (req) => {
         elfGameId: qualtricsPhase.elfGameId,
         nextPhaseKey: paramsJson.nextPhaseKey || -1,
         playerToken: paramsJson.palyerCode || qualtricsPhase.playHash[0].player,
-        playUrl: `${qualtricsProxy}/init/jfe/form/${qualtricsPhase._id.toString()}`,
+        playUrl: `${qualtricsProxy}/init/jfe/form/${qualtricsPhase._id.toString()}`
     }
 
-    await RedisCall.call<SetPlayerResult.IReq, SetPlayerResult.IRes>(SetPlayerResult.name, request)
+    await RedisCall.call<Linker.Result.IReq, Linker.Result.IRes>(Linker.Result.name, request)
     return '#'
 }
 

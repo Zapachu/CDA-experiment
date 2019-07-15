@@ -35,7 +35,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var _server_model_1 = require("@server-model");
+var model_1 = require("../model");
 var PlayerService = /** @class */ (function () {
     function PlayerService() {
     }
@@ -44,7 +44,7 @@ var PlayerService = /** @class */ (function () {
             var player;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, new _server_model_1.PlayerModel({ gameId: gameId, userId: userId }).save()];
+                    case 0: return [4 /*yield*/, new model_1.PlayerModel({ gameId: gameId, userId: userId }).save()];
                     case 1:
                         player = _a.sent();
                         return [2 /*return*/, player.id];
@@ -57,7 +57,7 @@ var PlayerService = /** @class */ (function () {
             var player;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, _server_model_1.PlayerModel.findOne({ gameId: gameId, userId: userId })];
+                    case 0: return [4 /*yield*/, model_1.PlayerModel.findOne({ gameId: gameId, userId: userId })];
                     case 1:
                         player = _a.sent();
                         return [2 /*return*/, player ? player.id : null];
@@ -70,7 +70,7 @@ var PlayerService = /** @class */ (function () {
             var players;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, _server_model_1.PlayerModel.find({ gameId: gameId }).populate('userId', 'name')];
+                    case 0: return [4 /*yield*/, model_1.PlayerModel.find({ gameId: gameId }).populate('userId', 'name')];
                     case 1:
                         players = _a.sent();
                         return [2 /*return*/, players.map(function (_a) {

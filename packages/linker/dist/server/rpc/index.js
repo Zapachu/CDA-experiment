@@ -40,7 +40,7 @@ var setting_1 = require("@elf/setting");
 var grpc_1 = require("grpc");
 var ElfAdmin_1 = require("./service/ElfAdmin");
 var protocol_1 = require("@elf/protocol");
-var _server_service_1 = require("@server-service");
+var service_1 = require("../service");
 var ElfAdmin_2 = require("./service/ElfAdmin");
 exports.getAdminService = ElfAdmin_2.getAdminService;
 function serve() {
@@ -50,16 +50,16 @@ function serve() {
     server.start();
 }
 exports.serve = serve;
-protocol_1.RedisCall.handle(protocol_1.SetPlayerResult.name, function (_a) {
-    var elfGameId = _a.elfGameId, playUrl = _a.playUrl, playerToken = _a.playerToken, result = _a.result;
+protocol_1.RedisCall.handle(protocol_1.Linker.Result.name, function (_a) {
+    var elfGameId = _a.elfGameId, playerToken = _a.playerToken, result = _a.result;
     return __awaiter(_this, void 0, void 0, function () {
         var stageManger;
         return __generator(this, function (_b) {
             switch (_b.label) {
-                case 0: return [4 /*yield*/, _server_service_1.StateManager.getManager(elfGameId)];
+                case 0: return [4 /*yield*/, service_1.StateManager.getManager(elfGameId)];
                 case 1:
                     stageManger = _b.sent();
-                    return [4 /*yield*/, stageManger.setPlayerResult(playUrl, playerToken, result)];
+                    return [4 /*yield*/, stageManger.setPlayerResult(playerToken, result)];
                 case 2:
                     _b.sent();
                     return [2 /*return*/, null];

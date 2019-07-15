@@ -3,7 +3,6 @@ import {diff} from 'deep-diff'
 import {CoreMove, IActor, IGameWithId, IMoveLog, TGameState, TPlayerState} from '@bespoke/share'
 import {MoveLogModel} from '../model'
 import {StateManager} from './StateManager'
-import {elfSetting} from '@elf/setting'
 import cloneDeep = require('lodash/cloneDeep')
 
 export class MoveQueue<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
@@ -46,7 +45,7 @@ export class MoveQueue<ICreateParams, IGameState, IPlayerState, MoveType, PushTy
             }
             this.gameState = cloneDeep(gameState)
             this.playerStates = cloneDeep(playerStates)
-            elfSetting.inProductEnv ? await MoveLogModel.create(moveLog) : null
+            await MoveLogModel.create(moveLog)
         })
     }
 }

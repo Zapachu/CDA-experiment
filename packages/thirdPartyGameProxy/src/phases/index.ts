@@ -1,6 +1,6 @@
-import {registerOnElf, IPhaseTemplate} from '@elf/register'
+import {registerOnElf, IGameTemplate} from '@elf/register'
 
-export function registerOnFramework(namespace: string, phaseTemplate: IPhaseTemplate) {
-    phaseTemplate.namespace = namespace
-    registerOnElf(namespace, phaseTemplate)
+export function registerOnFramework(namespace: string, gameTemplate: IGameTemplate) {
+    gameTemplate.namespace = namespace
+    registerOnElf(namespace, gameTemplate)
 }

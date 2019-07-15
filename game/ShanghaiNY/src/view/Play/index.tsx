@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Button, ButtonProps, Input, Label, Lang, MaskLoading, Request, Toast} from '@elf/component'
-import {Core} from '@bespoke/register'
+import {Button, ButtonProps, Input, Label, Lang, MaskLoading, Toast} from '@elf/component'
+import {Core, Request} from '@bespoke/register'
 import {FetchRoute, MoveType, namespace, PushType, Stage} from '../../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
 import TestStage from './TestStage'
@@ -31,7 +31,7 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     componentDidMount() {
         const {playerState: {actor}, frameEmitter, game} = this.props
         frameEmitter.emit(MoveType.initPosition)
-        Request.get(namespace, FetchRoute.getUserMobile, {gameId: game.id}, {token: actor.token, actorType: actor.type})
+        Request.instance(namespace).get(FetchRoute.getUserMobile, {gameId: game.id}, {token: actor.token, actorType: actor.type})
     }
 
     render(): React.ReactNode {

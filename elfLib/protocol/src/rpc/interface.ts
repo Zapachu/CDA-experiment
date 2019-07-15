@@ -1,74 +1,70 @@
-//region Elf
-export namespace PhaseReg {
-    export const intervalSeconds = 10
-    export const key = namespace=>`Elf:PhaseReg:${namespace}`
+export namespace Linker {
+    export namespace HeartBeat {
+        export const intervalSeconds = 10
+        export const key = namespace => `Linker:HeartBeat:${namespace}`
 
-    export interface IRegInfo {
-        namespace: string
-        jsUrl: string
+        export interface IHeartBeat {
+            namespace: string
+            jsUrl: string
+        }
+    }
+
+    export namespace Create {
+        export const name = namespace => `Linker:Create:${namespace}`
+
+        export interface IReq {
+            elfGameId: string
+            owner: string
+            params: any
+        }
+
+        export interface IRes {
+            playUrl: string
+        }
+    }
+
+    export namespace Result {
+        export const name = 'Linker:Result'
+
+        export interface IResult {
+            uniKey?: string
+            point?: number
+            detailIframeUrl?: string
+        }
+
+        export interface IReq {
+            elfGameId: string
+            playerToken: string
+            result?: IResult
+        }
+
+        export type IRes = null
     }
 }
 
-export namespace NewPhase {
-    export const name = namespace => `Elf:NewPhase:${namespace}`
+export namespace Trial {
+    export namespace Create {
+        export const name = (namespace: string) => `Trial:Create:${namespace}`
 
-    export interface IReq {
-        elfGameId: string
-        namespace: string
-        param: string//JSON string
-        owner: string
+        export interface IReq {
+        }
+
+        export interface IRes {
+            playUrl: string
+        }
     }
 
-    export interface IRes {
-        playUrl: string
-    }
-}
+    export namespace Done {
+        export const name = 'Trial:Done'
 
-export namespace SetPlayerResult {
-    export const name = 'Elf:SetPlayerResult'
+        export interface IReq {
+            namespace: string
+            userId: string
+            onceMore?: boolean
+        }
 
-    export interface IResult {
-        uniKey?: string
-        point?: number
-        detailIframeUrl?: string
-    }
-
-    export interface IReq {
-        elfGameId: string
-        playUrl: string
-        playerToken: string
-        result?: IResult
-    }
-
-    export type IRes = null
-}
-//endregion
-
-//region Trial
-export namespace CreateGame {
-    export const name = (namespace:string)=>`Trial:${namespace}:CreateGame`
-    export const playerLimit = 12
-
-    export interface IReq {
-        keys: string[]
-    }
-
-    export interface IRes {
-        playUrls: string[]
+        export interface IRes {
+            lobbyUrl: string
+        }
     }
 }
-
-export namespace GameOver{
-    export const name = 'Trial:GameOver'
-
-    export interface IReq {
-        playUrl: string
-        onceMore: boolean
-        namespace: string
-    }
-
-    export interface IRes {
-        lobbyUrl: string
-    }
-}
-//endregion

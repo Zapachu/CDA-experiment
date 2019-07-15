@@ -9,6 +9,9 @@ export class EventDispatcher {
     private static subscribeOnConnection(clientConn: IConnection) {
         Object.entries<IEventHandler>(EventHandler).forEach(([event, handler]) => {
             clientConn.on(event, async (...args) => {
+                if(!clientConn.actor){
+                    return
+                }
                 Log.i(clientConn.actor.token, event,
                     ...args.filter(arg => ![null, undefined].includes(arg)).map(arg => {
                         switch (typeof arg) {

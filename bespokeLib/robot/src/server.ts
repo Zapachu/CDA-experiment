@@ -7,10 +7,11 @@ export class RobotServer {
         IpcConnection.connect(namespace).then(client =>
             client.on(IpcEvent.startRobot, async (robotHandshake: IRobotHandshake, meta) => {
                 const connection = await IpcConnection.connect(namespace)
-                connection.emit(SocketEvent.connection, robotHandshake, () =>
-                    connection.emit(SocketEvent.online, async () =>
-                        await new Robot(robotHandshake.game, robotHandshake.actor, connection, meta).init()
-                    )
+                const robot: AnyRobot = await new Robot(robotHandshake.game, robotHandshake.actor, connection, meta)
+                connection.emit(SocketEvent.connection, robotHandshake, async () => {
+                        connection.emit(SocketEvent.online)
+                        await robot.init()
+                    }
                 )
             })
                 .emit(IpcEvent.asDaemon))

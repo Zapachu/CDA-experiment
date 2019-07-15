@@ -1,23 +1,24 @@
-import {elfSetting as setting} from '@elf/setting'
+import {elfSetting} from '@elf/setting'
 import {ThirdPartPhase} from '../../../../core/server/models'
-import {gen32Token} from '../../../../core/server/util'
+import {Token} from '@elf/util'
+import {Linker} from '@elf/protocol'
 
-export const getUrlByNamespace = async ({elfGameId, namespace, param, owner}) => {
-    let paramJson = JSON.parse(param)
-    const {qualtricsUrl: realQualtricsUrl} = paramJson
-    console.log('paramJson', paramJson)
-    paramJson.qualtricsHash = realQualtricsUrl.split('/jfe/form/')[1]
-    paramJson.adminUrl = `https://cessoxford.eu.qualtrics.com/responses/#/surveys/${paramJson.qualtricsHash}`
-    const paramString = JSON.stringify(paramJson)
+export const NAMESPACE = 'qualtrics'
+
+export const getUrlByNamespace = async ({elfGameId, params, owner}:Linker.Create.IReq) => {
+    const {qualtricsUrl: realQualtricsUrl} = params
+    params.qualtricsHash = realQualtricsUrl.split('/jfe/form/')[1]
+    params.adminUrl = `https://cessoxford.eu.qualtrics.com/responses/#/surveys/${params.qualtricsHash}`
+    const paramString = JSON.stringify(params)
     try {
         const newQualtricsPhase = await new ThirdPartPhase({
             playHash: [],
             elfGameId: elfGameId,
             param: paramString,
-            namespace: namespace,
-            ownerToken: gen32Token(owner.toString())
+            namespace: NAMESPACE,
+            ownerToken: Token.geneToken(owner)
         }).save()
-        return `${setting.qualtricsProxy}/init/jfe/form/${newQualtricsPhase._id.toString()}`
+        return `${elfSetting.qualtricsProxy}/init/jfe/form/${newQualtricsPhase._id.toString()}`
     } catch (err) {
         if (err) {
             console.log(err)

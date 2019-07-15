@@ -55,15 +55,39 @@ var __spread = (this && this.__spread) || function () {
     return ar;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var _common_1 = require("@common");
+var linker_share_1 = require("linker-share");
 var socketIO = require("socket.io");
 var eventHandler_1 = require("./eventHandler");
 var util_1 = require("@elf/util");
-var _server_service_1 = require("@server-service");
-var _server_model_1 = require("@server-model");
+var service_1 = require("../service");
+var model_1 = require("../model");
 var EventDispatcher = /** @class */ (function () {
     function EventDispatcher() {
     }
+    EventDispatcher.startSocketService = function (server) {
+        var _this = this;
+        this.socket = socketIO(server, { path: linker_share_1.config.socketPath });
+        this.socket.on(linker_share_1.SocketEvent.connection, function (connection) { return __awaiter(_this, void 0, void 0, function () {
+            var _a, token, type, gameId, playerId, userId, game, name, actor;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = connection.handshake.query, token = _a.token, type = _a.type, gameId = _a.gameId, playerId = _a.playerId;
+                        userId = connection.handshake.session.passport.user;
+                        return [4 /*yield*/, service_1.GameService.getGame(gameId)];
+                    case 1:
+                        game = _b.sent();
+                        return [4 /*yield*/, model_1.UserModel.findById(userId)];
+                    case 2:
+                        name = (_b.sent()).name;
+                        actor = { token: token, type: type, userId: userId, userName: name, playerId: playerId };
+                        this.subscribeOnConnection(Object.assign(connection, { actor: actor, game: game }));
+                        return [2 /*return*/];
+                }
+            });
+        }); });
+        return this.socket;
+    };
     EventDispatcher.subscribeOnConnection = function (clientConn) {
         var _this = this;
         Object.entries(eventHandler_1.EventHandler).forEach(function (_a) {
@@ -87,30 +111,6 @@ var EventDispatcher = /** @class */ (function () {
                 });
             });
         });
-    };
-    EventDispatcher.startSocketService = function (server) {
-        var _this = this;
-        this.socket = socketIO(server, { path: _common_1.config.socketPath });
-        this.socket.on(_common_1.SocketEvent.connection, function (connection) { return __awaiter(_this, void 0, void 0, function () {
-            var _a, token, type, gameId, playerId, userId, game, name, actor;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        _a = connection.handshake.query, token = _a.token, type = _a.type, gameId = _a.gameId, playerId = _a.playerId;
-                        userId = connection.handshake.session.passport.user;
-                        return [4 /*yield*/, _server_service_1.GameService.getGame(gameId)];
-                    case 1:
-                        game = _b.sent();
-                        return [4 /*yield*/, _server_model_1.UserModel.findById(userId)];
-                    case 2:
-                        name = (_b.sent()).name;
-                        actor = { token: token, type: type, userId: userId, userName: name, playerId: playerId };
-                        this.subscribeOnConnection(Object.assign(connection, { actor: actor, game: game }));
-                        return [2 /*return*/];
-                }
-            });
-        }); });
-        return this.socket;
     };
     return EventDispatcher;
 }());

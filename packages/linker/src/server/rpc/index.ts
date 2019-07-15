@@ -1,8 +1,8 @@
 import {elfSetting} from '@elf/setting'
 import {Server, ServerCredentials} from 'grpc'
 import {setElfService} from './service/ElfAdmin'
-import {RedisCall, SetPlayerResult} from '@elf/protocol'
-import {StateManager} from '@server-service'
+import {RedisCall, Linker} from '@elf/protocol'
+import {StateManager} from '../service'
 
 export {getAdminService} from './service/ElfAdmin'
 
@@ -13,10 +13,10 @@ export function serve() {
     server.start()
 }
 
-RedisCall.handle<SetPlayerResult.IReq, SetPlayerResult.IRes>(SetPlayerResult.name,
-    async ({elfGameId, playUrl, playerToken, result}) => {
+RedisCall.handle<Linker.Result.IReq, Linker.Result.IRes>(Linker.Result.name,
+    async ({elfGameId, playerToken, result}) => {
         const stageManger = await StateManager.getManager(elfGameId)
-        await stageManger.setPlayerResult(playUrl, playerToken, result)
+        await stageManger.setPlayerResult(playerToken, result)
         return null
     })
 

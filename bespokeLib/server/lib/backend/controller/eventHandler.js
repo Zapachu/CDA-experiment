@@ -40,8 +40,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var share_1 = require("@bespoke/share");
 var service_1 = require("../service");
 exports.EventHandler = (_a = {},
-    _a[share_1.SocketEvent.online] = function (connection, onlineCallback) {
-        if (onlineCallback === void 0) { onlineCallback = function () { return null; }; }
+    _a[share_1.SocketEvent.online] = function (connection, cb) {
+        if (cb === void 0) { cb = function () { return null; }; }
         return __awaiter(_this, void 0, void 0, function () {
             var game, actor, controller, gameState, playerState;
             return __generator(this, function (_a) {
@@ -51,9 +51,9 @@ exports.EventHandler = (_a = {},
                         return [4 /*yield*/, service_1.BaseLogic.getLogic(game.id)];
                     case 1:
                         controller = _a.sent();
-                        onlineCallback(actor);
                         connection.join(game.id);
                         controller.connections.set(actor.token, connection);
+                        cb();
                         if (!(actor.type === share_1.Actor.owner)) return [3 /*break*/, 4];
                         return [4 /*yield*/, controller.stateManager.getGameState()];
                     case 2:

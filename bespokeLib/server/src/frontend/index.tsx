@@ -2,7 +2,7 @@ import './initial.scss'
 import * as React from 'react'
 import {IGameTemplate} from '@bespoke/register'
 import {Lang, Language} from '@elf/component'
-import {BrowserRouter, Redirect, Route as ReactRoute, RouteComponentProps, RouteProps, Switch} from 'react-router-dom'
+import {BrowserRouter, Route as ReactRoute, RouteComponentProps, RouteProps, Switch} from 'react-router-dom'
 import {config} from '@bespoke/share'
 import {Login} from './Login'
 import {Dashboard} from './Dashboard'
@@ -12,6 +12,7 @@ import {Share} from './Share'
 import {Join} from './Join'
 import {Play} from './Play'
 import {Configuration} from './Configuration'
+import {NotFound} from './NotFound'
 import {render} from 'react-dom'
 import {Api, Button, TPageProps} from './util'
 
@@ -33,9 +34,7 @@ function renderRoot(pageProps: TPageProps, rootContainer: HTMLElement) {
                 <Route path='/info/:gameId' component={Info}/>
                 <Route path='/share/:gameId' component={Share}/>
                 <Route path='/join' component={Join}/>
-                <Route path='/*'>
-                    <Redirect to='/'/>
-                </Route>
+                <Route component={NotFound}/>
             </Switch>
         </BrowserRouter>
         {

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core} from '@bespoke/register'
-import {Button, Lang, Request} from '@elf/component'
+import {Core, Request} from '@bespoke/register'
+import {Button, Lang} from '@elf/component'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import {FetchRoute, MoveType, PushType, SheetType, Stage, namespace} from '../config'
 
@@ -29,7 +29,7 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
     render(): React.ReactNode {
         const {lang, props: {game, playerStates, frameEmitter}} = this
         return <section className={style.play4Owner}>
-            <a className={style.exportBtn} href={Request.buildUrl(namespace, FetchRoute.exportXlsPlaying, {gameId:game.id},{sheetType: SheetType.result} )}>{lang[SheetType[SheetType.result]]}</a>
+            <a className={style.exportBtn} href={Request.instance(namespace).buildUrl(FetchRoute.exportXlsPlaying, {gameId:game.id},{sheetType: SheetType.result} )}>{lang[SheetType[SheetType.result]]}</a>
             <table className={style.resultTable}>
                 <tbody>
                 <tr>

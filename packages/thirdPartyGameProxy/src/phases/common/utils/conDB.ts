@@ -1,9 +1,7 @@
-'use strict'
-
-import {elfSetting as settings} from '@elf/setting'
+import {elfSetting} from '@elf/setting'
 import {connect as DBConnect, connection as DBConnection} from 'mongoose'
 
-const {mongoUri, mongoUser, mongoPass} = settings
+const {mongoUri, mongoUser, mongoPass} = elfSetting
 const dbOptions = mongoUri ? {user: mongoUser, pass: mongoPass, useNewUrlParser: true} :
     {useNewUrlParser: true}
 

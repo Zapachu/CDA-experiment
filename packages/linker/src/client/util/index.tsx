@@ -1,33 +1,23 @@
-import * as React from "react"
+import {IUserWithId} from 'linker-share'
+import {RouteComponentProps} from 'react-router-dom'
+import {IGameTemplate} from '@elf/register'
 
-export {Request as Api} from './request'
+export {Api} from './Api'
 export {loadScript} from './fileLoader'
-export {Lang} from '@elf/component'
 
-export function getCookie(key: string) {
-    return getCookies().find(str => str.startsWith(`${key}=`)).substring(key.length + 1)
-}
+export type TPageProps = Partial<{
+    user: IUserWithId
+} & RouteComponentProps<{ gameId?: string }>>
 
-export function getCookies() {
-    return decodeURIComponent(document.cookie).split('; ')
-}
+export namespace GameTemplate {
+    let gameTemplate: IGameTemplate
 
-export function genePhaseKey(): string {
-    let res = ''
-    while (res.length<3){
-        res+=String.fromCharCode(~~(Math.random() * 26) + 65)
+    export function setTemplate(template: IGameTemplate) {
+        gameTemplate = template
     }
-    return res
-}
 
-export const connCtx = <C extends {}>(Context: React.Context<C>) =>
-    <P, S>(ComponentClass: React.ComponentClass<any, S>) => {
-        const ConsumerWrapper: React.FunctionComponent = (props: P) =>
-            <Context.Consumer>
-                {
-                    (context: C) =>
-                        <ComponentClass {...context} {...props}/>
-                }
-            </Context.Consumer>
-        return ConsumerWrapper as any
+    export function getTemplate() {
+        return gameTemplate
     }
+
+}

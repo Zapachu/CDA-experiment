@@ -8,15 +8,11 @@ import {
     IUserWithId,
     NationCode
 } from '@bespoke/share'
-import {IHttpRes, Request} from '@elf/component'
+import {BaseRequest, IHttpRes} from '@elf/component'
 
-export const Api = new class {
-    get: (path: string, params?: {}, query?: {}) => Promise<any>
-    post: (path: string, params?: {}, query?: {}, data?: {}) => Promise<any>
-
-    constructor() {
-        this.get = async (path, params, query) => await Request.get(NAMESPACE, `/${config.apiPrefix}${path}`, params, query)
-        this.post = async (path, params, query, data) => await Request.post(NAMESPACE, `/${config.apiPrefix}${path}`, params, query, data)
+export const Api = new class extends BaseRequest {
+    buildUrl(path: string, params: {} = {}, query: {} = {}): string {
+        return super.buildUrl(`/${config.rootName}/${NAMESPACE}/${config.apiPrefix}${path}`, params, query)
     }
 
     //region user

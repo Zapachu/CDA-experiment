@@ -207,7 +207,7 @@ io.adapter(socketRedis({ host: settings.redishost, port: settings.redisport }))
 // }))
 io.use(socketPassport.authorize({
   cookieParser: cookieParser,
-  key: settings.sessionId || 'whuipo.sid',
+  key: settings.sessionId,
   secret: settings.sessionSecret,
   store: sessionStore,
   success: handleSocketPassportSuccess,

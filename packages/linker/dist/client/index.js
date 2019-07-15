@@ -10,22 +10,67 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-var _client_util_1 = require("@client-util");
+var util_1 = require("./util");
+var component_1 = require("@elf/component");
 var React = require("react");
 var react_dom_1 = require("react-dom");
-var view_1 = require("./view");
+var react_router_dom_1 = require("react-router-dom");
+var linker_share_1 = require("linker-share");
+var Play_1 = require("./Play");
+var Info_1 = require("./Info");
+var GameList_1 = require("./GameList");
+var Create_1 = require("./Create");
+var antd_1 = require("antd");
 require('./initial.scss');
-var _client_util_2 = require("@client-util");
-exports.Lang = _client_util_2.Lang;
-exports.phaseTemplates = {};
-function registerOnElf(namespace, phaseTemplate) {
-    exports.phaseTemplates[namespace] = __assign({ namespace: namespace, Create: function () { return null; } }, phaseTemplate);
+function registerOnElf(namespace, template) {
+    template.namespace = namespace;
+    util_1.GameTemplate.setTemplate(template);
 }
 exports.registerOnElf = registerOnElf;
-var rootContainer = document.body.appendChild(document.createElement('div'));
-react_dom_1.render(React.createElement(view_1.Root, null), rootContainer);
-_client_util_1.Lang.switchListeners.push(function () {
-    react_dom_1.render(React.createElement(view_1.Root, { key: _client_util_1.Lang.activeLanguage }), rootContainer);
+util_1.Api.getUser().then(function (_a) {
+    var user = _a.user;
+    var rootContainer = document.body.appendChild(document.createElement('div'));
+    renderRoot({ user: user }, rootContainer);
+    component_1.Lang.switchListeners.push(function () { return renderRoot({ user: user }, rootContainer); });
 });
+function renderRoot(pageProps, rootContainer) {
+    var academusRoute = linker_share_1.config.academus.route;
+    var Route = function (_a) {
+        var Component = _a.component, routeProps = __rest(_a, ["component"]);
+        return React.createElement(react_router_dom_1.Route, __assign({}, routeProps, { render: function (props) {
+                return React.createElement(Component, __assign({}, pageProps, props));
+            } }));
+    };
+    react_dom_1.render(React.createElement(react_router_dom_1.BrowserRouter, { basename: linker_share_1.config.rootName },
+        React.createElement("div", { style: { position: 'absolute', right: 32, top: 16, zIndex: 1000 } },
+            React.createElement(antd_1.Button, { size: 'small', onClick: function () { return component_1.Lang.switchLang(component_1.Lang.activeLanguage === component_1.Language.en ? component_1.Language.zh : component_1.Language.en); } }, component_1.Lang.activeLanguage === component_1.Language.en ? '中文' : 'English')),
+        React.createElement(react_router_dom_1.Switch, null,
+            React.createElement(Route, { path: '/Create/:namespace', component: Create_1.Create }),
+            React.createElement(Route, { path: '/info/:gameId', component: Info_1.Info }),
+            React.createElement(Route, { path: '/play/:gameId', component: Play_1.Play }),
+            React.createElement(Route, { path: '/share/:gameId', component: toV5(function (gameId) { return "" + academusRoute.prefix + academusRoute.share(gameId); }) }),
+            React.createElement(Route, { path: '/join', component: toV5(function () { return "" + academusRoute.prefix + academusRoute.join; }) }),
+            React.createElement(Route, { path: '/player/:gameId', component: toV5(function (gameId) { return "" + academusRoute.prefix + academusRoute.member(pageProps.user.orgCode, gameId); }) }),
+            React.createElement(Route, { component: GameList_1.GameList }))), rootContainer);
+}
+function toV5(route) {
+    return function (_a) {
+        var history = _a.history, gameId = _a.match.params.gameId;
+        history.goBack();
+        window.open(route(gameId), '_blank');
+        return null;
+    };
+}
 //# sourceMappingURL=index.js.map

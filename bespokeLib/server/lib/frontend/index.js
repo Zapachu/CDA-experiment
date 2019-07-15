@@ -35,6 +35,7 @@ var Share_1 = require("./Share");
 var Join_1 = require("./Join");
 var Play_1 = require("./Play");
 var Configuration_1 = require("./Configuration");
+var NotFound_1 = require("./NotFound");
 var react_dom_1 = require("react-dom");
 var util_1 = require("./util");
 function renderRoot(pageProps, rootContainer) {
@@ -56,8 +57,7 @@ function renderRoot(pageProps, rootContainer) {
                 React.createElement(Route, { path: '/info/:gameId', component: Info_1.Info }),
                 React.createElement(Route, { path: '/share/:gameId', component: Share_1.Share }),
                 React.createElement(Route, { path: '/join', component: Join_1.Join }),
-                React.createElement(Route, { path: '/*' },
-                    React.createElement(react_router_dom_1.Redirect, { to: '/' })))),
+                React.createElement(Route, { component: NotFound_1.NotFound }))),
         WITH_LINKER ? null :
             React.createElement("div", { style: { position: 'absolute', right: 32, top: 16, zIndex: 1000 } },
                 React.createElement(util_1.Button, { size: 'small', onClick: function () { return component_1.Lang.switchLang(component_1.Lang.activeLanguage === component_1.Language.en ? component_1.Language.zh : component_1.Language.en); } }, component_1.Lang.activeLanguage === component_1.Language.en ? '中文' : 'English'))), rootContainer);

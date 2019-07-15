@@ -46,45 +46,39 @@ var protocol_1 = require("@elf/protocol");
 var robot_1 = require("@bespoke/robot");
 server_1.Server.start(config_1.namespace, Controller_1.default, path_1.resolve(__dirname, '../static'));
 robot_1.RobotServer.start(config_1.namespace, Robot_1.default);
-server_1.RedisCall.handle(protocol_1.CreateGame.name(stock_trading_config_1.phaseToNamespace(stock_trading_config_1.Phase.IPO_TopK)), function (_a) {
-    var keys = _a.keys;
-    return __awaiter(_this, void 0, void 0, function () {
-        var gameId;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
-                case 0: return [4 /*yield*/, server_1.Server.newGame({
-                        title: stock_trading_config_1.Phase.IPO_TopK + ":" + new Date().toUTCString(),
-                        params: {
-                            groupSize: 6,
-                            total: 10000,
-                            type: config_1.IPOType.TopK
-                        }
-                    })];
-                case 1:
-                    gameId = _b.sent();
-                    return [2 /*return*/, { playUrls: keys.map(function (key) { return server_1.gameId2PlayUrl(gameId, key); }) }];
-            }
-        });
+server_1.RedisCall.handle(protocol_1.Trial.Create.name(stock_trading_config_1.phaseToNamespace(stock_trading_config_1.Phase.IPO_TopK)), function () { return __awaiter(_this, void 0, void 0, function () {
+    var gameId;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, server_1.Server.newGame({
+                    title: stock_trading_config_1.Phase.IPO_TopK + ":" + new Date().toUTCString(),
+                    params: {
+                        groupSize: 6,
+                        total: 10000,
+                        type: config_1.IPOType.TopK
+                    }
+                })];
+            case 1:
+                gameId = _a.sent();
+                return [2 /*return*/, { playUrl: server_1.gameId2PlayUrl(gameId) }];
+        }
     });
-});
-server_1.RedisCall.handle(protocol_1.CreateGame.name(stock_trading_config_1.phaseToNamespace(stock_trading_config_1.Phase.IPO_Median)), function (_a) {
-    var keys = _a.keys;
-    return __awaiter(_this, void 0, void 0, function () {
-        var gameId;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
-                case 0: return [4 /*yield*/, server_1.Server.newGame({
-                        title: stock_trading_config_1.Phase.IPO_Median + ":" + new Date().toUTCString(),
-                        params: {
-                            groupSize: 6,
-                            total: 10000,
-                            type: config_1.IPOType.Median
-                        }
-                    })];
-                case 1:
-                    gameId = _b.sent();
-                    return [2 /*return*/, { playUrls: keys.map(function (key) { return server_1.gameId2PlayUrl(gameId, key); }) }];
-            }
-        });
+}); });
+server_1.RedisCall.handle(protocol_1.Trial.Create.name(stock_trading_config_1.phaseToNamespace(stock_trading_config_1.Phase.IPO_Median)), function () { return __awaiter(_this, void 0, void 0, function () {
+    var gameId;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, server_1.Server.newGame({
+                    title: stock_trading_config_1.Phase.IPO_Median + ":" + new Date().toUTCString(),
+                    params: {
+                        groupSize: 6,
+                        total: 10000,
+                        type: config_1.IPOType.Median
+                    }
+                })];
+            case 1:
+                gameId = _a.sent();
+                return [2 /*return*/, { playUrl: server_1.gameId2PlayUrl(gameId) }];
+        }
     });
-});
+}); });

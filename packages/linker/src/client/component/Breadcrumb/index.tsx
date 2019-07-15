@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {Link} from 'react-router-dom'
 import {History} from 'history'
-import {Button} from '@antd-component'
+import {Button} from 'antd'
 
 interface IBreadcrumbProps {
     history: History,

@@ -1,7 +1,6 @@
 import {
     Actor,
     BaseController,
-    gameId2PlayUrl,
     GameStatus,
     IActor,
     IMoveCallback,
@@ -25,12 +24,13 @@ import {
     MoveType,
     PERIOD,
     PeriodStage,
+    playerLimit,
     PrivatePriceRegion,
     PushType,
     ROLE
 } from './config'
 import {Phase, phaseToNamespace} from '@bespoke-game/stock-trading-config'
-import {CreateGame, GameOver} from '@elf/protocol'
+import {Trial} from '@elf/protocol'
 import {getBalanceIndex, getEnumKeys, random} from './util'
 
 export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
@@ -197,11 +197,11 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     case actor.type === Actor.serverRobot && playerStates.every(({identity}) => identity != Identity.moneyGuarantor):
                         playerState.identity = Identity.moneyGuarantor
                         playerState.count = 0
-                        playerState.money = gameState.initialAsset.money * CreateGame.playerLimit
+                        playerState.money = gameState.initialAsset.money * playerLimit
                         break
                     case actor.type === Actor.serverRobot && playerStates.every(({identity}) => identity != Identity.stockGuarantor):
                         playerState.identity = Identity.stockGuarantor
-                        playerState.count = gameState.initialAsset.count * CreateGame.playerLimit
+                        playerState.count = gameState.initialAsset.count * playerLimit
                         playerState.money = 0
                         break
                     default:
@@ -225,7 +225,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     switch (periodCountDown) {
                         case ~~(prepareTime / 2): {
                             if (periodIndex === 0) {
-                                Array(2 + CreateGame.playerLimit - gameState.playerIndex).fill(null).forEach(
+                                Array(2 + playerLimit - gameState.playerIndex).fill(null).forEach(
                                     async (_, i) => await this.startRobot(`$Robot_${i}`))
                             }
                             break
@@ -328,8 +328,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             }
             case MoveType.exitGame: {
                 const {onceMore} = params
-                const res = await RedisCall.call<GameOver.IReq, GameOver.IRes>(GameOver.name, {
-                    playUrl: gameId2PlayUrl(this.game.id, actor.token),
+                const res = await RedisCall.call<Trial.Done.IReq, Trial.Done.IRes>(Trial.Done.name, {
+                    userId: playerState.user.id,
                     onceMore,
                     namespace: phaseToNamespace(this.game.params.allowLeverage ? Phase.CBM_Leverage : Phase.CBM)
                 })

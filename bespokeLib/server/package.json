@@ -2,7 +2,7 @@
   "name": "@bespoke/server",
   "version": "1.1.1",
   "main": "lib/backend/index",
-  "types": "src/backend/index",
+  "types": "lib/backend/index",
   "scripts": {
     "tsc-w": "tsc -w",
     "client:build": "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./script/webpack.config.ts",

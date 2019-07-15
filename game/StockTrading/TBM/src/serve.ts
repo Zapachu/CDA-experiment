@@ -5,15 +5,15 @@ import Controller from "./Controller";
 import Robot from "./Robot";
 import { namespace, ICreateParams } from "./config";
 import {Phase, phaseToNamespace} from "@bespoke-game/stock-trading-config";
-import {CreateGame} from '@elf/protocol'
+import {Trial} from '@elf/protocol'
 
 Server.start(namespace, Controller, resolve(__dirname, '../static'))
 
 RobotServer.start(namespace, Robot)
 
-RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(
-  CreateGame.name(phaseToNamespace(Phase.TBM)),
-  async ({ keys }) => {
+RedisCall.handle<Trial.Create.IReq, Trial.Create.IRes>(
+  Trial.Create.name(phaseToNamespace(Phase.TBM)),
+  async () => {
     const gameId = await Server.newGame<ICreateParams>({
       title: `${Phase.TBM}:${new Date().toUTCString()}`,
       params: {
@@ -28,6 +28,6 @@ RedisCall.handle<CreateGame.IReq, CreateGame.IRes>(
         sellerPrivateMax: 45
       }
     });
-    return { playUrls: keys.map(key => gameId2PlayUrl(gameId, key)) };
+    return { playUrl: gameId2PlayUrl(gameId) };
   }
 );

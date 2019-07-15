@@ -1,6 +1,7 @@
 import * as React from 'react'
-import {FrameEmitter, IGameWithId, TGameState, TPlayerState} from '@bespoke/share'
+import {config, FrameEmitter, IGameWithId, TGameState, TPlayerState} from '@bespoke/share'
 import {registerOnElf, Template} from '@elf/register'
+import {BaseRequest} from '@elf/component'
 
 export interface IGameTemplate {
     namespace?: string
@@ -107,11 +108,29 @@ export namespace Core {
         | Result4OwnerSFC<{}, {}, {}, any, {}>
 }
 
-export function registerOnBespoke(namespace: string, gameTemplate: IGameTemplate) {
-    if (window['BespokeServer']) {
-        window['BespokeServer'].registerOnBespoke(gameTemplate)
+export class Request extends BaseRequest {
+    private static _instance: Request
+
+    constructor(private namespace: string) {
+        super()
     }
-    registerOnElf(namespace, {localeNames: [namespace], ...gameTemplate})
+
+    static instance(namespace: string) {
+        if (!this._instance) {
+            this._instance = new Request(namespace)
+        }
+        return this._instance
+    }
+
+    buildUrl(path: string, params: {} = {}, query: {} = {}): string {
+        return super.buildUrl(`/${config.rootName}/${this.namespace}${path}`, params, query)
+    }
 }
 
-export {registerOnBespoke as registerOnFramework}
+export function registerOnFramework(namespace: string, gameTemplate: IGameTemplate) {
+    if (window['BespokeServer']) {
+        window['BespokeServer'].registerOnBespoke(gameTemplate)
+    } else {
+        registerOnElf(namespace, {localeNames: [namespace], ...gameTemplate})
+    }
+}

@@ -15,7 +15,7 @@ import * as morgan from 'morgan'
 import {elfSetting} from '@elf/setting'
 import {gameId2PlayUrl, getOrigin, heartBeat, QCloudSMS, RedisKey, Setting} from './util'
 import {PassportStrategy} from './interface'
-import {AcademusRole, config, IGameConfig, IStartOption} from '@bespoke/share'
+import {AcademusRole, config, IGameConfig, IStartOption, csrfCookieKey} from '@bespoke/share'
 import {EventDispatcher} from './controller/eventDispatcher'
 import {router} from './controller/requestRouter'
 import {AnyLogic, BaseLogic, GameDAO} from './service'
@@ -23,7 +23,7 @@ import {AddressInfo} from 'net'
 import {GameModel, UserDoc, UserModel} from './model'
 import {Strategy} from 'passport-local'
 import * as http from 'http'
-import {NewPhase, PhaseReg, RedisCall, redisClient} from '@elf/protocol'
+import {Linker, RedisCall, redisClient} from '@elf/protocol'
 import {Log} from '@elf/util'
 
 export class Server {
@@ -63,7 +63,7 @@ export class Server {
         express.use(bodyParser.json())
         express.use(bodyParser.urlencoded({extended: true, limit: '30mb', parameterLimit: 30000}))
         express.use(this.sessionMiddleware)
-        express.use((req, res, next) => csrf({cookie: config.cookieKey.csrf})(req, res, next))
+        express.use((req, res, next) => csrf({cookie: csrfCookieKey})(req, res, next))
         express.use(passport.initialize())
         express.use(passport.session())
         express.use((req, res, next) => {
@@ -129,19 +129,19 @@ export class Server {
     }
 
     private static withLinker() {
-        RedisCall.handle<NewPhase.IReq, NewPhase.IRes>(NewPhase.name(Setting.namespace), async ({elfGameId, owner, namespace, param}) => {
+        RedisCall.handle<Linker.Create.IReq, Linker.Create.IRes>(Linker.Create.name(Setting.namespace), async ({elfGameId, owner, params}) => {
             const {id} = await GameModel.create({
-                title: '',
-                owner,
+                namespace: Setting.namespace,
+                title: Linker.Create.name(Setting.namespace),
                 elfGameId,
-                namespace,
-                params: JSON.parse(param)
+                owner,
+                params
             })
             return {playUrl: gameId2PlayUrl(id)}
         })
         const elfComponentPath = require('../../static/index.json')['ElfComponent.js'].replace('static', `${Setting.namespace}/static`)
-        heartBeat(PhaseReg.key(Setting.namespace), ()=>{
-            const regInfo: PhaseReg.IRegInfo = {
+        heartBeat(Linker.HeartBeat.key(Setting.namespace), () => {
+            const regInfo: Linker.HeartBeat.IHeartBeat = {
                 namespace: Setting.namespace,
                 jsUrl: `${getOrigin()}${elfComponentPath};${getOrigin()}${Setting.getClientPath()}`
             }
@@ -161,7 +161,7 @@ export class Server {
         EventDispatcher.startGameSocket(server).use(socketIOSession(this.sessionMiddleware))
         this.bindServerListener(server, () => {
             Log.i(`Running at：http://${Setting.ip}:${elfSetting.bespokeHmr ? config.devPort.client : Setting.port}/${config.rootName}/${Setting.namespace}`)
-            heartBeat(RedisKey.gameServer(Setting.namespace), ()=>`${Setting.ip}:${Setting.port}`)
+            heartBeat(RedisKey.gameServer(Setting.namespace), () => `${Setting.ip}:${Setting.port}`)
             if (elfSetting.bespokeWithLinker) {
                 this.withLinker()
             }

@@ -200,7 +200,7 @@ var GameCtrl = /** @class */ (function () {
                         return [3 /*break*/, 6];
                     case 5:
                         e_1 = _a.sent();
-                        util_1.Log.e(e_1);
+                        util_1.Log.e("Unknown GameId : " + gameId);
                         res.json({
                             code: share_1.ResponseCode.notFound
                         });

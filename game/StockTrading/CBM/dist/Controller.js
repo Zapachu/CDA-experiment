@@ -359,14 +359,14 @@ var Controller = /** @class */ (function (_super) {
                                 }):
                                     playerState.identity = config_1.Identity.moneyGuarantor;
                                     playerState.count = 0;
-                                    playerState.money = gameState.initialAsset.money * protocol_1.CreateGame.playerLimit;
+                                    playerState.money = gameState.initialAsset.money * config_1.playerLimit;
                                     break;
                                 case actor.type === server_1.Actor.serverRobot && playerStates.every(function (_a) {
                                     var identity = _a.identity;
                                     return identity != config_1.Identity.stockGuarantor;
                                 }):
                                     playerState.identity = config_1.Identity.stockGuarantor;
-                                    playerState.count = gameState.initialAsset.count * protocol_1.CreateGame.playerLimit;
+                                    playerState.count = gameState.initialAsset.count * config_1.playerLimit;
                                     playerState.money = 0;
                                     break;
                                 default:
@@ -396,7 +396,7 @@ var Controller = /** @class */ (function (_super) {
                                             switch (periodCountDown) {
                                                 case ~~(prepareTime / 2): {
                                                     if (periodIndex === 0) {
-                                                        Array(2 + protocol_1.CreateGame.playerLimit - gameState.playerIndex).fill(null).forEach(function (_, i) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+                                                        Array(2 + config_1.playerLimit - gameState.playerIndex).fill(null).forEach(function (_, i) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
                                                             switch (_a.label) {
                                                                 case 0: return [4 /*yield*/, this.startRobot("$Robot_" + i)];
                                                                 case 1: return [2 /*return*/, _a.sent()];
@@ -530,8 +530,8 @@ var Controller = /** @class */ (function (_super) {
                         _b.label = 13;
                     case 13:
                         onceMore = params.onceMore;
-                        return [4 /*yield*/, server_1.RedisCall.call(protocol_1.GameOver.name, {
-                                playUrl: server_1.gameId2PlayUrl(this.game.id, actor.token),
+                        return [4 /*yield*/, server_1.RedisCall.call(protocol_1.Trial.Done.name, {
+                                userId: playerState.user.id,
                                 onceMore: onceMore,
                                 namespace: stock_trading_config_1.phaseToNamespace(this.game.params.allowLeverage ? stock_trading_config_1.Phase.CBM_Leverage : stock_trading_config_1.Phase.CBM)
                             })];

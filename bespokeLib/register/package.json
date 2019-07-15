@@ -5,6 +5,7 @@
   "main": "index",
   "devDependencies": {
     "@bespoke/share": "^1.1.1",
+    "@elf/component": "^1.1.1",
     "@elf/register": "^1.1.1"
   }
 }

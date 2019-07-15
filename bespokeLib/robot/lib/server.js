@@ -44,21 +44,28 @@ var RobotServer = /** @class */ (function () {
         var _this = this;
         util_1.IpcConnection.connect(namespace).then(function (client) {
             return client.on(util_1.IpcEvent.startRobot, function (robotHandshake, meta) { return __awaiter(_this, void 0, void 0, function () {
-                var connection;
+                var connection, robot;
                 var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0: return [4 /*yield*/, util_1.IpcConnection.connect(namespace)];
                         case 1:
                             connection = _a.sent();
-                            connection.emit(share_1.SocketEvent.connection, robotHandshake, function () {
-                                return connection.emit(share_1.SocketEvent.online, function () { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+                            return [4 /*yield*/, new Robot(robotHandshake.game, robotHandshake.actor, connection, meta)];
+                        case 2:
+                            robot = _a.sent();
+                            connection.emit(share_1.SocketEvent.connection, robotHandshake, function () { return __awaiter(_this, void 0, void 0, function () {
+                                return __generator(this, function (_a) {
                                     switch (_a.label) {
-                                        case 0: return [4 /*yield*/, new Robot(robotHandshake.game, robotHandshake.actor, connection, meta).init()];
-                                        case 1: return [2 /*return*/, _a.sent()];
+                                        case 0:
+                                            connection.emit(share_1.SocketEvent.online);
+                                            return [4 /*yield*/, robot.init()];
+                                        case 1:
+                                            _a.sent();
+                                            return [2 /*return*/];
                                     }
-                                }); }); });
-                            });
+                                });
+                            }); });
                             return [2 /*return*/];
                     }
                 });

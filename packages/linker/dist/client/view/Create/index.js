@@ -23,12 +23,6 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -66,17 +60,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var react_1 = require("react");
-var _client_util_1 = require("@client-util");
-var _client_component_1 = require("@client-component");
+var util_1 = require("../../util");
+var component_1 = require("../../component");
 var index_1 = require("../../index");
-var _antd_component_1 = require("@antd-component");
-var _client_context_1 = require("@client-context");
+var antd_1 = require("antd");
 var share_1 = require("@elf/share");
 var Create = /** @class */ (function (_super) {
     __extends(Create, _super);
     function Create() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.lang = _client_util_1.Lang.extractLang({
+        _this.lang = util_1.Lang.extractLang({
             title: ['标题', 'Title'],
             desc: ['详情', 'Description'],
             invalidBaseInfo: ['请检查实验标题与描述信息', 'Check game title and description please'],
@@ -91,7 +84,7 @@ var Create = /** @class */ (function (_super) {
             title: '',
             desc: '',
             namespace: _this.props.match.params.namespace,
-            param: {},
+            params: {},
             submitable: true
         };
         return _this;
@@ -102,7 +95,7 @@ var Create = /** @class */ (function (_super) {
             var _this = this;
             return __generator(this, function (_b) {
                 switch (_b.label) {
-                    case 0: return [4 /*yield*/, _client_util_1.Api.getPhaseTemplates()];
+                    case 0: return [4 /*yield*/, util_1.Api.getPhaseTemplates()];
                     case 1:
                         _a = _b.sent(), code = _a.code, templates = _a.templates;
                         if (code !== share_1.ResponseCode.success) {
@@ -115,7 +108,7 @@ var Create = /** @class */ (function (_super) {
                         if (!template) {
                             return [2 /*return*/];
                         }
-                        _client_util_1.loadScript(template.jsUrl.split(';'), function () {
+                        util_1.loadScript(template.jsUrl.split(';'), function () {
                             return _this.setState({
                                 loading: false
                             });
@@ -127,23 +120,23 @@ var Create = /** @class */ (function (_super) {
     };
     Create.prototype.handleSubmit = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, lang, history, _b, title, desc, namespace, param, _c, code, gameId;
+            var _a, lang, history, _b, title, desc, namespace, params, _c, code, gameId;
             return __generator(this, function (_d) {
                 switch (_d.label) {
                     case 0:
-                        _a = this, lang = _a.lang, history = _a.props.history, _b = _a.state, title = _b.title, desc = _b.desc, namespace = _b.namespace, param = _b.param;
+                        _a = this, lang = _a.lang, history = _a.props.history, _b = _a.state, title = _b.title, desc = _b.desc, namespace = _b.namespace, params = _b.params;
                         if (!title || !desc) {
-                            return [2 /*return*/, _antd_component_1.message.warn(lang.invalidBaseInfo)];
+                            return [2 /*return*/, antd_1.message.warn(lang.invalidBaseInfo)];
                         }
-                        return [4 /*yield*/, _client_util_1.Api.postNewGame(title, desc, namespace, param)];
+                        return [4 /*yield*/, util_1.Api.postNewGame(title, desc, namespace, params)];
                     case 1:
                         _c = _d.sent(), code = _c.code, gameId = _c.gameId;
                         if (code === share_1.ResponseCode.success) {
-                            _antd_component_1.message.success(lang.createSuccess);
+                            antd_1.message.success(lang.createSuccess);
                             history.push("/info/" + gameId);
                         }
                         else {
-                            _antd_component_1.message.error(lang.submitFailed);
+                            antd_1.message.error(lang.submitFailed);
                         }
                         return [2 /*return*/];
                 }
@@ -152,17 +145,17 @@ var Create = /** @class */ (function (_super) {
     };
     Create.prototype.updatePhase = function (newParam) {
         this.setState(function (_a) {
-            var param = _a.param;
+            var params = _a.params;
             return ({
-                param: __assign({}, param, newParam)
+                params: __assign({}, params, newParam)
             });
         });
     };
     Create.prototype.render = function () {
         var _this = this;
-        var _a = this, lang = _a.lang, _b = _a.state, loading = _b.loading, namespace = _b.namespace, param = _b.param, title = _b.title, desc = _b.desc, submitable = _b.submitable;
+        var _a = this, lang = _a.lang, _b = _a.state, loading = _b.loading, namespace = _b.namespace, params = _b.params, title = _b.title, desc = _b.desc, submitable = _b.submitable;
         if (loading) {
-            return react_1.default.createElement(_client_component_1.Loading, null);
+            return react_1.default.createElement(component_1.Loading, null);
         }
         var Create = index_1.phaseTemplates[namespace].Create;
         return react_1.default.createElement("section", { style: {
@@ -172,13 +165,13 @@ var Create = /** @class */ (function (_super) {
                 background: 'white'
             } },
             react_1.default.createElement("br", null),
-            react_1.default.createElement(_antd_component_1.Input, { value: title, placeholder: lang.title, maxLength: '20', onChange: function (_a) {
+            react_1.default.createElement(antd_1.Input, { value: title, placeholder: lang.title, maxLength: '20', onChange: function (_a) {
                     var title = _a.target.value;
                     return _this.setState({ title: title });
                 } }),
             react_1.default.createElement("br", null),
             react_1.default.createElement("br", null),
-            react_1.default.createElement(_antd_component_1.Input.TextArea, { value: desc, maxLength: 500, autosize: { minRows: 4, maxRows: 8 }, placeholder: lang.desc, onChange: function (_a) {
+            react_1.default.createElement(antd_1.Input.TextArea, { value: desc, maxLength: 500, autosize: { minRows: 4, maxRows: 8 }, placeholder: lang.desc, onChange: function (_a) {
                     var desc = _a.target.value;
                     return _this.setState({ desc: desc });
                 } }),
@@ -187,16 +180,13 @@ var Create = /** @class */ (function (_super) {
             react_1.default.createElement(Create, __assign({}, {
                 submitable: submitable,
                 setSubmitable: function (submitable) { return _this.setState({ submitable: submitable }); },
-                params: param,
+                params: params,
                 setParams: function (params) { return _this.updatePhase(params); }
             })),
             submitable ?
                 react_1.default.createElement("div", { style: { textAlign: 'center' } },
-                    react_1.default.createElement(_antd_component_1.Button, { type: 'primary', onClick: function () { return _this.handleSubmit(); } }, lang.submit)) : null);
+                    react_1.default.createElement(antd_1.Button, { type: 'primary', onClick: function () { return _this.handleSubmit(); } }, lang.submit)) : null);
     };
-    Create = __decorate([
-        _client_util_1.connCtx(_client_context_1.rootContext)
-    ], Create);
     return Create;
 }(react_1.default.Component));
 exports.Create = Create;

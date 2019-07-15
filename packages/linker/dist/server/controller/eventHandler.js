@@ -37,33 +37,26 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var _a;
 var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
-var _common_1 = require("@common");
-var _server_service_1 = require("@server-service");
+var linker_share_1 = require("linker-share");
+var service_1 = require("../service");
 var share_1 = require("@elf/share");
 exports.EventHandler = (_a = {},
-    _a[_common_1.SocketEvent.upFrame] = function (connection, frame, data, cb) { return __awaiter(_this, void 0, void 0, function () {
-        var actor, game, stateManager, _a;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
+    _a[linker_share_1.SocketEvent.joinRoom] = function (connection) { return __awaiter(_this, void 0, void 0, function () {
+        var actor, game, stateManager;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
                 case 0:
                     actor = connection.actor, game = connection.game;
-                    return [4 /*yield*/, _server_service_1.StateManager.getManager(game.id)];
+                    return [4 /*yield*/, service_1.StateManager.getManager(game.id)];
                 case 1:
-                    stateManager = _b.sent();
-                    _a = frame;
-                    switch (_a) {
-                        case _common_1.NFrame.UpFrame.joinRoom: return [3 /*break*/, 2];
-                    }
-                    return [3 /*break*/, 5];
-                case 2:
+                    stateManager = _a.sent();
                     connection.join(game.id);
-                    if (!(actor.type !== share_1.Actor.owner)) return [3 /*break*/, 4];
+                    if (!(actor.type !== share_1.Actor.owner)) return [3 /*break*/, 3];
                     return [4 /*yield*/, stateManager.joinRoom(actor)];
+                case 2:
+                    _a.sent();
+                    _a.label = 3;
                 case 3:
-                    _b.sent();
-                    _b.label = 4;
-                case 4: return [3 /*break*/, 5];
-                case 5:
                     stateManager.broadcastState();
                     return [2 /*return*/];
             }

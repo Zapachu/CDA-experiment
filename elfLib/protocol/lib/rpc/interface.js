@@ -1,28 +1,29 @@
 "use strict";
 exports.__esModule = true;
-//region Elf
-var PhaseReg;
-(function (PhaseReg) {
-    PhaseReg.intervalSeconds = 10;
-    PhaseReg.key = function (namespace) { return "Elf:PhaseReg:" + namespace; };
-})(PhaseReg = exports.PhaseReg || (exports.PhaseReg = {}));
-var NewPhase;
-(function (NewPhase) {
-    NewPhase.name = function (namespace) { return "Elf:NewPhase:" + namespace; };
-})(NewPhase = exports.NewPhase || (exports.NewPhase = {}));
-var SetPlayerResult;
-(function (SetPlayerResult) {
-    SetPlayerResult.name = 'Elf:SetPlayerResult';
-})(SetPlayerResult = exports.SetPlayerResult || (exports.SetPlayerResult = {}));
-//endregion
-//region Trial
-var CreateGame;
-(function (CreateGame) {
-    CreateGame.name = function (namespace) { return "Trial:" + namespace + ":CreateGame"; };
-    CreateGame.playerLimit = 12;
-})(CreateGame = exports.CreateGame || (exports.CreateGame = {}));
-var GameOver;
-(function (GameOver) {
-    GameOver.name = 'Trial:GameOver';
-})(GameOver = exports.GameOver || (exports.GameOver = {}));
-//endregion
+var Linker;
+(function (Linker) {
+    var HeartBeat;
+    (function (HeartBeat) {
+        HeartBeat.intervalSeconds = 10;
+        HeartBeat.key = function (namespace) { return "Linker:HeartBeat:" + namespace; };
+    })(HeartBeat = Linker.HeartBeat || (Linker.HeartBeat = {}));
+    var Create;
+    (function (Create) {
+        Create.name = function (namespace) { return "Linker:Create:" + namespace; };
+    })(Create = Linker.Create || (Linker.Create = {}));
+    var Result;
+    (function (Result) {
+        Result.name = 'Linker:Result';
+    })(Result = Linker.Result || (Linker.Result = {}));
+})(Linker = exports.Linker || (exports.Linker = {}));
+var Trial;
+(function (Trial) {
+    var Create;
+    (function (Create) {
+        Create.name = function (namespace) { return "Trial:Create:" + namespace; };
+    })(Create = Trial.Create || (Trial.Create = {}));
+    var Done;
+    (function (Done) {
+        Done.name = 'Trial:Done';
+    })(Done = Trial.Done || (Trial.Done = {}));
+})(Trial = exports.Trial || (exports.Trial = {}));
