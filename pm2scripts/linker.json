@@ -1,5 +1,5 @@
 {
-  "script": "../packages/linker/dist/server/server.js",
+  "script": "../packages/linker/dist/backend/server.js",
   "name": "linker",
   "env": {
     "NODE_ENV": "production"
