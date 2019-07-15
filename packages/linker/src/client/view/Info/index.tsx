@@ -1,11 +1,12 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {IBaseGameWithId, baseEnum} from '@common'
+import {IBaseGameWithId} from '@common'
 import {Api, connCtx, Lang} from '@client-util'
 import {RouteComponentProps} from 'react-router'
 import {Button, Card, message} from '@antd-component'
 import {rootContext, TRootContext} from '@client-context'
 import {Loading} from '@client-component'
+import {ResponseCode} from '@elf/share'
 
 declare interface IInfoState {
     loading: boolean
@@ -44,40 +45,20 @@ export class Info extends React.Component<TRootContext & RouteComponentProps<{ g
         if (loading || !user) {
             return <Loading/>
         }
-        const btn4Teacher = <ul>
-                <li>
-                    <Button type={'primary'}
-                            block={true}
-                            onClick={() => history.push(`/play/${game.id}`)}>{lang.enterPlayRoom}</Button>
-                </li>
-                <li>
-                    <Button type={'primary'}
-                            block={true}
-                            onClick={() => history.push(`/player/${game.id}`)}>{lang.playerList}</Button>
-                </li>
-                <li>
-                    <Button type={'primary'}
-                            block={true}
-                            onClick={() => history.push(`/share/${game.id}`)}>{lang.share}</Button>
-                </li>
-            </ul>,
-            btn4Student = <Button
-                type={'primary'}
-                onClick={async () => {
-                    const {code} = await Api.joinGame(game.id)
-                    if (code === baseEnum.ResponseCode.success) {
-                        await message.success(lang.joinSuccess)
-                        history.push(`/play/${game.id}`)
-                    }
-                }}>{lang.joinGame}</Button>
         return <section className={style.info}>
             <Card title={game.title}>
                 {game.desc}
             </Card>
             <div className={style.buttonWrapper}>
-                {
-                    user.id === game.owner ? btn4Teacher : btn4Student
-                }
+                <Button
+                    type={'primary'}
+                    onClick={async () => {
+                        const {code} = await Api.joinGame(game.id)
+                        if (code === ResponseCode.success) {
+                            await message.success(lang.joinSuccess)
+                            history.push(`/play/${game.id}`)
+                        }
+                    }}>{lang.joinGame}</Button>
             </div>
         </section>
     }

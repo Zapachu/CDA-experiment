@@ -1,25 +1,16 @@
-import {
-    config,
-    baseEnum,
-    IGameWithId,
-    IActor,
-    IBaseGameWithId,
-    IUserWithId,
-    IGameToUpdate,
-    IPhaseConfig,
-    TApiPlayerResults
-} from '@common'
+import {config, IBaseGameWithId, IGameWithId, ILinkerActor, IUserWithId, RequestMethod} from '@common'
 import {getCookie} from '@client-util'
 import * as queryString from 'query-string'
+import {ResponseCode} from '@elf/share'
 
 const baseFetchOption = {
     credentials: 'include',
-    method: baseEnum.RequestMethod.get,
+    method: RequestMethod.get,
     headers: {'Content-Type': 'application/json; charset=utf-8'},
     cache: 'default'
 }
 
-async function request(url, method: baseEnum.RequestMethod = baseEnum.RequestMethod.get, data = null): Promise<any> {
+async function request(url, method: RequestMethod = RequestMethod.get, data = null): Promise<any> {
     let option = {
         ...baseFetchOption,
         method,
@@ -50,12 +41,12 @@ export async function GET(url: string, params = {}, query = {}): Promise<any> {
 
 export async function POST(url: string, params = {}, query = {}, data = {}): Promise<any> {
     return await request(`${buildPath(url, params)}?${queryString.stringify(query)}`,
-        baseEnum.RequestMethod.post, {...data, _csrf: getCookie(config.cookieKey.csrf)})
+        RequestMethod.post, {...data, _csrf: getCookie(config.cookieKey.csrf)})
 }
 
 /******************  API request methods *************************/
 interface IHttpRes {
-    code: baseEnum.ResponseCode
+    code: ResponseCode
 }
 
 interface ITemplateRegInfo {
@@ -93,33 +84,17 @@ export class Request {
         return await GET('/game/list', {}, {page})
     }
 
-    static async getPhaseTemplates(orgCode: string): Promise<IHttpRes & {
+    static async getPhaseTemplates(): Promise<IHttpRes & {
         templates: Array<ITemplateRegInfo>
     }> {
-        let namespaces = ''
-        try {
-            const authorizedRes = await this.getAuthorizedTemplates(orgCode)
-            if (authorizedRes.code === baseEnum.AcademusResCode.success) {
-                namespaces = authorizedRes.namespaces.toString()
-            }
-        } catch (e) {
-        }
-        return await GET('/game/phaseTemplates', null, {namespaces})
+        return await GET('/game/phaseTemplates')
     }
 
-    static async postNewGame(title: string, desc: string, mode: baseEnum.GameMode, phaseConfigs?: Array<IPhaseConfig<{}>>): Promise<IHttpRes & {
+    static async postNewGame(title: string, desc: string, namespace: string, param: {}): Promise<IHttpRes & {
         gameId: string
     }> {
         return await POST('/game/create', null, null, {
-            title, desc, mode, phaseConfigs
-        })
-    }
-
-    static async postEditGame(gameId: string, toUpdate: IGameToUpdate): Promise<IHttpRes & {
-        game: IGameWithId
-    }> {
-        return await POST('/game/edit/:gameId', {gameId}, null, {
-            toUpdate
+            title, desc, namespace, param
         })
     }
 
@@ -127,17 +102,7 @@ export class Request {
         return await GET('/game/share/:gameId', {gameId})
     }
 
-    static async getActor(gameId: string, token: string = ''): Promise<IHttpRes & { actor: IActor }> {
+    static async getActor(gameId: string, token: string = ''): Promise<IHttpRes & { actor: ILinkerActor }> {
         return await GET('/game/actor/:gameId', {gameId}, {token})
-    }
-
-    static async getPlayerResult(gameId: string, playerId: string):Promise<IHttpRes & {results:TApiPlayerResults}> {
-        return await GET('/game/playerResult', null, {gameId, playerId})
-    }
-
-    /**** V5 ****/
-
-    static async getAuthorizedTemplates(orgCode: string): Promise<{ code: baseEnum.AcademusResCode, namespaces: Array<string> }> {
-        return await request(`/v5/apiv5/${orgCode}/researcher/game/gametpl/myList`)
     }
 }

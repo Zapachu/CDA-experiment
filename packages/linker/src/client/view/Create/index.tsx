@@ -1,17 +1,19 @@
 import React from 'react'
-import {Api, connCtx, genePhaseKey, Lang, loadScript} from '@client-util'
+import {Api, connCtx, Lang, loadScript} from '@client-util'
 import {Loading} from '@client-component'
 import {RouteComponentProps} from 'react-router'
-import {baseEnum, CorePhaseNamespace, IPhaseConfig} from '@common'
 import {phaseTemplates} from '../../index'
 import {Button, Input, message} from '@antd-component'
 import {rootContext, TRootContext} from '@client-context'
+import {ResponseCode} from '@elf/share'
 
 interface ICreateState {
     loading: boolean
     title: string
     desc: string
-    phaseConfig: IPhaseConfig
+    namespace: string
+    param: {},
+    submitable: boolean
 }
 
 @connCtx(rootContext)
@@ -31,18 +33,14 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
         loading: true,
         title: '',
         desc: '',
-        phaseConfig: {
-            key: genePhaseKey(),
-            title: ``,
-            namespace: this.props.match.params.namespace,
-            param: {},
-            suffixPhaseKeys: []
-        }
+        namespace: this.props.match.params.namespace,
+        param: {},
+        submitable: true
     }
 
     async componentDidMount() {
-        const {code, templates} = await Api.getPhaseTemplates(this.props.user.orgCode)
-        if (code !== baseEnum.ResponseCode.success) {
+        const {code, templates} = await Api.getPhaseTemplates()
+        if (code !== ResponseCode.success) {
             return
         }
         const template = templates.find(({namespace}) => namespace === this.props.match.params.namespace)
@@ -57,28 +55,12 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
     }
 
     async handleSubmit() {
-        const {lang, props: {history}, state: {phaseConfig, title, desc}} = this
+        const {lang, props: {history}, state: {title, desc, namespace, param}} = this
         if (!title || !desc) {
             return message.warn(lang.invalidBaseInfo)
         }
-        const startPhase = {
-            key: CorePhaseNamespace.start,
-            title: lang.start,
-            namespace: CorePhaseNamespace.start,
-            param: {firstPhaseKey: phaseConfig.key},
-            suffixPhaseKeys: [phaseConfig.key]
-        }
-        const endPhase = {
-            key: CorePhaseNamespace.end,
-            title: lang.end,
-            namespace: CorePhaseNamespace.end,
-            param: {},
-            suffixPhaseKeys: []
-        }
-        phaseConfig.suffixPhaseKeys = [endPhase.key]
-        const phaseConfigs = [startPhase, phaseConfig, endPhase]
-        const {code, gameId} = await Api.postNewGame(title, desc, baseEnum.GameMode.easy, phaseConfigs)
-        if (code === baseEnum.ResponseCode.success) {
+        const {code, gameId} = await Api.postNewGame(title, desc, namespace, param)
+        if (code === ResponseCode.success) {
             message.success(lang.createSuccess)
             history.push(`/info/${gameId}`)
         } else {
@@ -86,30 +68,28 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
         }
     }
 
-    updatePhase(param: {}) {
-        const {state: {phaseConfig: config}} = this
-        const phaseConfig = {...config, param: {...config.param, ...param}}
-        this.setState({
-            phaseConfig
-        })
+    updatePhase(newParam: {}) {
+        this.setState(({param}) => ({
+            param: {...param, ...newParam}
+        }))
     }
 
     render(): React.ReactNode {
-        const {lang, state: {loading, phaseConfig, title, desc}} = this
+        const {lang, state: {loading, namespace, param, title, desc, submitable}} = this
         if (loading) {
             return <Loading/>
         }
-        const {Create} = phaseTemplates[phaseConfig.namespace]
+        const {Create} = phaseTemplates[namespace]
         return <section style={{
             maxWidth: '64rem',
             margin: '1rem auto',
-            padding:'1rem 1.5rem',
-            background:'white'
+            padding: '1rem 1.5rem',
+            background: 'white'
         }}>
             <br/>
             <Input value={title}
                    placeholder={lang.title}
-                   maxLength={20}
+                   maxLength='20'
                    onChange={({target: {value: title}}) => this.setState({title})}/>
             <br/><br/>
             <Input.TextArea value={desc}
@@ -119,15 +99,17 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
                             onChange={({target: {value: desc}}) => this.setState({desc})}/>
             <br/><br/>
             <Create {...{
-                key: phaseConfig ? phaseConfig.key : '',
-                phases: [],
-                curPhase: phaseConfig,
-                updatePhase: (suffixPhaseKeys: Array<string>, param: {}) => this.updatePhase(param),
-                highlightPhases: () => console.log('highlight')
+                submitable,
+                setSubmitable: submitable => this.setState({submitable}),
+                params: param,
+                setParams: params => this.updatePhase(params)
             }}/>
-            <div style={{textAlign: 'center'}}>
-                <Button type='primary' onClick={() => this.handleSubmit()}>{lang.submit}</Button>
-            </div>
+            {
+                submitable ?
+                    <div style={{textAlign: 'center'}}>
+                        <Button type='primary' onClick={() => this.handleSubmit()}>{lang.submit}</Button>
+                    </div> : null
+            }
         </section>
     }
 }

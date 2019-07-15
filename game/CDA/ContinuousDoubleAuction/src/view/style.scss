@@ -1,0 +1,235 @@
+@import "~@elf/component/lib/public";
+
+.blankMsg {
+  @include blankMsg;
+}
+
+.create {
+  margin: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  .phases {
+    width: 100%;
+    .phase {
+      margin: 1rem 1rem 2rem;
+      text-align: center;
+      animation: easyIn .2s linear;
+      .phaseTitle {
+        color: rgba($color-black, .6);
+        font-size: $fontSize-middle;
+        position: relative;
+        top: -.8 * $fontSize-middle;
+        padding: 0 3rem;
+      }
+      .createWrapper {
+        .marketBtns {
+          display: flex;
+          justify-content: flex-end;
+          li {
+            cursor: pointer;
+            text-align: right;
+            transition: all 0.2s linear;
+            margin: 0 1rem 1rem 0;
+            color: rgba($color-blue, .8);
+            font-size: .8rem;
+            &:hover {
+              color: $color-blue;
+              text-decoration: underline;
+            }
+            &.btnRemove {
+              color: $color-red;
+            }
+          }
+        }
+      }
+    }
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.player4Owner {
+  display: flex;
+  justify-content: center;
+  .playerStatusTable {
+    tr {
+      td {
+        min-width: 5rem;
+        padding: .5rem;
+        text-align: center;
+      }
+      &:nth-child(even) {
+        background: rgba($color-black, .05);
+      }
+    }
+  }
+  .assignPosition{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .btnWrapper{
+        margin-top: 1rem;
+        .inGameNum {
+          display: flex;
+          justify-content: center;
+        }
+    }
+  }
+  .mainGame {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    .timer {
+      color: rgba($color-black, .8);
+      em {
+        font-size: $fontSize-large;
+        color: $color-blue;
+        margin: .5rem;
+      }
+    }
+    .marketInfo {
+      display: flex;
+      align-items: center;
+      width: 40rem;
+      .orderList {
+        width: 75%;
+        ul {
+          display: flex;
+          align-items: center;
+          justify-content: left;
+          label {
+            color: rgba($color-black, .8);
+            margin: .5rem .8rem;
+          }
+          li {
+            padding: 0 .5rem;
+            border-left: 1px solid rgba($color-black, .6);
+          }
+        }
+      }
+      .countdownLabel {
+        @extend .timer;
+      }
+    }
+    .chartPanel {
+      width: 80%;
+      max-width: 32rem;
+      margin: 0 auto;
+      .marketName {
+        @extend .timer;
+        display: block;
+        text-align: center;
+      }
+      .chartWrapper {
+        width: 100%;
+      }
+    }
+  }
+}
+
+.viewResult {
+  font-size: $fontSize-large;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.resultContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .keyFields {
+    li {
+      text-align: center;
+      margin: 1rem;
+      span {
+        color: $color-blue;
+        font-size: $fontSize-large;
+        display: inline-block;
+        width: 5rem;
+      }
+    }
+  }
+  .profitTable {
+    tr {
+      th, td {
+        text-align: center;
+        border: 1px solid;
+        padding: .5rem 1.5rem;
+      }
+    }
+  }
+}
+
+.result4OwnerContent {
+  em {
+    color: $color-red;
+    margin: 0 .5rem;
+  }
+}
+
+.result4Owner {
+  margin: 1rem 2rem;
+  .timeLine {
+    margin: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    label {
+      font-size: .8 * $fontSize-small;
+      color: rgba($color-black, .8);
+    }
+    input {
+      margin: .5rem;
+      min-width: 24rem;
+    }
+    .paramsLabel {
+      display: inline-block;
+      height: 1rem;
+      font-size: .8 * $fontSize-small;
+      color: rgba($color-black, .8);
+    }
+  }
+  .resultWrapper {
+    display: flex;
+    .resultTable {
+      tr {
+        td {
+          min-width: 5rem;
+          padding: .5rem;
+          text-align: center;
+        }
+        &:nth-child(even) {
+          background: rgba($color-black, .05);
+        }
+      }
+    }
+    .exportWrapper {
+      margin-left: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border-left: 1px solid rgba($color-black, .1);
+      label {
+        margin: .5rem;
+        font-size: .8 * $fontSize-small;
+        color: rgba($color-black, .8);
+      }
+      a {
+        display: inline-block;
+        margin: .5rem;
+        font-size: $fontSize-middle;
+        color: $color-blue;
+        text-align: center;
+        transition: $transition-normal;
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}

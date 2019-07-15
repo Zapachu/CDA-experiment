@@ -1,0 +1,27 @@
+{
+  "name": "thirdparty-phase-proxy",
+  "version": "1.1.1",
+  "repository": " ",
+  "scripts": {
+    "tsc": "tsc -w",
+    "build": "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./bin/script/webpack.ts",
+    "wjx:dist": "npm run build --phase=wjx --buildMode=dist",
+    "qqwj:dist": "npm run build --phase=qqwj --buildMode=dist",
+    "otree:dist": "npm run build --phase=otree --buildMode=dist",
+    "qualtrics:dist": "npm run build --phase=qualtrics --buildMode=dist",
+    "wjx": "ts-node ./lib/phases/wjx/server/app.ts",
+    "qqwj": "ts-node ./lib/phases/qqwj/server/app.ts",
+    "otree": "ts-node ./lib/phases/otree/server/app.ts",
+    "qualtrics": "ts-node ./lib/phases/qualtrics/server/app.ts",
+    "otreeProxy": "ts-node ./lib/phases/otreeProxy/app.ts"
+  },
+  "devDependencies": {
+    "@elf/register": "^1.1.1",
+    "@elf/protocol": "^1.1.1",
+    "@elf/setting": "^1.1.1",
+    "@elf/share": "^1.1.1",
+    "ts-node": "^8.0.3",
+    "typescript": "^3.3.3333",
+    "webpack": "^4.29.6"
+  }
+}

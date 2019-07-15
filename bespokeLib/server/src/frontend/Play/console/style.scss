@@ -1,0 +1,143 @@
+@import "public";
+
+.blankMsg {
+  @include blankMsg;
+}
+
+.gameControl {
+  padding: 1rem 2rem 2rem;
+  background: white;
+  border-bottom: $borderLine;
+
+  .headBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    border-bottom: $borderLine;
+
+    .gameStatus {
+      width: 12rem;
+
+      span {
+        padding: 0 1rem;
+        color: rgba($color-black, .8);
+      }
+
+      @media (max-width: $layout-mediaWidth) {
+        display: none;
+      }
+    }
+
+    .gameTitle {
+      font-size: $fontSize-middle;
+      label{
+        @media (max-width: $layout-mediaWidth) {
+          display: none;
+        }
+      }
+      span {
+        padding: 0 1rem;
+        color: rgba($color-black, .8);
+        @media (max-width: $layout-mediaWidth) {
+          max-width: 5rem;
+          overflow: hidden;
+          display: inline-block;
+        }
+      }
+    }
+
+    .btnGroup {
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
+
+  .players {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    .simulatePlayer {
+      flex-basis: 60%;
+      margin: 1rem;
+      user-select: none;
+
+      .header {
+        display: flex;
+        justify-content: center;
+
+        .addWrapper {
+          margin-left: 2rem;
+
+          input {
+            width: 5rem;
+            border: none;
+            border-bottom: 1px solid rgba($color-blue, .7);
+            outline: none;
+            text-align: center;
+          }
+
+          span {
+            color: $color-blue;
+
+            &:hover {
+              cursor: pointer;
+            }
+          }
+        }
+      }
+
+      .playerNames {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        margin: 1rem;
+        min-height: 4rem;
+
+        a {
+          min-width: 4rem;
+          color: $color-black;
+          text-align: center;
+          transition: $transition-normal;
+
+          &:hover {
+            color: $color-blue;
+            text-decoration: underline;
+          }
+
+          &.startAll {
+            color: $color-blue;
+            font-size: $fontSize-small;
+          }
+        }
+      }
+
+      @media (max-width: $layout-mediaWidth) {
+        flex-basis: 100%;
+      }
+    }
+
+    .onlinePlayers {
+      display: flex;
+      align-items: center;
+      .onlinePlayersCount {
+        span{
+          margin: 1rem;
+          font-size: $fontSize-large;
+          color: $color-blue;
+        }
+      }
+    }
+  }
+
+  .statusSwitcher {
+    flex-basis: 40%;
+    border-right: 1px solid rgba($color-black, .1);
+
+    .switcherWrapper {
+      margin-top: 2rem;
+      display: flex;
+      justify-content: center;
+    }
+  }
+}

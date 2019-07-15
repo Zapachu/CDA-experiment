@@ -1,0 +1,45 @@
+@import "~@elf/component/lib/public";
+
+.play {
+  padding: 1rem;
+  font-size: 16px;
+  .stage {
+    > :global(.ant-row) {
+      margin-bottom: 1rem;
+    }
+  }
+  .radio {
+    display: block;
+    height: 30px;
+    line-height: 30px;
+  }
+  .question {
+    margin-bottom: 1rem;
+  }
+  .info {
+    margin-bottom: 1rem;
+    > label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    > input {
+      max-width: 300px;
+    }
+  }
+}
+
+.play4Owner {
+  padding: 1rem;
+  .exportBtn {
+    display: block;
+    margin-bottom: 1rem;
+  }
+  .btnContainer {
+    margin: 1rem 0;
+  }
+  // .table {
+  //   :global(.ant-pagination-item-link) {
+  //     padding-top: 9px;
+  //   }
+  // }
+}

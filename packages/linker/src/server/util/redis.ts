@@ -1,5 +1,5 @@
 import * as IORedis from 'ioredis'
-import {elfSetting} from 'elf-setting'
+import {elfSetting} from '@elf/setting'
 
 export const redisClient = new IORedis(elfSetting.redisPort, elfSetting.redisHost)
     .on('error', (err) => {

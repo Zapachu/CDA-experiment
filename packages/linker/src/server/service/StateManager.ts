@@ -1,9 +1,9 @@
-import {baseEnum, CorePhaseNamespace, IActor, IGameState, IGameWithId, IPhaseConfig, IPhaseState, NFrame} from '@common'
+import {IGameState, IGameWithId, ILinkerActor, NFrame, PhaseStatus, PlayerStatus, SocketEvent} from '@common'
 import {GameService} from './GameService'
-import {GameStateDoc, GameStateModel, PhaseResultModel} from '@server-model'
+import {GameStateDoc, GameStateModel, PlayerModel} from '@server-model'
 import {EventDispatcher} from '../controller/eventDispatcher'
-import {Log} from '@server-util'
-import {NewPhase, RedisCall, SetPhaseResult} from 'elf-protocol'
+import {Log} from '@elf/util'
+import {NewPhase, RedisCall, SetPlayerResult} from '@elf/protocol'
 
 const stateManagers: { [gameId: string]: StateManager } = {}
 
@@ -21,37 +21,6 @@ export class StateManager {
     constructor(public game: IGameWithId) {
     }
 
-    private async newPhase(phaseCfg: IPhaseConfig): Promise<IPhaseState> {
-        if (phaseCfg.namespace === CorePhaseNamespace.start) {
-            const {firstPhaseKey} = phaseCfg.param as any,
-                firstPhaseCfg = this.game.phaseConfigs.find(({key}) => key === firstPhaseKey)
-            return await this.newPhase(firstPhaseCfg)
-        }
-        if (phaseCfg.namespace === CorePhaseNamespace.end) {
-            return Promise.resolve({
-                key: phaseCfg.key,
-                status: baseEnum.PhaseStatus.playing,
-                playerState: {}
-            })
-        }
-        const {namespace, key, param} = phaseCfg
-        const res = await RedisCall.call<NewPhase.IReq, NewPhase.IRes>(NewPhase.name(namespace), {
-            owner: this.game.owner,
-            elfGameId: this.game.id,
-            namespace,
-            param: JSON.stringify(param)
-        })
-        if (!res) {
-            Log.e(`Call:NewPhase Error  ${namespace}`)
-        }
-        return {
-            key,
-            status: baseEnum.PhaseStatus.playing,
-            playUrl: res.playUrl,
-            playerState: {}
-        }
-    }
-
     async init(): Promise<StateManager> {
         await this.initState()
         return this
@@ -63,88 +32,51 @@ export class StateManager {
             this.gameState = gameStateDoc.data
             return
         }
+        const {namespace, param} = this.game
+        const {playUrl} = await RedisCall.call<NewPhase.IReq, NewPhase.IRes>(NewPhase.name(namespace), {
+            owner: this.game.owner,
+            elfGameId: this.game.id,
+            namespace,
+            param: JSON.stringify(param)
+        })
         this.gameState = {
             gameId: this.game.id,
-            phaseStates: []
+            status: PhaseStatus.playing,
+            playUrl,
+            playerState: {}
         }
-        const startPhaseCfg = this.game.phaseConfigs.find(({namespace}) => namespace === CorePhaseNamespace.start)
-        const phaseState = await this.newPhase(startPhaseCfg)
-        this.gameState.phaseStates.push(phaseState)
         await new GameStateModel({gameId: this.game.id, data: this.gameState}).save()
     }
 
-    async joinRoom(actor: IActor): Promise<void> {
-        const {gameState: {phaseStates}} = this
-        if (phaseStates.length === 1 && phaseStates[0].playerState[actor.token] === undefined) {
-            phaseStates[0].playerState[actor.token] = {
+    async joinRoom(actor: ILinkerActor): Promise<void> {
+        const {gameState: {playerState}} = this
+        if (playerState[actor.token] === undefined) {
+            playerState[actor.token] = {
                 actor,
-                status: baseEnum.PlayerStatus.playing
+                status: PlayerStatus.playing
             }
         }
     }
 
-    async setPhaseResult(playUrl: string, playerToken: string, phaseResult: SetPhaseResult.IPhaseResult): Promise<void> {
-        const {game: {phaseConfigs}, gameState: {phaseStates}} = this
-        const curPhaseState = phaseStates.find(phaseState => phaseState.playUrl === playUrl),
-            curPhaseCfgIndex = phaseConfigs.findIndex(phaseCfg => phaseCfg.key === curPhaseState.key),
-            playerCurPhaseState = curPhaseState.playerState[playerToken]
-        playerCurPhaseState.phaseResult = {...playerCurPhaseState.phaseResult, ...phaseResult}
-        if (!playerCurPhaseState || playerCurPhaseState.status === baseEnum.PlayerStatus.left) {
+    async setPlayerResult(playUrl: string, playerToken: string, result: SetPlayerResult.IResult): Promise<void> {
+        const {gameState} = this
+        const playerCurPhaseState = gameState.playerState[playerToken]
+        if (!playerCurPhaseState) {
+            return
+        }
+        playerCurPhaseState.result = {...playerCurPhaseState.result, ...result}
+        if (!playerCurPhaseState || playerCurPhaseState.status === PlayerStatus.left) {
             Log.w('玩家不在此环节中')
         }
-        const query = {gameId: this.game.id, playerId: playerCurPhaseState.actor.playerId}
-        await PhaseResultModel.findOneAndUpdate(query, {
-            ...query,
-            phaseName: phaseConfigs[curPhaseCfgIndex].title,
-            ...playerCurPhaseState.phaseResult
-        }, {
-            upsert: true
-        })
-    }
-
-    async sendBackPlayer(playUrl: string, playerToken: string, nextPhaseKey: string, phaseResult: SetPhaseResult.IPhaseResult): Promise<void> {
-        const {game: {phaseConfigs}, gameState: {phaseStates}} = this
-
-        let nextPhaseState: IPhaseState
-        const createNextPhase = async (phaseCfg: IPhaseConfig) => {
-            nextPhaseState = await this.newPhase(phaseCfg)
-            phaseStates.push(nextPhaseState)
-        }
-        const curPhaseState = phaseStates.find(phaseState => phaseState.playUrl === playUrl),
-            curPhaseCfgIndex = phaseConfigs.findIndex(phaseCfg => phaseCfg.key === curPhaseState.key),
-            playerCurPhaseState = curPhaseState.playerState[playerToken]
-        if (!playerCurPhaseState || playerCurPhaseState.status === baseEnum.PlayerStatus.left) {
-            Log.w('玩家不在此环节中')
-        }
-        playerCurPhaseState.status = baseEnum.PlayerStatus.left
-        await this.setPhaseResult(playUrl, playerToken, phaseResult)
-        let nextPhaseCfg = phaseConfigs.find(phaseCfg => phaseCfg.key === nextPhaseKey)
-        if (!nextPhaseCfg) {
-            if (curPhaseCfgIndex === phaseConfigs.length - 1) {
-                return
-            }
-            nextPhaseCfg = phaseConfigs[curPhaseCfgIndex + 1]
-        }
-        if (nextPhaseCfg.key === curPhaseState.key) {
-            curPhaseState.status = baseEnum.PhaseStatus.closed
-            await createNextPhase(nextPhaseCfg)
-        } else {
-            nextPhaseState = phaseStates.find(({key, status}) =>
-                key === nextPhaseKey && status !== baseEnum.PhaseStatus.closed)
-            if (!nextPhaseState) {
-                await createNextPhase(nextPhaseCfg)
-            }
-        }
-        nextPhaseState.playerState[playerToken] = {
-            actor: playerCurPhaseState.actor,
-            status: baseEnum.PlayerStatus.playing
-        }
+        PlayerModel.findByIdAndUpdate(playerCurPhaseState.actor.playerId, {
+            result: result
+        }, err => err && Log.e(err))
     }
 
     broadcastState() {
         Log.d(JSON.stringify(this.gameState))
         EventDispatcher.socket.in(this.game.id)
-            .emit(baseEnum.SocketEvent.downFrame, NFrame.DownFrame.syncGameState, this.gameState)
+            .emit(SocketEvent.downFrame, NFrame.DownFrame.syncGameState, this.gameState)
         GameStateModel.findOneAndUpdate({gameId: this.game.id}, {
             $set: {
                 data: this.gameState,

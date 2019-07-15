@@ -1,0 +1,94 @@
+@import "~@elf/component/lib/public";
+
+.play {
+  display: inline-block;
+  min-height: 100vh;
+  width: 100vw;
+  background: radial-gradient(#293567, #151b35);
+
+  .item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+
+  .introStage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10vh;
+    p {
+      color: #dde1e9;
+    }
+    .mask {
+      position: fixed;
+      background-color: #080d25;
+      pointer-events: none;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 100;
+      opacity: 0.8;
+    }
+  }
+
+  .playingStage {
+    p,
+    td {
+      color: #dde1e9;
+    }
+    max-width: 800px;
+    margin: auto;
+    .inputContainer {
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: center;
+    }
+    .modalIpo {
+      padding: 30px;
+      > .title {
+        text-align: center;
+      }
+    }
+    .operation {
+      padding: 1px 8px 1px 8px;
+      border: 1px solid transparent;
+      border-radius: 30%;
+      background-color: #11234C;
+      color: #65749C;
+      font-size: 11px;
+      cursor: pointer;
+      &:first-child {
+        margin-right: 5px;
+      }
+    }
+    .leftBtn {
+      position: fixed;
+      right: 15vw;
+      top: 48vh;
+    }
+    .rightBtn {
+      position: fixed;
+      right: 15vw;
+      top: 55vh;
+    }
+  }
+}
+
+@media(max-width: 768px) {
+  .play {
+    .playingStage {
+      .leftBtn {
+        top: 10px;
+        right: 55vw;
+      }
+      .rightBtn {
+        top: 10px;
+        right: 10vw;
+      }
+    }
+  }
+}

@@ -1,22 +1,25 @@
 {
-  "name": "elf-linker",
-  "version": "1.0.0",
+  "name": "linker",
+  "version": "1.1.1",
   "author": "GuoKan",
   "repository": " ",
   "license": "ISC",
   "scripts": {
     "tsc-w": "tsc -w",
-    "install": "tsc & npm run client:dist",
-    "start": "node build/server/server",
+    "build": "tsc & npm run client:dist",
     "client:build": "webpack  --env.TS_NODE_PROJECT=\"tsconfig.json\"  --config ./src/client/script/webpack.ts",
     "client:dist": "npm run client:build --buildMode=dist",
-    "server:ts-serve": "ts-node ./src/server/server.ts"
+    "start": "ts-node ./src/server/server.ts"
   },
-  "devDependencies":  {
-    "typescript": "^3.3.3333",
-    "webpack": "^4.29.6",
+  "devDependencies": {
+    "@elf/component": "^1.1.1",
+    "@elf/register": "^1.1.1",
+    "@elf/share": "^1.1.1",
+    "@elf/util": "^1.1.1",
+    "@elf/protocol": "^1.1.1",
+    "@elf/setting": "^1.1.1",
     "ts-node": "^8.0.3",
-    "elf-protocol": "^1.0.0",
-    "elf-setting": "^1.0.0"
+    "typescript": "^3.3.3333",
+    "webpack": "^4.29.6"
   }
 }

@@ -1,5 +1,5 @@
 import {Document, Model, model, Schema} from 'mongoose'
-import {getModels, SetPhaseResult} from 'elf-protocol'
+import {getModels} from '@elf/protocol'
 import {IGame, IGameState, IPlayer, IUser} from '@common'
 
 const {String} = Schema.Types
@@ -25,18 +25,3 @@ export const GameStateModel: Model<GameStateDoc> = model('LinkerGameState', new 
     createAt: {type: Date, default: Date.now},
     updateAt: {type: Date, default: Date.now}
 }, {minimize: false}))
-
-export type PhaseResultDoc = {
-    gameId: string
-    playerId: string
-    phaseName: string
-} & SetPhaseResult.IPhaseResult & Document
-export const PhaseResultModel: Model<PhaseResultDoc> = model('LinkerPhaseResult', new Schema({
-    gameId: String,
-    playerId: String,
-    phaseName: String,
-    uniKey: String,
-    point: String,
-    detailIframeUrl: String,
-    createAt: {type: Date, default: Date.now}
-}))

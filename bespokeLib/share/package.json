@@ -1,0 +1,14 @@
+{
+  "name": "@bespoke/share",
+  "version": "1.1.1",
+  "main": "lib/index",
+  "types": "src/index",
+  "scripts": {
+    "tsc-w": "tsc -w",
+    "libc": "tsc"
+  },
+  "devDependencies": {
+    "@elf/share": "^1.1.1",
+    "typescript": "^3.3.3333"
+  }
+}

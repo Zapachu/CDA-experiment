@@ -1,6 +1,8 @@
-import {baseEnum, config} from '@common'
-import {Hash, redisClient, RedisKey} from '@server-util'
-import {Request, Response, NextFunction} from 'express'
+import {config, IActor} from '@common'
+import {redisClient, RedisKey} from '@server-util'
+import {NextFunction, Request, Response} from 'express'
+import {Token} from '@elf/util'
+import {AcademusRole, Actor, ResponseCode} from '@elf/share'
 import {GameService, PhaseService} from '@server-service'
 import {WebpackHmr} from '../util/WebpackHmr'
 import {PlayerService} from '../service/PlayerService'
@@ -19,7 +21,7 @@ export class UserCtrl {
     }
 
     static isTeacher(req, res: Response, next) {
-        req.user.role === baseEnum.AcademusRole.teacher ? next() : res.redirect(`/${config.rootName}/join`)
+        req.user.role === AcademusRole.teacher ? next() : res.redirect(`/${config.rootName}/join`)
     }
 
     static async isTemplateAccessible(req, res: Response, next) {
@@ -45,12 +47,12 @@ export class UserCtrl {
     static getUser(req, res: Response) {
         if (!req.isAuthenticated()) {
             res.json({
-                code: baseEnum.ResponseCode.notFound
+                code: ResponseCode.notFound
             })
         }
         const {user: {_id, name, role, mobile, orgCode}} = req
         res.json({
-            code: baseEnum.ResponseCode.success,
+            code: ResponseCode.success,
             user: {id: _id.toString(), name, role, mobile, orgCode}
         })
     }
@@ -60,33 +62,24 @@ export class GameCtrl {
     static async getPhaseTemplates(req, res: Response) {
         const templates = await PhaseService.getPhaseTemplates(req.user._id.toString())
         res.json({
-            code: baseEnum.ResponseCode.success,
+            code: ResponseCode.success,
             templates
         })
     }
 
     static async saveNewGame(req: Request, res: Response) {
-        const {body: {title, desc, mode, phaseConfigs}, user: {id: owner, orgCode}, session} = req
+        const {body: {title, desc, namespace, param}, user: {id: owner, orgCode}, session} = req
         const gameId = await GameService.saveGame({
             owner,
             orgCode: session.orgCode || orgCode,
             title,
             desc,
-            mode,
-            ...(phaseConfigs ? {phaseConfigs} : {})
+            namespace,
+            param
         })
         res.json({
-            code: baseEnum.ResponseCode.success,
+            code: ResponseCode.success,
             gameId
-        })
-    }
-
-    static async updateGame(req: Request, res: Response) {
-        const {params: {gameId}, body: {toUpdate}} = req
-        const game = await GameService.updateGame(gameId, toUpdate)
-        res.json({
-            code: baseEnum.ResponseCode.success,
-            game
         })
     }
 
@@ -94,7 +87,7 @@ export class GameCtrl {
         const {user: {_id}, query: {page = 0, pageSize = DEFAULT_PAGE_SIZE}} = req
         const {count, gameList} = await GameService.getGameList(_id, +page, +pageSize)
         res.json({
-            code: baseEnum.ResponseCode.success,
+            code: ResponseCode.success,
             count,
             gameList
         })
@@ -102,9 +95,9 @@ export class GameCtrl {
 
     static async getBaseGame(req: Request, res: Response) {
         const {gameId} = req.params
-        const {phaseConfigs, ...game} = await GameService.getGame(gameId)
+        const {param, ...game} = await GameService.getGame(gameId)
         res.json({
-            code: baseEnum.ResponseCode.success,
+            code: ResponseCode.success,
             game
         })
     }
@@ -113,7 +106,7 @@ export class GameCtrl {
         const {gameId} = req.params
         const game = await GameService.getGame(gameId)
         res.json({
-            code: baseEnum.ResponseCode.success,
+            code: ResponseCode.success,
             game
         })
     }
@@ -124,7 +117,7 @@ export class GameCtrl {
         const {title} = await GameService.getGame(gameId)
         if (shareCode) {
             return res.json({
-                code: baseEnum.ResponseCode.success,
+                code: ResponseCode.success,
                 title,
                 shareCode
             })
@@ -134,13 +127,13 @@ export class GameCtrl {
             await redisClient.setex(RedisKey.share_GameCode(gameId), SECONDS_PER_DAY, shareCode)
             await redisClient.setex(RedisKey.share_CodeGame(shareCode), SECONDS_PER_DAY, gameId)
             res.json({
-                code: baseEnum.ResponseCode.success,
+                code: ResponseCode.success,
                 title,
                 shareCode
             })
         } catch (e) {
             res.js({
-                code: baseEnum.ResponseCode.serverError
+                code: ResponseCode.serverError
             })
         }
     }
@@ -149,10 +142,10 @@ export class GameCtrl {
         const {body: {code}} = req
         const gameId = await redisClient.get(RedisKey.share_CodeGame(code))
         res.json(gameId ? {
-            code: baseEnum.ResponseCode.success,
+            code: ResponseCode.success,
             gameId
         } : {
-            code: baseEnum.ResponseCode.notFound
+            code: ResponseCode.notFound
         })
     }
 
@@ -165,35 +158,27 @@ export class GameCtrl {
             }
         } catch (e) {
             return res.json({
-                code: baseEnum.ResponseCode.serverError
+                code: ResponseCode.serverError
             })
         }
         return res.json({
-            code: baseEnum.ResponseCode.success
+            code: ResponseCode.success
         })
     }
 
     static async getActor(req, res) {
-        const {ResponseCode, Actor} = baseEnum
-        let {user, params: {gameId}, query: {token: queryToken}} = req, userId = user._id.toString()
+        const {user, params: {gameId}} = req, userId = user._id.toString()
         const game = await GameService.getGame(gameId), playerId = await PlayerService.findPlayerId(gameId, userId)
-        let token = Hash.isHash(queryToken) ? queryToken : userId === game.owner ? Hash.hashObj(userId) : Hash.hashObj(playerId)
-        let type = token === Hash.hashObj(userId) ? Actor.owner : Actor.player
-        req.session.token = token
-        req.session.playerId = playerId
+        const token = Token.geneToken(userId === game.owner ? userId : playerId),
+            type = userId === game.owner ? Actor.owner : Actor.player
+        req.session.actor = {
+            token,
+            type
+        } as IActor
         res.json({
             code: ResponseCode.success,
             game,
             actor: {token, type, playerId}
-        })
-    }
-
-    static async getPlayerResult(req, res) {
-        const {query: {gameId, playerId}} = req
-        const results = await GameService.getPlayerResult(gameId, playerId)
-        res.json({
-            code: baseEnum.ResponseCode.success,
-            results
         })
     }
 }

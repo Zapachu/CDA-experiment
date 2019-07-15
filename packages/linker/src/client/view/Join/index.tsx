@@ -1,8 +1,8 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {baseEnum} from '@common'
 import {RouteComponentProps} from 'react-router-dom'
 import {Api, Lang} from '@client-util'
+import {ResponseCode} from '@elf/share'
 import {message} from '@antd-component'
 import {CodePanel} from '@client-component'
 
@@ -16,7 +16,7 @@ export class Join extends React.Component<RouteComponentProps<{}>> {
         const {lang, props: {history}} = this
         const res = await Api.joinGameWithCode(code)
         switch (res.code) {
-            case baseEnum.ResponseCode.success: {
+            case ResponseCode.success: {
                 history.push(`/info/${res.gameId}`)
                 break
             }

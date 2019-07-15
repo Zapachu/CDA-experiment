@@ -2,7 +2,7 @@ import * as React from "react"
 
 export {Request as Api} from './request'
 export {loadScript} from './fileLoader'
-export {Lang, languageNames} from './language'
+export {Lang} from '@elf/component'
 
 export function getCookie(key: string) {
     return getCookies().find(str => str.startsWith(`${key}=`)).substring(key.length + 1)

@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "outDir": "./lib",
+    "module": "commonjs",
+    "target": "es5",
+    "lib": [
+      "esnext",
+      "dom",
+      "scripthost"
+    ],
+    "sourceMap": true,
+    "experimentalDecorators": true,
+    "noUnusedLocals": true,
+    "resolveJsonModule": true,
+    "downlevelIteration": true,
+    "jsx": "react"
+  },
+  "include": [
+    "src/backend",
+    "src/frontend"
+  ]
+}

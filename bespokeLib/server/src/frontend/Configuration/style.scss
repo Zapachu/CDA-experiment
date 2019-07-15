@@ -1,0 +1,20 @@
+@import "public";
+
+.blankMsg{
+  @include blankMsg;
+}
+
+.configuration{
+  width: $layout-mainContentWidth;
+  margin: auto;
+  text-align: center;
+  @media (max-width: $layout-mediaWidth) {
+    width: 100%;
+  }
+  .phaseList{
+    max-width: 60rem;
+    padding: 2.5rem 0;
+    margin: auto;
+    @include secondarySection;
+  }
+}

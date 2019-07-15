@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+service AdminService {
+    rpc GetAuthorizedTemplates (GetAuthorizedTemplatesReq) returns (GetAuthorizedTemplatesRes) {
+    }
+}
+
+message GetAuthorizedTemplatesReq {
+    string userId = 1;
+}
+message GetAuthorizedTemplatesRes {
+    repeated string namespaces = 1;
+}
+
+service ElfService {
+    rpc GetOnlineTemplates (GetOnlineTemplatesReq) returns (GetOnlineTemplatesRes) {
+    }
+}
+
+message GetOnlineTemplatesReq {
+}
+message GetOnlineTemplatesRes {
+    repeated string namespaces = 1;
+}

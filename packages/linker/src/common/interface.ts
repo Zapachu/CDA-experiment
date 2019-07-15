@@ -1,7 +1,7 @@
-import {PhaseStatus, PlayerStatus, Actor, AcademusRole} from './baseEnum'
+import {PhaseStatus, PlayerStatus} from './baseEnum'
 import {Socket} from 'socket.io-client'
-import {SetPhaseResult} from 'elf-protocol'
-import {baseEnum} from '@common'
+import {SetPlayerResult} from '@elf/protocol'
+import {AcademusRole, Actor, IActor} from '@elf/share'
 
 export type TSocket = typeof Socket
 
@@ -17,35 +17,18 @@ export interface IUserWithId extends IUser {
     id: string
 }
 
-export interface IActor {
-    userId: string
-    userName: string
+export interface ILinkerActor extends IActor {
     token: string
     type: Actor
+    userId: string
+    userName: string
     playerId: string
 }
 
-export interface IPhaseConfig<ICreateParam = {}> {
-    namespace: string
-    key: string
-    title: string
-    param: ICreateParam
-    suffixPhaseKeys: Array<string>
-}
-
 export interface IPlayerState {
-    actor: IActor
+    actor: ILinkerActor
     status: PlayerStatus
-    phaseResult?: SetPhaseResult.IPhaseResult
-}
-
-export interface IPhaseState {
-    key: string
-    status: PhaseStatus
-    playUrl?: string
-    playerState: {
-        [playerToken: string]: IPlayerState
-    }
+    result?: SetPlayerResult.IResult
 }
 
 export interface IBaseGame {
@@ -53,42 +36,39 @@ export interface IBaseGame {
     desc: string
     owner?: string
     orgCode?: string
-    published?: boolean
-    mode: baseEnum.GameMode
 }
 
 export interface IBaseGameWithId extends IBaseGame {
     id: string
 }
 
-export interface IGame extends IBaseGame {
-    phaseConfigs: Array<IPhaseConfig<{}>>,
+export interface IGame<ICreateParam = {}> extends IBaseGame {
+    namespace: string
+    param: ICreateParam
 }
 
 export interface IGameWithId extends IGame {
     id: string
 }
 
-export interface IGameToUpdate {
-    // title?: string
-    // desc?: string
-    phaseConfigs?: Array<IPhaseConfig<{}>>
-    published?: boolean
-}
-
 export interface IPlayer {
     gameId: string
     userId: string
     reward: string
+    result?: SetPlayerResult.IResult
 }
 
 export interface IPlayerWithId {
     id: string
 }
 
-export interface IGameState {
+export interface IGameState{
     gameId: string,
-    phaseStates: Array<IPhaseState>
+    status: PhaseStatus
+    playUrl?: string
+    playerState: {
+        [playerToken: string]: IPlayerState
+    }
 }
 
 export namespace NFrame {
@@ -123,6 +103,4 @@ export type TApiPlayers = Array<{
     userId: string,
     name: string
 }>
-
-export type TApiPlayerResults = Array<{ phaseName: string } & SetPhaseResult.IPhaseResult>
 //endregion

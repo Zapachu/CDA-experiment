@@ -1,6 +1,10 @@
 {
   "packages": [
+    "elfLib/**/*",
+    "bespokeLib/**/*",
+    "game",
+    "game/**/*",
     "packages/**/*"
   ],
-  "version": "0.0.0"
+  "version": "1.1.1"
 }
