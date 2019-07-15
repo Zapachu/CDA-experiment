@@ -5,11 +5,9 @@ import {IGameConfig} from '@bespoke/share'
 import {Api, Button, Input, List, message, Modal, TPageProps} from '../util'
 import * as dateFormat from 'dateformat'
 
-const SubmitBarHeight = '5rem'
-
 export function Create({user, history, gameTemplate: {Create: GameCreate}}: TPageProps) {
     const lang = Lang.extractLang({
-        title: ['实验标题', 'Title'],
+        title: ['实验标题', 'Game Title'],
         loadFromHistory: ['点击从历史实验加载实验配置', 'Click to load configuration from history game'],
         loadSuccess: ['加载成功', 'Load success'],
         Submit: ['提交', 'Submit'],
@@ -36,7 +34,7 @@ export function Create({user, history, gameTemplate: {Create: GameCreate}}: TPag
         }
     }
 
-    return <section className={style.create} style={{marginBottom: SubmitBarHeight}}>
+    return <section className={style.create}>
         <div className={style.titleWrapper}>
             <Input size='large' value={title} placeholder={lang.title}
                    onChange={({target: {value: title}}) => setTitle(title)}/>
@@ -58,15 +56,13 @@ export function Create({user, history, gameTemplate: {Create: GameCreate}}: TPag
                 })
             }}/>
         </div>
-        <div className={style.bespokeWrapper}>
-            <GameCreate {...{
-                params,
-                setParams: newParams => setParams({...params, ...newParams}),
-                submitable,
-                setSubmitable: submitable => setSubmitable(submitable)
-            }}/>
-        </div>
-        <div className={style.submitBtnWrapper} style={{height: SubmitBarHeight}}>
+        <GameCreate {...{
+            params,
+            setParams: newParams => setParams({...params, ...newParams}),
+            submitable,
+            setSubmitable: submitable => setSubmitable(submitable)
+        }}/>
+        <div className={style.submitBtnWrapper}>
             <Button type='primary' disabled={!submitable} onClick={() => submit()}>{lang.Submit}</Button>
         </div>
     </section>

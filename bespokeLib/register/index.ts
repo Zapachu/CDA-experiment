@@ -7,7 +7,6 @@ export interface IGameTemplate {
     namespace?: string
     localeNames?: Array<string>
     Create?: Core.CreateClass
-    Info?: Core.InfoClass
     Play: Core.PlayClass
     Play4Owner?: Core.Play4OwnerClass
     Result?: Core.ResultClass
@@ -22,10 +21,6 @@ export namespace Core {
 
     export type CreateSFC<ICreateParams> = Template.CreateSFC<ICreateParams>
     export type CreateClass = (new(...args) => Create<{}, any>) | CreateSFC<{}>
-
-    export interface IInfoProps<ICreateParams> {
-        game: IGameWithId<ICreateParams>,
-    }
 
     export interface IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> extends Partial<ITravelState<IGameState, IPlayerState, MoveType, IMoveParams>> {
         game: IGameWithId<ICreateParams>,
@@ -57,12 +52,6 @@ export namespace Core {
         travelStates: Array<ITravelState<IGameState, IPlayerState, MoveType, IMoveParams>>
     }
 
-    export class Info<ICreateParams, S = {}> extends React.Component<IInfoProps<ICreateParams>, S> {
-    }
-
-    export type InfoSFC<ICreateParams> = React.FC<IInfoProps<ICreateParams>>
-
-
     export class Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, S = {}>
         extends React.Component<IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>, S> {
     }
@@ -92,8 +81,6 @@ export namespace Core {
 
     export type Result4OwnerSFC<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams> =
         React.FC<IResult4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams>>
-
-    export type InfoClass = (new(...args) => Info<{}>) | InfoSFC<{}>
 
     export type PlayClass = (new(...args) => Play<{}, {}, {}, any, any, {}, {}, any>)
         | PlaySFC<{}, {}, {}, any, any, {}, {}>

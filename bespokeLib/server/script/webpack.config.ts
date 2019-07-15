@@ -34,24 +34,15 @@ export = {
         rules: [
             {
                 test: /\.(ts|tsx)$/,
-                use: [
-                    {
-                        loader: 'ts-loader',
-                        options: {
-                            transpileOnly: true,
-                            compilerOptions: {
-                                noEmit: false
-                            }
-                        }
-                    }
-                ],
+                loader: 'ts-loader',
+                options: {
+                    transpileOnly: true
+                },
                 exclude: /node_modules/
             },
             {
                 test: /\.(scss|sass)$/,
-                exclude: [
-                    /node_modules/
-                ],
+                exclude: /node_modules/,
                 use: [
                     'style-loader',
                     {
@@ -77,16 +68,16 @@ export = {
         'react': 'React',
         'react-dom': 'ReactDOM',
         '@elf/component': 'ElfComponent',
-        'antd':'antd'
+        'antd': 'antd'
     },
     plugins: [
         new ManifestPlugin({
             fileName: `index.json`
         }),
         new HtmlWebpackPlugin({
-            hash:true,
+            hash: true,
             filename: 'index.html',
-            favicon:path.resolve(__dirname, './favicon.ico'),
+            favicon: path.resolve(__dirname, './favicon.ico'),
             template: path.resolve(__dirname, './index.html')
         }),
         new CleanWebpackPlugin()

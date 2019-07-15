@@ -9,7 +9,7 @@
     "dist": "tsc & npm run client:dist",
     "client:build": "webpack  --env.TS_NODE_PROJECT=\"tsconfig.json\"  --config ./script/webpack.config.ts",
     "client:dist": "npm run client:build --buildMode=dist",
-    "start": "ts-node ./src/server/server.ts"
+    "start": "ts-node ./src/backend/server.ts"
   },
   "devDependencies": {
     "@elf/component": "^1.1.1",

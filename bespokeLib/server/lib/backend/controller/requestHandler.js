@@ -55,8 +55,7 @@ var UserCtrl = /** @class */ (function () {
             return __generator(this, function (_a) {
                 chunk = fs.readFileSync(path.resolve(__dirname, "../../../static/index.html")).toString();
                 res.set('content-type', 'text/html');
-                res.end("<script type=\"text/javascript\">\nObject.assign(window, {\n    NAMESPACE:'" + util_2.Setting.namespace + "',\n    WITH_LINKER:" + setting_1.elfSetting.bespokeWithLinker + ",\n    PRODUCT_ENV:" + setting_1.elfSetting.inProductEnv + "\n})\n</script>" +
-                    chunk.replace(/static/g, util_2.Setting.namespace + "/static") +
+                res.end(chunk.replace('</head>', "<script type=\"text/javascript\">\nObject.assign(window, {\n    NAMESPACE:'" + util_2.Setting.namespace + "',\n    WITH_LINKER:" + setting_1.elfSetting.bespokeWithLinker + ",\n    PRODUCT_ENV:" + setting_1.elfSetting.inProductEnv + "\n})\n</script></head>").replace(/static/g, util_2.Setting.namespace + "/static") +
                     ("<script type=\"text/javascript\" src=\"" + util_2.Setting.getClientPath() + "\"></script>"));
                 return [2 /*return*/];
             });

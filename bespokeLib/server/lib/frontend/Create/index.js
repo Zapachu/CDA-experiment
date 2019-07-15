@@ -67,11 +67,10 @@ var style = require("./style.scss");
 var component_1 = require("@elf/component");
 var util_1 = require("../util");
 var dateFormat = require("dateformat");
-var SubmitBarHeight = '5rem';
 function Create(_a) {
     var user = _a.user, history = _a.history, GameCreate = _a.gameTemplate.Create;
     var lang = component_1.Lang.extractLang({
-        title: ['实验标题', 'Title'],
+        title: ['实验标题', 'Game Title'],
         loadFromHistory: ['点击从历史实验加载实验配置', 'Click to load configuration from history game'],
         loadSuccess: ['加载成功', 'Load success'],
         Submit: ['提交', 'Submit'],
@@ -105,7 +104,7 @@ function Create(_a) {
             });
         });
     }
-    return React.createElement("section", { className: style.create, style: { marginBottom: SubmitBarHeight } },
+    return React.createElement("section", { className: style.create },
         React.createElement("div", { className: style.titleWrapper },
             React.createElement(util_1.Input, { size: 'large', value: title, placeholder: lang.title, onChange: function (_a) {
                     var title = _a.target.value;
@@ -127,14 +126,13 @@ function Create(_a) {
                             })))
                     });
                 } })),
-        React.createElement("div", { className: style.bespokeWrapper },
-            React.createElement(GameCreate, __assign({}, {
-                params: params,
-                setParams: function (newParams) { return setParams(__assign({}, params, newParams)); },
-                submitable: submitable,
-                setSubmitable: function (submitable) { return setSubmitable(submitable); }
-            }))),
-        React.createElement("div", { className: style.submitBtnWrapper, style: { height: SubmitBarHeight } },
+        React.createElement(GameCreate, __assign({}, {
+            params: params,
+            setParams: function (newParams) { return setParams(__assign({}, params, newParams)); },
+            submitable: submitable,
+            setSubmitable: function (submitable) { return setSubmitable(submitable); }
+        })),
+        React.createElement("div", { className: style.submitBtnWrapper },
             React.createElement(util_1.Button, { type: 'primary', disabled: !submitable, onClick: function () { return submit(); } }, lang.Submit)));
 }
 exports.Create = Create;
