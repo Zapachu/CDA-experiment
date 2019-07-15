@@ -9,7 +9,7 @@ const SubmitBarHeight = '5rem'
 
 export function Create({user, history, gameTemplate: {Create: GameCreate}}: TPageProps) {
     const lang = Lang.extractLang({
-        title: ['实验标题', 'Title'],
+        title: ['实验标题', 'Game Title'],
         loadFromHistory: ['点击从历史实验加载实验配置', 'Click to load configuration from history game'],
         loadSuccess: ['加载成功', 'Load success'],
         Submit: ['提交', 'Submit'],

@@ -15,14 +15,13 @@ export class UserCtrl {
     static async renderApp(req, res: Response) {
         const chunk = fs.readFileSync(path.resolve(__dirname, `../../../static/index.html`)).toString()
         res.set('content-type', 'text/html')
-        res.end(`<script type="text/javascript">
+        res.end(chunk.replace('</head>', `<script type="text/javascript">
 Object.assign(window, {
     NAMESPACE:'${Setting.namespace}',
     WITH_LINKER:${elfSetting.bespokeWithLinker},
     PRODUCT_ENV:${elfSetting.inProductEnv}
 })
-</script>` +
-            chunk.replace(/static/g, `${Setting.namespace}/static`) +
+</script></head>`).replace(/static/g, `${Setting.namespace}/static`) +
             `<script type="text/javascript" src="${Setting.getClientPath()}"></script>`)
     }
 
