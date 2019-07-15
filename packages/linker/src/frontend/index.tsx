@@ -14,8 +14,11 @@ import {Button} from 'antd'
 require('./initial.scss')
 
 export function registerOnElf(namespace: string, template: IGameTemplate) {
-    template.namespace = namespace
-    GameTemplate.setTemplate(template)
+    GameTemplate.setTemplate({
+        namespace,
+        Create: ()=>null,
+        ...template
+    })
 }
 
 Api.getUser().then(({user}) => {
