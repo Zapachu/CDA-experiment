@@ -1,20 +1,21 @@
 @import "public";
 
-.blankMsg{
-  @include blankMsg;
-}
+$bottomBarHeight: 5rem;
 
 .configuration{
-  width: $layout-mainContentWidth;
-  margin: auto;
+  max-width: 48rem;
+  margin: 0 auto $bottomBarHeight;
   text-align: center;
-  @media (max-width: $layout-mediaWidth) {
-    width: 100%;
+  padding-top: 2rem;
+  .titleWrapper {
+    padding: 1rem 4rem;
   }
-  .phaseList{
-    max-width: 60rem;
-    padding: 2.5rem 0;
-    margin: auto;
-    @include secondarySection;
+  .backBtnWrapper {
+    position: fixed;
+    height: $bottomBarHeight;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background: linear-gradient(rgba($color-background, .1), $color-background)
   }
 }

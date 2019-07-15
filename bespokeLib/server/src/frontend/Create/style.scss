@@ -1,33 +1,28 @@
 @import "public";
 
-.blankMsg {
-  @include blankMsg;
-}
+$bottomBarHeight: 5rem;
 
 .create {
   max-width: 48rem;
-  margin: auto;
-  .titleWrapper{
-    padding: 2rem 4rem;
+  margin: 0 auto $bottomBarHeight;
+  padding-top: 2rem;
+  text-align: center;
+
+  .titleWrapper {
+    padding: 1rem 4rem;
   }
-  .historyGameBtnWrapper{
-    text-align: right;
+
+  .historyGameBtnWrapper {
     margin: 1rem;
+    text-align: right;
   }
-  .bespokeWrapper {
-    flex-basis: 66%;
-    @media (max-width: $layout-mediaWidth) {
-      width: 100%;
-    }
-  }
+
   .submitBtnWrapper {
     position: fixed;
+    height: $bottomBarHeight;
     bottom: 0;
     right: 0;
     left: 0;
-    display: flex;
-    justify-content: center;
-    align-items: start;
     background: linear-gradient(rgba($color-background, .1), $color-background)
   }
 }

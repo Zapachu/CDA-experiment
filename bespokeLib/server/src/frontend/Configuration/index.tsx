@@ -1,48 +1,32 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {IGameWithId} from '@bespoke/share'
-import {Button, ButtonProps, Lang, MaskLoading} from '@elf/component'
+import {Lang} from '@elf/component'
 import {Api, TPageProps} from '../util'
+import {Button, Input} from 'antd'
 
-declare type IConfigurationState = {
-    loading: boolean,
-    game?: IGameWithId<any>
-}
-
-export class Configuration extends React.Component<TPageProps, IConfigurationState> {
-    lang = Lang.extractLang({
+export function Configuration({history, match: {params: {gameId}}, gameTemplate: {Create}}: TPageProps) {
+    const lang = Lang.extractLang({
+        title: ['实验标题', 'Game Title'],
         playRoom: ['返回游戏', 'BACK TO GAME']
     })
-    state: IConfigurationState = {
-        loading: true
-    }
-
-    async componentDidMount() {
-        const {props: {match: {params: {gameId}}}} = this
-        const {game} = await Api.getGame(gameId)
-        this.setState({
-            loading: false,
-            game
-        })
-    }
-
-    render() {
-        const {lang, props: {history, match: {params: {gameId}}, gameTemplate}, state: {loading, game}} = this
-        if (loading) {
-            return <MaskLoading/>
-        }
-        const {Info} = gameTemplate
-        return <section className={style.configuration}>
-            <ul className={style.phaseList}>
-                <Info {...{game}}/>
-                <li style={{margin: '2rem auto 0'}}>
-                    <Button width={ButtonProps.Width.medium}
-                            color={ButtonProps.Color.blue}
-                            label={lang.playRoom}
-                            onClick={() => history.push(`/play/${gameId}`)}
-                    />
-                </li>
-            </ul>
-        </section>
-    }
+    const [game, setGame] = React.useState(null as IGameWithId<any>)
+    React.useEffect(() => {
+        Api.getGame(gameId).then(({game}) => setGame(game))
+    }, [])
+    return game ? <section className={style.configuration}>
+        <div className={style.titleWrapper}>
+            <Input size='large' value={game.title} placeholder={lang.title}
+                   onChange={() => null}/>
+        </div>
+        <Create {...{
+            submitable: true,
+            params: game.params,
+            setSubmitable: () => null,
+            setParams: () => null
+        }}/>
+        <div className={style.backBtnWrapper}>
+            <Button type='primary' onClick={() => history.push(`/play/${gameId}`)}>{lang.playRoom}</Button>
+        </div>
+    </section> : null
 }
