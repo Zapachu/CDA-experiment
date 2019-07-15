@@ -1,5 +1,5 @@
 {
-  "script": "../game/DecisionSurvey/build/serve.js",
+  "script": "../game/DecisionSurvey/dist/serve.js",
   "name": "DecisionSurvey",
   "env": {
     "NODE_ENV": "production",

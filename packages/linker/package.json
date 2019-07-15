@@ -6,7 +6,7 @@
   "license": "ISC",
   "scripts": {
     "tsc-w": "tsc -w",
-    "build": "tsc & npm run client:dist",
+    "dist": "tsc & npm run client:dist",
     "client:build": "webpack  --env.TS_NODE_PROJECT=\"tsconfig.json\"  --config ./src/client/script/webpack.ts",
     "client:dist": "npm run client:build --buildMode=dist",
     "start": "ts-node ./src/server/server.ts"

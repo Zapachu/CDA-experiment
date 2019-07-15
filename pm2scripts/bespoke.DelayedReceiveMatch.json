@@ -1,5 +1,5 @@
 {
-  "script": "../game/Graphical/DelayedReceiveMatch/build/serve.js",
+  "script": "../game/Graphical/DelayedReceiveMatch/dist/serve.js",
   "name": "DelayedReceiveMatch",
   "env": {
     "NODE_ENV": "production",

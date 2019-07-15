@@ -12,21 +12,22 @@ import {
 import Controller from "./Controller";
 import Robot from "./Robot";
 import { ICreateParams, namespace } from "./config";
-import settings from "./settings";
-import { CreateGame } from "@elf/protocol";
+import { CreateGame, GameOver } from "@elf/protocol";
+import { elfSetting } from "@elf/setting";
 import { RobotServer } from "@bespoke/robot";
-import { GameOver } from "@elf/protocol";
+// import { config } from "@bespoke/share";
 
 const { FreeStyleModel } = Model;
+const ROOTNAME = "gametrial";
 
 const resultHtmlStr = fs
-  .readFileSync(resolve(__dirname, "../static/result.html"))
+  .readFileSync(resolve(__dirname, "../asset/result.html"))
   .toString();
 
 const router = Router()
   .use(
     "/result/static",
-    Express.static(resolve(__dirname, "../static"), { maxAge: "10d" })
+    Express.static(resolve(__dirname, "../asset"), { maxAge: "10d" })
   )
   .get("/result/:gameId", async (req, res: Response) => {
     const {
@@ -49,7 +50,9 @@ const router = Router()
         return res.end(scriptStr + resultHtmlStr);
       }
     }
-    return res.redirect(settings.entryUrl);
+    return res.redirect(
+      `${elfSetting.proxyOrigin}/${ROOTNAME}/game/${namespace}`
+    );
   })
   .get("/getUserId/:gameId", async (req, res: Response) => {
     const {
@@ -84,7 +87,7 @@ const router = Router()
     return res.json({ code: 1, msg: "server error" });
   });
 
-Server.start(namespace, Controller, resolve(__dirname, "../dist"), router);
+Server.start(namespace, Controller, resolve(__dirname, "../static"), router);
 
 RobotServer.start(namespace, Robot);
 

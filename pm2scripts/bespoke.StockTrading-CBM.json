@@ -1,5 +1,5 @@
 {
-  "script": "../game/StockTrading/CBM/build/serve.js",
+  "script": "../game/StockTrading/CBM/dist/serve.js",
   "name": "StockTrading-CBM",
   "env": {
     "NODE_ENV": "production",

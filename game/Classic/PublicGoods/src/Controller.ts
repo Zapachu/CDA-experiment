@@ -72,7 +72,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 if (playerStatus.every(status => status === PlayerStatus.submitted)) {
                     setTimeout(async () => {
                         groupRounds[roundIndex].playerStatus = playerStatus.map(() => PlayerStatus.result)
-                        groupRoundState.returnMoney = ~~((groupPlayerStates.map(({rounds}) => rounds[roundIndex].submitMoney).reduce((m, n) => m + n, 0)) / groupPlayerStates.length)
+                        groupRoundState.returnMoney = ~~((groupPlayerStates.map(({rounds}) => rounds[roundIndex].submitMoney).reduce((m, n) => m + n, 0)) / groupPlayerStates.length * groupParams[groupIndex].roundParams[roundIndex].K)
                         await this.stateManager.syncState()
                         if (roundIndex == this.game.params.round - 1) {
                             return

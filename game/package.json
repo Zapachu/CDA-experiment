@@ -3,7 +3,7 @@
   "version": "1.1.1",
   "scripts": {
     "tsc-w": "tsc -w",
-    "libc": "tsc bin/help",
+    "dist": "tsc bin/help",
     "help": "node bin/help"
   },
   "dependencies": {

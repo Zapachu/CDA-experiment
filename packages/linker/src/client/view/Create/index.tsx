@@ -82,7 +82,7 @@ export class Create extends React.Component<TRootContext & RouteComponentProps<{
         const {Create} = phaseTemplates[namespace]
         return <section style={{
             maxWidth: '64rem',
-            margin: '1rem auto',
+            margin: 'auto',
             padding: '1rem 1.5rem',
             background: 'white'
         }}>

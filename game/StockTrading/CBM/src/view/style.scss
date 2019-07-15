@@ -8,6 +8,7 @@ $color-dark: #2a3564;
 $color-dark2: #212a51;
 $color-orange: #f99460;
 $color-red: #d6444e;
+$sidePanelBasis: 24rem;
 
 @mixin panel {
   display: flex;
@@ -44,12 +45,14 @@ $color-red: #d6444e;
   background: radial-gradient(at 50% 50%, $color-dark 10%, $color-dark2 80%);
   color: $color-light;
   user-select: none;
-  table{
+
+  table {
     color: $color-light;
   }
 
-  .tradeListWrapper{
+  .tradeListWrapper {
     @include panel;
+
     .tradeList {
       table-layout: fixed;
       text-align: center;
@@ -67,6 +70,7 @@ $color-red: #d6444e;
 
         td {
           color: $color-orange;
+
           &:first-child {
             color: $color-light;
           }
@@ -88,8 +92,9 @@ $color-red: #d6444e;
 
 
     .tradePanel {
-      flex-basis: 24rem;
+      flex-basis: $sidePanelBasis;
     }
+
     .asset {
       .summary {
         display: flex;
@@ -119,11 +124,17 @@ $color-red: #d6444e;
     }
 
     .orderPanel {
-      @include panel;
+      flex-basis: 1.5 * $sidePanelBasis;
       min-height: 80vh;
 
+      .title {
+        text-align: center;
+        font-size: $fontSize-large;
+        margin: 1.5rem;
+        color: $color-light;
+      }
+
       .orderBook {
-        margin: 2rem 0;
         min-height: 16rem;
         display: flex;
         justify-content: space-between;
@@ -205,6 +216,8 @@ $color-red: #d6444e;
     }
 
     .marketHistoryWrapper {
+      flex-basis: $sidePanelBasis;
+
       .marketHistory {
         @include panel;
         padding: 1rem;
@@ -235,17 +248,21 @@ $color-red: #d6444e;
           border: 1px solid;
         }
       }
-      .tips{
+
+      .tips {
         position: fixed;
         right: 15vw;
         top: 55vh;
-        .tipsTitle{
+
+        .tipsTitle {
           margin: 1rem;
         }
-        .tipsContent{
+
+        .tipsContent {
           margin: 1rem 2rem;
           text-align: left;
         }
+
         @media (max-width: $layout-mediaWidth) {
           top: 90vh;
         }
@@ -271,7 +288,29 @@ $color-red: #d6444e;
   }
 }
 
-.play4owner{
+.play4owner {
   text-align: center;
-  font-size: $fontSize-middle;
+
+  .waitInfo {
+    margin: 1rem;
+  }
+
+  .periodInfo {
+    display: inline-block;
+    margin: 1rem;
+  }
+
+  .chartWrapper {
+    margin: auto;
+    max-width: 32rem;
+  }
+}
+
+.result4Owner{
+  .timeLine{
+    margin: 1rem;
+  }
+  .actionInfo{
+    margin: 1rem;
+  }
 }

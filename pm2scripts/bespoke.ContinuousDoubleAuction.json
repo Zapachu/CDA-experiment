@@ -1,5 +1,5 @@
 {
-  "script": "../game/CDA/ContinuousDoubleAuction/build/serve.js",
+  "script": "../game/CDA/ContinuousDoubleAuction/dist/serve.js",
   "name": "ContinuousDoubleAuction",
   "env": {
     "NODE_ENV": "production",

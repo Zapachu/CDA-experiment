@@ -16,5 +16,5 @@ const router = Router()
         })
     })
 
-Server.start(namespace, Logic, resolve(__dirname, '../dist'), router)
+Server.start(namespace, Logic, resolve(__dirname, '../static'), router)
 RobotServer.start(namespace, Robot)

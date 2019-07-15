@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "install": "lerna bootstrap",
-    "libc": "lerna run libc"
+    "dist": "lerna run dist"
   },
   "devDependencies": {
     "@ant-design/icons": "~2.1.0",

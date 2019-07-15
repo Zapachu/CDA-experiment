@@ -14,7 +14,7 @@ interface IPaths {
 
 const defaultPaths: IPaths = {
   entry: './src/view',
-  output: './dist'
+  output: './static'
 }
 
 function resolvePaths(basePath, paths: IPaths = defaultPaths): IPaths {
@@ -60,7 +60,7 @@ export function geneClientBuilder(
     entry: {[namespace]: entry},
     output: {
       path: output,
-      filename: `[name]${HMR ? '' : '.[hash:4]'}.js`,
+      filename: `[name].js`,
       publicPath: buildMode === 'publish' ? `${qiNiu.download.jsDomain}/${qiNiu.upload.path}/${namespace}` : `/${config.rootName}/${namespace}/static/`
     },
     resolve: {
@@ -83,14 +83,14 @@ export function geneClientBuilder(
         },
         {
           test: /\.css$/,
-          use: ["style-loader", "css-loader"]
+          use: ['style-loader', 'css-loader']
         },
         {
           test: /\.less$/,
           use: [
-            "style-loader",
-            "css-loader",
-            { loader: "less-loader", options: { javascriptEnabled: true } }
+            'style-loader',
+            'css-loader',
+            {loader: 'less-loader', options: {javascriptEnabled: true}}
           ]
         },
         {
@@ -127,18 +127,26 @@ export function geneClientBuilder(
       'react': 'React',
       'react-dom': 'ReactDOM',
       '@elf/component': 'ElfComponent',
-      'antd':'antd'
+      'antd': 'antd'
     },
     plugins: [
       new ManifestPlugin({
-        fileName: `${namespace}.json`
+        fileName: `${namespace}.json`,
+        filter: descriptor => descriptor.isInitial,
+        generate: (seed, files) =>
+            files.reduce((manifest, {name, path, chunk}) => {
+              return {
+                ...manifest,
+                [name]: path + (chunk ? `?${chunk.hash}` : '')
+              }
+            }, seed)
       })
     ].concat(buildMode === 'publish' ? [
       new QiniuPlugin(qiNiu.upload)
     ] : buildMode === 'dist' ? [
       new CleanWebpackPlugin()
-    ] : [
+    ] : HMR ? [
       new webpack.HotModuleReplacementPlugin()
-    ])
+    ] : [])
   } as any
 }

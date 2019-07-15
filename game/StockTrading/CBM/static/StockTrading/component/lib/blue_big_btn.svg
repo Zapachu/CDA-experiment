@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="201px" height="56px" viewBox="0 0 201 56" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
+    <title>再玩一局</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="42.2768298%" y1="11.8185619%" x2="42.2768298%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#2D3B79" offset="0%"></stop>
+            <stop stop-color="#1F274B" offset="100%"></stop>
+        </linearGradient>
+        <radialGradient cx="60.1312007%" cy="0%" fx="60.1312007%" fy="0%" r="284.685738%" gradientTransform="translate(0.601312,0.000000),scale(0.278607,1.000000),rotate(85.320199),translate(-0.601312,-0.000000)" id="radialGradient-2">
+            <stop stop-color="#7FBEED" offset="0%"></stop>
+            <stop stop-color="#7FBEED" offset="0%"></stop>
+            <stop stop-color="#0C1A37" stop-opacity="0.23327106" offset="100%"></stop>
+        </radialGradient>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="中位数定价2" transform="translate(-497.000000, -823.000000)" fill="url(#linearGradient-1)" fill-rule="nonzero" stroke="url(#radialGradient-2)">
+            <rect id="再玩一局" x="497.5" y="823.5" width="200" height="55" rx="8"></rect>
+        </g>
+    </g>
+</svg>

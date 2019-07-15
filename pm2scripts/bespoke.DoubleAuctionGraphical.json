@@ -1,5 +1,5 @@
 {
-  "script": "../game/Graphical/DoubleAuctionGraphical/build/serve.js",
+  "script": "../game/Graphical/DoubleAuctionGraphical/dist/serve.js",
   "name": "DoubleAuctionGraphical",
   "env": {
     "NODE_ENV": "production",

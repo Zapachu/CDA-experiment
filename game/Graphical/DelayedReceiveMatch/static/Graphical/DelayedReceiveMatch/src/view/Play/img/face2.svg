@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="65px" height="75px" viewBox="0 0 65 75" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
+    <title>脸2</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="匹配机制4" transform="translate(-1225.000000, -328.000000)" fill-rule="nonzero">
+            <g id="分组" transform="translate(1172.000000, 320.000000)">
+                <g id="分组-copy-6" transform="translate(29.000000, 0.000000)">
+                    <g id="脸2" transform="translate(26.000000, 10.000000)">
+                        <path d="M4.87509791,30.9824219 C3.8698302,43.9731267 7.18291884,50.0568669 14.8143638,49.2336426 C15.7417323,52.2005365 26.37219,76.7925874 42.350954,69.5655382 C47.5050059,66.259049 57.9845667,62.4349881 59.9914595,31.382716 C65.302344,-13.0058594 23.1342439,2.54601872 14.8143638,8 C9.26777713,11.6359875 5.95468849,19.2967948 4.87509791,30.9824219 Z" id="路径-53" stroke="#282828" stroke-width="4" fill="#FFFFFF" transform="translate(32.575977, 35.884653) scale(-1, 1) translate(-32.575977, -35.884653) "></path>
+                        <path d="M34,30.7037037 C35.9284918,28.7748456 39.1424835,28.4838135 43.6419753,29.8306074 C42.0736556,30.1076314 40.77897,30.1147129 39.7579185,29.8518519 L34,30.7037037 Z" id="路径-50" fill="#171717" transform="translate(38.820988, 29.851852) scale(-1, 1) translate(-38.820988, -29.851852) "></path>
+                        <path d="M13,29.7037037 C14.9284918,27.7748456 18.1424835,27.4838135 22.6419753,28.8306074 C21.0736556,29.1076314 19.7284492,29.1147129 18.6063561,28.8518519 L13,29.7037037 Z" id="路径-50-copy" fill="#171717" transform="translate(17.820988, 28.851852) scale(-1, 1) translate(-17.820988, -28.851852) "></path>
+                        <path d="M29.3630418,27.6790123 C32.9577464,45.5009384 31.7696799,52.008917 25.7988422,47.202948" id="路径-51" stroke="#282828" stroke-width="2" stroke-linecap="round" transform="translate(28.594102, 38.206540) scale(-1, 1) translate(-28.594102, -38.206540) "></path>
+                        <path d="M26,58 C26.869928,58.6666667 28.6723972,58.6666667 31.4074074,58" id="路径-52" stroke="#282828" stroke-width="3" stroke-linecap="round" transform="translate(28.703704, 58.250000) scale(-1, 1) translate(-28.703704, -58.250000) "></path>
+                        <path d="M1.88059278,33 C8.17366621,34.5811447 7.54680195,39.1078937 0,46.5802469" id="路径-54" stroke="#282828" stroke-width="4" transform="translate(3.086420, 39.790123) scale(-1, 1) translate(-3.086420, -39.790123) "></path>
+                        <ellipse id="椭圆形" fill="#000000" transform="translate(37.641975, 38.172840) scale(-1, 1) translate(-37.641975, -38.172840) " cx="37.6419753" cy="38.1728395" rx="2.85185185" ry="3.08641975"></ellipse>
+                        <ellipse id="椭圆形-copy" fill="#000000" transform="translate(17.123457, 38.172840) scale(-1, 1) translate(-17.123457, -38.172840) " cx="17.1234568" cy="38.1728395" rx="2.85185185" ry="3.08641975"></ellipse>
+                        <ellipse id="椭圆形" fill="#FFFFFF" transform="translate(36.376543, 37.172840) scale(-1, 1) translate(-36.376543, -37.172840) " cx="36.3765432" cy="37.1728395" rx="1.11728395" ry="1.85185185"></ellipse>
+                        <ellipse id="椭圆形-copy-2" fill="#FFFFFF" transform="translate(16.117284, 36.851852) scale(-1, 1) translate(-16.117284, -36.851852) " cx="16.117284" cy="36.8518519" rx="1.11728395" ry="1.85185185"></ellipse>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,5 +1,5 @@
 {
-  "script": "../game/Graphical/TheTragedyOfTheCommonsGraphical/build/serve.js",
+  "script": "../game/Graphical/TheTragedyOfTheCommonsGraphical/dist/serve.js",
   "name": "TheTragedyOfTheCommonsGraphical",
   "env": {
     "NODE_ENV": "production",

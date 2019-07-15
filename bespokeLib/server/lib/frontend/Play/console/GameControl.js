@@ -151,8 +151,9 @@ var GameControl = /** @class */ (function (_super) {
                         _a[paused] = lang.paused,
                         _a[over] = lang.over,
                         _a)[gameState.status])),
-                React.createElement("div", { className: style.gameTitle },
-                    React.createElement("span", null, game.title)),
+                WITH_LINKER ? null :
+                    React.createElement("div", { className: style.gameTitle },
+                        React.createElement("span", null, game.title)),
                 React.createElement("div", { className: style.btnGroup },
                     WITH_LINKER ? null : React.createElement(component_1.Button, __assign({}, btnProps, { icon: component_1.ButtonProps.Icon.home, onClick: function () { return historyPush("/dashboard"); } })),
                     React.createElement(component_1.Button, __assign({}, btnProps, { icon: component_1.ButtonProps.Icon.parameter, onClick: function () { return historyPush("/configuration/" + game.id); } })),
