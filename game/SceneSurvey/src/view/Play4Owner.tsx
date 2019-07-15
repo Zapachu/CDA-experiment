@@ -1,8 +1,7 @@
 import * as React from "react";
 import * as style from "./style.scss";
 import { Table } from "antd";
-import { Request } from "@elf/component";
-import { Core } from "@bespoke/register";
+import { Core, Request } from "@bespoke/register";
 import {
   FetchRoute,
   ICreateParams,
@@ -58,8 +57,7 @@ export class Play4Owner extends Core.Play4Owner<
       <section className={style.play4Owner}>
         <a
           className={style.exportBtn}
-          href={Request.buildUrl(
-            namespace,
+          href={Request.instance(namespace).buildUrl(
             FetchRoute.exportXlsPlaying,
             { gameId: game.id },
             { sheetType: SheetType.result }

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Input, Radio, Button } from "antd";
 import * as style from "./style.scss";
-import { Request, Toast } from "@elf/component";
+import { Toast } from "@elf/component";
 import { Core } from "@bespoke/register";
 import {
   FetchRoute,

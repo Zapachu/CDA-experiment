@@ -1,7 +1,6 @@
 import * as React from "react";
 import * as style from "./style.scss";
-import { Core } from "@bespoke/register";
-import { Request } from "@elf/component";
+import { Core, Request } from "@bespoke/register";
 import {
   ICreateParams,
   IGameState,
@@ -28,8 +27,7 @@ export class Result4Owner extends Core.Result4Owner<
       <section className={style.result4Owner}>
         <a
           className={style.exportBtn}
-          href={Request.buildUrl(
-            namespace,
+          href={Request.instance(namespace).buildUrl(
             FetchRoute.exportXls,
             { gameId: game.id },
             { sheetType: SheetType.result }
