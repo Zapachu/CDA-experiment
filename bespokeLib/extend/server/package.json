@@ -1,0 +1,12 @@
+{
+  "name": "@extend/server",
+  "version": "1.1.1",
+  "types": "src/index",
+  "main": "src/index",
+  "devDependencies": {
+    "@bespoke/share": "^1.1.1",
+    "@bespoke/server": "^1.1.1",
+    "@elf/util": "^1.1.1",
+    "@extend/share": "^1.1.1"
+  }
+}
