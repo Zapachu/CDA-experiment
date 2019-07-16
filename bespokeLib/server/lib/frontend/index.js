@@ -24,6 +24,7 @@ var __rest = (this && this.__rest) || function (s, e) {
 Object.defineProperty(exports, "__esModule", { value: true });
 require("./initial.scss");
 var React = require("react");
+var register_1 = require("@bespoke/register");
 var component_1 = require("@elf/component");
 var react_router_dom_1 = require("react-router-dom");
 var share_1 = require("@bespoke/share");
@@ -62,16 +63,8 @@ function renderRoot(pageProps, rootContainer) {
             React.createElement("div", { style: { position: 'absolute', right: 32, top: 16, zIndex: 1000 } },
                 React.createElement(util_1.Button, { size: 'small', onClick: function () { return component_1.Lang.switchLang(component_1.Lang.activeLanguage === component_1.Language.en ? component_1.Language.zh : component_1.Language.en); } }, component_1.Lang.activeLanguage === component_1.Language.en ? '中文' : 'English'))), rootContainer);
 }
-function emptyPage(label) {
-    return function () { return React.createElement("div", { style: {
-            fontSize: '2rem',
-            margin: '2rem',
-            textAlign: 'center',
-            color: '#999'
-        } }, label); };
-}
 function registerOnBespoke(gameTemplate) {
-    var template = __assign({ Create: emptyPage(component_1.Lang.extractLang({ label: ['无可配置参数', 'No parameters to config'] }).label), Info: emptyPage(component_1.Lang.extractLang({ label: ['无配置', 'No Configuration'] }).label), Play4Owner: emptyPage(component_1.Lang.extractLang({ label: ['实验进行中', 'Playing...'] }).label), Result: emptyPage(component_1.Lang.extractLang({ label: ['实验已结束', 'GAME OVER'] }).label), Result4Owner: emptyPage(component_1.Lang.extractLang({ label: ['实验已结束', 'GAME OVER'] }).label) }, gameTemplate);
+    var template = __assign({ Create: register_1.Core.Create, Play4Owner: register_1.Core.Play4Owner, Result: register_1.Core.Result, Result4Owner: register_1.Core.Result4Owner }, gameTemplate);
     util_1.Api.getUser().then(function (_a) {
         var user = _a.user;
         var rootContainer = document.body.appendChild(document.createElement('div')), props = { gameTemplate: template, user: user };

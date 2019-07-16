@@ -1,6 +1,6 @@
 import './initial.scss'
 import * as React from 'react'
-import {IGameTemplate} from '@bespoke/register'
+import {IGameTemplate, Core} from '@bespoke/register'
 import {Lang, Language} from '@elf/component'
 import {BrowserRouter, Route as ReactRoute, RouteComponentProps, RouteProps, Switch} from 'react-router-dom'
 import {config} from '@bespoke/share'
@@ -48,22 +48,12 @@ function renderRoot(pageProps: TPageProps, rootContainer: HTMLElement) {
     </section>, rootContainer)
 }
 
-function emptyPage(label: string) {
-    return () => <div style={{
-        fontSize: '2rem',
-        margin: '2rem',
-        textAlign: 'center',
-        color: '#999'
-    }}>{label}</div>
-}
-
 export function registerOnBespoke(gameTemplate: IGameTemplate) {
     const template = {
-        Create: emptyPage(Lang.extractLang({label: ['无可配置参数', 'No parameters to config']}).label),
-        Info: emptyPage(Lang.extractLang({label: ['无配置', 'No Configuration']}).label),
-        Play4Owner: emptyPage(Lang.extractLang({label: ['实验进行中', 'Playing...']}).label),
-        Result: emptyPage(Lang.extractLang({label: ['实验已结束', 'GAME OVER']}).label),
-        Result4Owner: emptyPage(Lang.extractLang({label: ['实验已结束', 'GAME OVER']}).label),
+        Create: Core.Create ,
+        Play4Owner: Core.Play4Owner,
+        Result: Core.Result,
+        Result4Owner: Core.Result4Owner,
         ...gameTemplate
     }
     Api.getUser().then(({user}) => {

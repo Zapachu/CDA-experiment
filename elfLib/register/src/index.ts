@@ -4,7 +4,7 @@ export namespace Template {
 
     export interface ICreateProps<ICreateParams> {
         params: Partial<ICreateParams>
-        setParams: (newParams: Partial<ICreateParams>) => void
+        setParams: (params: Partial<ICreateParams>|((prevParams:ICreateParams)=>Partial<ICreateParams>)) => void
         submitable?: boolean
         setSubmitable?: (submitable: boolean) => void
     }

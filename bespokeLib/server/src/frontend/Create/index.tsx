@@ -58,7 +58,7 @@ export function Create({user, history, gameTemplate: {Create: GameCreate}}: TPag
         </div>
         <GameCreate {...{
             params,
-            setParams: newParams => setParams({...params, ...newParams}),
+            setParams: action => setParams(typeof action === 'function' ? prevParams => ({...prevParams, ...action(prevParams)}) : {...params, ...action}),
             submitable,
             setSubmitable: submitable => setSubmitable(submitable)
         }}/>

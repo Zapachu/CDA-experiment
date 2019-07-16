@@ -10,7 +10,7 @@ declare type TTravelState = Core.ITravelState<any, any, any, any>
 
 declare interface IGameResultProps {
     game: IGameWithId<{}>
-    Result4Owner: Core.Result4OwnerClass
+    Result4Owner: Core.Result4OwnerClass<any,any,any,any,any>
 }
 
 declare interface IGameResultState {
