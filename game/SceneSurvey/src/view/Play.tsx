@@ -21,7 +21,10 @@ interface IPlayState {
   answer: string;
   key: string;
   name: string;
+  timer: number;
 }
+
+const DURATION = 40;
 
 export class Play extends Core.Play<
   ICreateParams,
@@ -33,18 +36,36 @@ export class Play extends Core.Play<
   IPushParams,
   IPlayState
 > {
+  private interval: NodeJS.Timer;
   constructor(props) {
     super(props);
     this.state = {
       answer: undefined,
       key: undefined,
-      name: undefined
+      name: undefined,
+      timer: DURATION
     };
   }
 
+  componentDidMount = () => {
+    this.ticking(this.state.timer);
+  };
+
+  ticking = (duration: number) => {
+    clearInterval(this.interval);
+    this.setState({ timer: duration });
+    this.interval = setInterval(() => {
+      if (this.state.timer > 0) {
+        this.setState(({ timer }) => ({ timer: timer - 1 }));
+      } else {
+        clearInterval(this.interval);
+      }
+    }, 1000);
+  };
+
   renderContent = () => {
     const { playerState, frameEmitter } = this.props;
-    const { answer, name, key } = this.state;
+    const { answer, name, key, timer } = this.state;
     switch (playerState.status) {
       case STATUS.instruction: {
         return (
@@ -64,11 +85,13 @@ export class Play extends Core.Play<
             </p>
             <p>现在让我们做出选择吧！</p>
             <Button
+              disabled={timer > 0}
               onClick={() => {
                 frameEmitter.emit(MoveType.prepare);
+                this.ticking(DURATION);
               }}
             >
-              确定
+              确定{timer > 0 ? `(${timer}s)` : ""}
             </Button>
           </div>
         );
@@ -92,6 +115,7 @@ export class Play extends Core.Play<
               </Radio.Group>
             </p>
             <Button
+              disabled={timer > 0}
               onClick={() => {
                 if (!answer) {
                   return Toast.warn("请选择");
@@ -100,9 +124,10 @@ export class Play extends Core.Play<
                   Toast.warn(error);
                 });
                 this.setState({ answer: undefined });
+                this.ticking(DURATION);
               }}
             >
-              确定
+              确定{timer > 0 ? `(${timer}s)` : ""}
             </Button>
           </div>
         );
