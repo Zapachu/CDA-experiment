@@ -1,6 +1,7 @@
 export const namespace = 'Extend'
 
 export enum MoveType {
+    add
 }
 
 export enum PushType {

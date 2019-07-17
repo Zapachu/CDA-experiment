@@ -29,3 +29,4 @@ export declare class BaseLogic<ICreateParams, IGameState, IPlayerState, MoveType
     protected broadcast(type: PushType, params?: Partial<IPushParams>): void;
     protected setPhaseResult(playerToken: string, result: Linker.Result.IResult): import("tracer").Tracer.LogOutput;
 }
+export { StateManager };

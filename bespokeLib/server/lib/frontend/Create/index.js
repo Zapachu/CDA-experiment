@@ -128,7 +128,7 @@ function Create(_a) {
                 } })),
         React.createElement(GameCreate, __assign({}, {
             params: params,
-            setParams: function (newParams) { return setParams(__assign({}, params, newParams)); },
+            setParams: function (action) { return setParams(typeof action === 'function' ? function (prevParams) { return (__assign({}, prevParams, action(prevParams))); } : __assign({}, params, action)); },
             submitable: submitable,
             setSubmitable: function (submitable) { return setSubmitable(submitable); }
         })),

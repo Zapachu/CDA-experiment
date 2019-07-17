@@ -1,3 +1,25 @@
 export * from './const'
-export * from './enum'
-export * from './interface'
+
+export module Extend {
+    export enum MoveType {
+        getGroup = 'getGroup'
+    }
+
+    export interface ICreateParams<ICreateParams> {
+        group: number
+        groupSize: number
+        groupsParams: ICreateParams[]
+    }
+
+    export interface IGameState<IGameState> {
+        groups: Array<{
+            playerNum: number
+            state: IGameState
+        }>
+    }
+
+    export interface IPlayerState<IPlayerState> {
+        groupIndex: number
+        state: IPlayerState
+    }
+}

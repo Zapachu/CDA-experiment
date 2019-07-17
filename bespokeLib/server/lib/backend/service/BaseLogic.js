@@ -41,6 +41,7 @@ var protocol_1 = require("@elf/protocol");
 var EventIO_1 = require("./EventIO");
 var GameDAO_1 = require("./GameDAO");
 var StateManager_1 = require("./StateManager");
+exports.StateManager = StateManager_1.StateManager;
 var MoveQueue_1 = require("./MoveQueue");
 var BaseLogic = /** @class */ (function () {
     function BaseLogic(game) {

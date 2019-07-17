@@ -143,3 +143,5 @@ export class BaseLogic<ICreateParams, IGameState, IPlayerState, MoveType, PushTy
 
     //endregion
 }
+
+export {StateManager}
