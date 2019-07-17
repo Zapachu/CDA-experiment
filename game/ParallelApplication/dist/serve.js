@@ -109,7 +109,7 @@ var router = express_1.Router()
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, server_1.RedisCall.call(protocol_1.Trial.Done.name, {
-                    userId: req.session.user.id,
+                    userId: req.user._id,
                     onceMore: true,
                     namespace: config_1.namespace
                 })];

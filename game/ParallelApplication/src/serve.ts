@@ -12,7 +12,7 @@ import {
 import Controller from "./Controller";
 import Robot from "./Robot";
 import { ICreateParams, namespace } from "./config";
-import { Trial} from "@elf/protocol";
+import { Trial } from "@elf/protocol";
 import { elfSetting } from "@elf/setting";
 import { RobotServer } from "@bespoke/robot";
 // import { config } from "@bespoke/share";
@@ -74,7 +74,7 @@ const router = Router()
     const result = await RedisCall.call<Trial.Done.IReq, Trial.Done.IRes>(
       Trial.Done.name,
       {
-        userId: req.session.user.id,
+        userId: req.user._id,
         onceMore: true,
         namespace
       }
@@ -98,6 +98,6 @@ RedisCall.handle<Trial.Create.IReq, Trial.Create.IRes>(
         groupSize: 20
       }
     });
-    return { playUrl:gameId2PlayUrl(gameId)};
+    return { playUrl: gameId2PlayUrl(gameId) };
   }
 );
