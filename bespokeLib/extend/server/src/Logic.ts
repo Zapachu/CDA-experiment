@@ -1,13 +1,13 @@
 import {BaseLogic, IActor, IMoveCallback, TGameState} from '@bespoke/server'
 import {Extend} from '@extend/share'
-import {Inner} from './inner'
+import {Group} from './group'
 
 export class Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>
     extends BaseLogic<Extend.ICreateParams<ICreateParams>, Extend.IGameState<IGameState>, Extend.IPlayerState<IPlayerState>, Extend.MoveType | MoveType, PushType, IMoveParams, IPushParams> {
 
-    InnerLogic: new(params: ICreateParams, stateManager: Inner.StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) => Inner.Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>
+    GroupLogic: new(params: ICreateParams, stateManager: Group.StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) => Group.Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>
 
-    groupsLogic: Inner.Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>[] = []
+    groupsLogic: Group.Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>[] = []
 
     initGameState(): TGameState<Extend.IGameState<IGameState>> {
         const gameState = super.initGameState()
@@ -29,7 +29,7 @@ export class Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, 
                         break
                     }
                     groupIndex = this.groupsLogic.length
-                    const groupLogic = new this.InnerLogic(this.game.params.groupsParams[groupIndex], new Inner.StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>(groupIndex, this.stateManager))
+                    const groupLogic = new this.GroupLogic(this.game.params.groupsParams[groupIndex], new Group.StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>(groupIndex, this.stateManager))
                     this.groupsLogic.push(groupLogic)
                     gameState.groups.push({
                         playerNum: 0,

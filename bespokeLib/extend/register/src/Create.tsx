@@ -3,10 +3,10 @@ import {Core} from '@bespoke/register'
 import {Extend, RANGE} from '@extend/share'
 import {Col, Row, Slider, Spin, Tabs} from 'antd'
 import {Label, Lang} from '@elf/component'
-import {Inner} from './inner'
+import {Group} from './group'
 
 export class Create<ICreateParams, S = {}> extends Core.Create<Extend.ICreateParams<ICreateParams>, S> {
-    InnerCreate: React.ComponentClass<Inner.ICreateProps<ICreateParams>, S>
+    GroupCreate: React.ComponentClass<Group.ICreateProps<ICreateParams>, S>
 
     lang = Lang.extractLang({
         group: ['组', 'Extend.Inner.tsx'],
@@ -46,7 +46,7 @@ export class Create<ICreateParams, S = {}> extends Core.Create<Extend.ICreatePar
                 {
                     Array(group).fill(null).map((_, i) =>
                         <Tabs.TabPane forceRender={true} tab={lang.groupIndex(i)} key={i.toString()}>
-                            <this.InnerCreate {...{
+                            <this.GroupCreate {...{
                                 params: groupsParams[i],
                                 setParams: (action: Partial<ICreateParams> | ((prevParams: ICreateParams) => Partial<ICreateParams>)) => {
                                     setParams((prevParams => {

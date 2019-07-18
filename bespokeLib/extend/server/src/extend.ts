@@ -1,2 +1,2 @@
-export * from './inner'
+export * from './group'
 export * from './Logic'

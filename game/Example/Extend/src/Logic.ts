@@ -2,7 +2,7 @@ import {Extend} from '@extend/server'
 import {IActor, IMoveCallback} from '@bespoke/share'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, MoveType, PushType} from './config'
 
-class InnerLogic extends Extend.Inner.Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
+class GroupLogic extends Extend.Group.Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     initGameState(): IGameState {
         const gameState = super.initGameState()
         gameState.total = 0
@@ -27,5 +27,5 @@ class InnerLogic extends Extend.Inner.Logic<ICreateParams, IGameState, IPlayerSt
 }
 
 export class Logic extends Extend.Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
-    InnerLogic = InnerLogic
+    GroupLogic = GroupLogic
 }

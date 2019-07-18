@@ -3,7 +3,7 @@ import {Extend} from '@extend/register'
 import {Button} from 'antd'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, MoveType, PushType} from '../config'
 
-class InnerPlay extends Extend.Inner.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
+class GroupPlay extends Extend.Group.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     render(): React.ReactNode {
         const {game, playerState, gameState, frameEmitter} = this.props
         return <>
@@ -15,5 +15,5 @@ class InnerPlay extends Extend.Inner.Play<ICreateParams, IGameState, IPlayerStat
 }
 
 export class Play extends Extend.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
-    InnerPlay = InnerPlay
+    GroupPlay = GroupPlay
 }

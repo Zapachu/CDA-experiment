@@ -3,7 +3,7 @@ import {Extend} from '@extend/register'
 import {InputNumber} from 'antd'
 import {ICreateParams} from '../config'
 
-class InnerCreate extends Extend.Inner.Create<ICreateParams> {
+class GroupCreate extends Extend.Group.Create<ICreateParams> {
     componentDidMount(): void {
         const {props: {setParams}} = this
         setParams({
@@ -18,5 +18,5 @@ class InnerCreate extends Extend.Inner.Create<ICreateParams> {
 }
 
 export class Create extends Extend.Create<ICreateParams> {
-    InnerCreate = InnerCreate
+    GroupCreate = GroupCreate
 }

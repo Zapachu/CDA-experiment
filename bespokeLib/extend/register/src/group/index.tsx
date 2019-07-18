@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {FrameEmitter, IGameWithId, TGameState, TPlayerState} from '@bespoke/share'
 
-export namespace Inner {
+export namespace Group {
     export interface ICreateProps<ICreateParams> {
         params: Partial<ICreateParams>
         setParams: (params: Partial<ICreateParams> | ((prevParams: ICreateParams) => Partial<ICreateParams>)) => void
