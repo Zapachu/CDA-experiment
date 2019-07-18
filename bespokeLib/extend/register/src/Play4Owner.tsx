@@ -1,7 +1,7 @@
 import * as React from 'react'
-import {Wrapper} from '@extend/share'
+import {Extractor, Wrapper} from '@extend/share'
 import {Core} from '@bespoke/register'
-import {Group, TransProps} from './group'
+import {Group} from './group'
 import {Tabs} from 'antd'
 import {Lang} from '@elf/component'
 
@@ -21,10 +21,10 @@ export class Play4Owner<ICreateParams, IGameState, IPlayerState, MoveType, PushT
                 Array(game.params.group).fill(null).map((_, i) =>
                     <Tabs.TabPane forceRender={true} tab={lang.groupIndex(i)} key={i.toString()}>
                         <this.GroupPlay4Owner {...{
-                            game: TransProps.game(game, i),
-                            frameEmitter: TransProps.frameEmitter(frameEmitter, i),
-                            gameState: TransProps.gameState(gameState, i),
-                            playerStates: TransProps.playerStates(playerStates, i)
+                            game: Extractor.game(game, i),
+                            frameEmitter: Extractor.frameEmitter(frameEmitter, i),
+                            gameState: Extractor.gameState(gameState, i),
+                            playerStates: Extractor.playerStates(playerStates, i)
                         }}/>
                     </Tabs.TabPane>
                 )

@@ -1,9 +1,26 @@
 import * as React from 'react'
 import {Core} from '@bespoke/register'
-import {RANGE, Wrapper} from '@extend/share'
+import {GroupRange, Wrapper} from '@extend/share'
 import {Col, Row, Slider, Spin, Tabs} from 'antd'
 import {Label, Lang} from '@elf/component'
-import {Group, TransProps} from './group'
+import {Group} from './group'
+
+namespace Extractor {
+    export function params<P>(params: Core.TCreateParams<Wrapper.ICreateParams<P>>, groupIndex: number): Core.TCreateParams<P> {
+        return params.groupsParams[groupIndex]
+    }
+
+    export function setParams<P>(setParams: Core.TSetCreateParams<Wrapper.ICreateParams<P>>, groupIndex: number): Core.TSetCreateParams<P> {
+        return (action: React.SetStateAction<P>) =>
+            setParams((prevParams => {
+                const groupsParams = prevParams.groupsParams.slice(),
+                    prevGroupParams = groupsParams[groupIndex]
+                groupsParams[groupIndex] = {...prevGroupParams, ...typeof action === 'function' ? (action as (prevState: P) => P)(prevGroupParams) : action}
+                return {groupsParams}
+            }))
+    }
+}
+
 
 export class Create<ICreateParams, S = {}> extends Core.Create<Wrapper.ICreateParams<Core.TCreateParams<ICreateParams>>, S> {
     GroupCreate: React.ComponentType<Group.ICreateProps<ICreateParams>> = Group.Create
@@ -17,9 +34,9 @@ export class Create<ICreateParams, S = {}> extends Core.Create<Wrapper.ICreatePa
     componentDidMount(): void {
         const {props: {setParams}} = this
         const initParams: Wrapper.ICreateParams<ICreateParams> = {
-            group: RANGE.group.max,
-            groupSize: RANGE.groupSize.max,
-            groupsParams: Array(RANGE.group.max).fill(null).map(() => ({} as any))
+            group: GroupRange.group.max,
+            groupSize: GroupRange.groupSize.max,
+            groupsParams: Array(GroupRange.group.max).fill(null).map(() => ({} as any))
         }
         setParams(initParams)
     }
@@ -33,12 +50,12 @@ export class Create<ICreateParams, S = {}> extends Core.Create<Wrapper.ICreatePa
             <Row>
                 <Col span={6} offset={6}>
                     <Label label={lang.group}/>
-                    <Slider {...RANGE.group} value={params.group}
+                    <Slider {...GroupRange.group} value={params.group}
                             onChange={value => setParams({group: +value})}/>
                 </Col>
                 <Col span={6}>
                     <Label label={lang.groupSize}/>
-                    <Slider {...RANGE.groupSize} value={params.groupSize}
+                    <Slider {...GroupRange.groupSize} value={params.groupSize}
                             onChange={value => setParams({groupSize: +value})}/>
                 </Col>
             </Row>
@@ -47,8 +64,8 @@ export class Create<ICreateParams, S = {}> extends Core.Create<Wrapper.ICreatePa
                     Array(params.group).fill(null).map((_, i) =>
                         <Tabs.TabPane forceRender={true} tab={lang.groupIndex(i)} key={i.toString()}>
                             <this.GroupCreate {...{
-                                params: TransProps.params(params, i),
-                                setParams: TransProps.setParams(setParams, i)
+                                params: Extractor.params(params, i),
+                                setParams: Extractor.setParams(setParams, i)
                             }}/>
                         </Tabs.TabPane>
                     )

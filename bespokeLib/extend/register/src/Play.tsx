@@ -1,8 +1,8 @@
 import * as React from 'react'
 import {Core} from '@bespoke/register'
 import {MaskLoading} from '@elf/component'
-import {Wrapper} from '@extend/share'
-import {Group, TransProps} from './group'
+import {Wrapper, Extractor} from '@extend/share'
+import {Group} from './group'
 
 export class Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, S = {}>
     extends Core.Play<Wrapper.ICreateParams<ICreateParams>, Wrapper.IGameState<IGameState>, Wrapper.IPlayerState<IPlayerState>, Wrapper.MoveType<MoveType>, PushType, Wrapper.IMoveParams<IMoveParams>, IPushParams, S> {
@@ -20,10 +20,10 @@ export class Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, I
         }
         const {groupIndex} = playerState
         return <this.GroupPlay {...{
-            game: TransProps.game(game, groupIndex),
-            frameEmitter: TransProps.frameEmitter(frameEmitter, groupIndex),
-            gameState: TransProps.gameState(gameState, groupIndex),
-            playerState: TransProps.playerState(playerState)
+            game: Extractor.game(game, groupIndex),
+            frameEmitter: Extractor.frameEmitter(frameEmitter, groupIndex),
+            gameState: Extractor.gameState(gameState, groupIndex),
+            playerState: Extractor.playerState(playerState)
         }}/>
     }
 }

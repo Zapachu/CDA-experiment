@@ -29,6 +29,7 @@ export class Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, 
 
     protected async teacherMoveReducer(actor: IActor, type: Wrapper.MoveType<MoveType>, params: Wrapper.IMoveParams<IMoveParams>, cb: IMoveCallback): Promise<void> {
         await this.groupsLogic[params.groupIndex].teacherMoveReducer(actor, type as MoveType, params.params, cb)
+        this.startRobot(Math.random())
     }
 
     protected async playerMoveReducer(actor: IActor, type: Wrapper.MoveType<MoveType>, params: Wrapper.IMoveParams<IMoveParams>, cb: IMoveCallback): Promise<void> {
@@ -46,6 +47,7 @@ export class Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, 
             playerState.groupIndex = groupIndex
             playerState.state = await this.groupsLogic[groupIndex].initPlayerState()
             gameState.groups[groupIndex].playerNum++
+            await this.stateManager.syncState()
         } else {
             await this.groupsLogic[params.groupIndex].playerMoveReducer(actor, type, params.params, cb)
         }
