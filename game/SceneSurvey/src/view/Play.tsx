@@ -24,7 +24,7 @@ interface IPlayState {
   timer: number;
 }
 
-const DURATION = 40;
+const DURATION = 25;
 
 export class Play extends Core.Play<
   ICreateParams,
