@@ -1,16 +1,16 @@
 import * as React from 'react'
 import {Core} from '@bespoke/register'
 import {MaskLoading} from '@elf/component'
-import {Extend} from '@extend/share'
+import {Wrapper} from '@extend/share'
 import {Group, TransProps} from './group'
 
 export class Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, S = {}>
-    extends Core.Play<Extend.ICreateParams<ICreateParams>, Extend.IGameState<IGameState>, Extend.IPlayerState<IPlayerState>, MoveType | Extend.MoveType, PushType, Extend.IMoveParams<IMoveParams>, IPushParams, S> {
+    extends Core.Play<Wrapper.ICreateParams<ICreateParams>, Wrapper.IGameState<IGameState>, Wrapper.IPlayerState<IPlayerState>, Wrapper.MoveType<MoveType>, PushType, Wrapper.IMoveParams<IMoveParams>, IPushParams, S> {
     GroupPlay: React.ComponentType<Group.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>> = Group.Play
 
     componentDidMount(): void {
         const {props: {frameEmitter}} = this
-        frameEmitter.emit(Extend.MoveType.getGroup)
+        frameEmitter.emit(Wrapper.GroupMoveType.getGroup)
     }
 
     render(): React.ReactNode {
@@ -21,7 +21,7 @@ export class Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, I
         const {groupIndex} = playerState
         return <this.GroupPlay {...{
             game: TransProps.game(game, groupIndex),
-            frameEmitter : TransProps.frameEmitter(frameEmitter, groupIndex),
+            frameEmitter: TransProps.frameEmitter(frameEmitter, groupIndex),
             gameState: TransProps.gameState(gameState, groupIndex),
             playerState: TransProps.playerState(playerState)
         }}/>

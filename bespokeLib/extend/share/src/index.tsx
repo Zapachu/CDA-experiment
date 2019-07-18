@@ -1,16 +1,26 @@
-export * from './const'
+export const RANGE = {
+    group: {
+        min: 1,
+        max: 8
+    },
+    groupSize: {
+        min: 2,
+        max: 8
+    }
+}
 
-export module Extend {
-    export enum MoveType {
+export namespace Wrapper {
+    export enum GroupMoveType {
         getGroup = 'getGroup'
     }
+
+    export type MoveType<MoveType> = MoveType | GroupMoveType
 
     export interface ICreateParams<ICreateParams> {
         group: number
         groupSize: number
         groupsParams: ICreateParams[]
     }
-
 
     export interface IMoveParams<IMoveParams> {
         groupIndex: number

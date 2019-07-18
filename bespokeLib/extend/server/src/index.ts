@@ -1,3 +1,4 @@
-import * as Extend from './extend'
+import * as Group from './group'
 
-export {Extend}
+export {Group}
+export * from './Logic'

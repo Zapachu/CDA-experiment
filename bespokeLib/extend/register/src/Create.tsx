@@ -1,11 +1,11 @@
 import * as React from 'react'
 import {Core} from '@bespoke/register'
-import {Extend, RANGE} from '@extend/share'
+import {RANGE, Wrapper} from '@extend/share'
 import {Col, Row, Slider, Spin, Tabs} from 'antd'
 import {Label, Lang} from '@elf/component'
 import {Group, TransProps} from './group'
 
-export class Create<ICreateParams, S = {}> extends Core.Create<Extend.ICreateParams<Core.TCreateParams<ICreateParams>>, S> {
+export class Create<ICreateParams, S = {}> extends Core.Create<Wrapper.ICreateParams<Core.TCreateParams<ICreateParams>>, S> {
     GroupCreate: React.ComponentType<Group.ICreateProps<ICreateParams>> = Group.Create
 
     lang = Lang.extractLang({
@@ -16,7 +16,7 @@ export class Create<ICreateParams, S = {}> extends Core.Create<Extend.ICreatePar
 
     componentDidMount(): void {
         const {props: {setParams}} = this
-        const initParams: Extend.ICreateParams<ICreateParams> = {
+        const initParams: Wrapper.ICreateParams<ICreateParams> = {
             group: RANGE.group.max,
             groupSize: RANGE.groupSize.max,
             groupsParams: Array(RANGE.group.max).fill(null).map(() => ({} as any))
@@ -48,7 +48,7 @@ export class Create<ICreateParams, S = {}> extends Core.Create<Extend.ICreatePar
                         <Tabs.TabPane forceRender={true} tab={lang.groupIndex(i)} key={i.toString()}>
                             <this.GroupCreate {...{
                                 params: TransProps.params(params, i),
-                                setParams : TransProps.setParams(setParams, i)
+                                setParams: TransProps.setParams(setParams, i)
                             }}/>
                         </Tabs.TabPane>
                     )

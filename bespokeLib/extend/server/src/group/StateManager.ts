@@ -1,8 +1,8 @@
 import {IActor, StateManager as BespokeStateManager} from '@bespoke/server'
-import {Extend} from '@extend/share'
+import {Wrapper} from '@extend/share'
 
 export class StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
-    constructor(private groupIndex: number, private stateManager: BespokeStateManager<ICreateParams, Extend.IGameState<IGameState>, Extend.IPlayerState<IPlayerState>, MoveType, PushType, IMoveParams, IPushParams>) {
+    constructor(private groupIndex: number, private stateManager: BespokeStateManager<ICreateParams, Wrapper.IGameState<IGameState>, Wrapper.IPlayerState<IPlayerState>, MoveType, PushType, IMoveParams, IPushParams>) {
 
     }
 
@@ -24,7 +24,7 @@ export class StateManager<ICreateParams, IGameState, IPlayerState, MoveType, Pus
         return playerStates
     }
 
-    async syncState(){
+    async syncState() {
         await this.stateManager.syncState()
     }
 }

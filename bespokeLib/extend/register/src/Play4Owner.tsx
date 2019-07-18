@@ -1,12 +1,12 @@
 import * as React from 'react'
+import {Wrapper} from '@extend/share'
 import {Core} from '@bespoke/register'
-import {Extend} from '@extend/share'
 import {Group, TransProps} from './group'
 import {Tabs} from 'antd'
 import {Lang} from '@elf/component'
 
 export class Play4Owner<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, S = {}>
-    extends Core.Play4Owner<Extend.ICreateParams<ICreateParams>, Extend.IGameState<IGameState>, Extend.IPlayerState<IPlayerState>, MoveType | Extend.MoveType, PushType, IMoveParams, IPushParams, S> {
+    extends Core.Play4Owner<Wrapper.ICreateParams<ICreateParams>, Wrapper.IGameState<IGameState>, Wrapper.IPlayerState<IPlayerState>, Wrapper.MoveType<MoveType>, PushType, IMoveParams, IPushParams, S> {
     GroupPlay4Owner: React.ComponentType<Group.IPlay4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>> = Group.Play4Owner
     lang = Lang.extractLang({
         group: ['组', 'Extend.Inner.tsx'],

@@ -1,4 +1,4 @@
-import {Extend} from '@extend/server'
+import * as Extend from '@extend/server'
 import {IActor, IMoveCallback} from '@bespoke/share'
 import {Log} from '@elf/util'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, MoveType, PushType} from './config'

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {Extend} from '@extend/register'
+import * as Extend from '@extend/register'
 import {ICreateParams, IGameState, IPlayerState} from '../config'
 
 class GroupResult extends Extend.Group.Result<ICreateParams, IGameState, IPlayerState> {
