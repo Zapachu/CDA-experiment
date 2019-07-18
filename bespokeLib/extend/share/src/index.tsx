@@ -11,6 +11,12 @@ export module Extend {
         groupsParams: ICreateParams[]
     }
 
+
+    export interface IMoveParams<IMoveParams> {
+        groupIndex: number
+        params: IMoveParams
+    }
+
     export interface IGameState<IGameState> {
         groups: Array<{
             playerNum: number

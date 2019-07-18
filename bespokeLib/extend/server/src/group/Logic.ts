@@ -13,6 +13,9 @@ export class Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, 
         return {} as any
     }
 
+    async teacherMoveReducer(actor: IActor, type: MoveType, params: IMoveParams, cb: IMoveCallback): Promise<void> {
+    }
+
     async playerMoveReducer(actor: IActor, type: MoveType, params: IMoveParams, cb: IMoveCallback): Promise<void> {
     }
 

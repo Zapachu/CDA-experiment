@@ -5,7 +5,7 @@ import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, MoveT
 
 class GroupPlay extends Extend.Group.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     render(): React.ReactNode {
-        const {game, playerState, gameState, frameEmitter} = this.props
+        const {playerState, gameState, frameEmitter} = this.props
         return <>
             <h2>{playerState.count}</h2>
             <h2>{gameState.total}</h2>

@@ -1,5 +1,6 @@
 import {Extend} from '@extend/server'
 import {IActor, IMoveCallback} from '@bespoke/share'
+import {Log} from '@elf/util'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, MoveType, PushType} from './config'
 
 class GroupLogic extends Extend.Group.Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
@@ -13,6 +14,15 @@ class GroupLogic extends Extend.Group.Logic<ICreateParams, IGameState, IPlayerSt
         const playerState = await super.initPlayerState()
         playerState.count = 0
         return playerState
+    }
+
+    async teacherMoveReducer(actor: IActor, type: MoveType, params: IMoveParams, cb: IMoveCallback): Promise<void> {
+        const gameState = await this.stateManager.getGameState()
+        Log.d(gameState)
+        switch (type) {
+            case MoveType.reset:
+                gameState.total = 0
+        }
     }
 
     async playerMoveReducer(actor: IActor, type: MoveType, params: IMoveParams, cb: IMoveCallback): Promise<void> {

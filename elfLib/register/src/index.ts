@@ -1,15 +1,17 @@
 import * as React from 'react'
 
 export namespace Template {
+    export type TCreateParams<P> = Partial<P>
+    export type TSetCreateParams<P> = React.Dispatch<React.SetStateAction<TCreateParams<P>>>
 
-    export interface ICreateProps<ICreateParams> {
-        params: Partial<ICreateParams>
-        setParams: (params: Partial<ICreateParams> | ((prevParams: ICreateParams) => Partial<ICreateParams>)) => void
+    export interface ICreateProps<P> {
+        params: TCreateParams<P>
+        setParams: TSetCreateParams<P>
         submitable?: boolean
         setSubmitable?: (submitable: boolean) => void
     }
 
-    export class Create<ICreateParams, S = {}> extends React.Component<ICreateProps<ICreateParams>, S> {
+    export class Create<P, S = {}> extends React.Component<ICreateProps<P>, S> {
     }
 }
 

@@ -23,6 +23,9 @@ export namespace Core {
         }}>{Lang.extractLang(props).label}</div>
     }
 
+    export type TCreateParams<ICreateParams> = Template.TCreateParams<ICreateParams>
+    export type TSetCreateParams<ICreateParams> = Template.TSetCreateParams<ICreateParams>
+
     export type ICreateProps<ICreateParams> = Template.ICreateProps<ICreateParams>
 
     export class Create<ICreateParams, S = {}> extends Template.Create<ICreateParams, S> {

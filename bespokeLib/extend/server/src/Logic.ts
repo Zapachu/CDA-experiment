@@ -3,45 +3,51 @@ import {Extend} from '@extend/share'
 import {Group} from './group'
 
 export class Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>
-    extends BaseLogic<Extend.ICreateParams<ICreateParams>, Extend.IGameState<IGameState>, Extend.IPlayerState<IPlayerState>, Extend.MoveType | MoveType, PushType, IMoveParams, IPushParams> {
+    extends BaseLogic<Extend.ICreateParams<ICreateParams>, Extend.IGameState<IGameState>, Extend.IPlayerState<IPlayerState>, Extend.MoveType | MoveType, PushType, Extend.IMoveParams<IMoveParams>, IPushParams> {
 
     GroupLogic: new(params: ICreateParams, stateManager: Group.StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) => Group.Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>
 
-    groupsLogic: Group.Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>[] = []
+    groupsLogic: Group.Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>[]
+
+    async init(): Promise<this> {
+        await super.init()
+        const {game: {params: {group, groupsParams}}} = this
+        this.groupsLogic = Array(group).fill(null).map((_, i) =>
+            new this.GroupLogic(groupsParams[i], new Group.StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>(i, this.stateManager))
+        )
+        return this
+    }
 
     initGameState(): TGameState<Extend.IGameState<IGameState>> {
         const gameState = super.initGameState()
-        gameState.groups = []
+        gameState.groups = Array(this.game.params.group).fill(null).map((_, i) => ({
+            playerNum: 0,
+            state: this.groupsLogic[i].initGameState()
+        }))
         return gameState
     }
 
-    protected async playerMoveReducer(actor: IActor, type: Extend.MoveType | MoveType, params: IMoveParams, cb: IMoveCallback): Promise<void> {
-        const {group, groupSize} = this.game.params
+    protected async teacherMoveReducer(actor: IActor, type: Extend.MoveType | MoveType, params: Extend.IMoveParams<IMoveParams>, cb: IMoveCallback): Promise<void> {
+        await this.groupsLogic[params.groupIndex].teacherMoveReducer(actor, type as MoveType, params.params, cb)
+    }
+
+    protected async playerMoveReducer(actor: IActor, type: Extend.MoveType | MoveType, params: Extend.IMoveParams<IMoveParams>, cb: IMoveCallback): Promise<void> {
+        const {groupSize} = this.game.params
         const gameState = await this.stateManager.getGameState(),
-            playerState = await this.stateManager.getPlayerState(actor),
-            playerStates = await this.stateManager.getPlayerStates()
-        // noinspection JSRedundantSwitchStatement
-        switch (type) {
-            case Extend.MoveType.getGroup:
-                let groupIndex = gameState.groups.findIndex(group => group.playerNum < groupSize)
-                if (groupIndex === -1) {
-                    if (gameState.groups.length === group) {
-                        break
-                    }
-                    groupIndex = this.groupsLogic.length
-                    const groupLogic = new this.GroupLogic(this.game.params.groupsParams[groupIndex], new Group.StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>(groupIndex, this.stateManager))
-                    this.groupsLogic.push(groupLogic)
-                    gameState.groups.push({
-                        playerNum: 0,
-                        state: groupLogic.initGameState()
-                    })
-                }
-                playerState.groupIndex = groupIndex
-                playerState.state = await this.groupsLogic[groupIndex].initPlayerState()
-                gameState.groups[groupIndex].playerNum++
-                break
-            default:
-                await this.groupsLogic[playerState.groupIndex].playerMoveReducer(actor, type, params, cb)
+            playerState = await this.stateManager.getPlayerState(actor)
+        if (type === Extend.MoveType.getGroup) {
+            if (playerState.groupIndex !== undefined) {
+                return
+            }
+            let groupIndex = gameState.groups.findIndex(group => group.playerNum < groupSize)
+            if (groupIndex === -1) {
+                return
+            }
+            playerState.groupIndex = groupIndex
+            playerState.state = await this.groupsLogic[groupIndex].initPlayerState()
+            gameState.groups[groupIndex].playerNum++
+        } else {
+            await this.groupsLogic[params.groupIndex].playerMoveReducer(actor, type, params.params, cb)
         }
     }
 }

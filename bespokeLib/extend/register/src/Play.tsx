@@ -2,11 +2,11 @@ import * as React from 'react'
 import {Core} from '@bespoke/register'
 import {MaskLoading} from '@elf/component'
 import {Extend} from '@extend/share'
-import {Group} from './group'
+import {Group, TransProps} from './group'
 
-export class Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>
-    extends Core.Play<Extend.ICreateParams<ICreateParams>, Extend.IGameState<IGameState>, Extend.IPlayerState<IPlayerState>, MoveType | Extend.MoveType, PushType, IMoveParams, IPushParams> {
-    GroupPlay: React.ComponentType<Group.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>>
+export class Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, S = {}>
+    extends Core.Play<Extend.ICreateParams<ICreateParams>, Extend.IGameState<IGameState>, Extend.IPlayerState<IPlayerState>, MoveType | Extend.MoveType, PushType, Extend.IMoveParams<IMoveParams>, IPushParams, S> {
+    GroupPlay: React.ComponentType<Group.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>> = Group.Play
 
     componentDidMount(): void {
         const {props: {frameEmitter}} = this
@@ -18,14 +18,12 @@ export class Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, I
         if (playerState.groupIndex === undefined) {
             return <MaskLoading/>
         }
-        const {params, ...extraGame} = game,
-            {groupIndex, state, ...extraPlayerState} = playerState,
-            {groups, ...extraGameState} = gameState
+        const {groupIndex} = playerState
         return <this.GroupPlay {...{
-            game: {...extraGame, params: params.groupsParams[groupIndex]},
-            frameEmitter,
-            gameState: {...extraGameState, ...groups[groupIndex].state},
-            playerState: {...extraPlayerState, ...state}
+            game: TransProps.game(game, groupIndex),
+            frameEmitter : TransProps.frameEmitter(frameEmitter, groupIndex),
+            gameState: TransProps.gameState(gameState, groupIndex),
+            playerState: TransProps.playerState(playerState)
         }}/>
     }
 }

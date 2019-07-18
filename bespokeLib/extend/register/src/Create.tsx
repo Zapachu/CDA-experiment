@@ -3,10 +3,10 @@ import {Core} from '@bespoke/register'
 import {Extend, RANGE} from '@extend/share'
 import {Col, Row, Slider, Spin, Tabs} from 'antd'
 import {Label, Lang} from '@elf/component'
-import {Group} from './group'
+import {Group, TransProps} from './group'
 
-export class Create<ICreateParams, S = {}> extends Core.Create<Extend.ICreateParams<ICreateParams>, S> {
-    GroupCreate: React.ComponentType<Group.ICreateProps<ICreateParams>>
+export class Create<ICreateParams, S = {}> extends Core.Create<Extend.ICreateParams<Core.TCreateParams<ICreateParams>>, S> {
+    GroupCreate: React.ComponentType<Group.ICreateProps<ICreateParams>> = Group.Create
 
     lang = Lang.extractLang({
         group: ['组', 'Extend.Inner.tsx'],
@@ -25,37 +25,30 @@ export class Create<ICreateParams, S = {}> extends Core.Create<Extend.ICreatePar
     }
 
     render(): React.ReactNode {
-        const {lang, props: {params: {group, groupSize, groupsParams}, setParams}} = this
-        if (!groupsParams) {
+        const {lang, props: {params, setParams}} = this
+        if (!params.groupsParams) {
             return <Spin/>
         }
         return <Row>
             <Row>
                 <Col span={6} offset={6}>
                     <Label label={lang.group}/>
-                    <Slider {...RANGE.group} value={group}
+                    <Slider {...RANGE.group} value={params.group}
                             onChange={value => setParams({group: +value})}/>
                 </Col>
                 <Col span={6}>
                     <Label label={lang.groupSize}/>
-                    <Slider {...RANGE.groupSize} value={groupSize}
+                    <Slider {...RANGE.groupSize} value={params.groupSize}
                             onChange={value => setParams({groupSize: +value})}/>
                 </Col>
             </Row>
             <Tabs>
                 {
-                    Array(group).fill(null).map((_, i) =>
+                    Array(params.group).fill(null).map((_, i) =>
                         <Tabs.TabPane forceRender={true} tab={lang.groupIndex(i)} key={i.toString()}>
                             <this.GroupCreate {...{
-                                params: groupsParams[i],
-                                setParams: (action: Partial<ICreateParams> | ((prevParams: ICreateParams) => Partial<ICreateParams>)) => {
-                                    setParams((prevParams => {
-                                        const groupsParams = prevParams.groupsParams.slice(),
-                                            prevGroupParams = groupsParams[i]
-                                        groupsParams[i] = {...prevGroupParams, ...typeof action === 'function' ? action(prevGroupParams) : action}
-                                        return {groupsParams}
-                                    }))
-                                }
+                                params: TransProps.params(params, i),
+                                setParams : TransProps.setParams(setParams, i)
                             }}/>
                         </Tabs.TabPane>
                     )
