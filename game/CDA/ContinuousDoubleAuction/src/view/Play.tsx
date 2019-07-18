@@ -4,16 +4,15 @@ import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from 
 import {MoveType, PushType} from '../config'
 import {phaseTemplates} from './phase'
 
-export const Play: Core.PlaySFC<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> =
-    ({game, gameState, playerState, frameEmitter}) => {
-        const {templateName} = game.params.phases[gameState.gamePhaseIndex],
-            {Play} = phaseTemplates.find(({name}) => name === templateName)
-        return <Play key={`${templateName}-${gameState.gamePhaseIndex}`}
-                     {...{
-                         game,
-                         gameState,
-                         playerState,
-                         frameEmitter
-                     }}/>
-    }
+export function Play({game, gameState, playerState, frameEmitter}: Core.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {
+    const {templateName} = game.params.phases[gameState.gamePhaseIndex],
+        {Play} = phaseTemplates.find(({name}) => name === templateName)
+    return <Play key={`${templateName}-${gameState.gamePhaseIndex}`}
+                 {...{
+                     game,
+                     gameState,
+                     playerState,
+                     frameEmitter
+                 }}/>
+}
 

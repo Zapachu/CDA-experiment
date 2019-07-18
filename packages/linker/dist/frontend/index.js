@@ -35,7 +35,7 @@ var Create_1 = require("./Create");
 var antd_1 = require("antd");
 require('./initial.scss');
 function registerOnElf(namespace, template) {
-    util_1.GameTemplate.setTemplate(__assign({ namespace: namespace, Create: function () { return null; } }, template));
+    util_1.GameTemplate.setTemplate(__assign({ namespace: namespace, Create: template.Create }, template));
 }
 exports.registerOnElf = registerOnElf;
 util_1.Api.getUser().then(function (_a) {

@@ -16,7 +16,7 @@ require('./initial.scss')
 export function registerOnElf(namespace: string, template: IGameTemplate) {
     GameTemplate.setTemplate({
         namespace,
-        Create: ()=>null,
+        Create: template.Create,
         ...template
     })
 }

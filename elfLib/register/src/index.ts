@@ -4,23 +4,19 @@ export namespace Template {
 
     export interface ICreateProps<ICreateParams> {
         params: Partial<ICreateParams>
-        setParams: (params: Partial<ICreateParams>|((prevParams:ICreateParams)=>Partial<ICreateParams>)) => void
+        setParams: (params: Partial<ICreateParams> | ((prevParams: ICreateParams) => Partial<ICreateParams>)) => void
         submitable?: boolean
         setSubmitable?: (submitable: boolean) => void
     }
 
     export class Create<ICreateParams, S = {}> extends React.Component<ICreateProps<ICreateParams>, S> {
     }
-
-    export type CreateSFC<ICreateParams> = React.FC<ICreateProps<ICreateParams>>
-
-    export type CreateClass = (new(...args) => Create<{}, any>) | CreateSFC<{}>
 }
 
 export interface IGameTemplate {
     namespace?: string
     localeNames: Array<string>
-    Create?: Template.CreateClass
+    Create?: React.ComponentType<Template.ICreateProps<any>>
 }
 
 export function registerOnElf(namespace: string, gameTemplate: IGameTemplate) {

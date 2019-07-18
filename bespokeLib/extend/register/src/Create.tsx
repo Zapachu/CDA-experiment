@@ -6,7 +6,7 @@ import {Label, Lang} from '@elf/component'
 import {Group} from './group'
 
 export class Create<ICreateParams, S = {}> extends Core.Create<Extend.ICreateParams<ICreateParams>, S> {
-    GroupCreate: React.ComponentClass<Group.ICreateProps<ICreateParams>, S>
+    GroupCreate: React.ComponentType<Group.ICreateProps<ICreateParams>>
 
     lang = Lang.extractLang({
         group: ['组', 'Extend.Inner.tsx'],
