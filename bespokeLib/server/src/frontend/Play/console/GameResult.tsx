@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {IGameWithId, ResponseCode} from '@bespoke/share'
 import {MaskLoading} from '@elf/component'
-import {Core} from '@bespoke/register'
+import {Core} from '@bespoke/client'
 import {Api} from '../../util'
 import {applyChange} from 'deep-diff'
 import cloneDeep = require('lodash/cloneDeep')

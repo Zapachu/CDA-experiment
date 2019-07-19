@@ -24,7 +24,7 @@ var __rest = (this && this.__rest) || function (s, e) {
 Object.defineProperty(exports, "__esModule", { value: true });
 require("./initial.scss");
 var React = require("react");
-var register_1 = require("@bespoke/register");
+var client_1 = require("@bespoke/client");
 var component_1 = require("@elf/component");
 var react_router_dom_1 = require("react-router-dom");
 var share_1 = require("@bespoke/share");
@@ -64,7 +64,7 @@ function renderRoot(pageProps, rootContainer) {
                 React.createElement(util_1.Button, { size: 'small', onClick: function () { return component_1.Lang.switchLang(component_1.Lang.activeLanguage === component_1.Language.en ? component_1.Language.zh : component_1.Language.en); } }, component_1.Lang.activeLanguage === component_1.Language.en ? '中文' : 'English'))), rootContainer);
 }
 function registerOnBespoke(gameTemplate) {
-    var template = __assign({ Create: register_1.Core.Create, Play4Owner: register_1.Core.Play4Owner, Result: register_1.Core.Result, Result4Owner: register_1.Core.Result4Owner }, gameTemplate);
+    var template = __assign({ Create: client_1.Core.Create, Play4Owner: client_1.Core.Play4Owner, Result: client_1.Core.Result, Result4Owner: client_1.Core.Result4Owner }, gameTemplate);
     util_1.Api.getUser().then(function (_a) {
         var user = _a.user;
         var rootContainer = document.body.appendChild(document.createElement('div')), props = { gameTemplate: template, user: user };

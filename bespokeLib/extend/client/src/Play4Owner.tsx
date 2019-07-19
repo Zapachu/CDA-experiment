@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {Extractor, Wrapper} from '@extend/share'
-import {Core} from '@bespoke/register'
+import {Core} from '@bespoke/client'
 import {Group} from './group'
 import {Tabs} from 'antd'
 import {Lang} from '@elf/component'

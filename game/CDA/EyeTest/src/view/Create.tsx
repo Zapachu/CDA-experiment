@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {Input, Label, Lang} from '@elf/component'
-import {Core} from '@bespoke/register'
+import {Core} from '@bespoke/client'
 import {ICreateParams} from '../interface'
 
 interface ICreateState {

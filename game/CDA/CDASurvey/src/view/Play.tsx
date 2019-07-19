@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {Button, ButtonProps, Input, Lang, MaskLoading, RadioGroup, Toast} from '@elf/component'
-import {Core} from '@bespoke/register'
+import {Core} from '@bespoke/client'
 import {GameStage, MoveType, PushType, SURVEY_BASIC, SURVEY_FEEDBACK, SURVEY_STAGE, SURVEY_TEST} from '../config'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 

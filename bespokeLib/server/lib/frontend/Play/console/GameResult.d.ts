@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { IGameWithId } from '@bespoke/share';
-import { Core } from '@bespoke/register';
+import { Core } from '@bespoke/client';
 declare type TTravelState = Core.ITravelState<any, any, any, any>;
 declare interface IGameResultProps {
     game: IGameWithId<{}>;

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {Core} from '@bespoke/register'
+import {Core} from '@bespoke/client'
 import {MaskLoading} from '@elf/component'
 import {Extractor, Wrapper} from '@extend/share'
 import {Group} from './group'

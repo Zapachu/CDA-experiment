@@ -16,7 +16,7 @@
     "otreeProxy": "ts-node ./lib/phases/otreeProxy/app.ts"
   },
   "devDependencies": {
-    "@elf/register": "^1.1.1",
+    "@elf/client": "^1.1.1",
     "@elf/protocol": "^1.1.1",
     "@elf/setting": "^1.1.1",
     "@elf/share": "^1.1.1",

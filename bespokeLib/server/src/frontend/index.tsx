@@ -1,6 +1,6 @@
 import './initial.scss'
 import * as React from 'react'
-import {IGameTemplate, Core} from '@bespoke/register'
+import {IGameTemplate, Core} from '@bespoke/client'
 import {Lang, Language} from '@elf/component'
 import {BrowserRouter, Route as ReactRoute, RouteComponentProps, RouteProps, Switch} from 'react-router-dom'
 import {config} from '@bespoke/share'

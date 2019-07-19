@@ -1,5 +1,5 @@
 import * as React from 'react'
-import * as Extend from '@extend/register'
+import * as Extend from '@extend/client'
 import {InputNumber} from 'antd'
 import {ICreateParams} from '../config'
 

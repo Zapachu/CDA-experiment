@@ -10,7 +10,7 @@
     "dist": "tsc --downlevelIteration script/buildGame.ts -t ES5 & tsc & npm run client:dist"
   },
   "devDependencies": {
-    "@bespoke/register": "^1.1.1",
+    "@bespoke/client": "^1.1.1",
     "@elf/util": "^1.1.1",
     "@bespoke/share": "^1.1.1",
     "@elf/component": "^1.1.1",

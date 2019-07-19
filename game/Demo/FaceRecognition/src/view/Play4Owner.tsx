@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {Core} from '@bespoke/register'
+import {Core} from '@bespoke/client'
 import {Lang} from '@elf/component'
 import {Table, Tag} from './Antd'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, MoveType, PushType} from '../config'

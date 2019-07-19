@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "@elf/component": "^1.1.1",
-    "@elf/register": "^1.1.1",
+    "@elf/client": "^1.1.1",
     "@elf/share": "^1.1.1",
     "@elf/util": "^1.1.1",
     "@elf/protocol": "^1.1.1",

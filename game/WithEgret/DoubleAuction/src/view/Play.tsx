@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {config} from '@elf/component'
-import {Core} from '@bespoke/register'
+import {Core} from '@bespoke/client'
 import {stringify} from 'query-string'
 import {namespace} from '../config'
 

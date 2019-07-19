@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {Core} from '@bespoke/register'
+import {Core} from '@bespoke/client'
 import {GroupRange, Wrapper} from '@extend/share'
 import {Col, Row, Slider, Spin, Tabs} from 'antd'
 import {Label, Lang} from '@elf/component'

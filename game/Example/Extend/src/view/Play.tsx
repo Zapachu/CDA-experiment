@@ -1,5 +1,5 @@
 import * as React from 'react'
-import * as Extend from '@extend/register'
+import * as Extend from '@extend/client'
 import {Button} from 'antd'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, MoveType, PushType} from '../config'
 

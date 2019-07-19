@@ -1,4 +1,4 @@
-import {registerOnFramework} from '@bespoke/register'
+import {registerOnFramework} from '@bespoke/client'
 import {namespace} from '../config'
 import {Create} from '../../../../Classic/TrustGame/src/view/Create'
 import {Result} from '../../../../Classic/TrustGame/src/view/Result'

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import * as qiniu from 'qiniu-js'
-import {Core} from '@bespoke/register'
+import {Core} from '@bespoke/client'
 import Button from 'antd/es/button'
 import {Lang} from '@elf/component'
 import {

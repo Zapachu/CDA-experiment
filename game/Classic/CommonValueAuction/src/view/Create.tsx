@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {ICreateParams} from '../interface'
 import {Button, Input, Label, RadioGroup, RangeInput} from '@elf/component'
-import {Core} from '@bespoke/register'
+import {Core} from '@bespoke/client'
 
 interface ICreateState {
     commonValue: number

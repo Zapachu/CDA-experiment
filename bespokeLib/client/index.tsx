@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {config, FrameEmitter, IGameWithId, TGameState, TPlayerState} from '@bespoke/share'
-import {registerOnElf, Template} from '@elf/register'
+import {registerOnElf, Template} from '@elf/client'
 import {BaseRequest, Lang} from '@elf/component'
 
 export interface IGameTemplate<ICreateParams = {}, IGameState = {}, IPlayerState = {}, MoveType = any, PushType = any, IMoveParams = {}, IPushParams = {}> {

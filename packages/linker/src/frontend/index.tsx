@@ -1,6 +1,6 @@
 import {Api, GameTemplate, TPageProps} from './util'
 import {Lang, Language} from '@elf/component'
-import {IGameTemplate} from '@elf/register'
+import {IGameTemplate} from '@elf/client'
 import * as React from 'react'
 import {render} from 'react-dom'
 import {BrowserRouter, Route as ReactRoute, RouteComponentProps, RouteProps, Switch} from 'react-router-dom'
