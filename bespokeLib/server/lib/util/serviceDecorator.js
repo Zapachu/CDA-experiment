@@ -34,51 +34,51 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
-var deep_diff_1 = require("deep-diff");
-var share_1 = require("@bespoke/share");
-var util_1 = require("@elf/util");
-var cloneDeep = require("lodash/cloneDeep");
-var BaseRobot = /** @class */ (function () {
-    function BaseRobot(game, actor, connection, meta) {
-        var _this = this;
-        this.game = game;
-        this.actor = actor;
-        this.connection = connection;
-        this.meta = meta;
-        this.preGameState = null;
-        this.prePlayerState = null;
-        this.gameState = null;
-        this.playerState = null;
-        this.connection
-            .on(share_1.SocketEvent.syncGameState_json, function (gameState) {
-            _this.preGameState = cloneDeep(_this.gameState);
-            _this.gameState = cloneDeep(gameState);
-        })
-            .on(share_1.SocketEvent.changeGameState_diff, function (stateChanges) {
-            util_1.Log.l(_this.preGameState);
-            _this.preGameState = cloneDeep(_this.gameState);
-            stateChanges.forEach(function (change) { return deep_diff_1.applyChange(_this.gameState, null, change); });
-        })
-            .on(share_1.SocketEvent.syncPlayerState_json, function (playerState) {
-            _this.prePlayerState = cloneDeep(_this.playerState);
-            _this.playerState = cloneDeep(playerState);
-        })
-            .on(share_1.SocketEvent.changePlayerState_diff, function (stateChanges) {
-            util_1.Log.l(_this.prePlayerState);
-            _this.prePlayerState = cloneDeep(_this.playerState);
-            stateChanges.forEach(function (change) { return deep_diff_1.applyChange(_this.playerState, null, change); });
-        });
-        this.frameEmitter = new share_1.FrameEmitter(this.connection);
-    }
-    BaseRobot.prototype.init = function () {
-        return __awaiter(this, void 0, void 0, function () {
+var Cache_1 = require("./Cache");
+exports.cacheResult = function (target, propertyName, descriptor) {
+    var method = descriptor.value;
+    descriptor.value = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        return __awaiter(_this, void 0, void 0, function () {
+            var cacheKey, cachedData, result;
             return __generator(this, function (_a) {
-                util_1.Log.i('RobotInit', this.actor.token, this.meta);
-                return [2 /*return*/, this];
+                switch (_a.label) {
+                    case 0:
+                        cacheKey = propertyName + "_" + JSON.stringify(args), cachedData = Cache_1.Cache.get(cacheKey);
+                        if (!cachedData) return [3 /*break*/, 1];
+                        return [2 /*return*/, Promise.resolve(cachedData)];
+                    case 1: return [4 /*yield*/, method.apply(target, args)];
+                    case 2:
+                        result = _a.sent();
+                        Cache_1.Cache.set(cacheKey, result);
+                        return [2 /*return*/, result];
+                }
             });
         });
     };
-    return BaseRobot;
-}());
-exports.BaseRobot = BaseRobot;
+    return descriptor;
+};
+exports.cacheResultSync = function (target, propertyName, descriptor) {
+    var method = descriptor.value;
+    descriptor.value = function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        var cacheKey = propertyName + "_" + JSON.stringify(args), cachedData = Cache_1.Cache.get(cacheKey);
+        if (cachedData) {
+            return cachedData;
+        }
+        else {
+            var result = method.apply(target, args);
+            Cache_1.Cache.set(cacheKey, result);
+            return result;
+        }
+    };
+    return descriptor;
+};

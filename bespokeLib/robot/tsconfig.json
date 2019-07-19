@@ -8,8 +8,7 @@
     ],
     "noUnusedLocals": true,
     "skipLibCheck": true,
-    "downlevelIteration": true,
-    "sourceMap": true
+    "downlevelIteration": true
   },
   "include": [
     "src"

@@ -35,50 +35,35 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var deep_diff_1 = require("deep-diff");
-var share_1 = require("@bespoke/share");
-var util_1 = require("@elf/util");
-var cloneDeep = require("lodash/cloneDeep");
-var BaseRobot = /** @class */ (function () {
-    function BaseRobot(game, actor, connection, meta) {
-        var _this = this;
-        this.game = game;
-        this.actor = actor;
-        this.connection = connection;
-        this.meta = meta;
-        this.preGameState = null;
-        this.prePlayerState = null;
-        this.gameState = null;
-        this.playerState = null;
-        this.connection
-            .on(share_1.SocketEvent.syncGameState_json, function (gameState) {
-            _this.preGameState = cloneDeep(_this.gameState);
-            _this.gameState = cloneDeep(gameState);
-        })
-            .on(share_1.SocketEvent.changeGameState_diff, function (stateChanges) {
-            util_1.Log.l(_this.preGameState);
-            _this.preGameState = cloneDeep(_this.gameState);
-            stateChanges.forEach(function (change) { return deep_diff_1.applyChange(_this.gameState, null, change); });
-        })
-            .on(share_1.SocketEvent.syncPlayerState_json, function (playerState) {
-            _this.prePlayerState = cloneDeep(_this.playerState);
-            _this.playerState = cloneDeep(playerState);
-        })
-            .on(share_1.SocketEvent.changePlayerState_diff, function (stateChanges) {
-            util_1.Log.l(_this.prePlayerState);
-            _this.prePlayerState = cloneDeep(_this.playerState);
-            stateChanges.forEach(function (change) { return deep_diff_1.applyChange(_this.playerState, null, change); });
-        });
-        this.frameEmitter = new share_1.FrameEmitter(this.connection);
+var Logic = /** @class */ (function () {
+    function Logic(params, stateManager) {
+        this.params = params;
+        this.stateManager = stateManager;
     }
-    BaseRobot.prototype.init = function () {
+    Logic.prototype.initGameState = function () {
+        return {};
+    };
+    Logic.prototype.initPlayerState = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                util_1.Log.i('RobotInit', this.actor.token, this.meta);
-                return [2 /*return*/, this];
+                return [2 /*return*/, {}];
             });
         });
     };
-    return BaseRobot;
+    Logic.prototype.teacherMoveReducer = function (actor, type, params, cb) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/];
+            });
+        });
+    };
+    Logic.prototype.playerMoveReducer = function (actor, type, params, cb) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/];
+            });
+        });
+    };
+    return Logic;
 }());
-exports.BaseRobot = BaseRobot;
+exports.Logic = Logic;

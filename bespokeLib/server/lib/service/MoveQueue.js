@@ -35,50 +35,70 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var queue_1 = require("queue");
 var deep_diff_1 = require("deep-diff");
-var share_1 = require("@bespoke/share");
-var util_1 = require("@elf/util");
+var model_1 = require("../model");
 var cloneDeep = require("lodash/cloneDeep");
-var BaseRobot = /** @class */ (function () {
-    function BaseRobot(game, actor, connection, meta) {
-        var _this = this;
+var MoveQueue = /** @class */ (function () {
+    function MoveQueue(game, stateManager) {
         this.game = game;
-        this.actor = actor;
-        this.connection = connection;
-        this.meta = meta;
-        this.preGameState = null;
-        this.prePlayerState = null;
+        this.stateManager = stateManager;
+        this.seq = 0;
         this.gameState = null;
-        this.playerState = null;
-        this.connection
-            .on(share_1.SocketEvent.syncGameState_json, function (gameState) {
-            _this.preGameState = cloneDeep(_this.gameState);
-            _this.gameState = cloneDeep(gameState);
-        })
-            .on(share_1.SocketEvent.changeGameState_diff, function (stateChanges) {
-            util_1.Log.l(_this.preGameState);
-            _this.preGameState = cloneDeep(_this.gameState);
-            stateChanges.forEach(function (change) { return deep_diff_1.applyChange(_this.gameState, null, change); });
-        })
-            .on(share_1.SocketEvent.syncPlayerState_json, function (playerState) {
-            _this.prePlayerState = cloneDeep(_this.playerState);
-            _this.playerState = cloneDeep(playerState);
-        })
-            .on(share_1.SocketEvent.changePlayerState_diff, function (stateChanges) {
-            util_1.Log.l(_this.prePlayerState);
-            _this.prePlayerState = cloneDeep(_this.playerState);
-            stateChanges.forEach(function (change) { return deep_diff_1.applyChange(_this.playerState, null, change); });
+        this.playerStates = null;
+        this.queue = queue_1.default({
+            concurrency: 1,
+            autostart: true
         });
-        this.frameEmitter = new share_1.FrameEmitter(this.connection);
     }
-    BaseRobot.prototype.init = function () {
-        return __awaiter(this, void 0, void 0, function () {
+    MoveQueue.prototype.push = function (actor, type, params, moveHandler) {
+        var _this = this;
+        var moveLog = {
+            seq: this.seq++,
+            gameId: this.game.id,
+            token: actor.token,
+            type: type,
+            params: params
+        };
+        this.queue.push(function () { return __awaiter(_this, void 0, void 0, function () {
+            var gameState, playerStates, gameStateChanges, playerStatesChanges;
             return __generator(this, function (_a) {
-                util_1.Log.i('RobotInit', this.actor.token, this.meta);
-                return [2 /*return*/, this];
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, moveHandler()];
+                    case 1:
+                        _a.sent();
+                        return [4 /*yield*/, this.stateManager.syncState()];
+                    case 2:
+                        _a.sent();
+                        return [4 /*yield*/, this.stateManager.getGameState()];
+                    case 3:
+                        gameState = _a.sent();
+                        return [4 /*yield*/, this.stateManager.getPlayerStates()];
+                    case 4:
+                        playerStates = _a.sent();
+                        if (!this.gameState) {
+                            Object.assign(moveLog, {
+                                gameState: gameState,
+                                playerStates: playerStates
+                            });
+                        }
+                        else {
+                            gameStateChanges = deep_diff_1.diff(this.gameState || {}, gameState) || [], playerStatesChanges = deep_diff_1.diff(this.playerStates || {}, playerStates) || [];
+                            Object.assign(moveLog, {
+                                gameStateChanges: gameStateChanges,
+                                playerStatesChanges: playerStatesChanges
+                            });
+                        }
+                        this.gameState = cloneDeep(gameState);
+                        this.playerStates = cloneDeep(playerStates);
+                        return [4 /*yield*/, model_1.MoveLogModel.create(moveLog)];
+                    case 5:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
             });
-        });
+        }); });
     };
-    return BaseRobot;
+    return MoveQueue;
 }());
-exports.BaseRobot = BaseRobot;
+exports.MoveQueue = MoveQueue;

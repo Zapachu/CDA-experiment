@@ -35,50 +35,69 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var deep_diff_1 = require("deep-diff");
-var share_1 = require("@bespoke/share");
-var util_1 = require("@elf/util");
-var cloneDeep = require("lodash/cloneDeep");
-var BaseRobot = /** @class */ (function () {
-    function BaseRobot(game, actor, connection, meta) {
-        var _this = this;
-        this.game = game;
-        this.actor = actor;
-        this.connection = connection;
-        this.meta = meta;
-        this.preGameState = null;
-        this.prePlayerState = null;
-        this.gameState = null;
-        this.playerState = null;
-        this.connection
-            .on(share_1.SocketEvent.syncGameState_json, function (gameState) {
-            _this.preGameState = cloneDeep(_this.gameState);
-            _this.gameState = cloneDeep(gameState);
-        })
-            .on(share_1.SocketEvent.changeGameState_diff, function (stateChanges) {
-            util_1.Log.l(_this.preGameState);
-            _this.preGameState = cloneDeep(_this.gameState);
-            stateChanges.forEach(function (change) { return deep_diff_1.applyChange(_this.gameState, null, change); });
-        })
-            .on(share_1.SocketEvent.syncPlayerState_json, function (playerState) {
-            _this.prePlayerState = cloneDeep(_this.playerState);
-            _this.playerState = cloneDeep(playerState);
-        })
-            .on(share_1.SocketEvent.changePlayerState_diff, function (stateChanges) {
-            util_1.Log.l(_this.prePlayerState);
-            _this.prePlayerState = cloneDeep(_this.playerState);
-            stateChanges.forEach(function (change) { return deep_diff_1.applyChange(_this.playerState, null, change); });
-        });
-        this.frameEmitter = new share_1.FrameEmitter(this.connection);
+var StateManager = /** @class */ (function () {
+    function StateManager(groupIndex, stateManager) {
+        this.groupIndex = groupIndex;
+        this.stateManager = stateManager;
     }
-    BaseRobot.prototype.init = function () {
+    StateManager.prototype.getPlayerState = function (actor) {
         return __awaiter(this, void 0, void 0, function () {
+            var state;
             return __generator(this, function (_a) {
-                util_1.Log.i('RobotInit', this.actor.token, this.meta);
-                return [2 /*return*/, this];
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.stateManager.getPlayerState(actor)];
+                    case 1:
+                        state = (_a.sent()).state;
+                        return [2 /*return*/, state];
+                }
             });
         });
     };
-    return BaseRobot;
+    StateManager.prototype.getGameState = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var groups;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.stateManager.getGameState()];
+                    case 1:
+                        groups = (_a.sent()).groups;
+                        return [2 /*return*/, groups[this.groupIndex].state];
+                }
+            });
+        });
+    };
+    StateManager.prototype.getPlayerStates = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var playerStates, _a, _b;
+            var _this = this;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0:
+                        playerStates = {};
+                        _b = (_a = Object).values;
+                        return [4 /*yield*/, this.stateManager.getPlayerStates()];
+                    case 1:
+                        _b.apply(_a, [_c.sent()]).forEach(function (_a) {
+                            var actor = _a.actor, groupIndex = _a.groupIndex, state = _a.state;
+                            return groupIndex === _this.groupIndex ? playerStates[actor.token] = state : null;
+                        });
+                        return [2 /*return*/, playerStates];
+                }
+            });
+        });
+    };
+    StateManager.prototype.syncState = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.stateManager.syncState()];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    return StateManager;
 }());
-exports.BaseRobot = BaseRobot;
+exports.StateManager = StateManager;
