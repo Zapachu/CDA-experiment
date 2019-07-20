@@ -6,7 +6,7 @@ import {connect} from 'socket.io-client'
 import * as queryString from 'query-string'
 import {Loading} from '../component'
 import * as style from './style.scss'
-import {Affix, Button, Dropdown, Menu} from 'antd'
+import {Button, Dropdown, Menu} from 'antd'
 
 declare interface IPlayState {
     game?: IGameWithId,
@@ -77,8 +77,8 @@ class Play4Owner extends React.Component<{
     render(): React.ReactNode {
         const {props: {user, game, gameState}, lang} = this
         return <section>
-            <Affix style={{position: 'absolute', right: 32, top: 64, zIndex: 1000}}>
-                <Dropdown overlay={<Menu>
+            <div style={{position: 'absolute', right: 8, top: 48, zIndex: 1000}}>
+                <Dropdown trigger={['click']} overlay={<Menu>
                     <Menu.Item>
                         <Button
                             onClick={() => toV5(config.academus.route.member(user.orgCode, game.id))}>{lang.playerList}</Button>
@@ -89,9 +89,15 @@ class Play4Owner extends React.Component<{
                 </Menu>}>
                     <Button type='primary' shape="circle" icon="bars"/>
                 </Dropdown>
-            </Affix>
-            <iframe className={style.playIframe}
-                    src={`${gameState.playUrl}?${Lang.key}=${Lang.activeLanguage}`}/>
+            </div>
+            {
+                gameState.playUrl.includes('ancademy')?
+                    <iframe className={style.playIframe}
+                            src={`${gameState.playUrl}?${Lang.key}=${Lang.activeLanguage}`}/>:
+                    <div className={style.consoleBtnWrapper}>
+                        <Button type='primary' onClick={()=>window.open(gameState.playUrl)}>{lang.playerStatus}</Button>
+                    </div>
+            }
         </section>
     }
 }

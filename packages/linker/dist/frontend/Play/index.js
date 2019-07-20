@@ -145,14 +145,17 @@ var Play4Owner = /** @class */ (function (_super) {
     Play4Owner.prototype.render = function () {
         var _a = this, _b = _a.props, user = _b.user, game = _b.game, gameState = _b.gameState, lang = _a.lang;
         return React.createElement("section", null,
-            React.createElement(antd_1.Affix, { style: { position: 'absolute', right: 32, top: 64, zIndex: 1000 } },
-                React.createElement(antd_1.Dropdown, { overlay: React.createElement(antd_1.Menu, null,
+            React.createElement("div", { style: { position: 'absolute', right: 8, top: 48, zIndex: 1000 } },
+                React.createElement(antd_1.Dropdown, { trigger: ['click'], overlay: React.createElement(antd_1.Menu, null,
                         React.createElement(antd_1.Menu.Item, null,
                             React.createElement(antd_1.Button, { onClick: function () { return util_1.toV5(linker_share_1.config.academus.route.member(user.orgCode, game.id)); } }, lang.playerList)),
                         React.createElement(antd_1.Menu.Item, null,
                             React.createElement(antd_1.Button, { onClick: function () { return util_1.toV5(linker_share_1.config.academus.route.share(game.id)); } }, lang.share))) },
                     React.createElement(antd_1.Button, { type: 'primary', shape: "circle", icon: "bars" }))),
-            React.createElement("iframe", { className: style.playIframe, src: gameState.playUrl + "?" + component_1.Lang.key + "=" + component_1.Lang.activeLanguage }));
+            gameState.playUrl.includes('ancademy') ?
+                React.createElement("iframe", { className: style.playIframe, src: gameState.playUrl + "?" + component_1.Lang.key + "=" + component_1.Lang.activeLanguage }) :
+                React.createElement("div", { className: style.consoleBtnWrapper },
+                    React.createElement(antd_1.Button, { type: 'primary', onClick: function () { return window.open(gameState.playUrl); } }, lang.playerStatus)));
     };
     return Play4Owner;
 }(React.Component));

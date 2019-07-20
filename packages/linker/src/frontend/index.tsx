@@ -34,7 +34,7 @@ function renderRoot(pageProps: TPageProps, rootContainer: HTMLElement) {
         }/>
 
     render(<BrowserRouter basename={config.rootName}>
-        <div style={{position: 'absolute', right: 32, top: 16, zIndex: 1000}}>
+        <div style={{position: 'absolute', right: 8, top: 8, zIndex: 1000}}>
             <Button size='small'
                     onClick={() => Lang.switchLang(Lang.activeLanguage === Language.en ? Language.zh : Language.en)}>
                 {Lang.activeLanguage === Language.en ? '中文' : 'English'}</Button>

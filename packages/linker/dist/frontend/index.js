@@ -52,7 +52,7 @@ function renderRoot(pageProps, rootContainer) {
             } }));
     };
     react_dom_1.render(React.createElement(react_router_dom_1.BrowserRouter, { basename: linker_share_1.config.rootName },
-        React.createElement("div", { style: { position: 'absolute', right: 32, top: 16, zIndex: 1000 } },
+        React.createElement("div", { style: { position: 'absolute', right: 8, top: 8, zIndex: 1000 } },
             React.createElement(antd_1.Button, { size: 'small', onClick: function () { return component_1.Lang.switchLang(component_1.Lang.activeLanguage === component_1.Language.en ? component_1.Language.zh : component_1.Language.en); } }, component_1.Lang.activeLanguage === component_1.Language.en ? '中文' : 'English')),
         React.createElement(react_router_dom_1.Switch, null,
             React.createElement(Route, { path: '/Create/:namespace', component: Create_1.Create }),
