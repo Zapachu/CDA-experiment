@@ -1,6 +1,6 @@
 import {config, IUserWithId} from 'linker-share'
 import {RouteComponentProps} from 'react-router-dom'
-import {IGameTemplate} from '@elf/register'
+import {IGameTemplate} from '@elf/client'
 
 export {Api} from './Api'
 export {loadScript} from './fileLoader'

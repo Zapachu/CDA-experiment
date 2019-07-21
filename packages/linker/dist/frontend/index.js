@@ -35,7 +35,7 @@ var Create_1 = require("./Create");
 var antd_1 = require("antd");
 require('./initial.scss');
 function registerOnElf(namespace, template) {
-    util_1.GameTemplate.setTemplate(__assign({ namespace: namespace, Create: function () { return null; } }, template));
+    util_1.GameTemplate.setTemplate(__assign({ namespace: namespace, Create: template.Create }, template));
 }
 exports.registerOnElf = registerOnElf;
 util_1.Api.getUser().then(function (_a) {
@@ -52,7 +52,7 @@ function renderRoot(pageProps, rootContainer) {
             } }));
     };
     react_dom_1.render(React.createElement(react_router_dom_1.BrowserRouter, { basename: linker_share_1.config.rootName },
-        React.createElement("div", { style: { position: 'absolute', right: 32, top: 16, zIndex: 1000 } },
+        React.createElement("div", { style: { position: 'absolute', right: 8, top: 8, zIndex: 1000 } },
             React.createElement(antd_1.Button, { size: 'small', onClick: function () { return component_1.Lang.switchLang(component_1.Lang.activeLanguage === component_1.Language.en ? component_1.Language.zh : component_1.Language.en); } }, component_1.Lang.activeLanguage === component_1.Language.en ? '中文' : 'English')),
         React.createElement(react_router_dom_1.Switch, null,
             React.createElement(Route, { path: '/Create/:namespace', component: Create_1.Create }),

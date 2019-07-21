@@ -1,11 +1,11 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core} from '@bespoke/register'
+import {Core} from '@bespoke/client'
 import {Table} from 'antd'
 import {ICreateParams, IGameState, IPlayerState} from '../interface'
 import {Lang} from '@elf/component'
 
-export function Result({playerState, gameState}: Core.IResult4PlayerProps<ICreateParams, IGameState, IPlayerState>) {
+export function Result({playerState, gameState}: Core.IResultProps<ICreateParams, IGameState, IPlayerState>) {
     const lang = Lang.extractLang({
         initialMoney: ['初始资金'],
         submit: ['提交', 'Submit'],

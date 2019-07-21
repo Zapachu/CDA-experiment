@@ -10,7 +10,7 @@ import {
   Modal,
   StockInfo
 } from "@bespoke-game/stock-trading-component";
-import {Core} from '@bespoke/register'
+import {Core} from '@bespoke/client'
 import {Toast } from "@elf/component";
 import {
   MoveType,

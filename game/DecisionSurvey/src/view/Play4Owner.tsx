@@ -7,7 +7,7 @@ import "antd/es/button/style";
 import "antd/es/radio/style";
 import "antd/es/table/style";
 import { Toast } from "@elf/component";
-import { Core, Request } from "@bespoke/register";
+import { Core, Request } from "@bespoke/client";
 import {
   CARD,
   FetchRoute,

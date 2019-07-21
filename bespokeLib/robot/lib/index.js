@@ -5,4 +5,3 @@ function __export(m) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./server"));
 __export(require("./BaseRobot"));
-//# sourceMappingURL=index.js.map
