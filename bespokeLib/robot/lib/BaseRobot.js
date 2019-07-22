@@ -82,4 +82,3 @@ var BaseRobot = /** @class */ (function () {
     return BaseRobot;
 }());
 exports.BaseRobot = BaseRobot;
-//# sourceMappingURL=BaseRobot.js.map

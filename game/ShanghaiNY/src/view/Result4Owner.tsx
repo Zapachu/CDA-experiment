@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core, Request} from '@bespoke/register'
+import {Core, Request} from '@bespoke/client'
 import {Lang, Tabs, RangeInput} from '@elf/component'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState} from '../interface'
 import {FetchRoute, MoveType, namespace, SheetType} from '../config'

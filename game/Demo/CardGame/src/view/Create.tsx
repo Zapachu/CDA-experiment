@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {BtnGroup, Label, Lang, Switch} from '@elf/component'
-import {Core} from '@bespoke/register'
+import {Core} from '@bespoke/client'
 import {GameType} from '../config'
 import {ICreateParams} from '../interface'
 

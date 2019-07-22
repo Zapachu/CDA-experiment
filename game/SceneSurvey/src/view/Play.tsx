@@ -2,7 +2,7 @@ import * as React from "react";
 import { Input, Radio, Button } from "antd";
 import * as style from "./style.scss";
 import { Toast } from "@elf/component";
-import { Core } from "@bespoke/register";
+import { Core } from "@bespoke/client";
 import {
   FetchRoute,
   ICreateParams,
@@ -24,7 +24,7 @@ interface IPlayState {
   timer: number;
 }
 
-const DURATION = 40;
+const DURATION = 25;
 
 export class Play extends Core.Play<
   ICreateParams,

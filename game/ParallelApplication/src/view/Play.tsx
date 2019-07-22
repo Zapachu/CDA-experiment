@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as style from "./style.scss";
-import { Core, Request } from "@bespoke/register";
+import { Core, Request } from "@bespoke/client";
 import { Toast} from "@elf/component";
 import { useSpring, animated } from "react-spring";
 import {

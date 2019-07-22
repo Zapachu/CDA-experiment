@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {Template} from '@elf/register'
+import {Template} from '@elf/client'
 import * as style from './style.scss'
 
 import {registerOnFramework} from '../../index'

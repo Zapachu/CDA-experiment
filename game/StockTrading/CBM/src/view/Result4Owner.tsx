@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Core} from '@bespoke/register'
+import {Core} from '@bespoke/client'
 import {ICreateParams, IGameState, IMoveParams, IOrder, IPlayerState, MoveType, PeriodStage, ROLE} from '../config'
 import {Lang} from '@elf/component'
 import {Col, List, Row, Slider} from 'antd'

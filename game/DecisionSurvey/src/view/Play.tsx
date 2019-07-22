@@ -11,7 +11,7 @@ import "antd/es/input/style";
 
 import * as style from "./style.scss";
 import { Toast } from "@elf/component";
-import { Core, Request } from "@bespoke/register";
+import { Core, Request } from "@bespoke/client";
 import {
   CARD,
   DATE,

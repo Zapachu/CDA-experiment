@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import * as dateFormat from 'dateformat'
-import {Core} from '@bespoke/register'
+import {Core} from '@bespoke/client'
 import {Lang} from '@elf/component'
 import {Tabs, Table} from 'antd'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {ICreateParams} from '../interface'
-import {Core} from '@bespoke/register'
+import {Core} from '@bespoke/client'
 import {Label, RangeInput} from '@elf/component'
 interface ICreateState {
     rightReward: number,

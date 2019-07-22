@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as style from "./style.scss";
 import { Table } from "antd";
-import { Core, Request } from "@bespoke/register";
+import { Core, Request } from "@bespoke/client";
 import {
   FetchRoute,
   ICreateParams,

@@ -18,7 +18,7 @@ export = {
     },
     entry: {
         ElfComponent: path.resolve(__dirname, '../node_modules/@elf/component/lib/index.js'),
-        BespokeServer: path.resolve(__dirname, '../src/frontend/index.tsx')
+        BespokeServer: path.resolve(__dirname, '../frontend/index.tsx')
     },
     output: {
         path: path.resolve(__dirname, '../static'),
@@ -57,7 +57,7 @@ export = {
                     {
                         loader: 'sass-loader',
                         options: {
-                            includePaths: [path.resolve(__dirname, '../src/frontend/resource')]
+                            includePaths: [path.resolve(__dirname, '../frontend/resource')]
                         }
                     }
                 ]

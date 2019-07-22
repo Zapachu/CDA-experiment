@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {ICreateParams} from '../config'
-import {Core} from '@bespoke/register'
+import {Core} from '@bespoke/client'
 import {Button, Label, RangeInput, Input} from '@elf/component'
 interface ICreateState {
     buyerPriceStart: number
