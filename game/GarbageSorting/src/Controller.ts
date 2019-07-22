@@ -186,7 +186,7 @@ export default class Controller extends BaseController<
     if (index === ITEMS.length) {
       return;
     }
-    let shoutTimer = 1;
+    let shoutTimer = 0;
     this.ShoutTimeout[token] = setInterval(async () => {
       this.push(playerState.actor, PushType.shoutTimer, { shoutTimer });
       if (shoutTimer++ < SHOUT_TIMER) {
@@ -194,9 +194,28 @@ export default class Controller extends BaseController<
       }
       clearInterval(this.ShoutTimeout[token]);
       this.processPlayerState(playerState, GARBAGE.pass, index);
+      if (index === ITEMS.length - 1) {
+        this.checkAndProcessGameState();
+      }
       await this.stateManager.syncState();
       this.shoutTicking(playerState);
     }, 1000) as any;
+  }
+
+  private async checkAndProcessGameState() {
+    const { groupSize } = this.game.params;
+    const playerStates = await this.stateManager.getPlayerStates();
+    const playerStateArray = Object.values(playerStates);
+    if (
+      playerStateArray.length === groupSize &&
+      playerStateArray.every(
+        ps => ps.answers && ps.answers.length === ITEMS.length
+      )
+    ) {
+      const gameState = await this.stateManager.getGameState();
+      this.processGameState(gameState, playerStateArray);
+      await this.stateManager.syncState();
+    }
   }
 }
 

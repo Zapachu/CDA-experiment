@@ -29,6 +29,7 @@ export interface IPushParams {
 export interface IGameState {
   sortedPlayers: Array<{
     score: number;
+    img?: string;
   }>;
   averageScore: number;
 }
@@ -38,7 +39,7 @@ export interface IPlayerState {
   answers: Array<GARBAGE>;
 }
 
-export const SHOUT_TIMER = 10000;
+export const SHOUT_TIMER = 10;
 
 export enum GARBAGE {
   pass = 1,

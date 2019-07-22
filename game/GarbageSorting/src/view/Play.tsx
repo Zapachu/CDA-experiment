@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as style from "./style.scss";
-import { Core, Request } from "@bespoke/register";
+import { Core } from "@bespoke/register";
 import { Toast } from "@elf/component";
 import { useSpring, animated } from "react-spring";
 import {
@@ -27,6 +27,14 @@ const IMG_BIN_WET = require("./components/bin_wet.png");
 const IMG_BIN_RECYCLABLE = require("./components/bin_recyclable.png");
 const IMG_BIN_HAZARDOUS = require("./components/bin_hazardous.png");
 const IMG_ITEM_UMBRELLA = require("./components/item_umbrella.png");
+const IMG_RULE = require("./components/rule.png");
+const IMG_ENV_GOOD = require("./components/env_good.png");
+const IMG_ENV_MID = require("./components/env_mid.png");
+const IMG_ENV_BAD = require("./components/env_bad.png");
+const IMG_MEDAL_GOLD = require("./components/medal_gold.png");
+const IMG_MEDAL_SILVER = require("./components/medal_silver.png");
+const IMG_MEDAL_COPPER = require("./components/medal_copper.png");
+const IMG_SHARE = require("./components/share.png");
 
 interface IPlayState {
   score: number;
@@ -36,6 +44,7 @@ interface IPlayState {
   };
   modal: MODAL;
   modifier: number;
+  resultPlayerIndex: number;
 }
 
 enum MODAL {
@@ -90,7 +99,8 @@ export class Play extends Core.Play<
       shoutTimer: 0,
       btnStatus: { ...defaultBtnStatus },
       modal: undefined,
-      modifier: 20
+      modifier: undefined,
+      resultPlayerIndex: 0
     };
     this.modifierRef = React.createRef();
   }
@@ -133,6 +143,7 @@ export class Play extends Core.Play<
             this.setState(
               ({ score }) => ({ modifier, score: score + modifier, btnStatus }),
               () => {
+                this.showModifier();
                 setTimeout(() => {
                   frameEmitter.emit(
                     MoveType.shout,
@@ -147,7 +158,6 @@ export class Play extends Core.Play<
                 }, 1000);
               }
             );
-            this.showModifier();
           }
         );
       }, 1000);
@@ -176,9 +186,11 @@ export class Play extends Core.Play<
   };
 
   precache() {
-    // const img = new Image();
-    // img.src = SCORING;
-    // img.onload = this.join;
+    for (let i = 1; i < ITEMS.length; i++) {
+      const item = ITEMS[i];
+      const img = new Image();
+      img.src = IMG_ITEM[item.img];
+    }
   }
 
   getPlayerStatus = (): STATUS => {
@@ -222,14 +234,14 @@ export class Play extends Core.Play<
       }
       case STATUS.waiting: {
         return (
-          <div>
-            {this.renderResult()}
+          <div className={style.resultWrapper}>
+            {this.renderResult({ filter: "blur(8px)" })}
             <Modal visible={true}>{this.renderWaitingModal()}</Modal>
           </div>
         );
       }
       case STATUS.result: {
-        return <div>{this.renderResult()}</div>;
+        return <div className={style.resultWrapper}>{this.renderResult()}</div>;
       }
     }
   };
@@ -243,10 +255,16 @@ export class Play extends Core.Play<
     const item = ITEMS[index];
     return (
       <>
+        <img className={style.rule} src={IMG_RULE} />
         <p className={style.counter}>
           <span>{index + 1}</span>&nbsp;/&nbsp;{ITEMS.length}
         </p>
         <div className={style.scoreContainer}>
+          <ul>
+            <li>+</li>
+            <li>0</li>
+            <li>-</li>
+          </ul>
           <p className={style.modifier} ref={this.modifierRef}>
             {modifier > 0 ? "+" + modifier : modifier}
           </p>
@@ -272,7 +290,12 @@ export class Play extends Core.Play<
         <div className={style.itemContainer}>
           <img className={style.item} src={IMG_ITEM[item.img]} />
           <div className={style.gaugeContainer}>
-            <CircleProgress ratio={shoutTimer / SHOUT_TIMER} />
+            <CircleProgress
+              ratio={
+                (shoutTimer === SHOUT_TIMER ? 0 : shoutTimer) /
+                (SHOUT_TIMER - 1)
+              }
+            />
           </div>
         </div>
         <div className={style.binsContainer}>
@@ -309,10 +332,75 @@ export class Play extends Core.Play<
     );
   };
 
-  renderResult = () => {
+  renderPlayerRank = (rank: number) => {
+    if (rank > 3) {
+      return <span>{rank}</span>;
+    }
+    if (rank === 1) {
+      return <img className={style.rank} src={IMG_MEDAL_GOLD} />;
+    }
+    if (rank === 2) {
+      return <img className={style.rank} src={IMG_MEDAL_SILVER} />;
+    }
+    if (rank === 3) {
+      return <img className={style.rank} src={IMG_MEDAL_COPPER} />;
+    }
+  };
+
+  getTitleInfo = (score: number): { image: string; label: string } => {
+    return { image: IMG_ENV_GOOD, label: "环境健康" };
+  };
+
+  renderResult = (resultStyle = {}) => {
+    const { resultPlayerIndex } = this.state;
+    const {
+      gameState: { sortedPlayers, averageScore }
+    } = this.props;
+    const resultPlayer = sortedPlayers && sortedPlayers[resultPlayerIndex];
+    const { image, label } = this.getTitleInfo(averageScore);
     return (
-      <div>
-        <p>result</p>
+      <div style={resultStyle}>
+        <div
+          className={style.result}
+          style={{ backgroundImage: `url(${image})` }}
+        >
+          <ul className={style.title}>
+            <li>第一社区</li>
+            <li>{label}</li>
+            <li>{averageScore}</li>
+          </ul>
+          <div className={style.panel}>
+            <ul className={style.left}>
+              {sortedPlayers &&
+                sortedPlayers.map((player, i) => {
+                  return (
+                    <li
+                      key={i}
+                      className={resultPlayerIndex === i ? style.active : ""}
+                      onClick={() => this.setState({ resultPlayerIndex: i })}
+                    >
+                      {this.renderPlayerRank(i + 1)}
+                      <img className={style.header} src={IMG_RULE} />
+                    </li>
+                  );
+                })}
+            </ul>
+            <div className={style.right}>
+              {resultPlayer && (
+                <>
+                  <p className={style.score}>{resultPlayer.score}</p>
+                  <p>
+                    经游戏结果判断：我是文案我是文案我是文案经游戏结果判断我是文案我是文案我是文案经游戏结果判断我是文案我是文案我是文案经游戏结果
+                  </p>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className={style.shareButton}>
+          <img src={IMG_SHARE} />
+          <span>分享</span>
+        </div>
       </div>
     );
   };
@@ -344,7 +432,7 @@ export class Play extends Core.Play<
     const { frameEmitter } = this.props;
     return (
       <div className={style.prepareModal}>
-        <p>介绍</p>
+        <p>引导页面</p>
         <p
           onClick={() => {
             frameEmitter.emit(MoveType.prepare);
