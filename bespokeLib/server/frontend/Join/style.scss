@@ -1,17 +1,6 @@
 @import "public";
 
 .Join {
-  .btnLogin {
-    margin: .5rem 1rem;
-    text-align: right;
-    a{
-      color: $color-blue;
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-  }
-
   .tips {
     font-size: $fontSize-small;
     text-align: center;

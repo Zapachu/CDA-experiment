@@ -26,8 +26,8 @@ export class Login extends React.Component<TPageProps, ILoginState> {
 
     state: ILoginState = {
         nationCode: NationCode.China,
-        mobileNumber: '',
-        verifyCode: '',
+        mobileNumber: '13000000000',
+        verifyCode: '111111',
         counter: 0
     }
 
