@@ -2,7 +2,7 @@ import * as React from "react";
 import * as style from "./style.scss";
 import { ICreateParams } from "../config";
 import { Label } from "@elf/component";
-import { Core } from "@bespoke/register";
+import { Core } from "@bespoke/client";
 
 interface ICreateState {
   groupSize: number;

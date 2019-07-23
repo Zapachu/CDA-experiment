@@ -61,7 +61,7 @@ export enum BTN {
 
 interface PropType {
   status: BTN;
-  onClick: () => void;
+  onClick?: () => void;
   className?: string;
 }
 

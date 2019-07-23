@@ -154,13 +154,32 @@ export default class Controller extends BaseController<
   ) {
     playerStates.sort((a, b) => b.score - a.score);
     const sortedPlayers = playerStates.map(ps => {
-      return { score: ps.score };
+      //@ts-ignore
+      return { score: ps.score, img: ps.user.headimg };
     });
     const averageScore =
       sortedPlayers.reduce((acc, current) => acc + current.score, 0) /
       sortedPlayers.length;
     gameState.sortedPlayers = sortedPlayers;
     gameState.averageScore = averageScore;
+    this.recordResult(playerStates);
+  }
+
+  private async recordResult(playerStates: Array<TPlayerState<IPlayerState>>) {
+    playerStates.forEach(ps => {
+      if (ps.actor.type !== Actor.player) {
+        return;
+      }
+      new FreeStyleModel({
+        game: this.game.id,
+        key: ps.user.id,
+        data: {
+          score: ps.score
+        }
+      })
+        .save()
+        .catch(e => console.error(e));
+    });
   }
 
   private initRobots(amount: number) {

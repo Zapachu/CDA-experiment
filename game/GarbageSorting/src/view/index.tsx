@@ -1,4 +1,4 @@
-import { registerOnFramework } from "@bespoke/register";
+import { registerOnFramework } from "@bespoke/client";
 import { Create } from "./Create";
 import { Play } from "./Play";
 

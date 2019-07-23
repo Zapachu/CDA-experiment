@@ -1,8 +1,8 @@
 import * as React from "react";
+import * as QRCode from "qrcode.react";
 import * as style from "./style.scss";
-import { Core } from "@bespoke/register";
+import { Core } from "@bespoke/client";
 import { Toast } from "@elf/component";
-import { useSpring, animated } from "react-spring";
 import {
   MoveType,
   PushType,
@@ -16,7 +16,8 @@ import {
   namespace,
   GARBAGE_LABEL,
   SHOUT_TIMER,
-  TOTAL_SCORE
+  TOTAL_SCORE,
+  ITEM_NAME
 } from "../config";
 import Modal from "./components/Modal";
 import CircleProgress from "./components/CircleProgress";
@@ -35,6 +36,18 @@ const IMG_MEDAL_GOLD = require("./components/medal_gold.png");
 const IMG_MEDAL_SILVER = require("./components/medal_silver.png");
 const IMG_MEDAL_COPPER = require("./components/medal_copper.png");
 const IMG_SHARE = require("./components/share.png");
+const IMG_PREPARE_BUTTON = require("./components/prepare_button.png");
+const IMG_RULE_MODAL = require("./components/rule_modal.png");
+const IMG_CLOSE = require("./components/close.png");
+const IMG_GARBAGE_SORTING = require("./components/garbage_sorting.png");
+
+const DEFAULT_AVATAR = "https://qiniu1.anlint.com/img/head.jpg";
+
+declare global {
+  interface Window {
+    wx: any;
+  }
+}
 
 interface IPlayState {
   score: number;
@@ -48,7 +61,10 @@ interface IPlayState {
 }
 
 enum MODAL {
-  rule
+  rule,
+  prepare1,
+  prepare2,
+  share
 }
 
 enum STATUS {
@@ -66,7 +82,7 @@ const IMG_BIN = {
 };
 
 const IMG_ITEM = {
-  umbrella: IMG_ITEM_UMBRELLA
+  [ITEM_NAME.umbrella]: IMG_ITEM_UMBRELLA
 };
 
 const defaultBtnStatus = {
@@ -88,6 +104,8 @@ export class Play extends Core.Play<
   IPlayState
 > {
   private modifierRef: React.RefObject<any>;
+  private isWechat: boolean;
+  private shareUrl: string;
 
   constructor(props: { playerState: IPlayerState }) {
     super(props as any);
@@ -98,11 +116,13 @@ export class Play extends Core.Play<
       score: score,
       shoutTimer: 0,
       btnStatus: { ...defaultBtnStatus },
-      modal: undefined,
+      modal: MODAL.prepare1,
       modifier: undefined,
       resultPlayerIndex: 0
     };
     this.modifierRef = React.createRef();
+    this.shareUrl = getShareUrl();
+    this.isWechat = checkWechat();
   }
 
   componentDidMount(): void {
@@ -110,6 +130,12 @@ export class Play extends Core.Play<
     this.props.frameEmitter.on(PushType.shoutTimer, ({ shoutTimer }) => {
       this.setState({ shoutTimer });
     });
+    if (this.isWechat) {
+      initWechat(this.shareUrl).catch(err => {
+        console.log(err);
+        Toast.error("微信sdk加载出错");
+      });
+    }
   }
 
   showModifier = () => {
@@ -130,14 +156,14 @@ export class Play extends Core.Play<
     const btnStatus = { ...this.state.btnStatus };
     btnStatus[garbage] = BTN.active;
     this.setState({ btnStatus }, () => {
-      setTimeout(() => {
-        frameEmitter.emit(
-          MoveType.check,
-          { answer: garbage, index: answers.length },
-          (err, modifier: number) => {
-            if (err) {
-              return Toast.warn(err);
-            }
+      frameEmitter.emit(
+        MoveType.check,
+        { answer: garbage, index: answers.length },
+        (err, modifier: number) => {
+          if (err) {
+            return Toast.warn(err);
+          }
+          setTimeout(() => {
             const btnStatus = { ...this.state.btnStatus };
             btnStatus[garbage] = modifier > 0 ? BTN.true : BTN.false;
             this.setState(
@@ -158,9 +184,9 @@ export class Play extends Core.Play<
                 }, 1000);
               }
             );
-          }
-        );
-      }, 1000);
+          }, 1000);
+        }
+      );
     });
   };
 
@@ -241,7 +267,14 @@ export class Play extends Core.Play<
         );
       }
       case STATUS.result: {
-        return <div className={style.resultWrapper}>{this.renderResult()}</div>;
+        return (
+          <div className={style.resultWrapper}>
+            {this.renderResult()}
+            <Modal visible={modal === MODAL.share}>
+              {this.renderShareModal()}
+            </Modal>
+          </div>
+        );
       }
     }
   };
@@ -255,7 +288,11 @@ export class Play extends Core.Play<
     const item = ITEMS[index];
     return (
       <>
-        <img className={style.rule} src={IMG_RULE} />
+        <img
+          className={style.rule}
+          src={IMG_RULE}
+          onClick={() => this.setState({ modal: MODAL.rule })}
+        />
         <p className={style.counter}>
           <span>{index + 1}</span>&nbsp;/&nbsp;{ITEMS.length}
         </p>
@@ -299,7 +336,20 @@ export class Play extends Core.Play<
           </div>
         </div>
         <div className={style.binsContainer}>
-          <ul>
+          {[
+            GARBAGE.recyclable,
+            GARBAGE.dry,
+            GARBAGE.hazardous,
+            GARBAGE.wet
+          ].map(bin => {
+            return (
+              <li key={bin} className={style.bin}>
+                <img src={IMG_BIN[bin]} />
+                <span>{GARBAGE_LABEL[bin]}</span>
+              </li>
+            );
+          })}
+          <ul className={style.btnsContainer}>
             {[
               GARBAGE.recyclable,
               GARBAGE.dry,
@@ -307,26 +357,24 @@ export class Play extends Core.Play<
               GARBAGE.wet
             ].map(bin => {
               return (
-                <li key={bin} className={style.bin}>
+                <li key={bin} className={style.btn}>
                   <Btn
-                    className={style.btn}
+                    className={style.circle}
                     status={btnStatus[bin]}
                     onClick={() => this.choose(bin)}
                   />
-                  <img src={IMG_BIN[bin]} />
-                  <span>{GARBAGE_LABEL[bin]}</span>
                 </li>
               );
             })}
           </ul>
-          <div className={style.passContainer}>
-            <Btn
-              className={style.btn}
-              status={btnStatus[GARBAGE.pass]}
-              onClick={this.pass}
-            />
-            <span>{GARBAGE_LABEL[GARBAGE.pass]}</span>
-          </div>
+        </div>
+        <div className={style.passContainer}>
+          <Btn
+            className={style.btn}
+            status={btnStatus[GARBAGE.pass]}
+            onClick={this.pass}
+          />
+          <span>{GARBAGE_LABEL[GARBAGE.pass]}</span>
         </div>
       </>
     );
@@ -365,14 +413,13 @@ export class Play extends Core.Play<
           style={{ backgroundImage: `url(${image})` }}
         >
           <ul className={style.title}>
-            <li>第一社区</li>
             <li>{label}</li>
             <li>{averageScore}</li>
           </ul>
           <div className={style.panel}>
             <ul className={style.left}>
               {sortedPlayers &&
-                sortedPlayers.map((player, i) => {
+                sortedPlayers.map(({ img }, i) => {
                   return (
                     <li
                       key={i}
@@ -380,7 +427,10 @@ export class Play extends Core.Play<
                       onClick={() => this.setState({ resultPlayerIndex: i })}
                     >
                       {this.renderPlayerRank(i + 1)}
-                      <img className={style.header} src={IMG_RULE} />
+                      <img
+                        className={style.header}
+                        src={img || DEFAULT_AVATAR}
+                      />
                     </li>
                   );
                 })}
@@ -397,7 +447,10 @@ export class Play extends Core.Play<
             </div>
           </div>
         </div>
-        <div className={style.shareButton}>
+        <div
+          className={style.shareButton}
+          onClick={() => this.setState({ modal: MODAL.share })}
+        >
           <img src={IMG_SHARE} />
           <span>分享</span>
         </div>
@@ -408,14 +461,46 @@ export class Play extends Core.Play<
   renderRuleModal = () => {
     return (
       <div className={style.ruleModal}>
-        {/* <p className={style.ruleTitle}>平行志愿</p>
-        <p>
-          平行志愿是高考志愿的一种新的投档录取模式。所谓平行志愿，即一个志愿中包含若干所平行的院校。是指考生在填报高考志愿时，可在指定的批次同时填报若干个平行院校志愿。录取时，按照“分数优先，遵循志愿”的原则进行投档，对同一科类分数线上未被录取的考生按总分从高到低排序进行一次性投档，即所有考生排一个队列，高分者优先投档。每个考生投档时，根据考生所填报的院校顺序，投档到排序在前且有计划余额的院校。
-        </p>
+        <div className={style.ruleContent}>
+          <img src={IMG_RULE_MODAL} />
+          <p className={style.title}>游戏规则</p>
+          <div className={style.content}>
+            经游戏结果判断：我是文案我是文案我是文案经游戏结果判断我是文案我是文案我是文案经游戏结果判断我是文案我是文案我是文案经游戏结果
+            拷贝
+          </div>
+        </div>
         <img
-          src={CLOSE}
-          onClick={() => this.setState({ showModal: undefined })}
-        /> */}
+          src={IMG_CLOSE}
+          onClick={() => this.setState({ modal: undefined })}
+        />
+      </div>
+    );
+  };
+
+  renderShareModal = () => {
+    const { playerState } = this.props;
+    if (this.isWechat) {
+      return (
+        <div className={style.shareModal}>
+          <p>点击右上角分享</p>
+          <img
+            src={IMG_CLOSE}
+            onClick={() => this.setState({ modal: undefined })}
+          />
+        </div>
+      );
+    }
+    return (
+      <div className={style.shareModal}>
+        <p>扫码分享到微信</p>
+        <QRCode
+          size={150}
+          value={this.shareUrl + `?userId=${playerState.user.id}`}
+        />
+        <img
+          src={IMG_CLOSE}
+          onClick={() => this.setState({ modal: undefined })}
+        />
       </div>
     );
   };
@@ -430,19 +515,108 @@ export class Play extends Core.Play<
 
   renderPrepareModal = () => {
     const { frameEmitter } = this.props;
-    return (
-      <div className={style.prepareModal}>
-        <p>引导页面</p>
-        <p
-          onClick={() => {
-            frameEmitter.emit(MoveType.prepare);
-            this.precache();
-          }}
-        >
-          知道了
-        </p>
-      </div>
-    );
+    const { modal } = this.state;
+    switch (modal) {
+      case MODAL.prepare1: {
+        return (
+          <div className={style.prepareModal}>
+            <div className={style.itemContainer}>
+              <img src={IMG_ITEM[ITEMS[0].img]} />
+              <div className={style.outer}>
+                <div className={style.inner} />
+              </div>
+            </div>
+            <div className={style.binsContainer}>
+              {[
+                GARBAGE.recyclable,
+                GARBAGE.dry,
+                GARBAGE.hazardous,
+                GARBAGE.wet
+              ].map(bin => {
+                return (
+                  <li key={bin} className={style.bin}>
+                    <img src={IMG_BIN[bin]} />
+                  </li>
+                );
+              })}
+              <div className={style.btnsContainer}>
+                {[
+                  GARBAGE.recyclable,
+                  GARBAGE.dry,
+                  GARBAGE.hazardous,
+                  GARBAGE.wet
+                ].map(bin => {
+                  return (
+                    <li key={bin} className={style.btn}>
+                      <Btn
+                        className={style.btnCircle + " " + style.placeholder}
+                        status={BTN.default}
+                      />
+                      <div className={style.circle}>
+                        <div className={style.innerCircle} />
+                      </div>
+                    </li>
+                  );
+                })}
+                <div className={style.border} />
+              </div>
+            </div>
+            <div className={style.passContainer}>
+              <div className={style.passWrapper}>
+                <Btn className={style.btn} status={BTN.pass} />
+                <div className={style.border} />
+              </div>
+              <div className={style.prepareButton}>
+                <div
+                  onClick={() => {
+                    this.setState({ modal: MODAL.prepare2 });
+                    this.precache();
+                  }}
+                >
+                  <img src={IMG_PREPARE_BUTTON} />
+                  <span>我知道了</span>
+                </div>
+              </div>
+            </div>
+            <p className={style.word}>根据图中的物体选择分类</p>
+          </div>
+        );
+      }
+      case MODAL.prepare2: {
+        return (
+          <div className={style.prepareModal}>
+            <div className={style.itemContainer}>
+              <img src={IMG_ITEM[ITEMS[0].img]} style={{ opacity: 0 }} />
+              <div className={style.gaugeContainer}>
+                <CircleProgress ratio={0.5} />
+                <div className={style.border} />
+              </div>
+            </div>
+            <div className={style.passContainer}>
+              <div className={style.passWrapper}>
+                <Btn className={style.btn} status={BTN.pass} />
+                <div className={style.border} />
+              </div>
+              <div className={style.prepareButton}>
+                <div
+                  onClick={() => {
+                    frameEmitter.emit(MoveType.prepare);
+                  }}
+                >
+                  <img src={IMG_PREPARE_BUTTON} />
+                  <span>开始体验</span>
+                </div>
+              </div>
+            </div>
+            <div className={style.word} style={{ bottom: "30%" }}>
+              <p>每个物体思考时间为10秒</p>
+              <p>时间到会自动选择垃圾堆</p>
+              <p>或者在10秒内主动选择垃圾堆</p>
+            </div>
+          </div>
+        );
+      }
+    }
   };
 
   render() {
@@ -451,33 +625,105 @@ export class Play extends Core.Play<
   }
 }
 
-const Ready2Choose: React.SFC<{ score: number; scores: Array<number> }> = ({
-  score,
-  scores
-}) => {
-  const subjects = ["语文", "数学", "英语", "综合"];
-  const props = useSpring({
-    config: { duration: 1000 },
-    opacity: 1,
-    from: { opacity: 0 }
-  });
+function checkWechat(): boolean {
   return (
-    <animated.div className={style.scoreBoard} style={props}>
-      <p className={style.title}>
-        总分: &nbsp;<span className={style.redFont}>{score}</span>
-      </p>
-      <p className={style.name}>姓名: xxx</p>
-      <p className={style.name}>考号: xxx</p>
-      <ul className={style.table}>
-        {subjects.map((subject, index) => {
-          return (
-            <li key={subject}>
-              <p className={style.subject}>{subject}</p>
-              <p className={style.score}>{scores[index]}</p>
-            </li>
-          );
-        })}
-      </ul>
-    </animated.div>
+    window.navigator.userAgent.toLowerCase().indexOf("micromessenger") > -1
   );
-};
+}
+
+function getShareUrl() {
+  let originalUrl = window.location.search
+    ? window.location.href.split(window.location.search)[0]
+    : window.location.href;
+  return originalUrl.replace("/play", "/share");
+}
+
+async function initWechat(shareUrl: string) {
+  if (!window.wx) {
+    await loadScript("https://res.wx.qq.com/open/js/jweixin-1.4.0.js");
+  }
+  const res = await ajax(
+    "/wechat/jssdk?url=" + encodeURIComponent(window.location.href)
+  );
+  if (res.err) {
+    return alert("微信加载出错");
+  }
+  const option = res.msg;
+  window.wx.config({
+    debug: false,
+    appId: option.appId,
+    timestamp: option.timestamp,
+    nonceStr: option.nonceStr,
+    signature: option.signature,
+    jsApiList: ["onMenuShareTimeline", "onMenuShareAppMessage"]
+  });
+  window.wx.ready(function() {
+    window.wx.onMenuShareTimeline({
+      title: "垃圾分类", // 分享标题
+      link: shareUrl, // 分享链接
+      imgUrl: IMG_GARBAGE_SORTING
+    });
+    window.wx.onMenuShareAppMessage({
+      title: "垃圾分类", // 分享标题
+      desc: "快来垃圾分类吧!", // 分享描述
+      link: shareUrl, // 分享链接
+      imgUrl: IMG_GARBAGE_SORTING
+    });
+  });
+}
+
+async function loadScript(url: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const script: any = document.createElement("script");
+    script.type = "text/javascript";
+    if (script.readyState) {
+      script.onreadystatechange = function() {
+        if (
+          script.readyState === "loaded" ||
+          script.readyState === "complete"
+        ) {
+          script.onreadystatechange = null;
+          resolve();
+        }
+      };
+    } else {
+      script.onload = function() {
+        resolve();
+      };
+    }
+    script.onerror = function() {
+      reject(new Error("script loading failed"));
+    };
+    script.src = url;
+    document.body.appendChild(script);
+  });
+}
+
+async function ajax(
+  urlOrOptions: string | { url: string; method: string; data: object }
+): Promise<any> {
+  if (
+    typeof urlOrOptions === "string" ||
+    urlOrOptions.method.toLowerCase() === "get"
+  ) {
+    const url =
+      typeof urlOrOptions === "string" ? urlOrOptions : urlOrOptions.url;
+    return fetch(url, {
+      method: "GET",
+      cache: "default",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }).then(response => response.json());
+  }
+  return fetch(urlOrOptions.url, {
+    method: urlOrOptions.method,
+    cache: "default",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(urlOrOptions.data)
+  }).then(response => response.json());
+}

@@ -29,7 +29,7 @@ export interface IPushParams {
 export interface IGameState {
   sortedPlayers: Array<{
     score: number;
-    img?: string;
+    img: string;
   }>;
   averageScore: number;
 }
@@ -49,6 +49,10 @@ export enum GARBAGE {
   hazardous
 }
 
+export enum ITEM_NAME {
+  umbrella = "umbrella"
+}
+
 export const GARBAGE_LABEL = {
   [GARBAGE.pass]: "懒得分类",
   [GARBAGE.recyclable]: "可回收垃圾",
@@ -58,16 +62,16 @@ export const GARBAGE_LABEL = {
 };
 
 export const ITEMS = [
-  { img: "umbrella" },
-  { img: "umbrella" },
-  { img: "umbrella" },
-  { img: "umbrella" },
-  { img: "umbrella" },
-  { img: "umbrella" },
-  { img: "umbrella" },
-  { img: "umbrella" },
-  { img: "umbrella" },
-  { img: "umbrella" }
+  { img: ITEM_NAME.umbrella },
+  { img: ITEM_NAME.umbrella },
+  { img: ITEM_NAME.umbrella },
+  { img: ITEM_NAME.umbrella },
+  { img: ITEM_NAME.umbrella },
+  { img: ITEM_NAME.umbrella },
+  { img: ITEM_NAME.umbrella },
+  { img: ITEM_NAME.umbrella },
+  { img: ITEM_NAME.umbrella },
+  { img: ITEM_NAME.umbrella }
 ];
 
 export const TOTAL_SCORE = 200;
