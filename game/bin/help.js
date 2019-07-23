@@ -35,7 +35,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var fs_1 = require("fs");
+var fs_extra_1 = require("fs-extra");
 var path_1 = require("path");
 var inquirer_1 = require("inquirer");
 var shelljs_1 = require("shelljs");
@@ -44,13 +44,14 @@ var SpecialProject;
 (function (SpecialProject) {
     SpecialProject["RecentTask"] = "RecentTask";
     SpecialProject["DistAllGame"] = "DistAllGame";
+    SpecialProject["CleanAllGame"] = "CleanAllGame";
 })(SpecialProject || (SpecialProject = {}));
 var TaskHelper;
 (function (TaskHelper) {
     var logPath = path_1.resolve(__dirname, './help.log');
     function getLogs() {
         try {
-            return fs_1.readFileSync(logPath).toString().split('\n').map(function (row) { return JSON.parse(row); });
+            return fs_extra_1.readFileSync(logPath).toString().split('\n').map(function (row) { return JSON.parse(row); });
         }
         catch (e) {
             return [];
@@ -65,7 +66,7 @@ var TaskHelper;
             return;
         }
         logs.unshift(newLog);
-        fs_1.writeFileSync(logPath, logs.slice(0, 5).join('\n'));
+        fs_extra_1.writeFileSync(logPath, logs.slice(0, 5).join('\n'));
     }
     function execTask(task) {
         appendLog(task);
@@ -75,7 +76,7 @@ var TaskHelper;
     TaskHelper.execTask = execTask;
     function distServer(project) {
         execTask({
-            command: "tsc -t ES5 --downlevelIteration --experimentalDecorators --listEmittedFiles --outDir ./" + project + "/dist ./" + project + "/src/serve.ts"
+            command: "tsc -t ES5 --downlevelIteration --experimentalDecorators --listEmittedFiles --outDir ./" + project + "/build ./" + project + "/src/serve.ts"
         });
     }
     TaskHelper.distServer = distServer;
@@ -108,11 +109,11 @@ var ServerTask;
 function getProjects(parentProject, projectSet) {
     if (parentProject === void 0) { parentProject = '.'; }
     if (projectSet === void 0) { projectSet = new Set(); }
-    fs_1.readdirSync(path_1.resolve(__dirname, "../" + parentProject + "/")).forEach(function (p) {
+    fs_extra_1.readdirSync(path_1.resolve(__dirname, "../" + parentProject + "/")).forEach(function (p) {
         if (p[0] >= 'a') {
             return;
         }
-        if (!fs_1.statSync(path_1.resolve(__dirname, "../" + parentProject + "/" + p)).isDirectory()) {
+        if (!fs_extra_1.statSync(path_1.resolve(__dirname, "../" + parentProject + "/" + p)).isDirectory()) {
             return;
         }
         var childProject = parentProject + "/" + p;
@@ -137,7 +138,7 @@ function getProjects(parentProject, projectSet) {
                                 source: function (_, input) {
                                     if (input === void 0) { input = ''; }
                                     return Promise.resolve(input == ' ' ?
-                                        [SpecialProject.RecentTask, SpecialProject.DistAllGame] :
+                                        Object.values(SpecialProject) :
                                         projects.filter(function (p) { return input.toLowerCase().split(' ').every(function (s) { return p.toLowerCase().includes(s); }); }));
                                 }
                             }
@@ -166,6 +167,17 @@ function getProjects(parentProject, projectSet) {
                             TaskHelper.distClient(project);
                             TaskHelper.distServer(project);
                         });
+                        return [2 /*return*/];
+                    }
+                    if (project === SpecialProject.CleanAllGame) {
+                        projects.forEach(function (project) {
+                            if (Object.values(SpecialProject).includes(project)) {
+                                return;
+                            }
+                            fs_extra_1.removeSync(path_1.resolve(__dirname, "../" + project + "/dist"));
+                            fs_extra_1.removeSync(path_1.resolve(__dirname, "../" + project + "/build"));
+                        });
+                        return [2 /*return*/];
                     }
                     return [4 /*yield*/, inquirer_1.prompt([
                             {
@@ -276,7 +288,7 @@ function getProjects(parentProject, projectSet) {
                             BESPOKE_WITH_LINKER: withLinker,
                             NODE_ENV: 'production'
                         },
-                        command: "node ./" + project + "/dist/serve.js"
+                        command: "node ./" + project + "/build/serve.js"
                     });
                     return [3 /*break*/, 16];
                 case 16: return [3 /*break*/, 18];

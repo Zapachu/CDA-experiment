@@ -14,7 +14,7 @@ interface IPaths {
 
 const defaultPaths: IPaths = {
   entry: './src/view',
-  output: './static'
+  output: './dist'
 }
 
 function resolvePaths(basePath, paths: IPaths = defaultPaths): IPaths {
@@ -61,7 +61,7 @@ export function geneClientBuilder(
     output: {
       path: output,
       filename: `[name].js`,
-      publicPath: buildMode === 'publish' ? `${qiNiu.download.jsDomain}/${qiNiu.upload.path}/${namespace}` : `/${config.rootName}/${namespace}/static/`
+      publicPath: buildMode === 'publish' ? `${qiNiu.download.jsDomain}/${qiNiu.upload.path}/${namespace}` : `/${config.rootName}/${namespace}/dist/`
     },
     resolve: {
       extensions: ['.ts', '.tsx', '.js', '.jsx', '.json']

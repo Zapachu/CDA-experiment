@@ -5,6 +5,6 @@ import {RobotServer} from '@bespoke/robot'
 import {Logic} from './Logic'
 import {Robot} from './Robot'
 
-Server.start(namespace, Logic, resolve(__dirname, '../static'))
+Server.start(namespace, Logic, resolve(__dirname, '../dist'))
 
 RobotServer.start(namespace, Robot)

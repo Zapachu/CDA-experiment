@@ -68,6 +68,7 @@ typings/
 # temp
 .DS_Store
 build
+dist
 
 # setting
 setting.ts

@@ -20,7 +20,7 @@ var share_1 = require("@bespoke/share");
 var util_1 = require("@elf/util");
 var defaultPaths = {
     entry: './src/view',
-    output: './static'
+    output: './dist'
 };
 function resolvePaths(basePath, paths) {
     if (paths === void 0) { paths = defaultPaths; }
@@ -54,7 +54,7 @@ function geneClientBuilder(_a) {
         output: {
             path: output,
             filename: "[name].js",
-            publicPath: buildMode === 'publish' ? qiNiu.download.jsDomain + "/" + qiNiu.upload.path + "/" + namespace : "/" + share_1.config.rootName + "/" + namespace + "/static/"
+            publicPath: buildMode === 'publish' ? qiNiu.download.jsDomain + "/" + qiNiu.upload.path + "/" + namespace : "/" + share_1.config.rootName + "/" + namespace + "/dist/"
         },
         resolve: {
             extensions: ['.ts', '.tsx', '.js', '.jsx', '.json']

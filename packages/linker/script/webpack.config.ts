@@ -14,7 +14,7 @@ export = {
     },
     entry: path.resolve(__dirname, '../src/frontend/index.tsx'),
     output: {
-        path: path.resolve(__dirname, '../static'),
+        path: path.resolve(__dirname, '../dist'),
         filename: 'ElfLinker.js',
         library: 'ElfLinker',
         libraryTarget: 'umd',

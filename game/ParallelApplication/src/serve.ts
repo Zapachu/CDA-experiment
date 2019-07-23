@@ -85,7 +85,7 @@ const router = Router()
     return res.json({ code: 1, msg: "server error" });
   });
 
-Server.start(namespace, Controller, resolve(__dirname, "../static"), router);
+Server.start(namespace, Controller, resolve(__dirname, '../dist'), router);
 
 RobotServer.start(namespace, Robot);
 
