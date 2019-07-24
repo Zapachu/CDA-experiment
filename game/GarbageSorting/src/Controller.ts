@@ -22,7 +22,8 @@ import {
   IPushParams,
   SHOUT_TIMER,
   namespace,
-  GARBAGE
+  GARBAGE,
+  ITEM_COST
 } from "./config";
 
 const { FreeStyleModel } = Model;
@@ -46,7 +47,8 @@ export default class Controller extends BaseController<
 
   async initPlayerState(actor: IActor): Promise<TPlayerState<IPlayerState>> {
     const playerState = await super.initPlayerState(actor);
-    playerState.score = 0;
+    playerState.score = 100;
+    playerState.contribution = 0;
     return playerState;
   }
 
@@ -80,8 +82,13 @@ export default class Controller extends BaseController<
           return cb("请选择一种垃圾类别");
         }
         clearInterval(this.ShoutTimeout[playerState.actor.token]);
+        if (answer !== GARBAGE.pass) {
+          playerState.score -= ITEM_COST;
+        }
+        playerState.flyTo = undefined;
         const score = this.checkScore(answer, index);
-        cb(null, score);
+        playerState.contribution += score;
+        cb(null, score > 0);
         break;
       }
       case MoveType.shout: {
@@ -98,7 +105,14 @@ export default class Controller extends BaseController<
           this.initRobots(groupSize - playerStateArray.length);
           this.robotJoined = true;
         }
-        this.processPlayerState(playerState, answer, index);
+        playerState.answers[index] = answer;
+        if (playerState.actor.type === Actor.serverRobot) {
+          if (answer !== GARBAGE.pass) {
+            playerState.score -= ITEM_COST;
+          }
+          const score = this.checkScore(answer, index);
+          playerState.contribution += score;
+        }
         this.shoutTicking(playerState);
         if (
           playerStateArray.length === groupSize &&
@@ -126,25 +140,12 @@ export default class Controller extends BaseController<
     }
   }
 
-  private processPlayerState(
-    playerState: TPlayerState<IPlayerState>,
-    answer: GARBAGE,
-    index: number
-  ) {
-    playerState.answers[index] = answer;
-    if (answer === GARBAGE.pass) {
-      return;
-    }
-    const score = this.checkScore(answer, index);
-    playerState.score += score;
-  }
-
   private checkScore(answer: GARBAGE, index: number): number {
     const { value, garbage } = ITEMS[index];
     if (answer === garbage) {
       return value;
     } else {
-      return -value;
+      return 0;
     }
   }
 
@@ -152,16 +153,22 @@ export default class Controller extends BaseController<
     gameState: IGameState,
     playerStates: Array<TPlayerState<IPlayerState>>
   ) {
-    playerStates.sort((a, b) => b.score - a.score);
-    const sortedPlayers = playerStates.map(ps => {
-      //@ts-ignore
-      return { score: ps.score, img: ps.user.headimg };
-    });
-    const averageScore =
-      sortedPlayers.reduce((acc, current) => acc + current.score, 0) /
-      sortedPlayers.length;
+    const { groupSize } = this.game.params;
+    const totalScore = playerStates.reduce(
+      (acc, current) => acc + current.contribution,
+      0
+    );
+    const averageScore = totalScore / groupSize;
+    const sortedPlayers = playerStates
+      .map(ps => {
+        const finalScore = ps.score + averageScore;
+        ps.score = finalScore;
+        //@ts-ignore
+        return { score: finalScore, img: ps.user.headimg };
+      })
+      .sort((a, b) => b.score - a.score);
     gameState.sortedPlayers = sortedPlayers;
-    gameState.averageScore = averageScore;
+    gameState.totalScore = totalScore;
     this.recordResult(playerStates);
   }
 
@@ -212,13 +219,26 @@ export default class Controller extends BaseController<
         return;
       }
       clearInterval(this.ShoutTimeout[token]);
-      this.processPlayerState(playerState, GARBAGE.pass, index);
+      playerState.flyTo = GARBAGE.pass;
+      await this.stateManager.syncState();
+      this.nextItem(playerState, GARBAGE.pass, index);
+    }, 1000) as any;
+  }
+
+  private async nextItem(
+    playerState: TPlayerState<IPlayerState>,
+    answer: GARBAGE,
+    index: number
+  ) {
+    setTimeout(async () => {
+      playerState.answers[index] = answer;
+      playerState.flyTo = undefined;
       if (index === ITEMS.length - 1) {
         this.checkAndProcessGameState();
       }
       await this.stateManager.syncState();
       this.shoutTicking(playerState);
-    }, 1000) as any;
+    }, 1000);
   }
 
   private async checkAndProcessGameState() {

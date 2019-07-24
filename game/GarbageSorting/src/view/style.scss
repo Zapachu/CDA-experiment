@@ -146,23 +146,12 @@
     border: 1px solid #557ad8;
     background-color: #020a1d;
     padding: 2px;
-    > ul {
-      position: absolute;
-      top: 50%;
-      left: -10px;
-      font-size: 10px;
-      transform: translateY(-50%);
-      color: #091f68;
-      > li {
-        margin-bottom: 5px;
-      }
-    }
     .background {
       height: 100%;
       background: linear-gradient(#29d529, #cc173a);
       overflow: hidden;
       > div {
-        height: 50%;
+        height: 100%;
         background-color: #020a1d;
         transition: transform 0.5s linear;
       }

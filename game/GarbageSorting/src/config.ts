@@ -31,15 +31,15 @@ export interface IGameState {
     score: number;
     img: string;
   }>;
-  averageScore: number;
+  totalScore: number;
 }
 
 export interface IPlayerState {
   score: number;
+  contribution: number;
+  flyTo: GARBAGE;
   answers: Array<GARBAGE>;
 }
-
-export const SHOUT_TIMER = 10;
 
 export enum GARBAGE {
   pass = 1,
@@ -74,4 +74,5 @@ export const ITEMS = [
   { img: ITEM_NAME.umbrella }
 ];
 
-export const TOTAL_SCORE = 200;
+export const SHOUT_TIMER = 10;
+export const ITEM_COST = 10;

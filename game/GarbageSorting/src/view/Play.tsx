@@ -16,8 +16,8 @@ import {
   namespace,
   GARBAGE_LABEL,
   SHOUT_TIMER,
-  TOTAL_SCORE,
-  ITEM_NAME
+  ITEM_NAME,
+  ITEM_COST
 } from "../config";
 import Modal from "./components/Modal";
 import CircleProgress from "./components/CircleProgress";
@@ -50,14 +50,13 @@ declare global {
 }
 
 interface IPlayState {
-  score: number;
   shoutTimer: number;
   btnStatus: {
     [garbage: number]: BTN;
   };
   modal: MODAL;
-  modifier: number;
   resultPlayerIndex: number;
+  itemStyle: object;
 }
 
 enum MODAL {
@@ -93,6 +92,14 @@ const defaultBtnStatus = {
   [GARBAGE.hazardous]: BTN.default
 };
 
+const translateOffset = {
+  [GARBAGE.pass]: { x: "0", y: "500%" },
+  [GARBAGE.dry]: { x: "-50%", y: "350%" },
+  [GARBAGE.wet]: { x: "150%", y: "350%" },
+  [GARBAGE.recyclable]: { x: "-150%", y: "350%" },
+  [GARBAGE.hazardous]: { x: "50%", y: "350%" }
+};
+
 export class Play extends Core.Play<
   ICreateParams,
   IGameState,
@@ -109,16 +116,12 @@ export class Play extends Core.Play<
 
   constructor(props: { playerState: IPlayerState }) {
     super(props as any);
-    const {
-      playerState: { score }
-    } = props;
     this.state = {
-      score: score,
       shoutTimer: 0,
       btnStatus: { ...defaultBtnStatus },
       modal: MODAL.prepare1,
-      modifier: undefined,
-      resultPlayerIndex: 0
+      resultPlayerIndex: 0,
+      itemStyle: {}
     };
     this.modifierRef = React.createRef();
     this.shareUrl = getShareUrl();
@@ -138,14 +141,43 @@ export class Play extends Core.Play<
     }
   }
 
+  componentDidUpdate(prevProps) {
+    const {
+      playerState: { answers, score, flyTo }
+    } = this.props;
+    if (flyTo && prevProps.playerState.flyTo !== flyTo) {
+      const offset = translateOffset[flyTo];
+      this.setState({
+        itemStyle: {
+          transform: `translate(${offset.x}, ${offset.y}) scale(0)`,
+          transition: "transform 0.5s linear"
+        }
+      });
+    }
+    if (prevProps.playerState.score !== score) {
+      this.showModifier();
+    }
+    if (
+      prevProps.playerState.answers &&
+      prevProps.playerState.answers.length !== answers.length
+    ) {
+      this.setState({
+        btnStatus: { ...defaultBtnStatus },
+        itemStyle: { transform: "none", transition: "none" }
+      });
+    }
+  }
+
   showModifier = () => {
     const node = this.modifierRef.current;
-    node.classList.remove(style.modifier);
-    window.requestAnimationFrame(() => {
+    if (node) {
+      node.classList.remove(style.modifier);
       window.requestAnimationFrame(() => {
-        node.classList.add(style.modifier);
+        window.requestAnimationFrame(() => {
+          node.classList.add(style.modifier);
+        });
       });
-    });
+    }
   };
 
   choose = (garbage: GARBAGE) => {
@@ -155,60 +187,52 @@ export class Play extends Core.Play<
     } = this.props;
     const btnStatus = { ...this.state.btnStatus };
     btnStatus[garbage] = BTN.active;
-    this.setState({ btnStatus }, () => {
-      frameEmitter.emit(
-        MoveType.check,
-        { answer: garbage, index: answers.length },
-        (err, modifier: number) => {
-          if (err) {
-            return Toast.warn(err);
-          }
-          setTimeout(() => {
-            const btnStatus = { ...this.state.btnStatus };
-            btnStatus[garbage] = modifier > 0 ? BTN.true : BTN.false;
-            this.setState(
-              ({ score }) => ({ modifier, score: score + modifier, btnStatus }),
-              () => {
-                this.showModifier();
-                setTimeout(() => {
-                  frameEmitter.emit(
-                    MoveType.shout,
-                    { answer: garbage, index: answers.length },
-                    err => {
-                      Toast.warn(err);
-                    }
-                  );
-                  this.setState({
-                    btnStatus: { ...defaultBtnStatus }
-                  });
-                }, 1000);
-              }
-            );
-          }, 1000);
+    const offset = translateOffset[garbage];
+    this.setState(
+      {
+        btnStatus,
+        itemStyle: {
+          transform: `translate(${offset.x}, ${offset.y}) scale(0)`,
+          transition: "transform 0.5s linear"
         }
-      );
-    });
-  };
-
-  pass = () => {
-    const {
-      frameEmitter,
-      playerState: { answers }
-    } = this.props;
-    const { btnStatus } = this.state;
-    btnStatus[GARBAGE.pass] = BTN.active;
-    this.setState({ btnStatus }, () => {
-      setTimeout(() => {
+      },
+      () => {
         frameEmitter.emit(
-          MoveType.shout,
-          { answer: GARBAGE.pass, index: answers.length },
-          err => {
-            Toast.warn(err);
+          MoveType.check,
+          { answer: garbage, index: answers.length },
+          (err, isTrue: boolean) => {
+            if (err) {
+              return Toast.warn(err);
+            }
+            setTimeout(() => {
+              if (garbage === GARBAGE.pass) {
+                frameEmitter.emit(
+                  MoveType.shout,
+                  { answer: garbage, index: answers.length },
+                  err => {
+                    Toast.warn(err);
+                  }
+                );
+              } else {
+                const btnStatus = { ...this.state.btnStatus };
+                btnStatus[garbage] = isTrue ? BTN.true : BTN.false;
+                this.setState({ btnStatus }, () => {
+                  setTimeout(() => {
+                    frameEmitter.emit(
+                      MoveType.shout,
+                      { answer: garbage, index: answers.length },
+                      err => {
+                        Toast.warn(err);
+                      }
+                    );
+                  }, 1000);
+                });
+              }
+            }, 1000);
           }
         );
-        this.setState({ btnStatus: { ...defaultBtnStatus } });
-      }, 1000);
-    });
+      }
+    );
   };
 
   precache() {
@@ -224,7 +248,7 @@ export class Play extends Core.Play<
       playerState: { answers },
       gameState
     } = this.props;
-    if (gameState.averageScore !== undefined) {
+    if (gameState.totalScore !== undefined) {
       return STATUS.result;
     }
     if (!answers) {
@@ -281,9 +305,9 @@ export class Play extends Core.Play<
 
   renderPlaying = () => {
     const {
-      playerState: { answers }
+      playerState: { answers, score }
     } = this.props;
-    const { btnStatus, score, modifier, shoutTimer } = this.state;
+    const { btnStatus, shoutTimer, itemStyle } = this.state;
     const index = answers ? answers.length : 0;
     const item = ITEMS[index];
     return (
@@ -297,35 +321,23 @@ export class Play extends Core.Play<
           <span>{index + 1}</span>&nbsp;/&nbsp;{ITEMS.length}
         </p>
         <div className={style.scoreContainer}>
-          <ul>
-            <li>+</li>
-            <li>0</li>
-            <li>-</li>
-          </ul>
           <p className={style.modifier} ref={this.modifierRef}>
-            {modifier > 0 ? "+" + modifier : modifier}
+            {-ITEM_COST}
           </p>
           <div className={style.background}>
             <div
               style={{
-                transform: `translateY(-${
-                  score > 0 ? "" + (score / TOTAL_SCORE) * 100 + "%" : "0"
-                })`
-              }}
-            />
-            <div
-              style={{
-                transform: `translateY(${
-                  score < 0
-                    ? "" + ((-1 * score) / TOTAL_SCORE) * 100 + "%"
-                    : "0"
-                })`
+                transform: `translateY(-${score}%)`
               }}
             />
           </div>
         </div>
         <div className={style.itemContainer}>
-          <img className={style.item} src={IMG_ITEM[item.img]} />
+          <img
+            style={itemStyle}
+            className={style.item}
+            src={IMG_ITEM[item.img]}
+          />
           <div className={style.gaugeContainer}>
             <CircleProgress
               ratio={
@@ -372,7 +384,7 @@ export class Play extends Core.Play<
           <Btn
             className={style.btn}
             status={btnStatus[GARBAGE.pass]}
-            onClick={this.pass}
+            onClick={() => this.choose(GARBAGE.pass)}
           />
           <span>{GARBAGE_LABEL[GARBAGE.pass]}</span>
         </div>
@@ -402,10 +414,10 @@ export class Play extends Core.Play<
   renderResult = (resultStyle = {}) => {
     const { resultPlayerIndex } = this.state;
     const {
-      gameState: { sortedPlayers, averageScore }
+      gameState: { sortedPlayers, totalScore }
     } = this.props;
     const resultPlayer = sortedPlayers && sortedPlayers[resultPlayerIndex];
-    const { image, label } = this.getTitleInfo(averageScore);
+    const { image, label } = this.getTitleInfo(totalScore);
     return (
       <div style={resultStyle}>
         <div
@@ -414,7 +426,7 @@ export class Play extends Core.Play<
         >
           <ul className={style.title}>
             <li>{label}</li>
-            <li>{averageScore}</li>
+            <li>{totalScore}</li>
           </ul>
           <div className={style.panel}>
             <ul className={style.left}>
