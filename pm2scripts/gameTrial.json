@@ -1,5 +1,5 @@
 {
-  "script": "packages/gameTrial/build/app.js",
+  "script": "../packages/gameTrial/build/app.js",
   "name": "gameTrial",
   "env": {
     "NODE_ENV": "production",
