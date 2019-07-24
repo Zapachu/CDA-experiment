@@ -1,6 +1,6 @@
 {
-  "script": "../game/Graphical/DoubleAuctionGraphical/dist/serve.js",
-  "name": "DoubleAuctionGraphical",
+  "script": "../game/WithEgret/DoubleAuction/dist/serve.js",
+  "name": "EgretDoubleAuction",
   "env": {
     "NODE_ENV": "production",
     "BESPOKE_WITH_PROXY": "true",
