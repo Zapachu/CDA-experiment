@@ -1,0 +1,9 @@
+{
+  "script": "packages/gameTrial/build/app.js",
+  "name": "gameTrial",
+  "env": {
+    "NODE_ENV": "production",
+    "PORT":3021
+  },
+  "log_date_format": "YYYY-MM-DD HH:mm Z"
+}
