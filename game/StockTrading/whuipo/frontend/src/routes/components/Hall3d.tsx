@@ -13,7 +13,7 @@ import gameDesc from './gameDesc';
 
 import BabylonScene from "./BabylonScene";
 import Detail from './detail.png'
-import PANO from './pano.jpg'
+import PANO from './hall.jpg'
 import LockIcon from './lock.png'
 import UnLockIcon from './unlock.png'
 import style from './style.less'
