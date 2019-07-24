@@ -1,4 +1,4 @@
-export const namespace = 'Qualtrics'
+export const namespace = 'qualtrics'
 
 export enum MoveType {
     getIndex = 'getIndex'

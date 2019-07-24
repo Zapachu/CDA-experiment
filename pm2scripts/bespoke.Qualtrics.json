@@ -1,0 +1,10 @@
+{
+  "script": "../game/Proxy/Qualtrics/dist/serve.js",
+  "name": "Qualtrics",
+  "env": {
+    "NODE_ENV": "production",
+    "BESPOKE_WITH_PROXY": "true",
+    "BESPOKE_WITH_LINKER": "true"
+  },
+  "log_date_format": "YYYY-MM-DD HH:mm Z"
+}
