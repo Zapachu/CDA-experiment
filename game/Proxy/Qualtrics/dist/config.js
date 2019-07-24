@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.namespace = 'Qualtrics';
+exports.namespace = 'qualtrics';
 var MoveType;
 (function (MoveType) {
     MoveType["getIndex"] = "getIndex";
