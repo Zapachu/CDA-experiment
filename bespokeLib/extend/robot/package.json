@@ -9,6 +9,7 @@
   },
   "devDependencies": {
     "@bespoke/robot": "^1.1.1",
+    "@bespoke/share": "^1.1.1",
     "@extend/share": "^1.1.1",
     "typescript": "^3.3.3333"
   }
