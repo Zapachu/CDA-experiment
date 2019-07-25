@@ -1,0 +1,10 @@
+.create{
+  padding: 4rem;
+}
+.playIframe{
+  position: absolute;
+  border: none;
+  width: 100%;
+  height: calc(100% - 32px);
+  top: 32px;
+}

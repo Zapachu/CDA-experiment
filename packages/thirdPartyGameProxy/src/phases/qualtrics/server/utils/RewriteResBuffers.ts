@@ -34,7 +34,7 @@ const rewriteResBuffers = async (proxyRes, req, res) => {
         res.end = () => {
             console.log("log > got end")
             let fullChunk = Buffer.concat(buffers)
-            console.log(fullChunk)
+            console.log(fullChunk.toString())
             zlib.unzip(fullChunk, {
                 finishFlush: zlib.constants.Z_SYNC_FLUSH,
                 flush: zlib.Z_SYNC_FLUSH,

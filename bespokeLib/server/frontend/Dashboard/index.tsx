@@ -15,7 +15,7 @@ export function Dashboard({history, user}: TPageProps) {
         if (user && user.role === AcademusRole.teacher) {
             Api.getHistoryGames().then(({code, historyGameThumbs}) => code === ResponseCode.success ? setHistoryGameThumbs(historyGameThumbs) : null)
         } else {
-            history.push('/join')
+            history.push(PRODUCT_ENV ? '/join' : '/login')
         }
     }, [])
     return <section className={style.dashboard}>
