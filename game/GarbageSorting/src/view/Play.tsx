@@ -17,7 +17,8 @@ import {
   GARBAGE_LABEL,
   SHOUT_TIMER,
   ITEM_NAME,
-  ITEM_COST
+  ITEM_COST,
+  TOTAL_SCORE
 } from "../config";
 import Modal from "./components/Modal";
 import CircleProgress from "./components/CircleProgress";
@@ -408,7 +409,13 @@ export class Play extends Core.Play<
   };
 
   getTitleInfo = (score: number): { image: string; label: string } => {
-    return { image: IMG_ENV_GOOD, label: "环境健康" };
+    if (score > (TOTAL_SCORE / 3) * 2) {
+      return { image: IMG_ENV_GOOD, label: "环境健康" };
+    }
+    if (score < TOTAL_SCORE / 3) {
+      return { image: IMG_ENV_BAD, label: "环境污染" };
+    }
+    return { image: IMG_ENV_MID, label: "环境一般" };
   };
 
   renderResult = (resultStyle = {}) => {

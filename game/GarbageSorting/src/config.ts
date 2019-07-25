@@ -76,3 +76,4 @@ export const ITEMS = [
 
 export const SHOUT_TIMER = 10;
 export const ITEM_COST = 10;
+export const TOTAL_SCORE = 20 * 10 * 10;
