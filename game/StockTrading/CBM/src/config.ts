@@ -12,6 +12,7 @@ export enum PeriodStage {
 }
 
 export enum MoveType {
+    guideDone = 'guideDone',
     getIndex = 'getIndex',
     submitOrder = 'submitOrder',
     cancelOrder = 'cancelOrder',
@@ -97,7 +98,14 @@ export enum Identity {
     stockGuarantor
 }
 
+export enum PlayerStatus {
+    guide,
+    test,
+    play
+}
+
 export interface IPlayerState {
+    status: PlayerStatus
     playerIndex: number
     identity: Identity
     privatePrices: number[]

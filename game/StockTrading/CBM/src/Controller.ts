@@ -25,6 +25,7 @@ import {
     PERIOD,
     PeriodStage,
     playerLimit,
+    PlayerStatus,
     PrivatePriceRegion,
     PushType,
     ROLE
@@ -59,6 +60,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         const playerState = await super.initPlayerState(actor)
         const {type} = await this.stateManager.getGameState()
         const [[min, max]] = PrivatePriceRegion[type]
+        playerState.status = PlayerStatus.guide
         playerState.privatePrices = [random(min, max)]
         playerState.guaranteeMoney = 0
         playerState.guaranteeCount = 0
@@ -188,11 +190,16 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             playerState = await this.stateManager.getPlayerState(actor),
             playerStates = await this.getActivePlayerStates()
         switch (type) {
+            case MoveType.guideDone: {
+                playerState.status = PlayerStatus.test
+                break
+            }
             case MoveType.getIndex: {
                 if (playerState.playerIndex !== undefined) {
                     break
                 }
                 playerState.playerIndex = gameState.playerIndex++
+                playerState.status = PlayerStatus.play
                 switch (true) {
                     case actor.type === Actor.serverRobot && playerStates.every(({identity}) => identity != Identity.moneyGuarantor):
                         playerState.identity = Identity.moneyGuarantor

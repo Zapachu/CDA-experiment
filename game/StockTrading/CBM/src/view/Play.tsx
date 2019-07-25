@@ -2,6 +2,7 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {Core} from '@bespoke/client'
 import {Lang, Toast} from '@elf/component'
+import Joyride from 'react-joyride'
 
 import {
     CONFIG,
@@ -14,6 +15,7 @@ import {
     MoveType,
     PERIOD,
     PeriodStage,
+    PlayerStatus,
     PushType,
     ROLE
 } from '../config'
@@ -44,14 +46,14 @@ function Border({background = `radial-gradient(at 50% 0%, #67e968 1rem, transpar
 }
 
 export function TradeChart({
-                        tradeList, color = {
+                               tradeList, color = {
         scalePlate: '#999',
         line: '#999',
         title: '#999',
         number: '#999',
         point: '#E27B6A'
     }
-                    }: {
+                           }: {
     tradeList: Array<{
         price: number,
         count: number
@@ -250,7 +252,7 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
         invalidSellPrice: ['订单价格需低于市场当前最低卖价', 'Order price must be higher than the lowest buy price in the market'],
         invalidCount: ['超出可交易物品数量', 'Exceed the number of tradable units'],
         invalidMoney: ['金额有误，请检查', 'Invalid Money'],
-        marketOrders:['市场订单','Market Orders'],
+        marketOrders: ['市场订单', 'Market Orders'],
         sellOrders: ['卖家订单', 'SellOrders'],
         buyOrders: ['买家订单', 'BuyOrders'],
         yourTrades: ['交易记录', 'Your Trades'],
@@ -261,7 +263,9 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
         priceCountTips: ['价格 * 数量 ：', 'price * count : '],
         closeOutWarning: ['资产低于担保金额130%将被平仓', 'Your count will be closed out when assets is below 130% of guarantee money'],
         closedOut: ['资产低于担保金额130%，已被平仓', 'Your count has been closed out since assets is below 130% of guarantee money'],
-        tradeSuccess: [count => `交易成功 , 数量 : ${count}`, count => `Trade success, count : ${count}`]
+        tradeSuccess: [count => `交易成功 , 数量 : ${count}`, count => `Trade success, count : ${count}`],
+        gotIt: ['我知道了', 'I got it'],
+        confirm: ['确定', 'Confirm']
     })
     const {prepareTime, tradeTime, resultTime} = CONFIG
     const [countDown, setCountDown] = React.useState(0)
@@ -271,12 +275,12 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
     const [count, setCount] = React.useState('' as number | string)
     const [showChartModal, setShowChartModal] = React.useState(false)
     const [orderTabIndex, setOrderTabIndex] = React.useState(0)
+    const [testIndex, setTestIndex] = React.useState(0)
     React.useEffect(() => {
         frameEmitter.on(PushType.countDown, ({countDown}) => setCountDown(countDown))
         frameEmitter.on(PushType.closeOutWarning, () => Toast.warn(lang.closeOutWarning))
         frameEmitter.on(PushType.closeOut, () => Toast.warn(lang.closedOut))
         frameEmitter.on(PushType.tradeSuccess, ({tradeCount}) => Toast.success(lang.tradeSuccess(tradeCount)))
-        frameEmitter.emit(MoveType.getIndex)
     }, [])
     const gamePeriodState = gameState.periods[gameState.periodIndex]
     const {buyOrderIds, sellOrderIds, trades} = gamePeriodState,
@@ -313,6 +317,9 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
     const guaranteeMoneyLimit = nonNegative(playerState.money - playerState.guaranteeMoney),
         guaranteeCountLimit = nonNegative(~~(playerState.money / gamePeriodState.closingPrice) + playerState.count - playerState.guaranteeCount)
     return <section className={style.trading}>
+        {
+            playerState.status === PlayerStatus.guide ? renderGuide() : null
+        }
         <div className={style.tradePanel}>
             {
                 renderAsset()
@@ -322,12 +329,93 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
             }
         </div>
         {
-            renderOrderPanel()
+            playerState.status === PlayerStatus.test ? testIndex === 0 ? <OrderPanelTest {...{
+                label: {
+                    title: `测试题一`,
+                    todo: '您现在为买家，现要以12元的价格买入1股的配额数量',
+                    question: '挂在买家订单上面的最高买价是11，挂在卖家订单上面的最低卖价是12。在这个时候若同时出现了一个买入价格为13元的买价订单，则成交价格为',
+                    answer: '买入申报价13元高于即时揭示的最低卖价12元，以最低申报卖价12元成交。'
+                },
+                targetPrice: 12,
+                buyPrices: [11],
+                sellPrices: [12],
+                onDone: () => setTestIndex(testIndex + 1)
+            }}/> : <OrderPanelTest {...{
+                label: {
+                    title: '测试题二',
+                    todo: '您现在为卖家，现要以10元的价格卖出1股的配额数量',
+                    question: '挂在买家订单上面的最高买价是11，挂在卖家订单上面的最低卖价是12。在这个时候若同时出现了一个买入价格为10元的卖家订单，则成交价格为',
+                    answer: '卖出申报价10元低于即时揭示的最低卖价12元，以最低申报卖价12元成交。'
+                },
+                targetPrice: 10,
+                buyPrices: [11],
+                sellPrices: [12],
+                onDone: () => frameEmitter.emit(MoveType.getIndex)
+            }}/> : renderOrderPanel()
         }
         {
             renderChartPanel()
         }
     </section>
+
+    function renderGuide() {
+        return <Joyride
+            callback={({action}) => {
+                if (action == 'reset') {
+                    frameEmitter.emit(MoveType.guideDone)
+                }
+            }}
+            continuous
+            showProgress
+            hideBackButton
+            steps={[
+                {
+                    target: `.${style.asset}`,
+                    content: '您可以在这里查看您资产组合中的股票数量和资金数目',
+                    disableBeacon: true
+                },
+                {
+                    target: `.${style.tradeListWrapper}`,
+                    content: '您可以在这里查看您的股票交易记录'
+                },
+                {
+                    target: `.${style.orderBook}`,
+                    content: '您可以在这里查看已经提交的买家报价和卖家报价。买单和卖单分别排队，买单以价格从高到低排列，卖单以价格从低到高排列。同价的，按进入系统的先后排列。系统按照顺序将排在前面的买单和卖单配对成交，即按“价格优先，同等价格下时间优先”的顺序依次成交在，直到不能成交为止，未成交的委托排队等待成交。',
+                    styles: {
+                        tooltip: {
+                            width: '50vw',
+                            height: '50vh'
+                        }
+                    }
+                },
+                {
+                    target: `.${style.toNextPeriod}`,
+                    content: '您可以在这里查看当前的交易期数和剩余交易时间，您需在规定的时间内完成交易。'
+                },
+                {
+                    target: `.${style.orderSubmission}`,
+                    content: '您可以在这里提交您的卖单和卖单。买入申报价高于即时揭示最低卖价，以最低申报卖价成交；卖出申报价低于最高买入价，以最高买入价成交。两个委托如果不能全部成交，剩余的继续留在单上，等待下次成交。系统处理原则为价格优先和时间优先两个原则。'
+                },
+                {
+                    target: `.${style.marketHistoryWrapper}`,
+                    content: '您可以在这里查看已经成交的股票的成交价格。'
+                }
+            ]}
+            locale={{
+                next: lang.gotIt,
+                last: lang.gotIt
+            }}
+            styles={{
+                options: {
+                    arrowColor: 'rgba(30,39,82,.8)',
+                    backgroundColor: 'rgba(30,39,82,.8)',
+                    overlayColor: '#1d1d32',
+                    primaryColor: '#13553e',
+                    textColor: '#fff'
+                }
+            }}
+        />
+    }
 
     function submitOrder(role: ROLE, guarantee?: boolean) {
         const _price = Number(price || 0)
@@ -404,16 +492,16 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
             <Line text={lang.marketOrders} style={STYLE.titleLineStyle}/>
             <section className={style.orderBook}>
                 {
-                    renderOrderList(buyOrderIds, ROLE.Buyer)
+                    renderOrderList(buyOrderIds.map(id => orderDict[id]), ROLE.Buyer)
                 }
                 {
-                    renderOrderList(sellOrderIds, ROLE.Seller)
+                    renderOrderList(sellOrderIds.map(id => orderDict[id]), ROLE.Seller)
                 }
             </section>
             {
                 <section className={style.orderSubmission}>
                     {
-                        gamePeriodState.stage === PeriodStage.trading ?
+                        gamePeriodState.stage === PeriodStage.trading || playerState.status === PlayerStatus.guide ?
                             <section className={style.newOrder}>
                                 <label className={style.subLabel}>
                                     {lang.timeLeft(gameState.periodIndex + 1, countDown < prepareTime ? '' : timeLeft > 0 ? timeLeft : 0)}</label>
@@ -462,6 +550,98 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
                     }
                 </section>
             }
+        </div>
+    }
+
+    function OrderPanelTest({label, targetPrice, buyPrices, sellPrices, onDone}: {
+        label: {
+            todo: string
+            question: string
+            answer: string,
+            title: string
+        },
+        targetPrice: number,
+        buyPrices: Array<number>,
+        sellPrices: Array<number>,
+        onDone: () => void
+    }) {
+        const [price, setPrice] = React.useState('' as React.ReactText)
+        const [tradePrice, setTradePrice] = React.useState('' as React.ReactText)
+        const [count, setCount] = React.useState('' as React.ReactText)
+        const [showQuestion, setShowQuestion] = React.useState(false)
+        const [showAnswer, setShowAnswer] = React.useState(false)
+        return <div className={`${style.orderPanel} ${style.test}`}>
+            <Line text={lang.marketOrders} style={STYLE.titleLineStyle}/>
+            <section className={style.orderBook}>
+                {
+                    renderOrderList(buyPrices.map(price => ({
+                        id: 0,
+                        playerIndex: -1,
+                        role: ROLE.Buyer,
+                        price: price,
+                        count: 1,
+                        guarantee: false
+                    })), ROLE.Buyer)
+                }
+                {
+                    renderOrderList(sellPrices.map(price => ({
+                        id: 0,
+                        playerIndex: -1,
+                        role: ROLE.Seller,
+                        price: price,
+                        count: 1,
+                        guarantee: false
+                    })), ROLE.Seller)
+                }
+            </section>
+            <div className={style.testTitle}>
+                {
+                    label.title
+                }
+            </div>
+            {
+                showQuestion ?
+                    <>
+                        <div className={style.testLabel}>
+                            {label.question}
+                        </div>
+                        <Input value={tradePrice} onChange={val => setTradePrice(val)}/>
+                        <br/>
+                        {
+                            showAnswer ?
+                                <div className={style.answer}>
+                                    <em>{'解析'}</em><span>{label.answer}</span><br/><br/>
+                                    <Button label={lang.confirm} onClick={() => onDone()}/>
+                                </div> : <Button label={'OK'} onClick={() => setShowAnswer(true)}/>
+                        }
+                    </> : <>
+                        <div className={style.testLabel}>{label.todo}</div>
+                        <section className={style.orderSubmission}>
+                            <Input {...{
+                                value: price || '',
+                                placeholder: lang.price,
+                                onChange: v => setPrice(v),
+                                onMinus: v => setPrice(v - 1),
+                                onPlus: v => setPrice(v + 1)
+                            }}/>
+                            <br/>
+                            <Input {...{
+                                value: count || '',
+                                placeholder: lang.count,
+                                onChange: v => setCount(v),
+                                onMinus: v => setCount(v - 1),
+                                onPlus: v => setCount(v + 1)
+                            }}/>
+                            <br/>
+                            <Button label={lang.shout} onClick={() => {
+                                if (price == targetPrice && count == 1) {
+                                    setShowQuestion(true)
+                                }
+                            }}/>
+                        </section>
+                    </>
+            }
+
         </div>
     }
 
@@ -610,7 +790,7 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
         </div>
     }
 
-    function renderOrderList(marketOrderIds: Array<number>, shoutRole) {
+    function renderOrderList(marketOrders: Array<IOrder>, shoutRole) {
         return <section className={style.orderList}>
             <Line text={shoutRole === ROLE.Seller ? lang.sellOrders : lang.buyOrders} style={STYLE.orderPanelTitle}/>
             <table className={style.orderTable}>
@@ -623,12 +803,11 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
                 </thead>
                 <tbody>
                 {
-                    marketOrderIds.map(orderId => {
-                            const orderX = orderDict[orderId],
-                                isMine = orderX.playerIndex === playerState.playerIndex
-                            return <tr key={orderId} className={style.orderPrice}>
-                                <td>{orderX.price}</td>
-                                <td className={style.count}>{orderX.count}</td>
+                    marketOrders.map(order => {
+                            const isMine = order.playerIndex === playerState.playerIndex
+                            return <tr key={order.id} className={style.orderPrice}>
+                                <td>{order.price}</td>
+                                <td className={style.count}>{order.count}</td>
                                 <td>
                                     <a className={style.btnCancel}
                                        style={{visibility: isMine ? 'visible' : 'hidden'}}

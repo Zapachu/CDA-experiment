@@ -80,7 +80,6 @@ $sidePanelBasis: 24rem;
   }
 
   .trading {
-    margin: 2rem auto;
     width: 95%;
     display: flex;
     justify-content: center;
@@ -210,6 +209,23 @@ $sidePanelBasis: 24rem;
             margin: 2rem 0;
             display: flex;
             justify-content: center;
+          }
+        }
+      }
+
+      &.test{
+        text-align: center;
+        .testTitle{
+          font-size: $fontSize-large;
+        }
+        .testLabel{
+          margin: 1rem 0;
+        }
+        .answer{
+          margin: 1rem;
+          em{
+            margin: 1rem;
+            font-size: $fontSize-large;
           }
         }
       }
