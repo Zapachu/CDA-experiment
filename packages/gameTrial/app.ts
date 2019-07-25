@@ -197,9 +197,8 @@ app.set('port', port);
  * Create HTTP server.
  */
 let server = http.createServer(app);
-
 const io = socket(server, {
-  path: path.join(settings.rootname, '/socket')
+  path: `${settings.rootname}/socket`
 })
 io.adapter(socketRedis({ host: settings.redishost, port: settings.redisport }))
 // io.use(socketSession(sessionMiddleWare, {
