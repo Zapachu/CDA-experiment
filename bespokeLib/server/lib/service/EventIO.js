@@ -97,7 +97,7 @@ var EventIO = /** @class */ (function () {
         var _this = this;
         this.socketIOServer = SocketIO(server, { path: share_1.config.socketPath(util_2.Setting.namespace) });
         this.socketIOServer.on(share_1.SocketEvent.connection, function (connection) { return __awaiter(_this, void 0, void 0, function () {
-            var _a, _b, token, gameId, _c, _d, userId, linkerActor, sessionID, game, actor, user, _e, id, mobile, name_1, role;
+            var _a, _b, token, gameId, _c, _d, userId, linkerActor, sessionID, game, actor, user, _e, id, mobile, name_1, role, headimg;
             return __generator(this, function (_f) {
                 switch (_f.label) {
                     case 0:
@@ -114,8 +114,8 @@ var EventIO = /** @class */ (function () {
                         if (!userId) return [3 /*break*/, 3];
                         return [4 /*yield*/, model_1.UserModel.findById(userId)];
                     case 2:
-                        _e = _f.sent(), id = _e.id, mobile = _e.mobile, name_1 = _e.name, role = _e.role;
-                        user = { id: id, mobile: mobile, name: name_1, role: role };
+                        _e = _f.sent(), id = _e.id, mobile = _e.mobile, name_1 = _e.name, role = _e.role, headimg = _e.headimg;
+                        user = { id: id, mobile: mobile, name: name_1, role: role, headimg: headimg };
                         _f.label = 3;
                     case 3:
                         subscribeOnConnection(Object.assign(connection, { actor: actor, game: game, user: user }));
