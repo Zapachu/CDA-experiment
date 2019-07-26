@@ -68,7 +68,7 @@ class Server {
         express.use(bodyParser.json())
         express.use(bodyParser.urlencoded({extended: true, limit: '30mb', parameterLimit: 30000}))
         express.use(`/${config.rootName}/static`, Express.static(
-            path.join(__dirname, '../../static/'),
+            path.join(__dirname, '../dist/'),
             {maxAge: '10d'}
         ))
 

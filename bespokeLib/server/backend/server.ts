@@ -15,7 +15,7 @@ import * as morgan from 'morgan'
 import {elfSetting} from '@elf/setting'
 import {gameId2PlayUrl, getOrigin, heartBeat, QCloudSMS, RedisKey, Setting} from './util'
 import {PassportStrategy} from './interface'
-import {AcademusRole, config, IGameConfig, IStartOption, csrfCookieKey} from '@bespoke/share'
+import {AcademusRole, config, csrfCookieKey, IGameConfig, IStartOption} from '@bespoke/share'
 import {EventDispatcher} from './controller/eventDispatcher'
 import {router} from './controller/requestRouter'
 import {AnyLogic, BaseLogic, GameDAO} from './service'
@@ -28,6 +28,40 @@ import {Log} from '@elf/util'
 
 export class Server {
     private static sessionMiddleware
+
+    static start(namespace: string, Logic: new(...args) => AnyLogic, staticPath: string, bespokeRouter: Express.Router = Express.Router(), startOption: IStartOption = {}) {
+        Setting.init(namespace, staticPath, startOption)
+        this.initSessionMiddleware()
+        this.initMongo()
+        this.initPassPort()
+        QCloudSMS.init()
+        BaseLogic.init(Logic, startOption.syncStrategy)
+        const express = this.initExpress(bespokeRouter),
+            server = express.listen(Setting.port)
+        EventDispatcher.startGameSocket(server).use(socketIOSession(this.sessionMiddleware))
+        this.bindServerListener(server, () => {
+            Log.i(`Running at：http://${Setting.ip}:${elfSetting.bespokeHmr ? config.devPort.client : Setting.port}/${config.rootName}/${Setting.namespace}`)
+            heartBeat(RedisKey.gameServer(Setting.namespace), () => `${Setting.ip}:${Setting.port}`)
+            if (elfSetting.bespokeWithLinker) {
+                this.withLinker()
+            }
+        })
+    }
+
+    static async newGame<ICreateParams>(gameConfig: IGameConfig<ICreateParams>): Promise<string> {
+        const [mobile] = elfSetting.adminMobileNumbers
+        if (!mobile) {
+            Log.e('未配置管理员账号，无法创建实验')
+        }
+        let owner: UserDoc = await UserModel.findOne({mobile})
+        if (!owner) {
+            owner = await UserModel.create({
+                role: AcademusRole.teacher,
+                mobile: mobile
+            })
+        }
+        return await GameDAO.newGame(owner.id, gameConfig)
+    }
 
     private static initMongo() {
         connectMongo(elfSetting.mongoUri, {
@@ -139,47 +173,12 @@ export class Server {
             })
             return {playUrl: gameId2PlayUrl(id)}
         })
-        const elfComponentPath = require('../static/index.json')['ElfComponent.js'].replace('static', `${Setting.namespace}/static`)
         heartBeat(Linker.HeartBeat.key(Setting.namespace), () => {
             const regInfo: Linker.HeartBeat.IHeartBeat = {
                 namespace: Setting.namespace,
-                jsUrl: `${getOrigin()}${elfComponentPath};${getOrigin()}${Setting.getClientPath()}`
+                jsUrl: `${getOrigin()}${Setting.getClientPath()}`
             }
             return JSON.stringify(regInfo)
         })
-    }
-
-    static start(namespace: string, Logic: new(...args) => AnyLogic, staticPath: string, bespokeRouter: Express.Router = Express.Router(), startOption: IStartOption = {}) {
-        Setting.init(namespace, staticPath, startOption)
-        this.initSessionMiddleware()
-        this.initMongo()
-        this.initPassPort()
-        QCloudSMS.init()
-        BaseLogic.init(Logic, startOption.syncStrategy)
-        const express = this.initExpress(bespokeRouter),
-            server = express.listen(Setting.port)
-        EventDispatcher.startGameSocket(server).use(socketIOSession(this.sessionMiddleware))
-        this.bindServerListener(server, () => {
-            Log.i(`Running at：http://${Setting.ip}:${elfSetting.bespokeHmr ? config.devPort.client : Setting.port}/${config.rootName}/${Setting.namespace}`)
-            heartBeat(RedisKey.gameServer(Setting.namespace), () => `${Setting.ip}:${Setting.port}`)
-            if (elfSetting.bespokeWithLinker) {
-                this.withLinker()
-            }
-        })
-    }
-
-    static async newGame<ICreateParams>(gameConfig: IGameConfig<ICreateParams>): Promise<string> {
-        const [mobile] = elfSetting.adminMobileNumbers
-        if (!mobile) {
-            Log.e('未配置管理员账号，无法创建实验')
-        }
-        let owner: UserDoc = await UserModel.findOne({mobile})
-        if (!owner) {
-            owner = await UserModel.create({
-                role: AcademusRole.teacher,
-                mobile: mobile
-            })
-        }
-        return await GameDAO.newGame(owner.id, gameConfig)
     }
 }

@@ -12,7 +12,7 @@ const DEFAULT_PAGE_SIZE = 11
 
 export class UserCtrl {
     static async renderApp(req: Request, res: Response) {
-        res.sendFile(path.resolve(__dirname, '../../../static/index.html'))
+        res.sendFile(path.resolve(__dirname, '../../dist/index.html'))
     }
 
     static loggedIn(req, res: Response, next: NextFunction) {

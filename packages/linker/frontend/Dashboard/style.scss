@@ -2,21 +2,14 @@
 
 .gameList {
   text-align: center;
+  padding: 0 1rem;
   .gameItem {
-    height: 10rem;
-    padding: 1rem 2rem;
+    height: 8rem;
     display: flex;
     align-items: center;
-    justify-content: center;
     border: $borderLine;
-    transition: $transition-normal;
-    background: white;
     cursor: pointer;
-
-    .btnAdd {
-      width: 100%;
-      height: 100%;
-    }
+    transition: $transition-normal;
 
     &:hover {
       box-shadow: 0 1px 1px 0 rgba($color-black, 0.1);

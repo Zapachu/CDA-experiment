@@ -33,7 +33,7 @@ export const Dashboard: FunctionComponent<RouteComponentProps & TPageProps> = ({
         <Button style={{margin: '2rem'}} type='primary'
                 onClick={() => toV5(config.academus.route.join)}>{lang.join}</Button>
         <List
-            grid={{gutter: 24, xl: 4, md: 3, sm: 2, xs: 1}}
+            grid={{gutter: 24, md: 3}}
             dataSource={gameList}
             renderItem={({id, title, desc}) => <ListItem key={id}>
                 <section

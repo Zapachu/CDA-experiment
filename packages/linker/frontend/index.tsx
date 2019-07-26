@@ -40,7 +40,7 @@ function renderRoot(pageProps: TPageProps, rootContainer: HTMLElement) {
                 {Lang.activeLanguage === Language.en ? '中文' : 'English'}</Button>
         </div>
         <Switch>
-            <Route path={'/Create/:namespace'} component={Create}/>
+            <Route path={'/create/:namespace'} component={Create}/>
             <Route path={'/info/:gameId'} component={Info}/>
             <Route path={'/play/:gameId'} component={Play}/>
             <Route component={Dashboard}/>

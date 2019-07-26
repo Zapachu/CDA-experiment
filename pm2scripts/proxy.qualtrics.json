@@ -1,8 +1,0 @@
-{
-  "script": "../packages/thirdPartyGameProxy/src/phases/qualtrics/server/app.ts",
-  "name": "Proxy-qualtrics",
-  "env": {
-    "NODE_ENV": "production"
-  },
-  "log_date_format": "YYYY-MM-DD HH:mm Z"
-}

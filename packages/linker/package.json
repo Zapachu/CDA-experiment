@@ -5,11 +5,13 @@
   "repository": " ",
   "license": "ISC",
   "scripts": {
-    "tsc-w": "tsc -w",
-    "dist": "tsc & npm run client:dist",
-    "client:build": "webpack  --env.TS_NODE_PROJECT=\"tsconfig.json\"  --config ./script/webpack.config.ts",
+    "client:tsc-w": "tsc -p frontend -w",
+    "client:build": "webpack --env.TS_NODE_PROJECT=\"frontend/tsconfig.json\" --config ./script/webpack.config.ts",
     "client:dist": "npm run client:build --buildMode=dist",
-    "start": "ts-node ./src/backend/server.ts"
+    "server:tsc-w": "tsc -p backend -w",
+    "server:dist": "tsc -p backend",
+    "both:dist": "npm run server:dist & npm run client:dist",
+    "start": "ts-node backend/server.ts"
   },
   "devDependencies": {
     "@elf/component": "^1.1.1",

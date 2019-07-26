@@ -71,9 +71,6 @@ export = {
         'antd': 'antd'
     },
     plugins: [
-        new ManifestPlugin({
-            fileName: `index.json`
-        }),
         new HtmlWebpackPlugin({
             hash: true,
             filename: 'index.html',

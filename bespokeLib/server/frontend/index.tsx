@@ -1,7 +1,7 @@
 import './initial.scss'
 import * as React from 'react'
-import {IGameTemplate, Core} from '@bespoke/client'
-import {Lang, Language} from '@elf/component'
+import {Core, IGameTemplate} from '@bespoke/client'
+import {Lang} from '@elf/component'
 import {BrowserRouter, Route as ReactRoute, RouteComponentProps, RouteProps, Switch} from 'react-router-dom'
 import {config} from '@bespoke/share'
 import {Login} from './Login'
@@ -14,7 +14,7 @@ import {Play} from './Play'
 import {Configuration} from './Configuration'
 import {NotFound} from './NotFound'
 import {render} from 'react-dom'
-import {Api, Button, TPageProps} from './util'
+import {Api, TPageProps} from './util'
 
 function renderRoot(pageProps: TPageProps, rootContainer: HTMLElement) {
     const Route = ({component: Component, ...routeProps}: RouteProps) =>
@@ -37,20 +37,12 @@ function renderRoot(pageProps: TPageProps, rootContainer: HTMLElement) {
                 <Route component={NotFound}/>
             </Switch>
         </BrowserRouter>
-        {
-            WITH_LINKER ? null :
-                <div style={{position: 'absolute', right: 8, top: 8, zIndex: 1000}}>
-                    <Button size='small'
-                            onClick={() => Lang.switchLang(Lang.activeLanguage === Language.en ? Language.zh : Language.en)}>
-                        {Lang.activeLanguage === Language.en ? '中文' : 'English'}</Button>
-                </div>
-        }
     </section>, rootContainer)
 }
 
 export function registerOnBespoke(gameTemplate: IGameTemplate) {
     const template = {
-        Create: Core.Create ,
+        Create: Core.Create,
         Play4Owner: Core.Play4Owner,
         Result: Core.Result,
         Result4Owner: Core.Result4Owner,
