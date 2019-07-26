@@ -158,7 +158,7 @@ app.use((req, res, next) => {
   // if (_.includes(csrfExclude, req.path)) {
   //   return next();
   // }
-  lusca.csrf()(req, res, next);
+  lusca.csrf()(req as any, res as any, next);
 });
 
 app.use(passport.initialize());

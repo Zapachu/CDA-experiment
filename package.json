@@ -93,6 +93,7 @@
   "dependencies": {
     "@grpc/proto-loader": "^0.5.1",
     "babylonjs": "^4.0.3",
+    "babylonjs-loaders": "^4.0.3",
     "bcrypt-nodejs": "0.0.3",
     "big-integer": "^1.6.44",
     "body": "^5.1.0",
