@@ -179,7 +179,7 @@ html
                 align-items: center;
                 justify-content: center;
                 color: white;
-                padding: 33px 10px 21px;
+                padding: 16px 10px 12px;
             }
             .footer > .qrcode {
                 display: flex;
@@ -190,8 +190,8 @@ html
             .footer > .qrcode > img {
                 padding: 4px;
                 background-color: white;
-                width: 60px;
-                height: 60px;
+                width: 46px;
+                height: 46px;
                 margin-bottom: 10px;
             }
               .footer > .qrcode > label {
@@ -234,7 +234,7 @@ html
         include  login/html
         div.header
             div.topBar
-                img(src="https://qiniu1.anlint.com/img/newTopLogo.png" class="logo")
+                img(src="https://qiniu0.anlint.com/image/logo/0722.jpg" class="logo")
                 span.title="微课研"
             img(src=`${rootname}/static/banner.png`)
         div.list
@@ -259,13 +259,49 @@ html
                 img(src="https://qiniu1.anlint.com/v2/img/qrcode.jpg")
                 span.label="关注公众号了解更多详情"
         script(type="text/javascript" src="https://qiniu1.anlint.com/js/jquery.min.js")
+        script(type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.4.0.js")
         script
             include  login/script.js
         script
             include  modal/modal.js
         script
-            include  message/script.js
+            include  message/script.js    
         script.
+            function initWx () {
+                 if(navigator.userAgent.toLowerCase().includes('micromessenger')) {
+                    const gameListStr = '!{JSON.stringify(gameList)}'
+                    const gameList = JSON.parse(gameListStr) || []
+                    $.ajax({
+                        type: 'GET',
+                        url: "/wechat/jssdk?url=" + encodeURIComponent(window.location.href),
+                        success: function ({err, msg}) {
+                            if (err !== 0) {
+                                return console.error(msg)
+                            }
+                            wx.config({
+                                debug: false,
+                                appId: msg.appId,
+                                timestamp: msg.timestamp,
+                                nonceStr: msg.nonceStr,
+                                signature: msg.signature,
+                                jsApiList: [ 'updateAppMessageShareData', 'updateTimelineShareData ' ]
+                            })
+
+                            wx.ready(function () {
+                                const defaultObj = {
+                                    title: '微课研-体验互动实验，感受经济学魅力',
+                                    link: location.href,
+                                    imgUrl: gameList.length ? location.href.replace(/\/$/, '') + gameList[0].img : ''
+                                }
+                                wx.updateTimelineShareData(defaultObj)
+                                wx.updateAppMessageShareData(defaultObj)
+                            })
+                        }
+                    })
+                }
+
+            }
+
             window.onload =function () {
                 var inWx = /micromessenger/.test(navigator.userAgent.toLowerCase())
                 var isLogin = !{isLogin};
@@ -277,6 +313,7 @@ html
                     nowUrl = location.href.replace(/\/$/, '')
                     location.href = nowUrl + '/game/' + aimGameType
                 }
+                initWx()
                 $('.card').click(function (e) {
                     var type = $(this).attr('data-type')
                     aimGameType = type

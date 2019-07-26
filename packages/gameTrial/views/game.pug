@@ -516,6 +516,40 @@ html
                     }
                 })
             }
+
+            function initWx () {
+                 if(navigator.userAgent.toLowerCase().includes('micromessenger')) {
+                    $.ajax({
+                        type: 'GET',
+                        url: "/wechat/jssdk?url=" + encodeURIComponent(window.location.href),
+                        success: function ({err, msg}) {
+                            if (err !== 0) {
+                                return console.error(msg)
+                            }
+                            wx.config({
+                                debug: false,
+                                appId: msg.appId,
+                                timestamp: msg.timestamp,
+                                nonceStr: msg.nonceStr,
+                                signature: msg.signature,
+                                jsApiList: [ 'updateAppMessageShareData', 'updateTimelineShareData ' ]
+                            })
+
+                            wx.ready(function () {
+                                const defaultObj = {
+                                    title: '微课研-' + game.name + ' 体验互动实验，感受经济学魅力',
+                                    link: location.href,
+                                    imgUrl: location.href.replace(/\/$/, '') + game.img
+                                }
+                                wx.updateTimelineShareData(defaultObj)
+                                wx.updateAppMessageShareData(Object.assign({desc: game.desc}, defaultObj))
+                            })
+                        }
+                    })
+                }
+
+            }
+
             window.onload = function () {
                 var inWx = /micromessenger/.test(navigator.userAgent.toLowerCase())
                 var isLogin = !{isLogin}
@@ -525,6 +559,8 @@ html
                     isLogin = true
                     startGame()
                 });
+
+                initWx()
 
                 function startGame (e) {
                   //- $('.matchModal').show();
