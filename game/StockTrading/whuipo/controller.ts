@@ -197,6 +197,7 @@ RedisCall.handle<Trial.Done.IReq, Trial.Done.IRes>(
     const user = await User.findById(uid);
     let lobbyUrl = settings.lobbyUrl;
     if (user) {
+      sendBackData({ timestamp: Date.now() });
       const lastUserUnlockOrder = gamePhaseOrder[user.unblockGamePhase] || -1;
       const orderOfNowGame = gamePhaseOrder[phase];
       if (orderOfNowGame > lastUserUnlockOrder) {
@@ -442,4 +443,18 @@ function cbToPromise(func) {
       });
     });
   };
+}
+
+async function sendBackData(body) {
+  const token = XJWT.encode(XJWTType.SYS);
+  const url = `http://ilab-x.com/project/log/upload?xjwt=${encodeURIComponent(
+    token
+  )}`;
+  const response = await request({
+    url,
+    method: "POST",
+    body,
+    json: true
+  });
+  console.log(response);
 }
