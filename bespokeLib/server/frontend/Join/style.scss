@@ -1,0 +1,11 @@
+@import "public";
+
+.Join {
+  .tips {
+    font-size: $fontSize-small;
+    text-align: center;
+    margin: 1rem;
+    color: rgba($color-blue, .6);
+    user-select: none;
+  }
+}

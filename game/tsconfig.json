@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "outDir": "./build",
+    "module": "commonjs",
+    "target": "es5",
+    "lib": [
+      "esnext",
+      "dom",
+      "scripthost"
+    ],
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "skipLibCheck": true,
+    "downlevelIteration": true,
+    "jsx": "react"
+  },
+  "include": [
+    "."
+  ],
+  "exclude": [
+    "build",
+    "**/egret",
+    "**/whuipo"
+  ]
+}

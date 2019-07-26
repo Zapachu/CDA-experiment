@@ -1,0 +1,6 @@
+{
+  "BespokeServer.js": "/bespoke/static/BespokeServer.min.js",
+  "ElfComponent.js": "/bespoke/static/ElfComponent.min.js",
+  "favicon.ico": "/bespoke/static/favicon.ico",
+  "index.html": "/bespoke/static/index.html"
+}

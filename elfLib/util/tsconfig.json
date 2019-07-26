@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "outDir": "./lib",
+    "module": "commonjs",
+    "target": "es5",
+    "declaration": true,
+    "downlevelIteration": true,
+    "lib": [
+      "esnext",
+      "dom"
+    ],
+    "noUnusedLocals": true
+  }
+}

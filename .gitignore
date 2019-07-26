@@ -66,12 +66,12 @@ typings/
 .wing
 
 # temp
+.DS_Store
 build
-dist
-log
 
 # setting
 setting.ts
+setting.js
 settings.ts
 
 package-lock.json

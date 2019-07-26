@@ -1,0 +1,16 @@
+{
+  "name": "@extend/robot",
+  "version": "1.1.1",
+  "types": "src/index",
+  "main": "lib/index",
+  "scripts": {
+    "tsc-w": "tsc -w",
+    "dist": "tsc"
+  },
+  "devDependencies": {
+    "@bespoke/robot": "^1.1.1",
+    "@bespoke/share": "^1.1.1",
+    "@extend/share": "^1.1.1",
+    "typescript": "^3.3.3333"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "outDir": "./build",
+    "module": "commonjs",
+    "target": "es5",
+    "lib": [
+      "esnext",
+      "dom",
+      "scripthost"
+    ],
+    "sourceMap": true,
+    "experimentalDecorators": true,
+    "noUnusedLocals": true,
+    "resolveJsonModule": true,
+    "jsx": "react",
+    "skipLibCheck": true
+  },
+  "include": [
+    "src"
+  ]
+}

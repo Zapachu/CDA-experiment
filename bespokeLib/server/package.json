@@ -1,0 +1,25 @@
+{
+  "name": "@bespoke/server",
+  "version": "1.1.1",
+  "main": "lib/index",
+  "types": "lib/index",
+  "scripts": {
+    "client:tsc-w": "tsc -p frontend -w",
+    "client:build": "webpack --env.TS_NODE_PROJECT=\"frontend/tsconfig.json\" --config ./script/webpack.config.ts",
+    "client:dist": "npm run client:build --buildMode=dist",
+    "server:tsc-w": "tsc -p backend -w",
+    "server:dist": "tsc -p backend",
+    "dist": "tsc --downlevelIteration script/buildGame.ts -t ES5 & npm run server:dist & npm run client:dist"
+  },
+  "devDependencies": {
+    "@bespoke/client": "^1.1.1",
+    "@elf/util": "^1.1.1",
+    "@bespoke/share": "^1.1.1",
+    "@elf/component": "^1.1.1",
+    "@elf/protocol": "^1.1.1",
+    "@elf/setting": "^1.1.1",
+    "ts-node": "^8.0.3",
+    "typescript": "^3.3.3333",
+    "webpack": "^4.29.6"
+  }
+}

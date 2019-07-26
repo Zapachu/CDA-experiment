@@ -11,6 +11,7 @@ export default {
 
     rootname: '/gametrial',
     lobbyUrl: 'http://localhost:3020', // 游戏大厅地址
+    namespace: '/v5',  //主站 路由前缀  当为根目录时请置空 '' 而不是 '/'
     domain: 'microexperiment.cn',
     gameMatchTime:  10, // 多人模式匹配时间 s
     gameRoomSize: 10, // 多人模式每局最大人数 

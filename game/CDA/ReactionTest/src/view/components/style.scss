@@ -1,0 +1,11 @@
+@import "~@elf/component/lib/public";
+
+.result {
+    color: $color-black;
+
+    em {
+      margin: .5rem;
+      font-size: $fontSize-middle;
+      color: $color-blue;
+    }
+}

@@ -1,0 +1,21 @@
+@import "public";
+
+$bottomBarHeight: 5rem;
+
+.configuration{
+  max-width: 48rem;
+  margin: 0 auto $bottomBarHeight;
+  text-align: center;
+  padding-top: 2rem;
+  .titleWrapper {
+    padding: 1rem 4rem;
+  }
+  .backBtnWrapper {
+    position: fixed;
+    height: $bottomBarHeight;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background: linear-gradient(rgba($color-background, .1), $color-background)
+  }
+}

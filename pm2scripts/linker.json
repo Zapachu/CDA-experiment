@@ -1,0 +1,8 @@
+{
+  "script": "../packages/linker/dist/backend/server.js",
+  "name": "linker",
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "log_date_format": "YYYY-MM-DD HH:mm Z"
+}

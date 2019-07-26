@@ -1,0 +1,48 @@
+@import "~@elf/component/lib/public";
+
+.create {
+  margin: 1.5rem;
+  display: flex;
+  flex-direction: column;
+
+  .configFields {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .privatePriceTable {
+    //margin: 1rem;
+    color: $color-black;
+    text-align: center;
+
+    td {
+      border: $borderLine;
+      width: 5rem;
+      height: 3rem;
+
+      input {
+        width: 4rem;
+      }
+
+      &.readonly input {
+        border-bottom-color: transparent;
+      }
+    }
+  }
+
+  .btnSwitch {
+    margin-top: 1rem;
+    text-align: center;
+
+    a {
+      transition: $transition-normal;
+      color: rgba($color-blue, .6);
+
+      &:hover {
+        color: $color-blue;
+        text-decoration: underline;
+      }
+    }
+  }
+}

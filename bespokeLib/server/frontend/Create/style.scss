@@ -1,0 +1,28 @@
+@import "public";
+
+$bottomBarHeight: 5rem;
+
+.create {
+  max-width: 48rem;
+  margin: 0 auto $bottomBarHeight;
+  padding-top: 2rem;
+  text-align: center;
+
+  .titleWrapper {
+    padding: 1rem 4rem;
+  }
+
+  .historyGameBtnWrapper {
+    margin: 1rem;
+    text-align: right;
+  }
+
+  .submitBtnWrapper {
+    position: fixed;
+    height: $bottomBarHeight;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background: linear-gradient(rgba($color-background, .1), $color-background)
+  }
+}
