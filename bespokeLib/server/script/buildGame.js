@@ -54,7 +54,7 @@ function geneClientBuilder(_a) {
         output: {
             path: output,
             filename: "[name].js",
-            publicPath: buildMode === 'publish' ? qiNiu.download.jsDomain + "/" + qiNiu.upload.path + "/" + namespace : "/" + share_1.config.rootName + "/" + namespace + "/dist/"
+            publicPath: buildMode === 'publish' ? qiNiu.download.jsDomain + "/" + qiNiu.upload.path + "/" + namespace : "/" + share_1.config.rootName + "/" + namespace + "/static/"
         },
         resolve: {
             extensions: ['.ts', '.tsx', '.js', '.jsx', '.json']

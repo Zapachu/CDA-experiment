@@ -61,7 +61,7 @@ export function geneClientBuilder(
     output: {
       path: output,
       filename: `[name].js`,
-      publicPath: buildMode === 'publish' ? `${qiNiu.download.jsDomain}/${qiNiu.upload.path}/${namespace}` : `/${config.rootName}/${namespace}/dist/`
+      publicPath: buildMode === 'publish' ? `${qiNiu.download.jsDomain}/${qiNiu.upload.path}/${namespace}` : `/${config.rootName}/${namespace}/static/`
     },
     resolve: {
       extensions: ['.ts', '.tsx', '.js', '.jsx', '.json']
