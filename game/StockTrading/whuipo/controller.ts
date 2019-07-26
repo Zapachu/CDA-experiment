@@ -10,13 +10,14 @@ import qs from 'qs'
 
 import { User } from './models'
 import { UserDoc } from './interfaces'
-import settings from './settings'
+import {elfSetting} from '@elf/setting'
 import {Phase, namespaceToPhase, phaseToNamespace} from '@bespoke-game/stock-trading-config'
 import {Trial} from '@elf/protocol'
 import { ResCode, serverSocketListenEvents, clientSocketListenEvnets, UserGameStatus } from './enums'
+import config from './config'
 
-const ioEmitter = socketEmitter({ host: settings.redishost, port: settings.redisport })
-const redisCli = new Redis(settings.redisport, settings.redishost)
+const ioEmitter = socketEmitter({ host: elfSetting.redisHost, port: elfSetting.redisPort})
+const redisCli = new Redis(elfSetting.redisPort, elfSetting.redisHost)
 
 passport.serializeUser(function (user: UserDoc, done) {
     done(null, user._id);
@@ -58,8 +59,8 @@ const removeUserSocket = (uid, socketId) => {
     return arr
 }
 
-const matchRoomLimit = settings.gameRoomSize || 10
-const waittingTime = settings.gameMatchTime || 10 // 秒
+const matchRoomLimit = config.gameRoomSize
+const waittingTime = config.gameMatchTime
 const matchRoomOfGame: {[gamePhase: number]: string[]} = {
 }
 const matchRoomTimerOfGame = {}
@@ -169,7 +170,7 @@ RedisCall.handle<Trial.Done.IReq, Trial.Done.IRes>(Trial.Done.name, async ({user
     const phase = namespaceToPhase(namespace)
     const uid = userId
     const user = await User.findById(uid)
-    let lobbyUrl = settings.lobbyUrl
+    let lobbyUrl = config.lobbyUrl
     if (user) {
         const lastUserUnlockOrder = gamePhaseOrder[user.unblockGamePhase] || -1
         const orderOfNowGame = gamePhaseOrder[phase]

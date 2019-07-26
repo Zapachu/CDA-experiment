@@ -1,14 +1,4 @@
 export default {
-    mongouri: process.env.MONGODB || 'mongodb://127.0.0.1:27017/academy',
-    mongouser: '',
-    mongopass: '',
-
-    sessionId: 'academy.sid',
-    cookieSecret: 'academy',
-    redishost: process.env.REDIS || 'localhost',
-    redisport: 6379,
-    sessionSecret: process.env.SESSION_SECRET || 'sessionsecret',
-
     rootname: '/gametrial',
     lobbyUrl: 'http://localhost:3020', // 游戏大厅地址
     namespace: '/v5',  //主站 路由前缀  当为根目录时请置空 '' 而不是 '/'
