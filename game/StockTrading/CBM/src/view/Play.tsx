@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {Core} from '@bespoke/client'
 import {Lang, Toast} from '@elf/component'
-import Joyride from 'react-joyride'
+import Joyride, {Step} from 'react-joyride'
 
 import {
     CONFIG,
@@ -20,6 +20,7 @@ import {
     ROLE
 } from '../config'
 import {Button, Input, Line, Modal, Tabs} from '@bespoke-game/stock-trading-component'
+import {Input as AntInput, Radio} from 'antd'
 
 function Border({background = `radial-gradient(at 50% 0%, #67e968 1rem, transparent 70%)`, borderRadius = '1rem', children, style}: {
     background?: string,
@@ -264,7 +265,6 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
         closeOutWarning: ['资产低于担保金额130%将被平仓', 'Your count will be closed out when assets is below 130% of guarantee money'],
         closedOut: ['资产低于担保金额130%，已被平仓', 'Your count has been closed out since assets is below 130% of guarantee money'],
         tradeSuccess: [count => `交易成功 , 数量 : ${count}`, count => `Trade success, count : ${count}`],
-        gotIt: ['我知道了', 'I got it'],
         confirm: ['确定', 'Confirm']
     })
     const {prepareTime, tradeTime, resultTime} = CONFIG
@@ -314,11 +314,16 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
             }
         </section>
     }
+    if (playerState.status === PlayerStatus.test && allowLeverage) {
+        return <LeverageTest done={() => frameEmitter.emit(MoveType.getIndex)}/>
+    }
     const guaranteeMoneyLimit = nonNegative(playerState.money - playerState.guaranteeMoney),
         guaranteeCountLimit = nonNegative(~~(playerState.money / gamePeriodState.closingPrice) + playerState.count - playerState.guaranteeCount)
     return <section className={style.trading}>
         {
-            playerState.status === PlayerStatus.guide ? renderGuide() : null
+            playerState.status === PlayerStatus.guide ?
+                allowLeverage ? <LeverageGuide done={() => frameEmitter.emit(MoveType.guideDone)}/> :
+                    <Guide done={() => frameEmitter.emit(MoveType.guideDone)}/> : null
         }
         <div className={style.tradePanel}>
             {
@@ -331,7 +336,7 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
         {
             playerState.status === PlayerStatus.test ? testIndex === 0 ? <OrderPanelTest {...{
                 label: {
-                    title: `测试题一`,
+                    title: `测试题 1`,
                     todo: '您现在为买家，现要以12元的价格买入1股的配额数量',
                     question: '挂在买家订单上面的最高买价是11，挂在卖家订单上面的最低卖价是12。在这个时候若同时出现了一个买入价格为13元的买价订单，则成交价格为',
                     answer: '买入申报价13元高于即时揭示的最低卖价12元，以最低申报卖价12元成交。'
@@ -342,7 +347,7 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
                 onDone: () => setTestIndex(testIndex + 1)
             }}/> : <OrderPanelTest {...{
                 label: {
-                    title: '测试题二',
+                    title: '测试题 2',
                     todo: '您现在为卖家，现要以10元的价格卖出1股的配额数量',
                     question: '挂在买家订单上面的最高买价是11，挂在卖家订单上面的最低卖价是12。在这个时候若同时出现了一个买入价格为10元的卖家订单，则成交价格为',
                     answer: '卖出申报价10元低于即时揭示的最低卖价12元，以最低申报卖价12元成交。'
@@ -357,65 +362,6 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
             renderChartPanel()
         }
     </section>
-
-    function renderGuide() {
-        return <Joyride
-            callback={({action}) => {
-                if (action == 'reset') {
-                    frameEmitter.emit(MoveType.guideDone)
-                }
-            }}
-            continuous
-            showProgress
-            hideBackButton
-            steps={[
-                {
-                    target: `.${style.asset}`,
-                    content: '您可以在这里查看您资产组合中的股票数量和资金数目',
-                    disableBeacon: true
-                },
-                {
-                    target: `.${style.tradeListWrapper}`,
-                    content: '您可以在这里查看您的股票交易记录'
-                },
-                {
-                    target: `.${style.orderBook}`,
-                    content: '您可以在这里查看已经提交的买家报价和卖家报价。买单和卖单分别排队，买单以价格从高到低排列，卖单以价格从低到高排列。同价的，按进入系统的先后排列。系统按照顺序将排在前面的买单和卖单配对成交，即按“价格优先，同等价格下时间优先”的顺序依次成交在，直到不能成交为止，未成交的委托排队等待成交。',
-                    styles: {
-                        tooltip: {
-                            width: '50vw',
-                            height: '50vh'
-                        }
-                    }
-                },
-                {
-                    target: `.${style.toNextPeriod}`,
-                    content: '您可以在这里查看当前的交易期数和剩余交易时间，您需在规定的时间内完成交易。'
-                },
-                {
-                    target: `.${style.orderSubmission}`,
-                    content: '您可以在这里提交您的卖单和卖单。买入申报价高于即时揭示最低卖价，以最低申报卖价成交；卖出申报价低于最高买入价，以最高买入价成交。两个委托如果不能全部成交，剩余的继续留在单上，等待下次成交。系统处理原则为价格优先和时间优先两个原则。'
-                },
-                {
-                    target: `.${style.marketHistoryWrapper}`,
-                    content: '您可以在这里查看已经成交的股票的成交价格。'
-                }
-            ]}
-            locale={{
-                next: lang.gotIt,
-                last: lang.gotIt
-            }}
-            styles={{
-                options: {
-                    arrowColor: 'rgba(30,39,82,.8)',
-                    backgroundColor: 'rgba(30,39,82,.8)',
-                    overlayColor: '#1d1d32',
-                    primaryColor: '#13553e',
-                    textColor: '#fff'
-                }
-            }}
-        />
-    }
 
     function submitOrder(role: ROLE, guarantee?: boolean) {
         const _price = Number(price || 0)
@@ -682,32 +628,34 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
                 allowLeverage ? <>
                     <Line text={lang.repay} style={STYLE.titleLineStyle}/>
                     <div className={style.repayWrapper}>
-                        <Input {...{
-                            value: moneyRepay || '',
-                            placeholder: lang.money,
-                            onChange: v => setMoneyRepay(v),
-                            onMinus: v => setMoneyRepay(v - 1),
-                            onPlus: v => setMoneyRepay(v + 1)
-                        }}/>
-                        <br/>
-                        <Button {...{
-                            label: lang.repayMoney,
-                            onClick: () => repayMoney()
-                        }}/>
-                    </div>
-                    <div className={style.repayWrapper}>
-                        <Input {...{
-                            value: countRepay || '',
-                            placeholder: lang.count,
-                            onChange: v => setCountRepay(v),
-                            onMinus: v => setCountRepay(v - 1),
-                            onPlus: v => setCountRepay(v + 1)
-                        }}/>
-                        <br/>
-                        <Button {...{
-                            label: lang.repayStock,
-                            onClick: () => repayCount()
-                        }}/>
+                        <div className={style.repay}>
+                            <Input {...{
+                                value: moneyRepay || '',
+                                placeholder: lang.money,
+                                onChange: v => setMoneyRepay(v),
+                                onMinus: v => setMoneyRepay(v - 1),
+                                onPlus: v => setMoneyRepay(v + 1)
+                            }}/>
+                            <br/>
+                            <Button {...{
+                                label: lang.repayMoney,
+                                onClick: () => repayMoney()
+                            }}/>
+                        </div>
+                        <div className={style.repay}>
+                            <Input {...{
+                                value: countRepay || '',
+                                placeholder: lang.count,
+                                onChange: v => setCountRepay(v),
+                                onMinus: v => setCountRepay(v - 1),
+                                onPlus: v => setCountRepay(v + 1)
+                            }}/>
+                            <br/>
+                            <Button {...{
+                                label: lang.repayStock,
+                                onClick: () => repayCount()
+                            }}/>
+                        </div>
                     </div>
                 </> : null
             }
@@ -835,4 +783,285 @@ export function Play(props: TPlayProps) {
 
 function nonNegative(n: number) {
     return n < 0 ? 0 : n
+}
+
+function Guide({done}: { done: () => void }) {
+    const [stepIndex, setStepIndex] = React.useState(0)
+    const lang = Lang.extractLang({
+        gotIt: ['我知道了', 'I got it']
+    })
+    const stepProps: Partial<Step> = {
+            styles: {
+                spotlight: {
+                    border: '2px dashed #71ff7b',
+                    borderRadius: '1.5rem'
+                }
+            },
+            disableBeacon: true
+        },
+        steps = [
+            {
+                target: `.${style.summary}`,
+                content: '您可以在这里查看您资产组合中的股票数量和资金数目',
+                ...stepProps
+            },
+            {
+                target: `.${style.tradeListWrapper}`,
+                content: '您可以在这里查看您的股票交易记录',
+                ...stepProps
+            },
+            {
+                target: `.${style.orderBook}`,
+                content: '您可以在这里查看已经提交的买家报价和卖家报价。买单和卖单分别排队，买单以价格从高到低排列，卖单以价格从低到高排列。同价的，按进入系统的先后排列。系统按照顺序将排在前面的买单和卖单配对成交，即按“价格优先，同等价格下时间优先”的顺序依次成交在，直到不能成交为止，未成交的委托排队等待成交。',
+                styles: {
+                    tooltip: {
+                        width: '50vw',
+                        height: '50vh'
+                    }
+                },
+                ...stepProps
+            },
+            {
+                target: `.${style.subLabel}`,
+                content: '您可以在这里查看当前的交易期数和剩余交易时间，您需在规定的时间内完成交易。',
+                ...stepProps
+            },
+            {
+                target: `.${style.orderInputWrapper}`,
+                content: '您可以在这里提交您的卖单和卖单。买入申报价高于即时揭示最低卖价，以最低申报卖价成交；卖出申报价低于最高买入价，以最高买入价成交。两个委托如果不能全部成交，剩余的继续留在单上，等待下次成交。系统处理原则为价格优先和时间优先两个原则。',
+                ...stepProps
+            },
+            {
+                target: `.${style.marketHistory}`,
+                content: '您可以在这里查看已经成交的股票的成交价格。',
+                ...stepProps
+            }
+        ]
+    return <>
+        <ul className={style.guideProgress}>
+            {
+                steps.map((_, i) =>
+                    <li key={i} className={i < stepIndex ? style.active : ''}><span
+                        className={style.step}>{i + 1}</span></li>
+                )
+            }
+        </ul>
+        <Joyride
+            callback={({action}) => {
+                console.log(action)
+                if (action == 'update') {
+                    setStepIndex(stepIndex + 1)
+                }
+                if (action == 'reset') {
+                    done()
+                }
+            }}
+            continuous
+            showProgress
+            hideBackButton
+            disableOverlayClose
+            steps={steps}
+            locale={{
+                next: lang.gotIt,
+                last: lang.gotIt
+            }}
+            styles={{
+                options: {
+                    arrowColor: 'rgba(30,39,82,.8)',
+                    backgroundColor: 'rgba(30,39,82,.8)',
+                    overlayColor: '#1d1d32',
+                    primaryColor: '#13553e',
+                    textColor: '#fff'
+                }
+            }}
+        />
+    </>
+}
+
+function LeverageGuide({done}: { done: () => void }) {
+    const [stepIndex, setStepIndex] = React.useState(0)
+    const lang = Lang.extractLang({
+        gotIt: ['我知道了', 'I got it']
+    })
+    const stepProps: Partial<Step> = {
+            styles: {
+                spotlight: {
+                    border: '2px dashed #71ff7b',
+                    borderRadius: '1.5rem'
+                }
+            },
+            disableBeacon: true
+        },
+        steps = [
+            {
+                target: `.${style.summary}`,
+                content: '您可以在这里查看您资产组合中的股票数量和资金数量以及您融资融券数目',
+                ...stepProps
+            },
+            {
+                target: `.${style.repayWrapper}`,
+                content: <div className={style.repayGuide}>
+                    <p>您可以在这里偿还融资债务和融券债务</p>
+                    <p>偿还融资债务的方法有下列两种：</p>
+                    <p>1） 卖券还款。指通过信用证券账户申报卖券，结算时卖出证券所得资金直接划转至证券公司融资专用资金账户的一种还款方式；</p>
+                    <p>2） 直接还款。指使用信用资金账户中的现金，直接偿还对证券公司融资负债的一种还款方式；</p>
+                    <p>偿还融券债务的方法有下列两种：</p>
+                    <p>1） 买券还券。指通过信用证券账户申报买券，结算时买入证券直接划转至证券公司融券专用证券账户的一种还券方式；</p>
+                    <p>2） 直接还券。指使用信用证券账户中与其负债证券相同的证券申报还券，结算时期证券直接划转至证券公司融券专用证券账户的一种还券方式。</p>
+                </div>,
+                styles: {
+                    tooltip: {
+                        width: '32rem'
+                    }
+                }
+            },
+            {
+                target: `.${style.tradeListWrapper}`,
+                content: '您可以在这里查看您的股票交易记录',
+                ...stepProps
+            },
+            {
+                target: `.${style.orderBook}`,
+                content: '您可以在这里查看已经提交的买家报价和卖家报价。买单和卖单分别排队，买单以价格从高到低排列，卖单以价格从低到高排列。同价的，按进入系统的先后排列。系统按照顺序将排在前面的买单和卖单配对成交，即按“价格优先，同等价格下时间优先”的顺序依次成交在，直到不能成交为止，未成交的委托排队等待成交。',
+                styles: {
+                    tooltip: {
+                        width: '50vw',
+                        height: '50vh'
+                    }
+                },
+                ...stepProps
+            },
+            {
+                target: `.${style.subLabel}`,
+                content: '您可以在这里查看当前的交易期数和剩余交易时间，您需在规定的时间内完成交易。',
+                ...stepProps
+            },
+            {
+                target: `.${style.orderInputWrapper}`,
+                content: '您可以在这里提交您的卖单和卖单。买入申报价高于即时揭示最低卖价，以最低申报卖价成交；卖出申报价低于最高买入价，以最高买入价成交。两个委托如果不能全部成交，剩余的继续留在单上，等待下次成交。系统处理原则为价格优先和时间优先两个原则。',
+                ...stepProps
+            },
+            {
+                target: `.${style.marketHistory}`,
+                content: '您可以在这里查看已经成交的股票的成交价格。',
+                ...stepProps
+            }
+        ]
+    return <>
+        <ul className={style.guideProgress}>
+            {
+                steps.map((_, i) =>
+                    <li key={i} className={i < stepIndex ? style.active : ''}><span
+                        className={style.step}>{i + 1}</span></li>
+                )
+            }
+        </ul>
+        <Joyride
+            callback={({action}) => {
+                console.log(action)
+                if (action == 'update') {
+                    setStepIndex(stepIndex + 1)
+                }
+                if (action == 'reset') {
+                    done()
+                }
+            }}
+            continuous
+            showProgress
+            hideBackButton
+            disableOverlayClose
+            steps={steps}
+            locale={{
+                next: lang.gotIt,
+                last: lang.gotIt
+            }}
+            styles={{
+                options: {
+                    arrowColor: 'rgba(30,39,82,.8)',
+                    backgroundColor: 'rgba(30,39,82,.8)',
+                    overlayColor: '#1d1d32',
+                    primaryColor: '#13553e',
+                    textColor: '#fff'
+                }
+            }}
+        />
+    </>
+}
+
+function LeverageTest({done}: { done: () => void }) {
+    const lang = Lang.extractLang({
+        confirm: ['确定', 'CONFIRM']
+    })
+    const [choseA, setChoseA] = React.useState(0),
+        [choseB, setChoseB] = React.useState(0),
+        [choseC, setChoseC] = React.useState(0),
+        [inputA, setInputA] = React.useState(''),
+        [inputB, setInputB] = React.useState(''),
+        [inputC, setInputC] = React.useState(''),
+        [showAnswer, setShowAnswer] = React.useState(false)
+    return <section className={style.leverageTest}>
+        <div className={style.title}>{'知识点测试'}</div>
+        <ul className={`${style.questions} ${showAnswer ? style.showAnswer : ''}`}>
+            <li className={style.radioQuestion}>
+                <p>1. 偿还融资债务的方法有_________；偿还融券债务的方法有____________。</p>
+                <Radio.Group style={{margin: '.5rem'}} onChange={({target: {value}}) => setChoseA(+value)}
+                             value={choseA}>
+                    <Radio value={1}>A. 卖券还款和直接还款；买券还券和直接还券</Radio>
+                    <Radio value={2}>B. 卖券还款；买券还券</Radio>
+                    <Radio value={3}>C. 直接还款；直接还券</Radio>
+                    <Radio value={4}>D. 卖券还款；直接还券</Radio>
+                </Radio.Group>
+                <p className={style.answer}>正确答案：A</p>
+            </li>
+            <li>
+                <p>2.
+                    挂在买家订单上面的最高买价是9.96，挂在卖家订单上面的最低卖价是9.98。在这个时候同时出现了一个买入价格为10元的买价订单和卖出价格为9.90元的卖家订单。则报价为10元的订单会以9.98成交，报价为9.90元的订单会以
+                    <AntInput autosize={true} style={{width: '5rem', margin: '0 1rem'}} value={inputA}
+                              onChange={({target: {value}}) => setInputA(value)}/>
+                    成交。</p>
+                <p className={style.answer}>正确答案：9.96</p>
+            </li>
+            <li>
+                <p>3. 融资保证金比例不得低于
+                    <AntInput autosize={true} style={{width: '5rem', margin: '0 1rem'}} value={inputB}
+                              onChange={({target: {value}}) => setInputB(value)}/>
+                    %，融券保证金比例不得低于
+                    <AntInput autosize={true} style={{width: '5rem', margin: '0 1rem'}} value={inputC}
+                              onChange={({target: {value}}) => setInputC(value)}/>
+                    %</p>
+                <p className={style.answer}>正确答案：50 , 50</p>
+            </li>
+            <li className={style.radioQuestion}>
+                <p>4.
+                    假设客户提交市值为100万元的股票A作为进行融资融券交易的担保物，折算率为70%，融资保证金比例为0.5.则客户可以融资买入的最大金额为____________万元。本例中客户的佣金及融资利息、融券费用均忽略不计。</p>
+                <Radio.Group style={{margin: '.5rem'}} onChange={({target: {value}}) => setChoseB(+value)}
+                             value={choseB}>
+                    <Radio value={1}>A. 200</Radio>
+                    <Radio value={2}>B. 50</Radio>
+                    <Radio value={3}>C. 140</Radio>
+                    <Radio value={4}>D. 70</Radio>
+                </Radio.Group>
+                <p className={style.answer}>解析：100*0.7*2=140万元，因此正确答案为C</p>
+            </li>
+            <li className={style.radioQuestion}>
+                <p>5.
+                    投资者信用账户内有60万元现金和100万元市值的某证券，假设该证券的折算率为60%，那么，该投资者信用账户内的保证金金额为____________万元。</p>
+                <Radio.Group style={{margin: '.5rem'}} onChange={({target: {value}}) => setChoseC(+value)}
+                             value={choseC}>
+                    <Radio value={1}>A. 200</Radio>
+                    <Radio value={2}>B. 50</Radio>
+                    <Radio value={3}>C. 140</Radio>
+                    <Radio value={4}>D. 70</Radio>
+                </Radio.Group>
+                <p className={style.answer}>解析：60+100*0.6=120，因此正确答案为C</p>
+            </li>
+        </ul>
+        <Button label={lang.confirm} onClick={() => {
+            if (choseA == 1 && choseB == 3 && choseC == 3 && inputA == '9.96' && inputB == '50' && inputC == '50') {
+                done()
+            } else {
+                setShowAnswer(true)
+            }
+        }}/>
+    </section>
 }

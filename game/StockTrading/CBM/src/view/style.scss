@@ -80,15 +80,9 @@ $sidePanelBasis: 24rem;
   }
 
   .trading {
-    width: 95%;
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-
-    > div {
-      margin: 1rem;
-    }
-
 
     .tradePanel {
       flex-basis: $sidePanelBasis;
@@ -115,10 +109,12 @@ $sidePanelBasis: 24rem;
       }
 
       .repayWrapper {
-        margin: 1rem 0;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+        .repay {
+          margin: 1rem 0;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
       }
     }
 
@@ -213,17 +209,22 @@ $sidePanelBasis: 24rem;
         }
       }
 
-      &.test{
+      &.test {
         text-align: center;
-        .testTitle{
+
+        .testTitle {
           font-size: $fontSize-large;
+          color: $color-green;
         }
-        .testLabel{
+
+        .testLabel {
           margin: 1rem 0;
         }
-        .answer{
+
+        .answer {
           margin: 1rem;
-          em{
+
+          em {
             margin: 1rem;
             font-size: $fontSize-large;
           }
@@ -302,6 +303,73 @@ $sidePanelBasis: 24rem;
       justify-content: center;
     }
   }
+
+  .guideProgress {
+    position: absolute;
+    z-index: 1000;
+    display: flex;
+    text-align: center;
+    top: 1rem;
+
+    li {
+      display: flex;
+      width: 10rem;
+      height: .5rem;
+      align-items: center;
+      background: #101f34;
+      justify-content: center;
+
+      .step {
+        background: #999;
+        display: inline-block;
+        width: 2rem;
+        height: 2rem;
+        line-height: 2rem;
+        border-radius: 50%;
+      }
+
+      &.active {
+        background: $color-dark;
+
+        .step {
+          background: #409946;
+        }
+      }
+    }
+  }
+}
+
+.repayGuide {
+  text-align: left;
+  font-size: 1rem;
+}
+
+.leverageTest {
+  max-width: 48rem;
+  margin: auto;
+
+  .title {
+    font-size: $fontSize-large;
+    padding: 1rem;
+    text-align: center;
+    color: $color-green;
+  }
+  .questions{
+    li{
+      margin: 2rem;
+      .answer{
+        color: $color-green!important;
+        opacity: 0;
+        transition: $transition-normal;
+      }
+    }
+    .radioQuestion *{
+      color: $color-light !important;
+    }
+    &.showAnswer .answer{
+      opacity: 1;
+    }
+  }
 }
 
 .play4owner {
@@ -322,11 +390,12 @@ $sidePanelBasis: 24rem;
   }
 }
 
-.result4Owner{
-  .timeLine{
+.result4Owner {
+  .timeLine {
     margin: 1rem;
   }
-  .actionInfo{
+
+  .actionInfo {
     margin: 1rem;
   }
 }
