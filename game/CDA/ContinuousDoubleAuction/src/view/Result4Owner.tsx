@@ -85,7 +85,7 @@ export class Result4Owner extends Core.Result4Owner<ICreateParams, IGameState, I
                     <div>
                         {
                             travelState.gameState ?
-                                <Play4Owner {...{game, ...travelState}}/> : null
+                                <Play4Owner {...{game, ...travelState, frameEmitter:null}}/> : null
                         }
                     </div>
                 </div>
