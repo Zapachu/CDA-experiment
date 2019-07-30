@@ -1,3 +1,4 @@
+body,
 p {
   margin: 0;
 }
@@ -13,8 +14,10 @@ p {
   justify-content: flex-start;
   align-items: center;
   flex-direction: column;
-  width: 320px;
-  min-height: 530px;
+  width: 100%;
+  max-width: 500px;
+  height: 100vh;
+  max-height: 900px;
   box-sizing: border-box;
 }
 .redFont {
@@ -24,13 +27,15 @@ p {
   position: relative;
   background: url("./result_letter.png") no-repeat;
   background-size: 100% 100%;
-  width: 300px;
+  width: 95%;
+  max-width: 400px;
   box-sizing: border-box;
   padding: 20px;
   margin: 5px 0 20px 0;
 }
 .resultImg {
-  width: 300px;
+  width: 95%;
+  max-width: 400px;
   margin-bottom: 20px;
 }
 .QrImg {
