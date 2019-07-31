@@ -1,10 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.namespace = 'TogetherBidMarket';
+exports.namespace = "TogetherBidMarket";
 var MoveType;
 (function (MoveType) {
     MoveType["shout"] = "shout";
     MoveType["getPosition"] = "getPosition";
+    MoveType["nextRound"] = "nextRound";
 })(MoveType = exports.MoveType || (exports.MoveType = {}));
 var PushType;
 (function (PushType) {
@@ -13,9 +14,8 @@ var PushType;
 })(PushType = exports.PushType || (exports.PushType = {}));
 var PlayerStatus;
 (function (PlayerStatus) {
-    PlayerStatus[PlayerStatus["outside"] = 0] = "outside";
-    PlayerStatus[PlayerStatus["prepared"] = 1] = "prepared";
-    PlayerStatus[PlayerStatus["shouted"] = 2] = "shouted";
-    PlayerStatus[PlayerStatus["gameOver"] = 3] = "gameOver";
+    PlayerStatus[PlayerStatus["prepared"] = 0] = "prepared";
+    PlayerStatus[PlayerStatus["shouted"] = 1] = "shouted";
+    PlayerStatus[PlayerStatus["result"] = 2] = "result";
 })(PlayerStatus = exports.PlayerStatus || (exports.PlayerStatus = {}));
 exports.NEW_ROUND_TIMER = 3;

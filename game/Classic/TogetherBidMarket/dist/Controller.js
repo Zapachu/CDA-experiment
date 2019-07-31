@@ -47,47 +47,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 var server_1 = require("@bespoke/server");
 var config_1 = require("./config");
-var getBestMatching = function (G) {
-    var MATCHED = 'matched', UNMATCHED = 'unMatched';
-    var _dfs = function (G, right, left, r) {
-        for (var c = 0; c < G[0].length; c++) {
-            if (right[c] !== MATCHED && G[r][c]) {
-                right[c] = MATCHED;
-                if (left[c] === UNMATCHED || _dfs(G, right, left, left[c])) {
-                    left[c] = r;
-                    return true;
-                }
-            }
-        }
-        return false;
-    };
-    var left = Array(G[0].length).fill(UNMATCHED);
-    G.forEach(function (_, r) {
-        var right = [];
-        _dfs(G, right, left, r);
-    });
-    return left.map(function (linkTo, index) { return linkTo === UNMATCHED ? null : [linkTo, index]; })
-        .filter(function (_) { return _; });
-};
 var Controller = /** @class */ (function (_super) {
     __extends(Controller, _super);
     function Controller() {
@@ -98,139 +60,207 @@ var Controller = /** @class */ (function (_super) {
         gameState.groups = [];
         return gameState;
     };
-    Controller.prototype.initPlayerState = function (actor) {
+    // async initPlayerState(actor: IActor): Promise<TPlayerState<IPlayerState>> {
+    //   const {
+    //     game: {
+    //       params: { roundParams }
+    //     }
+    //   } = this;
+    //   const playerState = await super.initPlayerState(actor);
+    //   return playerState;
+    // }
+    Controller.prototype.playerMoveReducer = function (actor, type, params, cb) {
         return __awaiter(this, void 0, void 0, function () {
-            var round, playerState;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var _a, groupSize, positions, rounds, playerState, gameState, playerStates, groupIndex, group, positionParams_1, roundIndex_1, price, num, playerRound, playerStateArray, groupState, nextRoundIndex;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0:
-                        round = this.game.params.round;
-                        return [4 /*yield*/, _super.prototype.initPlayerState.call(this, actor)];
+                        _a = this.game.params, groupSize = _a.groupSize, positions = _a.positions, rounds = _a.rounds;
+                        return [4 /*yield*/, this.stateManager.getPlayerState(actor)];
                     case 1:
-                        playerState = _a.sent();
-                        playerState.prices = Array(round).fill(null);
-                        playerState.profits = Array(round).fill(0);
-                        return [2 /*return*/, playerState];
+                        playerState = _b.sent();
+                        return [4 /*yield*/, this.stateManager.getGameState()];
+                    case 2:
+                        gameState = _b.sent();
+                        return [4 /*yield*/, this.stateManager.getPlayerStates()];
+                    case 3:
+                        playerStates = _b.sent();
+                        switch (type) {
+                            case config_1.MoveType.getPosition:
+                                if (playerState.groupIndex !== undefined) {
+                                    break;
+                                }
+                                groupIndex = gameState.groups.findIndex(function (_a) {
+                                    var playerNum = _a.playerNum;
+                                    return playerNum < groupSize;
+                                });
+                                if (groupIndex === -1) {
+                                    group = {
+                                        roundIndex: 0,
+                                        playerNum: 0,
+                                        rounds: Array(rounds)
+                                            .fill(null)
+                                            .map(function () { return ({
+                                            strikePrice: undefined,
+                                            strikeNum: undefined
+                                        }); })
+                                    };
+                                    groupIndex = gameState.groups.push(group) - 1;
+                                }
+                                playerState.groupIndex = groupIndex;
+                                playerState.positionIndex = gameState.groups[groupIndex].playerNum++;
+                                positionParams_1 = positions[playerState.positionIndex];
+                                playerState.role = positionParams_1.role;
+                                playerState.rounds = Array(rounds)
+                                    .fill(null)
+                                    .map(function (_, i) { return ({
+                                    status: config_1.PlayerStatus.prepared,
+                                    startingPrice: positionParams_1.startingPrices[i],
+                                    startingQuota: positionParams_1.startingQuotas[i],
+                                    privateValue: positionParams_1.privateValues[i],
+                                    price: undefined,
+                                    bidNum: undefined,
+                                    actualNum: 0,
+                                    profit: 0
+                                }); });
+                                break;
+                            case config_1.MoveType.shout: {
+                                roundIndex_1 = params.roundIndex, price = params.price, num = params.num;
+                                playerRound = playerState.rounds[roundIndex_1];
+                                if (playerRound.price !== undefined) {
+                                    return [2 /*return*/];
+                                }
+                                if (this.invalidParams(playerState, params)) {
+                                    return [2 /*return*/, cb(playerState.role === 0 ? "价格应不大于估值" : "价格应不小于估值")];
+                                }
+                                playerRound.price = price;
+                                playerRound.bidNum = num;
+                                playerRound.status = config_1.PlayerStatus.shouted;
+                                playerStateArray = Object.values(playerStates).filter(function (ps) { return ps.groupIndex === playerState.groupIndex; });
+                                if (playerStateArray.length < groupSize ||
+                                    playerStateArray.some(function (ps) { return ps.rounds[roundIndex_1].price === undefined; })) {
+                                    return [2 /*return*/];
+                                }
+                                groupState = gameState.groups[playerState.groupIndex];
+                                this.processProfits(groupState, playerStateArray);
+                                this.tickNextRound(roundIndex_1, groupState, playerStateArray);
+                                break;
+                            }
+                            case config_1.MoveType.nextRound: {
+                                nextRoundIndex = params.nextRoundIndex;
+                                if (nextRoundIndex < rounds) {
+                                    gameState.groups[playerState.groupIndex].roundIndex = nextRoundIndex;
+                                }
+                                break;
+                            }
+                        }
+                        return [2 /*return*/];
                 }
             });
         });
     };
-    Controller.prototype.playerMoveReducer = function (actor, type, params, cb) {
-        return __awaiter(this, void 0, void 0, function () {
-            var _a, groupSize, round, positions, playerState, gameState, playerStates, _b, groupIndex, group, groupIndex_1, positionIndex, groupState_1, rounds, roundIndex_1, playerStatus, groupPlayerStates_1, buyerStates_1, sellerStates_1, intentionG, i, newRoundTimer_1, newRoundInterval_1;
+    Controller.prototype.tickNextRound = function (roundIndex, groupState, playerStates) {
+        var _this = this;
+        var rounds = this.game.params.rounds;
+        if (roundIndex === rounds - 1) {
+            return;
+        }
+        var newRoundTimer = 1;
+        var newRoundInterval = global.setInterval(function () { return __awaiter(_this, void 0, void 0, function () {
             var _this = this;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
                     case 0:
-                        _a = this.game.params, groupSize = _a.groupSize, round = _a.round, positions = _a.positions;
-                        return [4 /*yield*/, this.stateManager.getPlayerState(actor)];
+                        playerStates.forEach(function (_a) {
+                            var actor = _a.actor;
+                            return _this.push(actor, config_1.PushType.newRoundTimer, {
+                                roundIndex: roundIndex,
+                                newRoundTimer: newRoundTimer
+                            });
+                        });
+                        if (newRoundTimer++ < config_1.NEW_ROUND_TIMER) {
+                            return [2 /*return*/];
+                        }
+                        global.clearInterval(newRoundInterval);
+                        groupState.roundIndex = Math.min(groupState.roundIndex + 1, rounds - 1);
+                        return [4 /*yield*/, this.stateManager.syncState()];
                     case 1:
-                        playerState = _c.sent();
-                        return [4 /*yield*/, this.stateManager.getGameState()];
-                    case 2:
-                        gameState = _c.sent();
-                        return [4 /*yield*/, this.stateManager.getPlayerStates()];
-                    case 3:
-                        playerStates = _c.sent();
-                        _b = type;
-                        switch (_b) {
-                            case config_1.MoveType.getPosition: return [3 /*break*/, 4];
-                            case config_1.MoveType.shout: return [3 /*break*/, 5];
-                        }
-                        return [3 /*break*/, 9];
-                    case 4:
-                        if (playerState.groupIndex !== undefined) {
-                            return [3 /*break*/, 9];
-                        }
-                        groupIndex = gameState.groups.findIndex(function (_a) {
-                            var playerNum = _a.playerNum;
-                            return playerNum < groupSize;
-                        });
-                        if (groupIndex === -1) {
-                            group = {
-                                roundIndex: 0,
-                                playerNum: 0,
-                                rounds: Array(round).fill(null).map(function () { return ({
-                                    playerStatus: Array(groupSize).fill(config_1.PlayerStatus.prepared)
-                                }); })
-                            };
-                            groupIndex = gameState.groups.push(group) - 1;
-                        }
-                        playerState.groupIndex = groupIndex;
-                        playerState.positionIndex = gameState.groups[groupIndex].playerNum++;
-                        playerState.role = positions[playerState.positionIndex].role;
-                        playerState.privatePrices = positions[playerState.positionIndex].privatePrice;
-                        return [3 /*break*/, 9];
-                    case 5:
-                        groupIndex_1 = playerState.groupIndex, positionIndex = playerState.positionIndex, groupState_1 = gameState.groups[groupIndex_1], rounds = groupState_1.rounds, roundIndex_1 = groupState_1.roundIndex, playerStatus = rounds[roundIndex_1].playerStatus, groupPlayerStates_1 = Object.values(playerStates).filter(function (s) { return s.groupIndex === groupIndex_1; });
-                        playerStatus[positionIndex] = config_1.PlayerStatus.shouted;
-                        playerState.prices[roundIndex_1] = params.price;
-                        if (!playerStatus.every(function (status) { return status === config_1.PlayerStatus.shouted; })) return [3 /*break*/, 9];
-                        buyerStates_1 = groupPlayerStates_1.filter(function (s) { return s.role === 0; });
-                        sellerStates_1 = groupPlayerStates_1.filter(function (s) { return s.role === 1; });
-                        intentionG = buyerStates_1.map(function (_a) {
-                            var buyPrices = _a.prices;
-                            return sellerStates_1.map(function (_a) {
-                                var sellerPrices = _a.prices;
-                                return buyPrices[groupIndex_1] >= sellerPrices[groupIndex_1];
-                            });
-                        });
-                        groupState_1.results = [];
-                        getBestMatching(intentionG)
-                            .forEach(function (_a) {
-                            var _b = __read(_a, 2), buyerIndex = _b[0], sellerIndex = _b[1];
-                            return __awaiter(_this, void 0, void 0, function () {
-                                return __generator(this, function (_c) {
-                                    groupState_1.results.push({
-                                        buyerPosition: buyerStates_1[buyerIndex].positionIndex,
-                                        sellerPosition: sellerStates_1[sellerIndex].positionIndex
-                                    });
-                                    return [2 /*return*/];
-                                });
-                            });
-                        });
-                        groupPlayerStates_1.map(function (p) { return p.profits[roundIndex_1] = p.privatePrices[roundIndex_1] - p.prices[roundIndex_1]; });
-                        return [4 /*yield*/, this.stateManager.syncState()];
-                    case 6:
-                        _c.sent();
-                        if (!(roundIndex_1 == rounds.length - 1)) return [3 /*break*/, 8];
-                        for (i in playerStatus)
-                            playerStatus[i] = config_1.PlayerStatus.gameOver;
-                        return [4 /*yield*/, this.stateManager.syncState()];
-                    case 7:
-                        _c.sent();
+                        _a.sent();
                         return [2 /*return*/];
-                    case 8:
-                        newRoundTimer_1 = 1;
-                        newRoundInterval_1 = global.setInterval(function () { return __awaiter(_this, void 0, void 0, function () {
-                            var _this = this;
-                            return __generator(this, function (_a) {
-                                switch (_a.label) {
-                                    case 0:
-                                        groupPlayerStates_1.forEach(function (_a) {
-                                            var actor = _a.actor;
-                                            return _this.push(actor, config_1.PushType.newRoundTimer, {
-                                                roundIndex: roundIndex_1,
-                                                newRoundTimer: newRoundTimer_1
-                                            });
-                                        });
-                                        if (newRoundTimer_1++ < config_1.NEW_ROUND_TIMER) {
-                                            return [2 /*return*/];
-                                        }
-                                        global.clearInterval(newRoundInterval_1);
-                                        groupState_1.roundIndex++;
-                                        return [4 /*yield*/, this.stateManager.syncState()];
-                                    case 1:
-                                        _a.sent();
-                                        return [2 /*return*/];
-                                }
-                            });
-                        }); }, 1000);
-                        _c.label = 9;
-                    case 9: return [2 /*return*/];
                 }
             });
+        }); }, 1000);
+    };
+    Controller.prototype.invalidParams = function (playerState, params) {
+        var roundIndex = params.roundIndex, price = params.price, num = params.num;
+        var role = playerState.role;
+        var _a = playerState.rounds[roundIndex], startingPrice = _a.startingPrice, startingQuota = _a.startingQuota, privateValue = _a.privateValue;
+        return (!price ||
+            !num ||
+            (role === 0 && (price * num > startingPrice || price > privateValue)) ||
+            (role == 1 && (num > startingQuota || price < privateValue)));
+    };
+    Controller.prototype.processProfits = function (groupState, playerStates) {
+        var roundIndex = groupState.roundIndex, rounds = groupState.rounds;
+        var buyerList = playerStates
+            .filter(function (ps) { return ps.role === 0; })
+            .map(function (ps) { return ps.rounds[roundIndex]; })
+            .sort(function (a, b) { return b.price - a.price; });
+        var sellerList = playerStates
+            .filter(function (ps) { return ps.role === 1; })
+            .map(function (ps) { return ps.rounds[roundIndex]; })
+            .sort(function (a, b) { return a.price - b.price; });
+        var _a = this._strikeDeal(buyerList, sellerList), strikePrice = _a.strikePrice, strikeNum = _a.strikeNum;
+        this._updateGameState(rounds[roundIndex], strikePrice, strikeNum);
+        this._updatePlayerStates(playerStates, roundIndex, strikePrice);
+    };
+    Controller.prototype._strikeDeal = function (buyerList, sellerList) {
+        var buyerIndex = 0;
+        var sellerIndex = 0;
+        var strikeNum = 0;
+        var strikePrice = 0;
+        while (buyerIndex < buyerList.length && sellerIndex < sellerList.length) {
+            var buyer = buyerList[buyerIndex];
+            var seller = sellerList[sellerIndex];
+            if (buyer.price >= seller.price) {
+                var num = Math.min(buyer.bidNum - buyer.actualNum, seller.bidNum - seller.actualNum);
+                buyer.actualNum += num;
+                seller.actualNum += num;
+                strikeNum += num;
+                strikePrice = (buyer.price + seller.price) / 2;
+                if (buyer.actualNum === buyer.bidNum) {
+                    buyerIndex++;
+                }
+                else {
+                    sellerIndex++;
+                }
+            }
+            else {
+                break;
+            }
+        }
+        return { strikePrice: strikePrice, strikeNum: strikeNum };
+    };
+    Controller.prototype._updatePlayerStates = function (playerStates, roundIndex, strikePrice) {
+        playerStates.forEach(function (ps) {
+            var playerRound = ps.rounds[roundIndex];
+            playerRound.status = config_1.PlayerStatus.result;
+            if (!playerRound.actualNum) {
+                return;
+            }
+            if (ps.role === 0) {
+                playerRound.profit =
+                    (playerRound.privateValue - strikePrice) * playerRound.actualNum;
+            }
+            else {
+                playerRound.profit =
+                    (strikePrice - playerRound.privateValue) * playerRound.actualNum;
+            }
         });
+    };
+    Controller.prototype._updateGameState = function (roundState, strikePrice, strikeNum) {
+        roundState.strikePrice = strikePrice;
+        roundState.strikeNum = strikeNum;
     };
     return Controller;
 }(server_1.BaseController));
