@@ -9,7 +9,7 @@
     flex-direction: column;
     justify-content: flex-start;
     li {
-      margin: .8rem;
+      margin: 0.8rem;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -24,10 +24,11 @@
       width: 5rem;
       height: 3rem;
       a {
-        margin: 0 .3rem;
+        margin: 0 0.3rem;
       }
       input {
-        width: 4rem;
+        width: 5.5rem;
+        padding-right: 0;
       }
       &.readonly input {
         border-bottom-color: transparent;
@@ -39,7 +40,7 @@
     text-align: center;
     a {
       transition: $transition-normal;
-      color: rgba($color-blue, .9);
+      color: rgba($color-blue, 0.9);
       &:hover {
         color: $color-blue;
         text-decoration: underline;
@@ -56,13 +57,13 @@
     border-bottom: 1px solid rgba(49, 70, 89, 0.1);
     width: 95%;
     font-size: 1.3rem;
-    padding: .5rem;
+    padding: 0.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
   .highlight {
-    color: #4285f4;;
+    color: #4285f4;
   }
   .title {
     font-size: 2rem;
@@ -79,7 +80,7 @@
       width: 5rem;
       height: 3rem;
       a {
-        margin: 0 .3rem;
+        margin: 0 0.3rem;
       }
       input {
         width: 4rem;
