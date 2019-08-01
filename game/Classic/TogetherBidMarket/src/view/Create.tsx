@@ -1,177 +1,360 @@
-import * as React from 'react'
-import * as style from './style.scss'
-import {ICreateParams} from '../interface'
-import {Core} from '@bespoke/client'
-import {Button, Label, RangeInput, Input} from '@elf/component'
+import * as React from "react";
+import * as style from "./style.scss";
+import { ICreateParams } from "../config";
+import { Core } from "@bespoke/client";
+import { Button, Label, RangeInput, Input } from "@elf/component";
 
 interface ICreateState {
-    buyerPriceStart: number
-    buyerPriceEnd: number
-    sellerPriceStart: number
-    sellerPriceEnd: number
-    InitMoney: number
-    round: number
-    groupSize: number
-    positions: Array<{
-        role: number
-        privatePrice: Array<number>
-    }>
-    readonly: boolean
+  rounds: number;
+  groupSize: number;
+  buyerCapitalMin: number;
+  buyerCapitalMax: number;
+  buyerPrivateMin: number;
+  buyerPrivateMax: number;
+  sellerQuotaMin: number;
+  sellerQuotaMax: number;
+  sellerPrivateMin: number;
+  sellerPrivateMax: number;
+  positions: ICreateParams["positions"];
 }
 
 export class Create extends Core.Create<ICreateParams, ICreateState> {
+  state: ICreateState = {
+    rounds: 3,
+    groupSize: 2,
+    buyerCapitalMin: 50000,
+    buyerCapitalMax: 100000,
+    buyerPrivateMin: 65,
+    buyerPrivateMax: 80,
+    sellerQuotaMin: 1000,
+    sellerQuotaMax: 2000,
+    sellerPrivateMin: 30,
+    sellerPrivateMax: 45,
+    positions: []
+  };
 
-    state: ICreateState = {
-        buyerPriceStart: 0,
-        buyerPriceEnd: 100,
-        sellerPriceStart: 0,
-        sellerPriceEnd: 100,
-        InitMoney: 100,
-        round: 3,
-        groupSize: 2,
-        positions: [{role: 0, privatePrice: [10, 40, 60]}, {role: 1, privatePrice: [30, 50, 60]}],
-        readonly: false,
-    }
+  componentDidMount(): void {
+    const {
+      props: { setSubmitable }
+    } = this;
+    setSubmitable(false);
+  }
 
-    componentDidMount(): void {
-        const {props: {setSubmitable}} = this
-        setSubmitable(false)
-    }
-
-    genRan = ({L, H}) => ~~(Math.random() * (H - L)) + L
-
-    genPosition = (i) => {
-        const {buyerPriceStart, buyerPriceEnd, sellerPriceStart, sellerPriceEnd, round} = this.state
-        const role = i % 2
+  genPositions = () => {
+    const { groupSize, rounds } = this.state;
+    const positions = Array(groupSize)
+      .fill(null)
+      .map((_, i) => {
         return {
-            role,
-            privatePrice: Array(round).fill(null).map(() => this.genRan([{L: buyerPriceStart, H: buyerPriceEnd}, {L: sellerPriceStart, H: sellerPriceEnd}][role]))
-        }
+          role: i % 2,
+          privateValues: Array(rounds)
+            .fill(null)
+            .map(() => this.genPrivateValue(i % 2)),
+          startingPrices: Array(rounds)
+            .fill(null)
+            .map(() => this.genStartingPrice(i % 2)),
+          startingQuotas: Array(rounds)
+            .fill(null)
+            .map(() => this.genStartingQuota(i % 2))
+        };
+      });
+    this.setState({ positions });
+  };
+
+  genPrivateValue = (role: number): number => {
+    const {
+      buyerPrivateMin,
+      buyerPrivateMax,
+      sellerPrivateMin,
+      sellerPrivateMax
+    } = this.state;
+    let min: number, max: number;
+    if (role === 0) {
+      min = Math.floor(buyerPrivateMin);
+      max = Math.floor(buyerPrivateMax);
+    } else {
+      min = Math.floor(sellerPrivateMin);
+      max = Math.floor(sellerPrivateMax);
     }
+    return genRandomInt(min * 100, max * 100) / 100;
+  };
 
-    genParams = () => {
-        const {groupSize} = this.state
-        const positions = Array(groupSize).fill(null).map((v, i) => this.genPosition(i))
-        this.setState({positions})
+  genStartingPrice(role: number): number {
+    if (role === 1) {
+      return 0;
     }
+    const { buyerCapitalMin, buyerCapitalMax } = this.state;
+    return (
+      genRandomInt(
+        Math.floor(buyerCapitalMin) / 100,
+        Math.floor(buyerCapitalMax) / 100
+      ) * 100
+    );
+  }
 
-    resetRole = (i) => {
-        const {positions} = this.state
-        positions[i].role = positions[i].role === 0 ? 1 : 0
-        this.setState({positions})
+  genStartingQuota(role: number): number {
+    if (role === 0) {
+      return 0;
     }
+    const { sellerQuotaMin, sellerQuotaMax } = this.state;
+    return (
+      genRandomInt(
+        Math.floor(sellerQuotaMin) / 100,
+        Math.floor(sellerQuotaMax) / 100
+      ) * 100
+    );
+  }
 
-    resetPrivatePrice = (i, i1, e) => {
-        const {positions} = this.state
-        positions[i].privatePrice[i1] = parseInt(e.target.value)
-        this.setState({positions})
-    }
+  setRole = i => {
+    const { positions } = this.state;
+    positions[i].role = positions[i].role === 0 ? 1 : 0;
+    this.setState({ positions });
+  };
 
-    edit = () => {
-        const {props: {setSubmitable}} = this
-        this.setState({readonly: false})
-        setSubmitable(false)
-    }
+  setPositions = (
+    value: number,
+    prop: string,
+    positionIndex: number,
+    roundIndex: number
+  ) => {
+    const { positions } = this.state;
+    positions[positionIndex][prop][roundIndex] = value;
+    this.setState({ positions });
+  };
 
-    done = () => {
-        const {setParams, setSubmitable} = this.props
-        const {round, groupSize, positions, InitMoney} = this.state
-        setParams({round, groupSize, positions, InitMoney})
-        this.setState({readonly: true})
-        setSubmitable(true)
-    }
+  edit = () => {
+    const {
+      props: { setSubmitable }
+    } = this;
+    setSubmitable(false);
+  };
 
-    render() {
-        const {round, groupSize, buyerPriceStart, buyerPriceEnd, sellerPriceStart, sellerPriceEnd, InitMoney, positions, readonly} = this.state
-        return <div className={style.create}>
-            <ul className={style.configFields}>
-                <li>
-                    <Label label='轮次'/>
-                    <RangeInput value={round}
-                                min={1}
-                                max={10}
-                                onChange={(e) => this.setState({round: parseInt(e.target.value)})}/>
-                </li>
-                <li>
-                    <Label label='每组人数'/>
-                    <RangeInput value={groupSize}
-                                min={2}
-                                max={6}
-                                onChange={(e) => this.setState({groupSize: parseInt(e.target.value)})}/>
-                </li>
-                <li>
-                    <Label label='初始资金'/>
-                    <RangeInput value={InitMoney}
-                                onChange={(e) => this.setState({InitMoney: parseInt(e.target.value)})}/>
-                </li>
-                <li>
-                    <Label label='买家心理价值下限'/>
-                    <RangeInput value={buyerPriceStart}
-                                onChange={(e) => this.setState({buyerPriceStart: parseInt(e.target.value)})}/>
-                </li>
-                <li>
-                    <Label label='买家心理价值上限'/>
-                    <RangeInput value={buyerPriceEnd}
-                                onChange={(e) => this.setState({buyerPriceEnd: parseInt(e.target.value)})}/>
-                </li>
-                <li>
-                    <Label label='卖家心理价值下限'/>
-                    <RangeInput value={sellerPriceStart}
-                                onChange={(e) => this.setState({sellerPriceStart: parseInt(e.target.value)})}/>
-                </li>
-                <li>
-                    <Label label='卖家心理价值上限'/>
-                    <RangeInput value={sellerPriceEnd}
-                                onChange={(e) => this.setState({sellerPriceEnd: parseInt(e.target.value)})}/>
-                </li>
-                <li>
-                    <Button label='生成参数'
-                            onClick={async () => await this.genParams()}/>
-                </li>
-            </ul>
+  done = () => {
+    const { setParams, setSubmitable } = this.props;
+    const { rounds, groupSize, positions } = this.state;
+    setParams({ rounds, groupSize, positions });
+    setSubmitable(true);
+  };
 
-            <table className={style.privatePriceTable}>
-                <thead>
-                <tr>
-                    <td>玩家</td>
-                    <td>角色</td>
-                    <td>心理价值</td>
-                </tr>
-                </thead>
-                {
-                    positions.map((v, i) =>
-                        <tbody key={`tb${i}`}>
-                        <tr>
-                            <td>{`Player ${i + 1}`}</td>
-                            <td>
-                                <a style={{color: v.role === 0 ? 'blue' : '#333'}}
-                                   onClick={this.resetRole.bind(this, i)}>Buyer</a>
-                                <a style={{color: v.role === 1 ? 'blue' : '#333'}}
-                                   onClick={this.resetRole.bind(this, i)}>Seller</a>
-                            </td>
-                            <td>
-                                {
-                                    v.privatePrice.map((v1, i1) =>
-                                        <li key={`pv-${i}-${i1}`} >
-                                            <Label label={`第 ${i1 + 1} 轮`}/>
-                                            <Input type='number' value={v1}
-                                                   onChange={this.resetPrivatePrice.bind(this, i, i1)}/>
-                                        </li>
-                                    )
-                                }
-                            </td>
-                        </tr>
-                        </tbody>
-                    )
-                }
-            </table>
+  render() {
+    const { submitable } = this.props;
+    const {
+      rounds,
+      positions,
+      groupSize,
+      buyerCapitalMin,
+      buyerCapitalMax,
+      buyerPrivateMin,
+      buyerPrivateMax,
+      sellerQuotaMin,
+      sellerQuotaMax,
+      sellerPrivateMin,
+      sellerPrivateMax
+    } = this.state;
+    return (
+      <div className={style.create}>
+        <ul className={style.configFields}>
+          <li>
+            <Label label="轮次" />
+            <RangeInput
+              value={rounds}
+              min={1}
+              max={10}
+              onChange={e =>
+                this.setState({ rounds: parseInt(e.target.value) })
+              }
+            />
+          </li>
+          <li>
+            <Label label="每组人数" />
+            <RangeInput
+              value={groupSize}
+              min={2}
+              max={12}
+              onChange={e =>
+                this.setState({ groupSize: parseInt(e.target.value) })
+              }
+            />
+          </li>
+          <li>
+            <Label label="买家初始资金下限" />
+            <Input
+              value={buyerCapitalMin}
+              onChange={e =>
+                this.setState({ buyerCapitalMin: parseInt(e.target.value) })
+              }
+            />
+          </li>
+          <li>
+            <Label label="买家初始资金上限" />
+            <Input
+              value={buyerCapitalMax}
+              onChange={e =>
+                this.setState({ buyerCapitalMax: parseInt(e.target.value) })
+              }
+            />
+          </li>
+          <li>
+            <Label label="买家心理价值下限" />
+            <Input
+              value={buyerPrivateMin}
+              onChange={e =>
+                this.setState({ buyerPrivateMin: parseInt(e.target.value) })
+              }
+            />
+          </li>
+          <li>
+            <Label label="买家心理价值上限" />
+            <Input
+              value={buyerPrivateMax}
+              onChange={e =>
+                this.setState({ buyerPrivateMax: parseInt(e.target.value) })
+              }
+            />
+          </li>
+          <li>
+            <Label label="卖家股票配额下限" />
+            <Input
+              value={sellerQuotaMin}
+              onChange={e =>
+                this.setState({ sellerQuotaMin: parseInt(e.target.value) })
+              }
+            />
+          </li>
+          <li>
+            <Label label="卖家股票配额上限" />
+            <Input
+              value={sellerQuotaMax}
+              onChange={e =>
+                this.setState({ sellerQuotaMax: parseInt(e.target.value) })
+              }
+            />
+          </li>
+          <li>
+            <Label label="卖家心理价值下限" />
+            <Input
+              value={sellerPrivateMin}
+              onChange={e =>
+                this.setState({ sellerPrivateMin: parseInt(e.target.value) })
+              }
+            />
+          </li>
+          <li>
+            <Label label="卖家心理价值上限" />
+            <Input
+              value={sellerPrivateMax}
+              onChange={e =>
+                this.setState({ sellerPrivateMax: parseInt(e.target.value) })
+              }
+            />
+          </li>
+          <li>
+            <Button label="生成参数" onClick={() => this.genPositions()} />
+          </li>
+        </ul>
 
-            <div className={style.btnSwitch}>
-                {
-                    readonly ? <a onClick={() => this.edit()}>重新编辑</a> :
-                        <a onClick={() => this.done()}>确认参数</a>
-                }
-            </div>
+        <table className={style.privatePriceTable}>
+          <thead>
+            <tr>
+              <td>玩家</td>
+              <td>角色</td>
+              <td>心理价值</td>
+              <td>初始资金</td>
+              <td>股票配额</td>
+            </tr>
+          </thead>
+          {positions.map((position, i) => (
+            <tbody key={`tb${i}`}>
+              <tr>
+                <td>{`Player ${i + 1}`}</td>
+                <td>
+                  <a
+                    style={{ color: position.role === 0 ? "blue" : "#333" }}
+                    onClick={this.setRole.bind(this, i)}
+                  >
+                    Buyer
+                  </a>
+                  <a
+                    style={{ color: position.role === 1 ? "blue" : "#333" }}
+                    onClick={this.setRole.bind(this, i)}
+                  >
+                    Seller
+                  </a>
+                </td>
+                <td>
+                  {position.privateValues.map((privateValue, j) => (
+                    <li key={j}>
+                      <Label label={`第 ${j + 1} 轮`} />
+                      <Input
+                        type="number"
+                        value={privateValue}
+                        onChange={e =>
+                          this.setPositions(
+                            +e.target.value,
+                            "privateValues",
+                            i,
+                            j
+                          )
+                        }
+                      />
+                    </li>
+                  ))}
+                </td>
+                <td>
+                  {position.startingPrices.map((startingPrice, j) => (
+                    <li key={j}>
+                      <Label label={`第 ${j + 1} 轮`} />
+                      <Input
+                        type="number"
+                        value={startingPrice}
+                        onChange={e =>
+                          this.setPositions(
+                            +e.target.value,
+                            "startingPrices",
+                            i,
+                            j
+                          )
+                        }
+                      />
+                    </li>
+                  ))}
+                </td>
+                <td>
+                  {position.startingQuotas.map((startingQuota, j) => (
+                    <li key={j}>
+                      <Label label={`第 ${j + 1} 轮`} />
+                      <Input
+                        type="number"
+                        value={startingQuota}
+                        onChange={e =>
+                          this.setPositions(
+                            +e.target.value,
+                            "startingQuotas",
+                            i,
+                            j
+                          )
+                        }
+                      />
+                    </li>
+                  ))}
+                </td>
+              </tr>
+            </tbody>
+          ))}
+        </table>
+
+        <div className={style.btnSwitch}>
+          {submitable ? (
+            <a onClick={() => this.edit()}>重新编辑</a>
+          ) : (
+            <a onClick={() => this.done()}>确认参数</a>
+          )}
         </div>
-    }
+      </div>
+    );
+  }
+}
+
+function genRandomInt(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }

@@ -7,7 +7,6 @@ const SCHOOL_PIE_ACTIVE = require("./school_pie_active.png");
 const STUDENT = require("./student.png");
 const STUDENT_ACTIVE = require("./student_active.png");
 
-const UNIT = 45.72;
 const EMPTY_PLAYER = {
   token: "",
   schools: [],
@@ -146,7 +145,9 @@ class ApplyAnimation extends React.Component<PropType, StateType> {
       <div className={style.players}>
         <ul
           className={style.slots}
-          style={{ transform: `translateX(-${(playerIndex - 3) * UNIT}px)` }}
+          style={{
+            transform: `translateX(-${(((playerIndex - 3) * 1) / 7) * 100}%)`
+          }}
         >
           {Object.values(players).map((player, i) => {
             if (player === EMPTY_PLAYER) {

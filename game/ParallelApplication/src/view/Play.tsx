@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as style from "./style.scss";
 import { Core, Request } from "@bespoke/client";
-import { Toast} from "@elf/component";
+import { Toast } from "@elf/component";
 import { useSpring, animated } from "react-spring";
 import {
   MoveType,
@@ -27,19 +27,8 @@ const SCORING = require("./components/scoring.gif");
 const CLOSE = require("./components/close.png");
 const SCHOOL_ICON = require("./components/school.png");
 const ADMISSION_PIE = require("./components/admission_pie.png");
-// const UNI_ZHONG_SHAN = require("./components/zhongshanUni.png");
-// const UNI_ZHE_JIANG = require("./components/zhejiangUni.png");
-// const UNI_XIA_MEN = require("./components/XiamenUni.png");
-// const UNI_WU_HAN = require("./components/wuhanUni.png");
-// const UNI_SHANG_JIAO = require("./components/shangjiaoUni.png");
-// const UNI_REN_MIN = require("./components/renminUni.png");
-// const UNI_QING_HUA = require("./components/qinghuaUni.png");
-// const UNI_NAN_KAI = require("./components/nankaiUni.png");
-// const UNI_NAN_JING = require("./components/nanjingUni.png");
-// const UNI_HUA_KE = require("./components/huakeUni.png");
-// const UNI_FU_DAN = require("./components/fudanUni.png");
-// const UNI_BEI_JING = require("./components/beijingUni.png");
-// const QR_CODE = require("./components/qrcode.jpg");
+const SCORE_BOARD = require("./components/score_board.png");
+const APPLY_BOARD = require("./components/apply_board.png");
 
 interface IPlayState {
   schools: Array<SCHOOL>;
@@ -63,48 +52,6 @@ enum STATUS {
   applying,
   result
 }
-
-// const UNI_IMG = {
-//   [SCHOOL.beijingUni]: UNI_BEI_JING,
-//   [SCHOOL.qinghuaUni]: UNI_QING_HUA,
-//   [SCHOOL.renminUni]: UNI_REN_MIN,
-//   [SCHOOL.fudanUni]: UNI_FU_DAN,
-//   [SCHOOL.shangjiaoUni]: UNI_SHANG_JIAO,
-//   [SCHOOL.zhejiangUni]: UNI_ZHE_JIANG,
-//   [SCHOOL.nanjingUni]: UNI_NAN_JING,
-//   [SCHOOL.wuhanUni]: UNI_WU_HAN,
-//   [SCHOOL.huakeUni]: UNI_HUA_KE,
-//   [SCHOOL.nankaiUni]: UNI_NAN_KAI,
-//   [SCHOOL.xiamenUni]: UNI_XIA_MEN,
-//   [SCHOOL.zhongshanUni]: UNI_ZHONG_SHAN
-// };
-
-// const UNI_LETTER = {
-//   [SCHOOL.beijingUni]:
-//     "已经被$北京大学$录取，我们比隔壁清华多13年历史，我们的食堂全国第一。",
-//   [SCHOOL.qinghuaUni]:
-//     "已经被$清华大学$录取，你会有一个豪华学长团，习近平、胡锦涛、邓稼先、杨振宁，有他们成为你前进的动力。",
-//   [SCHOOL.renminUni]:
-//     "已经被$中国人民大学$录取，我们是人民的大学，你和强东是校友。",
-//   [SCHOOL.fudanUni]:
-//     "已经被$复旦大学$录取，欢迎你来到魔都享受大学时光，这是最好的大学，也是最好的城市，这是你的小时代。",
-//   [SCHOOL.shangjiaoUni]:
-//     "已经被$上海交通大学$录取，我们不是只有交通专业！不是只有交通专业！不是只有交通专业！重要事情说三遍。",
-//   [SCHOOL.zhejiangUni]:
-//     "已经被$浙江大学$录取，上有天堂，下有苏杭，这里不仅有马爸爸的阿里巨头，还有网易丁磊的养猪场。",
-//   [SCHOOL.nanjingUni]:
-//     "已经被$南京大学$录取，我们坐落于六朝古都，我们帅哥美女比浙大多。",
-//   [SCHOOL.wuhanUni]:
-//     "已经被$武汉大学$录取，听说其他大学都在晒校友，那我们也就随便推一个，小米雷军。",
-//   [SCHOOL.huakeUni]:
-//     "已经被$华中科技大学$录取，顺便说一句，你们人人都用的微信，就是我校校友张小龙的产品，低调、低调！",
-//   [SCHOOL.nankaiUni]:
-//     "已经被$南开大学$录取，我校在天津！天津！天津在南方城市！周恩来总理是你的学长，德云社总部就在你隔壁。",
-//   [SCHOOL.xiamenUni]:
-//     "已经被$厦门大学$录取，欢迎你来到全国最美大学，没有之一，不接受反驳。",
-//   [SCHOOL.zhongshanUni]:
-//     "已经被$中山大学$录取，咱们再广州、珠海、深圳都有校区，三个城市任你选，对了，福建人不好吃。"
-// };
 
 const NUM = {
   0: "一",
@@ -192,41 +139,6 @@ export class Play extends Core.Play<
     });
   };
 
-  // _renderAdmission = (admission: SCHOOL) => {
-  //   const letters = UNI_LETTER[admission].split("$");
-  //   return (
-  //     <>
-  //       <div className={style.resultLetter}>
-  //         <p>恭喜您:</p>
-  //         <p>
-  //           &nbsp;&nbsp;
-  //           {letters.map((letter, i) => {
-  //             return (
-  //               <span className={i === 1 ? style.redFont : ""}>{letter}</span>
-  //             );
-  //           })}
-  //         </p>
-  //       </div>
-  //       <img className={style.resultImg} src={UNI_IMG[admission]} />
-  //       {this._renderBackButton()}
-  //       <img className={style.resultQrImg} src={QR_CODE} />
-  //       <p className={style.resultQrMsg}>更多实验 请关注公众号</p>
-  //     </>
-  //   );
-  // };
-
-  // _renderNoneAdmission = () => {
-  //   return (
-  //     <>
-  //       <div className={style.resultBoard}>
-  //         <p>很遗憾</p>
-  //         <p>您没能被录取</p>
-  //       </div>
-  //       {this._renderBackButton()}
-  //     </>
-  //   );
-  // };
-
   _renderBackButton = () => {
     const { frameEmitter } = this.props;
     return (
@@ -245,26 +157,33 @@ export class Play extends Core.Play<
     const applications = ["第一志愿", "第二志愿", "第三志愿"];
     return (
       <>
-        <ul className={style.applyBoard}>
-          {applications.map((application, index) => {
-            return (
-              <li key={application}>
-                <span className={style.application}>
-                  <img src={SCHOOL_ICON} />
-                  {application}
-                </span>
-                <span
-                  className={style.redFont}
-                  style={{ cursor: "pointer" }}
-                  onClick={() => this.choose(undefined, index)}
-                >
-                  {SCHOOL_NAME[schools[index]]}
-                </span>
-              </li>
-            );
-          })}
-        </ul>
-        <Button label="提交" onClick={() => this.apply(schools)} />
+        <div className={style.applyBoard}>
+          <img src={APPLY_BOARD} />
+          <ul>
+            {applications.map((application, index) => {
+              return (
+                <li key={application}>
+                  <span className={style.application}>
+                    <img src={SCHOOL_ICON} />
+                    {application}
+                  </span>
+                  <span
+                    className={style.redFont}
+                    style={{ cursor: "pointer" }}
+                    onClick={() => this.choose(undefined, index)}
+                  >
+                    {SCHOOL_NAME[schools[index]]}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+        <Button
+          className={style.button}
+          label="提交"
+          onClick={() => this.apply(schools)}
+        />
       </>
     );
   };
@@ -273,11 +192,15 @@ export class Play extends Core.Play<
     return (
       <>
         <Ready2Choose score={score} scores={scores} />
-        <img className={style.arrow} src={ARROW} />
-        <Button
-          label="开始填报"
-          onClick={() => this.setState({ schools: [] })}
-        />
+        <div className={style.buttonContainer}>
+          <div className={style.arrow}>
+            <img src={ARROW} />
+          </div>
+          <Button
+            label="开始填报"
+            onClick={() => this.setState({ schools: [] })}
+          />
+        </div>
       </>
     );
   };
@@ -302,6 +225,7 @@ export class Play extends Core.Play<
         </ul>
         <Button
           label={"确定"}
+          className={style.button}
           disabled={!curSchool}
           onClick={() => {
             if (curSchool) {
@@ -324,9 +248,6 @@ export class Play extends Core.Play<
   getPlayerStatus = (): STATUS => {
     const { playerState, gameState } = this.props;
     const { schools } = this.state;
-    // if (playerState.admission !== undefined) {
-    //   return STATUS.result;
-    // }
     if (gameState.sortedPlayers && gameState.sortedPlayers.length) {
       return STATUS.applying;
     }
@@ -399,15 +320,6 @@ export class Play extends Core.Play<
           />
         );
       }
-      // case STATUS.result: {
-      //   if (playerState.admission === SCHOOL.none) {
-      //     msg = "录取结果出来啦";
-      //     content = this._renderNoneAdmission();
-      //   } else {
-      //     return this._renderAdmission(playerState.admission);
-      //   }
-      //   break;
-      // }
     }
     return (
       <>
@@ -509,21 +421,24 @@ const Ready2Choose: React.SFC<{ score: number; scores: Array<number> }> = ({
   });
   return (
     <animated.div className={style.scoreBoard} style={props}>
-      <p className={style.title}>
-        总分: &nbsp;<span className={style.redFont}>{score}</span>
-      </p>
-      <p className={style.name}>姓名: xxx</p>
-      <p className={style.name}>考号: xxx</p>
-      <ul className={style.table}>
-        {subjects.map((subject, index) => {
-          return (
-            <li key={subject}>
-              <p className={style.subject}>{subject}</p>
-              <p className={style.score}>{scores[index]}</p>
-            </li>
-          );
-        })}
-      </ul>
+      <img src={SCORE_BOARD} />
+      <div className={style.board}>
+        <p className={style.title}>
+          总分: &nbsp;<span className={style.redFont}>{score}</span>
+        </p>
+        <p className={style.name}>姓名: xxx</p>
+        <p className={style.name}>考号: xxx</p>
+        <ul className={style.table}>
+          {subjects.map((subject, index) => {
+            return (
+              <li key={subject}>
+                <p className={style.subject}>{subject}</p>
+                <p className={style.score}>{scores[index]}</p>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </animated.div>
   );
 };
