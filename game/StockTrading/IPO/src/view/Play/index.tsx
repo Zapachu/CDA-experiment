@@ -33,8 +33,7 @@ export class Play extends Core.Play<
     } = this.props;
     let content;
     switch (playerStatus) {
-      case PlayerStatus.intro:
-      case PlayerStatus.matching: {
+      case PlayerStatus.intro:{
         content = <IntroStage {...this.props} />;
         break;
       }
@@ -45,7 +44,6 @@ export class Play extends Core.Play<
     }
     return (
       <section className={style.play}>
-        {/* <Header stage={stage} /> */}
         {content}
       </section>
     );
