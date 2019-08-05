@@ -2,8 +2,9 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {Core} from '@bespoke/client'
 import {Lang, Toast} from '@elf/component'
-import {IPOType, MoveType, PlayerStatus, PushType, SHOUT_TIMER} from '../../config'
-import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
+import Joyride, {Step} from 'react-joyride'
+import {IPOType, MoveType, PlayerStatus, PushType, SHOUT_TIMER} from '../config'
+import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import {
     Button,
     Input,
@@ -29,7 +30,7 @@ interface IPlayState {
     shoutTimer: number;
 }
 
-export default class PlayingStage extends Core.Play<ICreateParams,
+export class Play extends Core.Play<ICreateParams,
     IGameState,
     IPlayerState,
     MoveType,
@@ -60,7 +61,10 @@ export default class PlayingStage extends Core.Play<ICreateParams,
         }
     }
 
-    lang = Lang.extractLang({})
+    lang = Lang.extractLang({
+        confirm: ['确认', 'Confirm'],
+        gotIt: ['我知道了', 'I got it']
+    })
 
     componentDidMount() {
         const {frameEmitter} = this.props
@@ -219,6 +223,7 @@ export default class PlayingStage extends Core.Play<ICreateParams,
         investorState: Partial<IPlayerState>,
         marketState: Partial<IGameState>
     ) => {
+        const {lang} = this
         const {
             frameEmitter,
             game: {
@@ -226,77 +231,154 @@ export default class PlayingStage extends Core.Play<ICreateParams,
             }
         } = this.props
         const {price, num, shoutTimer} = this.state
-        return (
-            <>
-                <div className={style.leftBtn}>
-                    <Button
-                        label={'交易规则回顾'}
-                        size={Button.Size.Big}
-                        color={Button.Color.Blue}
-                        onClick={() => this.setState({modalType: ModalType.Trade})}
-                    />
-                </div>
-                <StockInfo
-                    stockIndex={marketState.stockIndex}
-                    style={{marginTop: '15vh', marginBottom: '20px'}}
+        const stepProps: Partial<Step> = {
+                styles: {
+                    spotlight: {
+                        border: '2px dashed #71ff7b',
+                        borderRadius: '1.5rem'
+                    }
+                },
+                disableBeacon: true
+            },
+            steps = [
+                {
+                    target: `.${style.stockInfoWrapper}`,
+                    content: '您可以在这里查看您资产组合中的股票数量和资金数目',
+                    ...stepProps
+                },
+                {
+                    target: `.${style.privateValue}`,
+                    content: '您可以在这里查看您的股票交易记录',
+                    ...stepProps
+                },
+                {
+                    target: `.${style.inputWrapper}`,
+                    content: '您可以在这里查看已经提交的买家报价和卖家报价。买单和卖单分别排队，买单以价格从高到低排列，卖单以价格从低到高排列。同价的，按进入系统的先后排列。系统按照顺序将排在前面的买单和卖单配对成交，即按“价格优先，同等价格下时间优先”的顺序依次成交在，直到不能成交为止，未成交的委托排队等待成交。',
+                    styles: {
+                        tooltip: {
+                            width: '50vw',
+                            height: '50vh'
+                        }
+                    },
+                    ...stepProps
+                },
+                {
+                    target: `.${style.subLabel}`,
+                    content: '您可以在这里查看当前的交易期数和剩余交易时间，您需在规定的时间内完成交易。',
+                    ...stepProps
+                },
+                {
+                    target: `.${style.orderInputWrapper}`,
+                    content: '您可以在这里提交您的卖单和卖单。买入申报价高于即时揭示最低卖价，以最低申报卖价成交；卖出申报价低于最高买入价，以最高买入价成交。两个委托如果不能全部成交，剩余的继续留在单上，等待下次成交。系统处理原则为价格优先和时间优先两个原则。',
+                    ...stepProps
+                },
+                {
+                    target: `.${style.marketHistory}`,
+                    content: '您可以在这里查看已经成交的股票的成交价格。',
+                    ...stepProps
+                }
+            ]
+        return <>
+            <Joyride
+                callback={({action}) => {
+                    console.log(action)
+                    if (action == 'update') {
+                        // setStepIndex(stepIndex + 1)
+                    }
+                    if (action == 'reset') {
+                        frameEmitter.emit(MoveType.getIndex)
+                    }
+                }}
+                continuous
+                showProgress
+                hideBackButton
+                disableOverlayClose
+                steps={steps}
+                locale={{
+                    next: lang.gotIt,
+                    last: lang.gotIt
+                }}
+                styles={{
+                    options: {
+                        arrowColor: 'rgba(30,39,82,.8)',
+                        backgroundColor: 'rgba(30,39,82,.8)',
+                        overlayColor: '#1d1d32',
+                        primaryColor: '#13553e',
+                        textColor: '#fff'
+                    }
+                }}
+            />
+            <div className={style.leftBtn}>
+                <Button
+                    label={'交易规则回顾'}
+                    size={Button.Size.Big}
+                    color={Button.Color.Blue}
+                    onClick={() => this.setState({modalType: ModalType.Trade})}
                 />
-                <p style={{marginBottom: '10px'}}>
-                    *私人信息: 你们公司对该股票的估值是
-                    <span style={{color: 'orange'}}>{investorState.privateValue}</span>
-                </p>
-                <p style={{marginBottom: '30px'}}>
-                    *市场信息: 该公司共发行了
-                    <span style={{color: 'orange'}}>{total}股</span>股票, 最低保留价格为
-                    <span style={{color: 'orange'}}>{marketState.min}</span>
-                </p>
-                <div className={style.inputContainer}>
-                    <div>
-                        <Input
-                            value={price}
-                            onChange={val => this.setState({price: '' + val})}
-                            placeholder={'价格'}
-                            onMinus={val => this.setState({price: '' + (+val - 1)})}
-                            onPlus={val => this.setState({price: '' + (+val + 1)})}
-                        />
-                        <p
-                            style={{fontSize: '12px', marginTop: '5px', marginLeft: '45px'}}
-                        >
-                            可买
-                            <span style={{color: 'orange'}}>
+            </div>
+            <div className={style.stockInfoWrapper}>
+                <StockInfo stockIndex={marketState.stockIndex}/>
+            </div>
+            <p style={{marginBottom: '10px'}}>
+                *私人信息: 你们公司对该<span className={style.privateValue}>股票的估值</span>是
+                <span style={{color: 'orange'}}>{investorState.privateValue}</span>
+            </p>
+            <p style={{marginBottom: '30px'}}>
+                *市场信息: 该公司共发行了
+                <span style={{color: 'orange'}}>{total}股</span>股票, 最低保留价格为
+                <span style={{color: 'orange'}}>{marketState.min}</span>
+            </p>
+            <div className={style.inputWrapper}>
+                TODO
+            </div>
+            <div className={style.inputContainer}>
+                <div>
+                    <Input
+                        value={price}
+                        onChange={val => this.setState({price: '' + val})}
+                        placeholder={'价格'}
+                        onMinus={val => this.setState({price: '' + (+val - 1)})}
+                        onPlus={val => this.setState({price: '' + (+val + 1)})}
+                    />
+                    <p
+                        style={{fontSize: '12px', marginTop: '5px', marginLeft: '45px'}}
+                    >
+                        可买
+                        <span style={{color: 'orange'}}>
                 {+price
                     ? Math.floor(investorState.startingPrice / +price)
                     : ' '}
               </span>
-                            股
-                        </p>
-                    </div>
+                        股
+                    </p>
                 </div>
-                <div className={style.inputContainer}>
-                    <div>
-                        <Input
-                            value={num}
-                            onChange={val => this.setState({num: '' + val})}
-                            placeholder={'数量'}
-                            onMinus={val => this.setState({num: '' + (+val - 1)})}
-                            onPlus={val => this.setState({num: '' + (+val + 1)})}
-                        />
-                        <p
-                            style={{
-                                fontSize: '12px',
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                marginTop: '5px',
-                                marginLeft: '45px'
-                            }}
-                        >
+            </div>
+            <div className={style.inputContainer}>
+                <div>
+                    <Input
+                        value={num}
+                        onChange={val => this.setState({num: '' + val})}
+                        placeholder={'数量'}
+                        onMinus={val => this.setState({num: '' + (+val - 1)})}
+                        onPlus={val => this.setState({num: '' + (+val + 1)})}
+                    />
+                    <p
+                        style={{
+                            fontSize: '12px',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginTop: '5px',
+                            marginLeft: '45px'
+                        }}
+                    >
               <span>
                 总花费
                 <span style={{color: 'orange'}}>
                   {+price && +num ? (+price * +num).toFixed(2) : ' '}
                 </span>
               </span>
-                            <span>
+                        <span>
                 <span
                     className={style.operation}
                     onClick={() =>
@@ -312,45 +394,44 @@ export default class PlayingStage extends Core.Play<ICreateParams,
                   全仓
                 </span>
               </span>
-                        </p>
-                    </div>
+                    </p>
                 </div>
-                <Button
-                    label={'买入'}
-                    style={{
-                        marginBottom: shoutTimer !== null ? '5px' : '30px',
-                        marginTop: '20px'
-                    }}
-                    onClick={() => {
-                        if (!+price || !+num || num.includes('.')) return
-                        frameEmitter.emit(
-                            MoveType.shout,
-                            {price: +price, num: +num},
-                            err => {
-                                if (err) {
-                                    Toast.warn(err)
-                                } else {
-                                    this.setState({
-                                        price: undefined,
-                                        num: undefined
-                                    })
-                                }
+            </div>
+            <Button
+                label={'买入'}
+                style={{
+                    marginBottom: shoutTimer !== null ? '5px' : '30px',
+                    marginTop: '20px'
+                }}
+                onClick={() => {
+                    if (!+price || !+num || num.includes('.')) return
+                    frameEmitter.emit(
+                        MoveType.shout,
+                        {price: +price, num: +num},
+                        err => {
+                            if (err) {
+                                Toast.warn(err)
+                            } else {
+                                this.setState({
+                                    price: undefined,
+                                    num: undefined
+                                })
                             }
-                        )
-                    }}
-                />
-                {shoutTimer !== null ? (
-                    <p style={{marginBottom: '20px', textAlign: 'center'}}>
-                        {SHOUT_TIMER - shoutTimer} S
-                    </p>
-                ) : null}
-                <ListItem width={200} style={{marginBottom: '10px'}}>
-                    <p style={{color: 'orange'}} className={style.item}>
-                        初始资金: {investorState.startingPrice}
-                    </p>
-                </ListItem>
-            </>
-        )
+                        }
+                    )
+                }}
+            />
+            {shoutTimer !== null ? (
+                <p style={{marginBottom: '20px', textAlign: 'center'}}>
+                    {SHOUT_TIMER - shoutTimer} S
+                </p>
+            ) : null}
+            <ListItem width={200} style={{marginBottom: '10px'}}>
+                <p style={{color: 'orange'}} className={style.item}>
+                    初始资金: {investorState.startingPrice}
+                </p>
+            </ListItem>
+        </>
     }
 
     renderModal = (modalType: ModalType) => {
@@ -441,9 +522,11 @@ export default class PlayingStage extends Core.Play<ICreateParams,
 
     render() {
         const {
+            lang,
             props: {
                 playerState,
-                gameState
+                gameState,
+                frameEmitter
             },
             state: {modalType}
         } = this
@@ -452,10 +535,6 @@ export default class PlayingStage extends Core.Play<ICreateParams,
         investorState = playerState
         let content
         switch (playerState.playerStatus) {
-            case PlayerStatus.prepared: {
-                content = this.renderPrepared(investorState, marketState)
-                break
-            }
             case PlayerStatus.shouted: {
                 content = (
                     <>
@@ -476,15 +555,19 @@ export default class PlayingStage extends Core.Play<ICreateParams,
                 content = this.renderResult(investorState, marketState)
                 break
             }
+            default: {
+                content = this.renderPrepared(investorState, marketState)
+                break
+            }
         }
 
-        return (
-            <section className={style.playingStage}>
+        return <section className={style.play}>
+            <div className={style.playContent}>
                 {content}
                 <Modal visible={modalType !== ModalType.None}>
                     {this.renderModal(modalType)}
                 </Modal>
-            </section>
-        )
+            </div>
+        </section>
     }
 }

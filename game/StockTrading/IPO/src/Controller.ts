@@ -98,7 +98,7 @@ export default class Controller extends BaseController<ICreateParams,
   async initPlayerState(actor: IActor): Promise<TPlayerState<IPlayerState>> {
     const gameState = await this.stateManager.getGameState()
     const playerState = await super.initPlayerState(actor)
-    playerState.playerStatus = PlayerStatus.intro
+    playerState.playerStatus = PlayerStatus.guide
     playerState.privateValue = formatDigits(genRandomInt(gameState.min * 100, gameState.max * 100) / 100)
     playerState.startingPrice = Controller.genStartingPrice(gameState.min)
     return playerState
