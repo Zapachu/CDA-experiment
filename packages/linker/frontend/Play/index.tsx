@@ -64,8 +64,7 @@ class Play4Owner extends React.Component<{
     gameState: IGameState
 }> {
     lang = Lang.extractLang({
-        share: ['分享', 'Share'],
-        playerList: ['玩家列表', 'PlayerList'],
+        gameInfo: ['实验信息', 'Game Info'],
         console: ['控制台', 'Console'],
         playerStatus: ['玩家状态', 'Player Status'],
         point: ['得分', 'Point'],
@@ -81,10 +80,7 @@ class Play4Owner extends React.Component<{
                 <Dropdown trigger={['click']} overlay={<Menu>
                     <Menu.Item>
                         <Button
-                            onClick={() => toV5(config.academus.route.member(user.orgCode, game.id))}>{lang.playerList}</Button>
-                    </Menu.Item>
-                    <Menu.Item>
-                        <Button onClick={() => toV5(config.academus.route.share(game.id))}>{lang.share}</Button>
+                            onClick={() => toV5(config.academus.route.home(user.orgCode, game.id))}>{lang.gameInfo}</Button>
                     </Menu.Item>
                 </Menu>}>
                     <Button type='primary' shape="circle" icon="bars"/>
