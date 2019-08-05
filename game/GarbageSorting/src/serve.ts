@@ -47,7 +47,7 @@ const router = Router().get("/share/:gameId", async (req, res: Response) => {
   );
 });
 
-Server.start(namespace, Controller, resolve(__dirname, "../static"), router);
+Server.start(namespace, Controller, resolve(__dirname, "../dist"), router);
 
 RobotServer.start(namespace, Robot);
 

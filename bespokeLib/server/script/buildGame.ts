@@ -14,7 +14,7 @@ interface IPaths {
 
 const defaultPaths: IPaths = {
   entry: './src/view',
-  output: './static'
+  output: './dist'
 }
 
 function resolvePaths(basePath, paths: IPaths = defaultPaths): IPaths {

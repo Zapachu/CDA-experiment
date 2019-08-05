@@ -88,6 +88,53 @@ var util_2 = require("@elf/util");
 var Server = /** @class */ (function () {
     function Server() {
     }
+    Server.start = function (namespace, Logic, staticPath, bespokeRouter, startOption) {
+        var _this = this;
+        if (bespokeRouter === void 0) { bespokeRouter = Express.Router(); }
+        if (startOption === void 0) { startOption = {}; }
+        util_1.Setting.init(namespace, staticPath, startOption);
+        this.initSessionMiddleware();
+        this.initMongo();
+        this.initPassPort();
+        util_1.QCloudSMS.init();
+        service_1.BaseLogic.init(Logic, startOption.syncStrategy);
+        var express = this.initExpress(bespokeRouter), server = express.listen(util_1.Setting.port);
+        eventDispatcher_1.EventDispatcher.startGameSocket(server).use(socketIOSession(this.sessionMiddleware));
+        this.bindServerListener(server, function () {
+            util_2.Log.i("Running at\uFF1Ahttp://" + util_1.Setting.ip + ":" + (setting_1.elfSetting.bespokeHmr ? share_1.config.devPort.client : util_1.Setting.port) + "/" + share_1.config.rootName + "/" + util_1.Setting.namespace);
+            util_1.heartBeat(util_1.RedisKey.gameServer(util_1.Setting.namespace), function () { return util_1.Setting.ip + ":" + util_1.Setting.port; });
+            if (setting_1.elfSetting.bespokeWithLinker) {
+                _this.withLinker();
+            }
+        });
+    };
+    Server.newGame = function (gameConfig) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, mobile, owner;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = __read(setting_1.elfSetting.adminMobileNumbers, 1), mobile = _a[0];
+                        if (!mobile) {
+                            util_2.Log.e('未配置管理员账号，无法创建实验');
+                        }
+                        return [4 /*yield*/, model_1.UserModel.findOne({ mobile: mobile })];
+                    case 1:
+                        owner = _b.sent();
+                        if (!!owner) return [3 /*break*/, 3];
+                        return [4 /*yield*/, model_1.UserModel.create({
+                                role: share_1.AcademusRole.teacher,
+                                mobile: mobile
+                            })];
+                    case 2:
+                        owner = _b.sent();
+                        _b.label = 3;
+                    case 3: return [4 /*yield*/, service_1.GameDAO.newGame(owner.id, gameConfig)];
+                    case 4: return [2 /*return*/, _b.sent()];
+                }
+            });
+        });
+    };
     Server.initMongo = function () {
         mongoose_1.connect(setting_1.elfSetting.mongoUri, __assign({}, setting_1.elfSetting.mongoUser ? { user: setting_1.elfSetting.mongoUser, pass: setting_1.elfSetting.mongoPass } : {}, { useNewUrlParser: true, useCreateIndex: true }), function (err) { return err ? util_2.Log.e(err) : null; });
     };
@@ -200,60 +247,12 @@ var Server = /** @class */ (function () {
                 });
             });
         });
-        var elfComponentPath = require('../static/index.json')['ElfComponent.js'].replace('static', util_1.Setting.namespace + "/static");
         util_1.heartBeat(protocol_1.Linker.HeartBeat.key(util_1.Setting.namespace), function () {
             var regInfo = {
                 namespace: util_1.Setting.namespace,
-                jsUrl: "" + util_1.getOrigin() + elfComponentPath + ";" + util_1.getOrigin() + util_1.Setting.getClientPath()
+                jsUrl: "" + util_1.getOrigin() + util_1.Setting.getClientPath()
             };
             return JSON.stringify(regInfo);
-        });
-    };
-    Server.start = function (namespace, Logic, staticPath, bespokeRouter, startOption) {
-        var _this = this;
-        if (bespokeRouter === void 0) { bespokeRouter = Express.Router(); }
-        if (startOption === void 0) { startOption = {}; }
-        util_1.Setting.init(namespace, staticPath, startOption);
-        this.initSessionMiddleware();
-        this.initMongo();
-        this.initPassPort();
-        util_1.QCloudSMS.init();
-        service_1.BaseLogic.init(Logic, startOption.syncStrategy);
-        var express = this.initExpress(bespokeRouter), server = express.listen(util_1.Setting.port);
-        eventDispatcher_1.EventDispatcher.startGameSocket(server).use(socketIOSession(this.sessionMiddleware));
-        this.bindServerListener(server, function () {
-            util_2.Log.i("Running at\uFF1Ahttp://" + util_1.Setting.ip + ":" + (setting_1.elfSetting.bespokeHmr ? share_1.config.devPort.client : util_1.Setting.port) + "/" + share_1.config.rootName + "/" + util_1.Setting.namespace);
-            util_1.heartBeat(util_1.RedisKey.gameServer(util_1.Setting.namespace), function () { return util_1.Setting.ip + ":" + util_1.Setting.port; });
-            if (setting_1.elfSetting.bespokeWithLinker) {
-                _this.withLinker();
-            }
-        });
-    };
-    Server.newGame = function (gameConfig) {
-        return __awaiter(this, void 0, void 0, function () {
-            var _a, mobile, owner;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        _a = __read(setting_1.elfSetting.adminMobileNumbers, 1), mobile = _a[0];
-                        if (!mobile) {
-                            util_2.Log.e('未配置管理员账号，无法创建实验');
-                        }
-                        return [4 /*yield*/, model_1.UserModel.findOne({ mobile: mobile })];
-                    case 1:
-                        owner = _b.sent();
-                        if (!!owner) return [3 /*break*/, 3];
-                        return [4 /*yield*/, model_1.UserModel.create({
-                                role: share_1.AcademusRole.teacher,
-                                mobile: mobile
-                            })];
-                    case 2:
-                        owner = _b.sent();
-                        _b.label = 3;
-                    case 3: return [4 /*yield*/, service_1.GameDAO.newGame(owner.id, gameConfig)];
-                    case 4: return [2 /*return*/, _b.sent()];
-                }
-            });
         });
     };
     return Server;

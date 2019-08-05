@@ -46,8 +46,8 @@ export class EventIO {
                         {type: Actor.player, token: Token.geneToken(userId || sessionID)}
             let user: IUserWithId = null
             if (userId) {
-                const {id, mobile, name, role} = await UserModel.findById(userId)
-                user = {id, mobile, name, role}
+                const {id, mobile, name, role, headimg} = await UserModel.findById(userId)
+                user = {id, mobile, name, role, headimg}
             }
             subscribeOnConnection(Object.assign(connection, {actor, game, user}) as any)
             connection.emit(SocketEvent.connection, actor)
@@ -88,8 +88,8 @@ export class EventIO {
 
 namespace RobotIO {
     export class Server {
-        private namespaces: { [room: string]: Namespace } = {}
         daemonConnection: IpcConnection
+        private namespaces: { [room: string]: Namespace } = {}
 
         getNamespace(nsp: string): Namespace {
             if (!this.namespaces[nsp]) {

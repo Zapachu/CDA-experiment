@@ -75,6 +75,6 @@ const router = Router()
         return res.end(buffer, 'binary')
     })
 
-Server.start(namespace, Controller, resolve(__dirname, '../static'), router)
+Server.start(namespace, Controller, resolve(__dirname, '../dist'), router)
 
 RobotServer.start(namespace, Robot)

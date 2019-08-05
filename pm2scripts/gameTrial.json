@@ -1,9 +1,33 @@
 {
-  "script": "../packages/gameTrial/build/app.js",
-  "name": "gameTrial",
-  "env": {
-    "NODE_ENV": "production",
-    "PORT":3021
-  },
-  "log_date_format": "YYYY-MM-DD HH:mm Z"
+  "apps": [
+    {
+      "script": "../packages/gameTrial/build/app.js",
+      "name": "gameTrial",
+      "env": {
+        "NODE_ENV": "production",
+        "PORT": 3021
+      },
+      "log_date_format": "YYYY-MM-DD HH:mm Z"
+    },
+    {
+      "script": "../game/WithEgret/DoubleAuction/build/serve.js",
+      "name": "EgretDoubleAuction",
+      "env": {
+        "NODE_ENV": "production",
+        "BESPOKE_WITH_PROXY": "true",
+        "BESPOKE_WITH_LINKER": "true"
+      },
+      "log_date_format": "YYYY-MM-DD HH:mm Z"
+    },
+    {
+      "script": "../game/ParallelApplication/build/serve.js",
+      "name": "ParallelApplication",
+      "env": {
+        "NODE_ENV": "production",
+        "BESPOKE_WITH_PROXY": "true",
+        "BESPOKE_WITH_LINKER": "true"
+      },
+      "log_date_format": "YYYY-MM-DD HH:mm Z"
+    }
+  ]
 }

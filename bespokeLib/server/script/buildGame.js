@@ -20,7 +20,7 @@ var share_1 = require("@bespoke/share");
 var util_1 = require("@elf/util");
 var defaultPaths = {
     entry: './src/view',
-    output: './static'
+    output: './dist'
 };
 function resolvePaths(basePath, paths) {
     if (paths === void 0) { paths = defaultPaths; }

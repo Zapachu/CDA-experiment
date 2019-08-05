@@ -19,7 +19,8 @@ import cookieParser from 'cookie-parser'
 import router from './router'
 import { handleSocketInit, handleSocketPassportFailed, handleSocketPassportSuccess } from './controllers'
 
-import settings from './settings'
+import {elfSetting} from '@elf/setting'
+import config from './config'
 
 const RedisStore = connectRedis(session);
 
@@ -87,18 +88,18 @@ let onListening = () => {
 let app = express();
 
 // Database
-if (settings.mongouser) {
+if (elfSetting.mongoUser) {
   mongoose.connect(
-    settings.mongouri,
-    { user: settings.mongouser,
-      pass: settings.mongopass,
+      elfSetting.mongoUri,
+    { user: elfSetting.mongoUser,
+      pass: elfSetting.mongoPass,
       useNewUrlParser: true,
       useCreateIndex: true
     }
   );
 } else {
   mongoose.connect(
-    settings.mongouri,
+    elfSetting.mongoUri,
       {
         useNewUrlParser: true,
         useCreateIndex: true
@@ -112,8 +113,8 @@ mongoose.connection.on('error', () => {
 });
 
 const redisClient = new Redis({
-  port: settings.redisport,
-  host: settings.redishost,
+  port: elfSetting.redisPort,
+  host: elfSetting.redisHost,
 })
 
 
@@ -137,14 +138,14 @@ const sessionStore = new RedisStore({
   ttl: 60 * 24 * 60 * 30 // expire time in seconds
 })
 let sessionSet = {
-  name: settings.sessionId || 'academy.sid',
+  name: elfSetting.sessionName,
   resave: true,
   saveUninitialized: true,
-  secret: settings.sessionSecret,
+  secret: elfSetting.sessionSecret,
   store: sessionStore,
   cookie: {
     path: '/',
-    domain: process.env.NODE_ENV !== 'production' ? null : settings.domain, // TODO
+    domain: process.env.NODE_ENV !== 'production' ? null : config.domain, // TODO
     maxAge: 1000 * 60 * 24 * 7 // 24 hours
   }
 };
@@ -179,13 +180,13 @@ app.use((req, res, next) => {
 // server静态文件
 const staticPath = process.env.NODE_ENV === 'production' ? path.resolve(__dirname, '../static') : path.join(__dirname, './static')
 app.use(
-  settings.rootname + '/static',
+  config.rootname + '/static',
   express.static(staticPath, { maxAge: '10d' })
 );
 
 
 //routes
-app.use(settings.rootname || '/', router);
+app.use(config.rootname || '/', router);
 
 /**
  * Get port from environment and store in Express.
@@ -197,18 +198,17 @@ app.set('port', port);
  * Create HTTP server.
  */
 let server = http.createServer(app);
-
 const io = socket(server, {
-  path: path.join(settings.rootname, '/socket')
+  path: `${config.rootname}/socket`
 })
-io.adapter(socketRedis({ host: settings.redishost, port: settings.redisport }))
+io.adapter(socketRedis({ host: elfSetting.redisHost, port: elfSetting.redisPort }))
 // io.use(socketSession(sessionMiddleWare, {
 //   autoSave: true
 // }))
 io.use(socketPassport.authorize({
   cookieParser: cookieParser,
-  key: settings.sessionId,
-  secret: settings.sessionSecret,
+  key: elfSetting.sessionName,
+  secret: elfSetting.sessionSecret,
   store: sessionStore,
   success: handleSocketPassportSuccess,
   fail: handleSocketPassportFailed

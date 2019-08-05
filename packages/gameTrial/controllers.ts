@@ -7,15 +7,16 @@ import Redis from 'ioredis'
 
 import {User} from './models'
 import {UserDoc} from './interface'
-import settings from './settings'
+import {elfSetting} from '@elf/setting'
+import config from './config'
 import {clientSocketListenEvnets, ResCode, serverSocketListenEvents, UserGameStatus} from './enums'
 import areaCode from './config/areaCode'
 import gameConfig from './config/gameConfig'
 
 type Phase = string
 
-const ioEmitter = socketEmitter({ host: settings.redishost, port: settings.redisport })
-const redisCli = new Redis(settings.redisport, settings.redishost)
+const ioEmitter = socketEmitter({ host: elfSetting.redisHost, port: elfSetting.redisPort})
+const redisCli = new Redis(elfSetting.redisPort, elfSetting.redisHost)
 
 passport.serializeUser(function (user: UserDoc, done) {
     done(null, user._id);
@@ -59,7 +60,7 @@ class RedisTools {
         const oldData = await this.redisCli.get(key)
         const oldDataObj = oldData ? JSON.parse(oldData) : {}
         const mergeData = Object.assign(oldDataObj, data)
-        await this.redisCli.set(key, JSON.stringify(mergeData), 'EX', settings.recordExpire || 3600)
+        await this.redisCli.set(key, JSON.stringify(mergeData), 'EX', config.recordExpire || 3600)
     }
     async getUserGameData(uid: string, game: Phase): Promise<UserGameData> {
         const key = this._getUserGameKey(uid, game)
@@ -68,7 +69,7 @@ class RedisTools {
         return oldData ? JSON.parse(oldData) : null
     }
     async recordPalyerUrl(playerUrl: string, uid: string) {
-        await this.redisCli.set(this._getRecordPlayerUrlKey(playerUrl), uid, 'EX', settings.recordExpire || 3600)
+        await this.redisCli.set(this._getRecordPlayerUrlKey(playerUrl), uid, 'EX', config.recordExpire || 3600)
     }
     async getPlayerUrlRecord(playerUrl: string) {
         return await this.redisCli.get(this._getRecordPlayerUrlKey(playerUrl))
@@ -88,8 +89,8 @@ class RoomManager {
     sockerManager: SocketManager
 
     constructor(sockerManager: SocketManager) {
-        this.matchRoomLimit = settings.gameRoomSize || 10
-        this.waittingTime = settings.gameMatchTime || 10 // 秒
+        this.matchRoomLimit = config.gameRoomSize || 10
+        this.waittingTime = config.gameMatchTime || 10 // 秒
         this.matchRoomOfGame = {
         }
         this.matchRoomTimerOfGame = {}
@@ -187,7 +188,7 @@ const sockerManager = new SocketManager(redisTools);
 const roomManager = new RoomManager(sockerManager);
 
 RedisCall.handle<Trial.Done.IReq, Trial.Done.IRes>(Trial.Done.name, async ({ userId, onceMore, namespace: phase }) => {
-    let lobbyUrl = settings.lobbyUrl
+    let lobbyUrl = config.lobbyUrl
     await redisTools.setUserGameData(userId, phase, {
         status: UserGameStatus.notStarted
     })
@@ -222,8 +223,8 @@ export default class RouterController {
             areaCode,
             gameList,
             isLogin: req.isAuthenticated(),
-            rootname: settings.rootname,
-            namespace: settings.namespace
+            rootname: config.rootname,
+            namespace: config.namespace
         })
     }
 
@@ -236,8 +237,8 @@ export default class RouterController {
             areaCode,
             game,
             isLogin: req.isAuthenticated(),
-            rootname: settings.rootname,
-            namespace: settings.namespace
+            rootname: config.rootname,
+            namespace: config.namespace
         })
     }
 

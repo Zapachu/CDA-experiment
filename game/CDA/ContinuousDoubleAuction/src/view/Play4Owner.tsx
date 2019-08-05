@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import {Core} from '@bespoke/client'
-import {Lang, Button} from '@elf/component'
+import {Button, Lang} from '@elf/component'
 import {GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
 import {MoveType, phaseNames, PlayerStatus, PushType, ROLE} from '../config'
 import {TradeChart} from './phase/mainGame'
@@ -92,28 +92,17 @@ export class Play4Owner extends Core.Play4Owner<ICreateParams, IGameState, IPlay
     }
 
     renderMainGame() {
-        const {lang, props: {token, type, params, game, gameState, playerStates}, state: {timer}} = this
+        const {lang, props: {game, gameState}, state: {timer}} = this
         const {gamePhaseIndex} = gameState
-        const {positions} = game.params.phases[0].params,
-            {time2ReadInfo, durationOfEachPeriod} = game.params.phases[gamePhaseIndex].params,
+        const {time2ReadInfo, durationOfEachPeriod} = game.params.phases[gamePhaseIndex].params,
             {trades, sellOrderIds, buyOrderIds} = gameState.phases[gamePhaseIndex]
         const orderDict: { [id: number]: GameState.IOrder } = {}
         gameState.orders.forEach(order => {
             orderDict[order.id] = order
         })
-        const activePlayerState = playerStates[token]
         return <section className={style.mainGame}>
             <div className={style.marketInfo}>
                 <div className={style.orderList}>
-                    <ul><label>{lang.shoutInfo}</label>
-                        {
-                            type === MoveType.submitOrder ? <React.Fragment>
-                                <li>{lang[ROLE[positions[activePlayerState.positionIndex].role]]}：{activePlayerState.positionIndex + 1}</li>
-                                <li>{lang.unitIndex}：{params.unitIndex + 1}</li>
-                                <li>{lang.price}：{params.price}</li>
-                            </React.Fragment> : null
-                        }
-                    </ul>
                     <ul><label>{lang.buyOrders}</label>
                         {buyOrderIds.map(orderId => <li key={orderId}>{orderDict[orderId].price}</li>)}
                     </ul>

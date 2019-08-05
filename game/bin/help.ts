@@ -1,4 +1,4 @@
-import {readdirSync, readFileSync, statSync, writeFileSync} from 'fs'
+import {readdirSync, readFileSync, removeSync, statSync, writeFileSync} from 'fs-extra'
 import {resolve} from 'path'
 import {prompt, registerPrompt} from 'inquirer'
 import {env, exec} from 'shelljs'
@@ -12,7 +12,8 @@ interface Task {
 
 enum SpecialProject {
     RecentTask = 'RecentTask',
-    DistAllGame = 'DistAllGame'
+    DistAllGame = 'DistAllGame',
+    CleanAllGame = 'CleanAllGame'
 }
 
 namespace TaskHelper {
@@ -44,7 +45,7 @@ namespace TaskHelper {
 
     export function distServer(project: string) {
         execTask({
-                command: `tsc -t ES5 --downlevelIteration --experimentalDecorators --listEmittedFiles --outDir ./${project}/dist ./${project}/src/serve.ts`
+                command: `tsc -t ES5 --downlevelIteration --experimentalDecorators --listEmittedFiles --outDir ./${project}/build ./${project}/src/serve.ts`
             }
         )
     }
@@ -99,7 +100,7 @@ function getProjects(parentProject: string = '.', projectSet = new Set<string>()
             type: 'autocomplete',
             message: `Project(${projects.length}):`,
             source: (_, input = ''): Promise<string[]> => Promise.resolve(input == ' ' ?
-                [SpecialProject.RecentTask, SpecialProject.DistAllGame] :
+                Object.values(SpecialProject) :
                 projects.filter(p => input.toLowerCase().split(' ').every(s => p.toLowerCase().includes(s))))
         } as any
     ]))
@@ -123,6 +124,17 @@ function getProjects(parentProject: string = '.', projectSet = new Set<string>()
             TaskHelper.distClient(project)
             TaskHelper.distServer(project)
         })
+        return
+    }
+    if (project === SpecialProject.CleanAllGame) {
+        projects.forEach(project => {
+            if (Object.values(SpecialProject).includes(project)) {
+                return
+            }
+            removeSync(resolve(__dirname, `../${project}/dist`))
+            removeSync(resolve(__dirname, `../${project}/build`))
+        })
+        return
     }
     const {side} = (await prompt<{ side: Side }>([
         {
@@ -213,7 +225,7 @@ function getProjects(parentProject: string = '.', projectSet = new Set<string>()
                             BESPOKE_WITH_LINKER: withLinker,
                             NODE_ENV: 'production'
                         },
-                        command: `node ./${project}/dist/serve.js`
+                        command: `node ./${project}/build/serve.js`
                     })
                     break
                 }

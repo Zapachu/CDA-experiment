@@ -10,6 +10,7 @@ export interface IUser {
     mobile: string
     role: AcademusRole
     name: string
+    headimg: string
 }
 
 export interface IUserWithId extends IUser {

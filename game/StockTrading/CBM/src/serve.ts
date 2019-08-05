@@ -7,7 +7,7 @@ import {Phase, phaseToNamespace} from '@bespoke-game/stock-trading-config'
 import {Trial} from '@elf/protocol'
 import {RobotServer} from '@bespoke/robot'
 
-Server.start(namespace, Controller, resolve(__dirname, '../static'))
+Server.start(namespace, Controller, resolve(__dirname, '../dist'))
 
 RobotServer.start(namespace, Robot)
 
