@@ -272,6 +272,10 @@ export default class Controller extends BaseController<ICreateParams,
         gameState = await this.stateManager.getGameState(),
         playerStates = await this.stateManager.getPlayerStates()
     switch (type) {
+      case MoveType.guideDone: {
+        playerState.playerStatus = PlayerStatus.test
+        break
+      }
       case MoveType.getIndex: {
         if (playerState.index !== undefined || gameState.playerNum === groupSize) {
           break

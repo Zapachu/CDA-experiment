@@ -15,6 +15,7 @@ import {
     StockInfo,
     TableInfo
 } from '@bespoke-game/stock-trading-component'
+import {Input as AntInput, Radio} from 'antd'
 
 enum ModalType {
     None,
@@ -221,7 +222,8 @@ export class Play extends Core.Play<ICreateParams,
 
     renderPrepared = (
         investorState: Partial<IPlayerState>,
-        marketState: Partial<IGameState>
+        marketState: Partial<IGameState>,
+        guide?: boolean
     ) => {
         const {lang} = this
         const {
@@ -236,24 +238,66 @@ export class Play extends Core.Play<ICreateParams,
                     spotlight: {
                         border: '2px dashed #71ff7b',
                         borderRadius: '1.5rem'
+                    },
+                    tooltip: {
+                        width: '32rem',
+                        fontSize: '1rem'
                     }
+
                 },
                 disableBeacon: true
             },
-            steps = [
+            steps: Array<Step> = [
                 {
                     target: `.${style.stockInfoWrapper}`,
-                    content: '您可以在这里查看您资产组合中的股票数量和资金数目',
+                    content: <section className={style.guideContent}>
+                        <div>
+                            <h4>小知识</h4>
+                            <p>股票名称是从公司全称中精选2至4个字。股票代码是沪深两地证券交易所给上市股票分配的数字代码，主要通过前三位数字来反应该股所属板块。一个公司的股票代码跟车牌号差不多，能够显示出这个公司的实力以及知名度。
+                                股票代码的分类：
+                                <br/>创业板的代码是<em>300</em>打头的股票代码；
+                                <br/>沪市A股的代码是以<em>600</em>、<em>601</em>或<em>603</em>打头；
+                                <br/>深市A股的代码时以<em>000</em>打头；
+                                <br/>中小板的代码时<em>002</em>打头；
+                                <br/>沪市B股的代码是以<em>900</em>打头；
+                                <br/>深圳B股的代码是以<em>200</em>打头；
+                            </p>
+                            <h4>特别提醒</h4>
+                            <p>沪市新股申购的代码是以730打头，深市新股申购的代码与深市股票买卖代码一样；配股代码，沪市以700打头，深市以080打头；权证，沪市时580打头，深市时031打头。
+                                股票前面的字母含义：
+                                <br/><em>XR</em>：除权，购买该股后不再享有分红权利；
+                                <br/><em>XD</em>：除息，购买该股后不再有派息权利；
+                                <br/><em>DR</em>：除权除息，购买该股票后不再有送股派息的权利；
+                                <br/><em>NEW</em>：新股上市首日；
+                                <br/><em>ST</em>：亏损股，连续两个会计年度偶读亏损的公司；
+                                <br/><em>*ST</em>：退市风险，连续三年亏损，有退市风险；
+                                <br/><em>S*ST</em>：退市预警，连续三年亏损，退市预警。
+                            </p>
+                        </div>
+                    </section>,
                     ...stepProps
                 },
                 {
                     target: `.${style.privateValue}`,
-                    content: '您可以在这里查看您的股票交易记录',
+                    content: <section className={style.guideContent}>
+                        <br/>股票估值分为绝对估值、相对估值和联合估值。
+                        <br/>绝对估值是通过对上市公司历史及当前的基本面的分析和对未来反映公司经营状况的财务数据的预测获得上市公司股票的内在价值。
+                        <h4>绝对估值的方法</h4>
+                        一是现金流贴现定价模型，二是B-S期权定价模型（主要应用于期权定价、权证定价等）。现金流贴现定价模型目前使用最多的是DDM和DCF，而DCF估值模型中，最广泛应用的就是FCFE股权自由现金流模型。
+                        <h4>相对估值的方法</h4>
+                        相对估值是使用市盈率、市净率、市售率、市现率等价格指标与其它多只股票（对比系）进行对比，如果低于对比系的相应的指标值的平均值，股票价格被低估，股价将很有希望上涨，使得指标回归对比系的平均值。
+                        <br/>相对估值包括PE、PB、PEG、EV/EBITDA等估值法。通常的做法是对比，一个是和该公司历史数据进行对比，二是和国内同行业企业的数据进行对比，确定它的位置，三是和国际上的（特别是香港和美国）同行业重点企业数据进行对比。
+                        <br/>市盈率PE=股价/每股收益=p/e，其核心在于e的确定，e的变动往往取决于宏观经济和企业的生存周期所决定的波动周期。
+                        <h4>联合估值的方法</h4>
+                        联合估值是结合绝对估值和相对估值，寻找同时股价和相对指标都被低估的股票，这种股票的价格最有希望上涨。
+                    </section>,
                     ...stepProps
                 },
                 {
                     target: `.${style.inputWrapper}`,
-                    content: '您可以在这里查看已经提交的买家报价和卖家报价。买单和卖单分别排队，买单以价格从高到低排列，卖单以价格从低到高排列。同价的，按进入系统的先后排列。系统按照顺序将排在前面的买单和卖单配对成交，即按“价格优先，同等价格下时间优先”的顺序依次成交在，直到不能成交为止，未成交的委托排队等待成交。',
+                    content: <section className={style.guideContent}>
+                        您的买入价格需在您们公司对股票的估值和股票的最低保留价格之间。当您输入您的购买价格后，系统会自动根据您的初始资金计算并显示您可购买的股票数量。当您输入购买价格点击半仓后，购买的股票数量为您最多可购买数量的一半；当您点击全仓时，购买的股票数量为您最多可购买数量。
+                    </section>,
                     styles: {
                         tooltip: {
                             width: '50vw',
@@ -263,51 +307,50 @@ export class Play extends Core.Play<ICreateParams,
                     ...stepProps
                 },
                 {
-                    target: `.${style.subLabel}`,
-                    content: '您可以在这里查看当前的交易期数和剩余交易时间，您需在规定的时间内完成交易。',
+                    target: `.${style.leftBtn}`,
+                    content: '您可以在这里回顾交易规则。',
                     ...stepProps
                 },
                 {
-                    target: `.${style.orderInputWrapper}`,
-                    content: '您可以在这里提交您的卖单和卖单。买入申报价高于即时揭示最低卖价，以最低申报卖价成交；卖出申报价低于最高买入价，以最高买入价成交。两个委托如果不能全部成交，剩余的继续留在单上，等待下次成交。系统处理原则为价格优先和时间优先两个原则。',
+                    target: `.${style.shoutTimer}`,
+                    content: '您需在规定的时间内完成交易，您可以在这里查看剩余的交易时间。',
                     ...stepProps
                 },
                 {
-                    target: `.${style.marketHistory}`,
-                    content: '您可以在这里查看已经成交的股票的成交价格。',
+                    target: `.${style.startPrice}`,
+                    content: '您在这个询价中所能使用的资金总数，您的购买决策受到资金数量的限制。',
                     ...stepProps
                 }
             ]
         return <>
-            <Joyride
-                callback={({action}) => {
-                    console.log(action)
-                    if (action == 'update') {
-                        // setStepIndex(stepIndex + 1)
-                    }
-                    if (action == 'reset') {
-                        frameEmitter.emit(MoveType.getIndex)
-                    }
-                }}
-                continuous
-                showProgress
-                hideBackButton
-                disableOverlayClose
-                steps={steps}
-                locale={{
-                    next: lang.gotIt,
-                    last: lang.gotIt
-                }}
-                styles={{
-                    options: {
-                        arrowColor: 'rgba(30,39,82,.8)',
-                        backgroundColor: 'rgba(30,39,82,.8)',
-                        overlayColor: '#1d1d32',
-                        primaryColor: '#13553e',
-                        textColor: '#fff'
-                    }
-                }}
-            />
+            {
+                guide ?
+                    <Joyride
+                        callback={({action}) => {
+                            if (action == 'reset') {
+                                frameEmitter.emit(MoveType.guideDone)
+                            }
+                        }}
+                        continuous
+                        showProgress
+                        hideBackButton
+                        disableOverlayClose
+                        steps={steps}
+                        locale={{
+                            next: lang.gotIt,
+                            last: lang.gotIt
+                        }}
+                        styles={{
+                            options: {
+                                arrowColor: 'rgba(30,39,82,.8)',
+                                backgroundColor: 'rgba(30,39,82,.8)',
+                                overlayColor: '#1d1d32',
+                                primaryColor: '#13553e',
+                                textColor: '#fff'
+                            }
+                        }}
+                    /> : null
+            }
             <div className={style.leftBtn}>
                 <Button
                     label={'交易规则回顾'}
@@ -329,56 +372,52 @@ export class Play extends Core.Play<ICreateParams,
                 <span style={{color: 'orange'}}>{marketState.min}</span>
             </p>
             <div className={style.inputWrapper}>
-                TODO
-            </div>
-            <div className={style.inputContainer}>
-                <div>
-                    <Input
-                        value={price}
-                        onChange={val => this.setState({price: '' + val})}
-                        placeholder={'价格'}
-                        onMinus={val => this.setState({price: '' + (+val - 1)})}
-                        onPlus={val => this.setState({price: '' + (+val + 1)})}
-                    />
-                    <p
-                        style={{fontSize: '12px', marginTop: '5px', marginLeft: '45px'}}
-                    >
-                        可买
-                        <span style={{color: 'orange'}}>
+                <div className={style.inputContainer}>
+                    <div>
+                        <Input
+                            value={price}
+                            onChange={val => this.setState({price: '' + val})}
+                            placeholder={'价格'}
+                            onMinus={val => this.setState({price: '' + (+val - 1)})}
+                            onPlus={val => this.setState({price: '' + (+val + 1)})}
+                        />
+                        <p
+                            style={{fontSize: '12px', marginTop: '5px', marginLeft: '45px'}}
+                        >
+                            可买
+                            <span style={{color: 'orange'}}>
                 {+price
                     ? Math.floor(investorState.startingPrice / +price)
                     : ' '}
               </span>
-                        股
-                    </p>
+                            股
+                        </p>
+                    </div>
                 </div>
-            </div>
-            <div className={style.inputContainer}>
-                <div>
-                    <Input
-                        value={num}
-                        onChange={val => this.setState({num: '' + val})}
-                        placeholder={'数量'}
-                        onMinus={val => this.setState({num: '' + (+val - 1)})}
-                        onPlus={val => this.setState({num: '' + (+val + 1)})}
-                    />
-                    <p
-                        style={{
+                <div className={style.inputContainer}>
+                    <div>
+                        <Input
+                            value={num}
+                            onChange={val => this.setState({num: '' + val})}
+                            placeholder={'数量'}
+                            onMinus={val => this.setState({num: '' + (+val - 1)})}
+                            onPlus={val => this.setState({num: '' + (+val + 1)})}
+                        />
+                        <p style={{
                             fontSize: '12px',
                             display: 'flex',
                             justifyContent: 'space-between',
                             alignItems: 'center',
                             marginTop: '5px',
                             marginLeft: '45px'
-                        }}
-                    >
+                        }}>
               <span>
                 总花费
                 <span style={{color: 'orange'}}>
                   {+price && +num ? (+price * +num).toFixed(2) : ' '}
                 </span>
               </span>
-                        <span>
+                            <span>
                 <span
                     className={style.operation}
                     onClick={() =>
@@ -394,7 +433,8 @@ export class Play extends Core.Play<ICreateParams,
                   全仓
                 </span>
               </span>
-                    </p>
+                        </p>
+                    </div>
                 </div>
             </div>
             <Button
@@ -421,13 +461,11 @@ export class Play extends Core.Play<ICreateParams,
                     )
                 }}
             />
-            {shoutTimer !== null ? (
-                <p style={{marginBottom: '20px', textAlign: 'center'}}>
-                    {SHOUT_TIMER - shoutTimer} S
-                </p>
-            ) : null}
+            <p style={{marginBottom: '20px', textAlign: 'center'}} className={style.shoutTimer}>
+                {SHOUT_TIMER - shoutTimer} S
+            </p>
             <ListItem width={200} style={{marginBottom: '10px'}}>
-                <p style={{color: 'orange'}} className={style.item}>
+                <p style={{color: 'orange'}} className={style.startPrice}>
                     初始资金: {investorState.startingPrice}
                 </p>
             </ListItem>
@@ -535,27 +573,33 @@ export class Play extends Core.Play<ICreateParams,
         investorState = playerState
         let content
         switch (playerState.playerStatus) {
+            case PlayerStatus.test: {
+                content = <Test done={() => frameEmitter.emit(MoveType.getIndex)}/>
+                break
+            }
             case PlayerStatus.shouted: {
-                content = (
-                    <>
-                        <StockInfo
-                            stockIndex={marketState.stockIndex}
-                            style={{marginTop: '15vh', marginBottom: '100px'}}
-                        />
-                        <div
-                            style={{width: '200px', margin: 'auto', textAlign: 'center'}}
-                        >
-                            <Loading label={'等待其他玩家'}/>
-                        </div>
-                    </>
-                )
+                content = <>
+                    <StockInfo
+                        stockIndex={marketState.stockIndex}
+                        style={{marginTop: '15vh', marginBottom: '100px'}}
+                    />
+                    <div
+                        style={{width: '200px', margin: 'auto', textAlign: 'center'}}
+                    >
+                        <Loading label={'等待其他玩家'}/>
+                    </div>
+                </>
                 break
             }
             case PlayerStatus.result: {
                 content = this.renderResult(investorState, marketState)
                 break
             }
-            default: {
+            case PlayerStatus.guide: {
+                content = this.renderPrepared(investorState, marketState, true)
+                break
+            }
+            case PlayerStatus.prepared: {
                 content = this.renderPrepared(investorState, marketState)
                 break
             }
@@ -570,4 +614,177 @@ export class Play extends Core.Play<ICreateParams,
             </div>
         </section>
     }
+}
+
+function Test({done}: { done: () => void }) {
+    const lang = Lang.extractLang({
+        confirm: ['确定', 'CONFIRM']
+    })
+    const [choseA, setChoseA] = React.useState(0),
+        [choseB, setChoseB] = React.useState(0),
+        [choseC, setChoseC] = React.useState(0),
+        [inputA, setInputA] = React.useState(''),
+        [inputB, setInputB] = React.useState([] as Array<string>),
+        [inputC, setInputC] = React.useState([] as Array<string>),
+        [inputD, setInputD] = React.useState([] as Array<string>),
+        [showAnswer, setShowAnswer] = React.useState(false)
+    const inputStyle = {width: '5rem', margin: '2px .5rem'}
+    return <section className={style.test}>
+        <div className={style.title}>{'知识点测试'}</div>
+        <ul className={`${style.questions} ${showAnswer ? style.showAnswer : ''}`}>
+            <li className={style.radioQuestion}>
+                <p>1. 如图所示，浦发银行的股票代码是600000，则浦发银行是</p>
+                <img style={{width: '32rem', margin: '1rem'}} src={require('./asset/testImg.png')}/>
+                <Radio.Group style={{margin: '.5rem'}} onChange={({target: {value}}) => setChoseA(+value)}
+                             value={choseA}>
+                    <Radio value={1}>A. 沪市A股</Radio>
+                    <Radio value={2}>B. 深市B股</Radio>
+                    <Radio value={3}>C. 创业版</Radio>
+                    <Radio value={4}>D. 中小板</Radio>
+                </Radio.Group>
+                <p className={style.answer}>正确答案：A</p>
+            </li>
+            <li>
+                <p>2.一个股本1亿股的公司，如果今年预计利润为2亿元，其每股收益EPS=2亿/1亿=2元。如果目前股价为40元，则其市盈率：PE=<AntInput style={inputStyle}
+                                                                                             value={inputA}
+                                                                                             onChange={({target: {value}}) => setInputA(value)}/>
+                </p>
+                <p className={style.answer}>解析：市盈率=股价/每股收益=40/2=20</p>
+            </li>
+            <li>
+                <p>3. 当您们公司对股票的估值为49 元，股票的保留价格为33元是，则您的最高购买价格为
+                    <AntInput style={inputStyle} value={inputB[0]}
+                              onChange={({target: {value}}) => {
+                                  const _inputB = inputB.slice()
+                                  _inputB[0] = value
+                                  setInputB(_inputB)
+                              }}/>元，最低购买价格为<AntInput style={inputStyle} value={inputB[1]}
+                                                     onChange={({target: {value}}) => {
+                                                         const _inputB = inputB.slice()
+                                                         _inputB[1] = value
+                                                         setInputB(_inputB)
+                                                     }}/>元；如若您输入购买价格后，系统显示您可以买2000股，则当您点击半仓时，您的购买数量为
+                    <AntInput style={inputStyle} value={inputB[2]}
+                              onChange={({target: {value}}) => {
+                                  const _inputB = inputB.slice()
+                                  _inputB[2] = value
+                                  setInputB(_inputB)
+                              }}/>股，当您点击全仓时，您的购买数量为<AntInput style={inputStyle} value={inputB[3]}
+                                                             onChange={({target: {value}}) => {
+                                                                 const _inputB = inputB.slice()
+                                                                 _inputB[3] = value
+                                                                 setInputB(_inputB)
+                                                             }}/>股。</p>
+                <p className={style.answer}>正确答案：49；33；1000；2000</p>
+            </li>
+            <li>
+                <p>4. 市场上有10000股股票。您的拟购买价格和拟购买数量是105元和4000股。市场上其他参与者的拟购买价格和拟购买数量如下：交易者A给出的拟购买价格和拟购买数量分布为99元和5000股，交易者B给出的拟购买价格和购买数量为100元和6000股，交易者C给出的拟购买价格和购买数量为102元和3000股，交易者D给出的拟购买价格和购买数量为96元和3000股
+                    系统按照购买价格的由高到低进行排序：
+                    <br/>您：105元——4000股
+                    <br/>C: 102元——3000股
+                    <br/>B：100元——6000股
+                    <br/>A：99元——5000股
+                    <br/>D：96元——3000股</p>
+                <p>整个市场的拟购买总股数为21000，第10000股价格为100元，则成交价格为<AntInput style={inputStyle} value={inputC[0]}
+                                                                    onChange={({target: {value}}) => {
+                                                                        const _inputC = inputC.slice()
+                                                                        _inputC[0] = value
+                                                                        setInputC(_inputC)
+                                                                    }}/>元。
+                    <br/>A的成交数量：<AntInput style={inputStyle} value={inputC[1]}
+                                          onChange={({target: {value}}) => {
+                                              const _inputC = inputC.slice()
+                                              _inputC[1] = value
+                                              setInputC(_inputC)
+                                          }}/>股；
+                    <br/>B的成交数量：<AntInput style={inputStyle} value={inputC[2]}
+                                          onChange={({target: {value}}) => {
+                                              const _inputC = inputC.slice()
+                                              _inputC[2] = value
+                                              setInputC(_inputC)
+                                          }}/>股；
+                    <br/>C的成交数量：<AntInput style={inputStyle}
+                                          value={inputC[3]}
+                                          onChange={({target: {value}}) => {
+                                              const _inputC = inputC.slice()
+                                              _inputC[3] = value
+                                              setInputC(_inputC)
+                                          }}/>股；
+                    <br/>D的成交数量：<AntInput
+                        style={inputStyle} value={inputC[4]}
+                        onChange={({target: {value}}) => {
+                            const _inputC = inputC.slice()
+                            _inputC[4] = value
+                            setInputC(_inputC)
+                        }}/>股；
+                    <br/>您的成交数量：<AntInput style={inputStyle} value={inputC[5]}
+                                          onChange={({target: {value}}) => {
+                                              const _inputC = inputC.slice()
+                                              _inputC[5] = value
+                                              setInputC(_inputC)
+                                          }}/>股。</p>
+                <p className={style.answer}>整个市场的拟购买总股数为21000，第10000股价格为100元，则成交价格即为第10000股股票对应的价格：100元。
+                    您、C、B都有购买这1万股股票的权利。按照价格排序后，您的成交数量为
+                    4000股，C成交数量为3000股，市场上还剩3000股股票。虽然B的拟购买数量为6000股，但是此时市面上只剩3000股，因此B的成交数量为3000股。A和D的购买价格小于股票的成交价格，成交数量为0股。
+                </p>
+            </li>
+            <li>
+                <p>4. 市场上有10000股股票。您的拟购买价格和拟购买数量是48元和4000股。市场上其他参与者的拟购买价格和拟购买数量如下：交易者A给出的拟购买价格和拟购买数量分布为35元和5000股，交易者B给出的拟购买价格和购买数量为50元和7000股，交易者C给出的拟购买价格和购买数量为44元和3000股，交易者D给出的拟购买价格和购买数量为39元和3000股。
+                    系统按照购买价格的由高到低进行排序：
+                    <br/>B：50元——7000股
+                    <br/>您:  48元——4000股
+                    <br/>C：44元——3000股
+                    <br/>D：39元——3000股
+                    <br/>A：35元——5000股</p>
+                <p>整个市场的拟购买总股数为22000，第10000股价格为48元，则成交价格为<AntInput style={inputStyle} value={inputD[0]}
+                                                                    onChange={({target: {value}}) => {
+                                                                        const _inputD = inputD.slice()
+                                                                        _inputD[0] = value
+                                                                        setInputD(_inputD)
+                                                                    }}/>元。
+                    <br/>A的成交数量：<AntInput style={inputStyle} value={inputD[1]}
+                                          onChange={({target: {value}}) => {
+                                              const _inputD = inputD.slice()
+                                              _inputD[1] = value
+                                              setInputD(_inputD)
+                                          }}/>股；
+                    <br/>B的成交数量：<AntInput style={inputStyle} value={inputD[2]}
+                                          onChange={({target: {value}}) => {
+                                              const _inputD = inputD.slice()
+                                              _inputD[2] = value
+                                              setInputD(_inputD)
+                                          }}/>股；
+                    <br/>C的成交数量：<AntInput style={inputStyle}
+                                          value={inputD[3]}
+                                          onChange={({target: {value}}) => {
+                                              const _inputD = inputD.slice()
+                                              _inputD[3] = value
+                                              setInputD(_inputD)
+                                          }}/>股；
+                    <br/>D的成交数量：<AntInput
+                        style={inputStyle} value={inputD[4]}
+                        onChange={({target: {value}}) => {
+                            const _inputD = inputD.slice()
+                            _inputD[4] = value
+                            setInputD(_inputD)
+                        }}/>股；
+                    <br/>您的成交数量：<AntInput style={inputStyle} value={inputD[5]}
+                                          onChange={({target: {value}}) => {
+                                              const _inputD = inputD.slice()
+                                              _inputD[5] = value
+                                              setInputD(_inputD)
+                                          }}/>股。</p>
+                <p className={style.answer}>整个市场的拟购买总股数为22000，第10000股价格为48元，则成交价格即为第10000股股票对应的价格：48元。
+                    B、您都有购买这1万股股票的权利。按照价格排序后，B的成交数量为 7000股，市场上还剩3000股股票。虽然您的拟购买数量为4000股，但是此时市面上只剩3000股，因此您的成交数量为3000股。C、A和D的购买价格小于股票的成交价格，成交数量为0股。
+                </p>
+            </li>
+        </ul>
+        <Button label={lang.confirm} onClick={() => {
+            if (choseA == 1 && choseB == 3 && choseC == 3 && inputA == '9.96' && inputB[0] == '50') {
+                done()
+            } else {
+                setShowAnswer(true)
+            }
+        }}/>
+    </section>
 }
