@@ -28,6 +28,16 @@
         "BESPOKE_WITH_LINKER": "true"
       },
       "log_date_format": "YYYY-MM-DD HH:mm Z"
+    },
+    {
+      "script": "../game/GarbageSorting/build/serve.js",
+      "name": "GarbageSorting",
+      "env": {
+        "NODE_ENV": "production",
+        "BESPOKE_WITH_PROXY": "true",
+        "BESPOKE_WITH_LINKER": "true"
+      },
+      "log_date_format": "YYYY-MM-DD HH:mm Z"
     }
   ]
 }
