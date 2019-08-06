@@ -16,5 +16,13 @@ export default {
     coverImg: `${config.rootname}/static/parallel_application_cover.png`,
     desc:
       "平行志愿是高考志愿的一种新的投档录取模式。所谓平行志愿，即一个志愿中包含若干所平行的院校。是指考生在填报高考志愿时，可在指定的批次同时填报若干个平行院校志愿。录取时，按照“分数优先，遵循志愿”的原则进行投档，对同一科类分数线上未被录取的考生按总分从高到低排序进行一次性投档，即所有考生排一个队列，高分者优先投档。每个考生投档时，根据考生所填报的院校顺序，投档到排序在前且有计划余额的院校。"
+  },
+  GarbageSorting: {
+    img: `${config.rootname}/static/garbage_sorting_cover.png`,
+    name: "垃圾分类",
+    nameEn: "Garbage Sorting",
+    coverImg: `${config.rootname}/static/garbage_sorting_cover.png`,
+    desc:
+        ""
   }
 };
