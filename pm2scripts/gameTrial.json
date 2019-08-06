@@ -14,8 +14,7 @@
       "name": "EgretDoubleAuction",
       "env": {
         "NODE_ENV": "production",
-        "BESPOKE_WITH_PROXY": "true",
-        "BESPOKE_WITH_LINKER": "true"
+        "BESPOKE_WITH_PROXY": "true"
       },
       "log_date_format": "YYYY-MM-DD HH:mm Z"
     },
@@ -24,8 +23,7 @@
       "name": "ParallelApplication",
       "env": {
         "NODE_ENV": "production",
-        "BESPOKE_WITH_PROXY": "true",
-        "BESPOKE_WITH_LINKER": "true"
+        "BESPOKE_WITH_PROXY": "true"
       },
       "log_date_format": "YYYY-MM-DD HH:mm Z"
     },
@@ -34,8 +32,7 @@
       "name": "GarbageSorting",
       "env": {
         "NODE_ENV": "production",
-        "BESPOKE_WITH_PROXY": "true",
-        "BESPOKE_WITH_LINKER": "true"
+        "BESPOKE_WITH_PROXY": "true"
       },
       "log_date_format": "YYYY-MM-DD HH:mm Z"
     }
