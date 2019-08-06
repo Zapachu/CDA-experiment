@@ -12,13 +12,15 @@ export default class extends BaseRobot<ICreateParams,
     IPushParams> {
   async init(): Promise<this> {
     await super.init()
-    this.frameEmitter.on(PushType.robotShout, ({min, max, startingPrice}) => {
-      const {price, bidNum} = this.genPriceAndNum(min, max, startingPrice)
-      this.frameEmitter.emit(MoveType.shout, {price, num: bidNum})
-    })
+    setTimeout(() => this.frameEmitter.emit(MoveType.getIndex), 1e3)
     setTimeout(() => {
-      this.frameEmitter.emit(MoveType.getIndex)
-    }, 1100)
+      if (!this.playerState) {
+        return
+      }
+      const {startingPrice, privateValue} = this.playerState, {min} = this.gameState
+      const {price, bidNum} = this.genPriceAndNum(min, privateValue, startingPrice)
+      this.frameEmitter.emit(MoveType.shout, {price, num: bidNum})
+    }, 3e3 * Math.random() + 2e3)
     return this
   }
 

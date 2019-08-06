@@ -1,4 +1,4 @@
-import {BaseController, IActor, IMoveCallback, RedisCall, TGameState, TPlayerState} from '@bespoke/server'
+import {BaseController, IActor, IMoveCallback, Log, RedisCall, TGameState, TPlayerState} from '@bespoke/server'
 import {
   ICreateParams,
   IGameState,
@@ -88,38 +88,23 @@ export default class Controller extends BaseController<ICreateParams,
     const gameState = super.initGameState()
     const max = formatDigits(genRandomInt(minA * 100, maxA * 100) / 100),
         min = formatDigits((max * genRandomInt(minB * 100, maxB * 100)) / 100)
-    const stockIndex = genRandomInt(0, STOCKS.length - 1)
+    gameState.playerNum = 0
     gameState.min = min
     gameState.max = max
-    gameState.stockIndex = stockIndex
+    gameState.stockIndex = genRandomInt(0, STOCKS.length - 1)
     return gameState
   }
 
   async initPlayerState(actor: IActor): Promise<TPlayerState<IPlayerState>> {
     const gameState = await this.stateManager.getGameState()
     const playerState = await super.initPlayerState(actor)
-    playerState.playerStatus = PlayerStatus.intro
+    playerState.playerStatus = PlayerStatus.guide
     playerState.privateValue = formatDigits(genRandomInt(gameState.min * 100, gameState.max * 100) / 100)
     playerState.startingPrice = Controller.genStartingPrice(gameState.min)
     return playerState
   }
 
   async startTrade() {
-    const gameState = await this.stateManager.getGameState(),
-        playerStates = await this.stateManager.getPlayerStates()
-    await this.startShoutTicking()
-    Object.values(playerStates).forEach((playerState, i) => {
-      setTimeout(() => {
-        this.push(playerState.actor, PushType.robotShout, {
-          min: gameState.min,
-          max: playerState.privateValue,
-          startingPrice: playerState.startingPrice
-        })
-      }, 600 * (i + 1))
-    })
-  }
-
-  async startShoutTicking() {
     const gameState = await this.stateManager.getGameState()
     global.setTimeout(() => {
       const shoutIntervals = this.shoutInterval
@@ -293,49 +278,48 @@ export default class Controller extends BaseController<ICreateParams,
         }
         playerState.index = gameState.playerNum++
         playerState.playerStatus = PlayerStatus.prepared
-        if (gameState.playerNum === groupSize) {
-          await this.startTrade()
+        if (playerState.index === 0) {
+          global.setTimeout(async () => {
+            if (gameState.playerNum < groupSize) {
+              Array(groupSize - gameState.playerNum).fill(null).forEach(async (_, i) => {
+                await this.startRobot(i)
+              })
+            }
+            await this.startTrade()
+          }, 5e3)
         }
         break
       }
       case MoveType.shout: {
-        const playerStatus = playerState.playerStatus
-        if (playerStatus !== PlayerStatus.prepared) {
+        if (playerState.playerStatus !== PlayerStatus.prepared) {
           return
         }
-        let group: IGameState
-        const {privateValue, startingPrice} = playerState
-        group = gameState
-        const {min} = group
-        let errMsg
-        if (
-            (errMsg = Controller.invalidParams(
-                params,
-                privateValue,
-                min,
-                startingPrice
-            ))
-        ) {
+        const {privateValue, startingPrice} = playerState,
+            {min} = gameState
+        const errMsg = Controller.invalidParams(
+            params,
+            privateValue,
+            min,
+            startingPrice
+        )
+        if (errMsg) {
           return cb(errMsg)
         }
         playerState.playerStatus = PlayerStatus.shouted
         playerState.price = params.price
         playerState.bidNum = params.num
-        const groupPlayerStates = Object.values(playerStates)
+        const playerStatesArr = Object.values(playerStates)
         if (
-            !groupPlayerStates.every(s => s.playerStatus === PlayerStatus.shouted)
+            !playerStatesArr.every(s => s.playerStatus === PlayerStatus.shouted)
         ) {
           return
         }
-        const investorStates = groupPlayerStates
-        const marketState = group
-
         setTimeout(async () => {
           this.processProfits(
-              investorStates as Array<InvestorState>,
-              marketState as MarketState
+              playerStatesArr as Array<InvestorState>,
+              gameState as MarketState
           )
-          groupPlayerStates.forEach(
+          playerStatesArr.forEach(
               s => (s.playerStatus = PlayerStatus.result)
           )
           await this.stateManager.syncState()

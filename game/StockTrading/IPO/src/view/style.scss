@@ -5,107 +5,99 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+
   .fields {
-    >li {
+    > li {
       display: flex;
       margin-bottom: .5rem;
     }
   }
+
   .params {
     margin-top: 1rem;
   }
 }
 
-.play4Owner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  .resultTable {
-    border-collapse: separate;
-    width: 100%;
-    max-width: 500px;
-    margin: 1rem 0;
-    td {
-      text-align: center;
-    }
-  }
-  .exportBtn {
-    flex: 100%;
-    margin: .5rem;
-    color: $color-blue;
-    text-align: center;
-    transition: $transition-normal;
-    margin-top: 20px;
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-}
-
-.result {
+.play {
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(#293567, #151b35);
   text-align: center;
-  p {
-    margin: 20px 0;
-  }
-}
 
-.result4Owner {
-  margin: 1rem 2rem;
-  .timeLine {
-    margin: 1rem;
+  .playContent {
+    max-width: 800px;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    label {
-      font-size: .8 * $fontSize-small;
-      color: rgba($color-black, .8);
+    margin: auto;
+
+    p,
+    td {
+      color: #dde1e9;
     }
-    input {
-      margin: .5rem;
-      min-width: 24rem;
+
+    .inputContainer {
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: center;
     }
-    .paramsLabel {
-      display: inline-block;
-      height: 1rem;
-      font-size: .8 * $fontSize-small;
-      color: rgba($color-black, .8);
-    }
-  }
-  .resultWrapper {
-    display: flex;
-    .resultTable {
-      tr {
-        td {
-          min-width: 5rem;
-          padding: .5rem;
-          text-align: center;
-        }
-        &:nth-child(even) {
-          background: rgba($color-black, .05);
-        }
+
+    .modalIpo {
+      padding: 30px;
+
+      > .title {
+        text-align: center;
       }
     }
-    .exportWrapper {
-      margin-left: 2rem;
+
+    .operation {
+      padding: 1px 8px 1px 8px;
+      border: 1px solid transparent;
+      border-radius: 30%;
+      background-color: #11234C;
+      color: #65749C;
+      font-size: 11px;
+      cursor: pointer;
+
+      &:first-child {
+        margin-right: 5px;
+      }
+    }
+
+    .leftBtn {
+      position: fixed;
+      right: 15vw;
+      top: 48vh;
+    }
+
+    .rightBtn {
+      position: fixed;
+      right: 15vw;
+      top: 55vh;
+    }
+
+    .stockInfoWrapper{
+        margin: 15vh 1rem 1rem;
+    }
+
+    .privateValue{
+        display: inline-block;
+    }
+
+    .inputWrapper{
       display: flex;
       flex-direction: column;
-      align-items: center;
-      border-left: 1px solid rgba($color-black, .1);
-      label {
-        margin: .5rem;
-        font-size: .8 * $fontSize-small;
-        color: rgba($color-black, .8);
+    }
+
+    @media (max-width: $layout-mediaWidth) {
+      .leftBtn {
+        top: 10px;
+        right: 55vw;
       }
-      a {
-        display: inline-block;
-        margin: .5rem;
-        font-size: $fontSize-middle;
-        color: $color-blue;
-        text-align: center;
-        transition: $transition-normal;
-        &:hover {
-          text-decoration: underline;
-        }
+
+      .rightBtn {
+        top: 10px;
+        right: 10vw;
       }
     }
   }
