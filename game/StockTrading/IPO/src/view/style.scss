@@ -140,7 +140,7 @@ $color-light: rgba(white, .8);
     li{
       margin: 2rem;
       .answer{
-        height: 1rem;
+        max-height: 1rem;
         color: $color-green!important;
         opacity: 0;
         transition: $transition-normal;
@@ -151,6 +151,7 @@ $color-light: rgba(white, .8);
     }
     &.showAnswer .answer{
       opacity: 1;
+      max-height: 16rem;
     }
   }
 }
