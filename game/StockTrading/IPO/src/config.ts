@@ -1,8 +1,9 @@
 export const namespace = 'IPO'
 
 export enum MoveType {
-    shout = 'shout',
+    guideDone = 'guideDone',
     getIndex = 'getIndex',
+    shout = 'shout',
     nextGame = 'nextGame'
 }
 
@@ -12,6 +13,7 @@ export enum PushType {
 
 export enum PlayerStatus {
     guide,
+    test,
     prepared,
     shouted,
     result
