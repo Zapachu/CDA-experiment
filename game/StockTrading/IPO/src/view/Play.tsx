@@ -930,7 +930,7 @@ function Test({type, done}: { type: IPOType, done: () => void }) {
             }
         </ul>
         <Button label={lang.confirm} onClick={() => {
-            if ([choseA, inputA, inputE, choseB, inputF, inputB].toString() == [0, '20', ['150000', '300000'], 1,['A','B'],['49','33','1000','2000']].toString() && (
+            if ([choseA, inputA, inputE, choseB, inputF, inputB].toString() == [1, '20', ['1500000', '3000000'], 2,['A','B'],['49','33','1000','2000']].toString() && (
                 (type === IPOType.TopK && [inputC, inputD].toString() ==[['100', '0', '3000', '3000', '0','4000'],['48','0','7000','0','0','3000']].toString()) ||
                 (type === IPOType.Median&& [inputC, inputD].toString() ==[['100'],['48']].toString())
             )) {

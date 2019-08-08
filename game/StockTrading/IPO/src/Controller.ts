@@ -290,7 +290,7 @@ export default class Controller extends BaseController<ICreateParams,
               })
             }
             await this.startTrade()
-          }, 5e3)
+          }, 3e3)
         }
         break
       }
