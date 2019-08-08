@@ -1,7 +1,7 @@
 import {
   Actor,
   BaseController,
-  gameId2PlayUrl, GameStatus,
+  GameStatus,
   IActor,
   IMoveCallback,
   RedisCall,
@@ -15,6 +15,7 @@ import {
   IPlayerState,
   IPushParams,
   MoveType,
+  PlayerStatus,
   PushType,
   Role,
   SHOUT_TIMER
@@ -33,6 +34,62 @@ export default class Controller extends BaseController<ICreateParams,
   private robotJoined = false
   private shoutTimer: NodeJS.Timer
 
+  private static invalidParams(
+      playerState: IPlayerState,
+      params: IMoveParams
+  ): boolean {
+    const {price, num} = params
+    const {role, startingPrice, startingQuota, privateValue} = playerState
+    return (
+        !price ||
+        !num ||
+        (role === Role.Buyer &&
+            (price * num > startingPrice || price > privateValue)) ||
+        (role == Role.Seller && (num > startingQuota || price < privateValue))
+    )
+  }
+
+  private static strikeDeal(
+      buyerList: Array<IPlayerState>,
+      sellerList: Array<IPlayerState>
+  ): { strikePrice: number; strikeNum: number } {
+    let buyerIndex = 0
+    let sellerIndex = 0
+    let strikeNum = 0
+    let strikePrice = 0
+    while (buyerIndex < buyerList.length && sellerIndex < sellerList.length) {
+      const buyer = buyerList[buyerIndex]
+      const seller = sellerList[sellerIndex]
+      if (buyer.price >= seller.price) {
+        const num = Math.min(
+            buyer.bidNum - buyer.actualNum,
+            seller.bidNum - seller.actualNum
+        )
+        buyer.actualNum += num
+        seller.actualNum += num
+        strikeNum += num
+        strikePrice = (buyer.price + seller.price) / 2
+        if (buyer.actualNum === buyer.bidNum) {
+          buyerIndex++
+        } else {
+          sellerIndex++
+        }
+      } else {
+        break
+      }
+    }
+    return {strikePrice, strikeNum}
+  }
+
+  private static updateGameState(
+      gameState: IGameState,
+      strikePrice: number,
+      strikeNum: number
+  ) {
+    gameState.strikePrice = strikePrice
+    gameState.strikeNum = strikeNum
+  }
+
   initGameState(): TGameState<IGameState> {
     const gameState = super.initGameState()
     gameState.status = GameStatus.started
@@ -42,6 +99,7 @@ export default class Controller extends BaseController<ICreateParams,
 
   async initPlayerState(actor: IActor): Promise<TPlayerState<IPlayerState>> {
     const playerState = await super.initPlayerState(actor)
+    playerState.status = PlayerStatus.guide
     playerState.actualNum = 0
     playerState.profit = 0
     return playerState
@@ -58,10 +116,15 @@ export default class Controller extends BaseController<ICreateParams,
         gameState = await this.stateManager.getGameState(),
         playerStates = await this.stateManager.getPlayerStates()
     switch (type) {
+      case MoveType.guideDone: {
+        playerState.status = PlayerStatus.test
+        break
+      }
       case MoveType.join: {
         if (playerState.role !== undefined) {
           return
         }
+        playerState.status = PlayerStatus.play
         this.initPlayer(playerState)
         if ((playerState.actor.type = Actor.serverRobot)) {
           this.push(playerState.actor, PushType.robotShout)
@@ -72,7 +135,7 @@ export default class Controller extends BaseController<ICreateParams,
         if (playerState.price !== undefined) {
           return
         }
-        if (this.invalidParams(playerState, params)) {
+        if (Controller.invalidParams(playerState, params)) {
           return cb(
               playerState.role === Role.Buyer
                   ? '价格应不大于估值'
@@ -111,21 +174,6 @@ export default class Controller extends BaseController<ICreateParams,
     }
   }
 
-  private invalidParams(
-      playerState: IPlayerState,
-      params: IMoveParams
-  ): boolean {
-    const {price, num} = params
-    const {role, startingPrice, startingQuota, privateValue} = playerState
-    return (
-        !price ||
-        !num ||
-        (role === Role.Buyer &&
-            (price * num > startingPrice || price > privateValue)) ||
-        (role == Role.Seller && (num > startingQuota || price < privateValue))
-    )
-  }
-
   private processProfits(
       gameState: IGameState,
       playerStates: Array<IPlayerState>
@@ -136,41 +184,9 @@ export default class Controller extends BaseController<ICreateParams,
     const sellerList = playerStates
         .filter(ps => ps.role === Role.Seller)
         .sort((a, b) => a.price - b.price)
-    const {strikePrice, strikeNum} = this._strikeDeal(buyerList, sellerList)
-    this._updateGameState(gameState, strikePrice, strikeNum)
+    const {strikePrice, strikeNum} = Controller.strikeDeal(buyerList, sellerList)
+    Controller.updateGameState(gameState, strikePrice, strikeNum)
     this._updatePlayerStates(playerStates, strikePrice)
-  }
-
-  private _strikeDeal(
-      buyerList: Array<IPlayerState>,
-      sellerList: Array<IPlayerState>
-  ): { strikePrice: number; strikeNum: number } {
-    let buyerIndex = 0
-    let sellerIndex = 0
-    let strikeNum = 0
-    let strikePrice = 0
-    while (buyerIndex < buyerList.length && sellerIndex < sellerList.length) {
-      const buyer = buyerList[buyerIndex]
-      const seller = sellerList[sellerIndex]
-      if (buyer.price >= seller.price) {
-        const num = Math.min(
-            buyer.bidNum - buyer.actualNum,
-            seller.bidNum - seller.actualNum
-        )
-        buyer.actualNum += num
-        seller.actualNum += num
-        strikeNum += num
-        strikePrice = (buyer.price + seller.price) / 2
-        if (buyer.actualNum === buyer.bidNum) {
-          buyerIndex++
-        } else {
-          sellerIndex++
-        }
-      } else {
-        break
-      }
-    }
-    return {strikePrice, strikeNum}
   }
 
   private _updatePlayerStates(
@@ -187,15 +203,6 @@ export default class Controller extends BaseController<ICreateParams,
         ps.profit = (strikePrice - ps.privateValue) * ps.actualNum
       }
     })
-  }
-
-  private _updateGameState(
-      gameState: IGameState,
-      strikePrice: number,
-      strikeNum: number
-  ) {
-    gameState.strikePrice = strikePrice
-    gameState.strikeNum = strikeNum
   }
 
   private initRobots(amount: number) {
