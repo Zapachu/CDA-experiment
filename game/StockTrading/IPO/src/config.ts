@@ -21,7 +21,8 @@ export enum PlayerStatus {
 
 export enum IPOType {
     Median = 1,
-    TopK
+    TopK,
+    FPSBA
 }
 
 export const SHOUT_TIMER = 60e3

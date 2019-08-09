@@ -1,4 +1,4 @@
-import {BaseController, IActor, IMoveCallback, Log, RedisCall, TGameState, TPlayerState} from '@bespoke/server'
+import {BaseController, IActor, IMoveCallback, RedisCall, TGameState, TPlayerState} from '@bespoke/server'
 import {
   ICreateParams,
   IGameState,
@@ -226,16 +226,49 @@ export default class Controller extends BaseController<ICreateParams,
         })
   }
 
+  _processFPSBAProfits(
+      marketState: MarketState,
+      sortedPlayerStates: Array<InvestorState>
+  ) {
+    const {total} = this.game.params
+    const buyers = []
+    let strikePrice
+    let leftNum = total
+    for (let i = 0; i < sortedPlayerStates.length; i++) {
+      const curPlayer = sortedPlayerStates[i]
+      curPlayer.actualNum =
+          curPlayer.bidNum > leftNum ? leftNum : curPlayer.bidNum
+      buyers.push(curPlayer)
+      if (curPlayer.bidNum >= leftNum) {
+        strikePrice = curPlayer.price
+        break
+      }
+      leftNum -= curPlayer.bidNum
+    }
+    marketState.strikePrice =
+        strikePrice === undefined ? marketState.min : strikePrice
+    buyers
+    // .filter(s => s.privateValue !== undefined)
+        .forEach(s => {
+          s.profit = formatDigits(
+              (s.privateValue - marketState.strikePrice) * s.actualNum
+          )
+        })
+  }
+
   processProfits(playerStates: Array<InvestorState>, marketState: MarketState) {
     const {type} = this.game.params
     const sortedPlayerStates = playerStates.sort((a, b) => b.price - a.price)
-    // 中位数
-    if (type === IPOType.Median) {
-      this._processMedianProfits(marketState, sortedPlayerStates)
-    }
-    // 前K位
-    if (type === IPOType.TopK) {
-      this._processTopKProfits(marketState, sortedPlayerStates)
+    switch (type) {
+      case IPOType.FPSBA:
+        this._processFPSBAProfits(marketState, sortedPlayerStates)
+        break
+      case IPOType.Median:
+        this._processMedianProfits(marketState, sortedPlayerStates)
+        break
+      case IPOType.TopK:
+        this._processTopKProfits(marketState, sortedPlayerStates)
+        break
     }
   }
 
@@ -336,12 +369,17 @@ export default class Controller extends BaseController<ICreateParams,
           return
         }
         const {onceMore} = params
+        const trialNamespace = {
+          [IPOType.FPSBA]: Phase.IPO_FPSBA,
+          [IPOType.Median]: Phase.IPO_Median,
+          [IPOType.TopK]: Phase.IPO_TopK
+        }[this.game.params.type]
         const res = await RedisCall.call<Trial.Done.IReq, Trial.Done.IRes>(
             Trial.Done.name,
             {
               userId: playerState.user.id,
               onceMore,
-              namespace: phaseToNamespace(this.game.params.type == IPOType.Median ? Phase.IPO_Median : Phase.IPO_TopK)
+              namespace: phaseToNamespace(trialNamespace)
             }
         )
         res ? cb(res.lobbyUrl) : null

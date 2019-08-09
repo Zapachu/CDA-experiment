@@ -884,7 +884,7 @@ function Test({type, done}: { type: IPOType, done: () => void }) {
                                 7000股，市场上还剩3000股股票。虽然您的拟购买数量为4000股，但是此时市面上只剩3000股，因此您的成交数量为3000股。C、A和D的购买价格小于股票的成交价格，成交数量为0股。
                             </p>
                         </li>
-                    </> : <>
+                    </> : type === IPOType.Median ? <>
                         <li>
                             <p>7.
                                 市场上有10000股股票。您的拟购买价格和拟购买数量是105元和4000股。市场上其他参与者的拟购买价格和拟购买数量如下：交易者A给出的拟购买价格和拟购买数量分布为99元和5000股，交易者B给出的拟购买价格和购买数量为100元和6000股，交易者C给出的拟购买价格和购买数量为102元和3000股，交易者D给出的拟购买价格和购买数量为96元和3000股。
@@ -926,13 +926,14 @@ function Test({type, done}: { type: IPOType, done: () => void }) {
                                 您和B都有共同购买这1万股股票的权利。二人合起来的拟购买数量为13000，则系统随机从13000股股票中选择10000股分配购买权。，则每股股票被抽到的概率为10000/13000。简言之，当拟购买价格在成交价格之上时，预期购买数量越大，可能购买到的数量越多。
                             </p>
                         </li>
-                    </>
+                    </> : null
             }
         </ul>
         <Button label={lang.confirm} onClick={() => {
-            if ([choseA, inputA, inputE, choseB, inputF, inputB].toString() == [1, '20', ['1500000', '3000000'], 2,['A','B'],['49','33','1000','2000']].toString() && (
-                (type === IPOType.TopK && [inputC, inputD].toString() ==[['100', '0', '3000', '3000', '0','4000'],['48','0','7000','0','0','3000']].toString()) ||
-                (type === IPOType.Median&& [inputC, inputD].toString() ==[['100'],['48']].toString())
+            if ([choseA, inputA, inputE, choseB, inputF, inputB].toString() == [1, '20', ['1500000', '3000000'], 2, ['A', 'B'], ['49', '33', '1000', '2000']].toString() && (
+                (type === IPOType.FPSBA) ||
+                (type === IPOType.TopK && [inputC, inputD].toString() == [['100', '0', '3000', '3000', '0', '4000'], ['48', '0', '7000', '0', '0', '3000']].toString()) ||
+                (type === IPOType.Median && [inputC, inputD].toString() == [['100'], ['48']].toString())
             )) {
                 done()
             } else {

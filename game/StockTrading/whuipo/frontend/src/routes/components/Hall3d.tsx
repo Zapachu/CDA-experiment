@@ -73,6 +73,8 @@ enum GameSteps {
 const GamePhaseToStep = {
   [GameTypes.IPO_Median]: GameSteps.center,
   [GameTypes.IPO_TopK]: GameSteps.center,
+  [GameTypes.IPO_FPSBA]: GameSteps.center,
+  [GameTypes.OpenAuction]: GameSteps.center,
   [GameTypes.CBM]: GameSteps.left,
   [GameTypes.CBM_Leverage]: GameSteps.left,
   [GameTypes.TBM]: GameSteps.right
@@ -81,12 +83,14 @@ const GamePhaseToStep = {
 const GameStepsToGamePhase = {
   [GameSteps.left]: [GameTypes.CBM, GameTypes.CBM_Leverage],
   [GameSteps.right]: GameTypes.TBM,
-  [GameSteps.center]: [GameTypes.IPO_TopK, GameTypes.IPO_Median]
+  [GameSteps.center]: [GameTypes.IPO_TopK, GameTypes.IPO_Median, GameTypes.IPO_FPSBA, GameTypes.OpenAuction]
 };
 
 const gamePhaseOrder = {
   [GameTypes.IPO_Median]: 1,
   [GameTypes.IPO_TopK]: 1,
+  [GameTypes.IPO_FPSBA]: 1,
+  [GameTypes.OpenAuction]: 1,
   [GameTypes.TBM]: 2,
   [GameTypes.CBM]: 3,
   [GameTypes.CBM_Leverage]: 3
@@ -100,6 +104,8 @@ const gamePhaseVideoSrc = {
 const gamePhaseLabel = {
   [GameTypes.IPO_Median]: "中位数定价",
   [GameTypes.IPO_TopK]: "荷兰式拍卖",
+  [GameTypes.IPO_FPSBA]: "第一密封价格拍卖",
+  [GameTypes.OpenAuction]: "公开竞价拍卖",
   [GameTypes.TBM]: "集合竞价",
   [GameTypes.CBM]: "连续竞价",
   [GameTypes.CBM_Leverage]: "融资融券"
