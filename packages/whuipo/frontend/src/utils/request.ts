@@ -9,7 +9,7 @@ function checkStatus(response) {
     return response;
   }
 
-  const error = new Error(response.statusText);
+  const error = new Error(response.statusText) as any;
   error.response = response;
   throw error;
 }
@@ -22,7 +22,7 @@ function checkStatus(response) {
  * @return {object}           An object containing either "data" or "err"
  */
 export default function request(url, options) {
-  return fetch(url, options)
+  return (fetch as any)(url, options)
     .then(checkStatus)
     .then(parseJSON)
     .catch(err => ({ err }));
