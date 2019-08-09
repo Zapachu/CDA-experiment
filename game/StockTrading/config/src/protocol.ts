@@ -1,6 +1,7 @@
 export enum Phase {
     IPO_Median,
     IPO_TopK,
+    OpenAuction,
     TBM,
     CBM,
     CBM_Leverage
