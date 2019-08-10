@@ -7,7 +7,8 @@ import {ICreateParams} from '../interface'
 
 const gameTypes = [
     {label: '中位数', value: IPOType.Median},
-    {label: '最高价前K', value: IPOType.TopK}
+    {label: '最高价前K', value: IPOType.TopK},
+    {label: '第一密封价格', value: IPOType.FPSBA},
 ]
 
 export class Create extends Core.Create<ICreateParams> {

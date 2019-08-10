@@ -1048,16 +1048,16 @@ function LeverageTest({done}: { done: () => void }) {
                     投资者信用账户内有60万元现金和100万元市值的某证券，假设该证券的折算率为60%，那么，该投资者信用账户内的保证金金额为____________万元。</p>
                 <Radio.Group style={{margin: '.5rem'}} onChange={({target: {value}}) => setChoseC(+value)}
                              value={choseC}>
-                    <Radio value={1}>A. 200</Radio>
-                    <Radio value={2}>B. 50</Radio>
-                    <Radio value={3}>C. 140</Radio>
-                    <Radio value={4}>D. 70</Radio>
+                    <Radio value={1}>A. 160</Radio>
+                    <Radio value={2}>B. 136</Radio>
+                    <Radio value={3}>C. 120</Radio>
+                    <Radio value={4}>D. 100</Radio>
                 </Radio.Group>
                 <p className={style.answer}>解析：60+100*0.6=120，因此正确答案为C</p>
             </li>
         </ul>
         <Button label={lang.confirm} onClick={() => {
-            if (choseA == 1 && choseB == 3 && choseC == 3 && inputA == '9.96' && inputB == '50' && inputC == '50') {
+            if ([choseA,choseB,choseC,inputA,inputB,inputC].toString()===[1,3,3,'9.96','50','50'].toString()) {
                 done()
             } else {
                 setShowAnswer(true)

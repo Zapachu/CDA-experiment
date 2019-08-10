@@ -4,9 +4,11 @@ var Phase;
 (function (Phase) {
     Phase[Phase["IPO_Median"] = 0] = "IPO_Median";
     Phase[Phase["IPO_TopK"] = 1] = "IPO_TopK";
-    Phase[Phase["TBM"] = 2] = "TBM";
-    Phase[Phase["CBM"] = 3] = "CBM";
-    Phase[Phase["CBM_Leverage"] = 4] = "CBM_Leverage";
+    Phase[Phase["IPO_FPSBA"] = 2] = "IPO_FPSBA";
+    Phase[Phase["OpenAuction"] = 3] = "OpenAuction";
+    Phase[Phase["TBM"] = 4] = "TBM";
+    Phase[Phase["CBM"] = 5] = "CBM";
+    Phase[Phase["CBM_Leverage"] = 6] = "CBM_Leverage";
 })(Phase = exports.Phase || (exports.Phase = {}));
 var NAMESPACE_PREFIX = 'stockTrade:';
 function phaseToNamespace(phase) {

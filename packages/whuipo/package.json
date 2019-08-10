@@ -11,6 +11,9 @@
     "dev": "ts-node app.ts"
   },
   "dependencies": {
+    "@elf/setting": "^1.1.1",
+    "@elf/protocol": "^1.1.1",
+    "@bespoke-game/stock-trading-config": "^1.1.1",
     "@types/ioredis": "^4.0.10",
     "@types/lusca": "^1.5.0",
     "@types/morgan": "^1.7.35",

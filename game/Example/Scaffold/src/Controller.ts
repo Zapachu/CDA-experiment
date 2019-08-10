@@ -9,7 +9,7 @@ export class Controller extends BaseController<ICreateParams, IGameState, IPlaye
     }
 
     async initPlayerState(actor: IActor): Promise<TPlayerState<IPlayerState>> {
-        const playerState = super.initPlayerState(actor)
+        const playerState = await super.initPlayerState(actor)
         return playerState
     }
 

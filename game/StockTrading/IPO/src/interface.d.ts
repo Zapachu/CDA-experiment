@@ -1,7 +1,9 @@
+import {IPOType} from './config'
+
 export interface ICreateParams {
     groupSize: number
     total: number
-    type: number
+    type: IPOType
 }
 
 export interface IMoveParams {

@@ -124,6 +124,8 @@ app.use(
     express.static(staticPath, {maxAge: '10d'})
 )
 
+app.set('views', path.resolve(__dirname, './views'))
+app.set('view engine', 'pug')
 
 const sessionStore = new RedisStore({
   client: redisClient as any,

@@ -1,8 +1,9 @@
 {
   "private": true,
   "scripts": {
-    "start": "cross-env mode=development webpack --watch --config webpackConfig.js --mode development ",
-    "build": "cross-env mode=production webpack --config webpackConfig.js --mode=production && cp -rf dist ../",
+    "build-dev": "cross-env mode=development webpack --watch --config webpackConfig.js --mode development ",
+    "build": "cross-env mode=production webpack --config webpackConfig.js --mode=production ",
+    "build-pro": "npm run build && cp -rf dist ../",
     "lint": "eslint --ext .js src test",
     "precommit": "npm run lint"
   },
@@ -18,6 +19,8 @@
     "socket.io-client": "^2.2.0"
   },
   "devDependencies": {
+    "@bespoke-game/stock-trading-component": "^1.1.1",
+    "@elf/component": "^1.1.1",
     "webpack": "^4.32.2",
     "css-loader": "^2.1.1",
     "babel-plugin-dva-hmr": "^0.3.2",
