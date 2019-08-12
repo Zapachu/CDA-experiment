@@ -12,6 +12,7 @@ import {User} from './models'
 import {UserDoc} from './interfaces'
 import {elfSetting} from '@elf/setting'
 import config from './config'
+import setting from './setting'
 import {namespaceToPhase, Phase, phaseToNamespace} from '@bespoke-game/stock-trading-config'
 import {Trial, RedisCall} from '@elf/protocol'
 import {clientSocketListenEvnets, ResCode, serverSocketListenEvents, UserGameStatus} from './enums'
@@ -186,7 +187,7 @@ RedisCall.handle<Trial.Done.IReq, Trial.Done.IRes>(
       const phase = namespaceToPhase(namespace)
       const uid = userId
       const user = await User.findById(uid)
-      let lobbyUrl = config.lobbyUrl
+      let lobbyUrl = setting.lobbyUrl
       if (user) {
         sendBackData({timestamp: Date.now()})
         const lastUserUnlockOrder = gamePhaseOrder[user.unblockGamePhase] || -1
