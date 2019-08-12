@@ -11,10 +11,10 @@ Server.start(namespace, Controller, resolve(__dirname, '../dist'))
 RobotServer.start(namespace, Robot)
 
 RedisCall.handle<Trial.Create.IReq, Trial.Create.IRes>(
-    Trial.Create.name(phaseToNamespace(Phase.TBM)),
+    Trial.Create.name(phaseToNamespace(Phase.OpenAuction)),
     async () => {
         const gameId = await Server.newGame<ICreateParams>({
-            title: `${Phase.TBM}:${new Date().toUTCString()}`,
+            title: `${Phase.OpenAuction}:${new Date().toUTCString()}`,
             params: null
         })
         return {playUrl: gameId2PlayUrl(gameId)}
