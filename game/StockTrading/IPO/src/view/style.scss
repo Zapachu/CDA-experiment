@@ -1,4 +1,5 @@
 @import "~@elf/component/lib/public";
+
 $color-orange: #f99460;
 $color-green: #43be42;
 $color-light: rgba(white, .8);
@@ -22,7 +23,6 @@ $color-light: rgba(white, .8);
 }
 
 .play {
-  width: 100vw;
   min-height: 100vh;
   background: radial-gradient(#293567, #151b35);
   text-align: center;
@@ -79,23 +79,66 @@ $color-light: rgba(white, .8);
       top: 55vh;
     }
 
-    .stockInfoWrapper{
-        margin: 15vh 1rem 1rem;
+    .stockInfo {
+      margin: 15vh 1rem 1rem;
+      border-collapse: separate;
+      width: 100%;
+      border: 1px solid;
+      border-image: radial-gradient(closest-side, #67e968, #383d60) 40;
+
+      .codeName, .codeNameData {
+        display: flex;
+
+        div {
+          flex-basis: 8rem;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border-right: 1px solid #383d60;
+        }
+      }
+
+      .contractor {
+        margin: 0;
+      }
+
+      tr:first-child td {
+        color: #67e968;
+        border-bottom: 1px solid #383d60;
+      }
+
+      td {
+        height: 5rem;
+        border-right: 1px solid #383d60;
+
+        &:first-child, &:last-child {
+          border-right: none;
+        }
+      }
     }
 
-    .privateValue{
-        display: inline-block;
+    .issuer {
+      margin: 2rem;
     }
 
-    .inputWrapper{
-      padding: 1rem;
+    .privateValue {
+      display: inline-block;
     }
 
-    .shoutTimer{
+    .investor {
+      margin: 0;
+
+      .inputWrapper {
+        padding: 1rem;
+      }
+    }
+
+    .shoutTimer {
       margin: 1rem;
     }
 
-    .startPrice{
+    .startPrice {
       margin: 0;
     }
 
@@ -113,43 +156,47 @@ $color-light: rgba(white, .8);
   }
 }
 
-.guideContent{
+.guideContent {
   text-align: left;
-  h4{
+
+  h4 {
     color: $color-orange;
     margin: 1rem 0 .5rem;
   }
-  em{
+
+  em {
     color: $color-green;
     margin: .5rem;
   }
 }
 
-.test{
-  max-width: 48rem;
-  margin: auto;
+.test {
   text-align: left;
+  padding: 2rem;
 
   .title {
     font-size: $fontSize-large;
-    padding: 1rem;
     text-align: center;
     color: $color-green;
   }
-  .questions{
-    li{
+
+  .questions {
+    li {
       margin: 2rem;
-      .answer{
+
+      .answer {
         max-height: 1rem;
-        color: $color-green!important;
+        color: $color-green !important;
         opacity: 0;
         transition: $transition-normal;
       }
     }
-    .radioQuestion *{
+
+    .radioQuestion * {
       color: $color-light !important;
     }
-    &.showAnswer .answer{
+
+    &.showAnswer .answer {
       opacity: 1;
       max-height: 16rem;
     }
