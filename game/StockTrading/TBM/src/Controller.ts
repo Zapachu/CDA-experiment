@@ -102,6 +102,7 @@ export default class Controller extends BaseController<ICreateParams,
     playerState.status = PlayerStatus.guide
     playerState.actualNum = 0
     playerState.profit = 0
+    playerState.startingQuota = 0
     return playerState
   }
 

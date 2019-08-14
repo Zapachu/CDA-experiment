@@ -78,7 +78,7 @@ export interface MarketState {
     min: number;
 }
 
-export const SHOUT_TIMER = 60e3
+export const SHOUT_TIMER = 60
 export const minA = 30
 export const maxA = 100
 export const minB = 0.6
