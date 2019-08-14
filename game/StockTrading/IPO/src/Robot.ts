@@ -1,6 +1,15 @@
 import {BaseRobot} from '@bespoke/robot'
-import {maxNPCNum, minNPCNum, MoveType, PushType} from './config'
-import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface'
+import {
+  ICreateParams,
+  IGameState,
+  IMoveParams,
+  IPlayerState,
+  IPushParams,
+  maxNPCNum,
+  minNPCNum,
+  MoveType,
+  PushType
+} from './config'
 import {formatDigits, genRandomInt} from './Controller'
 
 export default class extends BaseRobot<ICreateParams,

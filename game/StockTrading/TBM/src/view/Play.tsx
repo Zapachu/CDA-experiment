@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import InfoBar from './coms/InfoBar'
-import {Button, Input, Line, ListItem, Loading, Modal, StockInfo} from '@bespoke-game/stock-trading-component'
+import {Button, Input, Line, ListItem, Loading, Modal, STOCKS} from '@bespoke-game/stock-trading-component'
 import {Core} from '@bespoke/client'
 import Joyride, {Step} from 'react-joyride'
 import {Lang, Toast} from '@elf/component'
@@ -323,15 +323,30 @@ export class Play extends Core.Play<ICreateParams,
             frameEmitter
         } = this.props
         const {shoutTime} = this.state
+        const stock = STOCKS[stockIndex]
         return (
-            <>
+            <section className={style.playContent}>
                 {
                     status === PlayerStatus.guide ? <Guide done={() => frameEmitter.emit(MoveType.guideDone)}/> : null
                 }
-                <div className={style.stockInfoWrapper}>
-                    <StockInfo stockIndex={stockIndex}
-                    />
-                </div>
+                <table className={style.stockInfo}>
+                    <tbody>
+                    <tr>
+                        <td>证券代码</td>
+                        <td>证券简称</td>
+                        <td>主承销商</td>
+                        <td><span className={style.startDate}>初步询价</span>起始日期</td>
+                        <td>初步询价截止日期</td>
+                    </tr>
+                    <tr>
+                        <td>{stock.code}</td>
+                        <td>{stock.name}</td>
+                        <td>{stock.contractor}</td>
+                        <td>{stock.startDate}</td>
+                        <td>{stock.endDate}</td>
+                    </tr>
+                    </tbody>
+                </table>
                 <p style={{margin: '10px 0 30px 0'}}>
                     *私人信息: 你们公司对该股票的估值是
                     <span style={{color: 'orange'}}>{privateValue}</span>
@@ -354,7 +369,7 @@ export class Play extends Core.Play<ICreateParams,
                         label={`交易规则回顾`}
                     />
                 </div>
-            </>
+            </section>
         )
     }
 
@@ -429,25 +444,23 @@ function Guide({done}: { done: () => void }) {
                     },
                     tooltip: {
                         fontSize: '1rem',
+                        width: '48rem',
+                        maxWidth: '95vw',
                         ...tooltipStyle
                     }
                 },
-                disableBeacon: true
+                disableBeacon: true,
+                hideCloseButton: true
             }
         ),
         steps: Array<Step> = [
             {
-                target: `.${style.stockInfoWrapper}`,
+                target: `.${style.startDate}`,
                 content: <section className={style.guideContent}>
-                    <div>
-                        <h4>关于初步询价</h4>
-                        <p>初步询价是指发行人及其保荐机构向询价对象进行询价，并根据询价对象的报价结果确定发行价格区间及相应的市盈率区间。通俗点讲，企业和主承销商向询价对象（一般是指在中国证监会备案的基金管理公司、投资机构、证券公司等）推介和发出询价函，以反馈回来的有效报价上下限确定的区间为初步询价区间。这一步做完后，就应该在证监会指定的网站上披露初步询价结果（即初步询价公告）。因特殊原因需要调整初步询价的，应在申购平台上填写具体原因修改。
-                        </p>
-                    </div>
+                    <p>初步询价是指发行人及其保荐机构向询价对象进行询价，并根据询价对象的报价结果确定发行价格区间及相应的市盈率区间。通俗点讲，企业和主承销商向询价对象（一般是指在中国证监会备案的基金管理公司、投资机构、证券公司等）推介和发出询价函，以反馈回来的有效报价上下限确定的区间为初步询价区间。这一步做完后，就应该在证监会指定的网站上披露初步询价结果（即初步询价公告）。因特殊原因需要调整初步询价的，应在申购平台上填写具体原因修改。
+                    </p>
                 </section>,
-                ...stepProps({
-                    width: '48rem'
-                })
+                ...stepProps()
             },
             {
                 target: `.${style.workBox}`,
@@ -542,13 +555,13 @@ function Test({done}: { done: () => void }) {
                     <br/>E的每份配额出售价格是52元，出售配额数量是4股；
                     <br/>D的每份配额出售价格是56元，出售配额数量是6股；
                     <br/>F的每份配额出售价格是63元，出售配额数量是5股；
-                    <br/>1）	最高买入价格的B的买入价格高于最低卖出价格E的卖出价格，E的四股股票全部成交，B可购入4股E的股票，B还有四股股票未购入；
-                    <br/>2）	最高买入价格的B的买入价格高于第二低卖出价格D的卖出价格，B还未成交的四股股票成交，此时D还剩2股；
-                    <br/>3）	第二高买入价格的C的买入价格高于第二低卖出价格D的卖出价格，D剩下的2股股票成交，C还有3股未成交；
-                    <br/>4）	第三高买入价格的A的买入价格低于D的卖出价格，无法成交；
+                    <br/>1） 最高买入价格的B的买入价格高于最低卖出价格E的卖出价格，E的四股股票全部成交，B可购入4股E的股票，B还有四股股票未购入；
+                    <br/>2） 最高买入价格的B的买入价格高于第二低卖出价格D的卖出价格，B还未成交的四股股票成交，此时D还剩2股；
+                    <br/>3） 第二高买入价格的C的买入价格高于第二低卖出价格D的卖出价格，D剩下的2股股票成交，C还有3股未成交；
+                    <br/>4） 第三高买入价格的A的买入价格低于D的卖出价格，无法成交；
                     <br/>故成交价格为（58+56）/2=<AntInput style={inputStyle}
-                                                                                             value={inputA}
-                                                                                             onChange={({target: {value}}) => setInputA(value)}/>，成交10股
+                                                   value={inputA}
+                                                   onChange={({target: {value}}) => setInputA(value)}/>，成交10股
                 </p>
                 <p className={style.answer}>正确答案：57</p>
             </li>

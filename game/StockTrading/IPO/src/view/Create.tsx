@@ -2,8 +2,7 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {Core} from '@bespoke/client'
 import {Input, Label, Lang, RangeInput, Select} from '@elf/component'
-import {IPOType} from '../config'
-import {ICreateParams} from '../interface'
+import {ICreateParams, IPOType} from '../config'
 
 const gameTypes = [
     {label: '中位数', value: IPOType.Median},

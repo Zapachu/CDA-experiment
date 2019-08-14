@@ -5,11 +5,9 @@ import {
   IMoveParams,
   InvestorState,
   IPlayerState,
-  IPushParams,
-  MarketState
-} from './interface'
-import {
   IPOType,
+  IPushParams,
+  MarketState,
   maxA,
   maxB,
   minA,

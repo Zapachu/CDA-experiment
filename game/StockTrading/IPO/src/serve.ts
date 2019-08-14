@@ -1,8 +1,7 @@
 import {resolve} from 'path'
-import {Server, RedisCall, gameId2PlayUrl} from '@bespoke/server'
+import {gameId2PlayUrl, RedisCall, Server} from '@bespoke/server'
 import Controller from './Controller'
-import {namespace, IPOType} from './config'
-import {ICreateParams} from './interface'
+import {ICreateParams, IPOType, namespace} from './config'
 import Robot from './Robot'
 import {Phase, phaseToNamespace} from '@bespoke-game/stock-trading-config'
 import {Trial} from '@elf/protocol'
@@ -21,7 +20,7 @@ RedisCall.handle<Trial.Create.IReq, Trial.Create.IRes>(Trial.Create.name(phaseTo
             type: IPOType.TopK
         }
     })
-    return {playUrl:gameId2PlayUrl(gameId)}
+    return {playUrl: gameId2PlayUrl(gameId)}
 })
 RedisCall.handle<Trial.Create.IReq, Trial.Create.IRes>(Trial.Create.name(phaseToNamespace(Phase.IPO_Median)), async () => {
     const gameId = await Server.newGame<ICreateParams>({
@@ -32,7 +31,7 @@ RedisCall.handle<Trial.Create.IReq, Trial.Create.IRes>(Trial.Create.name(phaseTo
             type: IPOType.Median
         }
     })
-    return {playUrl:gameId2PlayUrl(gameId)}
+    return {playUrl: gameId2PlayUrl(gameId)}
 })
 RedisCall.handle<Trial.Create.IReq, Trial.Create.IRes>(Trial.Create.name(phaseToNamespace(Phase.IPO_Median)), async () => {
     const gameId = await Server.newGame<ICreateParams>({
@@ -43,5 +42,5 @@ RedisCall.handle<Trial.Create.IReq, Trial.Create.IRes>(Trial.Create.name(phaseTo
             type: IPOType.FPSBA
         }
     })
-    return {playUrl:gameId2PlayUrl(gameId)}
+    return {playUrl: gameId2PlayUrl(gameId)}
 })

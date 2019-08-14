@@ -1,84 +1,146 @@
 @import "~@elf/component/lib/public";
+
 $color-orange: #f99460;
 $color-green: #43be42;
 $color-light: rgba(white, .8);
 
 .play {
-  color: #dde1e9;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  flex-direction: column;
-  width: 100%;
-  min-height: 100vh;
   background: radial-gradient(#293567, #151b35);
+  color: white;
+  min-height: 100vh;
 
-  .item {
+  .playContent {
+    max-width: 48rem;
+    margin: auto;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-  }
-
-  .line {
-    width: 95%;
-    padding: .5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: #2e2e2e;
-  }
-
-  .highlight {
-    color: #58c350;
-  }
-
-  .tradeBtn {
-    position: fixed;
-    top: 35vh;
-    right: 15vw;
-  }
-
-  .stockInfoWrapper{
-    margin: 10vh 0 0;
-  }
-
-  .workBox {
-    margin-bottom: 20px;
-    border-radius: 1rem;
-    display: flex;
-    justify-content: flex-start;
     align-items: center;
     flex-direction: column;
-    height: 22rem;
-    width: 20rem;
-    background: radial-gradient(#293567, #151b35);
-    border: solid 1px #5d5d5d;
+    text-align: center;
 
-    .tipText {
-      height: 4rem;
-      line-height: 4rem;
+    .item {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+    }
+
+    .line {
+      width: 95%;
+      padding: .5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #2e2e2e;
+    }
+
+    .highlight {
+      color: #58c350;
+    }
+
+    .tradeBtn {
+      position: fixed;
+      top: 35vh;
+      right: 15vw;
+    }
+
+    .stockInfo {
+      margin: 10vh 1rem 1rem;
+      border-collapse: separate;
+      width: 100%;
+      border: 1px solid;
+      border-image: radial-gradient(closest-side, #67e968, #383d60) 40;
+
+      .startDate {
+        margin: 0;
+      }
+
+      tr:first-child td {
+        color: #67e968;
+        border-bottom: 1px solid #383d60;
+      }
+
+      td {
+        height: 5rem;
+        border-right: 1px solid #383d60;
+
+        &:first-child, &:last-child {
+          border-right: none;
+        }
+      }
+    }
+
+    .workBox {
+      margin-bottom: 20px;
+      border-radius: 1rem;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      flex-direction: column;
+      height: 22rem;
+      width: 20rem;
+      background: radial-gradient(#293567, #151b35);
+      border: solid 1px #5d5d5d;
+
+      .tipText {
+        height: 4rem;
+        line-height: 4rem;
+        text-align: center;
+      }
+
+      .shoutBtn {
+        cursor: pointer;
+        margin-top: 2rem;
+        background: linear-gradient(#14533e, #1e2b49);
+        border: solid 1px #58c350;
+        color: #aefe49;
+        padding: .8rem 3rem;
+        border-radius: .5rem;
+      }
+    }
+
+    .countDown {
+      margin: 1rem;
       text-align: center;
     }
 
-    .shoutBtn {
-      cursor: pointer;
-      margin-top: 2rem;
-      background: linear-gradient(#14533e, #1e2b49);
-      border: solid 1px #58c350;
-      color: #aefe49;
-      padding: .8rem 3rem;
-      border-radius: .5rem;
+    .dynamicInfo {
+      margin: 0;
     }
   }
 
-  .countDown{
-    margin: 1rem;
-    text-align: center;
-  }
+  .test {
+    max-width: 48rem;
+    margin: auto;
+    text-align: left;
 
-  .dynamicInfo{
-    margin: 0;
+    .title {
+      font-size: $fontSize-large;
+      padding: 1rem;
+      text-align: center;
+      color: $color-green;
+    }
+
+    .questions {
+      li {
+        margin: 2rem;
+
+        .answer {
+          max-height: 1rem;
+          color: $color-green !important;
+          opacity: 0;
+          transition: $transition-normal;
+        }
+      }
+
+      .radioQuestion * {
+        color: $color-light !important;
+      }
+
+      &.showAnswer .answer {
+        opacity: 1;
+        max-height: 16rem;
+      }
+    }
   }
 }
 
@@ -200,46 +262,17 @@ $color-light: rgba(white, .8);
   }
 }
 
-.guideContent{
+.guideContent {
   text-align: left;
-  h4{
+
+  h4 {
     color: $color-orange;
     margin: 1rem 0 .5rem;
   }
-  em{
+
+  em {
     color: $color-green;
     margin: .5rem;
-  }
-}
-
-.test{
-  max-width: 48rem;
-  margin: auto;
-  text-align: left;
-
-  .title {
-    font-size: $fontSize-large;
-    padding: 1rem;
-    text-align: center;
-    color: $color-green;
-  }
-  .questions{
-    li{
-      margin: 2rem;
-      .answer{
-        max-height: 1rem;
-        color: $color-green!important;
-        opacity: 0;
-        transition: $transition-normal;
-      }
-    }
-    .radioQuestion *{
-      color: $color-light !important;
-    }
-    &.showAnswer .answer{
-      opacity: 1;
-      max-height: 16rem;
-    }
   }
 }
 
