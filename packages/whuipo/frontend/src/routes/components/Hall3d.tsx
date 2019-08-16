@@ -1,19 +1,19 @@
-import * as React from "react";
-import * as BABYLON from "babylonjs";
+import * as React from 'react'
+import * as BABYLON from 'babylonjs'
+
 import socket from 'socket.io-client'
 import {Button, Loading, MatchModal, Modal, PlayMode} from '@bespoke-game/stock-trading-component'
 import {Toast} from '@elf/component'
 import 'pepjs'
 import qs from 'qs'
 
-import {reqInitInfo} from '../../services/index'
+import {reqInitInfo} from '../../services'
 import {clientSocketListenEvnets, GameTypes, ResCode, serverSocketListenEvents, UserDoc} from '../../enums'
-import Line2d from './line2d'
-import gameDesc from './gameDesc';
+import gameDesc from './gameDesc'
 
-import BabylonScene from "./BabylonScene";
+import BabylonScene from './BabylonScene'
 import Detail from './detail.png'
-import PANO from './hall.jpg'
+import Hall from './hall.jpg'
 import LockIcon from './lock.png'
 import UnLockIcon from './unlock.png'
 import style from './style.less'
@@ -68,7 +68,10 @@ const gamePhaseOrder = {
 
 const gamePhaseVideoSrc = {
   [GameTypes.IPO_TopK]: 'https://qiniu0.anlint.com/video/whuipo/ipohe.mp4',
-  [GameTypes.IPO_Median]: 'https://qiniu0.anlint.com/video/whuipo/ipozhong.mp4'
+  [GameTypes.IPO_Median]: 'https://qiniu0.anlint.com/video/whuipo/ipozhong.mp4',
+  [GameTypes.TBM]: 'https://qiniu0.anlint.com/video/whuipo/jihejinjia.mp4',
+  [GameTypes.CBM]: 'https://qiniu0.anlint.com/video/whuipo/lianxujinjia.mp4',
+  [GameTypes.CBM_Leverage]: 'https://qiniu0.anlint.com/video/whuipo/rongzirongquan.mp4',
 }
 
 const gamePhaseLabel = {
@@ -100,11 +103,6 @@ const GameRenderConfigs = {
     },
     introRotateY: -Math.PI / 4,
     introContent: 'ipo ipo test',
-    btnPosition: {
-      x: -200,
-      y: -80,
-      z: -50
-    },
     lockIconPosition: {
       x: -345,
       y: 95,
@@ -130,11 +128,6 @@ const GameRenderConfigs = {
     },
     introRotateY: 0,
     introContent: 'ipo ipo test',
-    btnPosition: {
-      x: 0,
-      y: -80,
-      z: -50
-    },
     lockIconPosition: {
       x: 0,
       y: 165,
@@ -160,11 +153,6 @@ const GameRenderConfigs = {
     },
     introRotateY: Math.PI / 4,
     introContent: 'ipo ipo test',
-    btnPosition: {
-      x: 200,
-      y: -80,
-      z: -50
-    },
     lockIconPosition: {
       x: 355,
       y: 100,
@@ -198,44 +186,30 @@ interface State {
   matchTimer?: number,
 }
 
-class Hall3D extends React.Component<Props, State> {
+export default class Hall3D extends React.Component<Props, State> {
   camera: BABYLON.ArcRotateCamera
   scene: BABYLON.Scene
   gamePhaseVideoRefs: {
     [game: string]: HTMLVideoElement
-  }
+  } = {}
   hoverShowTimer: {
-    [gameStep: string]: NodeJS.Timer
-  }
+    [gameStep: string]: number
+  } = {}
   hoverMaskInstance: {
     [gameStep: string]: BABYLON.Mesh
-  }
+  } = {}
   gameIntroInstance: {
     [gameStep: string]: BABYLON.Mesh
-  }
+  } = {}
   io: SocketIOClient.Socket
-  matchTimer: NodeJS.Timer
+  matchTimer: number
   continuePlayUrl: string
-
-  constructor(props) {
-    super(props)
-    this.hoverMaskInstance = {}
-    this.gameIntroInstance = {}
-    this.hoverShowTimer = {}
-    this.state = {
-      isInitView: true,
-      focusGameStep: null,
-      showPreStartModal: false,
-      isDetailView: false,
-      focusGameType: null,
-    }
-    this.gamePhaseVideoRefs = {}
-  }
-
-  componentDidMount() {
-  }
-
-  componentWillUpdate() {
+  state: State = {
+    isInitView: true,
+    focusGameStep: null,
+    showPreStartModal: false,
+    isDetailView: false,
+    focusGameType: null,
   }
 
   reqInitInfo() {
@@ -285,7 +259,7 @@ class Hall3D extends React.Component<Props, State> {
       this.setState({
         isDetailView: true
       })
-    }, 2000);
+    }, 2000)
   }
 
   renderModal() {
@@ -412,12 +386,10 @@ class Hall3D extends React.Component<Props, State> {
     if (this.gameIntroInstance[gameStep]) {
       return
     }
-    const timerId = setTimeout(() => {
-      const introInstance = this.renderGameIntroCard(gameStep)
-      this.gameIntroInstance[gameStep] = introInstance
+    this.hoverShowTimer[gameStep] = window.setTimeout(() => {
+      this.gameIntroInstance[gameStep] = this.renderGameIntroCard(gameStep)
       this.hoverShowTimer[gameStep] = null
-    }, 600);
-    this.hoverShowTimer[gameStep] = timerId
+    }, 600)
   }
 
   handlePointerOut(gameStep: GameSteps) {
@@ -439,7 +411,6 @@ class Hall3D extends React.Component<Props, State> {
   }
 
   handleSelectGame(gameStep: GameSteps) {
-    console.log('click')
     const funMap = {
       [GameSteps.left]: this.handleShowLeftDetail.bind(this),
       [GameSteps.center]: this.handleShowCenterDetail.bind(this),
@@ -452,26 +423,25 @@ class Hall3D extends React.Component<Props, State> {
     const {introPosition, introContent, introRotateY} = GameRenderConfigs[gameStep]
     const {scene} = this
 
-    var ground = BABYLON.MeshBuilder.CreateGround(`introGround${gameStep}`, {
+    const ground = BABYLON.MeshBuilder.CreateGround(`introGround${gameStep}`, {
       width: cardWidth,
       height: cardHeight
-    }, scene);
+    }, scene)
 
-    var textureGround = new BABYLON.DynamicTexture(`dynamicTexture${gameStep}`, {
+    const textureGround = new BABYLON.DynamicTexture(`dynamicTexture${gameStep}`, {
       width: cardWidth,
       height: cardHeight
-    }, scene, false);
-    var textureContext = textureGround.getContext();
+    }, scene, false)
     textureGround.hasAlpha = true
 
-    var materialGround = new BABYLON.StandardMaterial(`introMaterial${gameStep}`, scene);
-    materialGround.diffuseTexture = textureGround;
+    const materialGround = new BABYLON.StandardMaterial(`introMaterial${gameStep}`, scene)
+    materialGround.diffuseTexture = textureGround
     materialGround.emissiveColor = new BABYLON.Color3(1, 1, 1)
-    ground.material = materialGround;
+    ground.material = materialGround
 
-    var textureContext = textureGround.getContext();
-    var img = new Image();
-    img.src = Detail;
+    const textureContext = textureGround.getContext()
+    const img = new Image()
+    img.src = Detail
     img.onload = function () {
       const fontType = 'Arial'
       const testFontSize = 12
@@ -482,12 +452,12 @@ class Hall3D extends React.Component<Props, State> {
       const realFontSize = cardWidth / (ratio * 1.4)
 
       console.log(img.naturalWidth, img.naturalHeight, cardWidth, cardHeight)
-      textureContext.drawImage(this as any, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, cardWidth, cardHeight);
-      textureGround.update();
+      textureContext.drawImage(this as any, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, cardWidth, cardHeight)
+      textureGround.update()
 
-      var font = `bold ${realFontSize}px ${fontType}`;
-      textureGround.drawText(introContent, null, 20, font, "white", null);
-      textureGround.update();
+      const font = `bold ${realFontSize}px ${fontType}`
+      textureGround.drawText(introContent, null, 20, font, 'white', null)
+      textureGround.update()
     }
     ground.position = new BABYLON.Vector3(introPosition.x, introPosition.y, introPosition.z)
     ground.rotation.x = -Math.PI / 2
@@ -502,8 +472,8 @@ class Hall3D extends React.Component<Props, State> {
       width: maskSize.width,
       height: maskSize.height,
       subdivisions: 4
-    }, this.scene);
-    const myMaterial = new BABYLON.StandardMaterial(`hoverMaskMaterial${gameStep}`, this.scene);
+    }, this.scene)
+    const myMaterial = new BABYLON.StandardMaterial(`hoverMaskMaterial${gameStep}`, this.scene)
     myGround.position.x = maskPosition.x
     myGround.position.y = maskPosition.y
     myGround.position.z = maskPosition.z
@@ -511,7 +481,7 @@ class Hall3D extends React.Component<Props, State> {
     myGround.rotation.y = maskRotateY
     myGround.material = myMaterial
     myGround.material.alpha = 0
-    myGround.actionManager = new BABYLON.ActionManager(this.scene);
+    myGround.actionManager = new BABYLON.ActionManager(this.scene)
     myGround.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
       {
         trigger: BABYLON.ActionManager.OnPointerOverTrigger,
@@ -533,61 +503,15 @@ class Hall3D extends React.Component<Props, State> {
     return myGround
   }
 
-  renderGameStepBtn(gameStep: GameSteps) {
-    const {btnPosition} = GameRenderConfigs[gameStep]
-    var light = new BABYLON.DirectionalLight("direct", new BABYLON.Vector3(0, -1, 0), this.scene);
-
-    const path = [
-      new BABYLON.Vector3(-10, 0, 0),
-      new BABYLON.Vector3(0, 10, 0),
-      new BABYLON.Vector3(10, 0, 0),
-    ]
-    const path2 = [
-      new BABYLON.Vector3(-10, -10, 0),
-      new BABYLON.Vector3(0, 0, 0),
-      new BABYLON.Vector3(10, -10, 0),
-    ]
-    const line1 = Line2d('testline', {
-      path,
-      width: 2,
-      color: [0, 0, 1, 1]
-    }, this.scene)
-    const line2 = Line2d('testline2', {
-      path: path2,
-      width: 2,
-      color: [0, 0, 1, 1]
-    }, this.scene)
-    const mesh2 = BABYLON.Mesh.MergeMeshes([line1, line2] as any)
-    mesh2.position = new BABYLON.Vector3(btnPosition.x, btnPosition.y, btnPosition.z)
-    mesh2.rotation.x = Math.PI / 4
-
-    var ground = BABYLON.Mesh.CreateGround("ground1", 20, 20, 1, this.scene);
-    const myMaterial = new BABYLON.StandardMaterial(`btnMat${gameStep}`, this.scene)
-    const texture = new BABYLON.Texture(Detail, this.scene)
-    myMaterial.emissiveTexture = texture
-    myMaterial.alpha = 0
-    ground.material = myMaterial
-    ground.position = new BABYLON.Vector3(btnPosition.x, btnPosition.y + 1, btnPosition.z)
-    ground.rotation.x = -Math.PI / 4
-    ground.actionManager = new BABYLON.ActionManager(this.scene)
-    ground.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
-      {
-        trigger: BABYLON.ActionManager.OnPickDownTrigger,
-      },
-      this.handleSelectGame.bind(this, gameStep)
-    ))
-  }
-
   renderLockIcon(gameStep: GameSteps) {
-    var light = new BABYLON.DirectionalLight("direct", new BABYLON.Vector3(0, 1, 1), this.scene);
+    const light = new BABYLON.DirectionalLight('direct', new BABYLON.Vector3(0, 1, 1), this.scene)
 
     const {isLock, lockIconPosition, maskRotateY} = GameRenderConfigs[gameStep]
-    var ground = BABYLON.Mesh.CreateGround(`lockGround${gameStep}`, 30, 30 * (186 / 144), 1, this.scene);
+    const ground = BABYLON.Mesh.CreateGround(`lockGround${gameStep}`, 30, 30 * (186 / 144), 1, this.scene)
     const myMaterial = new BABYLON.StandardMaterial(`lockMat${gameStep}`, this.scene)
     const texture = new BABYLON.Texture(isLock ? LockIcon : UnLockIcon, this.scene)
     texture.hasAlpha = true
     myMaterial.diffuseTexture = texture
-    // myMaterial.diffuseColor = new BABYLON.Color3(1, 1, 1)
     ground.material = myMaterial
     ground.rotation.x = -Math.PI / 2
     ground.rotation.y = maskRotateY
@@ -596,75 +520,75 @@ class Hall3D extends React.Component<Props, State> {
 
   handleShowLeftDetail() {
     const frameRate = 20
-    var movein = new BABYLON.Animation("movein", "position", frameRate, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+    const movein = new BABYLON.Animation('movein', 'position', frameRate, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT)
 
-    var movein_keys = [];
+    const movein_keys = []
 
     movein_keys.push({
       frame: 0,
       value: new BABYLON.Vector3(0, 0, -zLargeDistance)
-    });
+    })
 
     movein_keys.push({
       frame: 1 * frameRate,
       value: new BABYLON.Vector3(zLargeDistance / 2, 0, -zLargeDistance / 2)
-    });
+    })
 
     movein_keys.push({
       frame: 2 * frameRate,
       value: new BABYLON.Vector3(5, 0, -5)
-    });
-    movein.setKeys(movein_keys);
+    })
+    movein.setKeys(movein_keys)
     this.scene.beginDirectAnimation(this.camera, [movein], 0, 9 * frameRate, false)
     this.registerShowDetailView()
   }
 
   handleShowCenterDetail() {
     const frameRate = 20
-    var movein = new BABYLON.Animation("movein", "position", frameRate, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+    const movein = new BABYLON.Animation('movein', 'position', frameRate, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT)
 
-    var movein_keys = [];
+    const movein_keys = []
 
     movein_keys.push({
       frame: 0,
       value: new BABYLON.Vector3(0, 0, -zLargeDistance)
-    });
+    })
 
     movein_keys.push({
       frame: 1 * frameRate,
       value: new BABYLON.Vector3(0, -zLargeDistance / 10, -zLargeDistance / 2)
-    });
+    })
 
     movein_keys.push({
       frame: 2 * frameRate,
       value: new BABYLON.Vector3(0, -1, -5)
-    });
-    movein.setKeys(movein_keys);
+    })
+    movein.setKeys(movein_keys)
     this.scene.beginDirectAnimation(this.camera, [movein], 0, 9 * frameRate, false)
     this.registerShowDetailView()
   }
 
   handleShowRightDetail() {
     const frameRate = 20
-    var movein = new BABYLON.Animation("movein", "position", frameRate, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
+    const movein = new BABYLON.Animation('movein', 'position', frameRate, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT)
 
-    var movein_keys = [];
+    const movein_keys = []
 
     movein_keys.push({
       frame: 0,
       value: new BABYLON.Vector3(0, 0, -zLargeDistance)
-    });
+    })
 
     movein_keys.push({
       frame: 1 * frameRate,
       value: new BABYLON.Vector3(-zLargeDistance / 2, 0, -zLargeDistance / 2)
-    });
+    })
 
     movein_keys.push({
       frame: 2 * frameRate,
       value: new BABYLON.Vector3(-5, 0, -5)
-    });
-    movein.setKeys(movein_keys);
+    })
+    movein.setKeys(movein_keys)
     this.scene.beginDirectAnimation(this.camera, [movein], 0, 9 * frameRate, false)
     this.registerShowDetailView()
   }
@@ -703,33 +627,31 @@ class Hall3D extends React.Component<Props, State> {
         maskInstance = this.renderHoverMaskInstance(Number(gameStep))
         this.hoverMaskInstance[gameStep] = maskInstance
       }
-      this.renderGameStepBtn(Number(gameStep))
       this.renderLockIcon(Number(gameStep))
     })
     setTimeout(() => {
       this.setState({
         isInitView: false
       })
-    }, 500);
+    }, 500)
   }
 
   handleSceneMount({engine, scene, canvas}) {
-    // _showWorldAxis(scene, 20);
     const camera = new BABYLON.ArcRotateCamera(
-      "Camera",
+      'Camera',
       0, 0, 5,
       BABYLON.Vector3.Zero(),
       scene
-    );
+    )
     this.scene = scene
     this.camera = camera
 
-    camera.attachControl(canvas, true);
-    camera.inputs.attached.mousewheel.detachControl(canvas);
+    camera.attachControl(canvas, true)
+    camera.inputs.attached.mousewheel.detachControl(canvas)
 
-    const dome = new BABYLON.PhotoDome(
+    new BABYLON.PhotoDome(
       "hall",
-      PANO,
+      Hall,
       {
         resolution: 32,
         size: 1000
@@ -743,17 +665,17 @@ class Hall3D extends React.Component<Props, State> {
 
         case BABYLON.PointerEventTypes.POINTERUP:
           console.log(pointerInfo)
-          break;
+          break
         case BABYLON.PointerEventTypes.POINTERMOVE:
-          break;
+          break
       }
-    });
+    })
 
     engine.runRenderLoop(() => {
       if (scene) {
-        scene.render();
+        scene.render()
       }
-    });
+    })
   }
 
   connectSocket() {
@@ -768,7 +690,7 @@ class Hall3D extends React.Component<Props, State> {
         modalContentType: ModalContentTypes.waittingMatch,
         matchTimer: 0
       })
-      this.matchTimer = setInterval(() => {
+      this.matchTimer = window.setInterval(() => {
         this.setState({
           matchTimer: this.state.matchTimer + 1
         })
@@ -807,65 +729,37 @@ class Hall3D extends React.Component<Props, State> {
 
   render() {
     const {isDetailView, isInitView} = this.state
-    return (
-      <div>
-        {
-          isInitView && <div className={style.loading}>
-              <Loading label="加载中"/>
-          </div>
-        }
-        {
-          isDetailView && <div className={style.actionBtns}>
-              <Button onClick={this.handleCancelOverview.bind(this)} label="返回"></Button>
-          </div>
-        }
-        {this.renderModal()}
-        <BabylonScene
-          style={{width: "100vw", height: "100vh"}}
-          onSceneMount={this.handleSceneMount.bind(this)}
-        />
-      </div>
-
-    );
+    return <div>
+      {
+        isInitView && <div className={style.loading}>
+            <Loading label="加载中"/>
+        </div>
+      }
+      {
+        isDetailView && <div className={style.actionBtns}>
+            <Button onClick={this.handleCancelOverview.bind(this)} label="返回"/>
+        </div>
+      }
+      {this.renderModal()}
+      <BabylonScene
+        style={{width: '100vw', height: '100vh'}}
+        onSceneMount={this.handleSceneMount.bind(this)}
+      />
+      <section className={style.dock}>
+        <div onClick={() => this.handleSelectGame(GameSteps.left)}>
+          <label>连续竞价</label>
+          <img src={require('../../assets/dock/cbm.png')}/>
+        </div>
+        <div onClick={() => this.handleSelectGame(GameSteps.center)}>
+          <label>IPO与拍卖</label>
+          <img src={require('../../assets/dock/ipo.png')}/>
+        </div>
+        <div onClick={() => this.handleSelectGame(GameSteps.right)}>
+          <label>集合竞价</label>
+          <img src={require('../../assets/dock/tbm.png')}/>
+        </div>
+      </section>
+    </div>
   }
 }
-
-export default Hall3D;
-
-function _showWorldAxis(scene, size) {
-  var makeTextPlane = function (text, color, size) {
-    var dynamicTexture = new BABYLON.DynamicTexture("DynamicTexture", 50, scene, true);
-    dynamicTexture.hasAlpha = true;
-    dynamicTexture.drawText(text, 5, 40, "bold 36px Arial", color, "transparent", true);
-    var plane = BABYLON.Mesh.CreatePlane("TextPlane", size, scene, true);
-    const planeMaterial = new BABYLON.StandardMaterial("TextPlaneMaterial", scene);
-    planeMaterial.backFaceCulling = false;
-    planeMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
-    planeMaterial.diffuseTexture = dynamicTexture;
-    plane.material = planeMaterial;
-    return plane;
-  };
-  var axisX = BABYLON.Mesh.CreateLines("axisX", [
-    BABYLON.Vector3.Zero(), new BABYLON.Vector3(size, 0, 0), new BABYLON.Vector3(size * 0.95, 0.05 * size, 0),
-    new BABYLON.Vector3(size, 0, 0), new BABYLON.Vector3(size * 0.95, -0.05 * size, 0)
-  ], scene);
-  axisX.color = new BABYLON.Color3(1, 0, 0);
-  var xChar = makeTextPlane("X", "red", size / 10);
-  xChar.position = new BABYLON.Vector3(0.9 * size, -0.05 * size, 0);
-  var axisY = BABYLON.Mesh.CreateLines("axisY", [
-    BABYLON.Vector3.Zero(), new BABYLON.Vector3(0, size, 0), new BABYLON.Vector3(-0.05 * size, size * 0.95, 0),
-    new BABYLON.Vector3(0, size, 0), new BABYLON.Vector3(0.05 * size, size * 0.95, 0)
-  ], scene);
-  axisY.color = new BABYLON.Color3(0, 1, 0);
-  var yChar = makeTextPlane("Y", "green", size / 10);
-  yChar.position = new BABYLON.Vector3(0, 0.9 * size, -0.05 * size);
-  var axisZ = BABYLON.Mesh.CreateLines("axisZ", [
-    BABYLON.Vector3.Zero(), new BABYLON.Vector3(0, 0, size), new BABYLON.Vector3(0, -0.05 * size, size * 0.95),
-    new BABYLON.Vector3(0, 0, size), new BABYLON.Vector3(0, 0.05 * size, size * 0.95)
-  ], scene);
-  axisZ.color = new BABYLON.Color3(0, 0, 1);
-  var zChar = makeTextPlane("Z", "blue", size / 10);
-  zChar.position = new BABYLON.Vector3(0, 0.05 * size, 0.9 * size);
-};
-
 
