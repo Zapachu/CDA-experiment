@@ -74,7 +74,7 @@ const gamePhaseVideoSrc = {
 const gamePhaseLabel = {
   [GameTypes.IPO_Median]: '中位数定价',
   [GameTypes.IPO_TopK]: '荷兰式拍卖',
-  [GameTypes.IPO_FPSBA]: '第一密封价格拍卖',
+  [GameTypes.IPO_FPSBA]: '第一价格密封拍卖',
   [GameTypes.OpenAuction]: '公开竞价拍卖',
   [GameTypes.TBM]: '集合竞价',
   [GameTypes.CBM]: '连续竞价',

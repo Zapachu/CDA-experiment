@@ -181,8 +181,10 @@ $color-light: rgba(white, .8);
   }
 
   .questions {
+    color: $color-light;
     li {
       margin: 2rem;
+      list-style: decimal;
 
       .answer {
         max-height: 1rem;

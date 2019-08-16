@@ -623,16 +623,12 @@ function Test({type, done}: { type: IPOType, done: () => void }) {
         },
         [showAnswer, setShowAnswer] = React.useState(false)
 
-    function QRadio({index, children}: { index, children }) {
-        return <Radio.Group style={{margin: '.5rem'}} value={inputArr[index]}
-                            onChange={({target: {value}}) => setInputArr(index, value)}>
-            {children}
-        </Radio.Group>
-    }
+    let inputIndex = 0
 
-    function inputProps(index: number) {
+    function inputProps(style: React.CSSProperties = {width: '6rem', margin: '2px .5rem'}) {
+        const index = inputIndex++
         return {
-            style: {width: '6rem', margin: '2px .5rem'},
+            style,
             value: inputArr[index],
             onChange: ({target: {value}}) => setInputArr(index, value)
         }
@@ -640,88 +636,65 @@ function Test({type, done}: { type: IPOType, done: () => void }) {
 
     return <section className={style.test}>
         <div className={style.title}>{'知识点测试'}</div>
-        <ul className={`${style.questions} ${showAnswer ? style.showAnswer : ''}`}>
-            <li className={style.radioQuestion}>
-                <p>1. 如图所示，浦发银行的股票代码是600000，则浦发银行是</p>
-                <img style={{width: '32rem', margin: '1rem'}} src={require('./asset/testImg.png')}/>
-                <QRadio index={0}>
-                    <Radio value={1}>A. 沪市A股</Radio>
-                    <Radio value={2}>B. 深市B股</Radio>
-                    <Radio value={3}>C. 创业版</Radio>
-                    <Radio value={4}>D. 中小板</Radio>
-                </QRadio>
-                <p className={style.answer}>正确答案：A</p>
-            </li>
-            <li>
-                <p>2.一个股本1亿股的公司，如果今年预计利润为2亿元，其每股收益EPS=2亿/1亿=2元。如果目前股价为40元，则其市盈率：PE=<AntInput {...inputProps(1)}/>
-                </p>
-                <p className={style.answer}>解析：市盈率=股价/每股收益=40/2=20</p>
-            </li>
-            <li>
-                <p>3. 某企业发行股票的承销金额是1亿元，则最低承销费为<AntInput {...inputProps(2)}/>元；最高承销费为<AntInput {...inputProps(3)}/>元。</p>
-                <p className={style.answer}>解析：100000000*1.5%=1500000；100000000*3%=3000000</p>
-            </li>
-            <li className={style.radioQuestion}>
-                <p>4. 我国目前的股票发行监管制度的核心是</p>
-                <QRadio index={4}>
-                    <Radio value={1}>A. 保荐制</Radio>
-                    <Radio value={2}>B. 核准制</Radio>
-                    <Radio value={3}>C. 注册制</Radio>
-                    <Radio value={4}>D. 审核制</Radio>
-                </QRadio>
-                <p className={style.answer}>正确答案：B
-                    <br/>解析：我国现已形成了以核准制为核心的股票发行监管制度
-                </p>
-            </li>
-            <li>
-                <p>5. 外国公司、外国金融机构、外国人等不得买卖<AntInput {...inputProps(5)}/>股；境内中资机构和个人不得买卖<AntInput {...inputProps(6)}/>股。
-                </p>
-                <p className={style.answer}>正确答案：A；B</p>
-            </li>
-            <li>
-                <p>6. 当您们公司对股票的估值为49 元，股票的保留价格为33元是，则您的最高购买价格为
-                    <AntInput {...inputProps(7)}/>元，最低购买价格为<AntInput {...inputProps(8)}/>元；如若您输入购买价格后，系统显示您可以买2000股，则当您点击半仓时，您的购买数量为
-                    <AntInput {...inputProps(9)}/>股，当您点击全仓时，您的购买数量为<AntInput {...inputProps(10)}/>股。</p>
-                <p className={style.answer}>正确答案：49；33；1000；2000</p>
-            </li>
+        <ol className={`${style.questions} ${showAnswer ? style.showAnswer : ''}`}>
             {
                 type === IPOType.TopK ?
                     <>
+                        <li className={style.radioQuestion}>
+                            <p>如图所示，浦发银行的股票代码是600000，则浦发银行是</p>
+                            <img style={{width: '32rem', margin: '1rem'}} src={require('./asset/testImg.png')}/>
+                            <Radio.Group {...inputProps({margin: '.5rem'})}>
+                                <Radio value={1}>A. 沪市A股</Radio>
+                                <Radio value={2}>B. 深市B股</Radio>
+                                <Radio value={3}>C. 创业版</Radio>
+                                <Radio value={4}>D. 中小板</Radio>
+                            </Radio.Group>
+                            <p className={style.answer}>正确答案：A</p>
+                        </li>
                         <li>
-                            <p>7.
-                                市场上有10000股股票。您的拟购买价格和拟购买数量是105元和4000股。市场上其他参与者的拟购买价格和拟购买数量如下：交易者A给出的拟购买价格和拟购买数量分布为99元和5000股，交易者B给出的拟购买价格和购买数量为100元和6000股，交易者C给出的拟购买价格和购买数量为102元和3000股，交易者D给出的拟购买价格和购买数量为96元和3000股
+                            <p>一个股本1亿股的公司，如果今年预计利润为2亿元，其每股收益EPS=2亿/1亿=2元。如果目前股价为40元，则其市盈率：PE=<AntInput {...inputProps()}/>
+                            </p>
+                            <p className={style.answer}>解析：市盈率=股价/每股收益=40/2=20</p>
+                        </li>
+                        <li>
+                            <p>当您们公司对股票的估值为49 元，股票的保留价格为33元是，则您的最高购买价格为
+                                <AntInput {...inputProps()}/>元，最低购买价格为<AntInput {...inputProps()}/>元；如若您输入购买价格后，系统显示您可以买2000股，则当您点击半仓时，您的购买数量为
+                                <AntInput {...inputProps()}/>股，当您点击全仓时，您的购买数量为<AntInput {...inputProps()}/>股。</p>
+                            <p className={style.answer}>正确答案：49；33；1000；2000</p>
+                        </li>
+                        <li>
+                            <p>市场上有10000股股票。您的拟购买价格和拟购买数量是105元和4000股。市场上其他参与者的拟购买价格和拟购买数量如下：交易者A给出的拟购买价格和拟购买数量分布为99元和5000股，交易者B给出的拟购买价格和购买数量为100元和6000股，交易者C给出的拟购买价格和购买数量为102元和3000股，交易者D给出的拟购买价格和购买数量为96元和3000股
                                 系统按照购买价格的由高到低进行排序：
                                 <br/>您：105元——4000股
                                 <br/>C: 102元——3000股
                                 <br/>B：100元——6000股
                                 <br/>A：99元——5000股
                                 <br/>D：96元——3000股</p>
-                            <p>整个市场的拟购买总股数为21000，第10000股价格为100元，则成交价格为<AntInput {...inputProps(11)}/>元。
-                                <br/>A的成交数量：<AntInput {...inputProps(12)}/>股；
-                                <br/>B的成交数量：<AntInput {...inputProps(13)}/>股；
-                                <br/>C的成交数量：<AntInput {...inputProps(14)}/>股；
-                                <br/>D的成交数量：<AntInput {...inputProps(15)}/>股；
-                                <br/>您的成交数量：<AntInput {...inputProps(16)}/>股。</p>
+                            <p>整个市场的拟购买总股数为21000，第10000股价格为100元，则成交价格为<AntInput {...inputProps()}/>元。
+                                <br/>A的成交数量：<AntInput {...inputProps()}/>股；
+                                <br/>B的成交数量：<AntInput {...inputProps()}/>股；
+                                <br/>C的成交数量：<AntInput {...inputProps()}/>股；
+                                <br/>D的成交数量：<AntInput {...inputProps()}/>股；
+                                <br/>您的成交数量：<AntInput {...inputProps()}/>股。</p>
                             <p className={style.answer}>整个市场的拟购买总股数为21000，第10000股价格为100元，则成交价格即为第10000股股票对应的价格：100元。
                                 您、C、B都有购买这1万股股票的权利。按照价格排序后，您的成交数量为
                                 4000股，C成交数量为3000股，市场上还剩3000股股票。虽然B的拟购买数量为6000股，但是此时市面上只剩3000股，因此B的成交数量为3000股。A和D的购买价格小于股票的成交价格，成交数量为0股。
                             </p>
                         </li>
                         <li>
-                            <p>8.
-                                市场上有10000股股票。您的拟购买价格和拟购买数量是48元和4000股。市场上其他参与者的拟购买价格和拟购买数量如下：交易者A给出的拟购买价格和拟购买数量分布为35元和5000股，交易者B给出的拟购买价格和购买数量为50元和7000股，交易者C给出的拟购买价格和购买数量为44元和3000股，交易者D给出的拟购买价格和购买数量为39元和3000股。
+                            <p>市场上有10000股股票。您的拟购买价格和拟购买数量是48元和4000股。市场上其他参与者的拟购买价格和拟购买数量如下：交易者A给出的拟购买价格和拟购买数量分布为35元和5000股，交易者B给出的拟购买价格和购买数量为50元和7000股，交易者C给出的拟购买价格和购买数量为44元和3000股，交易者D给出的拟购买价格和购买数量为39元和3000股。
                                 系统按照购买价格的由高到低进行排序：
                                 <br/>B：50元——7000股
                                 <br/>您: 48元——4000股
                                 <br/>C：44元——3000股
                                 <br/>D：39元——3000股
                                 <br/>A：35元——5000股</p>
-                            <p>整个市场的拟购买总股数为22000，第10000股价格为48元，则成交价格为<AntInput {...inputProps(17)}/>元。
-                                <br/>A的成交数量：<AntInput {...inputProps(18)}/>股；
-                                <br/>B的成交数量：<AntInput {...inputProps(19)}/>股；
-                                <br/>C的成交数量：<AntInput {...inputProps(20)}/>股；
-                                <br/>D的成交数量：<AntInput {...inputProps(21)}/>股；
-                                <br/>您的成交数量：<AntInput {...inputProps(22)}/>股。</p>
+                            <p>整个市场的拟购买总股数为22000，第10000股价格为48元，则成交价格为<AntInput {...inputProps()}/>元。
+                                <br/>A的成交数量：<AntInput {...inputProps()}/>股；
+                                <br/>B的成交数量：<AntInput {...inputProps()}/>股；
+                                <br/>C的成交数量：<AntInput {...inputProps()}/>股；
+                                <br/>D的成交数量：<AntInput {...inputProps()}/>股；
+                                <br/>您的成交数量：<AntInput {...inputProps()}/>股。</p>
                             <p className={style.answer}>整个市场的拟购买总股数为22000，第10000股价格为48元，则成交价格即为第10000股股票对应的价格：48元。
                                 B、您都有购买这1万股股票的权利。按照价格排序后，B的成交数量为
                                 7000股，市场上还剩3000股股票。虽然您的拟购买数量为4000股，但是此时市面上只剩3000股，因此您的成交数量为3000股。C、A和D的购买价格小于股票的成交价格，成交数量为0股。
@@ -729,15 +702,36 @@ function Test({type, done}: { type: IPOType, done: () => void }) {
                         </li>
                     </> : type === IPOType.Median ? <>
                         <li>
-                            <p>7.
-                                市场上有10000股股票。您的拟购买价格和拟购买数量是105元和4000股。市场上其他参与者的拟购买价格和拟购买数量如下：交易者A给出的拟购买价格和拟购买数量分布为99元和5000股，交易者B给出的拟购买价格和购买数量为100元和6000股，交易者C给出的拟购买价格和购买数量为102元和3000股，交易者D给出的拟购买价格和购买数量为96元和3000股。
+                            <p>某企业发行股票的承销金额是1亿元，则最低承销费为<AntInput {...inputProps()}/>元；最高承销费为<AntInput {...inputProps()}/>元。
+                            </p>
+                            <p className={style.answer}>解析：100000000*1.5%=1500000；100000000*3%=3000000</p>
+                        </li>
+                        <li className={style.radioQuestion}>
+                            <p>我国目前的股票发行监管制度的核心是</p>
+                            <Radio.Group {...inputProps({margin: '.5rem'})}>
+                                <Radio value={1}>A. 保荐制</Radio>
+                                <Radio value={2}>B. 核准制</Radio>
+                                <Radio value={3}>C. 注册制</Radio>
+                                <Radio value={4}>D. 审核制</Radio>
+                            </Radio.Group>
+                            <p className={style.answer}>正确答案：B
+                                <br/>解析：我国现已形成了以核准制为核心的股票发行监管制度
+                            </p>
+                        </li>
+                        <li>
+                            <p>外国公司、外国金融机构、外国人等不得买卖<AntInput {...inputProps()}/>股；境内中资机构和个人不得买卖<AntInput {...inputProps()}/>股。
+                            </p>
+                            <p className={style.answer}>正确答案：A；B</p>
+                        </li>
+                        <li>
+                            <p>市场上有10000股股票。您的拟购买价格和拟购买数量是105元和4000股。市场上其他参与者的拟购买价格和拟购买数量如下：交易者A给出的拟购买价格和拟购买数量分布为99元和5000股，交易者B给出的拟购买价格和购买数量为100元和6000股，交易者C给出的拟购买价格和购买数量为102元和3000股，交易者D给出的拟购买价格和购买数量为96元和3000股。
                                 系统按照购买价格的由高到低进行排序：
                                 <br/>您：105元——4000股
                                 <br/>C: 102元——3000股
                                 <br/>B：100元——6000股
                                 <br/>A：99元——5000股
                                 <br/>D：96元——3000股</p>
-                            <p>整个市场的拟购买总股数为21000，中位数第10500股价格为100元，则成交价格为<AntInput {...inputProps(11)}/>元。
+                            <p>整个市场的拟购买总股数为21000，中位数第10500股价格为100元，则成交价格为<AntInput {...inputProps()}/>元。
                                 <br/>您、C和B都有共同购买这1万股股票的权利。三个合起来的拟购买数量为13000，则系统随机从13000股股票中选择10000股分配购买权。
                             </p>
                             <p className={style.answer}>整个市场的拟购买总股数为21000，中位数第10500股价格为100元，则成交价格即为第10500股股票对应的价格：100元。
@@ -745,30 +739,66 @@ function Test({type, done}: { type: IPOType, done: () => void }) {
                             </p>
                         </li>
                         <li>
-                            <p>8.
-                                市场上有10000股股票。您的拟购买价格和拟购买数量是48元和6000股。市场上其他参与者的拟购买价格和拟购买数量如下：交易者A给出的拟购买价格和拟购买数量分布为35元和5000股，交易者B给出的拟购买价格和购买数量为50元和7000股，交易者C给出的拟购买价格和购买数量为44元和3000股，交易者D给出的拟购买价格和购买数量为39元和3000股
+                            <p>市场上有10000股股票。您的拟购买价格和拟购买数量是48元和6000股。市场上其他参与者的拟购买价格和拟购买数量如下：交易者A给出的拟购买价格和拟购买数量分布为35元和5000股，交易者B给出的拟购买价格和购买数量为50元和7000股，交易者C给出的拟购买价格和购买数量为44元和3000股，交易者D给出的拟购买价格和购买数量为39元和3000股
                                 系统按照购买价格的由高到低进行排序：
                                 <br/>B：50元——7000股
                                 <br/>您: 48元——6000股
                                 <br/>C：44元——3000股
                                 <br/>D：39元——3000股
                                 <br/>A：35元——5000股</p>
-                            <p>整个市场的拟购买总股数为24000，中位数第12000股价格为48元，则成交价格为<AntInput {...inputProps(12)}/>元。
+                            <p>整个市场的拟购买总股数为24000，中位数第12000股价格为48元，则成交价格为<AntInput {...inputProps()}/>元。
                                 您、B都有共同购买这1万股股票的权利。三个合起来的拟购买数量为13000，则系统随机从13000股股票中选择10000股分配购买权。</p>
                             <p className={style.answer}>整个市场的拟购买总股数为22000，中位数第13000股价格为48元，则成交价格即为第13000股股票对应的价格：48元。
                                 您和B都有共同购买这1万股股票的权利。二人合起来的拟购买数量为13000，则系统随机从13000股股票中选择10000股分配购买权。，则每股股票被抽到的概率为10000/13000。简言之，当拟购买价格在成交价格之上时，预期购买数量越大，可能购买到的数量越多。
                             </p>
                         </li>
-                    </> : null
+                    </> : <>
+                        <li>
+                            <p>当您们公司对股票的估值为52
+                                元，股票的保留价格为43元是，则您的最高购买价格为<AntInput {...inputProps()}/>元，最低购买价格为<AntInput {...inputProps()}/>元；如若您输入购买价格后，系统显示您可以买4000股，则当您点击半仓时，您的购买数量为<AntInput {...inputProps()}/>股，当您点击全仓时，您的购买数量为<AntInput {...inputProps()}/>股。
+                            </p>
+                            <p className={style.answer}>正确答案：52；43；2000；4000</p>
+                        </li>
+                        <li>
+                            <p>市场上有10000股股票。您的拟购买价格和拟购买数量是105元和4000股。市场上其他参与者的拟购买价格和拟购买数量如下：交易者A给出的拟购买价格和拟购买数量分布为99元和5000股，交易者B给出的拟购买价格和购买数量为100元和6000股，交易者C给出的拟购买价格和购买数量为102元和3000股，交易者D给出的拟购买价格和购买数量为96元和3000股
+                                系统按照购买价格的由高到低进行排序：
+                                <br/>您：105元——4000股
+                                <br/>C: 102元——3000股
+                                <br/>B：100元——6000股
+                                <br/>A：99元——5000股
+                                <br/>D：96元——3000股
+                                <br/>您的成交数量：<AntInput {...inputProps()}/>股，购买价格为<AntInput {...inputProps()}/>元；C的成交数量：<AntInput {...inputProps()}/>股，购买价格为<AntInput {...inputProps()}/>元；B的成交数量：<AntInput {...inputProps()}/>股,
+                                购买价格为<AntInput {...inputProps()}/>元；A的成交数量：<AntInput {...inputProps()}/>股；
+                                D的成交数量：<AntInput {...inputProps()}/>股
+                            </p>
+                            <p className={style.answer}>解析：您、C、B都有购买这1万股股票的权利。按照价格排序后，您的成交数量为
+                                4000股，购买价格即为您的拟购买价格105元；C成交数量为3000股，购买价格即为C的拟购买价格102元；市场上还剩3000股股票。虽然B的拟购买数量为6000股，但是此时市面上只剩3000股，因此B的成交数量为3000股，B的购买价格即为B的拟购买价格。A和D的购买价格小于第10000股股票的价格，成交数量为0股</p>
+                        </li>
+                        <li>
+                            <p>市场上有10000股股票。您的拟购买价格和拟购买数量是48元和4000股。市场上其他参与者的拟购买价格和拟购买数量如下：交易者A给出的拟购买价格和拟购买数量分布为35元和5000股，交易者B给出的拟购买价格和购买数量为50元和7000股，交易者C给出的拟购买价格和购买数量为44元和3000股，交易者D给出的拟购买价格和购买数量为39元和3000股。
+                                系统按照购买价格的由高到低进行排序：
+                                <br/>B：50元——7000股
+                                <br/>您: 48元——4000股
+                                <br/>C：44元——3000股
+                                <br/>D：39元——3000股
+                                <br/>A：35元——5000股
+                                <br/>B的成交数量：<AntInput {...inputProps()}/>股,
+                                购买价格为<AntInput {...inputProps()}/>元；您的成交数量：<AntInput {...inputProps()}/>股，购买价格为<AntInput {...inputProps()}/>元；C的成交数量：<AntInput {...inputProps()}/>股；
+                                D的成交数量：<AntInput {...inputProps()}/>股；A的成交数量：<AntInput {...inputProps()}/>股
+                            </p>
+                            <p className={style.answer}>解析：B、您都有购买这1万股股票的权利。按照价格排序后，B的成交数量为
+                                7000股，B的购买价格即为B的拟购买价格50元；市场上还剩3000股股票。虽然您的拟购买数量为4000股，但是此时市面上只剩3000股，因此您的成交数量为3000股，您的购买价格即为您的拟购买价格48元。C、A和D的购买价格小于股票的成交价格，成交数量为0股。</p>
+                        </li>
+                    </>
             }
-        </ul>
+        </ol>
         <Button label={lang.confirm} onClick={() => {
-            const answer = [1, '20', '1500000', '3000000', 2, 'A', 'B', '49', '33', '1000', '2000'].concat({
-                [IPOType.FPSBA]: [],
-                [IPOType.TopK]: ['100', '0', '3000', '3000', '0', '4000', '48', '0', '7000', '0', '0', '3000'],
-                [IPOType.Median]: ['100', '48']
-            }[type])
-            console.log(answer)
+            console.log(inputArr)
+            const answer = {
+                [IPOType.TopK]: [1, '20', '49', '33', '1000', '2000', '100', '0', '3000', '3000', '0', '4000', '48', '0', '7000', '0', '0', '3000'],
+                [IPOType.Median]: ['1500000', '3000000', 2, 'A', 'B', '100', '48'],
+                [IPOType.FPSBA]: ['52', '43', '2000', '4000', '4000', '105', '3000', '102', '3000', '102', '0', '0', '7000', '50', '3000', '48', '0', '0', '0']
+            }[type]
             if (inputArr.toString() === answer.toString()) {
                 done()
             } else {
