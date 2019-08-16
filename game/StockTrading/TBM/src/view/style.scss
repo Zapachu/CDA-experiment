@@ -8,6 +8,8 @@ $color-light: rgba(white, .8);
   background: radial-gradient(#293567, #151b35);
   color: white;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 
   .playContent {
     max-width: 48rem;
@@ -35,12 +37,6 @@ $color-light: rgba(white, .8);
 
     .highlight {
       color: #58c350;
-    }
-
-    .tradeBtn {
-      position: fixed;
-      top: 35vh;
-      right: 15vw;
     }
 
     .stockInfo {
@@ -125,6 +121,7 @@ $color-light: rgba(white, .8);
         margin: 2rem;
 
         .answer {
+          overflow: hidden;
           max-height: 1rem;
           color: $color-green !important;
           opacity: 0;
@@ -138,9 +135,15 @@ $color-light: rgba(white, .8);
 
       &.showAnswer .answer {
         opacity: 1;
-        max-height: 16rem;
+        max-height: 24rem;
       }
     }
+  }
+
+  .tradeBtn {
+    position: fixed;
+    top: 35vh;
+    right: 15vw;
   }
 }
 

@@ -529,20 +529,38 @@ function Test({done}: { done: () => void }) {
     const lang = Lang.extractLang({
         confirm: ['确定', 'CONFIRM']
     })
-    const [choseA, setChoseA] = React.useState(0),
-        [inputA, setInputA] = React.useState(''),
+    const [inputArr, _setInputArr] = React.useState([]),
+        setInputArr = (index, value) => {
+            const _inputArr = inputArr.slice()
+            _inputArr[index] = value
+            _setInputArr(_inputArr)
+        },
         [showAnswer, setShowAnswer] = React.useState(false)
-    const inputStyle = {width: '5rem', margin: '2px .5rem'}
+
+    function QRadio({index, children}: { index, children }) {
+        return <Radio.Group style={{margin: '.5rem'}} value={inputArr[index]}
+                            onChange={({target: {value}}) => setInputArr(index, value)}>
+            {children}
+        </Radio.Group>
+    }
+
+    function inputProps(index: number) {
+        return {
+            style: {width: '6rem', margin: '2px .5rem'},
+            value: inputArr[index],
+            onChange: ({target: {value}}) => setInputArr(index, value)
+        }
+    }
+
     return <section className={style.test}>
         <div className={style.title}>{'知识点测试'}</div>
         <ul className={`${style.questions} ${showAnswer ? style.showAnswer : ''}`}>
             <li className={style.radioQuestion}>
                 <p>1. 初步询价只能有一次，而且不能修改</p>
-                <Radio.Group style={{margin: '.5rem'}} onChange={({target: {value}}) => setChoseA(+value)}
-                             value={choseA}>
+                <QRadio index={0}>
                     <Radio value={1}>A. 对</Radio>
                     <Radio value={2}>B. 错</Radio>
-                </Radio.Group>
+                </QRadio>
                 <p className={style.answer}>正确答案：B , 初步询价原则上只能有一次报价，因特殊原因需要调整的，应在申购平台上填写具体原因修改。</p>
             </li>
             <li>
@@ -559,15 +577,55 @@ function Test({done}: { done: () => void }) {
                     <br/>2） 最高买入价格的B的买入价格高于第二低卖出价格D的卖出价格，B还未成交的四股股票成交，此时D还剩2股；
                     <br/>3） 第二高买入价格的C的买入价格高于第二低卖出价格D的卖出价格，D剩下的2股股票成交，C还有3股未成交；
                     <br/>4） 第三高买入价格的A的买入价格低于D的卖出价格，无法成交；
-                    <br/>故成交价格为（58+56）/2=<AntInput style={inputStyle}
-                                                   value={inputA}
-                                                   onChange={({target: {value}}) => setInputA(value)}/>，成交10股
+                    <br/>故成交价格为（58+56）/2=<AntInput {...inputProps(1)}/>，成交10股
                 </p>
                 <p className={style.answer}>正确答案：57</p>
             </li>
+            <li>
+                <p>3.假设有还有另外2个卖家：B, C和3个卖家：D, E, F。将3个买家的买入价格按照从高到低排序，卖家的出售价格按照从低到高排序
+                    <br/>买家：
+                    <br/>B的每份配额买入价格是48元，购买配额数量是7股；
+                    <br/>C的每份配额买入价格是44元，购买配额数量是4股；
+                    <br/>您的每份配额买入价格是39元，购买配额数量是5股；
+                    <br/>卖家：
+                    <br/>E的每份配额出售价格是40元，出售配额数量是4股；
+                    <br/>D的每份配额出售价格是42元，出售配额数量是6股；
+                    <br/>F的每份配额出售价格是46元，出售配额数量是5股；
+                    <br/>故成交价格为（44+42）/2=<AntInput {...inputProps(2)}/>，B买入<AntInput {...inputProps(3)}/>股，C买入<AntInput {...inputProps(4)}/>股，您买入<AntInput {...inputProps(5)}/>股，E卖出<AntInput {...inputProps(6)}/>股，D卖出<AntInput {...inputProps(7)}/>股，F卖出<AntInput {...inputProps(8)}/>股。
+                </p>
+                <p className={style.answer}>
+                    <br/>1）最高买入价格的B的买入价格高于最低卖出价格E的卖出价格，E的四股股票全部成交，B可购入4股E的股票，B还有3股股票未购入；
+                    <br/>2）最高买入价格的B的买入价格高于第二低卖出价格D的卖出价格，B还未成交的3股股票成交，此时D还剩3股；
+                    <br/>3）第二高买入价格的C的买入价格高于第二低卖出价格D的卖出价格，D剩下的3股股票成交，C还有1股未成交；
+                    <br/>4）第三高买入价格您的买入价格低于D的卖出价格，无法成交；
+                    <br/>成交价格为（44+42）/2= 43 ，B买入 7 股，C买入 3 股，您买入 0 股，E卖出 4 股，D卖出 6 股，F卖出 0 股
+                </p>
+            </li>
+            <li>
+                <p>4.假设有还有另外2个卖家：B, C和3个卖家：和4个卖家：D, E, F,G。将3个买家的买入价格按照从高到低排序，卖家的出售价格按照从低到高排序
+                    <br/>买家：
+                    <br/>B的每份配额买入价格是48元，购买配额数量是7股；
+                    <br/>C的每份配额买入价格是45元，购买配额数量是4股；
+                    <br/>您的每份配额买入价格是39元，购买配额数量是5股；
+                    <br/>卖家：
+                    <br/>G的每份配额出售价格是40元，出售配额数量是4股；
+                    <br/>D的每份配额出售价格是42元，出售配额数量是4股；
+                    <br/>F的每份配额出售价格是43元，出售配额数量是5股；
+                    <br/>E的每份配额出售价格是46元，出售配额数量是5股；
+                    <br/>成交价格为（45+43）/2=<AntInput {...inputProps(9)}/>，B买入<AntInput {...inputProps(10)}/>股，C买入<AntInput {...inputProps(11)}/>股，您买入<AntInput {...inputProps(12)}/>股，G卖出<AntInput {...inputProps(13)}/>股，D卖出<AntInput {...inputProps(14)}/>股，F卖出<AntInput {...inputProps(15)}/>股，E卖出0股
+                </p>
+                <p className={style.answer}>
+                    <br/>1）最高买入价格的B的买入价格高于最低卖出价格G的卖出价格，G的四股股票全部成交，B可购入4股E的股票，B还有3股股票未购入；
+                    <br/>2）最高买入价格的B的买入价格高于第二低卖出价格D的卖出价格，B还未成交的3股股票成交，此时D还剩1股；
+                    <br/>3）第二高买入价格的C的买入价格高于第二低卖出价格D的卖出价格，D剩下的1股股票成交，C还有3股未成交；
+                    <br/>4）第二高买入价格的C的买入价格高于第三低卖出价格F的卖出价格，C剩下的3股股票全部成交，F还剩2股没有成交。
+                    <br/>4）第三高买入价格您的买入价格低于F的卖出价格，无法成交；
+                    <br/>故成交价格为（45+43）/2=44，B买入7股，C买入4股，您买入0股，G卖出4股，D卖出4股，F卖出3股，E卖出0股。
+                </p>
+            </li>
         </ul>
         <Button label={lang.confirm} onClick={() => {
-            if ([choseA, inputA].toString() == [2, '57'].toString()) {
+            if (inputArr.toString() == [2, '57', 43, 7, 3, 0, 4, 6, 0, 44, 7, 4, 0, 4, 4, 3].toString()) {
                 done()
             } else {
                 setShowAnswer(true)
