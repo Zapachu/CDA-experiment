@@ -466,6 +466,7 @@ export default class Hall3D extends React.Component<Props, State> {
   }
 
   renderHoverMaskInstance(gameStep: GameSteps) {
+    return
     const {maskPosition, maskSize, maskRotateY = 0} = GameRenderConfigs[gameStep]
     console.log(maskPosition, maskSize, 'mask')
     const myGround = BABYLON.MeshBuilder.CreateGround(`hoverMask${gameStep}`, {
@@ -504,7 +505,7 @@ export default class Hall3D extends React.Component<Props, State> {
   }
 
   renderLockIcon(gameStep: GameSteps) {
-    const light = new BABYLON.DirectionalLight('direct', new BABYLON.Vector3(0, 1, 1), this.scene)
+    new BABYLON.DirectionalLight('direct', new BABYLON.Vector3(0, 1, 1), this.scene)
 
     const {isLock, lockIconPosition, maskRotateY} = GameRenderConfigs[gameStep]
     const ground = BABYLON.Mesh.CreateGround(`lockGround${gameStep}`, 30, 30 * (186 / 144), 1, this.scene)
@@ -516,6 +517,26 @@ export default class Hall3D extends React.Component<Props, State> {
     ground.rotation.x = -Math.PI / 2
     ground.rotation.y = maskRotateY
     ground.position = new BABYLON.Vector3(lockIconPosition.x, lockIconPosition.y, lockIconPosition.z)
+    const myGround = ground
+    myGround.actionManager = new BABYLON.ActionManager(this.scene)
+    myGround.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+      {
+        trigger: BABYLON.ActionManager.OnPointerOverTrigger,
+      },
+      this.handlePointerOver.bind(this, gameStep)
+    ))
+    myGround.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+      {
+        trigger: BABYLON.ActionManager.OnPointerOutTrigger,
+      },
+      this.handlePointerOut.bind(this, gameStep)
+    ))
+    myGround.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+      {
+        trigger: BABYLON.ActionManager.OnPickDownTrigger,
+      },
+      this.handleShowGameModal.bind(this, gameStep)
+    ))
   }
 
   handleShowLeftDetail() {
@@ -751,7 +772,7 @@ export default class Hall3D extends React.Component<Props, State> {
           <img src={require('../../assets/dock/cbm.png')}/>
         </div>
         <div onClick={() => this.handleSelectGame(GameSteps.center)}>
-          <label>IPO与拍卖</label>
+          <label>资产竞价与IPO</label>
           <img src={require('../../assets/dock/ipo.png')}/>
         </div>
         <div onClick={() => this.handleSelectGame(GameSteps.right)}>
