@@ -52,8 +52,8 @@ function genRandomGarbage(): GARBAGE {
   // const garbages = arr.slice(arr.length / 2);
   const garbages = [
     GARBAGE.pass,
-    GARBAGE.dry,
-    GARBAGE.wet,
+    GARBAGE.kitchen,
+    GARBAGE.other,
     GARBAGE.recyclable,
     GARBAGE.hazardous
   ];

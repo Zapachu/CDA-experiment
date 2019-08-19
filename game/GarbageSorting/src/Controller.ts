@@ -259,14 +259,14 @@ export default class Controller extends BaseController<
 }
 
 export const ITEMS = [
-  { value: 20, garbage: GARBAGE.dry },
-  { value: 20, garbage: GARBAGE.dry },
-  { value: 20, garbage: GARBAGE.dry },
-  { value: 20, garbage: GARBAGE.dry },
-  { value: 20, garbage: GARBAGE.dry },
-  { value: 20, garbage: GARBAGE.dry },
-  { value: 20, garbage: GARBAGE.dry },
-  { value: 20, garbage: GARBAGE.dry },
-  { value: 20, garbage: GARBAGE.dry },
-  { value: 20, garbage: GARBAGE.dry }
+  { value: 20, garbage: GARBAGE.hazardous },
+  { value: 20, garbage: GARBAGE.kitchen },
+  { value: 20, garbage: GARBAGE.recyclable },
+  { value: 20, garbage: GARBAGE.hazardous },
+  { value: 20, garbage: GARBAGE.recyclable },
+  { value: 20, garbage: GARBAGE.other },
+  { value: 20, garbage: GARBAGE.other },
+  { value: 20, garbage: GARBAGE.recyclable },
+  { value: 20, garbage: GARBAGE.recyclable },
+  { value: 20, garbage: GARBAGE.kitchen }
 ];
