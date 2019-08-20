@@ -797,7 +797,8 @@ function Guide({done}: { done: () => void }) {
                     borderRadius: '1.5rem'
                 }
             },
-            disableBeacon: true
+            disableBeacon: true,
+            hideCloseButton: true
         },
         steps = [
             {
@@ -890,7 +891,8 @@ function LeverageGuide({done}: { done: () => void }) {
                     borderRadius: '1.5rem'
                 }
             },
-            disableBeacon: true
+            disableBeacon: true,
+            hideCloseButton: true
         },
         steps = [
             {

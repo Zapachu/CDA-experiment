@@ -39,21 +39,23 @@ enum PlayModes {
   Multi
 }
 
-enum GameSteps { left, center, right }
+enum GameSteps { first, second, third, fourth, fifth }
 
 const GamePhaseToStep = {
-  [GameTypes.IPO_Median]: GameSteps.center,
-  [GameTypes.IPO_TopK]: GameSteps.center,
-  [GameTypes.IPO_FPSBA]: GameSteps.center,
-  [GameTypes.OpenAuction]: GameSteps.center,
-  [GameTypes.CBM]: GameSteps.left,
-  [GameTypes.CBM_Leverage]: GameSteps.left,
-  [GameTypes.TBM]: GameSteps.right
+  [GameTypes.IPO_Median]: GameSteps.third,
+  [GameTypes.IPO_TopK]: GameSteps.third,
+  [GameTypes.IPO_FPSBA]: GameSteps.third,
+  [GameTypes.OpenAuction]: GameSteps.third,
+  [GameTypes.CBM]: GameSteps.first,
+  [GameTypes.CBM_Leverage]: GameSteps.first,
+  [GameTypes.TBM]: GameSteps.fifth
 }
 const GameStepsToGamePhase = {
-  [GameSteps.left]: [GameTypes.CBM, GameTypes.CBM_Leverage],
-  [GameSteps.right]: GameTypes.TBM,
-  [GameSteps.center]: [GameTypes.IPO_TopK, GameTypes.IPO_Median, GameTypes.IPO_FPSBA, GameTypes.OpenAuction]
+  [GameSteps.first]: GameTypes.OpenAuction,
+  [GameSteps.second]: [GameTypes.IPO_TopK, GameTypes.IPO_Median, GameTypes.IPO_FPSBA],
+  [GameSteps.fifth]: GameTypes.TBM,
+  [GameSteps.fourth]: GameTypes.CBM,
+  [GameSteps.third]: GameTypes.CBM_Leverage
 }
 
 const gamePhaseOrder = {
@@ -85,7 +87,7 @@ const gamePhaseLabel = {
 }
 
 const GameRenderConfigs = {
-  [GameSteps.left]: {
+  [GameSteps.first]: {
     maskSize: {
       width: 80,
       height: 30,
@@ -110,7 +112,32 @@ const GameRenderConfigs = {
     },
     isLock: false,
   },
-  [GameSteps.center]: {
+  [GameSteps.second]: {
+    maskSize: {
+      width: 80,
+      height: 30,
+    },
+    maskPosition: {
+      x: -364,
+      y: 57,
+      z: 330
+    },
+    maskRotateY: -Math.PI / 4,
+    introPosition: {
+      x: -250,
+      y: 40,
+      z: 400
+    },
+    introRotateY: -Math.PI / 4,
+    introContent: 'ipo ipo test',
+    lockIconPosition: {
+      x: -345,
+      y: 95,
+      z: 320
+    },
+    isLock: false,
+  },
+  [GameSteps.third]: {
     maskSize: {
       width: 100,
       height: 50
@@ -135,7 +162,32 @@ const GameRenderConfigs = {
     },
     isLock: false,
   },
-  [GameSteps.right]: {
+  [GameSteps.fourth]: {
+    maskSize: {
+      width: 80,
+      height: 30
+    },
+    maskPosition: {
+      x: 363,
+      y: 66,
+      z: 330
+    },
+    maskRotateY: Math.PI / 4,
+    introPosition: {
+      x: 250,
+      y: 72,
+      z: 400
+    },
+    introRotateY: Math.PI / 4,
+    introContent: 'ipo ipo test',
+    lockIconPosition: {
+      x: 355,
+      y: 100,
+      z: 325
+    },
+    isLock: false,
+  },
+  [GameSteps.fifth]: {
     maskSize: {
       width: 80,
       height: 30
@@ -412,11 +464,16 @@ export default class Hall3D extends React.Component<Props, State> {
 
   handleSelectGame(gameStep: GameSteps) {
     const funMap = {
-      [GameSteps.left]: this.handleShowLeftDetail.bind(this),
-      [GameSteps.center]: this.handleShowCenterDetail.bind(this),
-      [GameSteps.right]: this.handleShowRightDetail.bind(this)
+      [GameSteps.first]: ()=>this.handleShowLeftDetail(),
+      [GameSteps.second]: ()=>this.handleShowLeftDetail(),
+      [GameSteps.third]: ()=>this.handleShowCenterDetail(),
+      [GameSteps.fourth]: ()=>this.handleShowRightDetail(),
+      [GameSteps.fifth]: ()=>this.handleShowRightDetail()
     }
     funMap[gameStep]()
+    setTimeout(()=>{
+      this.handleShowGameModal(gameStep)
+    },2e3)
   }
 
   renderGameIntroCard(gameStep: GameSteps) {
@@ -671,14 +728,14 @@ export default class Hall3D extends React.Component<Props, State> {
     camera.inputs.attached.mousewheel.detachControl(canvas)
 
     new BABYLON.PhotoDome(
-      "hall",
+      'hall',
       Hall,
       {
         resolution: 32,
         size: 1000
       },
       scene
-    );
+    )
     this.reqInitInfo()
 
     scene.onPointerObservable.add((pointerInfo) => {
@@ -767,17 +824,25 @@ export default class Hall3D extends React.Component<Props, State> {
         onSceneMount={this.handleSceneMount.bind(this)}
       />
       <section className={style.dock}>
-        <div onClick={() => this.handleSelectGame(GameSteps.left)}>
+        <div onClick={() => this.handleSelectGame(GameSteps.first)}>
+          <label>市场拍卖</label>
+          <img src={require('../../assets/dock/ipo.png')}/>
+        </div>
+        <div onClick={() => this.handleSelectGame(GameSteps.second)}>
+          <label>IPO</label>
+          <img src={require('../../assets/dock/ipo.png')}/>
+        </div>
+        <div onClick={() => this.handleSelectGame(GameSteps.third)}>
+          <label>集合竞价</label>
+          <img src={require('../../assets/dock/tbm.png')}/>
+        </div>
+        <div onClick={() => this.handleSelectGame(GameSteps.fourth)}>
           <label>连续竞价</label>
           <img src={require('../../assets/dock/cbm.png')}/>
         </div>
-        <div onClick={() => this.handleSelectGame(GameSteps.center)}>
-          <label>资产竞价与IPO</label>
-          <img src={require('../../assets/dock/ipo.png')}/>
-        </div>
-        <div onClick={() => this.handleSelectGame(GameSteps.right)}>
-          <label>集合竞价</label>
-          <img src={require('../../assets/dock/tbm.png')}/>
+        <div onClick={() => this.handleSelectGame(GameSteps.fifth)}>
+          <label>融资融券</label>
+          <img src={require('../../assets/dock/cbm.png')}/>
         </div>
       </section>
     </div>
