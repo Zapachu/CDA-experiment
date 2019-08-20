@@ -169,38 +169,3 @@ $color-light: rgba(white, .8);
     margin: .5rem;
   }
 }
-
-.test {
-  text-align: left;
-  padding: 2rem;
-
-  .title {
-    font-size: $fontSize-large;
-    text-align: center;
-    color: $color-green;
-  }
-
-  .questions {
-    color: $color-light;
-    li {
-      margin: 2rem;
-      list-style: decimal;
-
-      .answer {
-        max-height: 1rem;
-        color: $color-green !important;
-        opacity: 0;
-        transition: $transition-normal;
-      }
-    }
-
-    .radioQuestion * {
-      color: $color-light !important;
-    }
-
-    &.showAnswer .answer {
-      opacity: 1;
-      max-height: 16rem;
-    }
-  }
-}
