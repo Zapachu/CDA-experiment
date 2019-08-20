@@ -181,6 +181,16 @@ const gamePhaseOrder = {
   [Phase.CBM_Leverage]: 3
 }
 
+const PhaseScore = {
+  [Phase.IPO_Median]: 10,
+  [Phase.IPO_TopK]: 10,
+  [Phase.IPO_FPSBA]: 10,
+  [Phase.OpenAuction]: 10,
+  [Phase.TBM]: 20,
+  [Phase.CBM]: 20,
+  [Phase.CBM_Leverage]: 20
+}
+
 RedisCall.handle<Trial.Done.IReq, Trial.Done.IRes>(
     Trial.Done.name,
     async ({userId, onceMore, namespace}) => {
@@ -195,6 +205,9 @@ RedisCall.handle<Trial.Done.IReq, Trial.Done.IRes>(
         if (orderOfNowGame > lastUserUnlockOrder) {
           user.unblockGamePhase = phase
         }
+        const phaseScore = user.phaseScore.slice()
+        phaseScore[phase] = PhaseScore[phase]
+        user.phaseScore = phaseScore
         await user.save()
         await RedisTools.setUserGameData(uid, phase, {
           status: UserGameStatus.notStarted
@@ -268,7 +281,6 @@ export default class RouterController {
         encrypted.nonce
         }&cnonce=${encrypted.cnonce}`
     const response = await request(url)
-    console.log(response)
     res.send(response)
   }
 

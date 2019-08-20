@@ -8,4 +8,5 @@ interface IDocument extends Document {
 export interface UserDoc extends IDocument {
     unionId: string,
     unblockGamePhase?: Phase
+    phaseScore: Array<number>
 }

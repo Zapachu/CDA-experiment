@@ -6,7 +6,8 @@ const UserSchema = new Schema({
   updateAt: Date,
   mobile:   {type: String, unique: true}, // 手机号(11位)
   unionId: {type: String, unique: true},
-  unblockGamePhase: Number
+  unblockGamePhase: Number,
+  phaseScore: {type: Array, default:[]}
 })
 
 UserSchema.pre<UserDoc>('save', function (next) {

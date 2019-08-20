@@ -42,20 +42,20 @@ enum PlayModes {
 enum GameSteps { first, second, third, fourth, fifth }
 
 const GamePhaseToStep = {
-  [GameTypes.IPO_Median]: GameSteps.third,
-  [GameTypes.IPO_TopK]: GameSteps.third,
-  [GameTypes.IPO_FPSBA]: GameSteps.third,
-  [GameTypes.OpenAuction]: GameSteps.third,
-  [GameTypes.CBM]: GameSteps.first,
-  [GameTypes.CBM_Leverage]: GameSteps.first,
-  [GameTypes.TBM]: GameSteps.fifth
+  [GameTypes.OpenAuction]: GameSteps.first,
+  [GameTypes.IPO_Median]: GameSteps.second,
+  [GameTypes.IPO_TopK]: GameSteps.second,
+  [GameTypes.IPO_FPSBA]: GameSteps.second,
+  [GameTypes.TBM]: GameSteps.third,
+  [GameTypes.CBM]: GameSteps.fifth,
+  [GameTypes.CBM_Leverage]: GameSteps.fifth
 }
 const GameStepsToGamePhase = {
   [GameSteps.first]: GameTypes.OpenAuction,
   [GameSteps.second]: [GameTypes.IPO_TopK, GameTypes.IPO_Median, GameTypes.IPO_FPSBA],
-  [GameSteps.fifth]: GameTypes.TBM,
+  [GameSteps.third]: GameTypes.TBM,
   [GameSteps.fourth]: GameTypes.CBM,
-  [GameSteps.third]: GameTypes.CBM_Leverage
+  [GameSteps.fifth]: GameTypes.CBM_Leverage
 }
 
 const gamePhaseOrder = {
@@ -236,6 +236,7 @@ interface State {
   isInitView: boolean,
   focusGameType?: GameTypes,
   matchTimer?: number,
+  score:number
 }
 
 export default class Hall3D extends React.Component<Props, State> {
@@ -257,6 +258,7 @@ export default class Hall3D extends React.Component<Props, State> {
   matchTimer: number
   continuePlayUrl: string
   state: State = {
+    score:0,
     isInitView: true,
     focusGameStep: null,
     showPreStartModal: false,
@@ -266,14 +268,12 @@ export default class Hall3D extends React.Component<Props, State> {
 
   reqInitInfo() {
     reqInitInfo().then(res => {
-      console.log(res)
       if (res.code === ResCode.success) {
         this.connectSocket()
         const user: UserDoc = res.user
         const {unblockGamePhase} = user
-
+        this.setState({score:user.phaseScore.reduce((m,n)=>m+n,0)})
         const userUnBlockGameOrder = gamePhaseOrder[unblockGamePhase] || 0
-        console.log(userUnBlockGameOrder, 'user now unlock order')
         Object.keys(GameRenderConfigs).forEach((gameStep) => {
 
           const gamePhase = GameStepsToGamePhase[gameStep]
@@ -281,7 +281,6 @@ export default class Hall3D extends React.Component<Props, State> {
           const isLock = gameStepPhaseOrder > (userUnBlockGameOrder + 1)
           GameRenderConfigs[gameStep].isLock = isLock
         })
-        console.log(GameRenderConfigs, 'config')
         this.initView()
 
         const urlObj = new URL(window.location.href)
@@ -427,7 +426,6 @@ export default class Hall3D extends React.Component<Props, State> {
   }
 
   handlePointerOver(gameStep: GameSteps) {
-    // console.log('onver', gameStep, arguments)
     return
     if (!this.state.isDetailView) {
       return
@@ -445,7 +443,6 @@ export default class Hall3D extends React.Component<Props, State> {
   }
 
   handlePointerOut(gameStep: GameSteps) {
-    // console.log('out', gameStep, arguments)
     if (!this.state.isDetailView) {
       return
     }
@@ -507,8 +504,6 @@ export default class Hall3D extends React.Component<Props, State> {
       const ratio = textWidth / testFontSize
 
       const realFontSize = cardWidth / (ratio * 1.4)
-
-      console.log(img.naturalWidth, img.naturalHeight, cardWidth, cardHeight)
       textureContext.drawImage(this as any, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, cardWidth, cardHeight)
       textureGround.update()
 
@@ -525,7 +520,6 @@ export default class Hall3D extends React.Component<Props, State> {
   renderHoverMaskInstance(gameStep: GameSteps) {
     return
     const {maskPosition, maskSize, maskRotateY = 0} = GameRenderConfigs[gameStep]
-    console.log(maskPosition, maskSize, 'mask')
     const myGround = BABYLON.MeshBuilder.CreateGround(`hoverMask${gameStep}`, {
       width: maskSize.width,
       height: maskSize.height,
@@ -742,7 +736,6 @@ export default class Hall3D extends React.Component<Props, State> {
       switch (pointerInfo.type) {
 
         case BABYLON.PointerEventTypes.POINTERUP:
-          console.log(pointerInfo)
           break
         case BABYLON.PointerEventTypes.POINTERMOVE:
           break
@@ -759,11 +752,7 @@ export default class Hall3D extends React.Component<Props, State> {
   connectSocket() {
     const io = socket.connect('/')
     this.io = io
-    io.on('connect', (socket) => {
-      console.log('io connected')
-    })
     io.on(clientSocketListenEvnets.startMatch, () => {
-      console.log('recive startmatch')
       this.setState({
         modalContentType: ModalContentTypes.waittingMatch,
         matchTimer: 0
@@ -778,7 +767,6 @@ export default class Hall3D extends React.Component<Props, State> {
       if (this.matchTimer) {
         clearInterval(this.matchTimer)
       }
-      console.log('recive start game', playerUrl)
       this.setState({
         modalContentType: ModalContentTypes.matchSuccess
       })
@@ -806,8 +794,11 @@ export default class Hall3D extends React.Component<Props, State> {
   }
 
   render() {
-    const {isDetailView, isInitView} = this.state
+    const {isDetailView, isInitView, score} = this.state
     return <div>
+      <span className={style.score}>
+        Score: {score}
+      </span>
       {
         isInitView && <div className={style.loading}>
             <Loading label="加载中"/>
@@ -826,7 +817,7 @@ export default class Hall3D extends React.Component<Props, State> {
       <section className={style.dock}>
         <div onClick={() => this.handleSelectGame(GameSteps.first)}>
           <label>市场拍卖</label>
-          <img src={require('../../assets/dock/ipo.png')}/>
+          <img src={require('../../assets/dock/auction.png')}/>
         </div>
         <div onClick={() => this.handleSelectGame(GameSteps.second)}>
           <label>IPO</label>
@@ -842,7 +833,7 @@ export default class Hall3D extends React.Component<Props, State> {
         </div>
         <div onClick={() => this.handleSelectGame(GameSteps.fifth)}>
           <label>融资融券</label>
-          <img src={require('../../assets/dock/cbm.png')}/>
+          <img src={require('../../assets/dock/cbm_l.png')}/>
         </div>
       </section>
     </div>
