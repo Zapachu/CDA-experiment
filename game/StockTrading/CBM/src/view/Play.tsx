@@ -19,7 +19,7 @@ import {
     PushType,
     ROLE
 } from '../config'
-import {Button, Input, Line, Modal, Tabs, TestPage, ITestPageQuestion} from '@bespoke-game/stock-trading-component'
+import {Button, Input, ITestPageQuestion, Line, Modal, Tabs, TestPage} from '@bespoke-game/stock-trading-component'
 import {Input as AntInput, Radio} from 'antd'
 
 function Border({background = `radial-gradient(at 50% 0%, #67e968 1rem, transparent 70%)`, borderRadius = '1rem', children, style}: {
@@ -315,7 +315,7 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
         </section>
     }
     if (playerState.status === PlayerStatus.test && allowLeverage) {
-        const questions:Array<ITestPageQuestion> = [
+        const questions: Array<ITestPageQuestion> = [
             {
                 Content: ({inputProps}) =>
                     <div>
@@ -346,7 +346,7 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
                         <AntInput {...inputProps()}/>
                         %</div>,
                 Answer: () => <text>正确答案：50,50</text>,
-                answer: [50,50]
+                answer: [50, 50]
             },
             {
                 Content: ({inputProps}) =>
@@ -932,7 +932,7 @@ function Guide({done}: { done: () => void }) {
                 options: {
                     arrowColor: 'rgba(30,39,82,.8)',
                     backgroundColor: 'rgba(30,39,82,.8)',
-                    overlayColor: '#1d1d32',
+                    overlayColor: 'rgba(30,39,82,.5)',
                     primaryColor: '#13553e',
                     textColor: '#fff'
                 }
@@ -1043,7 +1043,7 @@ function LeverageGuide({done}: { done: () => void }) {
                 options: {
                     arrowColor: 'rgba(30,39,82,.8)',
                     backgroundColor: 'rgba(30,39,82,.8)',
-                    overlayColor: '#1d1d32',
+                    overlayColor: 'rgba(30,39,82,.5)',
                     primaryColor: '#13553e',
                     textColor: '#fff'
                 }

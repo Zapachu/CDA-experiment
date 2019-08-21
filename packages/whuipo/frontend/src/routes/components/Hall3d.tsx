@@ -43,16 +43,16 @@ enum GameSteps { first, second, third, fourth, fifth }
 
 const GamePhaseToStep = {
   [GameTypes.OpenAuction]: GameSteps.first,
+  [GameTypes.IPO_FPSBA]: GameSteps.first,
   [GameTypes.IPO_Median]: GameSteps.second,
   [GameTypes.IPO_TopK]: GameSteps.second,
-  [GameTypes.IPO_FPSBA]: GameSteps.second,
   [GameTypes.TBM]: GameSteps.third,
   [GameTypes.CBM]: GameSteps.fifth,
   [GameTypes.CBM_Leverage]: GameSteps.fifth
 }
 const GameStepsToGamePhase = {
-  [GameSteps.first]: GameTypes.OpenAuction,
-  [GameSteps.second]: [GameTypes.IPO_TopK, GameTypes.IPO_Median, GameTypes.IPO_FPSBA],
+  [GameSteps.first]: [GameTypes.OpenAuction, GameTypes.IPO_FPSBA],
+  [GameSteps.second]: [GameTypes.IPO_TopK, GameTypes.IPO_Median],
   [GameSteps.third]: GameTypes.TBM,
   [GameSteps.fourth]: GameTypes.CBM,
   [GameSteps.fifth]: GameTypes.CBM_Leverage
@@ -236,7 +236,7 @@ interface State {
   isInitView: boolean,
   focusGameType?: GameTypes,
   matchTimer?: number,
-  score:number
+  score: number
 }
 
 export default class Hall3D extends React.Component<Props, State> {
@@ -258,7 +258,7 @@ export default class Hall3D extends React.Component<Props, State> {
   matchTimer: number
   continuePlayUrl: string
   state: State = {
-    score:0,
+    score: 0,
     isInitView: true,
     focusGameStep: null,
     showPreStartModal: false,
@@ -272,7 +272,7 @@ export default class Hall3D extends React.Component<Props, State> {
         this.connectSocket()
         const user: UserDoc = res.user
         const {unblockGamePhase} = user
-        this.setState({score:(user.phaseScore||[]).reduce((m,n)=>m+n,0)})
+        this.setState({score: (user.phaseScore || []).reduce((m, n) => m + n, 0)})
         const userUnBlockGameOrder = gamePhaseOrder[unblockGamePhase] || 0
         Object.keys(GameRenderConfigs).forEach((gameStep) => {
 
@@ -461,16 +461,16 @@ export default class Hall3D extends React.Component<Props, State> {
 
   handleSelectGame(gameStep: GameSteps) {
     const funMap = {
-      [GameSteps.first]: ()=>this.handleShowLeftDetail(),
-      [GameSteps.second]: ()=>this.handleShowLeftDetail(),
-      [GameSteps.third]: ()=>this.handleShowCenterDetail(),
-      [GameSteps.fourth]: ()=>this.handleShowRightDetail(),
-      [GameSteps.fifth]: ()=>this.handleShowRightDetail()
+      [GameSteps.first]: () => this.handleShowLeftDetail(),
+      [GameSteps.second]: () => this.handleShowLeftDetail(),
+      [GameSteps.third]: () => this.handleShowCenterDetail(),
+      [GameSteps.fourth]: () => this.handleShowRightDetail(),
+      [GameSteps.fifth]: () => this.handleShowRightDetail()
     }
     funMap[gameStep]()
-    setTimeout(()=>{
+    setTimeout(() => {
       this.handleShowGameModal(gameStep)
-    },2e3)
+    }, 2e3)
   }
 
   renderGameIntroCard(gameStep: GameSteps) {
@@ -821,7 +821,7 @@ export default class Hall3D extends React.Component<Props, State> {
       />
       <section className={style.dock}>
         <div onClick={() => this.handleSelectGame(GameSteps.first)}>
-          <label>市场拍卖</label>
+          <label>资产拍卖</label>
           <img src={require('../../assets/dock/auction.png')}/>
         </div>
         <div onClick={() => this.handleSelectGame(GameSteps.second)}>
