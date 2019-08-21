@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {Lang, TGameState, Toast} from '@elf/component'
 import {Core} from '@bespoke/client'
-import {Button, Input, Line, TestPage, ITestPageQuestion} from '@bespoke-game/stock-trading-component'
+import {Button, Input, ITestPageQuestion, Line, TestPage} from '@bespoke-game/stock-trading-component'
 import Joyride, {Step} from 'react-joyride'
 import {Input as AntInput, Radio} from 'antd'
 import {
@@ -69,7 +69,7 @@ function _Play({gameState, playerState, frameEmitter}: Core.IPlayProps<ICreatePa
 
 export function Play(props: TPlayProps) {
     const {playerState: {status}, frameEmitter} = props
-    const questions: Array<ITestPageQuestion>=[
+    const questions: Array<ITestPageQuestion> = [
         {
             Content: ({inputProps}) =>
                 <div>
@@ -180,7 +180,7 @@ function Guide({done}: { done: () => void }) {
             options: {
                 arrowColor: 'rgba(30,39,82,.8)',
                 backgroundColor: 'rgba(30,39,82,.8)',
-                overlayColor: '#1d1d32',
+                overlayColor: 'rgba(30,39,82,.5)',
                 primaryColor: '#13553e',
                 textColor: '#fff'
             }

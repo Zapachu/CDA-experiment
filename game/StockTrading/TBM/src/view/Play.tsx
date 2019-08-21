@@ -1,7 +1,17 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import InfoBar from './coms/InfoBar'
-import {Button, Input, Line, ListItem, Loading, Modal, STOCKS, TestPage, ITestPageQuestion} from '@bespoke-game/stock-trading-component'
+import {
+    Button,
+    Input,
+    ITestPageQuestion,
+    Line,
+    ListItem,
+    Loading,
+    Modal,
+    STOCKS,
+    TestPage
+} from '@bespoke-game/stock-trading-component'
 import {Core} from '@bespoke/client'
 import Joyride, {Step} from 'react-joyride'
 import {Lang, Toast} from '@elf/component'
@@ -378,7 +388,7 @@ export class Play extends Core.Play<ICreateParams,
             state: {showRule, showTBMRule},
             props: {frameEmitter, gameState: {strikePrice}, playerState: {status}}
         } = this
-        const questions: Array<ITestPageQuestion>=[
+        const questions: Array<ITestPageQuestion> = [
             {
                 Content: ({inputProps}) =>
                     <div>
@@ -424,7 +434,7 @@ export class Play extends Core.Play<ICreateParams,
                         <br/>F的每份配额出售价格是46元，出售配额数量是5股；
                         <br/>故成交价格为（44+42）/2=<AntInput {...inputProps()}/>，B买入<AntInput {...inputProps()}/>股，C买入<AntInput {...inputProps()}/>股，您买入<AntInput {...inputProps()}/>股，E卖出<AntInput {...inputProps()}/>股，D卖出<AntInput {...inputProps()}/>股，F卖出<AntInput {...inputProps()}/>股。
                     </p>,
-                Answer: () => <text>  <br/>1）最高买入价格的B的买入价格高于最低卖出价格E的卖出价格，E的四股股票全部成交，B可购入4股E的股票，B还有3股股票未购入；
+                Answer: () => <text><br/>1）最高买入价格的B的买入价格高于最低卖出价格E的卖出价格，E的四股股票全部成交，B可购入4股E的股票，B还有3股股票未购入；
                     <br/>2）最高买入价格的B的买入价格高于第二低卖出价格D的卖出价格，B还未成交的3股股票成交，此时D还剩3股；
                     <br/>3）第二高买入价格的C的买入价格高于第二低卖出价格D的卖出价格，D剩下的3股股票成交，C还有1股未成交；
                     <br/>4）第三高买入价格您的买入价格低于D的卖出价格，无法成交；
@@ -595,7 +605,7 @@ function Guide({done}: { done: () => void }) {
             options: {
                 arrowColor: 'rgba(30,39,82,.8)',
                 backgroundColor: 'rgba(30,39,82,.8)',
-                overlayColor: '#1d1d32',
+                overlayColor: 'rgba(30,39,82,.5)',
                 primaryColor: '#13553e',
                 textColor: '#fff'
             }

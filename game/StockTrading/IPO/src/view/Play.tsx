@@ -18,6 +18,7 @@ import {
 import {
     Button,
     Input,
+    ITestPageQuestion,
     Line,
     ListItem,
     Loading,
@@ -25,7 +26,6 @@ import {
     StockInfo,
     STOCKS,
     TableInfo,
-    ITestPageQuestion,
     TestPage
 } from '@bespoke-game/stock-trading-component'
 import {Input as AntInput, Radio} from 'antd'
@@ -520,8 +520,8 @@ export function Play({frameEmitter, game, gameState, playerState}: Core.IPlayPro
                                 <br/>您、C和B都有共同购买这1万股股票的权利。三个合起来的拟购买数量为13000，则系统随机从13000股股票中选择10000股分配购买权。
                             </p></div>,
                     Answer: () => <text>整个市场的拟购买总股数为21000，中位数第10500股价格为100元，则成交价格即为第10500股股票对应的价格：100元。
-                                您、C和B都有共同购买这1万股股票的权利。三个合起来的拟购买数量为13000，则系统随机从13000股股票中选择10000股分配购买权。则每股股票被抽到的概率为10000/13000。简言之，当拟购买价格在成交价格之上时，预期购买数量越大，可能购买到的数量越多。
-                            </text>,
+                        您、C和B都有共同购买这1万股股票的权利。三个合起来的拟购买数量为13000，则系统随机从13000股股票中选择10000股分配购买权。则每股股票被抽到的概率为10000/13000。简言之，当拟购买价格在成交价格之上时，预期购买数量越大，可能购买到的数量越多。
+                    </text>,
                     answer: ['100']
                 },
                 {
@@ -537,8 +537,8 @@ export function Play({frameEmitter, game, gameState, playerState}: Core.IPlayPro
                             <p>整个市场的拟购买总股数为24000，中位数第12000股价格为48元，则成交价格为<AntInput {...inputProps()}/>元。
                                 您、B都有共同购买这1万股股票的权利。三个合起来的拟购买数量为13000，则系统随机从13000股股票中选择10000股分配购买权。</p></div>,
                     Answer: () => <text>整个市场的拟购买总股数为22000，中位数第13000股价格为48元，则成交价格即为第13000股股票对应的价格：48元。
-                                您和B都有共同购买这1万股股票的权利。二人合起来的拟购买数量为13000，则系统随机从13000股股票中选择10000股分配购买权。，则每股股票被抽到的概率为10000/13000。简言之，当拟购买价格在成交价格之上时，预期购买数量越大，可能购买到的数量越多。
-                            </text>,
+                        您和B都有共同购买这1万股股票的权利。二人合起来的拟购买数量为13000，则系统随机从13000股股票中选择10000股分配购买权。，则每股股票被抽到的概率为10000/13000。简言之，当拟购买价格在成交价格之上时，预期购买数量越大，可能购买到的数量越多。
+                    </text>,
                     answer: ['48']
                 },
             ] : [
@@ -786,7 +786,7 @@ function Guide({done}: { done: () => void }) {
             options: {
                 arrowColor: 'rgba(30,39,82,.8)',
                 backgroundColor: 'rgba(30,39,82,.8)',
-                overlayColor: '#1d1d32',
+                overlayColor: 'rgba(30,39,82,.5)',
                 primaryColor: '#13553e',
                 textColor: '#fff'
             }
