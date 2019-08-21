@@ -796,9 +796,14 @@ export default class Hall3D extends React.Component<Props, State> {
   render() {
     const {isDetailView, isInitView, score} = this.state
     return <div>
-      <span className={style.score}>
-        Score: {score}
-      </span>
+      <section className={style.titleBar}>
+        <div className={style.logo}/>
+        <div className={style.title}>
+          <label>金融市场与算法交易</label><br/>
+          <span className={style.subTitle}>虚拟仿真实验教学软件</span>
+        </div>
+        <span className={style.score}>得分: {score}</span>
+      </section>
       {
         isInitView && <div className={style.loading}>
             <Loading label="加载中"/>
