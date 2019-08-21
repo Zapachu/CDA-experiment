@@ -9,6 +9,7 @@ $color-light: rgba(white, .8);
   color: white;
   min-height: 100vh;
   display: flex;
+  align-items: center;
   flex-direction: column;
 
   .playContent {
@@ -101,42 +102,6 @@ $color-light: rgba(white, .8);
 
     .dynamicInfo {
       margin: 0;
-    }
-  }
-
-  .test {
-    max-width: 48rem;
-    margin: auto;
-    text-align: left;
-
-    .title {
-      font-size: $fontSize-large;
-      padding: 1rem;
-      text-align: center;
-      color: $color-green;
-    }
-
-    .questions {
-      li {
-        margin: 2rem;
-
-        .answer {
-          overflow: hidden;
-          max-height: 1rem;
-          color: $color-green !important;
-          opacity: 0;
-          transition: $transition-normal;
-        }
-      }
-
-      .radioQuestion * {
-        color: $color-light !important;
-      }
-
-      &.showAnswer .answer {
-        opacity: 1;
-        max-height: 24rem;
-      }
     }
   }
 

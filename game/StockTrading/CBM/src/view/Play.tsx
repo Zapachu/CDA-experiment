@@ -19,7 +19,7 @@ import {
     PushType,
     ROLE
 } from '../config'
-import {Button, Input, Line, Modal, Tabs} from '@bespoke-game/stock-trading-component'
+import {Button, Input, Line, Modal, Tabs, TestPage, ITestPageQuestion} from '@bespoke-game/stock-trading-component'
 import {Input as AntInput, Radio} from 'antd'
 
 function Border({background = `radial-gradient(at 50% 0%, #67e968 1rem, transparent 70%)`, borderRadius = '1rem', children, style}: {
@@ -315,7 +315,69 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
         </section>
     }
     if (playerState.status === PlayerStatus.test && allowLeverage) {
-        return <LeverageTest done={() => frameEmitter.emit(MoveType.getIndex)}/>
+        const questions:Array<ITestPageQuestion> = [
+            {
+                Content: ({inputProps}) =>
+                    <div>
+                        <p>偿还融资债务的方法有_________；偿还融券债务的方法有____________</p>
+                        <Radio.Group {...inputProps({margin: '.5rem'})}>
+                            <Radio value={1}>A. 卖券还款和直接还款；买券还券和直接还券</Radio>
+                            <Radio value={2}>B. 卖券还款；买券还券</Radio>
+                            <Radio value={3}>C. 直接还款；直接还券</Radio>
+                            <Radio value={4}>D. 卖券还款；直接还券</Radio>
+                        </Radio.Group>
+                    </div>,
+                Answer: () => <text>正确答案：A</text>,
+                answer: [1]
+            },
+            {
+                Content: ({inputProps}) =>
+                    <div>挂在买家订单上面的最高买价是9.96，挂在卖家订单上面的最低卖价是9.98。在这个时候同时出现了一个买入价格为10元的买价订单和卖出价格为9.90元的卖家订单。则报价为10元的订单会以9.98成交，报价为9.90元的订单会以
+                        <AntInput {...inputProps()}/>
+                        成交</div>,
+                Answer: () => <text>正确答案：9.96</text>,
+                answer: [9.96]
+            },
+            {
+                Content: ({inputProps}) =>
+                    <div>融资保证金比例不得低于
+                        <AntInput {...inputProps()}/>
+                        %，融券保证金比例不得低于
+                        <AntInput {...inputProps()}/>
+                        %</div>,
+                Answer: () => <text>正确答案：50,50</text>,
+                answer: [50,50]
+            },
+            {
+                Content: ({inputProps}) =>
+                    <div>
+                        <p>假设客户提交市值为100万元的股票A作为进行融资融券交易的担保物，折算率为70%，融资保证金比例为0.5.则客户可以融资买入的最大金额为____________万元。本例中客户的佣金及融资利息、融券费用均忽略不计</p>
+                        <Radio.Group {...inputProps({margin: '.5rem'})}>
+                            <Radio value={1}>A. 200</Radio>
+                            <Radio value={2}>B. 50</Radio>
+                            <Radio value={3}>C. 140</Radio>
+                            <Radio value={4}>D. 70</Radio>
+                        </Radio.Group>
+                    </div>,
+                Answer: () => <text>解析：100*0.7*2=140万元，因此正确答案为C</text>,
+                answer: [3]
+            },
+            {
+                Content: ({inputProps}) =>
+                    <div>
+                        <p>投资者信用账户内有60万元现金和100万元市值的某证券，假设该证券的折算率为60%，那么，该投资者信用账户内的保证金金额为____________万元</p>
+                        <Radio.Group {...inputProps({margin: '.5rem'})}>
+                            <Radio value={1}>A. 160</Radio>
+                            <Radio value={2}>B. 136</Radio>
+                            <Radio value={3}>C. 120</Radio>
+                            <Radio value={4}>D. 100</Radio>
+                        </Radio.Group>
+                    </div>,
+                Answer: () => <text>解析：60+100*0.6=120，因此正确答案为C</text>,
+                answer: [3]
+            }
+        ]
+        return <TestPage questions={questions} done={() => frameEmitter.emit(MoveType.getIndex)}/>
     }
     const guaranteeMoneyLimit = nonNegative(playerState.money - playerState.guaranteeMoney),
         guaranteeCountLimit = nonNegative(~~(playerState.money / gamePeriodState.closingPrice) + playerState.count - playerState.guaranteeCount)
@@ -797,7 +859,8 @@ function Guide({done}: { done: () => void }) {
                     borderRadius: '1.5rem'
                 }
             },
-            disableBeacon: true
+            disableBeacon: true,
+            hideCloseButton: true
         },
         steps = [
             {
@@ -890,7 +953,8 @@ function LeverageGuide({done}: { done: () => void }) {
                     borderRadius: '1.5rem'
                 }
             },
-            disableBeacon: true
+            disableBeacon: true,
+            hideCloseButton: true
         },
         steps = [
             {
@@ -986,82 +1050,4 @@ function LeverageGuide({done}: { done: () => void }) {
             }}
         />
     </>
-}
-
-function LeverageTest({done}: { done: () => void }) {
-    const lang = Lang.extractLang({
-        confirm: ['确定', 'CONFIRM']
-    })
-    const [choseA, setChoseA] = React.useState(0),
-        [choseB, setChoseB] = React.useState(0),
-        [choseC, setChoseC] = React.useState(0),
-        [inputA, setInputA] = React.useState(''),
-        [inputB, setInputB] = React.useState(''),
-        [inputC, setInputC] = React.useState(''),
-        [showAnswer, setShowAnswer] = React.useState(false)
-    return <section className={style.leverageTest}>
-        <div className={style.title}>{'知识点测试'}</div>
-        <ul className={`${style.questions} ${showAnswer ? style.showAnswer : ''}`}>
-            <li className={style.radioQuestion}>
-                <p>1. 偿还融资债务的方法有_________；偿还融券债务的方法有____________。</p>
-                <Radio.Group style={{margin: '.5rem'}} onChange={({target: {value}}) => setChoseA(+value)}
-                             value={choseA}>
-                    <Radio value={1}>A. 卖券还款和直接还款；买券还券和直接还券</Radio>
-                    <Radio value={2}>B. 卖券还款；买券还券</Radio>
-                    <Radio value={3}>C. 直接还款；直接还券</Radio>
-                    <Radio value={4}>D. 卖券还款；直接还券</Radio>
-                </Radio.Group>
-                <p className={style.answer}>正确答案：A</p>
-            </li>
-            <li>
-                <p>2.
-                    挂在买家订单上面的最高买价是9.96，挂在卖家订单上面的最低卖价是9.98。在这个时候同时出现了一个买入价格为10元的买价订单和卖出价格为9.90元的卖家订单。则报价为10元的订单会以9.98成交，报价为9.90元的订单会以
-                    <AntInput autosize={true} style={{width: '5rem', margin: '0 1rem'}} value={inputA}
-                              onChange={({target: {value}}) => setInputA(value)}/>
-                    成交。</p>
-                <p className={style.answer}>正确答案：9.96</p>
-            </li>
-            <li>
-                <p>3. 融资保证金比例不得低于
-                    <AntInput autosize={true} style={{width: '5rem', margin: '0 1rem'}} value={inputB}
-                              onChange={({target: {value}}) => setInputB(value)}/>
-                    %，融券保证金比例不得低于
-                    <AntInput autosize={true} style={{width: '5rem', margin: '0 1rem'}} value={inputC}
-                              onChange={({target: {value}}) => setInputC(value)}/>
-                    %</p>
-                <p className={style.answer}>正确答案：50 , 50</p>
-            </li>
-            <li className={style.radioQuestion}>
-                <p>4.
-                    假设客户提交市值为100万元的股票A作为进行融资融券交易的担保物，折算率为70%，融资保证金比例为0.5.则客户可以融资买入的最大金额为____________万元。本例中客户的佣金及融资利息、融券费用均忽略不计。</p>
-                <Radio.Group style={{margin: '.5rem'}} onChange={({target: {value}}) => setChoseB(+value)}
-                             value={choseB}>
-                    <Radio value={1}>A. 200</Radio>
-                    <Radio value={2}>B. 50</Radio>
-                    <Radio value={3}>C. 140</Radio>
-                    <Radio value={4}>D. 70</Radio>
-                </Radio.Group>
-                <p className={style.answer}>解析：100*0.7*2=140万元，因此正确答案为C</p>
-            </li>
-            <li className={style.radioQuestion}>
-                <p>5.
-                    投资者信用账户内有60万元现金和100万元市值的某证券，假设该证券的折算率为60%，那么，该投资者信用账户内的保证金金额为____________万元。</p>
-                <Radio.Group style={{margin: '.5rem'}} onChange={({target: {value}}) => setChoseC(+value)}
-                             value={choseC}>
-                    <Radio value={1}>A. 160</Radio>
-                    <Radio value={2}>B. 136</Radio>
-                    <Radio value={3}>C. 120</Radio>
-                    <Radio value={4}>D. 100</Radio>
-                </Radio.Group>
-                <p className={style.answer}>解析：60+100*0.6=120，因此正确答案为C</p>
-            </li>
-        </ul>
-        <Button label={lang.confirm} onClick={() => {
-            if ([choseA,choseB,choseC,inputA,inputB,inputC].toString()===[1,3,3,'9.96','50','50'].toString()) {
-                done()
-            } else {
-                setShowAnswer(true)
-            }
-        }}/>
-    </section>
 }

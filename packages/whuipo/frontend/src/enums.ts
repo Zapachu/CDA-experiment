@@ -7,6 +7,7 @@ export interface UserDoc {
   createAt: number;
   unionId: string,
   unblockGamePhase?: Phase
+  phaseScore: Array<number>
 }
 
 export enum UserGameStatus {

@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {Lang, TGameState, Toast} from '@elf/component'
 import {Core} from '@bespoke/client'
-import {Button, Input, Line} from '@bespoke-game/stock-trading-component'
+import {Button, Input, Line, TestPage, ITestPageQuestion} from '@bespoke-game/stock-trading-component'
 import Joyride, {Step} from 'react-joyride'
 import {Input as AntInput, Radio} from 'antd'
 import {
@@ -69,9 +69,34 @@ function _Play({gameState, playerState, frameEmitter}: Core.IPlayProps<ICreatePa
 
 export function Play(props: TPlayProps) {
     const {playerState: {status}, frameEmitter} = props
+    const questions: Array<ITestPageQuestion>=[
+        {
+            Content: ({inputProps}) =>
+                <div>
+                    假设某资产现在进行拍卖，现最高的竞购价格为100元，经拍卖人三次提示而无人加价时，拍卖人击槌表示该资产以<AntInput {...inputProps()}/>元成交
+                </div>,
+            Answer: () => <text>正确答案：100</text>,
+            answer: [100]
+        },
+        {
+            Content: ({inputProps}) =>
+                <div>
+                    <p>以公开竞价的方法，组织有意受让的人到场竞价报价，最后以“价高者得“的原则确定土地使用权受让人的一种土地出让方式为</p>
+                    <Radio.Group {...inputProps({margin: '.5rem'})}>
+                        <Radio value={1}>A. 转让</Radio>
+                        <Radio value={2}>B. 划拨</Radio>
+                        <Radio value={3}>C. 协议</Radio>
+                        <Radio value={4}>D. 拍卖</Radio>
+                    </Radio.Group>
+                </div>,
+            Answer: () => <text>正确答案：D</text>,
+            answer: [4]
+        }
+    ]
     return <section className={style.play}>
         {
-            status === PlayerStatus.test ? <Test done={() => frameEmitter.emit(MoveType.testDone)}/> :
+            status === PlayerStatus.test ?
+                <TestPage questions={questions} done={() => frameEmitter.emit(MoveType.testDone)}/> :
                 <_Play {...props}/>
         }
         {
@@ -161,46 +186,6 @@ function Guide({done}: { done: () => void }) {
             }
         }}
     />
-}
-
-function Test({done}: { done: () => void }) {
-    const lang = Lang.extractLang({
-        confirm: ['确定', 'CONFIRM']
-    })
-    const [choseA, setChoseA] = React.useState(0),
-        [inputA, setInputA] = React.useState(''),
-        [showAnswer, setShowAnswer] = React.useState(false)
-    const inputStyle = {width: '5rem', margin: '2px .5rem'}
-    return <section className={style.test}>
-        <div className={style.title}>{'知识点测试'}</div>
-        <ul className={`${style.questions} ${showAnswer ? style.showAnswer : ''}`}>
-            <li>
-                <p>1.假设某资产现在进行拍卖，现最高的竞购价格为100元，经拍卖人三次提示而无人加价时，拍卖人击槌表示该资产以<AntInput style={inputStyle}
-                                                                                   value={inputA}
-                                                                                   onChange={({target: {value}}) => setInputA(value)}/>元成交
-                </p>
-                <p className={style.answer}>正确答案：100</p>
-            </li>
-            <li className={style.radioQuestion}>
-                <p>2. 以公开竞价的方法，组织有意受让的人到场竞价报价，最后以“价高者得“的原则确定土地使用权受让人的一种土地出让方式为</p>
-                <Radio.Group style={{margin: '.5rem'}} onChange={({target: {value}}) => setChoseA(+value)}
-                             value={choseA}>
-                    <Radio value={1}>A. 转让</Radio>
-                    <Radio value={2}>B. 划拨</Radio>
-                    <Radio value={3}>C. 协议</Radio>
-                    <Radio value={4}>D. 拍卖</Radio>
-                </Radio.Group>
-                <p className={style.answer}>正确答案：D</p>
-            </li>
-        </ul>
-        <Button label={lang.confirm} onClick={() => {
-            if ([choseA, inputA].toString() == [4, '100'].toString()) {
-                done()
-            } else {
-                setShowAnswer(true)
-            }
-        }}/>
-    </section>
 }
 
 function Result({gameState, exit}: { gameState: TGameState<IGameState>, exit: (onceMore?: boolean) => void }) {
