@@ -272,7 +272,7 @@ export default class Hall3D extends React.Component<Props, State> {
         this.connectSocket()
         const user: UserDoc = res.user
         const {unblockGamePhase} = user
-        this.setState({score:user.phaseScore.reduce((m,n)=>m+n,0)})
+        this.setState({score:(user.phaseScore||[]).reduce((m,n)=>m+n,0)})
         const userUnBlockGameOrder = gamePhaseOrder[unblockGamePhase] || 0
         Object.keys(GameRenderConfigs).forEach((gameStep) => {
 

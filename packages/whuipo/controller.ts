@@ -205,7 +205,7 @@ RedisCall.handle<Trial.Done.IReq, Trial.Done.IRes>(
         if (orderOfNowGame > lastUserUnlockOrder) {
           user.unblockGamePhase = phase
         }
-        const phaseScore = user.phaseScore.slice()
+        const phaseScore = (user.phaseScore||[]).slice()
         phaseScore[phase] = PhaseScore[phase]
         user.phaseScore = phaseScore
         await user.save()
