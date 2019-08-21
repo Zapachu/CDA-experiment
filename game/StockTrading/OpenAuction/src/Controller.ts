@@ -3,44 +3,54 @@ import {RedisCall, Trial} from '@elf/protocol'
 import {Phase, phaseToNamespace} from '@bespoke-game/stock-trading-config'
 import {
     ICreateParams,
+    IGameRoundState,
     IGameState,
     IMoveParams,
+    IPlayerRoundState,
     IPlayerState,
     IPushParams,
     MoveType,
     PlayerStatus,
     PriceRange,
     PushType,
-    RobotCfg
+    RobotCfg,
+    ROUNDS
 } from './config'
 import {Number} from './util'
 
 export class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
-    timer: NodeJS.Timer
+    roundTimers: Array<NodeJS.Timer> = []
 
     initGameState(): TGameState<IGameState> {
         const gameState = super.initGameState()
-        gameState.timer = 0
-        gameState.shouts = []
         gameState.playerIndex = 0
-        gameState.startPrice = Number.random(PriceRange.start.min, PriceRange.start.max)
+        gameState.round = 0
+        gameState.rounds = Array(ROUNDS).fill(null).map(() => ({
+            timer: 0,
+            shouts: [],
+            startPrice: Number.random(PriceRange.start.min, PriceRange.start.max)
+        } as IGameRoundState))
         return gameState
     }
 
     async initPlayerState(actor: IActor): Promise<TPlayerState<IPlayerState>> {
         const playerState = await super.initPlayerState(actor)
-        playerState.status = PlayerStatus.guide
-        playerState.privatePrice = Number.random(PriceRange.private.min, PriceRange.private.max)
+        playerState.rounds = Array(ROUNDS).fill(null).map((_, i) => ({
+            status: i === 0 ? PlayerStatus.guide : PlayerStatus.play,
+            privatePrice: Number.random(PriceRange.private.min, PriceRange.private.max)
+        } as IPlayerRoundState))
         return playerState
     }
 
     protected async playerMoveReducer(actor: IActor, type: MoveType, params: IMoveParams, cb: IMoveCallback): Promise<void> {
         const gameState = await this.stateManager.getGameState(),
             playerState = await this.stateManager.getPlayerState(actor),
-            playerStates = await this.stateManager.getPlayerStates()
+            playerStates = await this.stateManager.getPlayerStates(),
+            gameRoundState = gameState.rounds[gameState.round],
+            playerRoundState = playerState.rounds[gameState.round]
         switch (type) {
             case MoveType.guideDone: {
-                playerState.status = PlayerStatus.test
+                playerRoundState.status = PlayerStatus.test
                 break
             }
             case MoveType.testDone: {
@@ -48,7 +58,7 @@ export class Controller extends BaseController<ICreateParams, IGameState, IPlaye
                     break
                 }
                 playerState.index = gameState.playerIndex++
-                playerState.status = PlayerStatus.play
+                playerRoundState.status = PlayerStatus.play
                 break
             }
             case MoveType.shout: {
@@ -60,14 +70,17 @@ export class Controller extends BaseController<ICreateParams, IGameState, IPlaye
                         RobotCfg.startDelay * 1e3
                     )
                 }
-                gameState.timer = 30
-                gameState.shouts[playerState.index] = params.price
-                global.clearInterval(this.timer)
-                this.timer = global.setInterval(async () => {
-                    gameState.timer--
-                    if (gameState.timer <= 0) {
-                        gameState.traded = true
-                        global.clearInterval(this.timer)
+                gameRoundState.timer = 30
+                gameRoundState.shouts[playerState.index] = params.price
+                global.clearInterval(this.roundTimers[gameState.round])
+                this.roundTimers[gameState.round]= global.setInterval(async () => {
+                    gameRoundState.timer--
+                    if (gameRoundState.timer <= 0) {
+                        gameRoundState.traded = true
+                        global.clearInterval(this.roundTimers[gameState.round])
+                        if(gameState.round<ROUNDS-1){
+                            gameState.round++
+                        }
                     }
                     await this.stateManager.syncState()
                 }, 1e3)

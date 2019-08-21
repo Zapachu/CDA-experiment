@@ -1,5 +1,7 @@
 export const namespace = 'OpenAuction'
 
+export const ROUNDS = 3
+
 export const PriceRange = {
     start: {
         min: 50,
@@ -37,12 +39,17 @@ export interface IPushParams {
 export interface ICreateParams {
 }
 
-export interface IGameState {
+export interface IGameRoundState {
     startPrice: number
-    playerIndex: number
     shouts: Array<number>
     timer: number
     traded: boolean
+}
+
+export interface IGameState {
+    playerIndex: number
+    rounds: Array<IGameRoundState>
+    round: number
 }
 
 export enum PlayerStatus {
@@ -51,8 +58,12 @@ export enum PlayerStatus {
     play
 }
 
-export interface IPlayerState {
+export interface IPlayerRoundState {
     privatePrice: number
     status: PlayerStatus
+}
+
+export interface IPlayerState {
     index: number
+    rounds: Array<IPlayerRoundState>
 }

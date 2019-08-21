@@ -24,18 +24,20 @@ function _Play({gameState, playerState, frameEmitter}: Core.IPlayProps<ICreatePa
         shout: ['买入', 'Shout']
     })
     const [price, setPrice] = React.useState('' as React.ReactText)
+    const gameRoundState = gameState.rounds[gameState.round],
+        playerRoundState = playerState.rounds[gameState.round]
     let maxShout = 0
-    gameState.shouts.forEach(s => s > maxShout ? maxShout = s : null)
-    if (gameState.traded) {
+    gameRoundState.shouts.forEach(s => s > maxShout ? maxShout = s : null)
+    if (gameRoundState.traded) {
         return <Result gameState={gameState}
                        exit={onceMore => frameEmitter.emit(MoveType.exit, {onceMore}, lobbyUrl => (location.href = lobbyUrl))}/>
     }
     return <section className={style.playContent}>
         <div className={style.market}>
-            <Line text='已提交的报价'/>
+            <Line text={`已提交的报价 (第${gameState.round + 1}轮) `}/>
             <ul className={style.shouts}>
                 {
-                    gameState.shouts.filter(s => s).sort((m, n) => n - m)
+                    gameRoundState.shouts.filter(s => s).sort((m, n) => n - m)
                         .map((price, i) => <li key={i}>
                             {price}
                         </li>)
@@ -44,11 +46,12 @@ function _Play({gameState, playerState, frameEmitter}: Core.IPlayProps<ICreatePa
         </div>
         <div className={style.tips}>
             <label>最高拟购买价格</label><em>{maxShout}</em>元,若在<em
-            className={style.countDown}>{gameState.timer}</em>秒内没有更高报价，则此资产以现在的最高拟购买价格成交
+            className={style.countDown}>{gameRoundState.timer}</em>秒内没有更高报价，则此资产以现在的最高拟购买价格成交
             <p className={style.auction}>
-                <label>市场信息</label>该资产的<span className={style.startPrice}>起拍价格为<em>{gameState.startPrice}</em>元</span>
+                <label>市场信息</label>该资产的<span
+                className={style.startPrice}>起拍价格为<em>{gameRoundState.startPrice}</em>元</span>
             </p>
-            <label>私人信息</label>您的公司对该资产的估价值为<em>{playerState.privatePrice}</em>元
+            <label>私人信息</label>您的公司对该资产的估价值为<em>{playerRoundState.privatePrice}</em>元
         </div>
         <div className={style.inputWrapper}>
             <Input value={price} onChange={val => setPrice(val)}
@@ -68,7 +71,8 @@ function _Play({gameState, playerState, frameEmitter}: Core.IPlayProps<ICreatePa
 }
 
 export function Play(props: TPlayProps) {
-    const {playerState: {status}, frameEmitter} = props
+    const {gameState, playerState, frameEmitter} = props,
+        {status} = playerState.rounds[gameState.round]
     const questions: Array<ITestPageQuestion> = [
         {
             Content: ({inputProps}) =>
@@ -188,7 +192,7 @@ function Guide({done}: { done: () => void }) {
     />
 }
 
-function Result({gameState, exit}: { gameState: TGameState<IGameState>, exit: (onceMore?: boolean) => void }) {
+function Result({exit}: { gameState: TGameState<IGameState>, exit: (onceMore?: boolean) => void }) {
     return <>
         <Line
             text={'交易结果展示'}
@@ -199,9 +203,6 @@ function Result({gameState, exit}: { gameState: TGameState<IGameState>, exit: (o
                 marginBottom: '20px'
             }}
         />
-        {
-            gameState.traded
-        }
         <div style={{display: 'flex', justifyContent: 'center'}}>
             <Button
                 label={'再学一次'}
