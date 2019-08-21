@@ -33,7 +33,7 @@ RedisCall.handle<Trial.Create.IReq, Trial.Create.IRes>(Trial.Create.name(phaseTo
     })
     return {playUrl: gameId2PlayUrl(gameId)}
 })
-RedisCall.handle<Trial.Create.IReq, Trial.Create.IRes>(Trial.Create.name(phaseToNamespace(Phase.IPO_Median)), async () => {
+RedisCall.handle<Trial.Create.IReq, Trial.Create.IRes>(Trial.Create.name(phaseToNamespace(Phase.IPO_FPSBA)), async () => {
     const gameId = await Server.newGame<ICreateParams>({
         title: `${Phase.IPO_FPSBA}:${new Date().toUTCString()}`,
         params: {
