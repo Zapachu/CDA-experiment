@@ -105,6 +105,19 @@ $color-red: #d6444e;
       }
     }
   }
+
+  .result{
+    .resultInfo{
+      margin-top: 5rem;
+      font-size: $fontSize-middle;
+      text-align: center;
+      em{
+        margin: .5rem;
+        font-size: $fontSize-large;
+        color: $color-green;
+      }
+    }
+  }
 }
 
 .guideContent {
