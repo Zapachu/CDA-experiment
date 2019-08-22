@@ -287,10 +287,12 @@ export function Play({frameEmitter, game, gameState, playerState}: Core.IPlayPro
     const [price, setPrice] = React.useState(''),
         [num, setNum] = React.useState(''),
         [modalType, setModalType] = React.useState(ModalType.None),
-        [shoutTimer, setShoutTimer] = React.useState(0)
+        [shoutTimer, setShoutTimer] = React.useState(0),
+        gameRoundState = gameState.rounds[gameState.round],
+        playerRoundState = playerState.rounds[gameState.round]
     React.useEffect(() => {
         frameEmitter.on(PushType.shoutTimer, ({shoutTimer}) => {
-            if (playerState.status === PlayerStatus.prepared) {
+            if (playerRoundState.status === PlayerStatus.prepared) {
                 setShoutTimer(shoutTimer)
             }
         })
@@ -313,20 +315,20 @@ export function Play({frameEmitter, game, gameState, playerState}: Core.IPlayPro
             {
                 label: '股票的成交价格',
                 value: (
-                    <span style={{color: 'orange'}}>{gameState.tradePrice}</span>
+                    <span style={{color: 'orange'}}>{gameRoundState.tradePrice}</span>
                 )
             },
             {
                 label: '你们公司对股票的估值',
                 value: (
-                    <span style={{color: 'orange'}}>{playerState.privateValue}</span>
+                    <span style={{color: 'orange'}}>{playerRoundState.privateValue}</span>
                 )
             },
             {
                 label: '每股股票收益',
                 value: (
                     <span style={{color: 'orange'}}>
-            {(playerState.privateValue - gameState.tradePrice).toFixed(2)}
+            {(playerRoundState.privateValue - gameRoundState.tradePrice).toFixed(2)}
           </span>
                 )
             },
@@ -334,27 +336,27 @@ export function Play({frameEmitter, game, gameState, playerState}: Core.IPlayPro
                 label: '你的购买数量',
                 value: (
                     <span style={{color: 'orange'}}>
-            {playerState.actualNum || 0}
+            {playerRoundState.actualNum || 0}
           </span>
                 )
             },
             {
                 label: '你的总收益为',
                 value: (
-                    <span style={{color: 'orange'}}>{playerState.profit || 0}</span>
+                    <span style={{color: 'orange'}}>{playerRoundState.profit || 0}</span>
                 )
             },
             {
                 label: '你的初始账户资金',
                 value: (
-                    <span style={{color: 'orange'}}>{playerState.startMoney}</span>
+                    <span style={{color: 'orange'}}>{playerRoundState.startMoney}</span>
                 )
             },
             {
                 label: '你的现有账户资金',
                 value: (
                     <span style={{color: 'red'}}>
-            {(playerState.startMoney + (playerState.profit || 0)).toFixed(2)}
+            {(playerRoundState.startMoney + (playerRoundState.profit || 0)).toFixed(2)}
           </span>
                 )
             }
@@ -362,7 +364,7 @@ export function Play({frameEmitter, game, gameState, playerState}: Core.IPlayPro
         return (
             <>
                 <Line
-                    text={'交易结果展示'}
+                    text={`交易结果 (第${gameState.round + 1}轮)`}
                     style={{
                         margin: 'auto',
                         maxWidth: '400px',
@@ -371,6 +373,22 @@ export function Play({frameEmitter, game, gameState, playerState}: Core.IPlayPro
                     }}
                 />
                 <TableInfo dataList={dataList} style={{margin: '30px auto'}}/>
+                {
+                    gameState.round < CONFIG.round - 1 ?
+                        <p>即将进入下一轮......</p>:
+                        <div style={{display:  'flex', justifyContent: 'center'}}>
+                            <Button
+                                label={'再学一次'}
+                                color={Button.Color.Blue}
+                                style={{marginRight: '20px'}}
+                                onClick={() => exitGame(true)}
+                            />
+                            <Button
+                                label={'返回交易大厅'}
+                                onClick={() => exitGame()}
+                            />
+                        </div>
+                }
                 <div className={style.leftBtn}>
                     <Button
                         label={'ipo知识扩展'}
@@ -387,45 +405,17 @@ export function Play({frameEmitter, game, gameState, playerState}: Core.IPlayPro
                         onClick={() => setModalType(ModalType.Price)}
                     />
                 </div>
-                <div style={{display: 'flex', justifyContent: 'center'}}>
-                    <Button
-                        label={'再学一次'}
-                        color={Button.Color.Blue}
-                        style={{marginRight: '20px'}}
-                        onClick={() => exitGame(true)}
-                    />
-                    <Button
-                        label={'返回交易大厅'}
-                        onClick={() => exitGame()}
-                    />
-                </div>
-                <Line
-                    color={Line.Color.White}
-                    style={{
-                        margin: 'auto',
-                        maxWidth: '400px',
-                        marginTop: '40px',
-                        marginBottom: '20px'
-                    }}
-                />
             </>
         )
     }
 
     function renderPlay(guide = false) {
-        const stock = STOCKS[gameState.stockIndex]
+        const stock = STOCKS[gameRoundState.stockIndex]
         return <>
             {
                 guide ? <Guide done={() => frameEmitter.emit(MoveType.guideDone)}/> : null
             }
-            <div className={style.leftBtn}>
-                <Button
-                    label={'交易规则回顾'}
-                    size={Button.Size.Big}
-                    color={Button.Color.Blue}
-                    onClick={() => setModalType(ModalType.Trade)}
-                />
-            </div>
+            <Line text={`第${gameState.round + 1}轮`} style={{marginTop: '2rem'}}/>
             <table className={style.stockInfo}>
                 <tbody>
                 <tr>
@@ -450,12 +440,12 @@ export function Play({frameEmitter, game, gameState, playerState}: Core.IPlayPro
             </table>
             <p style={{marginBottom: '10px'}}>
                 *私人信息: 你们公司对该<span className={style.privateValue}>股票的估值</span>是
-                <span style={{color: 'orange'}}>{playerState.privateValue}</span>
+                <span style={{color: 'orange'}}>{playerRoundState.privateValue}</span>
             </p>
             <p className={style.issuer}>
                 *市场信息: 该公司共发行了
                 <span style={{color: 'orange'}}>{CONFIG.marketStockAmount}股</span>股票, 最低保留价格为
-                <span style={{color: 'orange'}}>{gameState.minPrice}</span>
+                <span style={{color: 'orange'}}>{gameRoundState.minPrice}</span>
             </p>
             <div className={style.investor}>
                 <div className={style.inputWrapper}>
@@ -474,7 +464,7 @@ export function Play({frameEmitter, game, gameState, playerState}: Core.IPlayPro
                                 可买
                                 <span style={{color: 'orange'}}>
                 {+price
-                    ? Math.floor(playerState.startMoney / +price)
+                    ? Math.floor(playerRoundState.startMoney / +price)
                     : ' '}
               </span>
                                 股
@@ -508,14 +498,14 @@ export function Play({frameEmitter, game, gameState, playerState}: Core.IPlayPro
                 <span
                     className={style.operation}
                     onClick={() =>
-                        inputNum(0.5, playerState.startMoney)
+                        inputNum(0.5, playerRoundState.startMoney)
                     }
                 >
                   半仓
                 </span>
                 <span
                     className={style.operation}
-                    onClick={() => inputNum(1, playerState.startMoney)}
+                    onClick={() => inputNum(1, playerRoundState.startMoney)}
                 >
                   全仓
                 </span>
@@ -552,9 +542,17 @@ export function Play({frameEmitter, game, gameState, playerState}: Core.IPlayPro
             </p>
             <ListItem width={200} style={{marginBottom: '10px'}}>
                 <p style={{color: 'orange'}} className={style.startPrice}>
-                    初始资金: {playerState.startMoney}
+                    初始资金: {playerRoundState.startMoney}
                 </p>
             </ListItem>
+            <div className={style.leftBtn}>
+                <Button
+                    label={'交易规则回顾'}
+                    size={Button.Size.Big}
+                    color={Button.Color.Blue}
+                    onClick={() => setModalType(ModalType.Trade)}
+                />
+            </div>
         </>
     }
 
@@ -620,16 +618,16 @@ export function Play({frameEmitter, game, gameState, playerState}: Core.IPlayPro
     }
 
     let content
-    switch (playerState.status) {
+    switch (playerRoundState.status) {
         case PlayerStatus.test: {
             content =
-                <TestPage done={() => frameEmitter.emit(MoveType.getIndex)} questions={IPOTypeConfig.testQuestions}/>
+                <TestPage done={()=>frameEmitter.emit(MoveType.getIndex)} questions={IPOTypeConfig.testQuestions}/>
             break
         }
         case PlayerStatus.shouted: {
             content = <>
                 <StockInfo
-                    stockIndex={gameState.stockIndex}
+                    stockIndex={gameRoundState.stockIndex}
                     style={{marginTop: '15vh', marginBottom: '100px'}}
                 />
                 <div
@@ -655,7 +653,7 @@ export function Play({frameEmitter, game, gameState, playerState}: Core.IPlayPro
     }
 
     return <section className={style.play}>
-        <div className={style.playContent}>
+        <div className={style.playContent} key={gameState.round}>
             {content}
             <Modal visible={modalType !== ModalType.None}>
                 <ModalContent modalType={modalType}/>

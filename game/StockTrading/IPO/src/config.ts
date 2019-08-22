@@ -16,9 +16,11 @@ export const BuyNumberRange = {
     robotMax: 3000
 }
 export const CONFIG = {
-    tradeTime: 60,
+    round: 3,
     groupSize: 6,
-    marketStockAmount: 1e4
+    tradeTime: 30,
+    marketStockAmount: 1e4,
+    secondsToShowResult:5,
 }
 
 export enum IPOType {
@@ -43,6 +45,7 @@ export enum MoveType {
 }
 
 export enum PushType {
+    startRound,
     shoutTimer
 }
 
@@ -60,16 +63,20 @@ export interface IPushParams {
     shoutTimer: number
 }
 
-export interface IGameState {
+export interface IGameRoundState {
     stockIndex: number
-    playerNum: number
     minPrice: number
     maxPrice: number
     tradePrice: number
 }
 
-export interface IPlayerState {
-    index: number
+export interface IGameState {
+    playerNum: number
+    rounds: Array<IGameRoundState>
+    round: number
+}
+
+export interface IPlayerRoundState {
     status: number
     privateValue: number
     price: number
@@ -77,4 +84,9 @@ export interface IPlayerState {
     actualNum: number
     profit: number
     startMoney: number
+}
+
+export interface IPlayerState {
+    index: number
+    rounds: Array<IPlayerRoundState>
 }

@@ -3,8 +3,10 @@ import {
   BuyNumberRange,
   CONFIG,
   ICreateParams,
+  IGameRoundState,
   IGameState,
   IMoveParams,
+  IPlayerRoundState,
   IPlayerState,
   IPOType,
   IPushParams,
@@ -31,29 +33,36 @@ export default class Controller extends BaseController<ICreateParams,
     PushType,
     IMoveParams,
     IPushParams> {
-  private shoutInterval: NodeJS.Timer
+  roundTimers: Array<NodeJS.Timer> = []
 
   initGameState(): TGameState<IGameState> {
     const gameState = super.initGameState()
-    const max = formatDigits(genRandomInt(PriceRange.limit.min * 100, PriceRange.limit.max * 100) / 100),
-        min = formatDigits(genRandomInt(max * PriceRange.minRatio.min, max * PriceRange.minRatio.max))
     gameState.playerNum = 0
-    gameState.minPrice = min
-    gameState.maxPrice = max
-    gameState.stockIndex = genRandomInt(0, STOCKS.length - 1)
+    gameState.round = 0
+    gameState.rounds = Array(CONFIG.round).fill(null).map(() => {
+      const maxPrice = formatDigits(genRandomInt(PriceRange.limit.min * 100, PriceRange.limit.max * 100) / 100),
+          minPrice = formatDigits(genRandomInt(maxPrice * PriceRange.minRatio.min, maxPrice * PriceRange.minRatio.max))
+      return {
+        minPrice,
+        maxPrice,
+        stockIndex: genRandomInt(0, STOCKS.length - 1)
+      } as IGameRoundState
+    })
     return gameState
   }
 
   async initPlayerState(actor: IActor): Promise<TPlayerState<IPlayerState>> {
     const gameState = await this.stateManager.getGameState()
     const playerState = await super.initPlayerState(actor)
-    playerState.status = PlayerStatus.guide
-    playerState.privateValue = formatDigits(genRandomInt(gameState.minPrice * 100, gameState.maxPrice * 100) / 100)
-    playerState.startMoney = Math.ceil(gameState.minPrice * BuyNumberRange.baseCount / 10000) * 10000
-    playerState.price = 0
-    playerState.bidNum = 0
-    playerState.actualNum = 0
-    playerState.profit = 0
+    playerState.rounds = Array(CONFIG.round).fill(null).map((_, i) => ({
+      status: i === 0 ? PlayerStatus.guide : PlayerStatus.prepared,
+      privateValue: formatDigits(genRandomInt(gameState.rounds[i].minPrice * 100, gameState.rounds[i].maxPrice * 100) / 100),
+      startMoney: Math.ceil(gameState.rounds[i].minPrice * BuyNumberRange.baseCount / 10000) * 10000,
+      price: 0,
+      bidNum: 0,
+      actualNum: 0,
+      profit: 0
+    } as IPlayerRoundState))
     return playerState
   }
 
@@ -63,12 +72,15 @@ export default class Controller extends BaseController<ICreateParams,
       params: IMoveParams,
       cb: IMoveCallback
   ): Promise<void> {
-    const playerState = await this.stateManager.getPlayerState(actor),
-        gameState = await this.stateManager.getGameState(),
+    const gameState = await this.stateManager.getGameState(),
+        {round} = gameState,
+        gameRoundState = gameState.rounds[round],
+        playerState = await this.stateManager.getPlayerState(actor),
+        playerRoundState = playerState.rounds[round],
         playerStates = await this.stateManager.getPlayerStates()
     switch (type) {
       case MoveType.guideDone: {
-        playerState.status = PlayerStatus.test
+        playerRoundState.status = PlayerStatus.test
         break
       }
       case MoveType.getIndex: {
@@ -76,7 +88,7 @@ export default class Controller extends BaseController<ICreateParams,
           break
         }
         playerState.index = gameState.playerNum++
-        playerState.status = PlayerStatus.prepared
+        playerRoundState.status = PlayerStatus.prepared
         if (playerState.index === 0) {
           global.setTimeout(async () => {
             if (gameState.playerNum < CONFIG.groupSize) {
@@ -84,17 +96,17 @@ export default class Controller extends BaseController<ICreateParams,
                 await this.startRobot(i)
               })
             }
-            await this.startTrade()
+            await this.startRound()
           }, 3e3)
         }
         break
       }
       case MoveType.shout: {
-        if (playerState.status !== PlayerStatus.prepared) {
+        if (playerRoundState.status !== PlayerStatus.prepared) {
           return
         }
-        const {privateValue, startMoney} = playerState,
-            {minPrice} = gameState
+        const {privateValue, startMoney} = playerRoundState,
+            {minPrice} = gameRoundState
         const errMsg = Controller.checkShoutParams(
             params,
             privateValue,
@@ -104,26 +116,33 @@ export default class Controller extends BaseController<ICreateParams,
         if (errMsg) {
           return cb(errMsg)
         }
-        playerState.status = PlayerStatus.shouted
-        playerState.price = params.price
-        playerState.bidNum = params.num
-        const playerStatesArr = Object.values(playerStates)
+        playerRoundState.status = PlayerStatus.shouted
+        playerRoundState.price = params.price
+        playerRoundState.bidNum = params.num
+        const playerRoundStatesArr = Object.values(playerStates).map(({rounds}) => rounds[round])
         if (
-            !playerStatesArr.every(s => s.status === PlayerStatus.shouted)
+            !playerRoundStatesArr.every(s => s.status === PlayerStatus.shouted)
         ) {
           return
         }
         setTimeout(async () => {
-          this.calcProfit(gameState, playerStatesArr)
-          playerStatesArr.forEach(
+          this.calcProfit(gameRoundState, playerRoundStatesArr)
+          playerRoundStatesArr.forEach(
               s => (s.status = PlayerStatus.result)
           )
+          if (gameState.round < CONFIG.round - 1) {
+            global.setTimeout(async () => {
+              gameState.round++
+              this.startRound()
+              await this.stateManager.syncState()
+            }, CONFIG.secondsToShowResult * 1e3)
+          }
           await this.stateManager.syncState()
         }, 2000)
         break
       }
       case MoveType.nextGame: {
-        const status = playerState.status
+        const status = playerRoundState.status
         if (status !== PlayerStatus.result) {
           return
         }
@@ -162,35 +181,37 @@ export default class Controller extends BaseController<ICreateParams,
     return null
   }
 
-  async startTrade() {
-    const gameState = await this.stateManager.getGameState()
+  async startRound() {
+    const {rounds, round} = await this.stateManager.getGameState(),
+        gameRoundState = rounds[round]
     global.setTimeout(() => {
-      const shoutIntervals = this.shoutInterval
       let shoutTimer = 1
-      this.shoutInterval = global.setInterval(async () => {
+      this.roundTimers[round] = global.setInterval(async () => {
         const playerStates = await this.stateManager.getPlayerStates(),
-            playerStatesArray = Object.values(playerStates)
+            playerStatesArray = Object.values(playerStates),
+            playerRoundStatesArray = playerStatesArray.map(({rounds}) => rounds[round])
         this.push(playerStatesArray.map(({actor}) => actor), PushType.shoutTimer, {shoutTimer})
         if (
-            playerStatesArray.every(s => s.status !== PlayerStatus.prepared)
+            playerRoundStatesArray.every(s => s.status !== PlayerStatus.prepared)
         ) {
-          global.clearInterval(shoutIntervals)
+          global.clearInterval(this.roundTimers[round])
           return
         }
         if (shoutTimer++ < CONFIG.tradeTime) {
           return
         }
-        global.clearInterval(shoutIntervals)
-        this.calcProfit(gameState, playerStatesArray)
+        global.clearInterval(this.roundTimers[round])
+        this.calcProfit(gameRoundState, playerRoundStatesArray)
         await this.stateManager.syncState()
-      }, 1000)
+      }, 1e3)
     }, 0)
+    global.setTimeout(() => this.broadcast(PushType.startRound), 1e3)
   }
 
   //region calcProfit
   calcProfit(
-      gameState: IGameState,
-      playerStates: Array<IPlayerState>
+      gameState: IGameRoundState,
+      playerStates: Array<IPlayerRoundState>
   ) {
     const sortedPlayerStates = playerStates.filter(s => s.status === PlayerStatus.shouted).sort((a, b) => b.price - a.price)
     const {type} = this.game.params
@@ -209,8 +230,8 @@ export default class Controller extends BaseController<ICreateParams,
   }
 
   calcProfit_Median(
-      IGameState: IGameState,
-      sortedPlayerStates: Array<IPlayerState>
+      IGameState: IGameRoundState,
+      sortedPlayerStates: Array<IPlayerRoundState>
   ) {
     function findBuyerIndex(num: number, array: Array<number>): number {
       let lo = 0
@@ -239,7 +260,6 @@ export default class Controller extends BaseController<ICreateParams,
     if (numberOfShares <= CONFIG.marketStockAmount) {
       IGameState.tradePrice = IGameState.minPrice
       sortedPlayerStates
-      // .filter(s => s.privateValue !== undefined)
           .forEach(s => {
             s.actualNum = s.bidNum
             s.profit = formatDigits(
@@ -248,7 +268,7 @@ export default class Controller extends BaseController<ICreateParams,
           })
       return
     }
-    const buyers: Array<IPlayerState> = []
+    const buyers: Array<IPlayerRoundState> = []
     const buyerLimits: Array<number> = []
     const median = Math.floor(numberOfShares / 2)
     let leftNum = median
@@ -267,7 +287,6 @@ export default class Controller extends BaseController<ICreateParams,
     // 买家总数小于发行股数
     if (buyerTotal <= CONFIG.marketStockAmount) {
       buyers
-      // .filter(s => s.privateValue !== undefined)
           .forEach(s => {
             s.actualNum = s.bidNum
             s.profit = formatDigits(
@@ -284,7 +303,6 @@ export default class Controller extends BaseController<ICreateParams,
         buyers[buyerIndex].actualNum++
       }
       buyers
-      // .filter(s => s.privateValue !== undefined)
           .forEach(s => {
             s.profit = formatDigits(
                 (s.privateValue - IGameState.tradePrice) * s.actualNum
@@ -294,8 +312,8 @@ export default class Controller extends BaseController<ICreateParams,
   }
 
   calcProfit_TopK(
-      IGameState: IGameState,
-      sortedPlayerStates: Array<IPlayerState>
+      IGameState: IGameRoundState,
+      sortedPlayerStates: Array<IPlayerRoundState>
   ) {
     const buyers = []
     let tradePrice
@@ -322,8 +340,8 @@ export default class Controller extends BaseController<ICreateParams,
   }
 
   calcProfit_FPSBA(
-      IGameState: IGameState,
-      sortedPlayerStates: Array<IPlayerState>
+      IGameState: IGameRoundState,
+      sortedPlayerStates: Array<IPlayerRoundState>
   ) {
     const buyers = []
     let tradePrice
@@ -342,7 +360,6 @@ export default class Controller extends BaseController<ICreateParams,
     IGameState.tradePrice =
         tradePrice === undefined ? IGameState.minPrice : tradePrice
     buyers
-    // .filter(s => s.privateValue !== undefined)
         .forEach(s => {
           s.profit = formatDigits(
               (s.privateValue - IGameState.tradePrice) * s.actualNum
