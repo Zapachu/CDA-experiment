@@ -54,7 +54,7 @@ export function Play({frameEmitter, game, gameState, playerState}: Core.IPlayPro
         if (isNaN(+price) || +price <= 0) {
             return
         }
-        setNum((multiplier * startingPrice / +price).toFixed(0))
+        setNum((~~(multiplier * startingPrice / +price)).toString())
     }
 
     function exitGame(onceMore = false) {
@@ -135,7 +135,7 @@ export function Play({frameEmitter, game, gameState, playerState}: Core.IPlayPro
                 <div className={style.rightBtn}>
                     <Button
                         label={
-                            game.params.type === IPOType.Median ? 'IPO价格知识扩展' : '荷兰式拍卖知识扩展'
+                            game.params.type === IPOType.Median ? 'IPO价格知识扩展' : game.params.type === IPOType.TopK?'荷兰式拍卖知识扩展':'第一价格密封拍卖'
                         }
                         size={Button.Size.Big}
                         color={Button.Color.Blue}
@@ -337,9 +337,7 @@ export function Play({frameEmitter, game, gameState, playerState}: Core.IPlayPro
                 return (
                     <div className={style.modalIpo}>
                         <p className={style.title}>
-                            {type === IPOType.Median
-                                ? 'IPO价格知识扩展'
-                                : '荷兰式拍卖知识扩展'}
+                            {type === IPOType.Median ? 'IPO价格知识扩展' : type === IPOType.TopK ? '荷兰式拍卖知识扩展' : '第一价格密封拍卖'}
                         </p>
                         {type === IPOType.Median ? (
                             <>
@@ -355,7 +353,7 @@ export function Play({frameEmitter, game, gameState, playerState}: Core.IPlayPro
                                     2、类比法，就是通过选择同类上市公司的一些比率，如最常用的市盈率、市净率(p/b即股价/每股净资产)，再结合新上市公司的财务指标如每股收益、每股净资产来确定上市公司价值，一般都采用预测的指标。市盈率法的适用具有许多局限性，例如要求上市公司经营业绩要稳定，不能出现亏损等，而市净率法则没有这些问题，但同样也有缺陷，主要是过分依赖公司账面价值而不是最新的市场价值。因此对于那些流动资产比例高的公司如银行、保险公司比较适用此方法。
                                 </p>
                             </>
-                        ) : (
+                        ) : type === IPOType.TopK ? (
                             <>
                                 <p>
                                     荷兰式拍卖亦称为“减价式拍卖”。拍卖标的的竞价由高到低依次递减直到第一个竞买入应价（达到或超过底价）时击槌成交的拍卖。减价式拍卖通常从非常高的价格开始，价格就以事先确定的降价阶梯，由高到低递减，直到有竞买人愿意接受为止。
@@ -364,7 +362,25 @@ export function Play({frameEmitter, game, gameState, playerState}: Core.IPlayPro
                                     荷兰式拍卖的特点：1、价格随着一定的时间间隔，按照事先确定的降价阶梯，由高到低递减。2、所有买受人（即买到物品的人）都以最后的竞价（即所有买受人中的最低出价）成交。
                                 </p>
                             </>
-                        )}
+                        ) : <>
+                            <p>您在一个基金机构工作，您所在的基金机构经过对市场信息的精密分析，现对一个即将上市的股票有一个估值A元。您的公司给您提供了竞价资金B，要您在市场上参与该股票的询价过程。企业共发行了1万股股票，您与市场上其他交易者对该股票的估值可能相同，也可能不同，您需要与其他买家共同竞争购买股票。
+                                <br/>股票的成交价格规则如下：每个股票都有一个最低的保留价格C元，即市场上股票的价格低于最低保留价格时，企业选择不发售股票，因此你的出价必需大于最低保留价格C。当所有的交易者提交自己的拟购买价格和拟购买数量，系统根据买家的拟购买价格由大到小进行排序后，拟购买价格在第10000股购买价之上的市场交易者获得购买资格，获得购买资格的交易者的成交价格即为其拟购买价，可购买数量按照价格排序后的拟购买数量依次进行分配。如若市场上拟购买总数小于企业发行的股票数量，则成交价格为最低保留价格C.
+                            </p><br/>
+                            <p>以下是一个简单的例子：
+                                <br/>交易者A根据自己的估值给出的拟购买价格和拟购买数量分布为98元和5000股，交易者B给出的拟购买价格和购买数量为96元和6000股，交易者C给出的拟购买价格和购买数量为104元和3000股，交易者D给出的拟购买价格和购买数量为107元和4000股，你根据自己的估值105元给出的拟购买数量和拟购买价格是101元和6000股。
+                                系统按照购买价格的由高到低进行排序：
+                                <br/>D：107元——4000股
+                                <br/>C: 104元——3000股
+                                <br/> 您：101元——6000股
+                                <br/> A：98元——5000股
+                                <br/> B：96元——6000股
+                            </p><br/>
+                            <p>
+                                决定成交价格：则整个市场的拟购买总股数为24000，第10000股价格为101元，则按照拟购买价格顺序排列购买在前10000股的交易者获得购买资格，即相应的成交价即为其拟购买价格，可购买数量按照价格排序后的拟购买数量依次进行分配。
+                                决定购买数量：你、D和C都有购买这1万股股票的权利。按照价格排序后，D可购买的数量为4000股，D的购买价格为107元；C可购买的数量为3000股，C的购买价格为104元。虽然你的拟购买数量为6000股，但是此时你只能购买3000股，你的购买价格为101元。
+                                您的收益：（您对股票的估值-股票的成交价格）*您的购买数量
+                            </p>
+                        </>}
                         <Button
                             style={{marginTop: '30px'}}
                             label={'关闭'}
