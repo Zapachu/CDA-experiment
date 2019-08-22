@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {Lang, TGameState, Toast} from '@elf/component'
+import {Lang, TGameState, Toast, TPlayerState} from '@elf/component'
 import {Core} from '@bespoke/client'
 import {Button, Input, ITestPageQuestion, Line, TestPage} from '@bespoke-game/stock-trading-component'
 import Joyride, {Step} from 'react-joyride'
@@ -13,8 +13,8 @@ import {
     IPushParams,
     MoveType,
     PlayerStatus,
-    PriceRange,
-    PushType
+    PushType,
+    ROUNDS
 } from '../config'
 
 type TPlayProps = Core.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>
@@ -30,6 +30,7 @@ function _Play({gameState, playerState, frameEmitter}: Core.IPlayProps<ICreatePa
     gameRoundState.shouts.forEach(s => s > maxShout ? maxShout = s : null)
     if (gameRoundState.traded) {
         return <Result gameState={gameState}
+                       playerState={playerState}
                        exit={onceMore => frameEmitter.emit(MoveType.exit, {onceMore}, lobbyUrl => (location.href = lobbyUrl))}/>
     }
     return <section className={style.playContent}>
@@ -59,8 +60,8 @@ function _Play({gameState, playerState, frameEmitter}: Core.IPlayProps<ICreatePa
                    onPlus={() => setPrice(+(price || 0) + 1)}/>
         </div>
         <Button label={lang.shout} onClick={() => {
-            if (price < PriceRange.start.min) {
-                return Toast.warn('报价有误，请检查')
+            if (price < gameRoundState.startPrice) {
+                return Toast.warn('报价需高于市场起拍价')
             }
             if (maxShout && price < maxShout) {
                 return Toast.warn('报价需高于当前市场最高报价')
@@ -192,28 +193,42 @@ function Guide({done}: { done: () => void }) {
     />
 }
 
-function Result({exit}: { gameState: TGameState<IGameState>, exit: (onceMore?: boolean) => void }) {
-    return <>
-        <Line
-            text={'交易结果展示'}
-            style={{
-                margin: 'auto',
-                maxWidth: '400px',
-                marginTop: '15vh',
-                marginBottom: '20px'
-            }}
-        />
-        <div style={{display: 'flex', justifyContent: 'center'}}>
-            <Button
-                label={'再学一次'}
-                color={Button.Color.Blue}
-                style={{marginRight: '20px'}}
-                onClick={() => exit(true)}
-            />
-            <Button
-                label={'返回交易大厅'}
-                onClick={() => exit()}
-            />
-        </div>
-    </>
+function Result({gameState, playerState, exit}: { gameState: TGameState<IGameState>, playerState: TPlayerState<IPlayerState>, exit: (onceMore?: boolean) => void }) {
+    const {round, rounds} = gameState,
+        {shouts} = rounds[round]
+    let tradeShoutIndex = 0
+    shouts.forEach((s, i) => s > shouts[tradeShoutIndex] ? tradeShoutIndex = i : null)
+    const tradePrice = shouts[tradeShoutIndex],
+        profit = playerState.index === tradeShoutIndex ? (playerState.rounds[round].privatePrice - tradePrice).toFixed(2) : 0
+    return <section className={style.result}>
+        <p className={style.resultInfo}>
+            该资产以<em>{tradePrice}</em>元成交，由{playerState.index === tradeShoutIndex ? '您' : '其它卖家'}竞购得到，您的收益为<em>{profit}</em>元
+        </p>
+        {
+            round === ROUNDS - 1 ? <>
+                <Line
+                    text={'交易结果展示'}
+                    style={{
+                        margin: 'auto',
+                        maxWidth: '400px',
+                        marginTop: '10vh',
+                        marginBottom: '20px'
+                    }}
+                />
+                <div style={{display: 'flex', justifyContent: 'center'}}>
+                    <Button
+                        label={'再学一次'}
+                        color={Button.Color.Blue}
+                        style={{marginRight: '20px'}}
+                        onClick={() => exit(true)}
+                    />
+                    <Button
+                        label={'返回交易大厅'}
+                        onClick={() => exit()}
+                    />
+                </div>
+            </> : <p style={{textAlign: 'center',marginTop: '2rem'}}>即将进入下一轮...</p>
+        }
+
+    </section>
 }

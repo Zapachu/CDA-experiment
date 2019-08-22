@@ -14,7 +14,8 @@ import {
     PriceRange,
     PushType,
     RobotCfg,
-    ROUNDS
+    ROUNDS, SecondsToShowResult,
+    SecondsToTrade
 } from './config'
 import {Number} from './util'
 
@@ -45,7 +46,6 @@ export class Controller extends BaseController<ICreateParams, IGameState, IPlaye
     protected async playerMoveReducer(actor: IActor, type: MoveType, params: IMoveParams, cb: IMoveCallback): Promise<void> {
         const gameState = await this.stateManager.getGameState(),
             playerState = await this.stateManager.getPlayerState(actor),
-            playerStates = await this.stateManager.getPlayerStates(),
             gameRoundState = gameState.rounds[gameState.round],
             playerRoundState = playerState.rounds[gameState.round]
         switch (type) {
@@ -70,16 +70,19 @@ export class Controller extends BaseController<ICreateParams, IGameState, IPlaye
                         RobotCfg.startDelay * 1e3
                     )
                 }
-                gameRoundState.timer = 30
+                gameRoundState.timer = SecondsToTrade
                 gameRoundState.shouts[playerState.index] = params.price
                 global.clearInterval(this.roundTimers[gameState.round])
-                this.roundTimers[gameState.round]= global.setInterval(async () => {
+                this.roundTimers[gameState.round] = global.setInterval(async () => {
                     gameRoundState.timer--
                     if (gameRoundState.timer <= 0) {
                         gameRoundState.traded = true
                         global.clearInterval(this.roundTimers[gameState.round])
-                        if(gameState.round<ROUNDS-1){
-                            gameState.round++
+                        if (gameState.round < ROUNDS - 1) {
+                            global.setTimeout(async () => {
+                                gameState.round++
+                                await this.stateManager.syncState()
+                            }, SecondsToShowResult * 1e3)
                         }
                     }
                     await this.stateManager.syncState()

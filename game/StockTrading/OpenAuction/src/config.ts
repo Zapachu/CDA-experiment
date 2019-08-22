@@ -2,6 +2,9 @@ export const namespace = 'OpenAuction'
 
 export const ROUNDS = 3
 
+export const SecondsToShowResult = 5
+export const SecondsToTrade = 30
+
 export const PriceRange = {
     start: {
         min: 50,
