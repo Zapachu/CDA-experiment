@@ -1,5 +1,40 @@
 export const namespace = 'IPO'
 
+export const PriceRange = {
+    limit: {
+        min: 50,
+        max: 70
+    },
+    minRatio: {
+        min: .6,
+        max: .7
+    }
+}
+export const BuyNumberRange = {
+    baseCount: 5000,
+    robotMin: 1000,
+    robotMax: 3000
+}
+export const CONFIG = {
+    tradeTime: 60,
+    groupSize: 6,
+    marketStockAmount: 1e4
+}
+
+export enum IPOType {
+    Median,
+    TopK,
+    FPSBA
+}
+
+export enum PlayerStatus {
+    guide,
+    test,
+    prepared,
+    shouted,
+    result
+}
+
 export enum MoveType {
     guideDone = 'guideDone',
     getIndex = 'getIndex',
@@ -11,23 +46,7 @@ export enum PushType {
     shoutTimer
 }
 
-export enum PlayerStatus {
-    guide,
-    test,
-    prepared,
-    shouted,
-    result
-}
-
-export enum IPOType {
-    Median = 1,
-    TopK,
-    FPSBA
-}
-
 export interface ICreateParams {
-    groupSize: number
-    total: number
     type: IPOType
 }
 
@@ -38,51 +57,24 @@ export interface IMoveParams {
 }
 
 export interface IPushParams {
-    matchTimer: number
-    matchNum: number
-    min: number
-    max: number
-    startingPrice: number
     shoutTimer: number
 }
 
 export interface IGameState {
+    stockIndex: number
     playerNum: number
-    strikePrice?: number
-    min?: number
-    max?: number
-    stockIndex?: number
+    minPrice: number
+    maxPrice: number
+    tradePrice: number
 }
 
 export interface IPlayerState {
     index: number
-    playerStatus: number
+    status: number
     privateValue: number
     price: number
     bidNum: number
     actualNum: number
     profit: number
-    startingPrice: number
+    startMoney: number
 }
-
-export interface InvestorState {
-    privateValue: number;
-    price: number;
-    bidNum: number;
-    actualNum?: number;
-    profit?: number;
-}
-
-export interface MarketState {
-    strikePrice?: number;
-    min: number;
-}
-
-export const SHOUT_TIMER = 60
-export const minA = 30
-export const maxA = 100
-export const minB = 0.6
-export const maxB = 0.7
-export const startingMultiplier = 5000
-export const minNPCNum = 1000
-export const maxNPCNum = 3000

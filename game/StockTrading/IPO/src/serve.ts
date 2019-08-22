@@ -15,8 +15,6 @@ RedisCall.handle<Trial.Create.IReq, Trial.Create.IRes>(Trial.Create.name(phaseTo
     const gameId = await Server.newGame<ICreateParams>({
         title: `${Phase.IPO_TopK}:${new Date().toUTCString()}`,
         params: {
-            groupSize: 6,
-            total: 10000,
             type: IPOType.TopK
         }
     })
@@ -26,8 +24,6 @@ RedisCall.handle<Trial.Create.IReq, Trial.Create.IRes>(Trial.Create.name(phaseTo
     const gameId = await Server.newGame<ICreateParams>({
         title: `${Phase.IPO_Median}:${new Date().toUTCString()}`,
         params: {
-            groupSize: 6,
-            total: 10000,
             type: IPOType.Median
         }
     })
@@ -37,8 +33,6 @@ RedisCall.handle<Trial.Create.IReq, Trial.Create.IRes>(Trial.Create.name(phaseTo
     const gameId = await Server.newGame<ICreateParams>({
         title: `${Phase.IPO_FPSBA}:${new Date().toUTCString()}`,
         params: {
-            groupSize: 6,
-            total: 10000,
             type: IPOType.FPSBA
         }
     })

@@ -1,12 +1,11 @@
 import {BaseRobot} from '@bespoke/robot'
 import {
+  BuyNumberRange,
   ICreateParams,
   IGameState,
   IMoveParams,
   IPlayerState,
   IPushParams,
-  maxNPCNum,
-  minNPCNum,
   MoveType,
   PushType
 } from './config'
@@ -26,8 +25,8 @@ export default class extends BaseRobot<ICreateParams,
       if (!this.playerState) {
         return
       }
-      const {startingPrice, privateValue} = this.playerState, {min} = this.gameState
-      const {price, bidNum} = this.genPriceAndNum(min, privateValue, startingPrice)
+      const {startMoney, privateValue} = this.playerState, {minPrice} = this.gameState
+      const {price, bidNum} = this.genPriceAndNum(minPrice, privateValue, startMoney)
       this.frameEmitter.emit(MoveType.shout, {price, num: bidNum})
     }, 3e3 * Math.random() + 2e3)
     return this
@@ -36,12 +35,12 @@ export default class extends BaseRobot<ICreateParams,
   genPriceAndNum(
       min: number,
       max: number,
-      startingPrice: number
+      startMoney: number
   ): { price: number; bidNum: number } {
     const price = formatDigits(genRandomInt(min * 100, max * 100) / 100)
-    const maxNum = Math.floor(startingPrice / price)
+    const maxNum = Math.floor(startMoney / price)
     const num =
-        genRandomInt(minNPCNum / 100, Math.min(maxNPCNum, maxNum) / 100) * 100
+        genRandomInt(BuyNumberRange.robotMin / 100, Math.min(BuyNumberRange.robotMax, maxNum) / 100) * 100
     return {price, bidNum: num}
   }
 }
