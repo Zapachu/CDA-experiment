@@ -31,7 +31,7 @@
       "log_date_format": "YYYY-MM-DD HH:mm Z"
     },
     {
-      "script": "../game/DecisionSurvey/build/serve.js",
+      "script": "../game/Custom/DecisionSurvey/build/serve.js",
       "name": "DecisionSurvey",
       "env": {
         "NODE_ENV": "production",
@@ -41,7 +41,7 @@
       "log_date_format": "YYYY-MM-DD HH:mm Z"
     },
     {
-      "script": "../game/Graphical/DelayedReceiveMatch/build/serve.js",
+      "script": "../game/Deprecated/Graphical/DelayedReceiveMatch/build/serve.js",
       "name": "DelayedReceiveMatch",
       "env": {
         "NODE_ENV": "production",
@@ -81,7 +81,7 @@
       "log_date_format": "YYYY-MM-DD HH:mm Z"
     },
     {
-      "script": "../game/SceneSurvey/build/serve.js",
+      "script": "../game/Custom/SceneSurvey/build/serve.js",
       "name": "SceneSurvey",
       "env": {
         "NODE_ENV": "production",

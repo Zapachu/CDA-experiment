@@ -19,7 +19,7 @@
       "log_date_format": "YYYY-MM-DD HH:mm Z"
     },
     {
-      "script": "../game/ParallelApplication/build/serve.js",
+      "script": "../game/Trial/ParallelApplication/build/serve.js",
       "name": "ParallelApplication",
       "env": {
         "NODE_ENV": "production",
@@ -28,7 +28,7 @@
       "log_date_format": "YYYY-MM-DD HH:mm Z"
     },
     {
-      "script": "../game/GarbageSorting/build/serve.js",
+      "script": "../game/Trial/GarbageSorting/build/serve.js",
       "name": "GarbageSorting",
       "env": {
         "NODE_ENV": "production",
