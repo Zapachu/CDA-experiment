@@ -71,6 +71,9 @@ export class Controller extends BaseController<ICreateParams, IGameState, IPlaye
                     )
                 }
                 gameRoundState.timer = SecondsToTrade
+                if(gameRoundState.shouts.some(p=>p>params.price)){
+                    break
+                }
                 gameRoundState.shouts[playerState.index] = params.price
                 global.clearInterval(this.roundTimers[gameState.round])
                 this.roundTimers[gameState.round] = global.setInterval(async () => {
