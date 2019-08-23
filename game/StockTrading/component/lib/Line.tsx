@@ -13,7 +13,7 @@ const Line: LineType = ({text, style: propStyle, color=Color.Green}) => {
 
 interface PropType {
     text?: string;
-    style?: object;
+    style?: React.CSSProperties;
     color?: Color;
 }
 

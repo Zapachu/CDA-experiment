@@ -1,14 +1,32 @@
 export const namespace = 'IPO'
 
-export enum MoveType {
-    guideDone = 'guideDone',
-    getIndex = 'getIndex',
-    shout = 'shout',
-    nextGame = 'nextGame'
+export const PriceRange = {
+    limit: {
+        min: 50,
+        max: 70
+    },
+    minRatio: {
+        min: .6,
+        max: .7
+    }
+}
+export const BuyNumberRange = {
+    baseCount: 5000,
+    robotMin: 1000,
+    robotMax: 3000
+}
+export const CONFIG = {
+    round: 3,
+    groupSize: 6,
+    tradeTime: 60,
+    marketStockAmount: 1e4,
+    secondsToShowResult:5,
 }
 
-export enum PushType {
-    shoutTimer
+export enum IPOType {
+    Median,
+    TopK,
+    FPSBA
 }
 
 export enum PlayerStatus {
@@ -19,15 +37,19 @@ export enum PlayerStatus {
     result
 }
 
-export enum IPOType {
-    Median = 1,
-    TopK,
-    FPSBA
+export enum MoveType {
+    guideDone = 'guideDone',
+    getIndex = 'getIndex',
+    shout = 'shout',
+    nextGame = 'nextGame'
+}
+
+export enum PushType {
+    startRound,
+    shoutTimer
 }
 
 export interface ICreateParams {
-    groupSize: number
-    total: number
     type: IPOType
 }
 
@@ -38,51 +60,33 @@ export interface IMoveParams {
 }
 
 export interface IPushParams {
-    matchTimer: number
-    matchNum: number
-    min: number
-    max: number
-    startingPrice: number
     shoutTimer: number
+}
+
+export interface IGameRoundState {
+    stockIndex: number
+    minPrice: number
+    maxPrice: number
+    tradePrice: number
 }
 
 export interface IGameState {
     playerNum: number
-    strikePrice?: number
-    min?: number
-    max?: number
-    stockIndex?: number
+    rounds: Array<IGameRoundState>
+    round: number
 }
 
-export interface IPlayerState {
-    index: number
-    playerStatus: number
+export interface IPlayerRoundState {
+    status: number
     privateValue: number
     price: number
     bidNum: number
     actualNum: number
     profit: number
-    startingPrice: number
+    startMoney: number
 }
 
-export interface InvestorState {
-    privateValue: number;
-    price: number;
-    bidNum: number;
-    actualNum?: number;
-    profit?: number;
+export interface IPlayerState {
+    index: number
+    rounds: Array<IPlayerRoundState>
 }
-
-export interface MarketState {
-    strikePrice?: number;
-    min: number;
-}
-
-export const SHOUT_TIMER = 60
-export const minA = 30
-export const maxA = 100
-export const minB = 0.6
-export const maxB = 0.7
-export const startingMultiplier = 5000
-export const minNPCNum = 1000
-export const maxNPCNum = 3000
