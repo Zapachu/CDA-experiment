@@ -375,8 +375,8 @@ export function Play({frameEmitter, game, gameState, playerState}: Core.IPlayPro
                 <TableInfo dataList={dataList} style={{margin: '30px auto'}}/>
                 {
                     gameState.round < CONFIG.round - 1 ?
-                        <p>即将进入下一轮......</p>:
-                        <div style={{display:  'flex', justifyContent: 'center'}}>
+                        <Loading label={'即将进入下一轮'}/> :
+                        <div style={{display: 'flex', justifyContent: 'center'}}>
                             <Button
                                 label={'再学一次'}
                                 color={Button.Color.Blue}
@@ -621,7 +621,7 @@ export function Play({frameEmitter, game, gameState, playerState}: Core.IPlayPro
     switch (playerRoundState.status) {
         case PlayerStatus.test: {
             content =
-                <TestPage done={()=>frameEmitter.emit(MoveType.getIndex)} questions={IPOTypeConfig.testQuestions}/>
+                <TestPage done={() => frameEmitter.emit(MoveType.getIndex)} questions={IPOTypeConfig.testQuestions}/>
             break
         }
         case PlayerStatus.shouted: {

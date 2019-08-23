@@ -18,7 +18,7 @@ export const BuyNumberRange = {
 export const CONFIG = {
     round: 3,
     groupSize: 6,
-    tradeTime: 30,
+    tradeTime: 60,
     marketStockAmount: 1e4,
     secondsToShowResult:5,
 }

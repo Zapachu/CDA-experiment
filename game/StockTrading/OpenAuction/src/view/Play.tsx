@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {Lang, TGameState, Toast, TPlayerState} from '@elf/component'
 import {Core} from '@bespoke/client'
-import {Button, Input, ITestPageQuestion, Line, TestPage} from '@bespoke-game/stock-trading-component'
+import {Button, Input, ITestPageQuestion, Line, Loading, TestPage} from '@bespoke-game/stock-trading-component'
 import Joyride, {Step} from 'react-joyride'
 import {Input as AntInput, Radio} from 'antd'
 import {
@@ -227,8 +227,7 @@ function Result({gameState, playerState, exit}: { gameState: TGameState<IGameSta
                         onClick={() => exit()}
                     />
                 </div>
-            </> : <p style={{textAlign: 'center',marginTop: '2rem'}}>即将进入下一轮...</p>
+            </> : <Loading label={'即将进入下一轮'}/>
         }
-
     </section>
 }
