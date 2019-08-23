@@ -126,17 +126,7 @@ export default class Controller extends BaseController<ICreateParams,
           return
         }
         setTimeout(async () => {
-          this.calcProfit(gameRoundState, playerRoundStatesArr)
-          playerRoundStatesArr.forEach(
-              s => (s.status = PlayerStatus.result)
-          )
-          if (gameState.round < CONFIG.round - 1) {
-            global.setTimeout(async () => {
-              gameState.round++
-              this.startRound()
-              await this.stateManager.syncState()
-            }, CONFIG.secondsToShowResult * 1e3)
-          }
+          this.calcProfit(gameState, gameRoundState, playerRoundStatesArr)
           await this.stateManager.syncState()
         }, 2000)
         break
@@ -182,7 +172,8 @@ export default class Controller extends BaseController<ICreateParams,
   }
 
   async startRound() {
-    const {rounds, round} = await this.stateManager.getGameState(),
+    const gameState = await this.stateManager.getGameState(),
+        {rounds, round} = gameState,
         gameRoundState = rounds[round]
     global.setTimeout(() => {
       let shoutTimer = 1
@@ -201,7 +192,7 @@ export default class Controller extends BaseController<ICreateParams,
           return
         }
         global.clearInterval(this.roundTimers[round])
-        this.calcProfit(gameRoundState, playerRoundStatesArray)
+        this.calcProfit(gameState, gameRoundState, playerRoundStatesArray)
         await this.stateManager.syncState()
       }, 1e3)
     }, 0)
@@ -210,23 +201,31 @@ export default class Controller extends BaseController<ICreateParams,
 
   //region calcProfit
   calcProfit(
-      gameState: IGameRoundState,
-      playerStates: Array<IPlayerRoundState>
+      gameState:IGameState,
+      gameRoundState: IGameRoundState,
+      playerRoundStatesArr: Array<IPlayerRoundState>
   ) {
-    const sortedPlayerStates = playerStates.filter(s => s.status === PlayerStatus.shouted).sort((a, b) => b.price - a.price)
+    const sortedPlayerStates = playerRoundStatesArr.filter(s => s.status === PlayerStatus.shouted).sort((a, b) => b.price - a.price)
     const {type} = this.game.params
     switch (type) {
       case IPOType.FPSBA:
-        this.calcProfit_FPSBA(gameState, sortedPlayerStates)
+        this.calcProfit_FPSBA(gameRoundState, sortedPlayerStates)
         break
       case IPOType.Median:
-        this.calcProfit_Median(gameState, sortedPlayerStates)
+        this.calcProfit_Median(gameRoundState, sortedPlayerStates)
         break
       case IPOType.TopK:
-        this.calcProfit_TopK(gameState, sortedPlayerStates)
+        this.calcProfit_TopK(gameRoundState, sortedPlayerStates)
         break
     }
-    playerStates.forEach(s => (s.status = PlayerStatus.result))
+    playerRoundStatesArr.forEach(s => (s.status = PlayerStatus.result))
+    if (gameState.round < CONFIG.round - 1) {
+      global.setTimeout(async () => {
+        gameState.round++
+        this.startRound()
+        await this.stateManager.syncState()
+      }, CONFIG.secondsToShowResult * 1e3)
+    }
   }
 
   calcProfit_Median(
