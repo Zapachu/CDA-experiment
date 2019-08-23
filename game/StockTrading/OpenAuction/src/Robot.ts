@@ -33,9 +33,12 @@ export class Robot extends BaseRobot<ICreateParams,
                 }
                 return
             }
-            let maxShouts = this.gameRoundState.startPrice
-            this.gameRoundState.shouts.forEach(s => s > maxShouts ? maxShouts = s : null)
-            let price = Number.format(maxShouts + Math.random() * 5)
+            let maxShout = this.gameRoundState.startPrice
+            this.gameRoundState.shouts.forEach(s => s > maxShout ? maxShout = s : null)
+            if(maxShout > this.playerRoundState.privatePrice){
+                return
+            }
+            let price = Number.format(maxShout + Math.random() * 5)
             if (price > this.playerRoundState.privatePrice) {
                 price = this.playerRoundState.privatePrice
             }
