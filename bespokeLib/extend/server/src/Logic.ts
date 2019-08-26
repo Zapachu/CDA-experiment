@@ -45,8 +45,7 @@ export class Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, 
                 return
             }
             playerState.groupIndex = groupIndex
-            playerState.state = await this.groupsLogic[groupIndex].initPlayerState()
-            gameState.groups[groupIndex].playerNum++
+            playerState.state = await this.groupsLogic[groupIndex].initPlayerState(gameState.groups[groupIndex].playerNum++)
             await this.stateManager.syncState()
         } else {
             await this.groupsLogic[params.groupIndex].playerMoveReducer(actor, type, params.params, cb)

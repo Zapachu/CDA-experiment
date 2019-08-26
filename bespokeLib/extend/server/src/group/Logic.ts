@@ -1,4 +1,5 @@
 import {StateManager} from './StateManager'
+import {Wrapper} from '@extend/share'
 import {IActor, IMoveCallback} from '@bespoke/share'
 
 export class Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
@@ -9,8 +10,10 @@ export class Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, 
         return {} as any
     }
 
-    async initPlayerState(): Promise<IPlayerState> {
-        return {} as any
+    async initPlayerState(index:number): Promise<Wrapper.TPlayerState<IPlayerState>> {
+        return {
+            index
+        } as any
     }
 
     async teacherMoveReducer(actor: IActor, type: MoveType, params: IMoveParams, cb: IMoveCallback): Promise<void> {

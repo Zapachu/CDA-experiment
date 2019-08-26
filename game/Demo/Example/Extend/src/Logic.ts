@@ -2,6 +2,7 @@ import * as Extend from '@extend/server'
 import {IActor, IMoveCallback} from '@bespoke/share'
 import {Log} from '@elf/util'
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, MoveType, PushType} from './config'
+import {Wrapper} from '@extend/share'
 
 class GroupLogic extends Extend.Group.Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     initGameState(): IGameState {
@@ -10,8 +11,8 @@ class GroupLogic extends Extend.Group.Logic<ICreateParams, IGameState, IPlayerSt
         return gameState
     }
 
-    async initPlayerState(): Promise<IPlayerState> {
-        const playerState = await super.initPlayerState()
+    async initPlayerState(index: number): Promise<Wrapper.TPlayerState<IPlayerState>> {
+        const playerState = await super.initPlayerState(index)
         playerState.count = 0
         return playerState
     }

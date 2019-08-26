@@ -18,6 +18,7 @@
     "@extend/client": "^1.1.1",
     "@extend/server": "^1.1.1",
     "@extend/robot": "^1.1.1",
+    "@extend/share": "^1.1.1",
     "@elf/component": "^1.1.1",
     "@elf/protocol": "^1.1.1",
     "@elf/setting": "^1.1.1",

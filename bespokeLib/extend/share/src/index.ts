@@ -36,9 +36,13 @@ export namespace Wrapper {
         }>
     }
 
+    export type TPlayerState<IPlayerState>  = IPlayerState & {
+        index: number
+    }
+
     export interface IPlayerState<IPlayerState> {
         groupIndex: number
-        state: IPlayerState
+        state: TPlayerState<IPlayerState>
     }
 }
 

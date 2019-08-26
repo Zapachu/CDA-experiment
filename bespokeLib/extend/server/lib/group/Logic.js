@@ -43,10 +43,12 @@ var Logic = /** @class */ (function () {
     Logic.prototype.initGameState = function () {
         return {};
     };
-    Logic.prototype.initPlayerState = function () {
+    Logic.prototype.initPlayerState = function (index) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2 /*return*/, {}];
+                return [2 /*return*/, {
+                        index: index
+                    }];
             });
         });
     };

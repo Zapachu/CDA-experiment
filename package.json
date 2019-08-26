@@ -73,6 +73,8 @@
     "rc-switch": "^1.9.0",
     "react": "^16.8.6",
     "react-beautiful-dnd": "^11.0.4",
+    "react-dnd": "^9.3.4",
+    "react-dnd-html5-backend": "^9.3.4",
     "react-dom": "^16.8.6",
     "react-joyride": "^2.1.1",
     "react-router-dom": "^5.0.1",
