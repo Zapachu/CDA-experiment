@@ -14,7 +14,7 @@
       "name": "TBM",
       "env": {
         "NODE_ENV": "production",
-        "BESPOKE_WITH_PROXY": "true",
+        "BESPOKE_WITH_PROXY": "true"
       },
       "log_date_format": "YYYY-MM-DD HH:mm Z"
     },
@@ -23,7 +23,7 @@
       "name": "CBM",
       "env": {
         "NODE_ENV": "production",
-        "BESPOKE_WITH_PROXY": "true",
+        "BESPOKE_WITH_PROXY": "true"
       },
       "log_date_format": "YYYY-MM-DD HH:mm Z"
     },
@@ -32,7 +32,7 @@
       "name": "OpenAuction",
       "env": {
         "NODE_ENV": "production",
-        "BESPOKE_WITH_PROXY": "true",
+        "BESPOKE_WITH_PROXY": "true"
       },
       "log_date_format": "YYYY-MM-DD HH:mm Z"
     },
