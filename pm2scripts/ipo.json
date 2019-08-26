@@ -1,7 +1,7 @@
 {
   "apps": [
     {
-      "script": "../game/StockTrading/IPO/build/serve.js",
+      "script": "../game/MicroExperiment/IPO/build/serve.js",
       "name": "IPO",
       "env": {
         "NODE_ENV": "production",
@@ -10,29 +10,29 @@
       "log_date_format": "YYYY-MM-DD HH:mm Z"
     },
     {
-      "script": "../game/StockTrading/TBM/build/serve.js",
+      "script": "../game/MicroExperiment/TBM/build/serve.js",
       "name": "TBM",
       "env": {
         "NODE_ENV": "production",
-        "BESPOKE_WITH_PROXY": "true",
+        "BESPOKE_WITH_PROXY": "true"
       },
       "log_date_format": "YYYY-MM-DD HH:mm Z"
     },
     {
-      "script": "../game/StockTrading/CBM/build/serve.js",
+      "script": "../game/MicroExperiment/CBM/build/serve.js",
       "name": "CBM",
       "env": {
         "NODE_ENV": "production",
-        "BESPOKE_WITH_PROXY": "true",
+        "BESPOKE_WITH_PROXY": "true"
       },
       "log_date_format": "YYYY-MM-DD HH:mm Z"
     },
     {
-      "script": "../game/StockTrading/OpenAuction/build/serve.js",
+      "script": "../game/MicroExperiment/OpenAuction/build/serve.js",
       "name": "OpenAuction",
       "env": {
         "NODE_ENV": "production",
-        "BESPOKE_WITH_PROXY": "true",
+        "BESPOKE_WITH_PROXY": "true"
       },
       "log_date_format": "YYYY-MM-DD HH:mm Z"
     },

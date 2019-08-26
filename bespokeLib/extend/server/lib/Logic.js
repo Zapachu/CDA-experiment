@@ -119,10 +119,9 @@ var Logic = /** @class */ (function (_super) {
                         }
                         playerState.groupIndex = groupIndex;
                         _a = playerState;
-                        return [4 /*yield*/, this.groupsLogic[groupIndex].initPlayerState()];
+                        return [4 /*yield*/, this.groupsLogic[groupIndex].initPlayerState(gameState.groups[groupIndex].playerNum++)];
                     case 3:
                         _a.state = _b.sent();
-                        gameState.groups[groupIndex].playerNum++;
                         return [4 /*yield*/, this.stateManager.syncState()];
                     case 4:
                         _b.sent();

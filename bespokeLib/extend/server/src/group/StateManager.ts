@@ -6,7 +6,7 @@ export class StateManager<ICreateParams, IGameState, IPlayerState, MoveType, Pus
 
     }
 
-    async getPlayerState(actor: IActor): Promise<IPlayerState> {
+    async getPlayerState(actor: IActor): Promise<Wrapper.TPlayerState<IPlayerState>> {
         const {state} = await this.stateManager.getPlayerState(actor)
         return state
     }
@@ -16,7 +16,7 @@ export class StateManager<ICreateParams, IGameState, IPlayerState, MoveType, Pus
         return groups[this.groupIndex].state
     }
 
-    async getPlayerStates(): Promise<{ [token: string]: IPlayerState }> {
+    async getPlayerStates(): Promise<{ [token: string]: Wrapper.TPlayerState<IPlayerState> }> {
         const playerStates = {}
         Object.values(await this.stateManager.getPlayerStates()).forEach(({actor, groupIndex, state}) =>
             groupIndex === this.groupIndex ? playerStates[actor.token] = state : null

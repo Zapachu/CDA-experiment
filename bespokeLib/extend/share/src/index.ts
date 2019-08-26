@@ -6,7 +6,7 @@ export const GroupRange = {
         max: 8
     },
     groupSize: {
-        min: 2,
+        min: 1,
         max: 8
     }
 }
@@ -36,9 +36,13 @@ export namespace Wrapper {
         }>
     }
 
+    export type TPlayerState<IPlayerState>  = IPlayerState & {
+        index: number
+    }
+
     export interface IPlayerState<IPlayerState> {
         groupIndex: number
-        state: IPlayerState
+        state: TPlayerState<IPlayerState>
     }
 }
 

@@ -38,8 +38,9 @@ enum ModalType {
 }
 
 interface IPOTypeConfig {
-    modalBtnLabel: string,
-    modalContent: React.ReactNode,
+    ruleContent: React.ReactNode
+    extendTitle?: string
+    extendContent?: React.ReactNode
     testQuestions: Array<ITestPageQuestion>
 }
 
@@ -47,8 +48,27 @@ function getIPOTypeConfig(type: IPOType): IPOTypeConfig {
     switch (type) {
         case IPOType.TopK:
             return {
-                modalBtnLabel: '荷兰式拍卖',
-                modalContent: <>
+                ruleContent: <>
+                    <p>您在一个基金机构工作，您所在的基金机构经过对市场信息的精密分析，现对一个即将上市的股票有一个估值A元。您的公司给您提供了竞价资金B，要您在市场上参与该股票的询价过程。企业共发行了1万股股票，您与市场上其他交易者对该股票的估值可能相同，也可能不同，您需要与其他买家共同竞争购买股票。
+                        <br/>股票的成交价格规则如下：每个股票都有一个最低的保留价格C元，即市场上股票的价格低于最低保留价格时，企业选择不发售股票，因此您的出价必需大于最低保留价格C。当所有的交易者提交自己的拟购买价格和拟购买数量后，系统根据买家的拟购买价格由大到小进行排序后，第1万股股票对应的价格即为成交价格，而拟购买价格在成交价格之上的市场交易者获得购买资格，可购买数量按照价格排序后的拟购买数量依次进行分配。如若市场上拟购买总数小于企业发行的股票数量，则成交价格为最低保留价格C.
+                    </p><br/>
+                    <p> 以下是一个简单的例子：
+                        <br/> 交易者A根据自己的估值给出的拟购买价格和拟购买数量分布为98元和5000股，交易者B给出的拟购买价格和购买数量为96元和6000股，交易者C给出的拟购买价格和购买数量为104元和3000股，交易者D给出的拟购买价格和购买数量为107元和4000股，您根据自己的估值105元给出的拟购买数量和拟购买价格是101元和6000股。
+                        系统按照购买价格的由高到低进行排序：
+                        <br/> D：107元——4000股
+                        <br/> C: 104元——3000股
+                        <br/> 您：101元——6000股
+                        <br/> A：98元——5000股
+                        <br/> B：96元——6000股
+                    </p>
+                    <p>
+                        决定成交价格: 则整个市场的拟购买总股数为24000，第10000股价格为101元，则成交价格为101元。
+                        决定购买数量：您、D和C都有购买这1万股股票的权利。按照价格排序后，D可购买的数量为4000股，C可购买的数量为3000股，市场上还剩3000股股票。虽然您的拟购买数量为6000股，但是此时您只能购买3000股。A和B未买购买到股票。
+                        您的收益（您对股票的估值-股票的成交价格）*您的购买数量
+                    </p>
+                </>,
+                extendTitle: '荷兰式拍卖',
+                extendContent: <>
                     <p>
                         荷兰式拍卖亦称为“减价式拍卖”。拍卖标的的竞价由高到低依次递减直到第一个竞买入应价（达到或超过底价）时击槌成交的拍卖。减价式拍卖通常从非常高的价格开始，价格就以事先确定的降价阶梯，由高到低递减，直到有竞买人愿意接受为止。
                     </p>
@@ -134,8 +154,28 @@ function getIPOTypeConfig(type: IPOType): IPOTypeConfig {
             }
         case IPOType.Median:
             return {
-                modalBtnLabel: 'IPO价格知识扩展',
-                modalContent: <>
+                ruleContent: <>
+                    <p>您在一个基金机构工作，您所在的基金机构经过对市场信息的精密分析，现对一个即将上市的股票有一个估值A元。您的公司给您提供了竞价资金B，要您在市场上参与该股票的询价过程。企业共发行了1万股股票，您与市场上其他交易者对该股票的估值可能相同，也可能不同，您需要与其他买家共同竞争购买股票。
+                        <br/>股票的成交价格规则如下：每个股票都有一个最低的保留价格C元，即市场上股票的价格低于最低保留价格时，企业选择不发售股票，因此您的出价必需大于最低保留价格C。当所有的交易者提交自己的拟购买价格和拟购买数量后，系统根据买家的拟购买价格由大到小进行排序后，拟购买总数的中位数对应的价格即为成交价格，而拟购买价格在成交价格之上（包含成交价格）的市场交易者获得购买资格，可购买数量由系统抽签决定，您可购买到的股票数量与您的拟购买数量正相关。如若市场上拟购买总数小于企业发行的股票数量，则成交价格为最低保留价格C.
+                    </p><br/>
+                    <p>以下是一个简单的例子：
+                        <br/>交易者A根据自己的估值给出的拟购买价格和拟购买数量分布为98元和5000股，交易者B给出的拟购买价格和购买数量为96元和6000股，交易者C给出的拟购买价格和购买数量为104元和3000股，交易者D给出的拟购买价格和购买数量为107元和4000股，您根据自己的估值105元给出的拟购买数量和拟购买价格是101元和6000股。
+                        系统按照购买价格的由高到低进行排序：
+                        <br/>D：107元——4000股
+                        <br/>C: 104元——3000股
+                        <br/>您：101元——6000股
+                        <br/>A：98元——5000股
+                        <br/>B：96元——6000股
+                    </p><br/>
+                    <p>
+                        决定成交价格：则整个市场的拟购买总股数为24000，价格的中位数为按拟购买价格由高到低进行排序后第12000股所对应的价格，即为您的拟购买价格101，也即为该股票的成交价格。
+                        决定购买数量：您、D和C都有共同购买这1万股股票的权利。您们三个合起来的拟购买数量为13000，则系统随机从13000股股票中选择10000股分配购买权。，则每股股票被抽到的概率为
+                        。简言之，当您的拟购买价格在成交价格之上时，您的预期购买数量越大，您可能购买到的数量越多。
+                        您的收益：（您对股票的估值-股票的成交价格）*您的购买数量
+                    </p>
+                </>,
+                extendTitle: 'IPO价格知识扩展',
+                extendContent: <>
                     <p>
                         IPO(Initial Public
                         Offering)价格又称新股发行价格，是指获准发行股票上市的公司与其承销商共同确定的将股票公开发售给特定或非特定投资者的价格。在这一价格的确定程序中，相关的影响因素包括公司帐面价值、经营业绩、发展前景、股票发行数量、行业特点及市场波动状况等，而这些因素的量化过程会随着定价者选用方法的不同而出现很大差别。
@@ -215,8 +255,7 @@ function getIPOTypeConfig(type: IPOType): IPOTypeConfig {
             }
         case IPOType.FPSBA:
             return {
-                modalBtnLabel: '第一价格密封拍卖',
-                modalContent: <>
+                ruleContent: <>
                     <p>您在一个基金机构工作，您所在的基金机构经过对市场信息的精密分析，现对一个即将上市的股票有一个估值A元。您的公司给您提供了竞价资金B，要您在市场上参与该股票的询价过程。企业共发行了1万股股票，您与市场上其他交易者对该股票的估值可能相同，也可能不同，您需要与其他买家共同竞争购买股票。
                         <br/>股票的成交价格规则如下：每个股票都有一个最低的保留价格C元，即市场上股票的价格低于最低保留价格时，企业选择不发售股票，因此你的出价必需大于最低保留价格C。当所有的交易者提交自己的拟购买价格和拟购买数量，系统根据买家的拟购买价格由大到小进行排序后，拟购买价格在第10000股购买价之上的市场交易者获得购买资格，获得购买资格的交易者的成交价格即为其拟购买价，可购买数量按照价格排序后的拟购买数量依次进行分配。如若市场上拟购买总数小于企业发行的股票数量，则成交价格为最低保留价格C.
                     </p><br/>
@@ -391,20 +430,23 @@ export function Play({frameEmitter, game, gameState, playerState}: Core.IPlayPro
                 }
                 <div className={style.leftBtn}>
                     <Button
-                        label={'ipo知识扩展'}
+                        label={'IPO知识扩展'}
                         size={Button.Size.Big}
                         color={Button.Color.Blue}
                         onClick={() => setModalType(ModalType.Ipo)}
                     />
                 </div>
-                <div className={style.rightBtn}>
-                    <Button
-                        label={IPOTypeConfig.modalBtnLabel}
-                        size={Button.Size.Big}
-                        color={Button.Color.Blue}
-                        onClick={() => setModalType(ModalType.Price)}
-                    />
-                </div>
+                {
+                    IPOTypeConfig.extendTitle ?
+                        <div className={style.rightBtn}>
+                            <Button
+                                label={IPOTypeConfig.extendTitle}
+                                size={Button.Size.Big}
+                                color={Button.Color.Blue}
+                                onClick={() => setModalType(ModalType.Price)}
+                            />
+                        </div> : null
+                }
             </>
         )
     }
@@ -579,8 +621,8 @@ export function Play({frameEmitter, game, gameState, playerState}: Core.IPlayPro
             case ModalType.Price: {
                 return (
                     <div className={style.modalIpo}>
-                        <p className={style.title}>{IPOTypeConfig.modalBtnLabel}</p>
-                        {IPOTypeConfig.modalContent}
+                        <p className={style.title}>{IPOTypeConfig.extendTitle}</p>
+                        {IPOTypeConfig.extendContent}
                         <Button
                             style={{marginTop: '30px'}}
                             label={'关闭'}
@@ -594,15 +636,9 @@ export function Play({frameEmitter, game, gameState, playerState}: Core.IPlayPro
                 return (
                     <div className={style.modalIpo}>
                         <p className={style.title}>交易规则回顾</p>
-                        {type === IPOType.Median ? (
-                            <p>
-                                股票的成交价格规则如下：每个股票都有一个最低的保留价格C元，即市场上股票的价格低于最低保留价格时，企业选择不发售股票，因此你的出价必需大于最低保留价格C。当所有的交易者提交自己的拟购买价格和拟购买数量后，系统根据买家的拟购买价格由大到小进行排序后，拟购买总数的中位数对应的价格即为成交价格，而拟购买价格在成交价格之上（包含成交价格）的市场交易者获得购买资格，可购买数量由系统抽签决定，你可购买到的股票数量与你的拟购买数量正相关。如若市场上拟购买总数小于企业发行的股票数量，则成交价格为最低保留价格C.
-                            </p>
-                        ) : (
-                            <p>
-                                股票的成交价格规则如下：每个股票都有一个最低的保留价格C元，即市场上股票的价格低于最低保留价格时，企业选择不发售股票，因此你的出价必需大于最低保留价格C。当所有的交易者提交自己的拟购买价格和拟购买数量后，系统根据买家的拟购买价格由大到小进行排序后，第1万股股票对应的价格即为成交价格，而拟购买价格在成交价格之上的市场交易者获得购买资格，可购买数量按照价格排序后的拟购买数量依次进行分配。如若市场上拟购买总数小于企业发行的股票数量，则成交价格为最低保留价格C.
-                            </p>
-                        )}
+                        {
+                            IPOTypeConfig.ruleContent
+                        }
                         <Button
                             style={{marginTop: '30px'}}
                             label={'关闭'}

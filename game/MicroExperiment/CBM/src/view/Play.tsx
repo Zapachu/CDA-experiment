@@ -147,13 +147,15 @@ export function TradeChart({
     </section>
 }
 
-function Result({periodIndex, count, point, closingPrice, balancePrice}: { periodIndex: number, count: number, point: number, closingPrice?: number, balancePrice?: number }) {
+function Result({periodIndex, count, point, closingPrice, balancePrice, guarantee, guaranteeMoney, guaranteeCount}: { periodIndex: number, count: number, point: number, closingPrice?: number, balancePrice?: number, guarantee?: boolean, guaranteeMoney?: number, guaranteeCount?: number }) {
     const lang = Lang.extractLang({
         news: [`据财经网新闻，该企业发布财报后，股价受到相应影响，现股价为${balancePrice}元`],
         result: [`当前第${periodIndex + 1}期您的交易结果如下`, 'Your results in this period are as follows'],
         stockPrice: ['股价', 'Stock Price'],
         stock: ['持有股票', 'Stock'],
         money: ['资金', 'Money'],
+        guaranteeMoney: ['已融资', 'Guarantee Money'],
+        guaranteeCount: ['已融券', 'Guarantee Stock'],
         totalAsset: ['总资产', 'TotalAsset'],
         tips: ['连续竞价知识扩展', 'Tips about Continuous Double Auction'],
         close: ['关闭', 'Close'],
@@ -162,6 +164,7 @@ function Result({periodIndex, count, point, closingPrice, balancePrice}: { perio
         '连续竞价时，成交价格的确定原则为:1、最高买入申报和最低卖出申报价格相同，以该价格成交; 2、买入申报价格高于即时揭示的最低卖出申报价格时，以即时揭示的最低卖出申报价格为成交价格; 3、卖出申报价格低于即时揭示的最高申报买入价格时，以即时揭示的最高申报买入价格为成交价。\n']
     })
     const [showTips, setShowTips] = React.useState(false)
+    const stockPrice = balancePrice || closingPrice
     return <section className={style.result}>
         {
             balancePrice ? <p className={style.resultTitle}>{lang.news}</p> : null
@@ -173,15 +176,27 @@ function Result({periodIndex, count, point, closingPrice, balancePrice}: { perio
                 <td>{lang.stockPrice}</td>
                 <td>{lang.stock}</td>
                 <td>{lang.money}</td>
+                {
+                    guarantee ? <>
+                        <td>{lang.guaranteeMoney}</td>
+                        <td>{lang.guaranteeCount}</td>
+                    </> : null
+                }
                 <td>{lang.totalAsset}</td>
             </tr>
             </thead>
             <tbody>
             <tr>
-                <td>{balancePrice || closingPrice}</td>
+                <td>{stockPrice}</td>
                 <td>{count}</td>
                 <td>{point}</td>
-                <td>{(balancePrice || closingPrice) * count + point}</td>
+                {
+                    guarantee ? <>
+                        <td>{guaranteeMoney}</td>
+                        <td>{guaranteeCount}</td>
+                    </> : null
+                }
+                <td>{stockPrice * (count - guaranteeCount) + point - guaranteeMoney}</td>
             </tr>
             </tbody>
         </table>
@@ -296,7 +311,11 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
                     count={playerState.count}
                     point={playerState.money}
                     closingPrice={gamePeriodState.closingPrice}
-                    balancePrice={gamePeriodState.balancePrice}/>
+                    balancePrice={gamePeriodState.balancePrice}
+                    guarantee={allowLeverage}
+                    guaranteeCount={playerState.guaranteeCount}
+                    guaranteeMoney={playerState.guaranteeMoney}
+            />
             {
                 renderTradePanel()
             }
@@ -365,8 +384,8 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
         ]
         return <TestPage questions={questions} done={() => frameEmitter.emit(MoveType.getIndex)}/>
     }
-    const guaranteeMoneyLimit = playerState.count ? nonNegative(playerState.money - playerState.guaranteeMoney) : 0,
-        guaranteeCountLimit = playerState.count ? nonNegative(~~(playerState.money / gamePeriodState.closingPrice) + playerState.count - playerState.guaranteeCount) : 0
+    const guaranteeMoneyLimit = nonNegative(playerState.money - playerState.guaranteeMoney),
+        guaranteeCountLimit = nonNegative(~~(playerState.money / gamePeriodState.closingPrice) + playerState.count - playerState.guaranteeCount)
     return <section className={style.trading}>
         {
             playerState.status === PlayerStatus.guide ?
@@ -724,6 +743,7 @@ function Guide({allowLeverage, done}: { allowLeverage: boolean, done: () => void
             {children}
         </section>
     }
+
     const lang = Lang.extractLang({
         gotIt: ['我知道了', 'I got it']
     })
@@ -750,7 +770,8 @@ function Guide({allowLeverage, done}: { allowLeverage: boolean, done: () => void
             },
             {
                 target: `.${style.orderBook}`,
-                content: <GuideContent>您可以在这里查看已经提交的买家报价和卖家报价。买单和卖单分别排队，买单以价格从高到低排列，卖单以价格从低到高排列。同价的，按进入系统的先后排列。系统按照顺序将排在前面的买单和卖单配对成交，即按“价格优先，同等价格下时间优先”的顺序依次成交在，直到不能成交为止，未成交的委托排队等待成交。</GuideContent>,
+                content:
+                    <GuideContent>您可以在这里查看已经提交的买家报价和卖家报价。买单和卖单分别排队，买单以价格从高到低排列，卖单以价格从低到高排列。同价的，按进入系统的先后排列。系统按照顺序将排在前面的买单和卖单配对成交，即按“价格优先，同等价格下时间优先”的顺序依次成交在，直到不能成交为止，未成交的委托排队等待成交。</GuideContent>,
                 styles: {
                     tooltip: {
                         width: '50vw',
@@ -766,7 +787,8 @@ function Guide({allowLeverage, done}: { allowLeverage: boolean, done: () => void
             },
             {
                 target: `.${style.orderInputWrapper}`,
-                content: <GuideContent>您可以在这里提交您的卖单和卖单。买入申报价高于即时揭示最低卖价，以最低申报卖价成交；卖出申报价低于最高买入价，以最高买入价成交。两个委托如果不能全部成交，剩余的继续留在单上，等待下次成交。系统处理原则为价格优先和时间优先两个原则。</GuideContent>,
+                content:
+                    <GuideContent>您可以在这里提交您的卖单和卖单。买入申报价高于即时揭示最低卖价，以最低申报卖价成交；卖出申报价低于最高买入价，以最高买入价成交。两个委托如果不能全部成交，剩余的继续留在单上，等待下次成交。系统处理原则为价格优先和时间优先两个原则。</GuideContent>,
                 ...stepProps
             },
             {

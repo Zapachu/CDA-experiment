@@ -28,7 +28,7 @@ exports.GroupRange = {
         max: 8
     },
     groupSize: {
-        min: 2,
+        min: 1,
         max: 8
     }
 };
