@@ -62,6 +62,8 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         const [[min, max]] = PrivatePriceRegion[type]
         playerState.status = PlayerStatus.guide
         playerState.privatePrices = [random(min, max)]
+        playerState.money = 0
+        playerState.count = 0
         playerState.guaranteeMoney = 0
         playerState.guaranteeCount = 0
         return playerState
