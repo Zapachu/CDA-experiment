@@ -16,6 +16,7 @@ class GroupCreate extends Extend.Group.Create<ICreateParams> {
     componentDidMount(): void {
         const {props: {setParams}} = this
         setParams({
+            round:3,
             oldPlayer: 8,
             newPlayer: 8,
             minPrivateValue: 50,
