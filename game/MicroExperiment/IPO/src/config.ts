@@ -1,3 +1,4 @@
+import {NspCreateParams} from '@bespoke-game/stock-trading-config'
 export const namespace = 'IPO'
 
 export const PriceRange = {
@@ -23,12 +24,6 @@ export const CONFIG = {
     secondsToShowResult:5,
 }
 
-export enum IPOType {
-    Median,
-    TopK,
-    FPSBA
-}
-
 export enum PlayerStatus {
     guide,
     test,
@@ -49,9 +44,7 @@ export enum PushType {
     shoutTimer
 }
 
-export interface ICreateParams {
-    type: IPOType
-}
+export type ICreateParams = NspCreateParams.IPO
 
 export interface IMoveParams {
     price: number

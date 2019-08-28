@@ -1,3 +1,5 @@
+import {NspCreateParams} from '@bespoke-game/stock-trading-config'
+
 export const namespace = 'StockTrading-CBM'
 
 export enum ROLE {
@@ -37,9 +39,7 @@ export const CONFIG = {
     resultTime: 30
 }
 
-export interface ICreateParams {
-    allowLeverage: boolean
-}
+export type ICreateParams  = NspCreateParams.CBM
 
 export interface IOrder {
     id: number

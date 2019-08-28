@@ -1,3 +1,4 @@
+import {NspCreateParams} from '@bespoke-game/stock-trading-config'
 export const namespace = 'OpenAuction'
 
 export const ROUNDS = 3
@@ -39,8 +40,7 @@ export interface IMoveParams {
 export interface IPushParams {
 }
 
-export interface ICreateParams {
-}
+export type ICreateParams  = NspCreateParams.OpenAuction
 
 export interface IGameRoundState {
     startPrice: number
