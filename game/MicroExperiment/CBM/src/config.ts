@@ -1,4 +1,4 @@
-import {NspCreateParams} from '@bespoke-game/stock-trading-config'
+import {NCreateParams} from '@micro-experiment/share'
 
 export const namespace = 'StockTrading-CBM'
 
@@ -39,7 +39,7 @@ export const CONFIG = {
     resultTime: 30
 }
 
-export type ICreateParams  = NspCreateParams.CBM
+export type ICreateParams  = NCreateParams.CBM
 
 export interface IOrder {
     id: number

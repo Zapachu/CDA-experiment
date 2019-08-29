@@ -30,7 +30,7 @@ import {
     PushType,
     ROLE
 } from './config'
-import {Phase, phaseToNamespace} from '@bespoke-game/stock-trading-config'
+import {Phase, phaseToNamespace} from '@micro-experiment/share'
 import {Trial} from '@elf/protocol'
 import {getBalanceIndex, getEnumKeys, random} from './util'
 

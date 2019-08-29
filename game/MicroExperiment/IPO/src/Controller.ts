@@ -8,15 +8,15 @@ import {
   IMoveParams,
   IPlayerRoundState,
   IPlayerState,
-  IPOType,
   IPushParams,
   MoveType,
   PlayerStatus,
   PriceRange,
   PushType
 } from './config'
-import {Phase, phaseToNamespace, STOCKS} from '@bespoke-game/stock-trading-config'
+import {Phase, phaseToNamespace, STOCKS, NCreateParams} from '@micro-experiment/share'
 import {Trial} from '@elf/protocol'
+import IPOType = NCreateParams.IPOType
 
 export function genRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min
@@ -138,9 +138,9 @@ export default class Controller extends BaseController<ICreateParams,
         }
         const {onceMore} = params
         const trialNamespace = {
-          [IPOType.FPSBA]: Phase.IPO_FPSBA,
-          [IPOType.Median]: Phase.IPO_Median,
-          [IPOType.TopK]: Phase.IPO_TopK
+          [IPOType.FPSBA]: Phase.IPO,
+          [IPOType.Median]: Phase.IPO,
+          [IPOType.TopK]: Phase.IPO
         }[this.game.params.type]
         const res = await RedisCall.call<Trial.Done.IReq, Trial.Done.IRes>(
             Trial.Done.name,

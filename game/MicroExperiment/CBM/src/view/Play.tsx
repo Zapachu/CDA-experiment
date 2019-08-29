@@ -19,7 +19,7 @@ import {
     PushType,
     ROLE
 } from '../config'
-import {Button, Input, ITestPageQuestion, Line, Modal, Tabs, TestPage} from '@bespoke-game/stock-trading-component'
+import {Button, Input, ITestPageQuestion, Line, Modal, Tabs, TestPage} from '@micro-experiment/component'
 import {Input as AntInput, Radio} from 'antd'
 
 function Border({background = `radial-gradient(at 50% 0%, #67e968 1rem, transparent 70%)`, borderRadius = '1rem', children, style}: {

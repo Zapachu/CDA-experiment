@@ -27,7 +27,7 @@ import {
     STOCKS,
     TableInfo,
     TestPage
-} from '@bespoke-game/stock-trading-component'
+} from '@micro-experiment/component'
 import {Input as AntInput, Radio} from 'antd'
 
 enum ModalType {

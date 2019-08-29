@@ -4,7 +4,7 @@ import {RobotServer} from '@bespoke/robot'
 import Controller from './Controller'
 import Robot from './Robot'
 import {DEFAULT_PARAMS, ICreateParams, namespace} from './config'
-import {Phase, phaseToNamespace} from '@bespoke-game/stock-trading-config'
+import {Phase, phaseToNamespace} from '@micro-experiment/share'
 import {Trial} from '@elf/protocol'
 
 Server.start(namespace, Controller, resolve(__dirname, '../dist'))

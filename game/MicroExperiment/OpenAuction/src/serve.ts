@@ -5,12 +5,12 @@ import {RobotServer} from '@bespoke/robot'
 import {Controller} from './Controller'
 import {Robot} from './Robot'
 import {RedisCall, Trial} from '@elf/protocol'
-import {NspCreateParams, Phase, phaseToNamespace} from '@bespoke-game/stock-trading-config'
+import {NCreateParams, Phase, phaseToNamespace} from '@micro-experiment/share'
 
 Server.start(namespace, Controller, resolve(__dirname, '../dist'))
 RobotServer.start(namespace, Robot)
 
-RedisCall.handle<Trial.Create.IReq<NspCreateParams.OpenAuction>, Trial.Create.IRes>(
+RedisCall.handle<Trial.Create.IReq<NCreateParams.OpenAuction>, Trial.Create.IRes>(
     Trial.Create.name(phaseToNamespace(Phase.OpenAuction)),
     async params => {
         const gameId = await Server.newGame<ICreateParams>({

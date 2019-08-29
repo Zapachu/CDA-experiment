@@ -1,11 +1,12 @@
 import * as React from 'react'
 import * as BABYLON from 'babylonjs'
 import socket from 'socket.io-client'
-import {Button, Loading, MatchModal, Modal, PlayMode} from '@bespoke-game/stock-trading-component'
+import {Button, Loading, MatchModal, Modal} from '@micro-experiment/component'
+import {NCreateParams, NSocketParam, Phase, ResCode, SocketEvent, UserDoc} from '@micro-experiment/share'
+import {BasePlayMode, TBasePlayMode} from './PlayMode'
 import {Toast} from '@elf/component'
 import qs from 'qs'
-import {redirect, reqInitInfo, getEnumKeys} from '../util'
-import {clientSocketListenEvnets, ResCode, serverSocketListenEvents, UserDoc} from '../util/enums'
+import {getEnumKeys, redirect, reqInitInfo} from '../util'
 import BabylonScene from './BabylonScene'
 import {Detail, Hall, UnLockIcon} from '../asset'
 import style from './style.less'
@@ -16,13 +17,16 @@ enum GameType {IPO_Median, IPO_TopK, IPO_FPSBA, OpenAuction, TBM, CBM, CBM_Lever
 
 const GameTypeConfig: {
   [key: number]: {
+    phase: Phase,
     title: string,
     desc: string,
     dock: Dock,
     video?: string,
+    PlayMode?: TBasePlayMode<any>
   }
 } = {
   [GameType.IPO_TopK]: {
+    phase: Phase.IPO,
     title: '荷兰式拍卖',
     dock: Dock.second,
     video: 'https://qiniu0.anlint.com/video/whuipo/ipohe.mp4',
@@ -48,6 +52,7 @@ const GameTypeConfig: {
     `
   },
   [GameType.IPO_Median]: {
+    phase: Phase.IPO,
     title: '中位数定价',
     dock: Dock.second,
     video: 'https://qiniu0.anlint.com/video/whuipo/ipozhong.mp4',
@@ -73,6 +78,7 @@ const GameTypeConfig: {
     `
   },
   [GameType.IPO_FPSBA]: {
+    phase: Phase.IPO,
     title: '第一价格密封拍卖',
     dock: Dock.first,
     desc: `
@@ -97,6 +103,7 @@ const GameTypeConfig: {
     `
   },
   [GameType.OpenAuction]: {
+    phase: Phase.OpenAuction,
     title: '公开竞价拍卖',
     dock: Dock.first,
     desc: `
@@ -105,6 +112,7 @@ const GameTypeConfig: {
 `
   },
   [GameType.TBM]: {
+    phase: Phase.TBM,
     title: '集合竞价',
     dock: Dock.third,
     video: 'https://qiniu0.anlint.com/video/whuipo/jihejinjia.mp4',
@@ -113,6 +121,7 @@ const GameTypeConfig: {
     `
   },
   [GameType.CBM]: {
+    phase: Phase.CBM,
     title: '连续竞价',
     dock: Dock.fourth,
     video: 'https://qiniu0.anlint.com/video/whuipo/lianxujinjia.mp4',
@@ -120,10 +129,17 @@ const GameTypeConfig: {
     您在一个基金机构工作，您所在的基金机构经过对市场信息的精密分析，现对市场上的股票有一个估值，要您在市场上进行股票交易活动。您需要根据您所在公司对股票的估值以及您对市场状况的判断来决定您的股票交易策略。在您提交买入申报价格/卖出申报价格和申购数量/出售数量之后，由电脑系统按照以下两种情况产生成交价：1）最高买进申报价格与最低卖出申报相同，则该价格为成交价格；2）买入申报高于卖出申报时，申报在先的价格即为成交价格。系统处理原则为价格优先和时间优先两个原则。
 	举一个简单的例子：挂在市场上的最高买价是9.96，最低卖价是9.98，在这个时候（分毫不差）同时出现了买入申报价为10元的买家，和卖出申报价为9.9元的卖家，则买入申报价为10元的买家会以9.98的价格成交，卖出申报价为9.9的卖家以9.96成交。
 	您会进入一个有6期交易期的市场，在第1、3、5期结束，您资产中的股票价值以当期股票收盘价计算。在第2、4、6期结束，股票发行公司会发布他们的公司财务报表，相应的股票价值会受到公司财务报表的影响，此时您资产组合中的股票价值以公司发布的财务报表价格计算。
-
-    `
+    `,
+    PlayMode: class extends BasePlayMode<NCreateParams.CBM> {
+      renderParams() {
+        return <section>
+          TODO
+        </section>
+      }
+    }
   },
   [GameType.CBM_Leverage]: {
+    phase: Phase.CBM,
     title: '融资融券',
     dock: Dock.fifth,
     video: 'https://qiniu0.anlint.com/video/whuipo/rongzirongquan.mp4',
@@ -320,7 +336,7 @@ interface State {
   score: number
 }
 
-export class Hall3D extends React.Component<null, State> {
+export class Hall3D extends React.Component<{}, State> {
   camera: BABYLON.ArcRotateCamera
   scene: BABYLON.Scene
   gamePhaseVideoRefs: {
@@ -385,8 +401,76 @@ export class Hall3D extends React.Component<null, State> {
     }, 2000)
   }
 
+  startMatch(multiPlayer: boolean, phase: Phase, params = {}) {
+    this.io.emit(SocketEvent.reqStartGame, {multiPlayer, phase, params} as NSocketParam.StartGame)
+    this.setState({
+      modalType: ModalType.preMatch
+    })
+  }
+
+  renderModalContent() {
+    const {modalType, focusDock, gameType} = this.state
+    const focusedGameConfig = GameTypeConfig[gameType]
+    switch (modalType) {
+      case ModalType.selectSubGameType:
+        return <div className={style.selectSubGame}>
+          {
+            getGameTypes(focusDock).map((gameType: GameType) => {
+              const onClick = _ => {
+                this.setState({gameType: gameType, modalType: ModalType.selectMode})
+              }
+              return <Button key={gameType} onClick={onClick} label={GameTypeConfig[gameType].title}/>
+            })
+          }
+        </div>
+      case ModalType.gameTypeDesc:
+        return <div className={style.gameDesc}>
+          <div className={style.title}>
+            <div className={style.label}>
+              <div>{focusedGameConfig.title}</div>
+            </div>
+            <div className={style.splitLine}/>
+          </div>
+          <div className={style.detail}>
+            {GameTypeConfig[gameType].desc}
+          </div>
+        </div>
+      case ModalType.continueGame:
+        return <div className={style.continueGame}>
+          <div className={style.label}>您尚有实验正在进行中，继续该实验吗？</div>
+          <Button onClick={_ => redirect(this.continuePlayUrl)} label="继续"/>
+        </div>
+      case ModalType.selectMode:
+        const {PlayMode = BasePlayMode} = focusedGameConfig
+        return <div className={style.selectGameMode}>
+          <div className={style.baseBox}>
+            <div className={style.label}>
+              <div>{focusedGameConfig.title}</div>
+              <div className={style.customShowGameDescBtn}
+                   onClick={_ => this.setState({modalType: ModalType.gameTypeDesc})}>详细规则
+              </div>
+            </div>
+            <div className={style.splitLine}/>
+            {
+              focusedGameConfig.video ? <video src={focusedGameConfig.video} controls autoPlay
+                                               ref={node => this.gamePhaseVideoRefs[gameType] = node}/> : null
+            }
+          </div>
+          <PlayMode onSubmit={(multiMode, params) => this.startMatch(multiMode, focusedGameConfig.phase, params)}/>
+        </div>
+      case ModalType.preMatch:
+        return <div>
+          <Loading label="处理中"/>
+        </div>
+      case ModalType.matchSuccess:
+        return <div className={style.matchSuccess}>
+          玩家匹配成功！
+        </div>
+    }
+  }
+
   renderModal() {
-    const {showModal, modalType, focusDock, gameType, matchTimer} = this.state
+    const {showModal, modalType, gameType, matchTimer} = this.state
     const handleClose = async () => {
       if (this.matchTimer) {
         clearInterval(this.matchTimer)
@@ -405,90 +489,20 @@ export class Hall3D extends React.Component<null, State> {
         showModal: false
       })
       if ([ModalType.matching, ModalType.preMatch].includes(modalType)) {
-        this.io.emit(serverSocketListenEvents.leaveMatchRoom, {
+        this.io.emit(SocketEvent.leaveMatchRoom, {
           gamePhase: gameType
         })
       }
 
     }
 
-    const handleSelectGameMode = (isGroupMode: boolean) => {
-      this.io.emit(serverSocketListenEvents.reqStartGame, {isGroupMode, gamePhase: gameType})
-      this.setState({
-        modalType: ModalType.preMatch
-      })
-    }
-
     if (modalType === ModalType.matching) {
       return <MatchModal visible={true} totalNum={4} matchNum={matchTimer % 5} timer={matchTimer}/>
     }
-    const focusedGameConfig = GameTypeConfig[gameType]
     return <Modal visible={showModal}>
       <div className={style.modalContent}>
         {
-          modalType === ModalType.selectSubGameType &&
-          <div className={style.selectSubGame}>
-            {
-              getGameTypes(focusDock).map((gameType: GameType) => {
-                const onClick = _ => {
-                  this.setState({gameType: gameType, modalType: ModalType.selectMode})
-                }
-                return <Button key={gameType} onClick={onClick} label={GameTypeConfig[gameType].title}/>
-              })
-            }
-          </div>
-        }
-        {
-          modalType === ModalType.gameTypeDesc &&
-          <div className={style.gameDesc}>
-            <div className={style.title}>
-              <div className={style.label}>
-                <div>{focusedGameConfig.title}</div>
-              </div>
-              <div className={style.splitLine}/>
-            </div>
-            <div className={style.detail}>
-              {GameTypeConfig[gameType].desc}
-            </div>
-          </div>
-        }
-        {
-          modalType === ModalType.continueGame &&
-          <div className={style.continueGame}>
-            <div className={style.label}>您尚有实验正在进行中，继续该实验吗？</div>
-            <Button onClick={_ => redirect(this.continuePlayUrl)} label="继续"/>
-          </div>
-        }
-        {
-          modalType === ModalType.selectMode &&
-          <div className={style.selectGameMode}>
-            <div className={style.baseBox}>
-              <div className={style.label}>
-                <div>{focusedGameConfig.title}</div>
-                <div className={style.customShowGameDescBtn}
-                     onClick={_ => this.setState({modalType: ModalType.gameTypeDesc})}>详细规则
-                </div>
-              </div>
-              <div className={style.splitLine}/>
-              {
-                focusedGameConfig.video ? <video src={focusedGameConfig.video} controls autoPlay
-                                                 ref={node => this.gamePhaseVideoRefs[gameType] = node}/> : null
-              }
-            </div>
-            <PlayMode onPlay={multiMode => handleSelectGameMode(multiMode)}/>
-          </div>
-        }
-        {
-          modalType === ModalType.preMatch &&
-          <div>
-            <Loading label="处理中"/>
-          </div>
-        }
-        {
-          modalType === ModalType.matchSuccess &&
-          <div className={style.matchSuccess}>
-            玩家匹配成功！
-          </div>
+          this.renderModalContent()
         }
         <div className={style.bottom}>
           <Button onClick={handleClose} label="返回"/>
@@ -819,7 +833,7 @@ export class Hall3D extends React.Component<null, State> {
   connectSocket() {
     const io = socket.connect('/')
     this.io = io
-    io.on(clientSocketListenEvnets.startMatch, () => {
+    io.on(SocketEvent.startMatch, () => {
       this.setState({
         modalType: ModalType.matching,
         matchTimer: 0
@@ -830,7 +844,7 @@ export class Hall3D extends React.Component<null, State> {
         })
       }, 1000)
     })
-    io.on(clientSocketListenEvnets.startGame, ({playerUrl}) => {
+    io.on(SocketEvent.startGame, ({playerUrl}) => {
       if (this.matchTimer) {
         clearInterval(this.matchTimer)
       }
@@ -841,19 +855,19 @@ export class Hall3D extends React.Component<null, State> {
         redirect(playerUrl)
       }, 1000)
     })
-    io.on(clientSocketListenEvnets.continueGame, ({playerUrl}) => {
+    io.on(SocketEvent.continueGame, ({playerUrl}) => {
       this.setState({
         modalType: ModalType.continueGame,
       })
       this.continuePlayUrl = playerUrl
     })
-    io.on(clientSocketListenEvnets.handleError, (data: { eventType: serverSocketListenEvents, msg: string }) => {
+    io.on(SocketEvent.handleError, (data: { eventType: SocketEvent, msg: string }) => {
       const {eventType, msg} = data
-      if (eventType === serverSocketListenEvents.reqStartGame) {
+      if (eventType === SocketEvent.reqStartGame) {
         // Todo
         Toast.error(msg)
       }
-      if (eventType === serverSocketListenEvents.leaveMatchRoom) {
+      if (eventType === SocketEvent.leaveMatchRoom) {
         // TODO
         Toast.error(msg)
       }

@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {Lang, TGameState, Toast, TPlayerState} from '@elf/component'
 import {Core} from '@bespoke/client'
-import {Button, Input, ITestPageQuestion, Line, Loading, TestPage} from '@bespoke-game/stock-trading-component'
+import {Button, Input, ITestPageQuestion, Line, Loading, TestPage} from '@micro-experiment/component'
 import Joyride, {Step} from 'react-joyride'
 import {Input as AntInput, Radio} from 'antd'
 import {

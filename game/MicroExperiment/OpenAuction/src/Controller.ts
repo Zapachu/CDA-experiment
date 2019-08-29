@@ -1,6 +1,6 @@
 import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from '@bespoke/server'
 import {RedisCall, Trial} from '@elf/protocol'
-import {Phase, phaseToNamespace} from '@bespoke-game/stock-trading-config'
+import {Phase, phaseToNamespace} from '@micro-experiment/share'
 import {
     ICreateParams,
     IGameRoundState,

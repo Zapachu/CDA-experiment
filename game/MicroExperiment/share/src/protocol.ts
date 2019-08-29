@@ -15,7 +15,7 @@ export function namespaceToPhase(namespace: string): Phase {
     return +namespace.replace(NAMESPACE_PREFIX, '')
 }
 
-export namespace NspCreateParams{
+export namespace NCreateParams{
     export enum IPOType {
         Median,
         TopK,
@@ -40,5 +40,40 @@ export namespace NspCreateParams{
 
     export interface OpenAuction {
 
+    }
+}
+
+export enum UserGameStatus {
+    matching,
+    started,
+    notStarted
+}
+
+export enum ResCode {
+    success = 0,
+    unexpectError = -1
+}
+
+export enum SocketEvent {
+    reqStartGame='reqStartGame',
+    leaveMatchRoom = 'leaveMatchRoom',
+    startMatch = 'startMatch',
+    startGame = 'startGame',
+    continueGame = 'continueGame',
+    handleError = 'handleError'
+}
+
+export interface UserDoc {
+    updateAt: number;
+    createAt: number;
+    unionId: string,
+    phaseScore: Array<number>
+}
+
+export namespace NSocketParam{
+    export interface StartGame {
+        multiPlayer:boolean,
+        phase:Phase,
+        params
     }
 }

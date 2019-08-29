@@ -13,9 +13,8 @@ import {UserDoc} from './interfaces'
 import {elfSetting} from '@elf/setting'
 import config from './config'
 import setting from './setting'
-import {namespaceToPhase, Phase, phaseToNamespace} from '@bespoke-game/stock-trading-config'
+import {namespaceToPhase, Phase, phaseToNamespace, SocketEvent, ResCode, UserGameStatus} from '@micro-experiment/share'
 import {RedisCall, Trial} from '@elf/protocol'
-import {clientSocketListenEvnets, ResCode, serverSocketListenEvents, UserGameStatus} from './enums'
 import XJWT, {encryptPassword, Type as XJWTType} from './XJWT'
 
 const ioEmitter = socketEmitter({
@@ -129,7 +128,7 @@ const emitMatchSuccess = async (gamePhase: Phase, uids = []) => {
     arr.forEach(socketId => {
       ioEmitter
           .to(socketId)
-          .emit(clientSocketListenEvnets.startGame, {playerUrl})
+          .emit(SocketEvent.startGame, {playerUrl})
     })
     await RedisTools.setUserGameData(uid, gamePhase, {
       status: UserGameStatus.started,
@@ -280,8 +279,8 @@ export function handleSocketInit(ioServer: Socket.Server) {
     if (socket.request.user.logged_in) {
       pushUserSocket(user._id, socket.id)
     }
-    socket.on(serverSocketListenEvents.reqStartGame, async function (msg: {
-      isGroupMode: boolean;
+    socket.on(SocketEvent.reqStartGame, async function (msg: {
+      multiPlayer: boolean;
       gamePhase: Phase;
     }) {
       try {
@@ -294,10 +293,10 @@ export function handleSocketInit(ioServer: Socket.Server) {
         )
         console.log(`请求者uid:${socket.request.user._id}`)
         const uid = socket.request.user._id
-        const {isGroupMode, gamePhase} = msg
+        const {multiPlayer, gamePhase} = msg
         const userGameData = await RedisTools.getUserGameData(uid, gamePhase)
         if (userGameData && userGameData.status === UserGameStatus.started) {
-          socket.emit(clientSocketListenEvnets.continueGame, {
+          socket.emit(SocketEvent.continueGame, {
             playerUrl: userGameData.playerUrl
           })
           return
@@ -307,14 +306,14 @@ export function handleSocketInit(ioServer: Socket.Server) {
             userGameData.status === UserGameStatus.notStarted
         ) {
           const user = await User.findById(uid)
-          if (isGroupMode) {
+          if (multiPlayer) {
             joinMatchRoom(gamePhase, user._id)
             const matchRoom = matchRoomOfGame[gamePhase]
 
             await RedisTools.setUserGameData(uid, gamePhase, {
               status: UserGameStatus.matching
             })
-            socket.emit(clientSocketListenEvnets.startMatch) // TODO
+            socket.emit(SocketEvent.startMatch) // TODO
             if (matchRoom.length === matchRoomLimit) {
               await emitMatchSuccess(gamePhase, matchRoom)
               await clearRoom(gamePhase)
@@ -326,12 +325,12 @@ export function handleSocketInit(ioServer: Socket.Server) {
       } catch (e) {
         console.error(e)
         handleSocketError(
-            serverSocketListenEvents.reqStartGame,
+            SocketEvent.reqStartGame,
             '加入游戏失败!'
         )
       }
     })
-    socket.on(serverSocketListenEvents.leaveMatchRoom, async function (
+    socket.on(SocketEvent.leaveMatchRoom, async function (
         gamePhase
     ) {
       console.log(' req leave room')
@@ -351,7 +350,7 @@ export function handleSocketInit(ioServer: Socket.Server) {
       } catch (e) {
         console.error(e)
         handleSocketError(
-            serverSocketListenEvents.leaveMatchRoom,
+            SocketEvent.leaveMatchRoom,
             '取消匹配失败!'
         )
       }
@@ -389,8 +388,8 @@ export function handleSocketInit(ioServer: Socket.Server) {
       }
     })
 
-    function handleSocketError(event: serverSocketListenEvents, msg: string) {
-      socket.emit(clientSocketListenEvnets.handleError, {
+    function handleSocketError(event: SocketEvent, msg: string) {
+      socket.emit(SocketEvent.handleError, {
         eventType: event,
         msg
       })

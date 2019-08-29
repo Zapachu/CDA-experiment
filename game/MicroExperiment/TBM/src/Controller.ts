@@ -20,7 +20,7 @@ import {
   Role,
   SHOUT_TIMER
 } from './config'
-import {Phase, phaseToNamespace, STOCKS} from '@bespoke-game/stock-trading-config'
+import {Phase, phaseToNamespace, STOCKS} from '@micro-experiment/share'
 import {Trial} from '@elf/protocol'
 
 export default class Controller extends BaseController<ICreateParams,
