@@ -2,12 +2,13 @@ import * as React from 'react'
 import * as style from './style.scss'
 import {Core} from '@bespoke/client'
 import {Label, Lang, Select} from '@elf/component'
-import {ICreateParams, IPOType} from '../config'
+import {ICreateParams} from '../config'
+import {NspCreateParams} from '@bespoke-game/stock-trading-config'
 
 const gameTypes = [
-    {label: '中位数', value: IPOType.Median},
-    {label: '最高价前K', value: IPOType.TopK},
-    {label: '第一价格密封拍卖', value: IPOType.FPSBA},
+    {label: '中位数', value: NspCreateParams.IPOType.Median},
+    {label: '最高价前K', value: NspCreateParams.IPOType.TopK},
+    {label: '第一价格密封拍卖', value: NspCreateParams.IPOType.FPSBA},
 ]
 
 export class Create extends Core.Create<ICreateParams> {
@@ -18,7 +19,7 @@ export class Create extends Core.Create<ICreateParams> {
     componentDidMount(): void {
         const {props: {setParams}} = this
         let defaultParams: ICreateParams = {
-            type: IPOType.Median
+            type: NspCreateParams.IPOType.Median
         }
         setParams(defaultParams)
     }

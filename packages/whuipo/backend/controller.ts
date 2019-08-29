@@ -312,7 +312,7 @@ export function handleSocketInit(ioServer: Socket.Server) {
             const matchRoom = matchRoomOfGame[gamePhase]
 
             await RedisTools.setUserGameData(uid, gamePhase, {
-              status: UserGameStatus.waittingMatch
+              status: UserGameStatus.matching
             })
             socket.emit(clientSocketListenEvnets.startMatch) // TODO
             if (matchRoom.length === matchRoomLimit) {
@@ -342,7 +342,7 @@ export function handleSocketInit(ioServer: Socket.Server) {
           if (!userGameData) {
             return
           }
-          if (userGameData.status === UserGameStatus.waittingMatch) {
+          if (userGameData.status === UserGameStatus.matching) {
             leaveRoom(gamePhase, uid)
             userGameData.status = UserGameStatus.notStarted
             await RedisTools.setUserGameData(uid, gamePhase, userGameData)
@@ -375,7 +375,7 @@ export function handleSocketInit(ioServer: Socket.Server) {
               if (!userGameData) {
                 return
               }
-              if (userGameData.status === UserGameStatus.waittingMatch) {
+              if (userGameData.status === UserGameStatus.matching) {
                 leaveRoom(game, uid)
                 userGameData.status = UserGameStatus.notStarted
                 await RedisTools.setUserGameData(uid, game, userGameData)

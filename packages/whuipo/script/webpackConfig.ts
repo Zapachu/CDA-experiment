@@ -1,6 +1,6 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const CleanWebpackPlugin = require('clean-webpack-plugin')
+import {CleanWebpackPlugin} from 'clean-webpack-plugin'
 const ProgressBarPlugin = require('progress-bar-webpack-plugin')
 const webpack = require('webpack')
 
@@ -25,7 +25,7 @@ module.exports = {
     devtool: mode === 'development' ? 'eval' : '',
     mode: mode === 'development' ? 'development' : 'production',
     watch: mode === 'development',
-    entry: './frontend/index.ts',
+    entry: './frontend/index.tsx',
     output: {
         filename: '[name].[hash].js',
         path: path.resolve(__dirname, '../dist'),
@@ -74,10 +74,29 @@ module.exports = {
                     {
                         loader: 'css-loader',
                         options: {
-                            modules: true,
-                            localIdentName: '[name]__[local]___[hash:base64:5]'
+                            modules: {
+                                localIdentName: '[local]_[hash:base64:4]'
+                            },
+                            importLoaders: 1
                         }
                     }
+                ]
+            },
+            {
+                test: /\.(scss|sass)$/,
+                exclude: /node_modules/,
+                use: [
+                    'style-loader',
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            modules: {
+                                localIdentName: '[local]_[hash:base64:4]'
+                            },
+                            importLoaders: 1
+                        }
+                    },
+                    'sass-loader'
                 ]
             },
             {
@@ -88,8 +107,10 @@ module.exports = {
                     {
                         loader: 'css-loader',
                         options: {
-                            modules: true,
-                            localIdentName: '[name]__[local]___[hash:base64:5]'
+                            modules: {
+                                localIdentName: '[local]_[hash:base64:4]'
+                            },
+                            importLoaders: 1
                         }
                     },
                     'less-loader'
@@ -108,27 +129,6 @@ module.exports = {
                 test: /\.(woff|woff2|eot|ttf|otf)$/,
                 exclude: /node_modules/,
                 use: ['file-loader']
-            },
-            {
-                test: /\.(sass|scss)$/,
-                use: [
-                    'style-loader',
-                    {
-                        loader: 'css-loader',
-                        options: {
-                            modules: true,
-                            localIdentName: '[name]__[local]___[hash:base64:5]'
-                        }
-                    },
-                    {
-                        loader: 'sass-loader',
-                        options: {
-                            includePaths: [
-                                path.resolve(__dirname, '../../../../core/client/lib/resource/')
-                            ]
-                        }
-                    }
-                ]
             }
         ]
     }

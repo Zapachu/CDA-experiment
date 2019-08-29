@@ -15,14 +15,11 @@ import socketRedis from 'socket.io-redis'
 import socketSession from 'express-socket.io-session'
 import socketPassport from 'passport.socketio'
 import cookieParser from 'cookie-parser'
-import headdump from 'heapdump'
 import router from './router'
 import {handleSocketInit, handleSocketPassportFailed, handleSocketPassportSuccess} from './controller'
-
 import {elfSetting} from '@elf/setting'
+import {NetWork} from '@elf/util'
 import config from './config'
-
-console.log(headdump)
 
 const RedisStore = connectRedis(session)
 
@@ -73,9 +70,9 @@ let onError = error => {
  * Event listener for HTTP server "listening" event.
  */
 let onListening = () => {
-  let addr = server.address()
-  let bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port
-  console.log('Listening on ' + bind)
+  const addr = server.address(),
+      bind = typeof addr === 'string' ? `pipe:${addr}` : `http://${NetWork.getIp()}:${addr.port}`
+  console.log(`Running at：${bind}`)
 }
 
 let app = express()
@@ -84,12 +81,20 @@ let app = express()
 if (elfSetting.mongoUser) {
   mongoose.connect(
       elfSetting.mongoUri,
-      {user: elfSetting.mongoUser, pass: elfSetting.mongoPass, useMongoClient: true}
+      {
+        user: elfSetting.mongoUser,
+        pass: elfSetting.mongoPass,
+        useNewUrlParser: true,
+        useCreateIndex: true
+      }
   )
 } else {
   mongoose.connect(
       elfSetting.mongoUri,
-      {useMongoClient: true}
+      {
+        useNewUrlParser: true,
+        useCreateIndex: true
+      }
   )
 }
 mongoose.connection.on('error', () => {

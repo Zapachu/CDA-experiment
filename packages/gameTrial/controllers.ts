@@ -286,7 +286,7 @@ export function handleSocketInit(ioServer: Socket.Server) {
                     })
                     return
                 }
-                if (userGameData && userGameData.status === UserGameStatus.waittingMatch) {
+                if (userGameData && userGameData.status === UserGameStatus.matching) {
                     throw new Error('正在匹配中, 请稍后')
                 }
                 
@@ -297,7 +297,7 @@ export function handleSocketInit(ioServer: Socket.Server) {
 
                     await redisTools.setUserGameData(uid, gamePhase,
                         {
-                            status: UserGameStatus.waittingMatch
+                            status: UserGameStatus.matching
                         }
                     )
                     socket.emit(clientSocketListenEvnets.startMatch) // TODO
@@ -323,7 +323,7 @@ export function handleSocketInit(ioServer: Socket.Server) {
                     if (!userGameData) {
                         return
                     }
-                    if (userGameData.status === UserGameStatus.waittingMatch) {
+                    if (userGameData.status === UserGameStatus.matching) {
                         roomManager.leaveRoom(gamePhase, uid)
                         userGameData.status = UserGameStatus.notStarted
                         await redisTools.setUserGameData(uid, gamePhase, userGameData)
@@ -349,7 +349,7 @@ export function handleSocketInit(ioServer: Socket.Server) {
                             if (!userGameData) {
                                 return
                             }
-                            if (userGameData.status === UserGameStatus.waittingMatch) {
+                            if (userGameData.status === UserGameStatus.matching) {
                                 roomManager.leaveRoom(game, uid)
                                 userGameData.status = UserGameStatus.notStarted
                                 await redisTools.setUserGameData(uid, game, userGameData)

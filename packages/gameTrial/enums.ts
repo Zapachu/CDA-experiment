@@ -1,5 +1,5 @@
 export enum UserGameStatus {
-    waittingMatch,
+    matching,
     started,
     notStarted
 }
