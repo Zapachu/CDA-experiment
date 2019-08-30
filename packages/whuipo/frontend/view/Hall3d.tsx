@@ -11,9 +11,82 @@ import BabylonScene from './BabylonScene'
 import {Detail, Hall, UnLockIcon} from '../asset'
 import style from './style.less'
 
-enum Dock { first, second, third, fourth, fifth }
+enum Dock { auction = 5, ipo = 1, tbm = 2, cbm = 3, cbm_l = 4 }
 
 enum GameType {IPO_Median, IPO_TopK, IPO_FPSBA, OpenAuction, TBM, CBM, CBM_Leverage}
+
+class CBMPlayMode extends BasePlayMode<NCreateParams.CBM> {
+  defaultParams = {
+    allowLeverage: false,
+    robotCD: 5,
+    robotType: NCreateParams.CBMRobotType.zip
+  }
+
+  renderConfigDesc() {
+    return <section className={style.cbmConfigDesc}>
+      <h4>ZIP算法策略</h4>
+      <img src={require('../asset/ZIP_01.png')}/><br/>
+      <p>
+        ZIP算法逻辑简介：CDA连续双向拍卖机制下，买方和卖方均被赋予了一个保留价格序列（价值序列和成本序列）；然后根据自己的保留价格进行报价。每次报价后进入休眠期（sleep
+        time）。根据休眠期的长短将zip算法定义为fast zip（例如：休眠时间1s），slow
+        zip（例如，休眠时间5s）。休眠期结束后，报出自己当前最新的计算价格；在市场交易期间，算法会根据根据四个因素决定更新自己的计算价格：第一，上期报价p是否成交；第二，市场最近报价q；第三，q是买方报价还是卖方报价；第四，报价q是否达成交易。结合上述四个因素，算法决定自己是提高利润率还是降低利润率。
+      </p>
+      <img src={require('../asset/ZIP_02.png')}/><br/>
+      <img src={require('../asset/ZIP_03.png')}/><br/>
+      <h4>GD算法策略</h4>
+      <p>
+        按固定周期休眠，醒来后报价，出价策略计算的过程：
+        <br/>1）计算信念函数
+        <br/>2）计算期望剩余价值
+        <br/>3）最大化期望剩余价值的出价即为算法的出价策略
+        <br/>其中，基于市场上最近k笔交易完成的时间内，市场上所有的被接受和被拒绝的出价和要价构成的历史数据H
+      </p>
+      <h4>Normal策略</h4>
+      <p>
+        按固定周期休眠，醒来后在可报价区间内随机取值报价
+      </p>
+    </section>
+  }
+
+  renderConfig() {
+    const {state: {params}} = this
+    return <ul className={style.cbmConfig}>
+      <li>
+        <label>报价策略</label>
+        <ul className={style.robotType}>
+          {
+            [
+              {
+                robotType: NCreateParams.CBMRobotType.zip,
+                label: 'ZIP'
+              },
+              {
+                robotType: NCreateParams.CBMRobotType.gd,
+                label: 'GD'
+              },
+              {
+                robotType: NCreateParams.CBMRobotType.normal,
+                label: 'Normal'
+              }].map(({robotType, label}) => <li
+                onClick={() => this.setState({params: {...params, robotType}})}>
+              <input type='radio' checked={params.robotType === robotType}/>
+              {label}</li>)
+          }
+        </ul>
+      </li>
+      <li>
+        <label>报价间隔</label>
+        <input type='number' value={params.robotCD}
+               onChange={({target: {value}}) => this.setState({
+                 params: {
+                   ...params,
+                   robotCD: value as any
+                 }
+               })}/>s
+      </li>
+    </ul>
+  }
+}
 
 const GameTypeConfig: {
   [key: number]: {
@@ -28,7 +101,7 @@ const GameTypeConfig: {
   [GameType.IPO_TopK]: {
     phase: Phase.IPO,
     title: '荷兰式拍卖',
-    dock: Dock.second,
+    dock: Dock.ipo,
     video: 'https://qiniu0.anlint.com/video/whuipo/ipohe.mp4',
     desc: `
     您在一个基金机构工作，您所在的基金机构经过对市场信息的精密分析，现对一个即将上市的股票有一个估值A元。您的公司给您提供了竞价资金B，要您在市场上参与该股票的询价过程。企业共发行了1万股股票，您与市场上其他交易者对该股票的估值可能相同，也可能不同，您需要与其他买家共同竞争购买股票。
@@ -49,12 +122,17 @@ const GameTypeConfig: {
     决定购买数量：您、D和C都有购买这1万股股票的权利。按照价格排序后，D可购买的数量为4000股，C可购买的数量为3000股，市场上还剩3000股股票。虽然您的拟购买数量为6000股，但是此时您只能购买3000股。A和B未买购买到股票。
     
     您的收益（您对股票的估值-股票的成交价格）*您的购买数量
-    `
+    `,
+    PlayMode: class extends BasePlayMode<NCreateParams.IPO> {
+      defaultParams = {
+        type: NCreateParams.IPOType.TopK
+      }
+    }
   },
   [GameType.IPO_Median]: {
     phase: Phase.IPO,
     title: '中位数定价',
-    dock: Dock.second,
+    dock: Dock.ipo,
     video: 'https://qiniu0.anlint.com/video/whuipo/ipozhong.mp4',
     desc: `
     您在一个基金机构工作，您所在的基金机构经过对市场信息的精密分析，现对一个即将上市的股票有一个估值A元。您的公司给您提供了竞价资金B，要您在市场上参与该股票的询价过程。企业共发行了1万股股票，您与市场上其他交易者对该股票的估值可能相同，也可能不同，您需要与其他买家共同竞争购买股票。
@@ -75,12 +153,17 @@ const GameTypeConfig: {
     决定购买数量：您、D和C都有共同购买这1万股股票的权利。您们三个合起来的拟购买数量为13000，则系统随机从13000股股票中选择10000股分配购买权。，则每股股票被抽到的概率为 。简言之，当您的拟购买价格在成交价格之上时，您的预期购买数量越大，您可能购买到的数量越多。
     
     您的收益：（您对股票的估值-股票的成交价格）*您的购买数量
-    `
+    `,
+    PlayMode: class extends BasePlayMode<NCreateParams.IPO> {
+      defaultParams = {
+        type: NCreateParams.IPOType.Median
+      }
+    }
   },
   [GameType.IPO_FPSBA]: {
     phase: Phase.IPO,
     title: '第一价格密封拍卖',
-    dock: Dock.first,
+    dock: Dock.auction,
     desc: `
     您在一个基金机构工作，您所在的基金机构经过对市场信息的精密分析，现对一个即将上市的股票有一个估值A元。您的公司给您提供了竞价资金B，要您在市场上参与该股票的询价过程。企业共发行了1万股股票，您与市场上其他交易者对该股票的估值可能相同，也可能不同，您需要与其他买家共同竞争购买股票。
 
@@ -100,12 +183,17 @@ const GameTypeConfig: {
     决定购买数量：你、D和C都有购买这1万股股票的权利。按照价格排序后，D可购买的数量为4000股，D的购买价格为107元；C可购买的数量为3000股，C的购买价格为104元。虽然你的拟购买数量为6000股，但是此时你只能购买3000股，你的购买价格为101元。
     
     您的收益：（您对股票的估值-股票的成交价格）*您的购买数量
-    `
+    `,
+    PlayMode: class extends BasePlayMode<NCreateParams.IPO> {
+      defaultParams = {
+        type: NCreateParams.IPOType.FPSBA
+      }
+    }
   },
   [GameType.OpenAuction]: {
     phase: Phase.OpenAuction,
     title: '公开竞价拍卖',
-    dock: Dock.first,
+    dock: Dock.auction,
     desc: `
     您要在市场上竞购某资产，您所在的基金机构对该资产有估值A元，该资产的起拍价格为B元，你需要和市场上其他交易者相继出价竞购，拍卖价格最高的买家可购入该资产。
     您可以不断提交您的拍卖价格，但是您的拍卖价格必须大于市场上现已有的最高购买价格。至某一价格，30秒内无人加价时，则此时市场上已有的最高拍卖价即为成交价，出此价格的买家即可购入该资产
@@ -114,7 +202,7 @@ const GameTypeConfig: {
   [GameType.TBM]: {
     phase: Phase.TBM,
     title: '集合竞价',
-    dock: Dock.third,
+    dock: Dock.tbm,
     video: 'https://qiniu0.anlint.com/video/whuipo/jihejinjia.mp4',
     desc: `
     您在一个基金机构工作，您所在的基金机构经过对市场信息的精密分析，现对市场上的股票有一个估值，要您在市场上进行股票交易活动。在这个市场中，您会被系统随机分配为买家或卖家。买家有初始的购买资金M，卖家有初始的股票数量S。买家和卖家对股票的估值不同，并根据自己的估值一次性进行买卖申请。系统将在有效价格范围内选取成交量最大的价位，对接受到的买卖申报一次性集中撮合，产生股票的成交价格。报价大于等于市场成交价格的买家成交；价小于等于市场成交成交价格的卖家成交。买家收益=（成交价-估值）*成交数量；卖家收益=（估值-成交价）*成交数量
@@ -123,31 +211,32 @@ const GameTypeConfig: {
   [GameType.CBM]: {
     phase: Phase.CBM,
     title: '连续竞价',
-    dock: Dock.fourth,
+    dock: Dock.cbm,
     video: 'https://qiniu0.anlint.com/video/whuipo/lianxujinjia.mp4',
     desc: `
     您在一个基金机构工作，您所在的基金机构经过对市场信息的精密分析，现对市场上的股票有一个估值，要您在市场上进行股票交易活动。您需要根据您所在公司对股票的估值以及您对市场状况的判断来决定您的股票交易策略。在您提交买入申报价格/卖出申报价格和申购数量/出售数量之后，由电脑系统按照以下两种情况产生成交价：1）最高买进申报价格与最低卖出申报相同，则该价格为成交价格；2）买入申报高于卖出申报时，申报在先的价格即为成交价格。系统处理原则为价格优先和时间优先两个原则。
 	举一个简单的例子：挂在市场上的最高买价是9.96，最低卖价是9.98，在这个时候（分毫不差）同时出现了买入申报价为10元的买家，和卖出申报价为9.9元的卖家，则买入申报价为10元的买家会以9.98的价格成交，卖出申报价为9.9的卖家以9.96成交。
 	您会进入一个有6期交易期的市场，在第1、3、5期结束，您资产中的股票价值以当期股票收盘价计算。在第2、4、6期结束，股票发行公司会发布他们的公司财务报表，相应的股票价值会受到公司财务报表的影响，此时您资产组合中的股票价值以公司发布的财务报表价格计算。
     `,
-    PlayMode: class extends BasePlayMode<NCreateParams.CBM> {
-      renderParams() {
-        return <section>
-          TODO
-        </section>
-      }
-    }
+    PlayMode: CBMPlayMode
   },
   [GameType.CBM_Leverage]: {
     phase: Phase.CBM,
     title: '融资融券',
-    dock: Dock.fifth,
+    dock: Dock.cbm_l,
     video: 'https://qiniu0.anlint.com/video/whuipo/rongzirongquan.mp4',
     desc: `
     您在一个基金机构工作，您所在的基金机构经过对市场信息的精密分析，现对市场上的股票有一个估值，要您在市场上进行股票交易活动。您需要根据您所在公司对股票的估值以及您对市场状况的判断来决定您的股票交易策略。在您提交买入申报价格/卖出申报价格和申购数量/出售数量之后，由电脑系统按照以下两种情况产生成交价：1）最高买进申报价格与最低卖出申报相同，则该价格为成交价格；2）买入申报高于卖出申报时，申报在先的价格即为成交价格。系统处理原则为价格优先和时间优先两个原则。
 	举一个简单的例子：挂在市场上的最高买价是9.96，最低卖价是9.98，在这个时候（分毫不差）同时出现了买入申报价为10元的买家，和卖出申报价为9.9元的卖家，则买入申报价为10元的买家会以9.98的价格成交，卖出申报价为9.9的卖家以9.96成交。
 	您会进入一个有6期交易期的市场，在第1、3、5期结束，您资产中的股票价值以当期股票收盘价计算。在第2、4、6期结束，股票发行公司会发布他们的公司财务报表，相应的股票价值会受到公司财务报表的影响，此时您资产组合中的股票价值以公司发布的财务报表价格计算。
-您可以在市场上融资融券，您可融入与您资金数量相同的资金，也可融入您股票数量相同的股票。当股价变动，使您的资产低于融资或融券价值的150%时，您将会收到券商的警告；小于130%时将被强制清仓，强制清仓后剩余的资金可以继续交易。您可以在任一时间点还款还券。`
+您可以在市场上融资融券，您可融入与您资金数量相同的资金，也可融入您股票数量相同的股票。当股价变动，使您的资产低于融资或融券价值的150%时，您将会收到券商的警告；小于130%时将被强制清仓，强制清仓后剩余的资金可以继续交易。您可以在任一时间点还款还券。`,
+    PlayMode: class extends CBMPlayMode {
+      defaultParams = {
+        allowLeverage: true,
+        robotCD: 5,
+        robotType: NCreateParams.CBMRobotType.zip
+      }
+    }
   }
 }
 
@@ -183,9 +272,9 @@ const DockConfig: {
     lockIconPosition: IPoint
   }
 } = {
-  [Dock.first]: {
+  [Dock.auction]: {
     icon: require('../asset/dock/auction.png'),
-    title: '资产拍卖',
+    title: '股票场外交易',
     maskSize: {
       width: 80,
       height: 30,
@@ -209,9 +298,9 @@ const DockConfig: {
       z: 320
     }
   },
-  [Dock.second]: {
+  [Dock.ipo]: {
     icon: require('../asset/dock/ipo.png'),
-    title: 'IPO',
+    title: '新股首次发行',
     maskSize: {
       width: 80,
       height: 30,
@@ -235,7 +324,7 @@ const DockConfig: {
       z: 320
     }
   },
-  [Dock.third]: {
+  [Dock.tbm]: {
     icon: require('../asset/dock/tbm.png'),
     title: '集合竞价',
     maskSize: {
@@ -261,7 +350,7 @@ const DockConfig: {
       z: 460
     }
   },
-  [Dock.fourth]: {
+  [Dock.cbm]: {
     icon: require('../asset/dock/cbm.png'),
     title: '连续竞价',
     maskSize: {
@@ -287,7 +376,7 @@ const DockConfig: {
       z: 325
     }
   },
-  [Dock.fifth]: {
+  [Dock.cbm_l]: {
     icon: require('../asset/dock/cbm_l.png'),
     title: '融资融券',
     maskSize: {
@@ -456,7 +545,10 @@ export class Hall3D extends React.Component<{}, State> {
                                                ref={node => this.gamePhaseVideoRefs[gameType] = node}/> : null
             }
           </div>
-          <PlayMode onSubmit={(multiMode, params) => this.startMatch(multiMode, focusedGameConfig.phase, params)}/>
+          <PlayMode onSubmit={(multiMode, params) => {
+            return console.log(multiMode, focusedGameConfig.phase, params)
+            this.startMatch(multiMode, focusedGameConfig.phase, params)
+          }}/>
         </div>
       case ModalType.preMatch:
         return <div>
@@ -547,11 +639,11 @@ export class Hall3D extends React.Component<{}, State> {
 
   handleSelectGame(dock: Dock) {
     const funMap = {
-      [Dock.first]: () => this.handleShowLeftDetail(),
-      [Dock.second]: () => this.handleShowLeftDetail(),
-      [Dock.third]: () => this.handleShowCenterDetail(),
-      [Dock.fourth]: () => this.handleShowRightDetail(),
-      [Dock.fifth]: () => this.handleShowRightDetail()
+      [Dock.auction]: () => this.handleShowLeftDetail(),
+      [Dock.ipo]: () => this.handleShowLeftDetail(),
+      [Dock.tbm]: () => this.handleShowCenterDetail(),
+      [Dock.cbm]: () => this.handleShowRightDetail(),
+      [Dock.cbm_l]: () => this.handleShowRightDetail()
     }
     funMap[dock]()
     setTimeout(() => {

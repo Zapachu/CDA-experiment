@@ -2,20 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var Phase;
 (function (Phase) {
-    Phase[Phase["IPO"] = 0] = "IPO";
-    Phase[Phase["OpenAuction"] = 1] = "OpenAuction";
-    Phase[Phase["TBM"] = 2] = "TBM";
-    Phase[Phase["CBM"] = 3] = "CBM";
+    Phase["IPO"] = "IPO";
+    Phase["OpenAuction"] = "OpenAuction";
+    Phase["TBM"] = "TBM";
+    Phase["CBM"] = "CBM";
 })(Phase = exports.Phase || (exports.Phase = {}));
-var NAMESPACE_PREFIX = 'stockTrade:';
-function phaseToNamespace(phase) {
-    return "" + NAMESPACE_PREFIX + phase;
-}
-exports.phaseToNamespace = phaseToNamespace;
-function namespaceToPhase(namespace) {
-    return +namespace.replace(NAMESPACE_PREFIX, '');
-}
-exports.namespaceToPhase = namespaceToPhase;
 var NCreateParams;
 (function (NCreateParams) {
     var IPOType;
@@ -26,8 +17,9 @@ var NCreateParams;
     })(IPOType = NCreateParams.IPOType || (NCreateParams.IPOType = {}));
     var CBMRobotType;
     (function (CBMRobotType) {
-        CBMRobotType[CBMRobotType["random"] = 0] = "random";
+        CBMRobotType[CBMRobotType["normal"] = 0] = "normal";
         CBMRobotType[CBMRobotType["zip"] = 1] = "zip";
+        CBMRobotType[CBMRobotType["gd"] = 2] = "gd";
     })(CBMRobotType = NCreateParams.CBMRobotType || (NCreateParams.CBMRobotType = {}));
 })(NCreateParams = exports.NCreateParams || (exports.NCreateParams = {}));
 var UserGameStatus;

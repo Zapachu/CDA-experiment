@@ -10,11 +10,12 @@ import {
   IPlayerState,
   IPushParams,
   MoveType,
+  namespace,
   PlayerStatus,
   PriceRange,
   PushType
 } from './config'
-import {Phase, phaseToNamespace, STOCKS, NCreateParams} from '@micro-experiment/share'
+import {NCreateParams, STOCKS} from '@micro-experiment/share'
 import {Trial} from '@elf/protocol'
 import IPOType = NCreateParams.IPOType
 
@@ -137,17 +138,12 @@ export default class Controller extends BaseController<ICreateParams,
           return
         }
         const {onceMore} = params
-        const trialNamespace = {
-          [IPOType.FPSBA]: Phase.IPO,
-          [IPOType.Median]: Phase.IPO,
-          [IPOType.TopK]: Phase.IPO
-        }[this.game.params.type]
         const res = await RedisCall.call<Trial.Done.IReq, Trial.Done.IRes>(
             Trial.Done.name,
             {
               userId: playerState.user.id,
               onceMore,
-              namespace: phaseToNamespace(trialNamespace)
+              namespace
             }
         )
         res ? cb(res.lobbyUrl) : null
@@ -201,7 +197,7 @@ export default class Controller extends BaseController<ICreateParams,
 
   //region calcProfit
   calcProfit(
-      gameState:IGameState,
+      gameState: IGameState,
       gameRoundState: IGameRoundState,
       playerRoundStatesArr: Array<IPlayerRoundState>
   ) {

@@ -1,6 +1,6 @@
-import {NCreateParams} from '@micro-experiment/share'
+import {NCreateParams, Phase} from '@micro-experiment/share'
 
-export const namespace = 'StockTrading-CBM'
+export const namespace = Phase.CBM
 
 export enum ROLE {
     Seller,

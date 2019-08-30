@@ -1,18 +1,8 @@
 export enum Phase {
-    IPO,
-    OpenAuction,
-    TBM,
-    CBM
-}
-
-const NAMESPACE_PREFIX = 'stockTrade:'
-
-export function phaseToNamespace(phase: Phase) {
-    return `${NAMESPACE_PREFIX}${phase}`
-}
-
-export function namespaceToPhase(namespace: string): Phase {
-    return +namespace.replace(NAMESPACE_PREFIX, '')
+    IPO = 'IPO',
+    OpenAuction = 'OpenAuction',
+    TBM = 'TBM',
+    CBM = 'CBM'
 }
 
 export namespace NCreateParams{
@@ -29,8 +19,9 @@ export namespace NCreateParams{
     }
 
     export enum CBMRobotType {
-        random,
-        zip
+        normal,
+        zip,
+        gd,
     }
     export interface CBM {
         allowLeverage: boolean

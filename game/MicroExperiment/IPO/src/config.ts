@@ -1,5 +1,5 @@
-import {NCreateParams} from '@micro-experiment/share'
-export const namespace = 'IPO'
+import {NCreateParams, Phase} from '@micro-experiment/share'
+export const namespace = Phase.IPO
 
 export const PriceRange = {
     limit: {

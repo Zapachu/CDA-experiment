@@ -1,12 +1,14 @@
 import * as React from 'react'
 import * as style from './style.less'
-import {Button} from '@micro-experiment/component'
+import {Button, Modal} from '@micro-experiment/component'
 
 interface IBasePlayModeProps<ICreateParams> {
     onSubmit: (multiPlayer: boolean, params: ICreateParams) => void
 }
 
 interface IBasePlayModeState<ICreateParams> {
+    showConfigModal: boolean
+    showDescModal: boolean
     multiPlayer: boolean
     params: ICreateParams
 }
@@ -14,17 +16,33 @@ interface IBasePlayModeState<ICreateParams> {
 export type TBasePlayMode<ICreateParams> = React.ComponentType<IBasePlayModeProps<ICreateParams>>
 
 export class BasePlayMode<ICreateParams> extends React.Component<IBasePlayModeProps<ICreateParams>, IBasePlayModeState<ICreateParams>> {
-    state: IBasePlayModeState<ICreateParams> = {
-        multiPlayer: false,
-        params: null
+    defaultParams:ICreateParams = {} as any
+
+    componentDidMount(): void {
+        this.setState({
+            params:this.defaultParams
+        })
     }
 
-    renderParams(): React.ReactNode {
+    state: IBasePlayModeState<ICreateParams> = {
+        showConfigModal: false,
+        showDescModal: false,
+        multiPlayer: false,
+        params: this.defaultParams
+    }
+
+    renderConfigDesc(): React.ReactNode {
+        return null
+    }
+
+
+    renderConfig(): React.ReactNode {
         return null
     }
 
     render(): React.ReactNode {
-        const {props: {onSubmit}, state: {multiPlayer, params}} = this
+        const {props: {onSubmit}, state: {showConfigModal, showDescModal, multiPlayer, params}} = this
+        const configNode = this.renderConfig(), descNode = this.renderConfigDesc()
         return <section className={style.playMode}>
             <div className={style.modesWrapper}>
                 {
@@ -42,16 +60,39 @@ export class BasePlayMode<ICreateParams> extends React.Component<IBasePlayModePr
                         <div className={style.btnMode} key={label} onClick={() => onClick()}>
                             <img
                                 src={active ? require('./play_mode_active.svg') : require('./play_mode_inactive.svg')}/>
-                            <div className={active ? style.active : style.inactive}>
+                            <div className={`${style.btn} ${active ? style.active : ''}`}>
                                 <p>{label}</p>
                                 <p>{subLabel}</p>
                             </div>
                         </div>)
                 }
             </div>
-            {
-                multiPlayer ? null : this.renderParams()
-            }
+            <a style={{visibility: !multiPlayer && configNode ? 'visible' : 'hidden'}} className={style.btnShowConfig}
+               onClick={() => this.setState({showConfigModal: true})}>配置算法交易者</a>
+            <Modal visible={showConfigModal} width=''>
+                <div className={style.configModal}>
+                    <label className={style.btnShowDesc}
+                           onClick={() => this.setState({showDescModal: true})}>关于算法交易者</label>
+                    {
+                        descNode ? <>
+                            <Modal visible={showDescModal} width={'48rem'}>
+                                {
+                                    this.renderConfigDesc()
+                                }
+                                <div style={{marginBottom: '1rem'}}>
+                                    <Button label={'确定'} onClick={() => this.setState({showDescModal: false})}/>
+                                </div>
+                            </Modal>
+                        </> : null
+                    }
+                    <div className={style.paramsWrapper}>
+                        {configNode}
+                    </div>
+                    <div>
+                        <Button label={'确定'} onClick={() => this.setState({showConfigModal: false})}/>
+                    </div>
+                </div>
+            </Modal>
             <Button label={'开始匹配'} onClick={() => onSubmit(multiPlayer, params)}/>
         </section>
     }

@@ -1,44 +1,82 @@
 .playMode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
   .modesWrapper {
     display: flex;
     justify-content: center;
-    margin-bottom: 20px;
+
     .btnMode {
       position: relative;
       cursor: pointer;
+      margin: 1rem;
+
       img {
         width: 180px;
       }
-      > div {
+
+      .btn {
         position: absolute;
         top: 0;
         right: 0;
         bottom: 0;
         left: 25%;
+
         p {
+          color: #dde1e9;
+
           &:first-child {
             margin-top: 6px;
           }
+
           &:last-child {
             font-size: 12px;
             margin-top: 10px;
             opacity: 0.7;
           }
         }
+
         &.active {
           p {
             color: #9ee759;
           }
         }
-        &.inactive {
-          p {
-            color: #dde1e9;
-          }
-        }
       }
-      &:first-child {
-        margin-right: 20px;
-      }
+    }
+  }
+
+  .btnShowConfig {
+    font-size: .8rem;
+    color: #ccc;
+    margin-bottom: 1rem;
+    display: inline-block;
+    cursor: pointer;
+    transition: text-decoration .2s;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .configModal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+
+    .btnShowDesc {
+      color: #9ee759;
+      margin-top: 1rem;
+      border: solid 1px;
+      font-size: .8rem;
+      padding: 1px 2px;
+      border-radius: 2px;
+      cursor: pointer;
+    }
+
+    .paramsWrapper {
+      padding: 1rem 1.5rem;
     }
   }
 }

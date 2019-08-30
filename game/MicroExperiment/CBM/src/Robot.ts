@@ -1,4 +1,4 @@
-import {baseEnum, GameStatus} from '@bespoke/server'
+import {GameStatus} from '@bespoke/server'
 import {BaseRobot} from '@bespoke/robot'
 import {
     ICreateParams,

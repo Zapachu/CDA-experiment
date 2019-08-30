@@ -13,7 +13,13 @@ import {UserDoc} from './interfaces'
 import {elfSetting} from '@elf/setting'
 import config from './config'
 import setting from './setting'
-import {namespaceToPhase, Phase, phaseToNamespace, SocketEvent, ResCode, UserGameStatus} from '@micro-experiment/share'
+import {
+  NSocketParam,
+  Phase,
+  ResCode,
+  SocketEvent,
+  UserGameStatus
+} from '@micro-experiment/share'
 import {RedisCall, Trial} from '@elf/protocol'
 import XJWT, {encryptPassword, Type as XJWTType} from './XJWT'
 
@@ -67,19 +73,19 @@ const removeUserSocket = (uid, socketId) => {
 }
 
 const matchRoomLimit = config.gameRoomSize || 10
-const waittingTime = config.gameMatchTime || 10 // 秒
+const waitSeconds = config.gameMatchTime || 10
 const matchRoomOfGame: { [gamePhase: number]: string[] } = {}
 const matchRoomTimerOfGame = {}
 
-const initRoom = (gamePhase: Phase) => {
+function initRoom(gamePhase: Phase, params) {
   const arr = []
   matchRoomOfGame[gamePhase] = arr
   let i = 0
   const timerId = setInterval(async () => {
     console.log(`${gamePhase} 房间 正在匹配中, 已等待${i}s`)
-    if (i === waittingTime) {
+    if (i === waitSeconds) {
       clearRoom(gamePhase)
-      await emitMatchSuccess(gamePhase, arr)
+      await emitMatchSuccess(gamePhase, arr, params)
       return
     }
     i++
@@ -88,14 +94,15 @@ const initRoom = (gamePhase: Phase) => {
   return arr
 }
 
-const joinMatchRoom = (gamePhase: Phase, uid) => {
+function joinMatchRoom(gamePhase: Phase, uid, params) {
   let matchRoom = matchRoomOfGame[gamePhase]
   if (!matchRoom || matchRoom.length === 0) {
-    matchRoom = initRoom(gamePhase)
+    matchRoom = initRoom(gamePhase, params)
   }
   matchRoom.push(uid)
 }
-const leaveRoom = (gamePhase: Phase, uid) => {
+
+function leaveRoom(gamePhase: Phase, uid) {
   console.log(gamePhase, 'leave room')
   const matchRoom = matchRoomOfGame[gamePhase] || []
   const findIndex = matchRoom.findIndex(i => i === uid)
@@ -110,7 +117,7 @@ const leaveRoom = (gamePhase: Phase, uid) => {
   return flag
 }
 
-const clearRoom = (gamePhase: Phase) => {
+function clearRoom(gamePhase: Phase) {
   const timerId = matchRoomTimerOfGame[gamePhase]
   if (timerId) {
     clearInterval(timerId)
@@ -119,9 +126,9 @@ const clearRoom = (gamePhase: Phase) => {
   matchRoomOfGame[gamePhase] = []
 }
 
-const emitMatchSuccess = async (gamePhase: Phase, uids = []) => {
+async function emitMatchSuccess(phase: Phase, uids = [], params = {}) {
   const {playUrl} = await RedisCall.call<Trial.Create.IReq,
-      Trial.Create.IRes>(Trial.Create.name(phaseToNamespace(gamePhase)), {})
+      Trial.Create.IRes>(Trial.Create.name(phase), params)
   uids.forEach(async uid => {
     const arr = userSocketMap[uid] || []
     const playerUrl = playUrl
@@ -130,7 +137,7 @@ const emitMatchSuccess = async (gamePhase: Phase, uids = []) => {
           .to(socketId)
           .emit(SocketEvent.startGame, {playerUrl})
     })
-    await RedisTools.setUserGameData(uid, gamePhase, {
+    await RedisTools.setUserGameData(uid, phase, {
       status: UserGameStatus.started,
       playerUrl
     })
@@ -177,7 +184,7 @@ const PhaseScore = {
 RedisCall.handle<Trial.Done.IReq, Trial.Done.IRes>(
     Trial.Done.name,
     async ({userId, onceMore, namespace}) => {
-      const phase = namespaceToPhase(namespace)
+      const phase = namespace as Phase
       const uid = userId
       const user = await User.findById(uid)
       let lobbyUrl = setting.lobbyUrl
@@ -279,10 +286,7 @@ export function handleSocketInit(ioServer: Socket.Server) {
     if (socket.request.user.logged_in) {
       pushUserSocket(user._id, socket.id)
     }
-    socket.on(SocketEvent.reqStartGame, async function (msg: {
-      multiPlayer: boolean;
-      gamePhase: Phase;
-    }) {
+    socket.on(SocketEvent.reqStartGame, async function ({multiPlayer, phase, params}: NSocketParam.StartGame) {
       try {
         if (!socket.request.user.logged_in) {
           throw new Error('没有登陆')
@@ -293,8 +297,7 @@ export function handleSocketInit(ioServer: Socket.Server) {
         )
         console.log(`请求者uid:${socket.request.user._id}`)
         const uid = socket.request.user._id
-        const {multiPlayer, gamePhase} = msg
-        const userGameData = await RedisTools.getUserGameData(uid, gamePhase)
+        const userGameData = await RedisTools.getUserGameData(uid, phase)
         if (userGameData && userGameData.status === UserGameStatus.started) {
           socket.emit(SocketEvent.continueGame, {
             playerUrl: userGameData.playerUrl
@@ -307,19 +310,19 @@ export function handleSocketInit(ioServer: Socket.Server) {
         ) {
           const user = await User.findById(uid)
           if (multiPlayer) {
-            joinMatchRoom(gamePhase, user._id)
-            const matchRoom = matchRoomOfGame[gamePhase]
+            joinMatchRoom(phase, user._id, params)
+            const matchRoom = matchRoomOfGame[phase]
 
-            await RedisTools.setUserGameData(uid, gamePhase, {
+            await RedisTools.setUserGameData(uid, phase, {
               status: UserGameStatus.matching
             })
-            socket.emit(SocketEvent.startMatch) // TODO
+            socket.emit(SocketEvent.startMatch)
             if (matchRoom.length === matchRoomLimit) {
-              await emitMatchSuccess(gamePhase, matchRoom)
-              await clearRoom(gamePhase)
+              await emitMatchSuccess(phase, matchRoom, params)
+              await clearRoom(phase)
             }
           } else {
-            await emitMatchSuccess(gamePhase, [user._id])
+            await emitMatchSuccess(phase, [user._id], params)
           }
         }
       } catch (e) {

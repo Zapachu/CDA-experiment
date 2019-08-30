@@ -1,6 +1,5 @@
 import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from '@bespoke/server'
 import {RedisCall, Trial} from '@elf/protocol'
-import {Phase, phaseToNamespace} from '@micro-experiment/share'
 import {
     ICreateParams,
     IGameRoundState,
@@ -10,11 +9,13 @@ import {
     IPlayerState,
     IPushParams,
     MoveType,
+    namespace,
     PlayerStatus,
     PriceRange,
     PushType,
     RobotCfg,
-    ROUNDS, SecondsToShowResult,
+    ROUNDS,
+    SecondsToShowResult,
     SecondsToTrade
 } from './config'
 import {Number} from './util'
@@ -71,7 +72,7 @@ export class Controller extends BaseController<ICreateParams, IGameState, IPlaye
                     )
                 }
                 gameRoundState.timer = SecondsToTrade
-                if(gameRoundState.shouts.some(p=>p>params.price)){
+                if (gameRoundState.shouts.some(p => p > params.price)) {
                     break
                 }
                 gameRoundState.shouts[playerState.index] = params.price
@@ -99,7 +100,7 @@ export class Controller extends BaseController<ICreateParams, IGameState, IPlaye
                     {
                         userId: playerState.user.id,
                         onceMore,
-                        namespace: phaseToNamespace(Phase.OpenAuction)
+                        namespace
                     }
                 )
                 res ? cb(res.lobbyUrl) : null
