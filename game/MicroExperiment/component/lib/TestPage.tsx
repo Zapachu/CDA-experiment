@@ -37,6 +37,14 @@ export function TestPage({questions, done}: { questions: Array<ITestPageQuestion
             }
         }
 
+        function nextQuestion() {
+            if (questionIndex < questions.length - 1) {
+                setQuestionIndex(questionIndex + 1)
+            } else {
+                done()
+            }
+        }
+
         return <section className={style.question}>
             <div className={style.contentWrapper}>
                 <Content inputProps={style => inputProps(style)}/>
@@ -44,23 +52,22 @@ export function TestPage({questions, done}: { questions: Array<ITestPageQuestion
             <div className={`${style.answerWrapper} ${showAnswer ? style.active : ''}`}>
                 <Answer/>
             </div>
-            {
-                showAnswer ?
-                    <Button label={'下一步'}
-                            onClick={() => {
-                                if (inputArr.toString() !== answer.toString()) {
-                                    return
+            <div className={style.btnWrapper}>
+                {
+                    showAnswer ?
+                        <Button label={'下一步'}
+                                onClick={() => {
+                                    if (inputArr.toString() !== answer.toString()) {
+                                        return
+                                    }
+                                    nextQuestion()
                                 }
-                                if (questionIndex < questions.length - 1) {
-                                    setQuestionIndex(questionIndex + 1)
-                                } else {
-                                    done()
-                                }
-                            }
-                            }/> :
-                    <Button label={'确定'}
-                            onClick={() => setShowAnswer(true)}/>
-            }
+                                }/> :
+                        <Button label={'确定'}
+                                onClick={() => setShowAnswer(true)}/>
+                }
+                <a className={style.btnSkip} onClick={()=>nextQuestion()}>跳过</a>
+            </div>
         </section>
     }
 

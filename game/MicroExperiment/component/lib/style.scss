@@ -383,5 +383,19 @@
         opacity: 1;
       }
     }
+
+    .btnWrapper{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      .btnSkip{
+        font-size: 1rem!important;
+        color: #ccc;
+        margin: 1rem;
+        &:hover{
+          text-decoration: underline;
+        }
+      }
+    }
   }
 }

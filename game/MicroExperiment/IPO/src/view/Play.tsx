@@ -9,7 +9,6 @@ import {
     IGameState,
     IMoveParams,
     IPlayerState,
-    IPOType,
     IPushParams,
     MoveType,
     PlayerStatus,
@@ -28,7 +27,9 @@ import {
     TableInfo,
     TestPage
 } from '@micro-experiment/component'
+import {NCreateParams} from '@micro-experiment/share'
 import {Input as AntInput, Radio} from 'antd'
+import IPOType = NCreateParams.IPOType
 
 enum ModalType {
     None,
