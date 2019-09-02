@@ -1,16 +1,14 @@
 import {Router} from 'express'
 
-import Controllers from './controller'
-
-const {isLogined} = Controllers
-
-const rootRouter = Router()
-rootRouter.get('/', isLogined, Controllers.renderIndex)
-rootRouter.get('/signIn', Controllers.renderSignIn)
-rootRouter.get('/login', Controllers.login)
+import Controller from './controller'
 
 const apiRouter = Router()
-apiRouter.get('/initInfo', Controllers.getInitInfo)
-rootRouter.use('/api', isLogined, apiRouter)
+apiRouter.get('/initInfo', Controller.getInitInfo)
+apiRouter.post('/login', Controller.login)
+
+const rootRouter = Router()
+rootRouter.use('/api', apiRouter)
+rootRouter.get('/login', Controller.renderLogin)
+rootRouter.get('/*', Controller.loggedIn, Controller.renderIndex)
 
 export default rootRouter

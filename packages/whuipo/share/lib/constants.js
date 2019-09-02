@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.csrfCookieKey = '_csrf';
 var Stage;
 (function (Stage) {
     Stage[Stage["Home"] = 0] = "Home";

@@ -68,3 +68,12 @@ export namespace NSocketParam{
         params
     }
 }
+
+export namespace iLabX{
+    export enum ResCode{
+        success = 0,
+        invalidInput = 3,
+        errorPwd = 4,
+        errorUserName = 5
+    }
+}

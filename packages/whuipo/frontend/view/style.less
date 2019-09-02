@@ -1,3 +1,4 @@
+/* region Hall3d*/
 .actionBtns {
   position: absolute;
   right: 10%;
@@ -134,13 +135,14 @@
       opacity: .8;
       cursor: pointer;
     }
-    &:hover{
+
+    &:hover {
       transform: scale(1.1);
     }
   }
 }
 
-.titleBar{
+.titleBar {
   position: fixed;
   background: linear-gradient(#3e3d42, #444c62);
   border-bottom: 1px solid #2e3f5f;
@@ -150,23 +152,27 @@
   justify-content: space-between;
   width: 100vw;
   opacity: .8;
-  .logo{
+
+  .logo {
     height: 3rem;
     width: 12rem;
     background: url("../asset/logo.png") no-repeat center center;
     background-size: contain;
   }
-  .title{
+
+  .title {
     margin: .8rem;
     font-size: 1.5rem;
     text-align: center;
-    .subTitle{
+
+    .subTitle {
       font-size: 1rem;
       margin-top: .5rem;
       color: #6ee47c;
       display: flex;
       align-items: center;
-      &:before,&:after{
+
+      &:before, &:after {
         content: "";
         margin: .25rem;
         display: inline-block;
@@ -176,11 +182,13 @@
       }
     }
   }
-  .score{
+
+  .score {
     margin-right: 1.5rem;
     display: flex;
     align-items: center;
-    &:before{
+
+    &:before {
       content: "";
       background: url("../asset/score.png") no-repeat center center;
       display: inline-block;
@@ -192,18 +200,21 @@
 }
 
 /*region CBM*/
-.cbmConfig{
+.cbmConfig {
   display: flex;
   flex-direction: column;
   margin: 0;
-  li{
+
+  li {
     display: flex;
     align-items: center;
-    label{
+
+    label {
       margin: 0.5rem;
       font-size: 1rem;
     }
-    input{
+
+    input {
       font-size: 1.25rem;
       margin: .5rem;
       max-width: 4rem;
@@ -212,30 +223,89 @@
       border-radius: .2rem;
       cursor: pointer;
     }
-    .robotType{
+
+    .robotType {
       display: flex;
-      li{
+
+      li {
         cursor: pointer;
       }
     }
   }
 }
 
-.cbmConfigDesc{
+.cbmConfigDesc {
   padding: 1rem 1.5rem;
-  h4{
+
+  h4 {
     font-weight: normal;
     margin: 1.25rem 0 .5rem;
     font-size: 1.5rem;
     color: #9ee759;
   }
-  img{
+
+  img {
     width: 100%;
   }
-  p{
+
+  p {
     margin: 1rem 0;
   }
 }
+
 /*endregion*/
+/* endregion*/
 
+/* region Login*/
+.login {
+  margin: 10vh auto;
+  border: 1px solid #ddd;
+  border-radius: .3rem;
+  background: white;
+  max-width: 48rem;
+  display: flex;
 
+  .loginBody {
+    margin: 3rem auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: normal;
+    }
+
+    input {
+      width: 16rem;
+      margin: 1rem 2rem;
+      padding: 1rem 1.5rem;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 19rem;
+      margin: 1rem;
+      border: none;
+      padding: 1rem;
+      border-radius: 4px;
+      background-color: #216acd;
+      color: white;
+      cursor: pointer;
+    }
+
+    .iLabXBtns {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+
+      a {
+        color: #333;
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+/* endregion*/

@@ -4,6 +4,7 @@
   "main": "lib/index",
   "types": "src/index",
   "scripts": {
+    "tsc-w": "tsc -w",
     "dist": "tsc"
   },
   "devDependencies": {

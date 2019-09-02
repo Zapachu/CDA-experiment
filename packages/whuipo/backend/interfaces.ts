@@ -5,6 +5,6 @@ interface IDocument extends Document {
 }
 
 export interface UserDoc extends IDocument {
-    unionId: string,
+    iLabXUserName: string
     phaseScore: Array<number>
 }

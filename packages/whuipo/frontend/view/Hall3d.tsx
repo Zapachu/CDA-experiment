@@ -3,11 +3,10 @@ import * as BABYLON from 'babylonjs'
 import socket from 'socket.io-client'
 import {Button, Loading, MatchModal, Modal} from '@micro-experiment/component'
 import {NCreateParams, NSocketParam, Phase, ResCode, SocketEvent, UserDoc} from '@micro-experiment/share'
-import {BasePlayMode, TBasePlayMode} from './PlayMode'
+import {BasePlayMode, TBasePlayMode, BabylonScene} from '../component'
 import {Toast} from '@elf/component'
 import qs from 'qs'
-import {getEnumKeys, redirect, reqInitInfo} from '../util'
-import BabylonScene from './BabylonScene'
+import {getEnumKeys, redirect, Api} from '../util'
 import {Detail, Hall, UnLockIcon} from '../asset'
 import style from './style.less'
 
@@ -453,7 +452,7 @@ export class Hall3D extends React.Component<{}, State> {
   }
 
   reqInitInfo() {
-    reqInitInfo().then(res => {
+    Api.reqInitInfo().then(res => {
       if (res.code === ResCode.success) {
         this.connectSocket()
         const user: UserDoc = res.user

@@ -7,19 +7,13 @@ import request from 'request-promise-native'
 import Redis from 'ioredis'
 import {URL} from 'url'
 import qs from 'qs'
-
+import {Log} from '@elf/util'
 import {User} from './models'
 import {UserDoc} from './interfaces'
 import {elfSetting} from '@elf/setting'
 import config from './config'
 import setting from './setting'
-import {
-  NSocketParam,
-  Phase,
-  ResCode,
-  SocketEvent,
-  UserGameStatus
-} from '@micro-experiment/share'
+import {iLabX, NSocketParam, Phase, ResCode, SocketEvent, UserGameStatus} from '@micro-experiment/share'
 import {RedisCall, Trial} from '@elf/protocol'
 import XJWT, {encryptPassword, Type as XJWTType} from './XJWT'
 
@@ -211,55 +205,63 @@ RedisCall.handle<Trial.Done.IReq, Trial.Done.IRes>(
 )
 export default class RouterController {
   @catchError
-  static async isLogined(req: Request, res: Response, next: NextFunction) {
-    const token = req.query.token
-    const {isValid, payload} = {isValid: true, payload: {id: Math.random().toString()}} || XJWT.decode(token)
-    if (isValid) {
-      if (!req.isAuthenticated()) {
-        if (!['get', 'post'].includes(req.method.toLowerCase())) {
-          throw new Error('非法请求')
-        }
-        const key = payload.id
-        let user = await User.findOne({unionId: key})
-        if (!user) {
-          user = new User({
-            unionId: key,
-            mobile: `null_${key}`
-          })
-          await user.save()
-        }
-        await cbToPromise(req.logIn.bind(req))(user)
-      }
-      next()
-    } else {
-      if (req.isAuthenticated()) {
-        req.logOut()
-      }
-      res.redirect(`${config.rootname}/signIn`)
+  static async loggedIn(req: Request, res: Response, next: NextFunction) {
+    const {query: {token}} = req
+    Log.d(req.user)
+    if (req.isAuthenticated()) {
+      return next()
     }
+    const {isValid, payload} = XJWT.decode(token)
+    if (!isValid) {
+      return res.redirect(`${config.rootname}/login`)
+    }
+    await RouterController.loginILabXUser(req, payload.un)
+    next()
   }
 
   @catchError
-  static async renderIndex(req: Request, res: Response, next: NextFunction) {
+  static async renderIndex(req: Request, res: Response) {
     res.sendFile(path.resolve(__dirname, '../dist/index.html'))
   }
 
   @catchError
-  static async renderSignIn(req: Request, res: Response, next: NextFunction) {
-    res.sendFile(path.resolve(__dirname, '../view/signIn.html'))
+  static async renderLogin(req: Request, res: Response) {
+    if (req.isAuthenticated()) {
+      res.redirect(`${config.rootname}/`)
+    } else {
+      res.sendFile(path.resolve(__dirname, '../dist/index.html'))
+    }
   }
 
   @catchError
   static async login(req: Request, res: Response, next: NextFunction) {
-    const {username, password} = req.query
-    const encrypted = encryptPassword(password)
-    const url = `http://ilab-x.com/sys/api/user/validate?username=${encodeURIComponent(
-        username
-    )}&password=${encodeURIComponent(encrypted.password)}&nonce=${
-        encrypted.nonce
-    }&cnonce=${encrypted.cnonce}`
-    const response = await request(url)
-    res.send(response)
+    const {username, password} = req.body,
+        encrypted = encryptPassword(password),
+        url = `http://ilab-x.com/sys/api/user/validate?username=${encodeURIComponent(username)}&password=${encodeURIComponent(encrypted.password)}&nonce=${encrypted.nonce}&cnonce=${encrypted.cnonce}`
+    const response = JSON.parse(await request(url))
+    Log.d(response)
+    if (response.code !== iLabX.ResCode.success) {
+      return res.json({
+        code: ResCode.unexpectError,
+        msg: response.code
+      })
+    }
+    await RouterController.loginILabXUser(req, response.username)
+    res.json({
+      code: ResCode.success
+    })
+  }
+
+  static async loginILabXUser(req:Request, username:string){
+    let user = await User.findOne({iLabXUserName: username})
+    if (!user) {
+      user = new User({
+        mobile: `null_${username}`,
+        iLabXUserName: username
+      })
+      await user.save()
+    }
+    await cbToPromise(req.logIn.bind(req))(user)
   }
 
   @catchError

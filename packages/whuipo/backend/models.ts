@@ -5,7 +5,7 @@ const UserSchema = new Schema({
   createAt: Date,
   updateAt: Date,
   mobile:   {type: String, unique: true}, // 手机号(11位)
-  unionId: {type: String, unique: true},
+  iLabXUserName:String,
   phaseScore: {type: Array, default:[]}
 })
 

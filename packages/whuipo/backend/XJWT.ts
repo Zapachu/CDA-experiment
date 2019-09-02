@@ -178,10 +178,9 @@ function _hmacsha256(text: string, secret: string): string {
 
 function _sha256(text: string): string {
   return crypto
-    .createHash("sha256")
-    .update(text)
-    .digest()
-    .toString();
+      .createHash("sha256")
+      .update(text)
+      .digest('hex');
 }
 
 // only node 10.4.0+ supported, while negative number not supported yet
@@ -204,8 +203,9 @@ interface DecodeRet {
 }
 
 interface Payload {
-  ti: number;
   id: number;
+  un: string;
+  dis: string
 }
 
 export default new XJWT(tokenSecret, tokenAesKey);
@@ -219,29 +219,11 @@ export enum Type {
 export function encryptPassword(
   password: string
 ): { nonce: string; cnonce: string; password: string } {
-  const nonce = _randomDigit();
-  const cnonce = _randomDigit();
-  const pw = _sha256(nonce + _sha256(password) + cnonce);
+  const nonce = randomStr(), cnonce = randomStr(),
+      pw = _sha256(nonce + _sha256(password).toUpperCase() + cnonce).toUpperCase();
   return { nonce, cnonce, password: pw };
-  function _randomDigit() {
-    const RANDOMS = [
-      "0",
-      "1",
-      "2",
-      "3",
-      "4",
-      "5",
-      "6",
-      "7",
-      "8",
-      "9",
-      "A",
-      "B",
-      "C",
-      "D",
-      "E",
-      "F"
-    ];
-    return RANDOMS[Math.floor(Math.random() * RANDOMS.length)];
-  }
+}
+
+function randomStr(len:number = 16):string {
+  return crypto.randomBytes(Math.ceil(len / 2)).toString('hex').slice(0, len)
 }

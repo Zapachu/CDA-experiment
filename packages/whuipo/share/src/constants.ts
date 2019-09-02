@@ -1,3 +1,5 @@
+export const csrfCookieKey = '_csrf'
+
 export enum Stage {
   Home = 0,
   IPO_Median,

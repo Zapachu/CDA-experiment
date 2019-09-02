@@ -42,3 +42,13 @@ var SocketEvent;
     SocketEvent["continueGame"] = "continueGame";
     SocketEvent["handleError"] = "handleError";
 })(SocketEvent = exports.SocketEvent || (exports.SocketEvent = {}));
+var iLabX;
+(function (iLabX) {
+    var ResCode;
+    (function (ResCode) {
+        ResCode[ResCode["success"] = 0] = "success";
+        ResCode[ResCode["invalidInput"] = 3] = "invalidInput";
+        ResCode[ResCode["errorPwd"] = 4] = "errorPwd";
+        ResCode[ResCode["errorUserName"] = 5] = "errorUserName";
+    })(ResCode = iLabX.ResCode || (iLabX.ResCode = {}));
+})(iLabX = exports.iLabX || (exports.iLabX = {}));

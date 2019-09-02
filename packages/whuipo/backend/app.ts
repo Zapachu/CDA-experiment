@@ -5,7 +5,7 @@ import session from 'express-session'
 import mongoose from 'mongoose'
 import connectRedis from 'connect-redis'
 import Redis from 'ioredis'
-import lusca from 'lusca'
+import {csrf} from 'lusca'
 import path from 'path'
 import http from 'http'
 import morgan from 'morgan'
@@ -20,6 +20,7 @@ import {handleSocketInit, handleSocketPassportFailed, handleSocketPassportSucces
 import {elfSetting} from '@elf/setting'
 import {NetWork} from '@elf/util'
 import config from './config'
+import {csrfCookieKey} from '@micro-experiment/share'
 
 const RedisStore = connectRedis(session)
 
@@ -150,13 +151,7 @@ app.use(sessionMiddleWare)
 /**csrf whitelist*/
 // const csrfExclude = [];
 
-app.use((req, res, next) => {
-  // CSRF protection.
-  // if (_.includes(csrfExclude, req.path)) {
-  //   return next();
-  // }
-  lusca.csrf()(req, res, next)
-})
+app.use(csrf({cookie: csrfCookieKey}))
 
 app.use(passport.initialize())
 app.use(passport.session())
