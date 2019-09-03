@@ -1,5 +1,5 @@
 import axios from 'axios'
-import {iLabX, csrfCookieKey} from '@micro-experiment/share'
+import {iLabX, csrfCookieKey, ResCode} from '@micro-experiment/share';
 
 export namespace Api {
     function getCookie(key: string) {
@@ -14,7 +14,7 @@ export namespace Api {
         return res.data
     }
 
-    async function post(url: string, data) {
+    async function post(url: string, data={}) {
         const res = await axios.post(`/api${url}`, {...data, _csrf: getCookie(csrfCookieKey)})
         return res.data
     }
@@ -23,8 +23,12 @@ export namespace Api {
         return await get('/initInfo')
     }
 
-    export async function loginIn(username: string, password: string): Promise<{ code: iLabX.ResCode, msg?: string }> {
+    export async function loginIn(username: string, password: string): Promise<{ code: ResCode, msg:iLabX.ResCode}> {
         return await post('/login', {username, password})
+    }
+
+    export async function asGuest(): Promise<{ code: iLabX.ResCode}> {
+        return await post('/asGuest')
     }
 }
 

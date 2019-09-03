@@ -224,6 +224,6 @@ export function encryptPassword(
   return { nonce, cnonce, password: pw };
 }
 
-function randomStr(len:number = 16):string {
+export function randomStr(len:number = 16):string {
   return crypto.randomBytes(Math.ceil(len / 2)).toString('hex').slice(0, len)
 }

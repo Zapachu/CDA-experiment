@@ -15,7 +15,7 @@ import config from './config'
 import setting from './setting'
 import {iLabX, NSocketParam, Phase, ResCode, SocketEvent, UserGameStatus} from '@micro-experiment/share'
 import {RedisCall, Trial} from '@elf/protocol'
-import XJWT, {encryptPassword, Type as XJWTType} from './XJWT'
+import XJWT, {encryptPassword, randomStr, Type as XJWTType} from './XJWT';
 
 const ioEmitter = socketEmitter({
   host: elfSetting.redisHost,
@@ -207,7 +207,6 @@ export default class RouterController {
   @catchError
   static async loggedIn(req: Request, res: Response, next: NextFunction) {
     const {query: {token}} = req
-    Log.d(req.user)
     if (req.isAuthenticated()) {
       return next()
     }
@@ -226,7 +225,7 @@ export default class RouterController {
 
   @catchError
   static async renderLogin(req: Request, res: Response) {
-    if (req.isAuthenticated()) {
+    if (req.isAuthenticated() && req.user.iLabXUserName) {
       res.redirect(`${config.rootname}/`)
     } else {
       res.sendFile(path.resolve(__dirname, '../dist/index.html'))
@@ -234,7 +233,7 @@ export default class RouterController {
   }
 
   @catchError
-  static async login(req: Request, res: Response, next: NextFunction) {
+  static async login(req: Request, res: Response) {
     const {username, password} = req.body,
         encrypted = encryptPassword(password),
         url = `http://ilab-x.com/sys/api/user/validate?username=${encodeURIComponent(username)}&password=${encodeURIComponent(encrypted.password)}&nonce=${encrypted.nonce}&cnonce=${encrypted.cnonce}`
@@ -252,16 +251,36 @@ export default class RouterController {
     })
   }
 
-  static async loginILabXUser(req:Request, username:string){
-    let user = await User.findOne({iLabXUserName: username})
-    if (!user) {
-      user = new User({
-        mobile: `null_${username}`,
-        iLabXUserName: username
+  @catchError
+  static async asGuest(req: Request, res: Response){
+    if(!req.isAuthenticated()){
+      Log.d('Create Guest')
+      const username = randomStr(8)
+      const user = new User({
+        mobile: `null_${username}`
       })
       await user.save()
+      await cbToPromise(req.logIn.bind(req))(user)
     }
-    await cbToPromise(req.logIn.bind(req))(user)
+    res.json({
+      code: ResCode.success
+    })
+  }
+
+  static async loginILabXUser(req:Request, iLabXUserName:string){
+    if(req.isAuthenticated()){
+      await User.findByIdAndUpdate(req.user.id, {iLabXUserName})
+    }else {
+      let user = await User.findOne({iLabXUserName})
+      if (!user) {
+        user = new User({
+          mobile: `null_${iLabXUserName}`,
+          iLabXUserName
+        })
+        await user.save()
+      }
+      await cbToPromise(req.logIn.bind(req))(user)
+    }
   }
 
   @catchError

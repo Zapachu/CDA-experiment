@@ -5,6 +5,7 @@ import Controller from './controller'
 const apiRouter = Router()
 apiRouter.get('/initInfo', Controller.getInitInfo)
 apiRouter.post('/login', Controller.login)
+apiRouter.post('/asGuest', Controller.asGuest)
 
 const rootRouter = Router()
 rootRouter.use('/api', apiRouter)
