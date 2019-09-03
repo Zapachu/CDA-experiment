@@ -1,9 +1,9 @@
 import {resolve} from 'path'
 import {gameId2PlayUrl, RedisCall, Server} from '@bespoke/server'
 import Controller from './Controller'
-import {ICreateParams, IPOType, namespace} from './config'
+import {ICreateParams, namespace} from './config'
 import Robot from './Robot'
-import {Phase, phaseToNamespace} from '@bespoke-game/stock-trading-config'
+import {NCreateParams} from '@micro-experiment/share'
 import {Trial} from '@elf/protocol'
 import {RobotServer} from '@bespoke/robot'
 
@@ -11,30 +11,10 @@ Server.start(namespace, Controller, resolve(__dirname, '../dist'))
 
 RobotServer.start(namespace, Robot)
 
-RedisCall.handle<Trial.Create.IReq, Trial.Create.IRes>(Trial.Create.name(phaseToNamespace(Phase.IPO_TopK)), async () => {
+RedisCall.handle<Trial.Create.IReq<NCreateParams.IPO>, Trial.Create.IRes>(Trial.Create.name(namespace), async params => {
     const gameId = await Server.newGame<ICreateParams>({
-        title: `${Phase.IPO_TopK}:${new Date().toUTCString()}`,
-        params: {
-            type: IPOType.TopK
-        }
-    })
-    return {playUrl: gameId2PlayUrl(gameId)}
-})
-RedisCall.handle<Trial.Create.IReq, Trial.Create.IRes>(Trial.Create.name(phaseToNamespace(Phase.IPO_Median)), async () => {
-    const gameId = await Server.newGame<ICreateParams>({
-        title: `${Phase.IPO_Median}:${new Date().toUTCString()}`,
-        params: {
-            type: IPOType.Median
-        }
-    })
-    return {playUrl: gameId2PlayUrl(gameId)}
-})
-RedisCall.handle<Trial.Create.IReq, Trial.Create.IRes>(Trial.Create.name(phaseToNamespace(Phase.IPO_FPSBA)), async () => {
-    const gameId = await Server.newGame<ICreateParams>({
-        title: `${Phase.IPO_FPSBA}:${new Date().toUTCString()}`,
-        params: {
-            type: IPOType.FPSBA
-        }
+        title: `${params.type}:${new Date().toUTCString()}`,
+        params
     })
     return {playUrl: gameId2PlayUrl(gameId)}
 })

@@ -36,8 +36,7 @@ export declare namespace Linker {
 export declare namespace Trial {
     namespace Create {
         const name: (namespace: string) => string;
-        interface IReq {
-        }
+        type IReq<ICreateParams = {}> = ICreateParams;
         interface IRes {
             playUrl: string;
         }

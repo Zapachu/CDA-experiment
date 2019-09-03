@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as style from "./style.scss";
 
-const Modal: React.SFC<PropType> = ({ visible, children, width=600 }) => {
+const Modal: React.SFC<PropType> = ({ visible, children, width='600px' }) => {
   return (
     <div className={style.modal} style={visible ? {} : { display: "none" }}>
       <div className={style.mask} />
@@ -12,7 +12,7 @@ const Modal: React.SFC<PropType> = ({ visible, children, width=600 }) => {
 
 interface PropType {
   visible: boolean;
-  width?: number
+  width?: string
 }
 
 export default Modal;

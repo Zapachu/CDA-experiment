@@ -28,9 +28,9 @@ import {
     PlayerStatus,
     PrivatePriceRegion,
     PushType,
-    ROLE
+    ROLE,
+    namespace
 } from './config'
-import {Phase, phaseToNamespace} from '@bespoke-game/stock-trading-config'
 import {Trial} from '@elf/protocol'
 import {getBalanceIndex, getEnumKeys, random} from './util'
 
@@ -340,7 +340,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 const res = await RedisCall.call<Trial.Done.IReq, Trial.Done.IRes>(Trial.Done.name, {
                     userId: playerState.user.id,
                     onceMore,
-                    namespace: phaseToNamespace(this.game.params.allowLeverage ? Phase.CBM_Leverage : Phase.CBM)
+                    namespace
                 })
                 res ? cb(res.lobbyUrl) : null
                 break

@@ -46,8 +46,7 @@ export namespace Trial {
     export namespace Create {
         export const name = (namespace: string) => `Trial:Create:${namespace}`
 
-        export interface IReq {
-        }
+        export type IReq<ICreateParams={}> = ICreateParams
 
         export interface IRes {
             playUrl: string

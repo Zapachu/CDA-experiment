@@ -1,4 +1,5 @@
-export const namespace = 'IPO'
+import {NCreateParams, Phase} from '@micro-experiment/share'
+export const namespace = Phase.IPO
 
 export const PriceRange = {
     limit: {
@@ -23,12 +24,6 @@ export const CONFIG = {
     secondsToShowResult:5,
 }
 
-export enum IPOType {
-    Median,
-    TopK,
-    FPSBA
-}
-
 export enum PlayerStatus {
     guide,
     test,
@@ -49,9 +44,7 @@ export enum PushType {
     shoutTimer
 }
 
-export interface ICreateParams {
-    type: IPOType
-}
+export type ICreateParams = NCreateParams.IPO
 
 export interface IMoveParams {
     price: number

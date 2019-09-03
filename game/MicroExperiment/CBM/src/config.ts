@@ -1,4 +1,6 @@
-export const namespace = 'StockTrading-CBM'
+import {NCreateParams, Phase} from '@micro-experiment/share'
+
+export const namespace = Phase.CBM
 
 export enum ROLE {
     Seller,
@@ -37,9 +39,7 @@ export const CONFIG = {
     resultTime: 30
 }
 
-export interface ICreateParams {
-    allowLeverage: boolean
-}
+export type ICreateParams  = NCreateParams.CBM
 
 export interface IOrder {
     id: number

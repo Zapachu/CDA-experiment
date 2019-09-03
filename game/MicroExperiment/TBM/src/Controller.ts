@@ -15,12 +15,13 @@ import {
   IPlayerState,
   IPushParams,
   MoveType,
+  namespace,
   PlayerStatus,
   PushType,
   Role,
   SHOUT_TIMER
 } from './config'
-import {Phase, phaseToNamespace, STOCKS} from '@bespoke-game/stock-trading-config'
+import {STOCKS} from '@micro-experiment/share'
 import {Trial} from '@elf/protocol'
 
 export default class Controller extends BaseController<ICreateParams,
@@ -166,7 +167,7 @@ export default class Controller extends BaseController<ICreateParams,
             {
               userId: playerState.user.id,
               onceMore,
-              namespace: phaseToNamespace(Phase.TBM)
+              namespace
             }
         )
         res ? cb(res.lobbyUrl) : null

@@ -1,4 +1,5 @@
-export const namespace = 'TBM'
+import {Phase} from '@micro-experiment/share'
+export const namespace = Phase.TBM
 
 export const DEFAULT_PARAMS: ICreateParams = {
     groupSize: 12,

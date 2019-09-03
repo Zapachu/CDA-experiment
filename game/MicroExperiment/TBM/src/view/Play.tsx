@@ -11,7 +11,7 @@ import {
     Modal,
     STOCKS,
     TestPage
-} from '@bespoke-game/stock-trading-component'
+} from '@micro-experiment/component'
 import {Core} from '@bespoke/client'
 import Joyride, {Step} from 'react-joyride'
 import {Lang, Toast} from '@elf/component'
