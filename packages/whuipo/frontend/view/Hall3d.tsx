@@ -1,14 +1,14 @@
-import * as React from 'react'
-import * as BABYLON from 'babylonjs'
-import socket from 'socket.io-client'
-import {Button, Loading, MatchModal, Modal} from '@micro-experiment/component'
-import {NCreateParams, NSocketParam, Phase, ResCode, SocketEvent, UserDoc} from '@micro-experiment/share'
-import {BasePlayMode, TBasePlayMode, BabylonScene} from '../component'
-import {Toast} from '@elf/component'
-import qs from 'qs'
-import {getEnumKeys, redirect, Api} from '../util'
-import {Detail, Hall, UnLockIcon} from '../asset'
-import style from './style.less'
+import * as React from 'react';
+import * as BABYLON from 'babylonjs';
+import socket from 'socket.io-client';
+import {Button, Loading, MatchModal, Modal} from '@micro-experiment/component';
+import {NCreateParams, NSocketParam, Phase, ResCode, SocketEvent, UserDoc} from '@micro-experiment/share';
+import {BabylonScene, BasePlayMode, TBasePlayMode} from '../component';
+import {Toast} from '@elf/component';
+import qs from 'qs';
+import {Api, getEnumKeys, redirect} from '../util';
+import {Detail, Hall, UnLockIcon} from '../asset';
+import style from './style.less';
 
 enum Dock { auction = 5, ipo = 1, tbm = 2, cbm = 3, cbm_l = 4 }
 
@@ -19,7 +19,7 @@ class CBMPlayMode extends BasePlayMode<NCreateParams.CBM> {
     allowLeverage: false,
     robotCD: 5,
     robotType: NCreateParams.CBMRobotType.zip
-  }
+  };
 
   renderConfigDesc() {
     return <section className={style.cbmConfigDesc}>
@@ -44,11 +44,11 @@ class CBMPlayMode extends BasePlayMode<NCreateParams.CBM> {
       <p>
         按固定周期休眠，醒来后在可报价区间内随机取值报价
       </p>
-    </section>
+    </section>;
   }
 
   renderConfig() {
-    const {state: {params}} = this
+    const {state: {params}} = this;
     return <ul className={style.cbmConfig}>
       <li>
         <label>报价策略</label>
@@ -83,7 +83,7 @@ class CBMPlayMode extends BasePlayMode<NCreateParams.CBM> {
                  }
                })}/>s
       </li>
-    </ul>
+    </ul>;
   }
 }
 
@@ -125,7 +125,7 @@ const GameTypeConfig: {
     PlayMode: class extends BasePlayMode<NCreateParams.IPO> {
       defaultParams = {
         type: NCreateParams.IPOType.TopK
-      }
+      };
     }
   },
   [GameType.IPO_Median]: {
@@ -156,7 +156,7 @@ const GameTypeConfig: {
     PlayMode: class extends BasePlayMode<NCreateParams.IPO> {
       defaultParams = {
         type: NCreateParams.IPOType.Median
-      }
+      };
     }
   },
   [GameType.IPO_FPSBA]: {
@@ -186,7 +186,7 @@ const GameTypeConfig: {
     PlayMode: class extends BasePlayMode<NCreateParams.IPO> {
       defaultParams = {
         type: NCreateParams.IPOType.FPSBA
-      }
+      };
     }
   },
   [GameType.OpenAuction]: {
@@ -234,20 +234,20 @@ const GameTypeConfig: {
         allowLeverage: true,
         robotCD: 5,
         robotType: NCreateParams.CBMRobotType.zip
-      }
+      };
     }
   }
-}
+};
 
 function getGameTypes(dock: Dock): GameType[] {
-  return Object.keys(GameTypeConfig).filter(key => GameTypeConfig[key].dock === dock) as any
+  return Object.keys(GameTypeConfig).filter(key => GameTypeConfig[key].dock === dock) as any;
 }
 
 const CONST = {
   zLargeDistance: 500,
   cardWidth: 120,
   cardHeight: 120 * (347 / 620)
-}
+};
 
 interface IPoint {
   x: number,
@@ -401,7 +401,7 @@ const DockConfig: {
       z: 325
     }
   },
-}
+};
 
 enum ModalType {
   selectSubGameType,
@@ -425,23 +425,24 @@ interface State {
 }
 
 export class Hall3D extends React.Component<{}, State> {
-  camera: BABYLON.ArcRotateCamera
-  scene: BABYLON.Scene
+  onlinePlayer = new Date().getMinutes() % 33;
+  camera: BABYLON.ArcRotateCamera;
+  scene: BABYLON.Scene;
   gamePhaseVideoRefs: {
     [game: string]: HTMLVideoElement
-  } = {}
+  } = {};
   hoverShowTimer: {
     [gameStep: string]: number
-  } = {}
+  } = {};
   hoverMaskInstance: {
     [gameStep: string]: BABYLON.Mesh
-  } = {}
+  } = {};
   gameIntroInstance: {
     [gameStep: string]: BABYLON.Mesh
-  } = {}
-  io: SocketIOClient.Socket
-  matchTimer: number
-  continuePlayUrl: string
+  } = {};
+  io: SocketIOClient.Socket;
+  matchTimer: number;
+  continuePlayUrl: string;
   state: State = {
     score: 0,
     isInitView: true,
@@ -449,68 +450,68 @@ export class Hall3D extends React.Component<{}, State> {
     showModal: false,
     detailActive: false,
     gameType: null,
-  }
+  };
 
   reqInitInfo() {
     Api.reqInitInfo().then(res => {
       if (res.code === ResCode.success) {
-        this.connectSocket()
-        const user: UserDoc = res.user
-        this.setState({score: (user.phaseScore || []).reduce((m, n) => m + n, 0)})
-        this.initView()
+        this.connectSocket();
+        const user: UserDoc = res.user;
+        this.setState({score: (user.phaseScore || []).reduce((m, n) => m + n, 0)});
+        this.initView();
 
-        const urlObj = new URL(window.location.href)
-        const queryObj = qs.parse(urlObj.search.replace('?', '')) || {}
+        const urlObj = new URL(window.location.href);
+        const queryObj = qs.parse(urlObj.search.replace('?', '')) || {};
         if (queryObj.gamePhase) {
-          const dock = GameTypeConfig[queryObj.gamePhase].dock
-          this.handleSelectGame(dock)
+          const dock = GameTypeConfig[queryObj.gamePhase].dock;
+          this.handleSelectGame(dock);
           setTimeout(_ => {
             this.setState({
               showModal: true,
               modalType: ModalType.selectMode,
               gameType: queryObj.gamePhase,
-            })
-          }, 2000)
+            });
+          }, 2000);
         }
 
-        return
+        return;
       }
-      throw new Error(res.msg)
+      throw new Error(res.msg);
     }).catch(e => {
-      console.error(e)
-    })
+      console.error(e);
+    });
   }
 
   registerShowDetailView() {
     setTimeout(() => {
       this.setState({
         detailActive: true
-      })
-    }, 2000)
+      });
+    }, 2000);
   }
 
   startMatch(multiPlayer: boolean, phase: Phase, params = {}) {
-    this.io.emit(SocketEvent.reqStartGame, {multiPlayer, phase, params} as NSocketParam.StartGame)
+    this.io.emit(SocketEvent.reqStartGame, {multiPlayer, phase, params} as NSocketParam.StartGame);
     this.setState({
       modalType: ModalType.preMatch
-    })
+    });
   }
 
   renderModalContent() {
-    const {modalType, focusDock, gameType} = this.state
-    const focusedGameConfig = GameTypeConfig[gameType]
+    const {modalType, focusDock, gameType} = this.state;
+    const focusedGameConfig = GameTypeConfig[gameType];
     switch (modalType) {
       case ModalType.selectSubGameType:
         return <div className={style.selectSubGame}>
           {
             getGameTypes(focusDock).map((gameType: GameType) => {
               const onClick = _ => {
-                this.setState({gameType: gameType, modalType: ModalType.selectMode})
-              }
-              return <Button key={gameType} onClick={onClick} label={GameTypeConfig[gameType].title}/>
+                this.setState({gameType: gameType, modalType: ModalType.selectMode});
+              };
+              return <Button key={gameType} onClick={onClick} label={GameTypeConfig[gameType].title}/>;
             })
           }
-        </div>
+        </div>;
       case ModalType.gameTypeDesc:
         return <div className={style.gameDesc}>
           <div className={style.title}>
@@ -522,14 +523,14 @@ export class Hall3D extends React.Component<{}, State> {
           <div className={style.detail}>
             {GameTypeConfig[gameType].desc}
           </div>
-        </div>
+        </div>;
       case ModalType.continueGame:
         return <div className={style.continueGame}>
           <div className={style.label}>您尚有实验正在进行中，继续该实验吗？</div>
           <Button onClick={_ => redirect(this.continuePlayUrl)} label="继续"/>
-        </div>
+        </div>;
       case ModalType.selectMode:
-        const {PlayMode = BasePlayMode} = focusedGameConfig
+        const {PlayMode = BasePlayMode} = focusedGameConfig;
         return <div className={style.selectGameMode}>
           <div className={style.baseBox}>
             <div className={style.label}>
@@ -544,51 +545,50 @@ export class Hall3D extends React.Component<{}, State> {
                                                ref={node => this.gamePhaseVideoRefs[gameType] = node}/> : null
             }
           </div>
-          <PlayMode onSubmit={(multiMode, params) => {
-            return console.log(multiMode, focusedGameConfig.phase, params)
-            this.startMatch(multiMode, focusedGameConfig.phase, params)
-          }}/>
-        </div>
+          <PlayMode onSubmit={(multiMode, params) =>
+              this.startMatch(multiMode, focusedGameConfig.phase, params)
+          }/>
+        </div>;
       case ModalType.preMatch:
         return <div>
           <Loading label="处理中"/>
-        </div>
+        </div>;
       case ModalType.matchSuccess:
         return <div className={style.matchSuccess}>
           玩家匹配成功！
-        </div>
+        </div>;
     }
   }
 
   renderModal() {
-    const {showModal, modalType, gameType, matchTimer} = this.state
+    const {showModal, modalType, gameType, matchTimer} = this.state;
     const handleClose = async () => {
       if (this.matchTimer) {
-        clearInterval(this.matchTimer)
+        clearInterval(this.matchTimer);
       }
-      const videoNodeRef = this.gamePhaseVideoRefs[gameType]
+      const videoNodeRef = this.gamePhaseVideoRefs[gameType];
       if (videoNodeRef) {
-        videoNodeRef.pause()
+        videoNodeRef.pause();
       }
       if (modalType === ModalType.gameTypeDesc) {
         this.setState({
           modalType: ModalType.selectMode
-        })
-        return
+        });
+        return;
       }
       this.setState({
         showModal: false
-      })
+      });
       if ([ModalType.matching, ModalType.preMatch].includes(modalType)) {
         this.io.emit(SocketEvent.leaveMatchRoom, {
           gamePhase: gameType
-        })
+        });
       }
 
-    }
+    };
 
     if (modalType === ModalType.matching) {
-      return <MatchModal visible={true} totalNum={4} matchNum={matchTimer % 5} timer={matchTimer}/>
+      return <MatchModal visible={true} totalNum={4} matchNum={matchTimer % 5} timer={matchTimer}/>;
     }
     return <Modal visible={showModal}>
       <div className={style.modalContent}>
@@ -599,40 +599,40 @@ export class Hall3D extends React.Component<{}, State> {
           <Button onClick={handleClose} label="返回"/>
         </div>
       </div>
-    </Modal>
+    </Modal>;
   }
 
   handlePointerOver(dock: Dock) {
-    return
+    return;
     if (!this.state.detailActive) {
-      return
+      return;
     }
     if (this.hoverShowTimer[dock]) {
-      return
+      return;
     }
     if (this.gameIntroInstance[dock]) {
-      return
+      return;
     }
     this.hoverShowTimer[dock] = window.setTimeout(() => {
-      this.gameIntroInstance[dock] = this.renderGameIntroCard(dock)
-      this.hoverShowTimer[dock] = null
-    }, 600)
+      this.gameIntroInstance[dock] = this.renderGameIntroCard(dock);
+      this.hoverShowTimer[dock] = null;
+    }, 600);
   }
 
   handlePointerOut(dock: Dock) {
     if (!this.state.detailActive) {
-      return
+      return;
     }
-    const timerId = this.hoverShowTimer[dock]
+    const timerId = this.hoverShowTimer[dock];
     if (timerId) {
-      clearTimeout(timerId)
-      this.hoverShowTimer[dock] = null
-      return
+      clearTimeout(timerId);
+      this.hoverShowTimer[dock] = null;
+      return;
     }
-    const instance = this.gameIntroInstance[dock]
+    const instance = this.gameIntroInstance[dock];
     if (instance) {
-      this.scene.removeMesh(instance)
-      this.gameIntroInstance[dock] = null
+      this.scene.removeMesh(instance);
+      this.gameIntroInstance[dock] = null;
     }
   }
 
@@ -643,241 +643,241 @@ export class Hall3D extends React.Component<{}, State> {
       [Dock.tbm]: () => this.handleShowCenterDetail(),
       [Dock.cbm]: () => this.handleShowRightDetail(),
       [Dock.cbm_l]: () => this.handleShowRightDetail()
-    }
-    funMap[dock]()
+    };
+    funMap[dock]();
     setTimeout(() => {
-      this.handleShowGameModal(dock)
-    }, 2e3)
+      this.handleShowGameModal(dock);
+    }, 2e3);
   }
 
   renderGameIntroCard(dock: Dock) {
-    const {introPosition, introContent, introRotateY} = DockConfig[dock]
-    const {scene} = this
+    const {introPosition, introContent, introRotateY} = DockConfig[dock];
+    const {scene} = this;
 
     const ground = BABYLON.MeshBuilder.CreateGround(`introGround${dock}`, {
       width: CONST.cardWidth,
       height: CONST.cardHeight
-    }, scene)
+    }, scene);
 
     const textureGround = new BABYLON.DynamicTexture(`dynamicTexture${dock}`, {
       width: CONST.cardWidth,
       height: CONST.cardHeight
-    }, scene, false)
-    textureGround.hasAlpha = true
+    }, scene, false);
+    textureGround.hasAlpha = true;
 
-    const materialGround = new BABYLON.StandardMaterial(`introMaterial${dock}`, scene)
-    materialGround.diffuseTexture = textureGround
-    materialGround.emissiveColor = new BABYLON.Color3(1, 1, 1)
-    ground.material = materialGround
+    const materialGround = new BABYLON.StandardMaterial(`introMaterial${dock}`, scene);
+    materialGround.diffuseTexture = textureGround;
+    materialGround.emissiveColor = new BABYLON.Color3(1, 1, 1);
+    ground.material = materialGround;
 
-    const textureContext = textureGround.getContext()
-    const img = new Image()
-    img.src = Detail
+    const textureContext = textureGround.getContext();
+    const img = new Image();
+    img.src = Detail;
     img.onload = function () {
-      const fontType = 'Arial'
-      const testFontSize = 12
-      textureContext.font = `${testFontSize}px ${fontType}`
-      const textWidth = textureContext.measureText(introContent).width
-      const ratio = textWidth / testFontSize
+      const fontType = 'Arial';
+      const testFontSize = 12;
+      textureContext.font = `${testFontSize}px ${fontType}`;
+      const textWidth = textureContext.measureText(introContent).width;
+      const ratio = textWidth / testFontSize;
 
-      const realFontSize = CONST.cardWidth / (ratio * 1.4)
-      textureContext.drawImage(this as any, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, CONST.cardWidth, CONST.cardHeight)
-      textureGround.update()
+      const realFontSize = CONST.cardWidth / (ratio * 1.4);
+      textureContext.drawImage(this as any, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, CONST.cardWidth, CONST.cardHeight);
+      textureGround.update();
 
-      const font = `bold ${realFontSize}px ${fontType}`
-      textureGround.drawText(introContent, null, 20, font, 'white', null)
-      textureGround.update()
-    }
-    ground.position = new BABYLON.Vector3(introPosition.x, introPosition.y, introPosition.z)
-    ground.rotation.x = -Math.PI / 2
-    ground.rotation.y = introRotateY
-    return ground
+      const font = `bold ${realFontSize}px ${fontType}`;
+      textureGround.drawText(introContent, null, 20, font, 'white', null);
+      textureGround.update();
+    };
+    ground.position = new BABYLON.Vector3(introPosition.x, introPosition.y, introPosition.z);
+    ground.rotation.x = -Math.PI / 2;
+    ground.rotation.y = introRotateY;
+    return ground;
   }
 
   renderHoverMaskInstance(dock: Dock) {
-    return
-    const {maskPosition, maskSize, maskRotateY = 0} = DockConfig[dock]
+    return;
+    const {maskPosition, maskSize, maskRotateY = 0} = DockConfig[dock];
     const myGround = BABYLON.MeshBuilder.CreateGround(`hoverMask${dock}`, {
       width: maskSize.width,
       height: maskSize.height,
       subdivisions: 4
-    }, this.scene)
-    const myMaterial = new BABYLON.StandardMaterial(`hoverMaskMaterial${dock}`, this.scene)
-    myGround.position.x = maskPosition.x
-    myGround.position.y = maskPosition.y
-    myGround.position.z = maskPosition.z
-    myGround.rotation.x = -Math.PI / 2
-    myGround.rotation.y = maskRotateY
-    myGround.material = myMaterial
-    myGround.material.alpha = 0
-    myGround.actionManager = new BABYLON.ActionManager(this.scene)
+    }, this.scene);
+    const myMaterial = new BABYLON.StandardMaterial(`hoverMaskMaterial${dock}`, this.scene);
+    myGround.position.x = maskPosition.x;
+    myGround.position.y = maskPosition.y;
+    myGround.position.z = maskPosition.z;
+    myGround.rotation.x = -Math.PI / 2;
+    myGround.rotation.y = maskRotateY;
+    myGround.material = myMaterial;
+    myGround.material.alpha = 0;
+    myGround.actionManager = new BABYLON.ActionManager(this.scene);
     myGround.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
         {
           trigger: BABYLON.ActionManager.OnPointerOverTrigger,
         },
         this.handlePointerOver.bind(this, dock)
-    ))
+    ));
     myGround.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
         {
           trigger: BABYLON.ActionManager.OnPointerOutTrigger,
         },
         this.handlePointerOut.bind(this, dock)
-    ))
+    ));
     myGround.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
         {
           trigger: BABYLON.ActionManager.OnPickDownTrigger,
         },
         this.handleShowGameModal.bind(this, dock)
-    ))
-    return myGround
+    ));
+    return myGround;
   }
 
   renderLockIcon(dock: Dock) {
-    new BABYLON.DirectionalLight('direct', new BABYLON.Vector3(0, 1, 1), this.scene)
+    new BABYLON.DirectionalLight('direct', new BABYLON.Vector3(0, 1, 1), this.scene);
 
-    const {lockIconPosition, maskRotateY} = DockConfig[dock]
-    const ground = BABYLON.Mesh.CreateGround(`lockGround${dock}`, 30, 30 * (186 / 144), 1, this.scene)
-    const myMaterial = new BABYLON.StandardMaterial(`lockMat${dock}`, this.scene)
-    const texture = new BABYLON.Texture(UnLockIcon, this.scene)
-    texture.hasAlpha = true
-    myMaterial.diffuseTexture = texture
-    ground.material = myMaterial
-    ground.rotation.x = -Math.PI / 2
-    ground.rotation.y = maskRotateY
-    ground.position = new BABYLON.Vector3(lockIconPosition.x, lockIconPosition.y, lockIconPosition.z)
-    const myGround = ground
-    myGround.actionManager = new BABYLON.ActionManager(this.scene)
+    const {lockIconPosition, maskRotateY} = DockConfig[dock];
+    const ground = BABYLON.Mesh.CreateGround(`lockGround${dock}`, 30, 30 * (186 / 144), 1, this.scene);
+    const myMaterial = new BABYLON.StandardMaterial(`lockMat${dock}`, this.scene);
+    const texture = new BABYLON.Texture(UnLockIcon, this.scene);
+    texture.hasAlpha = true;
+    myMaterial.diffuseTexture = texture;
+    ground.material = myMaterial;
+    ground.rotation.x = -Math.PI / 2;
+    ground.rotation.y = maskRotateY;
+    ground.position = new BABYLON.Vector3(lockIconPosition.x, lockIconPosition.y, lockIconPosition.z);
+    const myGround = ground;
+    myGround.actionManager = new BABYLON.ActionManager(this.scene);
     myGround.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
         {
           trigger: BABYLON.ActionManager.OnPointerOverTrigger,
         },
         this.handlePointerOver.bind(this, dock)
-    ))
+    ));
     myGround.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
         {
           trigger: BABYLON.ActionManager.OnPointerOutTrigger,
         },
         this.handlePointerOut.bind(this, dock)
-    ))
+    ));
     myGround.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
         {
           trigger: BABYLON.ActionManager.OnPickDownTrigger,
         },
         this.handleShowGameModal.bind(this, dock)
-    ))
+    ));
   }
 
   handleShowLeftDetail() {
-    const frameRate = 20
-    const movein = new BABYLON.Animation('movein', 'position', frameRate, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT)
+    const frameRate = 20;
+    const movein = new BABYLON.Animation('movein', 'position', frameRate, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
 
-    const movein_keys = []
+    const movein_keys = [];
 
     movein_keys.push({
       frame: 0,
       value: new BABYLON.Vector3(0, 0, -CONST.zLargeDistance)
-    })
+    });
 
     movein_keys.push({
       frame: 1 * frameRate,
       value: new BABYLON.Vector3(CONST.zLargeDistance / 2, 0, -CONST.zLargeDistance / 2)
-    })
+    });
 
     movein_keys.push({
       frame: 2 * frameRate,
       value: new BABYLON.Vector3(5, 0, -5)
-    })
-    movein.setKeys(movein_keys)
-    this.scene.beginDirectAnimation(this.camera, [movein], 0, 9 * frameRate, false)
-    this.registerShowDetailView()
+    });
+    movein.setKeys(movein_keys);
+    this.scene.beginDirectAnimation(this.camera, [movein], 0, 9 * frameRate, false);
+    this.registerShowDetailView();
   }
 
   handleShowCenterDetail() {
-    const frameRate = 20
-    const movein = new BABYLON.Animation('movein', 'position', frameRate, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT)
+    const frameRate = 20;
+    const movein = new BABYLON.Animation('movein', 'position', frameRate, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
 
-    const movein_keys = []
+    const movein_keys = [];
 
     movein_keys.push({
       frame: 0,
       value: new BABYLON.Vector3(0, 0, -CONST.zLargeDistance)
-    })
+    });
 
     movein_keys.push({
       frame: 1 * frameRate,
       value: new BABYLON.Vector3(0, -CONST.zLargeDistance / 10, -CONST.zLargeDistance / 2)
-    })
+    });
 
     movein_keys.push({
       frame: 2 * frameRate,
       value: new BABYLON.Vector3(0, -1, -5)
-    })
-    movein.setKeys(movein_keys)
-    this.scene.beginDirectAnimation(this.camera, [movein], 0, 9 * frameRate, false)
-    this.registerShowDetailView()
+    });
+    movein.setKeys(movein_keys);
+    this.scene.beginDirectAnimation(this.camera, [movein], 0, 9 * frameRate, false);
+    this.registerShowDetailView();
   }
 
   handleShowRightDetail() {
-    const frameRate = 20
-    const movein = new BABYLON.Animation('movein', 'position', frameRate, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT)
+    const frameRate = 20;
+    const movein = new BABYLON.Animation('movein', 'position', frameRate, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
 
-    const movein_keys = []
+    const movein_keys = [];
 
     movein_keys.push({
       frame: 0,
       value: new BABYLON.Vector3(0, 0, -CONST.zLargeDistance)
-    })
+    });
 
     movein_keys.push({
       frame: 1 * frameRate,
       value: new BABYLON.Vector3(-CONST.zLargeDistance / 2, 0, -CONST.zLargeDistance / 2)
-    })
+    });
 
     movein_keys.push({
       frame: 2 * frameRate,
       value: new BABYLON.Vector3(-5, 0, -5)
-    })
-    movein.setKeys(movein_keys)
-    this.scene.beginDirectAnimation(this.camera, [movein], 0, 9 * frameRate, false)
-    this.registerShowDetailView()
+    });
+    movein.setKeys(movein_keys);
+    this.scene.beginDirectAnimation(this.camera, [movein], 0, 9 * frameRate, false);
+    this.registerShowDetailView();
   }
 
   handleCancelOverview() {
-    const pos = new BABYLON.Vector3(0, 0, -CONST.zLargeDistance)
-    this.camera.setPosition(pos)
+    const pos = new BABYLON.Vector3(0, 0, -CONST.zLargeDistance);
+    this.camera.setPosition(pos);
     this.setState({
       detailActive: false
-    })
+    });
   }
 
   handleShowGameModal(dock: Dock) {
     const gameType = getGameTypes(dock),
-        moreThanOne = gameType.length > 1
+        moreThanOne = gameType.length > 1;
     this.setState({
       showModal: true,
       modalType: moreThanOne ? ModalType.selectSubGameType : ModalType.selectMode,
       focusDock: dock,
       gameType: moreThanOne ? null : (gameType[0])
-    })
+    });
   }
 
   initView() {
-    const pos = new BABYLON.Vector3(0, 0, -CONST.zLargeDistance)
-    this.camera.setPosition(pos)
+    const pos = new BABYLON.Vector3(0, 0, -CONST.zLargeDistance);
+    this.camera.setPosition(pos);
 
     Object.keys(DockConfig).forEach((dock) => {
-      let maskInstance = this.hoverMaskInstance[dock]
+      let maskInstance = this.hoverMaskInstance[dock];
       if (!maskInstance) {
-        maskInstance = this.renderHoverMaskInstance(Number(dock))
-        this.hoverMaskInstance[dock] = maskInstance
+        maskInstance = this.renderHoverMaskInstance(Number(dock));
+        this.hoverMaskInstance[dock] = maskInstance;
       }
-      this.renderLockIcon(Number(dock))
-    })
+      this.renderLockIcon(Number(dock));
+    });
     setTimeout(() => {
       this.setState({
         isInitView: false
-      })
-    }, 500)
+      });
+    }, 500);
   }
 
   handleSceneMount({engine, scene, canvas}) {
@@ -886,12 +886,12 @@ export class Hall3D extends React.Component<{}, State> {
         0, 0, 5,
         BABYLON.Vector3.Zero(),
         scene
-    )
-    this.scene = scene
-    this.camera = camera
+    );
+    this.scene = scene;
+    this.camera = camera;
 
-    camera.attachControl(canvas, true)
-    camera.inputs.attached.mousewheel.detachControl(canvas)
+    camera.attachControl(canvas, true);
+    camera.inputs.attached.mousewheel.detachControl(canvas);
 
     new BABYLON.PhotoDome(
         'hall',
@@ -901,72 +901,72 @@ export class Hall3D extends React.Component<{}, State> {
           size: 1000
         },
         scene
-    )
-    this.reqInitInfo()
+    );
+    this.reqInitInfo();
 
     scene.onPointerObservable.add((pointerInfo) => {
       switch (pointerInfo.type) {
 
         case BABYLON.PointerEventTypes.POINTERUP:
-          break
+          break;
         case BABYLON.PointerEventTypes.POINTERMOVE:
-          break
+          break;
       }
-    })
+    });
 
     engine.runRenderLoop(() => {
       if (scene) {
-        scene.render()
+        scene.render();
       }
-    })
+    });
   }
 
   connectSocket() {
-    const io = socket.connect('/')
-    this.io = io
+    const io = socket.connect('/');
+    this.io = io;
     io.on(SocketEvent.startMatch, () => {
       this.setState({
         modalType: ModalType.matching,
         matchTimer: 0
-      })
+      });
       this.matchTimer = window.setInterval(() => {
         this.setState({
           matchTimer: this.state.matchTimer + 1
-        })
-      }, 1000)
-    })
+        });
+      }, 1000);
+    });
     io.on(SocketEvent.startGame, ({playerUrl}) => {
       if (this.matchTimer) {
-        clearInterval(this.matchTimer)
+        clearInterval(this.matchTimer);
       }
       this.setState({
         modalType: ModalType.matchSuccess
-      })
+      });
       setTimeout(() => {
-        redirect(playerUrl)
-      }, 1000)
-    })
+        redirect(playerUrl);
+      }, 1000);
+    });
     io.on(SocketEvent.continueGame, ({playerUrl}) => {
       this.setState({
         modalType: ModalType.continueGame,
-      })
-      this.continuePlayUrl = playerUrl
-    })
+      });
+      this.continuePlayUrl = playerUrl;
+    });
     io.on(SocketEvent.handleError, (data: { eventType: SocketEvent, msg: string }) => {
-      const {eventType, msg} = data
+      const {eventType, msg} = data;
       if (eventType === SocketEvent.reqStartGame) {
         // Todo
-        Toast.error(msg)
+        Toast.error(msg);
       }
       if (eventType === SocketEvent.leaveMatchRoom) {
         // TODO
-        Toast.error(msg)
+        Toast.error(msg);
       }
-    })
+    });
   }
 
   render() {
-    const {detailActive, isInitView, score} = this.state
+    const {detailActive, isInitView, score} = this.state;
     return <div>
       <section className={style.titleBar}>
         <div className={style.logo}/>
@@ -975,6 +975,10 @@ export class Hall3D extends React.Component<{}, State> {
           <span className={style.subTitle}>虚拟仿真实验教学软件</span>
         </div>
         <span className={style.score}>得分: {score}</span>
+      </section>
+      <section className={style.onlinePlayers}>
+        <label>在线人数<em>{this.onlinePlayer}</em></label>
+        <label>排队人数<em>{this.onlinePlayer < 10 ? 0 : this.onlinePlayer % 4}</em></label>
       </section>
       {
         isInitView && <div className={style.loading}>
@@ -999,7 +1003,7 @@ export class Hall3D extends React.Component<{}, State> {
           </div>)
         }
       </section>
-    </div>
+    </div>;
   }
 }
 
