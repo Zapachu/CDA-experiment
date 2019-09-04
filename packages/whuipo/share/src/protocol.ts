@@ -5,17 +5,11 @@ export enum Phase {
     CBM = 'CBM'
 }
 
-export namespace NCreateParams{
+export namespace NCreateParams {
     export enum IPOType {
         Median,
         TopK,
         FPSBA
-    }
-    export interface IPO {
-        type: IPOType
-    }
-    export interface TBM {
-
     }
 
     export enum CBMRobotType {
@@ -23,13 +17,34 @@ export namespace NCreateParams{
         zip,
         gd,
     }
-    export interface CBM {
-        allowLeverage: boolean
-        robotType: CBMRobotType
-        robotCD:number
+
+    interface IBaseCreateParams {
+        onceMoreSuffix?: string
     }
 
-    export interface OpenAuction {
+    export interface IPO extends IBaseCreateParams {
+        type: IPOType
+    }
+
+    export interface TBM extends IBaseCreateParams {
+        groupSize: number;
+        buyerCapitalMin: number;
+        buyerCapitalMax: number;
+        buyerPrivateMin: number;
+        buyerPrivateMax: number;
+        sellerQuotaMin: number;
+        sellerQuotaMax: number;
+        sellerPrivateMin: number;
+        sellerPrivateMax: number;
+    }
+
+    export interface CBM extends IBaseCreateParams {
+        allowLeverage: boolean
+        robotType: CBMRobotType
+        robotCD: number
+    }
+
+    export interface OpenAuction extends IBaseCreateParams {
 
     }
 }
@@ -46,7 +61,7 @@ export enum ResCode {
 }
 
 export enum SocketEvent {
-    reqStartGame='reqStartGame',
+    reqStartGame = 'reqStartGame',
     leaveMatchRoom = 'leaveMatchRoom',
     startMatch = 'startMatch',
     startGame = 'startGame',
@@ -58,19 +73,19 @@ export interface UserDoc {
     updateAt: number;
     createAt: number;
     unionId: string,
-    phaseScore: Array<number>
+    score: number
 }
 
-export namespace NSocketParam{
+export namespace NSocketParam {
     export interface StartGame {
-        multiPlayer:boolean,
-        phase:Phase,
+        multiPlayer: boolean,
+        phase: Phase,
         params
     }
 }
 
-export namespace iLabX{
-    export enum ResCode{
+export namespace iLabX {
+    export enum ResCode {
         success = 0,
         invalidInput = 3,
         errorPwd = 4,

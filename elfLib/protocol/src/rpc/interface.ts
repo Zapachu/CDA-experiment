@@ -59,7 +59,6 @@ export namespace Trial {
         export interface IReq {
             namespace: string
             userId: string
-            onceMore?: boolean
         }
 
         export interface IRes {

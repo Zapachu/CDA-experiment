@@ -75,7 +75,6 @@ const router = Router()
       Trial.Done.name,
       {
         userId: req.user._id,
-        onceMore: true,
         namespace
       }
     );

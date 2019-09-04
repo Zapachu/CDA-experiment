@@ -7,7 +7,7 @@ interface IDocument extends Document {
 
 export interface UserDoc extends IDocument {
   iLabXUserName: string
-  phaseScore: Array<number>
+  score: number
 }
 
 const UserSchema = new Schema({
@@ -15,7 +15,7 @@ const UserSchema = new Schema({
   updateAt: Date,
   mobile: {type: String, unique: true}, // 手机号(11位)
   iLabXUserName: String,
-  phaseScore: {type: Array, default: []}
+  score: {type: Number, default: 0}
 });
 
 UserSchema.pre<UserDoc>('save', function (next) {

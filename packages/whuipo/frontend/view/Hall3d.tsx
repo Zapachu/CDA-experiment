@@ -5,7 +5,7 @@ import {Button, Loading, MatchModal, Modal} from '@micro-experiment/component';
 import {NCreateParams, NSocketParam, Phase, ResCode, SocketEvent, UserDoc} from '@micro-experiment/share';
 import {BabylonScene, BasePlayMode, TBasePlayMode} from '../component';
 import {Toast} from '@elf/component';
-import qs from 'qs';
+import queryString from 'query-string';
 import {Api, getEnumKeys, redirect} from '../util';
 import {Detail, Hall, UnLockIcon} from '../asset';
 import style from './style.less';
@@ -14,11 +14,16 @@ enum Dock { auction = 5, ipo = 1, tbm = 2, cbm = 3, cbm_l = 4 }
 
 enum GameType {IPO_Median, IPO_TopK, IPO_FPSBA, OpenAuction, TBM, CBM, CBM_Leverage}
 
+function gameType2QuerySuffix(gameType: GameType) {
+  return `?${queryString.stringify({gameType})}`;
+}
+
 class CBMPlayMode extends BasePlayMode<NCreateParams.CBM> {
-  defaultParams = {
+  defaultParams: NCreateParams.CBM = {
     allowLeverage: false,
     robotCD: 5,
-    robotType: NCreateParams.CBMRobotType.zip
+    robotType: NCreateParams.CBMRobotType.zip,
+    onceMoreSuffix: gameType2QuerySuffix(GameType.CBM)
   };
 
   renderConfigDesc() {
@@ -124,7 +129,8 @@ const GameTypeConfig: {
     `,
     PlayMode: class extends BasePlayMode<NCreateParams.IPO> {
       defaultParams = {
-        type: NCreateParams.IPOType.TopK
+        type: NCreateParams.IPOType.TopK,
+        onceMoreSuffix: gameType2QuerySuffix(GameType.IPO_TopK)
       };
     }
   },
@@ -155,7 +161,8 @@ const GameTypeConfig: {
     `,
     PlayMode: class extends BasePlayMode<NCreateParams.IPO> {
       defaultParams = {
-        type: NCreateParams.IPOType.Median
+        type: NCreateParams.IPOType.Median,
+        onceMoreSuffix: gameType2QuerySuffix(GameType.IPO_Median)
       };
     }
   },
@@ -185,7 +192,8 @@ const GameTypeConfig: {
     `,
     PlayMode: class extends BasePlayMode<NCreateParams.IPO> {
       defaultParams = {
-        type: NCreateParams.IPOType.FPSBA
+        type: NCreateParams.IPOType.FPSBA,
+        onceMoreSuffix: gameType2QuerySuffix(GameType.IPO_FPSBA)
       };
     }
   },
@@ -196,7 +204,12 @@ const GameTypeConfig: {
     desc: `
     您要在市场上竞购某资产，您所在的基金机构对该资产有估值A元，该资产的起拍价格为B元，你需要和市场上其他交易者相继出价竞购，拍卖价格最高的买家可购入该资产。
     您可以不断提交您的拍卖价格，但是您的拍卖价格必须大于市场上现已有的最高购买价格。至某一价格，30秒内无人加价时，则此时市场上已有的最高拍卖价即为成交价，出此价格的买家即可购入该资产
-`
+`,
+    PlayMode: class extends BasePlayMode<NCreateParams.OpenAuction> {
+      defaultParams:NCreateParams.OpenAuction = {
+        onceMoreSuffix: gameType2QuerySuffix(GameType.OpenAuction)
+      };
+    }
   },
   [GameType.TBM]: {
     phase: Phase.TBM,
@@ -205,7 +218,21 @@ const GameTypeConfig: {
     video: 'https://qiniu0.anlint.com/video/whuipo/jihejinjia.mp4',
     desc: `
     您在一个基金机构工作，您所在的基金机构经过对市场信息的精密分析，现对市场上的股票有一个估值，要您在市场上进行股票交易活动。在这个市场中，您会被系统随机分配为买家或卖家。买家有初始的购买资金M，卖家有初始的股票数量S。买家和卖家对股票的估值不同，并根据自己的估值一次性进行买卖申请。系统将在有效价格范围内选取成交量最大的价位，对接受到的买卖申报一次性集中撮合，产生股票的成交价格。报价大于等于市场成交价格的买家成交；价小于等于市场成交成交价格的卖家成交。买家收益=（成交价-估值）*成交数量；卖家收益=（估值-成交价）*成交数量
-    `
+    `,
+    PlayMode: class extends BasePlayMode<NCreateParams.TBM> {
+      defaultParams:NCreateParams.TBM = {
+        groupSize:2,
+        buyerCapitalMin:0,
+        buyerCapitalMax:1e5,
+        buyerPrivateMin:0,
+        buyerPrivateMax:1e5,
+        sellerQuotaMin:0,
+        sellerQuotaMax:1e5,
+        sellerPrivateMin:0,
+        sellerPrivateMax:1e5,
+        onceMoreSuffix: gameType2QuerySuffix(GameType.TBM)
+      };
+    }
   },
   [GameType.CBM]: {
     phase: Phase.CBM,
@@ -233,7 +260,8 @@ const GameTypeConfig: {
       defaultParams = {
         allowLeverage: true,
         robotCD: 5,
-        robotType: NCreateParams.CBMRobotType.zip
+        robotType: NCreateParams.CBMRobotType.zip,
+        onceMoreSuffix: gameType2QuerySuffix(GameType.CBM_Leverage)
       };
     }
   }
@@ -457,24 +485,23 @@ export class Hall3D extends React.Component<{}, State> {
       if (res.code === ResCode.success) {
         this.connectSocket();
         const user: UserDoc = res.user;
-        this.setState({score: (user.phaseScore || []).reduce((m, n) => m + n, 0)});
+        this.setState({score: user.score});
         this.initView();
 
         const urlObj = new URL(window.location.href);
-        const queryObj = qs.parse(urlObj.search.replace('?', '')) || {};
-        if (queryObj.gamePhase) {
-          const dock = GameTypeConfig[queryObj.gamePhase].dock;
-          this.handleSelectGame(dock);
-          setTimeout(_ => {
-            this.setState({
-              showModal: true,
-              modalType: ModalType.selectMode,
-              gameType: queryObj.gamePhase,
-            });
-          }, 2000);
+        const queryObj = queryString.parse(urlObj.search.replace('?', '')) as { gameType: string };
+        if (!queryObj || queryObj.gameType === undefined) {
+          return;
         }
-
-        return;
+        const gameType = +queryObj.gameType;
+        this.handleSelectGame(GameTypeConfig[gameType].dock);
+        setTimeout(() => {
+          this.setState({
+            showModal: true,
+            modalType: ModalType.selectMode,
+            gameType,
+          });
+        }, 2000);
       }
       throw new Error(res.msg);
     }).catch(e => {

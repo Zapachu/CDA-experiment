@@ -118,7 +118,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             case MoveType.onceMore: {
                 const res = await RedisCall.call<Trial.Done.IReq, Trial.Done.IRes>(Trial.Done.name, {
                     userId: playerState.user.id,
-                    onceMore: true,
                     namespace
                 })
                 res ? cb(res.lobbyUrl) : null

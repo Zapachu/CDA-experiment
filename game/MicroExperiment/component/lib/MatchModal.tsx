@@ -14,7 +14,7 @@ const MatchModal: React.SFC<PropType> = ({
   timer
 }) => {
   return (
-    <Modal visible={visible} width={400}>
+    <Modal visible={visible} width='400px'>
       <div className={style.matchModal}>
         <p>正在为您配对玩家...</p>
         <Line color={Line.Color.White} style={{ margin: "20px 0" }} />

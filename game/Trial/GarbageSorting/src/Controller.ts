@@ -125,12 +125,10 @@ export default class Controller extends BaseController<
         break;
       }
       case MoveType.back: {
-        const { onceMore } = params;
         const res = await RedisCall.call<Trial.Done.IReq, Trial.Done.IRes>(
           Trial.Done.name,
           {
             userId: playerState.user.id,
-            onceMore,
             namespace
           }
         );
