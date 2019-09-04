@@ -46,7 +46,6 @@ export declare namespace Trial {
         interface IReq {
             namespace: string;
             userId: string;
-            onceMore?: boolean;
         }
         interface IRes {
             lobbyUrl: string;

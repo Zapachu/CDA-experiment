@@ -1,4 +1,4 @@
-import {Phase} from '@micro-experiment/share'
+import {NCreateParams, Phase} from '@micro-experiment/share';
 export const namespace = Phase.TBM
 
 export const DEFAULT_PARAMS: ICreateParams = {
@@ -36,17 +36,7 @@ export enum PushType {
     shoutTimer
 }
 
-export interface ICreateParams {
-    groupSize: number;
-    buyerCapitalMin: number;
-    buyerCapitalMax: number;
-    buyerPrivateMin: number;
-    buyerPrivateMax: number;
-    sellerQuotaMin: number;
-    sellerQuotaMax: number;
-    sellerPrivateMin: number;
-    sellerPrivateMax: number;
-}
+export type ICreateParams = NCreateParams.TBM
 
 export interface IMoveParams {
     price: number;

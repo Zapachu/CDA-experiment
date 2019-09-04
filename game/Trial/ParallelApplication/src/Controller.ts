@@ -124,7 +124,6 @@ export default class Controller extends BaseController<
           Trial.Done.name,
           {
             userId: playerState.user.id,
-            onceMore,
             namespace
           }
         );
@@ -261,7 +260,6 @@ export default class Controller extends BaseController<
         Trial.Done.name,
         {
           userId,
-          onceMore: true,
           namespace
         }
       );

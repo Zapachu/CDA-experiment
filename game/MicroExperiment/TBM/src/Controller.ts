@@ -166,11 +166,10 @@ export default class Controller extends BaseController<ICreateParams,
             Trial.Done.name,
             {
               userId: playerState.user.id,
-              onceMore,
               namespace
             }
         )
-        res ? cb(res.lobbyUrl) : null
+        res ? cb(res.lobbyUrl + (onceMore ? this.game.params.onceMoreSuffix : '')) : null;
         break
       }
     }
