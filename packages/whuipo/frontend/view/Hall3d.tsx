@@ -221,15 +221,15 @@ const GameTypeConfig: {
     `,
     PlayMode: class extends BasePlayMode<NCreateParams.TBM> {
       defaultParams:NCreateParams.TBM = {
-        groupSize:2,
-        buyerCapitalMin:0,
-        buyerCapitalMax:1e5,
-        buyerPrivateMin:0,
-        buyerPrivateMax:1e5,
-        sellerQuotaMin:0,
-        sellerQuotaMax:1e5,
-        sellerPrivateMin:0,
-        sellerPrivateMax:1e5,
+        groupSize: 12,
+        buyerCapitalMin: 50000,
+        buyerCapitalMax: 100000,
+        buyerPrivateMin: 65,
+        buyerPrivateMax: 80,
+        sellerQuotaMin: 1000,
+        sellerQuotaMax: 2000,
+        sellerPrivateMin: 30,
+        sellerPrivateMax: 45,
         onceMoreSuffix: gameType2QuerySuffix(GameType.TBM)
       };
     }

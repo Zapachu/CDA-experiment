@@ -2,28 +2,24 @@ import XJWT, {Type as XJWTType} from './XJWT';
 import {Phase, UserGameStatus} from '@micro-experiment/share';
 import {User} from './models';
 import setting from './setting';
-import {inProduction} from './config';
 import {RedisTools} from './redis';
 import request from 'request-promise-native';
 import {RedisCall, Trial} from '@elf/protocol';
-import {Log} from '@elf/util'
+import {Log} from '@elf/util';
 
 async function sendBackData(body) {
-    if(!inProduction){
-        Log.d(body)
-        return
+    try {
+        const token = XJWT.encode(XJWTType.SYS);
+        const response = await request({
+            url: `http://ilab-x.com/project/log/upload?xjwt=${encodeURIComponent(token)}`,
+            method: 'POST',
+            body,
+            json: true
+        });
+        Log.d(response);
+    } catch (e) {
+        Log.e('Failed to post data',body);
     }
-    const token = XJWT.encode(XJWTType.SYS);
-    const url = `http://ilab-x.com/project/log/upload?xjwt=${encodeURIComponent(
-        token
-    )}`;
-    const response = await request({
-        url,
-        method: 'POST',
-        body,
-        json: true
-    });
-    Log.d(response)
 }
 
 export function runRPC() {
@@ -33,16 +29,15 @@ export function runRPC() {
             const phase = namespace as Phase;
             const uid = userId;
             const user = await User.findById(uid);
-            let lobbyUrl = setting.lobbyUrl;
             if (user) {
                 await sendBackData({timestamp: Date.now()});
-                user.score+=10;
+                user.score += 10;
                 await user.save();
                 await RedisTools.setUserGameData(uid, phase, {
                     status: UserGameStatus.notStarted
                 });
             }
-            return {lobbyUrl};
+            return {lobbyUrl:setting.lobbyUrl};
         }
     );
 }
