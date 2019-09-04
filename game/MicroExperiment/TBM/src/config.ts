@@ -1,18 +1,6 @@
 import {NCreateParams, Phase} from '@micro-experiment/share';
 export const namespace = Phase.TBM
 
-export const DEFAULT_PARAMS: ICreateParams = {
-    groupSize: 12,
-    buyerCapitalMin: 50000,
-    buyerCapitalMax: 100000,
-    buyerPrivateMin: 65,
-    buyerPrivateMax: 80,
-    sellerQuotaMin: 1000,
-    sellerQuotaMax: 2000,
-    sellerPrivateMin: 30,
-    sellerPrivateMax: 45
-}
-
 export enum PlayerStatus {
     guide,
     test,
