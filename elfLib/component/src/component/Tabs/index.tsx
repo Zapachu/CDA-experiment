@@ -1,6 +1,5 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import {ErrorBoundary} from '../ErrorBoundary'
 
 export const Tabs: React.FunctionComponent<{
     labels: Array<string>,
@@ -22,10 +21,8 @@ export const Tabs: React.FunctionComponent<{
                 )}
             </ul>
             <div>
-                <ErrorBoundary>
-                    {
-                        children[activeTabIndex]
-                    }
-                </ErrorBoundary>
+                {
+                    children[activeTabIndex]
+                }
             </div>
         </section>
