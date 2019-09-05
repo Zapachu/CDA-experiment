@@ -28,6 +28,8 @@ export enum PushType {
     beginTrading = 'beginTrading',
     closeOutWarning = 'closeOutWarning',
     closeOut = 'closeOut',
+    newOrder = 'newOrder',
+    newTrade = 'newTrade',
     tradeSuccess = 'tradeSuccess'
 }
 
@@ -133,3 +135,8 @@ export type IPushParams = Partial<{
 }>
 
 export const playerLimit = 12
+
+export enum AdjustDirection {
+    raise,
+    lower
+}
