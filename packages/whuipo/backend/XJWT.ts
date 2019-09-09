@@ -12,7 +12,7 @@ const ISSUER_ID = settings.issuerId;
 
 export default class XJWT {
 
-  static encode(type: Type, payload?: any): string {
+  static encode(type: Type, payload?: object): string {
     if (type === Type.JSON && !payload) {
       console.error('must pass in payload when type is JSON');
       return null;
@@ -70,10 +70,7 @@ export default class XJWT {
     const expiry = Date.now() + EXPIRE_SPAN;
     const expiryBuf = toBufferBE(BigInt(expiry), 8);
     const typeBuf = Buffer.alloc(1).fill(type);
-    const issuerIdArray = new Uint16Array(1);
-    issuerIdArray[0] = +ISSUER_ID;
-    const issuerIdBuf = Buffer.from(issuerIdArray.buffer);
-    issuerIdBuf.swap16();
+    const issuerIdBuf = toBufferBE(BigInt(settings.issuerId), 8);
     const bufLength = expiryBuf.length + typeBuf.length + issuerIdBuf.length;
     const headerBuf = Buffer.concat(
         [expiryBuf, typeBuf, issuerIdBuf],
@@ -87,7 +84,7 @@ export default class XJWT {
     let body: string;
     switch (type) {
       case Type.JSON: {
-        body = JSON.stringify(payload);
+        body = JSON.stringify(payload as object);
         break;
       }
       case Type.RESERVED: {
@@ -95,7 +92,7 @@ export default class XJWT {
         break;
       }
       case Type.SYS: {
-        body = 'sys';
+        body = JSON.stringify(payload as object);
         break;
       }
     }

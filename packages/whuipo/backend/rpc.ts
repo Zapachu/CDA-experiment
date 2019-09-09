@@ -9,12 +9,9 @@ import {Log} from '@elf/util';
 
 export async function sendBackData(body) {
     try {
-        const token = XJWT.encode(XJWTType.SYS);
+        const token = XJWT.encode(XJWTType.SYS, body);
         const response = await request({
-            url: `${setting.iLabXGateWay}/project/log/upload?xjwt=${encodeURIComponent(token)}`,
-            method: 'POST',
-            body,
-            json: true
+            url: `${setting.iLabXGateWay}/project/log/upload?xjwt=${encodeURIComponent(token)}`
         });
         Log.d(response);
     } catch (e) {
@@ -23,13 +20,13 @@ export async function sendBackData(body) {
 }
 
 export async function sendUserStatus(userName: string) {
-    const xjwt = XJWT.encode(XJWTType.SYS, JSON.stringify({
+    const _xjwt = XJWT.encode(XJWTType.SYS, {
         username: userName,
         issuerId: setting.issuerId
-    }) as any);
-    Log.d(encodeURIComponent(xjwt))
+    });
+    const xjwt = encodeURIComponent(_xjwt)
     const response = await request({
-        url: `${setting.iLabXGateWay}/project/log/upload?xjwt=${encodeURIComponent(xjwt)}`
+        url:`${setting.iLabXGateWay}/third/api/test/result/upload?xjwt=${xjwt}`
     });
     Log.d(response);
 }
