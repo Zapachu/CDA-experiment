@@ -10,7 +10,8 @@ import {elfSetting} from '@elf/setting';
 import {Config} from './config';
 import {iLabX, NSocketParam, Phase, ResCode, SocketEvent, UserGameStatus} from '@micro-experiment/share';
 import {RedisCall, Trial} from '@elf/protocol';
-import XJWT, {encryptPassword, randomStr} from './XJWT';
+import setting from './setting'
+import XJWT from './XJWT';
 
 const ioEmitter = socketEmitter({
   host: elfSetting.redisHost,
@@ -154,8 +155,8 @@ export default class RouterController {
   @catchError
   static async login(req: Request, res: Response) {
     const {username, password} = req.body,
-        encrypted = encryptPassword(password),
-        url = `http://ilab-x.com/sys/api/user/validate?username=${encodeURIComponent(username)}&password=${encodeURIComponent(encrypted.password)}&nonce=${encrypted.nonce}&cnonce=${encrypted.cnonce}`;
+        encrypted = XJWT.encryptPassword(password),
+        url = `${setting.iLabXGateWay}/sys/api/user/validate?username=${encodeURIComponent(username)}&password=${encodeURIComponent(encrypted.password)}&nonce=${encrypted.nonce}&cnonce=${encrypted.cnonce}`;
     const response = JSON.parse(await request(url));
     Log.d(response);
     if (response.code !== iLabX.ResCode.success) {
@@ -174,7 +175,7 @@ export default class RouterController {
   static async asGuest(req: Request, res: Response) {
     if (!req.isAuthenticated()) {
       Log.d('Create Guest');
-      const username = randomStr(8);
+      const username = XJWT.randomStr(8);
       const user = new User({
         mobile: `null_${username}`
       });

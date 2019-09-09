@@ -8,11 +8,11 @@ const HEADER_TIME_OFFSET = 0;
 const HEADER_TYPE_OFFSET = HEADER_TIME_OFFSET + 8;
 const PAYLOAD_OFFSET = 8;
 const EXPIRE_SPAN = 1000 * 60;
-const ISSUER_ID = 3000; // should be less than 65536
+const ISSUER_ID = settings.issuerId;
 
-class XJWT {
+export default class XJWT {
 
-  encode(type: Type, payload?: object): string {
+  static encode(type: Type, payload?: any): string {
     if (type === Type.JSON && !payload) {
       console.error('must pass in payload when type is JSON');
       return null;
@@ -22,7 +22,7 @@ class XJWT {
     return this.sign(headerStr, payloadStr);
   }
 
-  decode(token: string): DecodeRet {
+  static decode(token: string): DecodeRet {
     try {
       if (!token) {
         return {isValid: false};
@@ -66,12 +66,12 @@ class XJWT {
     }
   }
 
-  encodeHeaderToBase64(type: Type): string {
+  static encodeHeaderToBase64(type: Type): string {
     const expiry = Date.now() + EXPIRE_SPAN;
     const expiryBuf = toBufferBE(BigInt(expiry), 8);
     const typeBuf = Buffer.alloc(1).fill(type);
     const issuerIdArray = new Uint16Array(1);
-    issuerIdArray[0] = ISSUER_ID;
+    issuerIdArray[0] = +ISSUER_ID;
     const issuerIdBuf = Buffer.from(issuerIdArray.buffer);
     issuerIdBuf.swap16();
     const bufLength = expiryBuf.length + typeBuf.length + issuerIdBuf.length;
@@ -82,8 +82,8 @@ class XJWT {
     return headerBuf.toString('base64');
   }
 
-  encodePayloadToBase64(type: Type, payload: object): string {
-    const randomBuf = Buffer.alloc(8).fill(_randomInt8());
+  static encodePayloadToBase64(type: Type, payload: object): string {
+    const randomBuf = Buffer.alloc(8).fill(this._randomInt8());
     let body: string;
     switch (type) {
       case Type.JSON: {
@@ -115,17 +115,17 @@ class XJWT {
     return Buffer.from(encryptedBytes.buffer).toString('base64');
   }
 
-  repairToken(token: string): string {
+  static repairToken(token: string): string {
     return token.replace(/\s/g, '+');
   }
 
-  checkTimestamp(header: string): boolean {
+  static checkTimestamp(header: string): boolean {
     const buf = Buffer.from(header, 'base64');
-    const expiry = _readInt64BE(buf, HEADER_TIME_OFFSET);
+    const expiry = this._readInt64BE(buf, HEADER_TIME_OFFSET);
     return Date.now() < expiry;
   }
 
-  extractType(header: string): Type {
+  static extractType(header: string): Type {
     const buf = Buffer.from(header, 'base64');
     const type = buf.readInt8(HEADER_TYPE_OFFSET);
     const TYPES = {
@@ -139,8 +139,8 @@ class XJWT {
     throw new Error('invalid type in token');
   }
 
-  checkSignature(header: string, payload: string, signature: string): boolean {
-    const _sig = _hmacSha256(header + '.' + payload, tokenSecret);
+  static checkSignature(header: string, payload: string, signature: string): boolean {
+    const _sig = this._hmacSha256(header + '.' + payload, tokenSecret);
     const _sigBytes = Uint8Array.from(Buffer.from(_sig, 'base64'));
     const sigBytes = Uint8Array.from(Buffer.from(signature, 'base64'));
     for (let i = 0; i < _sigBytes.length; i++) {
@@ -151,34 +151,45 @@ class XJWT {
     return true;
   }
 
-  private sign(header: string, payload: string): string {
-    const signature = _hmacSha256(header + '.' + payload, tokenSecret);
+  static encryptPassword(
+      password: string
+  ): { nonce: string; cnonce: string; password: string } {
+    const nonce = this.randomStr(), cnonce = this.randomStr(),
+        pw = this._sha256(nonce + this._sha256(password).toUpperCase() + cnonce).toUpperCase();
+    return {nonce, cnonce, password: pw};
+  }
+
+  static randomStr(len: number = 16): string {
+    return crypto.randomBytes(Math.ceil(len / 2)).toString('hex').slice(0, len);
+  }
+
+  private static sign(header: string, payload: string): string {
+    const signature = this._hmacSha256(header + '.' + payload, tokenSecret);
     return header + '.' + payload + '.' + signature;
   }
-}
 
-function _hmacSha256(text: string, secret: string): string {
-  return crypto
-      .createHmac('sha256', secret)
-      .update(text)
-      .digest('base64');
-}
+  private static _hmacSha256(text: string, secret: string): string {
+    return crypto
+        .createHmac('sha256', secret)
+        .update(text)
+        .digest('base64');
+  }
 
-function _sha256(text: string): string {
-  return crypto
-      .createHash('sha256')
-      .update(text)
-      .digest('hex');
-}
+  private static _sha256(text: string): string {
+    return crypto
+        .createHash('sha256')
+        .update(text)
+        .digest('hex');
+  }
 
-// only node 10.4.0+ supported, while negative number not supported yet
-function _readInt64BE(buf: Buffer, offset: number): bigint {
-  const hex = buf.slice(offset, 8).toString('hex');
-  return BigInt('0x' + hex);
-}
+  private static _readInt64BE(buf: Buffer, offset: number): bigint {
+    const hex = buf.slice(offset, 8).toString('hex');
+    return BigInt('0x' + hex);
+  }
 
-function _randomInt8(): number {
-  return Math.floor(Math.random() * 256);
+  private static _randomInt8(): number {
+    return Math.floor(Math.random() * 256);
+  }
 }
 
 interface DecodeRet {
@@ -192,22 +203,8 @@ interface Payload {
   dis: string
 }
 
-export default new XJWT();
-
 export enum Type {
   RESERVED = 0,
   JSON,
   SYS
-}
-
-export function encryptPassword(
-    password: string
-): { nonce: string; cnonce: string; password: string } {
-  const nonce = randomStr(), cnonce = randomStr(),
-      pw = _sha256(nonce + _sha256(password).toUpperCase() + cnonce).toUpperCase();
-  return {nonce, cnonce, password: pw};
-}
-
-export function randomStr(len: number = 16): string {
-  return crypto.randomBytes(Math.ceil(len / 2)).toString('hex').slice(0, len);
 }
