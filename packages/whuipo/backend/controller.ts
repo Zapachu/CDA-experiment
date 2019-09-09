@@ -205,9 +205,12 @@ export default class RouterController {
 
   @catchError
   static async getInitInfo(req: Request, res: Response, next: NextFunction) {
+    const count = (await RedisTools.getOnlineSessionKeys()).length
     res.json({
       code: ResCode.success,
-      user: req.user
+      user: req.user,
+      count,
+      waiting:count<100?0:~~(Math.random()*5)
     });
   }
 }
