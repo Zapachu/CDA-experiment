@@ -338,6 +338,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 break;
             }
             case MoveType.exitGame: {
+                global.setTimeout(()=>gameState.status = GameStatus.over, 1e3)
                 const {onceMore} = params;
                 const res = await RedisCall.call<Trial.Done.IReq, Trial.Done.IRes>(Trial.Done.name, {
                     userId: playerState.user.id,
