@@ -1,4 +1,4 @@
-export const inProduction = process.env.NODE_ENV === 'production'
+export const inProduction = process.env.NODE_ENV === 'production';
 
 export const Config = {
     rootName: '',

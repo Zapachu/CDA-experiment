@@ -8,7 +8,6 @@
     "declaration": true,
     "experimentalDecorators": true,
     "esModuleInterop": true,
-    "noUnusedLocals": true,
     "resolveJsonModule": true,
     "downlevelIteration": true
   }

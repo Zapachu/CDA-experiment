@@ -11,7 +11,7 @@ var GameUserPermission = new mongoose_1.Schema({
     name: MongodString,
     tags: [MongodString],
     charge: MongodNumber,
-    permitted: MongodNumber
+    permitted: MongodNumber,
 });
 exports.GameUserPermission = GameUserPermission;
 GameUserPermission.pre('save', function (next) {

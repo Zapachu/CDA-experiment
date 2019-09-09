@@ -111,57 +111,59 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         const tradeSuccess = order.role === ROLE.Seller ?
             buyOrderIds.length && order.price <= orders.find(({id}) => id === buyOrderIds[0]).price :
             sellOrderIds.length && order.price >= orders.find(({id}) => id === sellOrderIds[0]).price;
-        if (!tradeSuccess) {
+        if (tradeSuccess) {
+            const pairOrderId = order.role === ROLE.Seller ? buyOrderIds.shift() : sellOrderIds.shift(),
+                pairOrder = orders.find(({id}) => id === pairOrderId),
+                trade: ITrade = {
+                    reqOrderId: pairOrderId,
+                    resOrderId: order.id,
+                    count: order.count
+                };
+            if (pairOrder.count > order.count) {
+                const subOrder: IOrder = {
+                    ...pairOrder,
+                    id: orders.length,
+                    count: pairOrder.count - order.count
+                };
+                orders.push(subOrder)
+                ;(order.role === ROLE.Buyer ? sellOrderIds : buyOrderIds).unshift(subOrder.id);
+                trade.subOrderId = subOrder.id;
+            } else if (pairOrder.count < order.count) {
+                trade.count = pairOrder.count;
+                const subOrder: IOrder = {
+                    ...order,
+                    id: orders.length,
+                    count: order.count - pairOrder.count
+                };
+                trade.subOrderId = subOrder.id;
+                await this.shoutNewOrder(periodIndex, subOrder);
+            }
+            trades.push(trade);
+            gamePeriodState.closingPrice = pairOrder.price;
+            playerStates.forEach(playerState => {
+                const o = playerState.playerIndex === order.playerIndex ? order :
+                    playerState.playerIndex === pairOrder.playerIndex ? pairOrder : null;
+                if (!o) {
+                    return null;
+                }
+                this.push(playerState.actor, PushType.tradeSuccess, {tradeCount: trade.count});
+                switch (o.role) {
+                    case ROLE.Buyer:
+                        const money = trade.count * pairOrder.price;
+                        playerState.count += trade.count;
+                        o.guarantee ? playerState.guaranteeMoney += money : playerState.money -= money;
+                        break;
+                    case ROLE.Seller:
+                        o.guarantee ? playerState.guaranteeCount += trade.count : playerState.count -= trade.count;
+                        playerState.money += trade.count * pairOrder.price;
+                        break;
+                }
+            });
+            this.broadcast(PushType.newTrade, {resOrderId: order.id});
+        } else {
             (order.role === ROLE.Seller ? sellOrderIds : buyOrderIds).unshift(order.id);
-            return;
+            this.broadcast(PushType.newOrder, {newOrderId: order.id});
         }
-        const pairOrderId = order.role === ROLE.Seller ? buyOrderIds.shift() : sellOrderIds.shift(),
-            pairOrder = orders.find(({id}) => id === pairOrderId),
-            trade: ITrade = {
-                reqOrderId: pairOrderId,
-                resOrderId: order.id,
-                count: order.count
-            };
-        if (pairOrder.count > order.count) {
-            const subOrder: IOrder = {
-                ...pairOrder,
-                id: orders.length,
-                count: pairOrder.count - order.count
-            };
-            orders.push(subOrder)
-            ;(order.role === ROLE.Buyer ? sellOrderIds : buyOrderIds).unshift(subOrder.id);
-            trade.subOrderId = subOrder.id;
-        } else if (pairOrder.count < order.count) {
-            trade.count = pairOrder.count;
-            const subOrder: IOrder = {
-                ...order,
-                id: orders.length,
-                count: order.count - pairOrder.count
-            };
-            trade.subOrderId = subOrder.id;
-            await this.shoutNewOrder(periodIndex, subOrder);
-        }
-        trades.push(trade);
-        gamePeriodState.closingPrice = pairOrder.price;
-        playerStates.forEach(playerState => {
-            const o = playerState.playerIndex === order.playerIndex ? order :
-                playerState.playerIndex === pairOrder.playerIndex ? pairOrder : null;
-            if (!o) {
-                return null;
-            }
-            this.push(playerState.actor, PushType.tradeSuccess, {tradeCount: trade.count});
-            switch (o.role) {
-                case ROLE.Buyer:
-                    const money = trade.count * pairOrder.price;
-                    playerState.count += trade.count;
-                    o.guarantee ? playerState.guaranteeMoney += money : playerState.money -= money;
-                    break;
-                case ROLE.Seller:
-                    o.guarantee ? playerState.guaranteeCount += trade.count : playerState.count -= trade.count;
-                    playerState.money += trade.count * pairOrder.price;
-                    break;
-            }
-        });
     }
 
     async cancelOrder(periodIndex: number, playerIndex: number): Promise<void> {
