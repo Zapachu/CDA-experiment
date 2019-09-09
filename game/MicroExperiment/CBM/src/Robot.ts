@@ -115,9 +115,10 @@ export default class Robot extends BaseRobot<ICreateParams, IGameState, IPlayerS
         if (marketRejected) {
             return;
         }
+        const count = ~~(maxCount * (.3 * Math.random() + .2)) + 1;
         this.frameEmitter.emit(MoveType.submitOrder, {
             price,
-            count: ~~(maxCount * (.3 * Math.random() + .2)) + 1,
+            count: count > 100 ? 100 : count,
             role
         });
     }
