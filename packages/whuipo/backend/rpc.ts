@@ -19,7 +19,7 @@ export async function sendBackData(iLabXUserName: string, childProjectTitle:stri
         startDate: Date.now() - ~~(timeUsed * 6e4 - Math.random() * 1e4),
         endDate: Date.now(),
         timeUsed: ~~timeUsed,
-        issuerId: setting.iLabXGateWay
+        issuerId: setting.issuerId
     };
     try {
         const token = XJWT.encode(XJWTType.SYS, data);

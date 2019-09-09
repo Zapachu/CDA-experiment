@@ -15,6 +15,7 @@ interface UserGameData {
 export const RedisTools = {
     _getUserGameKey: (uid: string, game: Phase) => `usergamedata:${uid}/${game}`,
     _getRecordPlayerUrlKey: (playerUrl: string) => `playerUrlToUid:${playerUrl}`,
+    getOnlineSessionKeys: async ()=>await redisClient.keys("sess:*"),
     setUserGameData: async (
         uid: string,
         game: Phase,

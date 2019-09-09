@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as BABYLON from 'babylonjs';
 import socket from 'socket.io-client';
 import {Button, Loading, MatchModal, Modal} from '@micro-experiment/component';
-import {NCreateParams, NSocketParam, Phase, ResCode, SocketEvent, UserDoc} from '@micro-experiment/share';
+import {NCreateParams, NSocketParam, Phase, ResCode, SocketEvent} from '@micro-experiment/share';
 import {BabylonScene, BasePlayMode, TBasePlayMode} from '../component';
 import {Toast} from '@elf/component';
 import queryString from 'query-string';
@@ -449,11 +449,12 @@ interface State {
   isInitView: boolean,
   gameType?: GameType,
   matchTimer?: number,
-  score: number
+  score: number,
+  count:number,
+  waiting:number
 }
 
 export class Hall3D extends React.Component<{}, State> {
-  onlinePlayer = new Date().getMinutes() % 33;
   camera: BABYLON.ArcRotateCamera;
   scene: BABYLON.Scene;
   gamePhaseVideoRefs: {
@@ -478,14 +479,16 @@ export class Hall3D extends React.Component<{}, State> {
     showModal: false,
     detailActive: false,
     gameType: null,
+    count:0,
+    waiting:0
   };
 
   reqInitInfo() {
     Api.reqInitInfo().then(res => {
       if (res.code === ResCode.success) {
         this.connectSocket();
-        const user: UserDoc = res.user;
-        this.setState({score: user.score});
+        const {user, count, waiting} = res;
+        this.setState({score: user.score, count, waiting});
         this.initView();
 
         const urlObj = new URL(window.location.href);
@@ -1004,8 +1007,8 @@ export class Hall3D extends React.Component<{}, State> {
         <span className={style.score}>得分: {score}</span>
       </section>
       <section className={style.onlinePlayers}>
-        <label>在线人数<em>{this.onlinePlayer}</em></label>
-        <label>排队人数<em>{this.onlinePlayer < 10 ? 0 : this.onlinePlayer % 4}</em></label>
+        <label>在线人数<em>{this.state.count}</em></label>
+        <label>排队人数<em>{this.state.count < 100 ? 0 : this.state.waiting}</em></label>
       </section>
       {
         isInitView && <div className={style.loading}>

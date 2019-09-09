@@ -1,5 +1,5 @@
 import axios from 'axios'
-import {iLabX, csrfCookieKey, ResCode} from '@micro-experiment/share';
+import {iLabX, csrfCookieKey, ResCode, UserDoc} from '@micro-experiment/share';
 
 export namespace Api {
     function getCookie(key: string) {
@@ -19,7 +19,7 @@ export namespace Api {
         return res.data
     }
 
-    export async function reqInitInfo() {
+    export async function reqInitInfo():Promise<{code:ResCode, user:UserDoc, count:number, waiting:number, msg?:string}> {
         return await get('/initInfo')
     }
 
