@@ -22,7 +22,7 @@ class CBMPlayMode extends BasePlayMode<NCreateParams.CBM> {
   defaultParams: NCreateParams.CBM = {
     allowLeverage: false,
     robotCD: 5,
-    robotType: NCreateParams.CBMRobotType.zip,
+    robotType: NCreateParams.CBMRobotType.normal,
     onceMoreSuffix: gameType2QuerySuffix(GameType.CBM)
   };
 
@@ -61,16 +61,16 @@ class CBMPlayMode extends BasePlayMode<NCreateParams.CBM> {
           {
             [
               {
+                robotType: NCreateParams.CBMRobotType.normal,
+                label: 'Normal'
+              },
+              {
                 robotType: NCreateParams.CBMRobotType.zip,
                 label: 'ZIP'
               },
               {
                 robotType: NCreateParams.CBMRobotType.gd,
                 label: 'GD'
-              },
-              {
-                robotType: NCreateParams.CBMRobotType.normal,
-                label: 'Normal'
               }].map(({robotType, label}) => <li
                 onClick={() => this.setState({params: {...params, robotType}})}>
               <input type='radio' checked={params.robotType === robotType}/>
@@ -260,7 +260,7 @@ const GameTypeConfig: {
       defaultParams = {
         allowLeverage: true,
         robotCD: 5,
-        robotType: NCreateParams.CBMRobotType.zip,
+        robotType: NCreateParams.CBMRobotType.normal,
         onceMoreSuffix: gameType2QuerySuffix(GameType.CBM_Leverage)
       };
     }
