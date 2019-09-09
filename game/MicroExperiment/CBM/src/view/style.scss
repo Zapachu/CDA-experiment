@@ -228,6 +228,12 @@ $sidePanelBasis: 24rem;
         }
       }
     }
+
+    .btnGameOver{
+      position: fixed;
+      top: 20vh;
+      right: 2rem;
+    }
   }
 
   .resultWrapper {

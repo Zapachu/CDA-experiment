@@ -1,8 +1,8 @@
-import * as React from 'react'
-import * as style from './style.scss'
-import {Core} from '@bespoke/client'
-import {Lang, Toast} from '@elf/component'
-import Joyride, {Step} from 'react-joyride'
+import * as React from 'react';
+import * as style from './style.scss';
+import {Core} from '@bespoke/client';
+import {Lang, Toast} from '@elf/component';
+import Joyride, {Step} from 'react-joyride';
 
 import {
     CONFIG,
@@ -18,9 +18,9 @@ import {
     PlayerStatus,
     PushType,
     ROLE
-} from '../config'
-import {Button, Input, ITestPageQuestion, Line, Modal, Tabs, TestPage} from '@micro-experiment/component'
-import {Input as AntInput, Radio} from 'antd'
+} from '../config';
+import {Button, Input, ITestPageQuestion, Line, Modal, Tabs, TestPage} from '@micro-experiment/component';
+import {Input as AntInput, Radio} from 'antd';
 
 function Border({background = `radial-gradient(at 50% 0%, #67e968 1rem, transparent 70%)`, borderRadius = '1rem', children, style}: {
     background?: string,
@@ -280,7 +280,8 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
         closeOutWarning: ['资产低于担保金额130%将被平仓', 'Your count will be closed out when assets is below 130% of guarantee money'],
         closedOut: ['资产低于担保金额130%，已被平仓', 'Your count has been closed out since assets is below 130% of guarantee money'],
         tradeSuccess: [count => `交易成功 , 数量 : ${count}`, count => `Trade success, count : ${count}`],
-        confirm: ['确定', 'Confirm']
+        confirm: ['确定', 'Confirm'],
+        gameOver:['结束交易返回大厅','Over and Back to Lobby']
     })
     const {prepareTime, tradeTime, resultTime} = CONFIG
     const [countDown, setCountDown] = React.useState(0)
@@ -405,6 +406,9 @@ function _Play({gameState, playerState, frameEmitter, game: {params: {allowLever
         {
             renderChartPanel()
         }
+        <div className={style.btnGameOver}>
+            <Button label={lang.gameOver} color={Button.Color.Blue} onClick={()=>exitGame()}/>
+        </div>
     </section>
 
     function submitOrder(role: ROLE, guarantee?: boolean) {
