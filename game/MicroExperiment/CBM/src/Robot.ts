@@ -14,6 +14,7 @@ import {
     MoveType,
     PERIOD,
     PeriodStage,
+    PrivatePriceRegion,
     PushType,
     ROLE
 } from './config';
@@ -21,7 +22,6 @@ import {
 export default class Robot extends BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     normalSleepLoop: NodeJS.Timer;
     normalSleepTime = this.game.params.robotCD * 1e3 * (.5 + Math.random());
-    zipRole: ROLE = Math.random() > .5 ? ROLE.Buyer : ROLE.Seller;
     zipSleepTime = this.game.params.robotCD * 1e3 * (1 + Math.random());
     zipActive: boolean;
     zipFreeField: {
@@ -34,6 +34,11 @@ export default class Robot extends BaseRobot<ICreateParams, IGameState, IPlayerS
     gdSleepTime = this.game.params.robotCD * 1e3 * (1 + Math.random());
 
     //region getter
+    get zipRole(): ROLE {
+        const [[min, max]] = PrivatePriceRegion[this.gameState.type];
+        return this.unitPrice > (min + max) / 2 ? ROLE.Buyer : ROLE.Seller;
+    }
+
     get gamePhaseState(): IGamePeriodState {
         return this.gameState.periods[this.gameState.periodIndex];
     }
@@ -222,7 +227,7 @@ export default class Robot extends BaseRobot<ICreateParams, IGameState, IPlayerS
         this.zipFreeField.u = calcPrice / this.unitPrice - 1;
         this.frameEmitter.emit(MoveType.submitOrder, {
             price: calcPrice,
-            count: ~~(Math.random() * 10),
+            count: ~~(Math.random() * 40) + 10,
             role: this.zipRole
         });
     }
