@@ -1,8 +1,11 @@
 export enum Phase {
-    IPO = 'IPO',
+    IPO_Median = 'IPO_Median',
+    IPO_TopK = 'IPO_TopK',
+    IPO_FPSBA = 'IPO_FPSBA',
     OpenAuction = 'OpenAuction',
     TBM = 'TBM',
-    CBM = 'CBM'
+    CBM = 'CBM',
+    CBM_L = 'CBM_L',
 }
 
 export namespace NCreateParams {
@@ -26,6 +29,9 @@ export namespace NCreateParams {
         type: IPOType
     }
 
+    export interface OpenAuction extends IBaseCreateParams {
+    }
+
     export interface TBM extends IBaseCreateParams {
         groupSize: number;
         buyerCapitalMin: number;
@@ -38,14 +44,22 @@ export namespace NCreateParams {
         sellerPrivateMax: number;
     }
 
+    export const TBMDefaultParams: TBM = {
+        groupSize: 12,
+        buyerCapitalMin: 50000,
+        buyerCapitalMax: 100000,
+        buyerPrivateMin: 65,
+        buyerPrivateMax: 80,
+        sellerQuotaMin: 1000,
+        sellerQuotaMax: 2000,
+        sellerPrivateMin: 30,
+        sellerPrivateMax: 45,
+    };
+
     export interface CBM extends IBaseCreateParams {
         allowLeverage: boolean
         robotType: CBMRobotType
         robotCD: number
-    }
-
-    export interface OpenAuction extends IBaseCreateParams {
-
     }
 }
 
@@ -78,8 +92,9 @@ export interface UserDoc {
 
 export namespace NSocketParam {
     export interface StartGame {
-        multiPlayer: boolean,
-        phase: Phase,
+        multiPlayer: boolean
+        phase: Phase
+        force: boolean
         params
     }
 }

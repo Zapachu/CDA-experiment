@@ -1,30 +1,30 @@
-'use strict'
+'use strict';
 
-import * as path from 'path'
-import {connect as connectMongo} from 'mongoose'
-import * as connectRedis from 'connect-redis'
-import {csrf} from 'lusca'
-import * as Express from 'express'
-import * as expressSession from 'express-session'
-import * as socketIOSession from 'express-socket.io-session'
-import * as passport from 'passport'
-import * as errorHandler from 'errorhandler'
-import * as bodyParser from 'body-parser'
-import * as compression from 'compression'
-import * as morgan from 'morgan'
-import {elfSetting} from '@elf/setting'
-import {gameId2PlayUrl, getOrigin, heartBeat, QCloudSMS, RedisKey, Setting} from './util'
-import {PassportStrategy} from './interface'
-import {AcademusRole, config, csrfCookieKey, IGameConfig, IStartOption} from '@bespoke/share'
-import {EventDispatcher} from './controller/eventDispatcher'
-import {router} from './controller/requestRouter'
-import {AnyLogic, BaseLogic, GameDAO} from './service'
-import {AddressInfo} from 'net'
-import {GameModel, UserDoc, UserModel} from './model'
-import {Strategy} from 'passport-local'
-import * as http from 'http'
-import {Linker, RedisCall, redisClient} from '@elf/protocol'
-import {Log} from '@elf/util'
+import * as path from 'path';
+import {connect as connectMongo} from 'mongoose';
+import * as connectRedis from 'connect-redis';
+import {csrf} from 'lusca';
+import * as Express from 'express';
+import * as expressSession from 'express-session';
+import * as socketIOSession from 'express-socket.io-session';
+import * as passport from 'passport';
+import * as errorHandler from 'errorhandler';
+import * as bodyParser from 'body-parser';
+import * as compression from 'compression';
+import * as morgan from 'morgan';
+import {elfSetting} from '@elf/setting';
+import {gameId2PlayUrl, getOrigin, heartBeat, QCloudSMS, RedisKey, Setting} from './util';
+import {PassportStrategy} from './interface';
+import {AcademusRole, config, csrfCookieKey, IGameConfig, IStartOption} from '@bespoke/share';
+import {EventDispatcher} from './controller/eventDispatcher';
+import {router} from './controller/requestRouter';
+import {AnyLogic, BaseLogic, GameDAO} from './service';
+import {AddressInfo} from 'net';
+import {GameModel, UserDoc, UserModel} from './model';
+import {Strategy} from 'passport-local';
+import * as http from 'http';
+import {Linker, RedisCall, redisClient} from '@elf/protocol';
+import {Log} from '@elf/util';
 
 export class Server {
     private static sessionMiddleware
@@ -148,8 +148,7 @@ export class Server {
                     process.exit(1)
                     break
                 case 'EADDRINUSE':
-                    console.error('Port is already in use')
-                    process.exit(1)
+                    server.listen(0);
                     break
                 default:
                     Log.e(error)

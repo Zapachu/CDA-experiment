@@ -54,10 +54,13 @@ export function runRPC() {
             if (user) {
                 await sendUserStatus(user.iLabXUserName);
                 await sendBackData(user.iLabXUserName, {
-                    [Phase.IPO]:'中位数定价/荷兰式拍卖/第一价格密封拍卖',
+                    [Phase.IPO_Median]: '中位数定价',
+                    [Phase.IPO_TopK]: '荷兰式拍卖',
+                    [Phase.IPO_FPSBA]: '第一价格密封拍卖',
                     [Phase.OpenAuction]:'公开竞价拍卖',
                     [Phase.TBM]:'集合竞价',
-                    [Phase.CBM]:'连续竞价/融资融券',
+                    [Phase.CBM]: '连续竞价',
+                    [Phase.CBM_L]: '融资融券',
                 }[phase]);
                 user.score += 10;
                 await user.save();

@@ -12,10 +12,8 @@ import style from './style.less';
 
 enum Dock { auction = 5, ipo = 1, tbm = 2, cbm = 3, cbm_l = 4 }
 
-enum GameType {IPO_Median, IPO_TopK, IPO_FPSBA, OpenAuction, TBM, CBM, CBM_Leverage}
-
-function gameType2QuerySuffix(gameType: GameType) {
-  return `?${queryString.stringify({gameType})}`;
+function phase2QuerySuffix(phase: Phase) {
+  return `?${queryString.stringify({phase})}`;
 }
 
 class CBMPlayMode extends BasePlayMode<NCreateParams.CBM> {
@@ -23,7 +21,7 @@ class CBMPlayMode extends BasePlayMode<NCreateParams.CBM> {
     allowLeverage: false,
     robotCD: 5,
     robotType: NCreateParams.CBMRobotType.normal,
-    onceMoreSuffix: gameType2QuerySuffix(GameType.CBM)
+    onceMoreSuffix: phase2QuerySuffix(Phase.CBM)
   };
 
   renderConfigDesc() {
@@ -92,9 +90,8 @@ class CBMPlayMode extends BasePlayMode<NCreateParams.CBM> {
   }
 }
 
-const GameTypeConfig: {
-  [key: number]: {
-    phase: Phase,
+const PhaseConfig: {
+  [key: string]: {
     title: string,
     desc: string,
     dock: Dock,
@@ -102,8 +99,7 @@ const GameTypeConfig: {
     PlayMode?: TBasePlayMode<any>
   }
 } = {
-  [GameType.IPO_TopK]: {
-    phase: Phase.IPO,
+  [Phase.IPO_TopK]: {
     title: '荷兰式拍卖',
     dock: Dock.ipo,
     video: 'https://qiniu0.anlint.com/video/whuipo/ipohe.mp4',
@@ -130,12 +126,11 @@ const GameTypeConfig: {
     PlayMode: class extends BasePlayMode<NCreateParams.IPO> {
       defaultParams = {
         type: NCreateParams.IPOType.TopK,
-        onceMoreSuffix: gameType2QuerySuffix(GameType.IPO_TopK)
+        onceMoreSuffix: phase2QuerySuffix(Phase.IPO_TopK)
       };
     }
   },
-  [GameType.IPO_Median]: {
-    phase: Phase.IPO,
+  [Phase.IPO_Median]: {
     title: '中位数定价',
     dock: Dock.ipo,
     video: 'https://qiniu0.anlint.com/video/whuipo/ipozhong.mp4',
@@ -162,12 +157,11 @@ const GameTypeConfig: {
     PlayMode: class extends BasePlayMode<NCreateParams.IPO> {
       defaultParams = {
         type: NCreateParams.IPOType.Median,
-        onceMoreSuffix: gameType2QuerySuffix(GameType.IPO_Median)
+        onceMoreSuffix: phase2QuerySuffix(Phase.IPO_Median)
       };
     }
   },
-  [GameType.IPO_FPSBA]: {
-    phase: Phase.IPO,
+  [Phase.IPO_FPSBA]: {
     title: '第一价格密封拍卖',
     dock: Dock.auction,
     desc: `
@@ -193,12 +187,11 @@ const GameTypeConfig: {
     PlayMode: class extends BasePlayMode<NCreateParams.IPO> {
       defaultParams = {
         type: NCreateParams.IPOType.FPSBA,
-        onceMoreSuffix: gameType2QuerySuffix(GameType.IPO_FPSBA)
+        onceMoreSuffix: phase2QuerySuffix(Phase.IPO_FPSBA)
       };
     }
   },
-  [GameType.OpenAuction]: {
-    phase: Phase.OpenAuction,
+  [Phase.OpenAuction]: {
     title: '公开竞价拍卖',
     dock: Dock.auction,
     desc: `
@@ -206,13 +199,12 @@ const GameTypeConfig: {
     您可以不断提交您的拍卖价格，但是您的拍卖价格必须大于市场上现已有的最高购买价格。至某一价格，30秒内无人加价时，则此时市场上已有的最高拍卖价即为成交价，出此价格的买家即可购入该资产
 `,
     PlayMode: class extends BasePlayMode<NCreateParams.OpenAuction> {
-      defaultParams:NCreateParams.OpenAuction = {
-        onceMoreSuffix: gameType2QuerySuffix(GameType.OpenAuction)
+      defaultParams: NCreateParams.OpenAuction = {
+        onceMoreSuffix: phase2QuerySuffix(Phase.OpenAuction)
       };
     }
   },
-  [GameType.TBM]: {
-    phase: Phase.TBM,
+  [Phase.TBM]: {
     title: '集合竞价',
     dock: Dock.tbm,
     video: 'https://qiniu0.anlint.com/video/whuipo/jihejinjia.mp4',
@@ -220,22 +212,13 @@ const GameTypeConfig: {
     您在一个基金机构工作，您所在的基金机构经过对市场信息的精密分析，现对市场上的股票有一个估值，要您在市场上进行股票交易活动。在这个市场中，您会被系统随机分配为买家或卖家。买家有初始的购买资金M，卖家有初始的股票数量S。买家和卖家对股票的估值不同，并根据自己的估值一次性进行买卖申请。系统将在有效价格范围内选取成交量最大的价位，对接受到的买卖申报一次性集中撮合，产生股票的成交价格。报价大于等于市场成交价格的买家成交；价小于等于市场成交成交价格的卖家成交。买家收益=（成交价-估值）*成交数量；卖家收益=（估值-成交价）*成交数量
     `,
     PlayMode: class extends BasePlayMode<NCreateParams.TBM> {
-      defaultParams:NCreateParams.TBM = {
-        groupSize: 12,
-        buyerCapitalMin: 50000,
-        buyerCapitalMax: 100000,
-        buyerPrivateMin: 65,
-        buyerPrivateMax: 80,
-        sellerQuotaMin: 1000,
-        sellerQuotaMax: 2000,
-        sellerPrivateMin: 30,
-        sellerPrivateMax: 45,
-        onceMoreSuffix: gameType2QuerySuffix(GameType.TBM)
+      defaultParams: NCreateParams.TBM = {
+        ...NCreateParams.TBMDefaultParams,
+        onceMoreSuffix: phase2QuerySuffix(Phase.TBM)
       };
     }
   },
-  [GameType.CBM]: {
-    phase: Phase.CBM,
+  [Phase.CBM]: {
     title: '连续竞价',
     dock: Dock.cbm,
     video: 'https://qiniu0.anlint.com/video/whuipo/lianxujinjia.mp4',
@@ -246,8 +229,7 @@ const GameTypeConfig: {
     `,
     PlayMode: CBMPlayMode
   },
-  [GameType.CBM_Leverage]: {
-    phase: Phase.CBM,
+  [Phase.CBM_L]: {
     title: '融资融券',
     dock: Dock.cbm_l,
     video: 'https://qiniu0.anlint.com/video/whuipo/rongzirongquan.mp4',
@@ -257,18 +239,18 @@ const GameTypeConfig: {
 	您会进入一个有6期交易期的市场，在第1、3、5期结束，您资产中的股票价值以当期股票收盘价计算。在第2、4、6期结束，股票发行公司会发布他们的公司财务报表，相应的股票价值会受到公司财务报表的影响，此时您资产组合中的股票价值以公司发布的财务报表价格计算。
 您可以在市场上融资融券，您可融入与您资金数量相同的资金，也可融入您股票数量相同的股票。当股价变动，使您的资产低于融资或融券价值的150%时，您将会收到券商的警告；小于130%时将被强制清仓，强制清仓后剩余的资金可以继续交易。您可以在任一时间点还款还券。`,
     PlayMode: class extends CBMPlayMode {
-      defaultParams = {
+      defaultParams: NCreateParams.CBM = {
         allowLeverage: true,
         robotCD: 5,
         robotType: NCreateParams.CBMRobotType.normal,
-        onceMoreSuffix: gameType2QuerySuffix(GameType.CBM_Leverage)
+        onceMoreSuffix: phase2QuerySuffix(Phase.CBM_L)
       };
     }
   }
 };
 
-function getGameTypes(dock: Dock): GameType[] {
-  return Object.keys(GameTypeConfig).filter(key => GameTypeConfig[key].dock === dock) as any;
+function getPhases(dock: Dock): Phase[] {
+  return Object.keys(PhaseConfig).filter(key => PhaseConfig[key].dock === dock) as any;
 }
 
 const CONST = {
@@ -437,8 +419,7 @@ enum ModalType {
   continueGame,
   selectMode,
   preMatch,
-  matching,
-  matchSuccess
+  matching
 }
 
 interface State {
@@ -447,11 +428,11 @@ interface State {
   showModal: boolean
   modalType?: ModalType,
   isInitView: boolean,
-  gameType?: GameType,
+  phase?: Phase,
   matchTimer?: number,
   score: number,
-  count:number,
-  waiting:number
+  count: number,
+  waiting: number
 }
 
 export class Hall3D extends React.Component<{}, State> {
@@ -471,16 +452,19 @@ export class Hall3D extends React.Component<{}, State> {
   } = {};
   io: SocketIOClient.Socket;
   matchTimer: number;
-  continuePlayUrl: string;
+  continueInfo: {
+    startParams: NSocketParam.StartGame,
+    playerUrl: string
+  };
   state: State = {
     score: 0,
     isInitView: true,
     focusDock: null,
     showModal: false,
     detailActive: false,
-    gameType: null,
-    count:0,
-    waiting:0
+    phase: null,
+    count: 0,
+    waiting: 0
   };
 
   reqInitInfo() {
@@ -492,17 +476,17 @@ export class Hall3D extends React.Component<{}, State> {
         this.initView();
 
         const urlObj = new URL(window.location.href);
-        const queryObj = queryString.parse(urlObj.search.replace('?', '')) as { gameType: string };
-        if (!queryObj || queryObj.gameType === undefined) {
+        const queryObj = queryString.parse(urlObj.search.replace('?', '')) as { phase: string };
+        if (!queryObj || queryObj.phase === undefined) {
           return;
         }
-        const gameType = +queryObj.gameType;
-        this.handleSelectGame(GameTypeConfig[gameType].dock);
+        const phase = queryObj.phase as Phase;
+        this.handleSelectGame(PhaseConfig[phase].dock);
         setTimeout(() => {
           this.setState({
             showModal: true,
             modalType: ModalType.selectMode,
-            gameType,
+            phase,
           });
         }, 2000);
       }
@@ -528,17 +512,17 @@ export class Hall3D extends React.Component<{}, State> {
   }
 
   renderModalContent() {
-    const {modalType, focusDock, gameType} = this.state;
-    const focusedGameConfig = GameTypeConfig[gameType];
+    const {modalType, focusDock, phase} = this.state;
+    const focusedGameConfig = PhaseConfig[phase];
     switch (modalType) {
       case ModalType.selectSubGameType:
         return <div className={style.selectSubGame}>
           {
-            getGameTypes(focusDock).map((gameType: GameType) => {
+            getPhases(focusDock).map((phase: Phase) => {
               const onClick = _ => {
-                this.setState({gameType: gameType, modalType: ModalType.selectMode});
+                this.setState({phase: phase, modalType: ModalType.selectMode});
               };
-              return <Button key={gameType} onClick={onClick} label={GameTypeConfig[gameType].title}/>;
+              return <Button key={phase} onClick={onClick} label={PhaseConfig[phase].title}/>;
             })
           }
         </div>;
@@ -551,13 +535,19 @@ export class Hall3D extends React.Component<{}, State> {
             <div className={style.splitLine}/>
           </div>
           <div className={style.detail}>
-            {GameTypeConfig[gameType].desc}
+            {PhaseConfig[phase].desc}
           </div>
         </div>;
       case ModalType.continueGame:
         return <div className={style.continueGame}>
           <div className={style.label}>您尚有实验正在进行中，继续该实验吗？</div>
-          <Button onClick={_ => redirect(this.continuePlayUrl)} label="继续"/>
+          <div className={style.btnWrapper}>
+            <Button onClick={() => redirect(this.continueInfo.playerUrl)} label="继续"/>
+            &nbsp;&nbsp;&nbsp;
+            <Button
+                onClick={() => this.io.emit(SocketEvent.reqStartGame, {...this.continueInfo.startParams, force: true})}
+                label="开始新实验"/>
+          </div>
         </div>;
       case ModalType.selectMode:
         const {PlayMode = BasePlayMode} = focusedGameConfig;
@@ -572,31 +562,27 @@ export class Hall3D extends React.Component<{}, State> {
             <div className={style.splitLine}/>
             {
               focusedGameConfig.video ? <video src={focusedGameConfig.video} controls autoPlay
-                                               ref={node => this.gamePhaseVideoRefs[gameType] = node}/> : null
+                                               ref={node => this.gamePhaseVideoRefs[phase] = node}/> : null
             }
           </div>
           <PlayMode onSubmit={(multiMode, params) =>
-              this.startMatch(multiMode, focusedGameConfig.phase, params)
+              this.startMatch(multiMode, phase, params)
           }/>
         </div>;
       case ModalType.preMatch:
         return <div>
           <Loading label="处理中"/>
         </div>;
-      case ModalType.matchSuccess:
-        return <div className={style.matchSuccess}>
-          玩家匹配成功！
-        </div>;
     }
   }
 
   renderModal() {
-    const {showModal, modalType, gameType, matchTimer} = this.state;
+    const {showModal, modalType, phase, matchTimer} = this.state;
     const handleClose = async () => {
       if (this.matchTimer) {
         clearInterval(this.matchTimer);
       }
-      const videoNodeRef = this.gamePhaseVideoRefs[gameType];
+      const videoNodeRef = this.gamePhaseVideoRefs[phase];
       if (videoNodeRef) {
         videoNodeRef.pause();
       }
@@ -611,7 +597,7 @@ export class Hall3D extends React.Component<{}, State> {
       });
       if ([ModalType.matching, ModalType.preMatch].includes(modalType)) {
         this.io.emit(SocketEvent.leaveMatchRoom, {
-          gamePhase: gameType
+          gamePhase: phase
         });
       }
 
@@ -625,9 +611,7 @@ export class Hall3D extends React.Component<{}, State> {
         {
           this.renderModalContent()
         }
-        <div className={style.bottom}>
-          <Button onClick={handleClose} label="返回"/>
-        </div>
+        <a className={style.btnClose} onClick={() => handleClose()}>×</a>
       </div>
     </Modal>;
   }
@@ -881,13 +865,13 @@ export class Hall3D extends React.Component<{}, State> {
   }
 
   handleShowGameModal(dock: Dock) {
-    const gameType = getGameTypes(dock),
-        moreThanOne = gameType.length > 1;
+    const phase = getPhases(dock),
+        moreThanOne = phase.length > 1;
     this.setState({
       showModal: true,
       modalType: moreThanOne ? ModalType.selectSubGameType : ModalType.selectMode,
       focusDock: dock,
-      gameType: moreThanOne ? null : (gameType[0])
+      phase: moreThanOne ? null : (phase[0])
     });
   }
 
@@ -969,18 +953,16 @@ export class Hall3D extends React.Component<{}, State> {
       if (this.matchTimer) {
         clearInterval(this.matchTimer);
       }
-      this.setState({
-        modalType: ModalType.matchSuccess
-      });
+      Toast.success('匹配成功！');
       setTimeout(() => {
         redirect(playerUrl);
       }, 1000);
     });
-    io.on(SocketEvent.continueGame, ({playerUrl}) => {
+    io.on(SocketEvent.continueGame, continueInfo => {
       this.setState({
         modalType: ModalType.continueGame,
       });
-      this.continuePlayUrl = playerUrl;
+      this.continueInfo = continueInfo;
     });
     io.on(SocketEvent.handleError, (data: { eventType: SocketEvent, msg: string }) => {
       const {eventType, msg} = data;

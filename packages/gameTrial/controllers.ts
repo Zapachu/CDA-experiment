@@ -1,17 +1,17 @@
-import Socket from 'socket.io'
-import passport from 'passport'
-import {NextFunction, Request, Response} from 'express'
-import socketEmitter from 'socket.io-emitter'
-import {RedisCall, Trial} from '@elf/protocol'
-import Redis from 'ioredis'
+import Socket from 'socket.io';
+import passport from 'passport';
+import {NextFunction, Request, Response} from 'express';
+import socketEmitter from 'socket.io-emitter';
+import {RedisCall, Trial} from '@elf/protocol';
+import Redis from 'ioredis';
 
-import {User} from './models'
-import {UserDoc} from './interface'
-import {elfSetting} from '@elf/setting'
-import config from './config'
-import {clientSocketListenEvnets, ResCode, serverSocketListenEvents, UserGameStatus} from './enums'
-import areaCode from './config/areaCode'
-import gameConfig from './config/gameConfig'
+import {User} from './models';
+import {UserDoc} from './interface';
+import {elfSetting} from '@elf/setting';
+import config from './config';
+import {clientSocketListenEvnets, ResCode, serverSocketListenEvents, UserGameStatus} from './enums';
+import areaCode from './config/areaCode';
+import gameConfig from './config/gameConfig';
 
 type Phase = string
 
@@ -187,15 +187,11 @@ const redisTools = new RedisTools(redisCli);
 const sockerManager = new SocketManager(redisTools);
 const roomManager = new RoomManager(sockerManager);
 
-RedisCall.handle<Trial.Done.IReq, Trial.Done.IRes>(Trial.Done.name, async ({ userId, onceMore, namespace: phase }) => {
+RedisCall.handle<Trial.Done.IReq, Trial.Done.IRes>(Trial.Done.name, async ({userId, namespace: phase}) => {
     let lobbyUrl = config.lobbyUrl
     await redisTools.setUserGameData(userId, phase, {
         status: UserGameStatus.notStarted
     })
-    if (onceMore) {
-        lobbyUrl = `${lobbyUrl}/game/${phase}`
-    }
-    console.log(lobbyUrl, 'lobbyurl')
     return { lobbyUrl }
 })
 

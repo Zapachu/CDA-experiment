@@ -1,11 +1,11 @@
-import * as React from 'react'
-import * as style from './style.scss'
-import * as dateFormat from 'dateformat'
-import {Core} from '@bespoke/client'
-import {Lang} from '@elf/component'
-import {Tabs, Table} from 'antd'
-import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
-import {MoveType, PushType} from '../config'
+import * as React from 'react';
+import * as style from './style.scss';
+import {Core} from '@bespoke/client';
+import {Lang} from '@elf/component';
+import {Table, Tabs} from 'antd';
+import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface';
+import {MoveType, PushType} from '../config';
+import dateFormat = require('dateformat');
 
 export function Play4Owner({game: {}, playerStates, gameState: {logs, groups}}: Core.IPlay4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {
     const lang = Lang.extractLang({
@@ -17,10 +17,10 @@ export function Play4Owner({game: {}, playerStates, gameState: {logs, groups}}: 
         logs: ['操作记录', 'Logs'],
         money: ['金额', 'Money'],
         time: ['时间', 'Time']
-    })
-    const [activeTabKey, setActiveTabKey] = React.useState(lang.members)
-    const playerNames = []
-    Object.values(playerStates).forEach(({positionIndex, user}) => playerNames[positionIndex] = user.name)
+    });
+    const [activeTabKey, setActiveTabKey] = React.useState(lang.members);
+    const playerNames = [];
+    Object.values(playerStates).forEach(({positionIndex, user}) => playerNames[positionIndex] = user.name);
     return <section className={style.play4owner}>
         <div className={style.tabsWrapper}>
             <Tabs defaultActiveKey={activeTabKey} onChange={setActiveTabKey}>
@@ -31,7 +31,7 @@ export function Play4Owner({game: {}, playerStates, gameState: {logs, groups}}: 
                             name: user.name,
                             mobile: user.mobile,
                             group: groupIndex + 1,
-                            round: groups[groupIndex]? groups[groupIndex].roundIndex+1 : null
+                            round: groups[groupIndex] ? groups[groupIndex].roundIndex + 1 : null
                         })
                     )} columns={[
                         {
@@ -95,5 +95,5 @@ export function Play4Owner({game: {}, playerStates, gameState: {logs, groups}}: 
                 </Tabs.TabPane>
             </Tabs>
         </div>
-    </section>
+    </section>;
 }

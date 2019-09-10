@@ -1,6 +1,6 @@
-import * as style from "../style.scss"
-import * as dateFormat from "dateformat"
-import * as React from "react"
+import * as style from '../style.scss';
+import * as React from 'react';
+import dateFormat = require('dateformat');
 
 const Stock = () => {
     return <table className={style.infoTable}>
@@ -22,7 +22,7 @@ const Stock = () => {
             <td>{dateFormat(Date.now(), 'yyyy/mm/dd')}</td>
         </tr>
         </tbody>
-    </table>
-}
+    </table>;
+};
 
-export default Stock
+export default Stock;

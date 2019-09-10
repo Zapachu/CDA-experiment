@@ -212,8 +212,7 @@ var Server = /** @class */ (function () {
                     process.exit(1);
                     break;
                 case 'EADDRINUSE':
-                    console.error('Port is already in use');
-                    process.exit(1);
+                    server.listen(0);
                     break;
                 default:
                     util_2.Log.e(error);

@@ -1,23 +1,23 @@
-import {BaseController, IActor, IMoveCallback, RedisCall, TGameState, TPlayerState} from '@bespoke/server'
+import {BaseController, IActor, IMoveCallback, RedisCall, TGameState, TPlayerState} from '@bespoke/server';
 import {
-  BuyNumberRange,
-  CONFIG,
-  ICreateParams,
-  IGameRoundState,
-  IGameState,
-  IMoveParams,
-  IPlayerRoundState,
-  IPlayerState,
-  IPushParams,
-  MoveType,
-  namespace,
-  PlayerStatus,
-  PriceRange,
-  PushType
-} from './config'
-import {NCreateParams, STOCKS} from '@micro-experiment/share'
-import {Trial} from '@elf/protocol'
-import IPOType = NCreateParams.IPOType
+    BuyNumberRange,
+    CONFIG,
+    ICreateParams,
+    IGameRoundState,
+    IGameState,
+    IMoveParams,
+    IPlayerRoundState,
+    IPlayerState,
+    IPushParams,
+    MoveType,
+    namespace,
+    PlayerStatus,
+    PriceRange,
+    PushType
+} from './config';
+import {NCreateParams, STOCKS} from '@micro-experiment/share';
+import {Trial} from '@elf/protocol';
+import IPOType = NCreateParams.IPOType;
 
 export function genRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min

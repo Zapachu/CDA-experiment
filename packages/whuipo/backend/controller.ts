@@ -10,7 +10,7 @@ import {elfSetting} from '@elf/setting';
 import {Config} from './config';
 import {iLabX, NSocketParam, Phase, ResCode, SocketEvent, UserGameStatus} from '@micro-experiment/share';
 import {RedisCall, Trial} from '@elf/protocol';
-import setting from './setting'
+import setting from './setting';
 import XJWT from './XJWT';
 
 const ioEmitter = socketEmitter({
@@ -221,44 +221,40 @@ export function handleSocketInit(ioServer: Socket.Server) {
     if (socket.request.user.logged_in) {
       pushUserSocket(user._id, socket.id);
     }
-    socket.on(SocketEvent.reqStartGame, async function ({multiPlayer, phase, params}: NSocketParam.StartGame) {
+      socket.on(SocketEvent.reqStartGame, async function (startParams: NSocketParam.StartGame) {
+          const {multiPlayer, phase, force, params} = startParams;
       try {
         if (!socket.request.user.logged_in) {
           throw new Error('没有登陆');
         }
-        console.log(
-            socket.request.isAuthenticated,
-            socket.request.isAuthenticated()
-        );
-        console.log(`请求者uid:${socket.request.user._id}`);
         const uid = socket.request.user._id;
         const userGameData = await RedisTools.getUserGameData(uid, phase);
-        if (userGameData && userGameData.status === UserGameStatus.started) {
+          Log.d(startParams);
+          if (userGameData && userGameData.status === UserGameStatus.started && !force) {
           socket.emit(SocketEvent.continueGame, {
+              startParams,
             playerUrl: userGameData.playerUrl
           });
           return;
         }
-        if (
-            !userGameData ||
-            userGameData.status === UserGameStatus.notStarted
-        ) {
+          if (userGameData && userGameData.status === UserGameStatus.matching) {
+              throw new Error('正在匹配中, 请稍后');
+          }
           const user = await User.findById(uid);
           if (multiPlayer) {
-            joinMatchRoom(phase, user._id, params);
-            const matchRoom = matchRoomOfGame[phase];
+              joinMatchRoom(phase, user._id, params);
+              const matchRoom = matchRoomOfGame[phase];
 
-            await RedisTools.setUserGameData(uid, phase, {
-              status: UserGameStatus.matching
-            });
-            socket.emit(SocketEvent.startMatch);
-            if (matchRoom.length === Config.roomSize) {
-              await emitMatchSuccess(phase, matchRoom, params);
-              await clearRoom(phase);
-            }
+              await RedisTools.setUserGameData(uid, phase, {
+                  status: UserGameStatus.matching
+              });
+              socket.emit(SocketEvent.startMatch);
+              if (matchRoom.length === Config.roomSize) {
+                  await emitMatchSuccess(phase, matchRoom, params);
+                  await clearRoom(phase);
+              }
           } else {
-            await emitMatchSuccess(phase, [user._id], params);
-          }
+              await emitMatchSuccess(phase, [user._id], params);
         }
       } catch (e) {
         console.error(e);
@@ -302,10 +298,13 @@ export function handleSocketInit(ioServer: Socket.Server) {
 
           if (userSockets.length === 0) {
             const games = [
-              Phase.IPO,
+                Phase.IPO_Median,
+                Phase.IPO_TopK,
+                Phase.IPO_FPSBA,
               Phase.OpenAuction,
               Phase.TBM,
-              Phase.CBM
+                Phase.CBM,
+                Phase.CBM_L,
             ];
             const tasks = games.map(async (game: Phase) => {
               const userGameData = await RedisTools.getUserGameData(uid, game);

@@ -8,9 +8,9 @@
       "dom",
       "scripthost"
     ],
-    "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "skipLibCheck": true,
+    "esModuleInterop": true,
     "downlevelIteration": true,
     "jsx": "react"
   },

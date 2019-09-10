@@ -1,15 +1,15 @@
-import {BaseRobot} from '@bespoke/robot'
+import {BaseRobot} from '@bespoke/robot';
 import {
-  BuyNumberRange,
-  ICreateParams,
-  IGameState,
-  IMoveParams,
-  IPlayerState,
-  IPushParams,
-  MoveType,
-  PushType
-} from './config'
-import {formatDigits, genRandomInt} from './Controller'
+    BuyNumberRange,
+    ICreateParams,
+    IGameState,
+    IMoveParams,
+    IPlayerState,
+    IPushParams,
+    MoveType,
+    PushType
+} from './config';
+import {formatDigits, genRandomInt} from './Controller';
 
 function genPriceAndNum(
     min: number,

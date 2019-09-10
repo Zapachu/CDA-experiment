@@ -1,8 +1,8 @@
-import * as React from 'react'
-import * as QRCode from 'qrcode.react'
-import * as style from './style.scss'
-import {Core} from '@bespoke/client'
-import {Toast} from '@elf/component'
+import * as React from 'react';
+import * as QRCode from 'qrcode.react';
+import * as style from './style.scss';
+import {Core} from '@bespoke/client';
+import {Toast} from '@elf/component';
 import {
     GARBAGE,
     GARBAGE_LABEL,
@@ -18,10 +18,10 @@ import {
     PushType,
     SHOUT_TIMER,
     TOTAL_SCORE
-} from '../config'
-import Modal from './components/Modal'
-import CircleProgress from './components/CircleProgress'
-import Btn, {BTN} from './components/Btn'
+} from '../config';
+import Modal from './components/Modal';
+import CircleProgress from './components/CircleProgress';
+import Btn, {BTN} from './components/Btn';
 
 const IMG_RULE = require('./components/rule.png')
 const IMG_PREPARE_BUTTON = require('./components/prepare_button.png')
@@ -508,10 +508,11 @@ export class Play extends Core.Play<ICreateParams,
                 </div>
             )
         }
+        const QR = QRCode as any;
         return (
             <div className={style.shareModal}>
                 <p>扫码分享到微信</p>
-                <QRCode
+                <QR
                     size={150}
                     value={this.shareUrl + `?userId=${playerState.user.id}`}
                 />

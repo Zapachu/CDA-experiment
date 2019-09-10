@@ -1,8 +1,26 @@
 {
   "apps": [
     {
-      "script": "../game/MicroExperiment/IPO/build/serve.js",
-      "name": "IPO",
+      "script": "../game/MicroExperiment/IPO_Median/build/serve.js",
+      "name": "IPO_Median",
+      "env": {
+        "NODE_ENV": "production",
+        "BESPOKE_WITH_PROXY": "true"
+      },
+      "log_date_format": "YYYY-MM-DD HH:mm Z"
+    },
+    {
+      "script": "../game/MicroExperiment/IPO_TopK/build/serve.js",
+      "name": "IPO_TopK",
+      "env": {
+        "NODE_ENV": "production",
+        "BESPOKE_WITH_PROXY": "true"
+      },
+      "log_date_format": "YYYY-MM-DD HH:mm Z"
+    },
+    {
+      "script": "../game/MicroExperiment/IPO_FPSBA/build/serve.js",
+      "name": "IPO_FPSBA",
       "env": {
         "NODE_ENV": "production",
         "BESPOKE_WITH_PROXY": "true"
@@ -21,6 +39,15 @@
     {
       "script": "../game/MicroExperiment/CBM/build/serve.js",
       "name": "CBM",
+      "env": {
+        "NODE_ENV": "production",
+        "BESPOKE_WITH_PROXY": "true"
+      },
+      "log_date_format": "YYYY-MM-DD HH:mm Z"
+    },
+    {
+      "script": "../game/MicroExperiment/CBM_L/build/serve.js",
+      "name": "CBM_L",
       "env": {
         "NODE_ENV": "production",
         "BESPOKE_WITH_PROXY": "true"
