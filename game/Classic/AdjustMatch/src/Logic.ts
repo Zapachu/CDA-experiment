@@ -1,8 +1,9 @@
-import * as Extend from '@extend/server'
-import {IActor, IMoveCallback} from '@bespoke/share'
-import {Wrapper} from '@extend/share'
+import * as Extend from '@extend/server';
+import {IActor, IMoveCallback} from '@bespoke/share';
+import {Wrapper} from '@extend/share';
 import {
     CONFIG,
+    GoodStatus,
     ICreateParams,
     IGameRoundState,
     IGameState,
@@ -14,58 +15,59 @@ import {
     PlayerRoundStatus,
     PlayerStatus,
     PushType
-} from './config'
-import {Log} from '@elf/util'
-import shuffle = require('lodash/shuffle')
+} from './config';
+import {Log} from '@elf/util';
+import shuffle = require('lodash/shuffle');
 
 class GroupLogic extends Extend.Group.Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     initGameState(): IGameState {
-        const gameState = super.initGameState()
-        gameState.rounds = []
-        return gameState
+        const gameState = super.initGameState();
+        gameState.rounds = [];
+        return gameState;
     }
 
     async initPlayerState(index: number): Promise<Wrapper.TPlayerState<IPlayerState>> {
-        const playerState = await super.initPlayerState(index)
-        playerState.index = index
-        playerState.status = PlayerStatus.guide
-        playerState.rounds = []
-        return playerState
+        const playerState = await super.initPlayerState(index);
+        playerState.index = index;
+        playerState.status = PlayerStatus.guide;
+        playerState.rounds = [];
+        return playerState;
     }
 
     async startRound(r: number) {
-        const {round, oldPlayer, newPlayer, minPrivateValue, maxPrivateValue} = this.params
+        const {round, oldPlayer, minPrivateValue, maxPrivateValue} = this.params;
         if (r >= round) {
-            return
+            return;
         }
         const gameState = await this.stateManager.getGameState(),
-            playerStates = await this.stateManager.getPlayerStates()
-        gameState.round = r
+            playerStates = await this.stateManager.getPlayerStates();
+        gameState.round = r;
+        Log.d(oldPlayer, this.groupSize);
         gameState.rounds[r] = {
             timeLeft: CONFIG.tradeSeconds,
-            oldFlag: shuffle([...Array(oldPlayer).fill(true), ...Array(newPlayer).fill(false)]),
+            goodStatus: shuffle([...Array(oldPlayer).fill(GoodStatus.old), ...Array(this.groupSize - oldPlayer).fill(GoodStatus.new)]),
             result: []
-        }
+        };
         Object.values(playerStates).forEach(p => p.rounds[r] = {
-            status: PlayerRoundStatus.prepare,
+            status: PlayerRoundStatus.play,
             sort: [],
-            privatePrices: Array(newPlayer + oldPlayer).fill(null)
+            privatePrices: Array(this.groupSize).fill(null)
                 .map(() => ~~(minPrivateValue + Math.random() * (maxPrivateValue - minPrivateValue)))
-        })
-        await this.stateManager.syncState()
+        });
+        await this.stateManager.syncState();
         const tradeTimer = global.setInterval(() => {
-            if(gameState.rounds[r].result.length){
+            if (gameState.rounds[r].result.length) {
 
             }
-        }, 1e3)
+        }, 1e3);
     }
 
     async getPlayerRoundStates(): Promise<Array<IPlayerRoundState>> {
         const gameState = await this.stateManager.getGameState(),
             {round} = gameState,
             playerStates = await this.stateManager.getPlayerStates(),
-            playerStatesArr = Object.values(playerStates)
-        return playerStatesArr.map(({rounds}) => rounds[round])
+            playerStatesArr = Object.values(playerStates);
+        return playerStatesArr.map(({rounds}) => rounds[round]);
     }
 
     async getState(): Promise<{
@@ -79,48 +81,57 @@ class GroupLogic extends Extend.Group.Logic<ICreateParams, IGameState, IPlayerSt
             gameRoundState = gameState.rounds[round],
             playerStates = await this.stateManager.getPlayerStates(),
             playerStatesArr = Object.values(playerStates),
-            playerRoundStates = await this.getPlayerRoundStates()
+            playerRoundStates = await this.getPlayerRoundStates();
         return {
             gameState, gameRoundState, playerStatesArr, playerRoundStates
-        }
+        };
     }
 
     async roundOver() {
-        const {gameState: {round}, gameRoundState, playerRoundStates} = await this.getState()
-        Log.d(playerRoundStates.map(({sort}) => sort))
-        Log.d(gameRoundState.result)
-        Log.d('TODO : Round Over')
-        if (round <= this.params.round) {
-            this.startRound(round + 1)
+        const {gameState, gameRoundState, playerRoundStates, playerStatesArr} = await this.getState();
+        Log.d(playerRoundStates.map(({sort}) => sort));
+        Log.d('TODO : Round Over', gameRoundState.result);
+        if (gameState.round < this.params.round - 1) {
+            playerRoundStates.forEach(p => p.status = PlayerRoundStatus.result);
+            global.setTimeout(() => this.startRound(gameState.round + 1), 3e3);
         } else {
-            Log.d('TODO : Game Over')
+            playerStatesArr.forEach(p => p.status = PlayerStatus.result);
         }
+        await this.stateManager.syncState();
     }
 
     async playerMoveReducer(actor: IActor, type: MoveType, params: IMoveParams, cb: IMoveCallback): Promise<void> {
+        const {groupSize} = this;
         const {gameState, playerStatesArr, playerRoundStates} = await this.getState(),
             playerState = await this.stateManager.getPlayerState(actor),
             {round} = gameState,
-            playerRoundState = playerState.rounds[round]
+            gameRoundState = gameState.rounds[round],
+            playerRoundState = playerState.rounds[round];
         switch (type) {
             case MoveType.guideDone: {
-                playerState.status = PlayerStatus.round
-                if (playerStatesArr.every(p => p.status === PlayerStatus.round)) {
-                    this.startRound(0)
+                playerState.status = PlayerStatus.round;
+                if (playerStatesArr.length === groupSize && playerStatesArr.every(p => p.status === PlayerStatus.round)) {
+                    this.startRound(0);
                 }
-                break
+                break;
             }
-            case MoveType.submit:
-                playerRoundState.status = PlayerRoundStatus.wait
-                playerRoundState.sort = params.sort
+            case MoveType.leave: {
+                playerRoundState.status = PlayerRoundStatus.wait;
+                gameRoundState.goodStatus[playerState.index] = GoodStatus.left;
+                break;
+            }
+            case MoveType.submit: {
+                playerRoundState.status = PlayerRoundStatus.wait;
+                playerRoundState.sort = params.sort;
                 if (playerRoundStates.every(p => p.status === PlayerRoundStatus.wait)) {
-                    this.roundOver()
+                    this.roundOver();
                 }
+                break;
+            }
         }
-
     }
 }
 
 export class Logic extends Extend.Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
-    GroupLogic = GroupLogic
+    GroupLogic = GroupLogic;
 }

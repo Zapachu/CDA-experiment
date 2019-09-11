@@ -1,8 +1,9 @@
-import * as React from 'react'
-import * as Extend from '@extend/client'
-import {Button, Tag} from 'antd'
-import * as style from './style.scss'
+import * as React from 'react';
+import * as Extend from '@extend/client';
+import {Button, Tag} from 'antd';
+import * as style from './style.scss';
 import {
+    GoodStatus,
     ICreateParams,
     IGameRoundState,
     IGameState,
@@ -14,9 +15,9 @@ import {
     PlayerRoundStatus,
     PlayerStatus,
     PushType
-} from '../config'
-import {FrameEmitter, Lang, MaskLoading} from '@elf/component'
-import {DragTable} from './component/DragTable'
+} from '../config';
+import {FrameEmitter, Lang, MaskLoading} from '@elf/component';
+import {DragTable} from './component/DragTable';
 
 function RoundPlay({playerRoundState, gameRoundState, frameEmitter, playerIndex}: {
     playerRoundState: IPlayerRoundState,
@@ -28,90 +29,111 @@ function RoundPlay({playerRoundState, gameRoundState, frameEmitter, playerIndex}
         good: ['物品', 'Good'],
         privateValue: ['心理价值', 'Private Value'],
         goodStatus: ['物品状态', 'Good Status'],
+        leftMarket: ['已离开市场', 'Left market'],
         beingOwned: ['被持有', 'Being owned'],
         beingOwnedByYou: ['被你持有', 'Being owned by you'],
         wait4Others: ['等待其它玩家提交......'],
-    })
-    const {oldFlag} = gameRoundState, {privatePrices, status} = playerRoundState
-    const [sort, setSort] = React.useState(privatePrices.map((_, i) => i))
+        leave: ['不参与', 'Don\'t Participate in'],
+        submit: ['提交', 'Submit'],
+    });
+    const {goodStatus} = gameRoundState, {privatePrices, status} = playerRoundState;
+    const [sort, setSort] = React.useState(privatePrices.map((_, i) => i));
     switch (status) {
-        case PlayerRoundStatus.prepare:
-            return <section className={style.roundPlay}>
-                <DragTable columns={[
-                    {
-                        title: lang.good,
-                        dataIndex: 'key',
-                        key: 'key',
-                        render: v => <div style={colStyle}>{v + 1}</div>
-                    },
-                    {
-                        title: lang.privateValue,
-                        dataIndex: 'price',
-                        key: 'price',
-                        render: v => <div style={colStyle}>{v}</div>
-                    },
-                    {
-                        title: lang.goodStatus,
-                        dataIndex: 'isOld',
-                        key: 'isOld',
-                        render: (isOld, {isYou}) => <div style={colStyle}>
-                            {
-                                isOld ? isYou ?
+        case PlayerRoundStatus.play:
+            return <Play/>;
+        case PlayerRoundStatus.wait:
+            return <MaskLoading label={lang.wait4Others}/>;
+        case PlayerRoundStatus.result:
+            return <div>Round Result</div>;
+    }
+
+    function Play() {
+        const colStyle: React.CSSProperties = {
+            minWidth: '6rem',
+            maxWidth: '12rem'
+        };
+        return <section className={style.roundPlay}>
+            <DragTable columns={[
+                {
+                    title: lang.good,
+                    dataIndex: 'key',
+                    key: 'key',
+                    render: v => <div style={colStyle}>{v + 1}</div>
+                },
+                {
+                    title: lang.privateValue,
+                    dataIndex: 'price',
+                    key: 'price',
+                    render: v => <div style={colStyle}>{v}</div>
+                },
+                {
+                    title: lang.goodStatus,
+                    dataIndex: 'goodStatus',
+                    key: 'goodStatus',
+                    render: (goodStatus, {isYou}) => <div style={colStyle}>
+                        {
+                            goodStatus === GoodStatus.left ?
+                                <Tag color='gray'>{lang.leftMarket}</Tag> :
+                                goodStatus === GoodStatus.old ? isYou ?
                                     <Tag color='green'>{lang.beingOwnedByYou}</Tag> :
                                     <Tag color='blue'>{lang.beingOwned}</Tag> : null
-                            }
-                        </div>
-                    }
-                ]} data={sort.map(i => ({
-                    key: i,
-                    price: privatePrices[i],
-                    isOld: oldFlag[i],
-                    isYou: i === playerIndex
-                }))} setData={data => setSort(data.map(({key}) => key))}/>
-                <Button onClick={() => frameEmitter.emit(MoveType.submit, {sort})}>Submit</Button>
-            </section>
-        case PlayerRoundStatus.wait:
-            return <MaskLoading label={lang.wait4Others}/>
-        case PlayerRoundStatus.result:
-            return <div>RESULT</div>
-    }
-    const colStyle: React.CSSProperties = {
-        minWidth: '6rem',
-        maxWidth: '12rem'
+                        }
+                    </div>
+                }
+            ]} data={sort.map(i => ({
+                key: i,
+                price: privatePrices[i],
+                goodStatus: goodStatus[i],
+                isYou: i === playerIndex
+            }))} setData={data => setSort(data.map(({key}) => key))}/>
+            <div className={style.btnsWrapper}>
+                {
+                    goodStatus[playerIndex] === GoodStatus.old ?
+                        <Button onClick={() => frameEmitter.emit(MoveType.leave, {sort})}>{lang.leave}</Button> : null
+                }
+                <Button type={'primary'}
+                        onClick={() => frameEmitter.emit(MoveType.submit, {sort})}>{lang.submit}</Button>
+            </div>
+        </section>;
     }
 }
 
 class GroupPlay extends Extend.Group.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     lang = Lang.extractLang({
+        round1: ['第', 'Round'],
+        round2: ['轮', ''],
         wait4OtherPlayers: ['等待其它玩家加入......']
-    })
+    });
 
     render(): React.ReactNode {
-        const {lang, props: {playerState, gameState, frameEmitter}} = this
+        const {lang, props: {playerState, gameState, frameEmitter}} = this;
         if (playerState.status === PlayerStatus.guide) {
-            return <section>
-                <Button onClick={() => frameEmitter.emit(MoveType.guideDone)}>Start</Button>
-            </section>
+            return <section className={style.groupGuide}>
+                <Button type='primary' onClick={() => frameEmitter.emit(MoveType.guideDone)}>Start</Button>
+            </section>;
         }
         if (playerState.status === PlayerStatus.result) {
-            return <section>
+            return <section className={style.groupResult}>
                 Result
-            </section>
+            </section>;
         }
         const playerRoundState = playerState.rounds[gameState.round],
-            gameRoundState = gameState.rounds[gameState.round]
+            gameRoundState = gameState.rounds[gameState.round];
         if (!playerRoundState) {
-            return <MaskLoading label={lang.wait4OtherPlayers}/>
+            return <MaskLoading label={lang.wait4OtherPlayers}/>;
         }
-        return <RoundPlay {...{
-            playerRoundState,
-            gameRoundState,
-            frameEmitter,
-            playerIndex: playerState.index
-        }}/>
+        return <section className={style.groupPlay}>
+            <h2 className={style.title}>{lang.round1}{gameState.round + 1}{lang.round2}</h2>
+            <RoundPlay {...{
+                playerRoundState,
+                gameRoundState,
+                frameEmitter,
+                playerIndex: playerState.index
+            }}/>
+        </section>;
     }
 }
 
 export class Play extends Extend.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
-    GroupPlay = GroupPlay
+    GroupPlay = GroupPlay;
 }

@@ -1,12 +1,13 @@
-export const namespace = 'AdjustMatch'
+export const namespace = 'AdjustMatch';
 
 export const CONFIG = {
     tradeSeconds: 30,
     resultSeconds: 5,
-}
+};
 
 export enum MoveType {
     guideDone,
+    leave,
     submit
 }
 
@@ -23,15 +24,20 @@ export interface IPushParams {
 export interface ICreateParams {
     round: number
     oldPlayer: number
-    newPlayer: number
     minPrivateValue: number
     maxPrivateValue: number
 }
 
+export enum GoodStatus {
+    new,
+    old,
+    left,
+}
+
 export interface IGameRoundState {
-    timeLeft:number
+    timeLeft: number
     result: number[]
-    oldFlag: boolean[]
+    goodStatus: GoodStatus[]
 }
 
 export interface IGameState {
@@ -40,14 +46,14 @@ export interface IGameState {
 }
 
 export enum PlayerRoundStatus {
-    prepare,
+    play,
     wait,
     result
 }
 
 export interface IPlayerRoundState {
     privatePrices: number[]
-    sort:number[]
+    sort: number[]
     status: PlayerRoundStatus
 }
 
