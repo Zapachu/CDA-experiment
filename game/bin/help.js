@@ -76,7 +76,8 @@ var TaskHelper;
     TaskHelper.execTask = execTask;
     function distServer(project) {
         execTask({
-            command: "tsc -t ES5 --downlevelIteration --experimentalDecorators --listEmittedFiles --outDir ./" + project + "/build ./" + project + "/src/serve.ts"
+            env: { PROJECT: project },
+            command: "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./bin/webpack.server.ts"
         });
     }
     TaskHelper.distServer = distServer;
