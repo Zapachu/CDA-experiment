@@ -7,6 +7,7 @@
     "@bespoke/share": "^1.1.1",
     "@bespoke/client": "^1.1.1",
     "@elf/component": "^1.1.1",
+    "@elf/client": "^1.1.1",
     "@extend/share": "^1.1.1"
   }
 }

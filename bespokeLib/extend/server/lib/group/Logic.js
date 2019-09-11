@@ -36,7 +36,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var Logic = /** @class */ (function () {
-    function Logic(params, stateManager) {
+    function Logic(groupSize, params, stateManager) {
+        this.groupSize = groupSize;
         this.params = params;
         this.stateManager = stateManager;
     }
