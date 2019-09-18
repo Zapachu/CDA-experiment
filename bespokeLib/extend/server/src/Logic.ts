@@ -5,15 +5,15 @@ import * as Group from './group';
 export class Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>
     extends BaseLogic<Wrapper.ICreateParams<ICreateParams>, Wrapper.IGameState<IGameState>, Wrapper.IPlayerState<IPlayerState>, Wrapper.MoveType<MoveType>, PushType, Wrapper.IMoveParams<IMoveParams>, IPushParams> {
 
-    GroupLogic: new(groupSize: number, params: ICreateParams, stateManager: Group.StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) => Group.Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>;
+    GroupLogic: new(gameId: string, groupIndex: number, groupSize: number, params: ICreateParams, stateManager: Group.StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) => Group.Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>;
 
     groupsLogic: Group.Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>[];
 
     async init(): Promise<this> {
         await super.init();
-        const {game: {params: {group, groupSize, groupsParams}}} = this;
+        const {game: {id, params: {group, groupSize, groupsParams}}} = this;
         this.groupsLogic = Array(group).fill(null).map((_, i) =>
-            new this.GroupLogic(groupSize, groupsParams[i], new Group.StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>(i, this.stateManager))
+            new this.GroupLogic(id, i, groupSize, groupsParams[i], new Group.StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>(i, this.stateManager))
         );
         return this;
     }
@@ -45,7 +45,7 @@ export class Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, 
                 return;
             }
             playerState.groupIndex = groupIndex;
-            playerState.state = await this.groupsLogic[groupIndex].initPlayerState(gameState.groups[groupIndex].playerNum++);
+            playerState.state = await this.groupsLogic[groupIndex].initPlayerState(playerState.user, gameState.groups[groupIndex].playerNum++);
             await this.stateManager.syncState();
         } else {
             await this.groupsLogic[params.groupIndex].playerMoveReducer(actor, type, params.params, cb);

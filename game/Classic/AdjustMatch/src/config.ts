@@ -5,6 +5,10 @@ export const CONFIG = {
     resultSeconds: 5,
 };
 
+export enum FetchRoute {
+    exportXls = '/exportXls/:gameId'
+}
+
 export enum MoveType {
     guideDone,
     leave,
@@ -36,7 +40,8 @@ export enum GoodStatus {
 
 export interface IGameRoundState {
     timeLeft: number
-    result: number[]
+    initAllocation: number[]
+    allocation: number[]
     goodStatus: GoodStatus[]
 }
 

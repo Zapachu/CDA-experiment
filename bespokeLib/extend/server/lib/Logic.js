@@ -58,16 +58,16 @@ var Logic = /** @class */ (function (_super) {
     }
     Logic.prototype.init = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, group, groupSize, groupsParams;
+            var _a, id, _b, group, groupSize, groupsParams;
             var _this = this;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0: return [4 /*yield*/, _super.prototype.init.call(this)];
                     case 1:
-                        _b.sent();
-                        _a = this.game.params, group = _a.group, groupSize = _a.groupSize, groupsParams = _a.groupsParams;
+                        _c.sent();
+                        _a = this.game, id = _a.id, _b = _a.params, group = _b.group, groupSize = _b.groupSize, groupsParams = _b.groupsParams;
                         this.groupsLogic = Array(group).fill(null).map(function (_, i) {
-                            return new _this.GroupLogic(groupSize, groupsParams[i], new Group.StateManager(i, _this.stateManager));
+                            return new _this.GroupLogic(id, i, groupSize, groupsParams[i], new Group.StateManager(i, _this.stateManager));
                         });
                         return [2 /*return*/, this];
                 }
@@ -119,7 +119,7 @@ var Logic = /** @class */ (function (_super) {
                         }
                         playerState.groupIndex = groupIndex;
                         _a = playerState;
-                        return [4 /*yield*/, this.groupsLogic[groupIndex].initPlayerState(gameState.groups[groupIndex].playerNum++)];
+                        return [4 /*yield*/, this.groupsLogic[groupIndex].initPlayerState(playerState.user, gameState.groups[groupIndex].playerNum++)];
                     case 3:
                         _a.state = _b.sent();
                         return [4 /*yield*/, this.stateManager.syncState()];

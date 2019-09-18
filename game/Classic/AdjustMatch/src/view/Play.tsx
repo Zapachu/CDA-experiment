@@ -26,7 +26,8 @@ function RoundPlay({playerRoundState, gameRoundState, frameEmitter, playerIndex}
     playerIndex: number
 }) {
     const lang = Lang.extractLang({
-        good: ['物品', 'Good'],
+        dragPlease: ['请拖拽下方物品列表进行偏好表达'],
+        goodNo: ['物品编号', 'Good No.'],
         privateValue: ['心理价值', 'Private Value'],
         goodStatus: ['物品状态', 'Good Status'],
         leftMarket: ['已离开市场', 'Left market'],
@@ -35,8 +36,13 @@ function RoundPlay({playerRoundState, gameRoundState, frameEmitter, playerIndex}
         wait4Others: ['等待其它玩家提交......'],
         leave: ['不参与', 'Don\'t Participate in'],
         submit: ['提交', 'Submit'],
+        roundOver1: ['您已完成本轮实验'],
+        roundOver2: ['初始分配到的物品为'],
+        roundOver3: ['其价值为'],
+        roundOver4: ['最终分配到的物品为'],
+        toNextRound: ['即将进入下一轮...']
     });
-    const {goodStatus} = gameRoundState, {privatePrices, status} = playerRoundState;
+    const {goodStatus, initAllocation, allocation} = gameRoundState, {privatePrices, status} = playerRoundState;
     const [sort, setSort] = React.useState(privatePrices.map((_, i) => i));
     switch (status) {
         case PlayerRoundStatus.play:
@@ -44,7 +50,17 @@ function RoundPlay({playerRoundState, gameRoundState, frameEmitter, playerIndex}
         case PlayerRoundStatus.wait:
             return <MaskLoading label={lang.wait4Others}/>;
         case PlayerRoundStatus.result:
-            return <div>Round Result</div>;
+            const good = allocation[playerIndex],
+                initGood = initAllocation[playerIndex];
+            return <div className={style.roundResult}>
+                <p>
+                    {lang.roundOver1}&nbsp;,&nbsp;
+                    {initGood === null ? null : <>{lang.roundOver2}<em>{initGood + 1}</em>&nbsp;,&nbsp;{lang.roundOver3}<em>{privatePrices[initGood]}</em>&nbsp;,&nbsp;</>}
+                    {lang.roundOver4}<em>{good + 1}</em> &nbsp;,&nbsp;
+                    {lang.roundOver3}<em>{privatePrices[good]}</em>
+                </p>
+                <label className={style.toNextRound}>{lang.toNextRound}</label>
+            </div>;
     }
 
     function Play() {
@@ -53,9 +69,10 @@ function RoundPlay({playerRoundState, gameRoundState, frameEmitter, playerIndex}
             maxWidth: '12rem'
         };
         return <section className={style.roundPlay}>
+            <label style={{marginBottom: '1rem'}}>{lang.dragPlease}</label>
             <DragTable columns={[
                 {
-                    title: lang.good,
+                    title: lang.goodNo,
                     dataIndex: 'key',
                     key: 'key',
                     render: v => <div style={colStyle}>{v + 1}</div>
@@ -102,7 +119,8 @@ class GroupPlay extends Extend.Group.Play<ICreateParams, IGameState, IPlayerStat
     lang = Lang.extractLang({
         round1: ['第', 'Round'],
         round2: ['轮', ''],
-        wait4OtherPlayers: ['等待其它玩家加入......']
+        wait4OtherPlayers: ['等待其它玩家加入......'],
+        gameOver: ['所有轮次结束，等待老师关闭实验'],
     });
 
     render(): React.ReactNode {
@@ -114,7 +132,7 @@ class GroupPlay extends Extend.Group.Play<ICreateParams, IGameState, IPlayerStat
         }
         if (playerState.status === PlayerStatus.result) {
             return <section className={style.groupResult}>
-                Result
+                {lang.gameOver}
             </section>;
         }
         const playerRoundState = playerState.rounds[gameState.round],

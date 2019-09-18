@@ -36,7 +36,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var Logic = /** @class */ (function () {
-    function Logic(groupSize, params, stateManager) {
+    function Logic(gameId, groupIndex, groupSize, params, stateManager) {
+        this.gameId = gameId;
+        this.groupIndex = groupIndex;
         this.groupSize = groupSize;
         this.params = params;
         this.stateManager = stateManager;
@@ -44,10 +46,11 @@ var Logic = /** @class */ (function () {
     Logic.prototype.initGameState = function () {
         return {};
     };
-    Logic.prototype.initPlayerState = function (index) {
+    Logic.prototype.initPlayerState = function (user, index) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 return [2 /*return*/, {
+                        user: user,
                         index: index
                     }];
             });
