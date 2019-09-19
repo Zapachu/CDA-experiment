@@ -45,7 +45,7 @@ export function Login({history}: RouteComponentProps) {
 
     return <section className={style.login}>
         <div className={style.loginBody}>
-            <h1>国家虚拟仿真实验教学项目共享平台-登录</h1>
+            <h1>金融市场与算法交易-登录</h1>
             <input placeholder="手机号/用户名/邮箱" value={username} onChange={({target: {value}}) => setUserName(value)}/>
             <input type='password' placeholder="密码" value={password}
                    onChange={({target: {value}}) => setPassword(value)}/>

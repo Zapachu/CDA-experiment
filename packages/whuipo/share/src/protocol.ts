@@ -84,10 +84,12 @@ export enum SocketEvent {
 }
 
 export interface UserDoc {
-    updateAt: number;
-    createAt: number;
-    unionId: string,
+    updateAt: number
+    createAt: number
+    unionId: string
     score: number
+    iLabXUserName: string
+    iLabXUserDis: string
 }
 
 export namespace NSocketParam {

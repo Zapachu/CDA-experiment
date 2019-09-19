@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as BABYLON from 'babylonjs';
 import socket from 'socket.io-client';
 import {Button, Loading, MatchModal, Modal} from '@micro-experiment/component';
-import {NCreateParams, NSocketParam, Phase, ResCode, SocketEvent} from '@micro-experiment/share';
+import {NCreateParams, NSocketParam, Phase, ResCode, SocketEvent, UserDoc} from '@micro-experiment/share';
 import {BabylonScene, BasePlayMode, TBasePlayMode} from '../component';
 import {Toast} from '@elf/component';
 import queryString from 'query-string';
@@ -430,7 +430,7 @@ interface State {
   isInitView: boolean,
   phase?: Phase,
   matchTimer?: number,
-  score: number,
+  user?: Partial<UserDoc>,
   count: number,
   waiting: number
 }
@@ -457,7 +457,11 @@ export class Hall3D extends React.Component<{}, State> {
     playerUrl: string
   };
   state: State = {
-    score: 0,
+    user: {
+      score: 0,
+      iLabXUserDis: '',
+      iLabXUserName: ''
+    },
     isInitView: true,
     focusDock: null,
     showModal: false,
@@ -472,7 +476,7 @@ export class Hall3D extends React.Component<{}, State> {
       if (res.code === ResCode.success) {
         this.connectSocket();
         const {user, count, waiting} = res;
-        this.setState({score: user.score, count, waiting});
+        this.setState({user, count, waiting});
         this.initView();
 
         const urlObj = new URL(window.location.href);
@@ -978,7 +982,8 @@ export class Hall3D extends React.Component<{}, State> {
   }
 
   render() {
-    const {detailActive, isInitView, score} = this.state;
+    const {detailActive, isInitView, user, count, waiting} = this.state;
+    console.log(user);
     return <div>
       <section className={style.titleBar}>
         <div className={style.logo}/>
@@ -986,11 +991,12 @@ export class Hall3D extends React.Component<{}, State> {
           <label>金融市场与算法交易</label><br/>
           <span className={style.subTitle}>虚拟仿真实验教学软件</span>
         </div>
-        <span className={style.score}>得分: {score}</span>
+        <span className={style.score}>得分: {user.score}</span>
       </section>
       <section className={style.onlinePlayers}>
-        <label>在线人数<em>{this.state.count}</em></label>
-        <label>排队人数<em>{this.state.count < 100 ? 0 : this.state.waiting}</em></label>
+        <label>当前用户<em>{user.iLabXUserDis || '游客'}</em></label>
+        <label>在线人数<em>{count}</em></label>
+        <label>排队人数<em>{count < 100 ? 0 : waiting}</em></label>
       </section>
       {
         isInitView && <div className={style.loading}>

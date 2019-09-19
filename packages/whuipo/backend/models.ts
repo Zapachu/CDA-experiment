@@ -15,6 +15,7 @@ const UserSchema = new Schema({
   updateAt: Date,
   mobile: {type: String, unique: true}, // 手机号(11位)
   iLabXUserName: String,
+  iLabXUserDis: String,
   score: {type: Number, default: 0}
 });
 

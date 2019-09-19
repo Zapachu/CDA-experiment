@@ -134,7 +134,7 @@ export default class RouterController {
     if (!isValid) {
       return res.redirect(`${Config.rootName}/login`);
     }
-    await RouterController.loginILabXUser(req, payload.un);
+      await RouterController.loginILabXUser(req, payload.un, payload.dis);
     next();
   }
 
@@ -165,7 +165,7 @@ export default class RouterController {
         msg: response.code
       });
     }
-    await RouterController.loginILabXUser(req, response.username);
+      await RouterController.loginILabXUser(req, response.username, response.name);
     res.json({
       code: ResCode.success
     });
@@ -187,7 +187,7 @@ export default class RouterController {
     });
   }
 
-  static async loginILabXUser(req: Request, iLabXUserName: string) {
+    static async loginILabXUser(req: Request, iLabXUserName: string, iLabXUserDis: string) {
     if (req.isAuthenticated()) {
       await User.findByIdAndUpdate(req.user.id, {iLabXUserName});
     } else {
@@ -195,7 +195,8 @@ export default class RouterController {
       if (!user) {
         user = new User({
           mobile: `null_${iLabXUserName}`,
-          iLabXUserName
+            iLabXUserName,
+            iLabXUserDis
         });
         await user.save();
       }
