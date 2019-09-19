@@ -39,11 +39,7 @@ export namespace Wrapper {
     export type TPlayerState<IPlayerState> = IPlayerState & {
         index: number
         user: IUserWithId
-    }
-
-    export interface IPlayerState<IPlayerState> {
         groupIndex: number
-        state: TPlayerState<IPlayerState>
     }
 }
 
@@ -64,12 +60,11 @@ export namespace Extractor {
         return {...groups[groupIndex].state, ...extraGameState};
     }
 
-    export function playerState<S>(playerState: TPlayerState<Wrapper.IPlayerState<S>>): TPlayerState<S> {
-        const {state, ...extraPlayerState} = playerState;
-        return {...extraPlayerState, ...state};
+    export function playerState<S>(playerState: TPlayerState<Wrapper.TPlayerState<S>>): TPlayerState<S> {
+        return playerState;
     }
 
-    export function playerStates<IPlayerState>(playerStates: { [token: string]: TPlayerState<Wrapper.IPlayerState<IPlayerState>> }, groupIndex: number): { [token: string]: TPlayerState<IPlayerState> } {
+    export function playerStates<IPlayerState>(playerStates: { [token: string]: TPlayerState<Wrapper.TPlayerState<IPlayerState>> }, groupIndex: number): { [token: string]: TPlayerState<IPlayerState> } {
         const r: { [token: string]: TPlayerState<IPlayerState> } = {};
         Object.values(playerStates).forEach(playerState => {
             if (playerState.groupIndex !== groupIndex) {

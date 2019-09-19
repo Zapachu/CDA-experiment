@@ -1,14 +1,14 @@
-import * as React from 'react'
-import * as Extend from '@extend/client'
-import {Button} from 'antd'
-import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, MoveType, PushType} from '../config'
+import * as React from 'react';
+import * as Extend from '@extend/client';
+import {Button} from 'antd';
+import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, MoveType, PushType} from '../config';
 
 class GroupPlay extends Extend.Group.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     render(): React.ReactNode {
-        const {playerState, gameState, frameEmitter} = this.props
+        const {playerState, groupGameState, frameEmitter} = this.props;
         return <>
             <h2>{playerState.count}</h2>
-            <h2>{gameState.total}</h2>
+            <h2>{groupGameState.total}</h2>
             <Button onClick={() => frameEmitter.emit(MoveType.add)}>Add</Button>
         </>
     }

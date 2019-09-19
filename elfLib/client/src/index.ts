@@ -1,8 +1,8 @@
-import * as React from 'react'
+import * as React from 'react';
 
 export namespace Template {
-    export type TCreateParams<P> = Partial<P>
-    export type TSetCreateParams<P> = React.Dispatch<React.SetStateAction<TCreateParams<P>>>
+    export type TCreateParams<P> = P
+    export type TSetCreateParams<P> = React.Dispatch<React.SetStateAction<Partial<P>>>
 
     export interface ICreateProps<P> {
         params: TCreateParams<P>

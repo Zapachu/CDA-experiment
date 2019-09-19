@@ -98,17 +98,17 @@ var Logic = /** @class */ (function (_super) {
     };
     Logic.prototype.playerMoveReducer = function (actor, type, params, cb) {
         return __awaiter(this, void 0, void 0, function () {
-            var groupSize, gameState, playerState, groupIndex, _a;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            var groupSize, gameState, playerState, groupIndex, _a, _b, _c;
+            return __generator(this, function (_d) {
+                switch (_d.label) {
                     case 0:
                         groupSize = this.game.params.groupSize;
                         return [4 /*yield*/, this.stateManager.getGameState()];
                     case 1:
-                        gameState = _b.sent();
+                        gameState = _d.sent();
                         return [4 /*yield*/, this.stateManager.getPlayerState(actor)];
                     case 2:
-                        playerState = _b.sent();
+                        playerState = _d.sent();
                         if (!(type === share_1.Wrapper.GroupMoveType.getGroup)) return [3 /*break*/, 5];
                         if (playerState.groupIndex !== undefined) {
                             return [2 /*return*/];
@@ -118,18 +118,19 @@ var Logic = /** @class */ (function (_super) {
                             return [2 /*return*/];
                         }
                         playerState.groupIndex = groupIndex;
-                        _a = playerState;
+                        _b = (_a = Object).assign;
+                        _c = [playerState];
                         return [4 /*yield*/, this.groupsLogic[groupIndex].initPlayerState(playerState.user, gameState.groups[groupIndex].playerNum++)];
                     case 3:
-                        _a.state = _b.sent();
+                        _b.apply(_a, _c.concat([_d.sent()]));
                         return [4 /*yield*/, this.stateManager.syncState()];
                     case 4:
-                        _b.sent();
+                        _d.sent();
                         return [3 /*break*/, 7];
                     case 5: return [4 /*yield*/, this.groupsLogic[params.groupIndex].playerMoveReducer(actor, type, params.params, cb)];
                     case 6:
-                        _b.sent();
-                        _b.label = 7;
+                        _d.sent();
+                        _d.label = 7;
                     case 7: return [2 /*return*/];
                 }
             });

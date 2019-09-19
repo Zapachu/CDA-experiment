@@ -124,10 +124,10 @@ class GroupPlay extends Extend.Group.Play<ICreateParams, IGameState, IPlayerStat
     });
 
     render(): React.ReactNode {
-        const {lang, props: {playerState, gameState, frameEmitter}} = this;
+        const {lang, props: {playerState, groupGameState, groupFrameEmitter}} = this;
         if (playerState.status === PlayerStatus.guide) {
             return <section className={style.groupGuide}>
-                <Button type='primary' onClick={() => frameEmitter.emit(MoveType.guideDone)}>Start</Button>
+                <Button type='primary' onClick={() => groupFrameEmitter.emit(MoveType.guideDone)}>Start</Button>
             </section>;
         }
         if (playerState.status === PlayerStatus.result) {
@@ -135,17 +135,17 @@ class GroupPlay extends Extend.Group.Play<ICreateParams, IGameState, IPlayerStat
                 {lang.gameOver}
             </section>;
         }
-        const playerRoundState = playerState.rounds[gameState.round],
-            gameRoundState = gameState.rounds[gameState.round];
+        const playerRoundState = playerState.rounds[groupGameState.round],
+            gameRoundState = groupGameState.rounds[groupGameState.round];
         if (!playerRoundState) {
             return <MaskLoading label={lang.wait4OtherPlayers}/>;
         }
         return <section className={style.groupPlay}>
-            <h2 className={style.title}>{lang.round1}{gameState.round + 1}{lang.round2}</h2>
+            <h2 className={style.title}>{lang.round1}{groupGameState.round + 1}{lang.round2}</h2>
             <RoundPlay {...{
                 playerRoundState,
                 gameRoundState,
-                frameEmitter,
+                frameEmitter: groupFrameEmitter,
                 playerIndex: playerState.index
             }}/>
         </section>;

@@ -1,13 +1,13 @@
-import {BaseRobot} from '@bespoke/robot'
-import {Extractor, Wrapper} from '@extend/share'
-import {config, FrameEmitter, IGameWithId, TGameState, TPlayerState} from '@bespoke/share'
+import {BaseRobot} from '@bespoke/robot';
+import {Extractor, Wrapper} from '@extend/share';
+import {config, FrameEmitter, IGameWithId, TGameState, TPlayerState} from '@bespoke/share';
 
 export namespace Group {
     export class Robot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IRobotMeta = any> {
         game: IGameWithId<ICreateParams>
         frameEmitter: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
 
-        constructor(private host: BaseRobot<Wrapper.ICreateParams<ICreateParams>, Wrapper.IGameState<IGameState>, Wrapper.IPlayerState<IPlayerState>, Wrapper.MoveType<MoveType>, PushType, Wrapper.IMoveParams<IMoveParams>, IPushParams, IRobotMeta>) {
+        constructor(private host: BaseRobot<Wrapper.ICreateParams<ICreateParams>, Wrapper.IGameState<IGameState>, Wrapper.TPlayerState<IPlayerState>, Wrapper.MoveType<MoveType>, PushType, Wrapper.IMoveParams<IMoveParams>, IPushParams, IRobotMeta>) {
             const {playerState: {groupIndex}, game, frameEmitter} = host
             this.game = Extractor.game(game, groupIndex)
             this.frameEmitter = Extractor.frameEmitter(frameEmitter, groupIndex)
@@ -32,7 +32,7 @@ export namespace Group {
 }
 
 export class Robot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IRobotMeta = {}>
-    extends BaseRobot<Wrapper.ICreateParams<ICreateParams>, Wrapper.IGameState<IGameState>, Wrapper.IPlayerState<IPlayerState>, Wrapper.MoveType<MoveType>, PushType, Wrapper.IMoveParams<IMoveParams>, IPushParams, IRobotMeta> {
+    extends BaseRobot<Wrapper.ICreateParams<ICreateParams>, Wrapper.IGameState<IGameState>, Wrapper.TPlayerState<IPlayerState>, Wrapper.MoveType<MoveType>, PushType, Wrapper.IMoveParams<IMoveParams>, IPushParams, IRobotMeta> {
 
     GroupRobot: new(host: Robot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IRobotMeta>) => Group.Robot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IRobotMeta>
 

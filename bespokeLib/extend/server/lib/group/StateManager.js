@@ -42,13 +42,10 @@ var StateManager = /** @class */ (function () {
     }
     StateManager.prototype.getPlayerState = function (actor) {
         return __awaiter(this, void 0, void 0, function () {
-            var state;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.stateManager.getPlayerState(actor)];
-                    case 1:
-                        state = (_a.sent()).state;
-                        return [2 /*return*/, state];
+                    case 1: return [2 /*return*/, _a.sent()];
                 }
             });
         });
@@ -77,9 +74,8 @@ var StateManager = /** @class */ (function () {
                         _b = (_a = Object).values;
                         return [4 /*yield*/, this.stateManager.getPlayerStates()];
                     case 1:
-                        _b.apply(_a, [_c.sent()]).forEach(function (_a) {
-                            var actor = _a.actor, groupIndex = _a.groupIndex, state = _a.state;
-                            return groupIndex === _this.groupIndex ? playerStates[actor.token] = state : null;
+                        _b.apply(_a, [_c.sent()]).forEach(function (playerState) {
+                            return playerState.groupIndex === _this.groupIndex ? playerStates[playerState.actor.token] = playerState : null;
                         });
                         return [2 /*return*/, playerStates];
                 }

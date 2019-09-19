@@ -57,8 +57,8 @@ export class Create<ICreateParams, S extends ICreateState = ICreateState> extend
     }
 
     render(): React.ReactNode {
-        const {lang, props: {params, setParams}, state: {independentGroup}} = this,
-            {groupSize} = params;
+        const {lang, props, state: {independentGroup}} = this,
+            {params, setParams} = props;
         if (!params.groupsParams) {
             return <Spin/>;
         }
@@ -87,17 +87,18 @@ export class Create<ICreateParams, S extends ICreateState = ICreateState> extend
                     independentGroup ? Array(params.group).fill(null).map((_, i) =>
                             <Tabs.TabPane forceRender={true} tab={lang.groupIndex(i)} key={i.toString()}>
                                 <this.GroupCreate {...{
-                                    groupSize,
-                                    params: Extractor.params(params, i),
-                                    setParams: Extractor.setParams(setParams, i)
+                                    ...props,
+                                    groupIndex: i,
+                                    groupParams: Extractor.params(params, i),
+                                    setGroupParams: Extractor.setParams(setParams, i)
                                 }}/>
                             </Tabs.TabPane>
                         ) :
                         <Tabs.TabPane tab={lang.allGroup}>
                             <this.GroupCreate {...{
-                                groupSize,
-                                params: Extractor.params(params, 0),
-                                setParams: Extractor.setParams(setParams)
+                                ...props,
+                                groupParams: Extractor.params(params, 0),
+                                setGroupParams: Extractor.setParams(setParams)
                             }}/>
                         </Tabs.TabPane>
                 }

@@ -10,7 +10,7 @@ class GroupPlay4Owner extends Extend.Group.Play4Owner<ICreateParams, IGameState,
     });
 
     render(): React.ReactNode {
-        const {lang, props: {playerStates, gameState}} = this;
+        const {lang, props: {groupPlayerStates, groupGameState}} = this;
         const columns = [
             {
                 title: '玩家',
@@ -55,11 +55,11 @@ class GroupPlay4Owner extends Extend.Group.Play4Owner<ICreateParams, IGameState,
         ];
         return <Tabs tabPosition={'left'}>
             {
-                gameState.rounds.map((gameRoundState, i) =>
+                groupGameState.rounds.map((gameRoundState, i) =>
                     <Tabs.TabPane tab={lang.roundIndex(i)} key={i.toString()}>
                         {
                             gameRoundState.allocation.length ? <Table
-                                dataSource={Object.values(playerStates).map(({user, index, rounds}) => {
+                                dataSource={groupPlayerStates.map(({user, index, rounds}) => {
                                     const {initAllocation, allocation} = gameRoundState;
                                     const {privatePrices, sort} = rounds[i];
                                     return {

@@ -3,7 +3,7 @@ import {Wrapper} from '@extend/share';
 import * as Group from './group';
 
 export class Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>
-    extends BaseLogic<Wrapper.ICreateParams<ICreateParams>, Wrapper.IGameState<IGameState>, Wrapper.IPlayerState<IPlayerState>, Wrapper.MoveType<MoveType>, PushType, Wrapper.IMoveParams<IMoveParams>, IPushParams> {
+    extends BaseLogic<Wrapper.ICreateParams<ICreateParams>, Wrapper.IGameState<IGameState>, Wrapper.TPlayerState<IPlayerState>, Wrapper.MoveType<MoveType>, PushType, Wrapper.IMoveParams<IMoveParams>, IPushParams> {
 
     GroupLogic: new(gameId: string, groupIndex: number, groupSize: number, params: ICreateParams, stateManager: Group.StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) => Group.Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>;
 
@@ -45,7 +45,7 @@ export class Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, 
                 return;
             }
             playerState.groupIndex = groupIndex;
-            playerState.state = await this.groupsLogic[groupIndex].initPlayerState(playerState.user, gameState.groups[groupIndex].playerNum++);
+            Object.assign(playerState, await this.groupsLogic[groupIndex].initPlayerState(playerState.user, gameState.groups[groupIndex].playerNum++));
             await this.stateManager.syncState();
         } else {
             await this.groupsLogic[params.groupIndex].playerMoveReducer(actor, type, params.params, cb);

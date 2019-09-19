@@ -13,8 +13,8 @@ class GroupCreate extends Extend.Group.Create<ICreateParams> {
     });
 
     componentDidMount(): void {
-        const {props: {groupSize, setParams}} = this;
-        setParams({
+        const {props: {params: {groupSize}, setGroupParams}} = this;
+        setGroupParams({
             round: 3,
             oldPlayer: ~~(groupSize >> 1),
             minPrivateValue: 25,
@@ -23,24 +23,24 @@ class GroupCreate extends Extend.Group.Create<ICreateParams> {
     }
 
     render() {
-        const {props: {groupSize, params: {round, oldPlayer, minPrivateValue, maxPrivateValue}, setParams}, lang} = this;
+        const {props: {params: {groupSize}, groupParams: {round, oldPlayer, minPrivateValue, maxPrivateValue}, setGroupParams}, lang} = this;
         return <Row>
             <Col span={12} offset={6}>
                 <div>
                     <Label label={lang.round}/>
-                    <Slider value={round} onChange={v => setParams({round: +v})} max={6}/>
+                    <Slider value={round} onChange={v => setGroupParams({round: +v})} max={6}/>
                 </div>
                 <div>
                     <Label label={lang.oldPlayer}/>
-                    <Slider value={oldPlayer} onChange={v => setParams({oldPlayer: +v})} max={groupSize}/>
+                    <Slider value={oldPlayer} onChange={v => setGroupParams({oldPlayer: +v})} max={groupSize}/>
                 </div>
                 <div>
                     <Label label={lang.minPrivateValue}/>
-                    <Slider value={minPrivateValue} onChange={v => setParams({minPrivateValue: +v})} max={50}/>
+                    <Slider value={minPrivateValue} onChange={v => setGroupParams({minPrivateValue: +v})} max={50}/>
                 </div>
                 <div>
                     <Label label={lang.maxPrivateValue}/>
-                    <Slider value={maxPrivateValue} onChange={v => setParams({maxPrivateValue: +v})} min={50}/>
+                    <Slider value={maxPrivateValue} onChange={v => setGroupParams({maxPrivateValue: +v})} min={50}/>
                 </div>
             </Col>
         </Row>;
