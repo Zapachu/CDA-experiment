@@ -68,7 +68,6 @@ export enum PlayerStatus {
 }
 
 export interface IPlayerState {
-    index: number
     status: PlayerStatus
     rounds: IPlayerRoundState[]
 }

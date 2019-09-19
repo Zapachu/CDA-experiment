@@ -1,13 +1,18 @@
 import * as React from 'react';
 import {Core} from '@bespoke/client';
-import {Template} from '@elf/client';
+import {Wrapper} from '@extend/share';
+import {FrameEmitter, IGameWithId, TGameState} from '@bespoke/share';
 
 export namespace Group {
-    export interface ICreateProps<ICreateParams> extends Template.ICreateProps<ICreateParams> {
+    export interface ICreateProps<ICreateParams> extends Core.ICreateProps<ICreateParams> {
         groupSize: number
     }
 
-    export interface IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> extends Core.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
+    export interface IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
+        game: IGameWithId<ICreateParams>,
+        frameEmitter: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
+        gameState: TGameState<IGameState>
+        playerState: Wrapper.TPlayerState<IPlayerState>
     }
 
     export interface IPlay4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> extends Core.IPlay4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
@@ -23,7 +28,7 @@ export namespace Group {
     }
 
     export class Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, S = {}>
-        extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, S> {
+        extends React.Component<IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>> {
     }
 
     export class Play4Owner<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, S = {}>
