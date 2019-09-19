@@ -42,7 +42,7 @@ class GroupLogic extends Extend.Group.Logic<ICreateParams, IGameState, IPlayerSt
         const gameState = await this.stateManager.getGameState(),
             playerStates = await this.stateManager.getPlayerStates();
         gameState.round = r;
-        const goodStatus = [...Array(oldPlayer).fill(GoodStatus.old), ...Array(this.groupSize - oldPlayer).fill(GoodStatus.new)];
+        const goodStatus = shuffle([...Array(oldPlayer).fill(GoodStatus.old), ...Array(this.groupSize - oldPlayer).fill(GoodStatus.new)]);
         gameState.rounds[r] = {
             timeLeft: CONFIG.tradeSeconds,
             goodStatus,
@@ -122,15 +122,13 @@ class GroupLogic extends Extend.Group.Logic<ICreateParams, IGameState, IPlayerSt
                 }
                 break;
             }
-            case MoveType.leave: {
-                playerRoundState.status = PlayerRoundStatus.wait;
-                const {goodStatus, initAllocation} = gameRoundState;
-                goodStatus[initAllocation[playerState.index]] = GoodStatus.left;
-                break;
-            }
             case MoveType.submit: {
                 playerRoundState.status = PlayerRoundStatus.wait;
                 playerRoundState.sort = params.sort;
+                if (params.sort.length === 0) {
+                    const {goodStatus, initAllocation} = gameRoundState;
+                    goodStatus[initAllocation[playerState.index]] = GoodStatus.left;
+                }
                 if (playerRoundStates.every(p => p.status === PlayerRoundStatus.wait)) {
                     this.roundOver();
                 }

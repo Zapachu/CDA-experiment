@@ -105,8 +105,8 @@ function RoundPlay({playerRoundState, gameRoundState, frameEmitter, playerIndex}
             }))} setData={data => setSort(data.map(({key}) => key))}/>
             <div className={style.btnsWrapper}>
                 {
-                    goodStatus[playerIndex] === GoodStatus.old ?
-                        <Button onClick={() => frameEmitter.emit(MoveType.leave, {sort})}>{lang.leave}</Button> : null
+                    initAllocation[playerIndex] === null ? null :
+                        <Button onClick={() => frameEmitter.emit(MoveType.submit, {sort: []})}>{lang.leave}</Button>
                 }
                 <Button type={'primary'}
                         onClick={() => frameEmitter.emit(MoveType.submit, {sort})}>{lang.submit}</Button>

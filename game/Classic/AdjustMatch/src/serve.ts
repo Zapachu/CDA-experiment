@@ -17,13 +17,17 @@ const router = Router()
         const name = 'RoundResult';
         let data = [], option = {};
         data.push(['玩家', '优先序', '初始物品编号', '初始物品价格', '参与分配', '偏好表达', '分得物品编号', '分得物品价格']);
-        const record = await Model.FreeStyleModel.findOne({
-            game: game.id,
-            key: `${group}_${round}`
-        }) as any;
-        record.data.forEach(({user, playerIndex, initGood, initGoodPrice, join, sort, good, goodPrice}) =>
-            data.push([user, playerIndex, initGood, initGoodPrice, join, sort, good, goodPrice])
-        );
+        const rounds = await Model.FreeStyleModel.find({
+            game: game.id
+        }).sort({key: 1}) as Array<any>;
+        rounds.forEach(round => {
+            const [g, r] = round.key.split('_');
+            data.push([]);
+            data.push([`第${+g + 1}组`, `第${+r + 1}轮`]);
+            round.data.forEach(({user, playerIndex, initGood, initGoodPrice, join, sort, good, goodPrice}) =>
+                data.push([user, playerIndex, initGood, initGoodPrice, join, sort, good, goodPrice])
+            );
+        });
         let buffer = nodeXlsx.build([{name, data}], option);
         res.setHeader('Content-Type', 'application/vnd.openxmlformats');
         res.setHeader('Content-Disposition', 'attachment; filename=' + `${encodeURI(name)}.xlsx`);

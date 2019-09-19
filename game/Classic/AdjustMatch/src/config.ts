@@ -11,7 +11,6 @@ export enum FetchRoute {
 
 export enum MoveType {
     guideDone,
-    leave,
     submit
 }
 
