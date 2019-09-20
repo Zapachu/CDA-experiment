@@ -16,7 +16,7 @@ var GameTemplate = new mongoose_1.Schema({
     permittedFree: { type: MongodNumber, "default": 0 },
     chargePro: { type: MongodNumber, "default": 0 },
     permittedPro: { type: MongodNumber, "default": 0 },
-    status: { type: MongodNumber, "default": 1 },
+    status: { type: MongodNumber, "default": 1 }
 });
 exports.GameTemplate = GameTemplate;
 GameTemplate.pre('save', function (next) {

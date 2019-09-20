@@ -11,10 +11,11 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -136,7 +137,7 @@ var Server = /** @class */ (function () {
         });
     };
     Server.initMongo = function () {
-        mongoose_1.connect(setting_1.elfSetting.mongoUri, __assign({}, setting_1.elfSetting.mongoUser ? { user: setting_1.elfSetting.mongoUser, pass: setting_1.elfSetting.mongoPass } : {}, { useNewUrlParser: true, useCreateIndex: true }), function (err) { return err ? util_2.Log.e(err) : null; });
+        mongoose_1.connect(setting_1.elfSetting.mongoUri, __assign(__assign({}, setting_1.elfSetting.mongoUser ? { user: setting_1.elfSetting.mongoUser, pass: setting_1.elfSetting.mongoPass } : {}), { useNewUrlParser: true, useCreateIndex: true }), function (err) { return err ? util_2.Log.e(err) : null; });
     };
     Server.initSessionMiddleware = function () {
         var RedisStore = connectRedis(expressSession);

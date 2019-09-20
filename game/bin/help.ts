@@ -119,7 +119,7 @@ function getProjects(parentProject: string = '.', projectSet = new Set<string>()
     }
     if (project === SpecialProject.DistAllGame) {
         projects.forEach(project => {
-            if (Object.values(SpecialProject).includes(project)) {
+            if ((Object.values(SpecialProject) as string[]).includes(project)) {
                 return;
             }
             TaskHelper.distClient(project);
@@ -129,7 +129,7 @@ function getProjects(parentProject: string = '.', projectSet = new Set<string>()
     }
     if (project === SpecialProject.CleanAllGame) {
         projects.forEach(project => {
-            if (Object.values(SpecialProject).includes(project)) {
+            if ((Object.values(SpecialProject) as string[]).includes(project)) {
                 return;
             }
             removeSync(resolve(__dirname, `../${project}/dist`));

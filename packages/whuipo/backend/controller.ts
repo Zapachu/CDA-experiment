@@ -5,7 +5,7 @@ import path from 'path';
 import request from 'request-promise-native';
 import {RedisTools} from './redis';
 import {Log} from '@elf/util';
-import {User} from './models';
+import {User, UserDoc} from './models';
 import {elfSetting} from '@elf/setting';
 import {Config} from './config';
 import {iLabX, NSocketParam, Phase, ResCode, SocketEvent, UserGameStatus} from '@micro-experiment/share';
@@ -145,7 +145,7 @@ export default class RouterController {
 
   @catchError
   static async renderLogin(req: Request, res: Response) {
-    if (req.isAuthenticated() && req.user.iLabXUserName) {
+    if (req.isAuthenticated() && (req.user as UserDoc).iLabXUserName) {
       res.redirect(`${Config.rootName}/`);
     } else {
       res.sendFile(path.resolve(__dirname, '../dist/index.html'));
@@ -189,7 +189,7 @@ export default class RouterController {
 
     static async loginILabXUser(req: Request, iLabXUserName: string, iLabXUserDis: string) {
     if (req.isAuthenticated()) {
-      await User.findByIdAndUpdate(req.user.id, {iLabXUserName});
+      await User.findByIdAndUpdate((req.user as UserDoc).id, {iLabXUserName});
     } else {
       let user = await User.findOne({iLabXUserName});
       if (!user) {

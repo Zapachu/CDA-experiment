@@ -17,7 +17,7 @@ exports.__esModule = true;
 __export(require("./setting"));
 var setting_1 = require("./setting");
 var _a = process.env, NODE_ENV = _a.NODE_ENV, BESPOKE_HMR = _a.BESPOKE_HMR, BESPOKE_WITH_PROXY = _a.BESPOKE_WITH_PROXY, BESPOKE_WITH_LINKER = _a.BESPOKE_WITH_LINKER, OTREE_PORT = _a.OTREE_PORT, OTREE_PROXY = _a.OTREE_PROXY, OTREE_SERVER = _a.OTREE_SERVER, OTREE_NAMESPACE = _a.OTREE_NAMESPACE;
-exports.elfSetting = __assign({}, setting_1["default"], { inProductEnv: NODE_ENV === 'production', 
+exports.elfSetting = __assign(__assign({}, setting_1["default"]), { inProductEnv: NODE_ENV === 'production', 
     //region bespoke
     bespokeHmr: BESPOKE_HMR === 'true', bespokeWithProxy: BESPOKE_WITH_PROXY === 'true', bespokeWithLinker: BESPOKE_WITH_LINKER === 'true', 
     //endregion

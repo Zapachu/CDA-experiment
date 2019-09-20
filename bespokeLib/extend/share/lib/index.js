@@ -43,7 +43,7 @@ var Extractor;
 (function (Extractor) {
     function game(game, groupIndex) {
         var params = game.params, extraGame = __rest(game, ["params"]);
-        return __assign({}, extraGame, params[groupIndex]);
+        return __assign(__assign({}, extraGame), params[groupIndex]);
     }
     Extractor.game = game;
     function frameEmitter(frameEmitter, groupIndex) {
@@ -54,12 +54,11 @@ var Extractor;
     Extractor.frameEmitter = frameEmitter;
     function gameState(gameState, groupIndex) {
         var groups = gameState.groups, extraGameState = __rest(gameState, ["groups"]);
-        return __assign({}, groups[groupIndex].state, extraGameState);
+        return __assign(__assign({}, groups[groupIndex].state), extraGameState);
     }
     Extractor.gameState = gameState;
     function playerState(playerState) {
-        var state = playerState.state, extraPlayerState = __rest(playerState, ["state"]);
-        return __assign({}, extraPlayerState, state);
+        return playerState;
     }
     Extractor.playerState = playerState;
     function playerStates(playerStates, groupIndex) {

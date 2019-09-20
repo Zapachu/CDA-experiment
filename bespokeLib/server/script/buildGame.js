@@ -130,7 +130,7 @@ function geneClientBuilder(_a) {
                     return files.reduce(function (manifest, _a) {
                         var _b;
                         var name = _a.name, path = _a.path, chunk = _a.chunk;
-                        return __assign({}, manifest, (_b = {}, _b[name] = path + (chunk ? "?" + chunk.hash : ''), _b));
+                        return __assign(__assign({}, manifest), (_b = {}, _b[name] = path + (chunk ? "?" + chunk.hash : ''), _b));
                     }, seed);
                 }
             })
