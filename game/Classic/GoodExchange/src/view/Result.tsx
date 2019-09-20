@@ -5,7 +5,7 @@ import {ICreateParams, IGameState, IPlayerState} from '../config';
 
 class GroupResult extends Extend.Group.Result<ICreateParams, IGameState, IPlayerState> {
     render(): React.ReactNode {
-        const {playerState, gameState} = this.props
+        const {playerState, gameState} = this.props;
         return <section className={style.groupResult}>
             Game Closed
         </section>;
@@ -13,5 +13,5 @@ class GroupResult extends Extend.Group.Result<ICreateParams, IGameState, IPlayer
 }
 
 export class Result extends Extend.Result<ICreateParams, IGameState, IPlayerState> {
-    GroupResult = GroupResult
+    GroupResult = GroupResult;
 }
