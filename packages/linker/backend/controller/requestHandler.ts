@@ -1,11 +1,11 @@
-import {config, IActor} from 'linker-share'
-import * as path from 'path'
-import {RedisKey} from '../util'
-import {NextFunction, Request, Response} from 'express'
-import {Token} from '@elf/util'
-import {redisClient} from '@elf/protocol'
-import {AcademusRole, Actor, ResponseCode} from '@elf/share'
-import {GameService, PlayerService} from '../service'
+import {config, IActor} from 'linker-share';
+import * as path from 'path';
+import {RedisKey} from '../util';
+import {NextFunction, Request, Response} from 'express';
+import {Token} from '@elf/util';
+import {redisClient} from '@elf/protocol';
+import {AcademusRole, Actor, ResponseCode} from '@elf/share';
+import {GameService, PlayerService} from '../service';
 
 const SECONDS_PER_DAY = 86400
 const DEFAULT_PAGE_SIZE = 11
@@ -76,7 +76,7 @@ export class GameCtrl {
         })
     }
 
-    static async saveNewGame(req: Request, res: Response) {
+    static async saveNewGame(req, res: Response) {
         const {body: {title, desc, namespace, params}, user: {id: owner, orgCode}, session} = req
         const gameId = await GameService.saveGame({
             owner,
@@ -92,7 +92,7 @@ export class GameCtrl {
         })
     }
 
-    static async getGameList(req: Request, res: Response) {
+    static async getGameList(req, res: Response) {
         const {user: {_id}, query: {page = 0, pageSize = DEFAULT_PAGE_SIZE}} = req
         const {count, gameList} = await GameService.getGameList(_id, +page, +pageSize)
         res.json({

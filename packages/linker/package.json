@@ -10,8 +10,8 @@
     "client:dist": "npm run client:build --buildMode=dist",
     "server:tsc-w": "tsc -p backend -w",
     "server:dist": "tsc -p backend",
-    "both:dist": "npm run server:dist & npm run client:dist",
-    "start": "ts-node backend/server.ts"
+    "server:dev": "ts-node backend/server.ts",
+    "both:dist": "npm run server:dist & npm run client:dist"
   },
   "devDependencies": {
     "@elf/component": "^1.1.1",

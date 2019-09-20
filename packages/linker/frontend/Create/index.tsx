@@ -1,11 +1,11 @@
-import * as React from 'react'
-import * as style from './style.scss'
-import {Api, GameTemplate, loadScript, TPageProps} from '../util'
-import {Lang} from '@elf/component'
-import {Loading} from '../component'
-import {RouteComponentProps} from 'react-router'
-import {Button, Input, message} from 'antd'
-import {ResponseCode} from '@elf/share'
+import * as React from 'react';
+import * as style from './style.scss';
+import {Api, GameTemplate, loadScript, TPageProps} from '../util';
+import {Lang} from '@elf/component';
+import {Loading} from '../component';
+import {RouteComponentProps} from 'react-router';
+import {Button, Input, message} from 'antd';
+import {ResponseCode} from '@elf/share';
 
 interface ICreateState {
     loading: boolean
@@ -25,7 +25,7 @@ export class Create extends React.Component<TPageProps & RouteComponentProps<{ n
         submit: ['提交', 'SUBMIT'],
         submitFailed: ['提交失败', 'Submit failed'],
         createSuccess: ['创建成功', 'Created successfully']
-    })
+    });
 
     state: ICreateState = {
         loading: true,
@@ -33,46 +33,48 @@ export class Create extends React.Component<TPageProps & RouteComponentProps<{ n
         desc: '',
         params: {},
         submitable: true
-    }
+    };
 
     async componentDidMount() {
-        const {code, jsUrl} = await Api.getJsUrl(this.props.match.params.namespace)
+        const {code, jsUrl} = await Api.getJsUrl(this.props.match.params.namespace);
         if (code !== ResponseCode.success) {
-            return
+            return;
         }
         loadScript(jsUrl.split(';'), () =>
             this.setState({
                 loading: false
             })
-        )
+        );
     }
 
     async handleSubmit() {
-        const {lang, props: {history}, state: {title, desc, params}} = this
+        const {lang, props: {history}, state: {title, desc, params}} = this;
         if (!title || !desc) {
-            return message.warn(lang.invalidBaseInfo)
+            return message.warn(lang.invalidBaseInfo);
         }
-        const {code, gameId} = await Api.postNewGame(title, desc, GameTemplate.getTemplate().namespace, params)
+        const {code, gameId} = await Api.postNewGame(title, desc, GameTemplate.getTemplate().namespace, params);
         if (code === ResponseCode.success) {
-            message.success(lang.createSuccess)
-            history.push(`/info/${gameId}`)
+            message.success(lang.createSuccess);
+            history.push(`/info/${gameId}`);
         } else {
-            message.error(lang.submitFailed)
+            message.error(lang.submitFailed);
         }
     }
 
-    updatePhase(newParam: {}) {
-        this.setState(({params}) => ({
-            params: {...params, ...newParam}
-        }))
+    updatePhase(action) {
+        if (typeof action === 'function') {
+            this.setState(({params}) => ({params: {...params, ...action(params)}}));
+        } else {
+            this.setState({params: {...this.state.params, ...action}});
+        }
     }
 
     render(): React.ReactNode {
-        const {lang, state: {loading, params, title, desc, submitable}} = this
+        const {lang, state: {loading, params, title, desc, submitable}} = this;
         if (loading) {
-            return <Loading/>
+            return <Loading/>;
         }
-        const {Create} = GameTemplate.getTemplate()
+        const {Create} = GameTemplate.getTemplate();
         return <section className={style.create}>
             <div className={style.titleWrapper}>
                 <Input size='large'
@@ -91,7 +93,7 @@ export class Create extends React.Component<TPageProps & RouteComponentProps<{ n
                 submitable,
                 setSubmitable: submitable => this.setState({submitable}),
                 params,
-                setParams: params => this.updatePhase(params)
+                setParams: action => this.updatePhase(action)
             }}/>
             {
                 submitable ?
@@ -99,6 +101,6 @@ export class Create extends React.Component<TPageProps & RouteComponentProps<{ n
                         <Button type='primary' onClick={() => this.handleSubmit()}>{lang.submit}</Button>
                     </div> : null
             }
-        </section>
+        </section>;
     }
 }

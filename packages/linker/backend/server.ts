@@ -1,22 +1,22 @@
-import * as Express from 'express'
-import {csrf} from 'lusca'
-import * as path from 'path'
-import * as bodyParser from 'body-parser'
-import {connect as connectMongo} from 'mongoose'
-import * as connectRedis from 'connect-redis'
-import * as expressSession from 'express-session'
-import * as socketIOSession from 'express-socket.io-session'
-import * as morgan from 'morgan'
-import {config} from 'linker-share'
-import {elfSetting} from '@elf/setting'
-import {Log, NetWork} from '@elf/util'
-import {csrfCookieKey} from '@elf/share'
-import * as passport from 'passport'
-import {redisClient} from '@elf/protocol'
-import requestRouter from './controller/requestRouter'
-import {serve as serveRPC} from './rpc'
-import {EventDispatcher} from './controller/eventDispatcher'
-import {UserDoc, UserModel} from './model'
+import * as Express from 'express';
+import {csrf} from 'lusca';
+import * as path from 'path';
+import * as bodyParser from 'body-parser';
+import {connect as connectMongo} from 'mongoose';
+import * as connectRedis from 'connect-redis';
+import * as expressSession from 'express-session';
+import * as socketIOSession from 'express-socket.io-session';
+import * as morgan from 'morgan';
+import {config} from 'linker-share';
+import {elfSetting} from '@elf/setting';
+import {Log, NetWork} from '@elf/util';
+import {csrfCookieKey} from '@elf/share';
+import * as passport from 'passport';
+import {redisClient} from '@elf/protocol';
+import requestRouter from './controller/requestRouter';
+import {serve as serveRPC} from './rpc';
+import {EventDispatcher} from './controller/eventDispatcher';
+import {UserDoc, UserModel} from './model';
 
 class Server {
     private static sessionMiddleware
@@ -39,7 +39,8 @@ class Server {
         connectMongo(elfSetting.mongoUri, {
             ...elfSetting.mongoUser ? {user: elfSetting.mongoUser, pass: elfSetting.mongoPass} : {},
             useNewUrlParser: true,
-            useCreateIndex: true
+            useCreateIndex: true,
+            useUnifiedTopology: true,
         }, err => err ? Log.e(err) : null)
     }
 

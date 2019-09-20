@@ -67,7 +67,8 @@ export class Server {
         connectMongo(elfSetting.mongoUri, {
             ...elfSetting.mongoUser ? {user: elfSetting.mongoUser, pass: elfSetting.mongoPass} : {},
             useNewUrlParser: true,
-            useCreateIndex: true
+            useCreateIndex: true,
+            useUnifiedTopology: true
         }, err => err ? Log.e(err) : null)
     }
 

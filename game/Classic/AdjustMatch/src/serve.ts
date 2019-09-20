@@ -9,9 +9,9 @@ import {Robot} from './Robot';
 
 const router = Router()
     .get(FetchRoute.exportXls, async (req, res) => {
-        const {params: {gameId}, query: {group, round}} = req;
+        const {params: {gameId}, query: {group, round}, user} = req;
         const {game} = await BaseLogic.getLogic(gameId);
-        if (req.user.id !== game.owner) {
+        if ((user as any).id !== game.owner) {
             return res.end('Invalid Request');
         }
         const name = 'RoundResult';
