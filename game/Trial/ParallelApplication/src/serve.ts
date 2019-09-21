@@ -1,20 +1,14 @@
-import * as Express from "express";
-import { Response, Router } from "express";
-import { resolve } from "path";
-import * as fs from "fs";
-import {
-  gameId2PlayUrl,
-  RedisCall,
-  Server,
-  Model,
-  BaseLogic
-} from "@bespoke/server";
-import Controller from "./Controller";
-import Robot from "./Robot";
-import { ICreateParams, namespace } from "./config";
-import { Trial } from "@elf/protocol";
-import { elfSetting } from "@elf/setting";
-import { RobotServer } from "@bespoke/robot";
+import * as Express from 'express';
+import {Response, Router} from 'express';
+import {resolve} from 'path';
+import * as fs from 'fs';
+import {BaseLogic, gameId2PlayUrl, Model, RedisCall, Server} from '@bespoke/server';
+import Controller from './Controller';
+import Robot from './Robot';
+import {ICreateParams, namespace} from './config';
+import {Trial} from '@elf/protocol';
+import {elfSetting} from '@elf/setting';
+import {RobotServer} from '@bespoke/robot';
 // import { config } from "@bespoke/share";
 
 const { FreeStyleModel } = Model;
@@ -29,7 +23,7 @@ const router = Router()
     "/result/static",
     Express.static(resolve(__dirname, "../asset"), { maxAge: "10d" })
   )
-  .get("/result/:gameId", async (req, res: Response) => {
+    .get('/result/:gameId', async (req: any, res: Response) => {
     const {
       user,
       params: { gameId },
@@ -54,7 +48,7 @@ const router = Router()
       `${elfSetting.proxyOrigin}/${ROOTNAME}/game/${namespace}`
     );
   })
-  .get("/getUserId/:gameId", async (req, res: Response) => {
+    .get('/getUserId/:gameId', async (req: any, res: Response) => {
     const {
       user: { _id: userId },
       params: { gameId },
@@ -70,7 +64,7 @@ const router = Router()
     }
     return res.end();
   })
-  .get("/onceMore/:gameId", async (req, res: Response) => {
+    .get('/onceMore/:gameId', async (req: any, res: Response) => {
     const result = await RedisCall.call<Trial.Done.IReq, Trial.Done.IRes>(
       Trial.Done.name,
       {

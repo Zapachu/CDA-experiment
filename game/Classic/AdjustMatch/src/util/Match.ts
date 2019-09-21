@@ -1,12 +1,9 @@
-import {Log} from '@elf/util';
-
 export interface IPlayer {
     good?: number,
     sort: number[]
 }
 
 export function match(players: IPlayer[]): number[] {
-    Log.d(players);
     const SIZE = players.length;
     const good2Player: number[] = Array(SIZE).fill(null),
         result: number[] = Array(SIZE).fill(null),

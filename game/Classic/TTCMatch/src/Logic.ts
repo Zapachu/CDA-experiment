@@ -17,7 +17,6 @@ import {
     PushType
 } from './config';
 import {Model} from '@bespoke/server';
-import {Log} from '@elf/util';
 import {IPlayer, match} from './util/Match';
 import shuffle = require('lodash/shuffle');
 
@@ -36,18 +35,18 @@ export class GroupLogic extends Extend.Group.Logic<ICreateParams, IGameState, IP
     }
 
     async startRound(r: number) {
-        const {round, oldPlayer, minPrivateValue, maxPrivateValue} = this.params;
+        const {round, minPrivateValue, maxPrivateValue} = this.params;
         if (r >= round) {
             return;
         }
         const gameState = await this.stateManager.getGameState(),
             playerStates = await this.stateManager.getPlayerStates();
         gameState.round = r;
-        const goodStatus = shuffle([...Array(oldPlayer).fill(GoodStatus.old), ...Array(this.groupSize - oldPlayer).fill(GoodStatus.new)]);
+        const goodStatus = shuffle([...Array(this.groupSize).fill(GoodStatus.active)]);
         gameState.rounds[r] = {
             timeLeft: CONFIG.tradeSeconds,
             goodStatus,
-            initAllocation: shuffle(goodStatus.map((s, i) => s === GoodStatus.new ? null : i)),
+            initAllocation: shuffle([...goodStatus.map((_, i) => i)]),
             allocation: []
         };
         Object.values(playerStates).forEach(p => p.rounds[r] = {
@@ -77,7 +76,6 @@ export class GroupLogic extends Extend.Group.Logic<ICreateParams, IGameState, IP
     }
 
     match(players: IPlayer[]): number[] {
-        Log.d(players);
         return match(players);
     }
 

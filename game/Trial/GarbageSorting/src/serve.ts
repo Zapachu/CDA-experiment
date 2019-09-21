@@ -1,26 +1,18 @@
-import * as Express from "express";
-import { Response, Router } from "express";
-import { resolve } from "path";
-import * as fs from "fs";
-import {
-  gameId2PlayUrl,
-  RedisCall,
-  Server,
-  Model,
-  BaseLogic
-} from "@bespoke/server";
-import Controller from "./Controller";
-import Robot from "./Robot";
-import { ICreateParams, namespace } from "./config";
-import { Trial } from "@elf/protocol";
-import { elfSetting } from "@elf/setting";
-import { RobotServer } from "@bespoke/robot";
+import {Response, Router} from 'express';
+import {resolve} from 'path';
+import {gameId2PlayUrl, Model, RedisCall, Server} from '@bespoke/server';
+import Controller from './Controller';
+import Robot from './Robot';
+import {ICreateParams, namespace} from './config';
+import {Trial} from '@elf/protocol';
+import {elfSetting} from '@elf/setting';
+import {RobotServer} from '@bespoke/robot';
 // import { config } from "@bespoke/share";
 
 const { FreeStyleModel } = Model;
 const ROOTNAME = "gametrial";
 
-const router = Router().get("/share/:gameId", async (req, res: Response) => {
+const router = Router().get('/share/:gameId', async (req: any, res: Response) => {
   const {
     user,
     params: { gameId },

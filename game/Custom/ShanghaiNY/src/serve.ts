@@ -1,13 +1,13 @@
-import {Response, Router} from 'express'
-import nodeXlsx from 'node-xlsx'
-import {resolve} from 'path'
-import {BaseLogic, Server} from '@bespoke/server'
-import Controller from './Controller'
-import {FetchRoute, namespace, SheetType} from './config'
+import {Response, Router} from 'express';
+import nodeXlsx from 'node-xlsx';
+import {resolve} from 'path';
+import {BaseLogic, Server} from '@bespoke/server';
+import Controller from './Controller';
+import {FetchRoute, namespace, SheetType} from './config';
 
 const router = Router()
-    .get(FetchRoute.getUserMobile, async (req, res: Response) => {
-        const {user: {_id: userId, mobile}, params: {gameId}, query: {token, actorType}} = req
+    .get(FetchRoute.getUserMobile, async (req: any, res: Response) => {
+        const {user: {_id: userId, mobile}, params: {gameId}, query: {token, actorType}} = req as any;
         const {game, stateManager} = await BaseLogic.getLogic(gameId)
         if (game.owner.toString() !== userId.toString()) {
             const playerState = await stateManager.getPlayerState({type: actorType, token})
@@ -15,7 +15,7 @@ const router = Router()
         }
         return res.end()
     })
-    .get(FetchRoute.exportXls, async (req, res: Response) => {
+    .get(FetchRoute.exportXls, async (req: any, res: Response) => {
         const {params: {gameId}, query: {sheetType}} = req
         const {game, stateManager} = await BaseLogic.getLogic(gameId)
         if (req.user.id !== game.owner) {
@@ -40,7 +40,7 @@ const router = Router()
     .get(FetchRoute.exportXlsPlaying, async (req, res: Response) => {
         const {params: {gameId}, query: {sheetType}} = req
         const controller = await BaseLogic.getLogic(gameId) as Controller
-        if (req.user.id !== controller.game.owner) {
+        if ((req.user as any).id !== controller.game.owner) {
             return res.end('Invalid Request')
         }
         const name = SheetType[sheetType]

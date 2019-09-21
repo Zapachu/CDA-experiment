@@ -1,12 +1,12 @@
-import {resolve} from 'path'
-import {BaseLogic, Model, Server} from '@bespoke/server'
-import Controller from './Controller'
-import {FetchRoute, IResult, namespace, SheetType, SURVEY_BASIC, SURVEY_FEEDBACK, SURVEY_TEST} from './config'
-import {Router} from 'express'
-import nodeXlsx from 'node-xlsx'
+import {resolve} from 'path';
+import {BaseLogic, Model, Server} from '@bespoke/server';
+import Controller from './Controller';
+import {FetchRoute, IResult, namespace, SheetType, SURVEY_BASIC, SURVEY_FEEDBACK, SURVEY_TEST} from './config';
+import {Router} from 'express';
+import nodeXlsx from 'node-xlsx';
 
 const router = Router()
-    .get(FetchRoute.exportXls, async (req, res) => {
+    .get(FetchRoute.exportXls, async (req: any, res) => {
         const {params: {gameId}, query: {sheetType}} = req
         const {game} = await BaseLogic.getLogic(gameId)
         if (req.user.id !== game.owner) {

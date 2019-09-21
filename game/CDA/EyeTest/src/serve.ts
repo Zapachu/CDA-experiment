@@ -1,12 +1,12 @@
-import {resolve} from 'path'
-import nodeXlsx from 'node-xlsx'
-import {Server, Model, BaseLogic} from '@bespoke/server'
-import Controller from './Controller'
-import {namespace, FetchRoute, SheetType, IAnwserLog, IResult} from './config'
-import {Router} from 'express'
+import {resolve} from 'path';
+import nodeXlsx from 'node-xlsx';
+import {BaseLogic, Model, Server} from '@bespoke/server';
+import Controller from './Controller';
+import {FetchRoute, IAnwserLog, IResult, namespace, SheetType} from './config';
+import {Router} from 'express';
 
 const router = Router()
-    .get(FetchRoute.exportXls, async (req, res) => {
+    .get(FetchRoute.exportXls, async (req: any, res) => {
         const {params:{gameId}, query: {sheetType}} = req
         const {game} = await BaseLogic.getLogic(gameId)
         if (req.user.id !== game.owner) {

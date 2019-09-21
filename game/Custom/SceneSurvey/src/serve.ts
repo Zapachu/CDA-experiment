@@ -1,12 +1,12 @@
-import { Response, Router } from "express";
-import nodeXlsx from "node-xlsx";
-import { resolve } from "path";
-import { BaseLogic, Server } from "@bespoke/server";
-import Controller from "./Controller";
-import { FetchRoute, namespace, SheetType } from "./config";
+import {Response, Router} from 'express';
+import nodeXlsx from 'node-xlsx';
+import {resolve} from 'path';
+import {BaseLogic, Server} from '@bespoke/server';
+import Controller from './Controller';
+import {FetchRoute, namespace, SheetType} from './config';
 
 const router = Router()
-  .get(FetchRoute.exportXls, async (req, res: Response) => {
+    .get(FetchRoute.exportXls, async (req: any, res: Response) => {
     const {
       params: { gameId },
       query: { sheetType }
@@ -35,7 +35,7 @@ const router = Router()
     );
     return res.end(buffer, "binary");
   })
-  .get(FetchRoute.exportXlsPlaying, async (req, res: Response) => {
+    .get(FetchRoute.exportXlsPlaying, async (req: any, res: Response) => {
     const {
       params: { gameId },
       query: { sheetType }

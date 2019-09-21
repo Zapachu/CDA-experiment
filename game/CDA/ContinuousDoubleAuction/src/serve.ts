@@ -1,24 +1,24 @@
-import {resolve} from 'path'
-import {Server, Model, BaseLogic} from '@bespoke/server'
-import Controller from './Controller'
-import Robot from './Robot'
+import {resolve} from 'path';
+import {BaseLogic, Model, Server} from '@bespoke/server';
+import Controller from './Controller';
+import Robot from './Robot';
 import {
-    namespace,
-    FetchRoute,
-    SheetType,
-    RobotCalcLog,
     DBKey,
-    ShoutResult,
-    RobotSubmitLog,
+    FetchRoute,
     ISeatNumberRow,
-} from './config'
-import {Router} from 'express'
-import {getEnumKeys} from './util'
-import nodeXlsx from 'node-xlsx'
-import {RobotServer} from '@bespoke/robot'
+    namespace,
+    RobotCalcLog,
+    RobotSubmitLog,
+    SheetType,
+    ShoutResult,
+} from './config';
+import {Router} from 'express';
+import {getEnumKeys} from './util';
+import nodeXlsx from 'node-xlsx';
+import {RobotServer} from '@bespoke/robot';
 
 const router = Router()
-    .get(FetchRoute.exportXls, async (req, res) => {
+    .get(FetchRoute.exportXls, async (req: any, res) => {
         const {params: {gameId}, query: {sheetType}} = req
         const {game, stateManager} = await BaseLogic.getLogic(gameId)
         if (req.user.id !== game.owner) {
