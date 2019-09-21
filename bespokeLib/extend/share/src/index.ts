@@ -7,7 +7,7 @@ export const GroupRange = {
     },
     groupSize: {
         min: 1,
-        max: 8
+        max: 12
     }
 };
 

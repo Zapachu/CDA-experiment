@@ -29,7 +29,7 @@ exports.GroupRange = {
     },
     groupSize: {
         min: 1,
-        max: 8
+        max: 12
     }
 };
 var Wrapper;
