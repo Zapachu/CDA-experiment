@@ -1,12 +1,25 @@
-import * as React from 'react'
-import * as style from './style.scss'
-import {Button, ButtonProps, Lang, MaskLoading, Radio} from '@elf/component'
-import {Core} from '@bespoke/client'
-import {Choice, GameType, MoveType, PushType, Test1, Test2, TestStageIndex, Version} from '../../config'
-import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
-import Display from './Display'
-import Choice1 from './Choice1'
-import Choice2 from './Choice2'
+import * as React from 'react';
+import * as style from './style.scss';
+import {Button, ButtonProps, Lang, MaskLoading, Radio} from '@elf/component';
+import {Core} from '@bespoke/client';
+import {
+    Choice,
+    GameType,
+    ICreateParams,
+    IGameState,
+    IMoveParams,
+    IPlayerState,
+    IPushParams,
+    MoveType,
+    PushType,
+    Test1,
+    Test2,
+    TestStageIndex,
+    Version
+} from '../../config';
+import Display from './Display';
+import Choice1 from './Choice1';
+import Choice2 from './Choice2';
 
 interface IPlayState {
     c1: number,
@@ -36,20 +49,12 @@ interface Test {
 }
 
 export default class TestStage extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IPlayState> {
-    private Test: Array<Test>
-
-    constructor(props) {
-        super(props)
-        this.Test = props.game.params.gameType === GameType.T1 ? Test1 : Test2
-    }
-
     state: IPlayState = {
         c1: 0,
         c2: [],
         answers: [],
         tips: []
-    }
-
+    };
     lang = Lang.extractLang({
         confirm: ['确定', 'Confirm'],
         inputSeatNumberPls: ['请输入座位号', 'Input your seat number please'],
@@ -65,38 +70,44 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
         wrong: ['(错误)', '(Wrong)'],
         nextToMain: ['理解测试结束，下面进入正式实验', 'The test is over, click "Confirm" button for the main game'],
         pageIndex: [(m, n) => `第${m}/${n}页`, (m, n) => `Page ${m}/${n}`]
-    })
+    });
+    private Test: Array<Test>;
+
+    constructor(props) {
+        super(props);
+        this.Test = props.game.params.gameType === GameType.T1 ? Test1 : Test2;
+    }
 
     submit = () => {
-        const {props: {frameEmitter, playerState: {stageIndex}}, state: {answers, tips}} = this
-        const curTest = this.Test[stageIndex]
+        const {props: {frameEmitter, playerState: {stageIndex}}, state: {answers, tips}} = this;
+        const curTest = this.Test[stageIndex];
         if (answers.length !== curTest.questions.length) {
-            return
+            return;
         }
-        if (answers.includes(undefined)) return
+        if (answers.includes(undefined)) return;
         if (tips.some(tip => tip !== Tip.Correct)) {
-            return
+            return;
         }
-        frameEmitter.emit(MoveType.answerTest)
-        this.setState({answers: [], tips: []})
-    }
+        frameEmitter.emit(MoveType.answerTest);
+        this.setState({answers: [], tips: []});
+    };
 
     answer = (val: string, i: number) => {
-        const {props: {playerState: {stageIndex}, game: {params: {d}}}, state: {answers, tips}} = this
-        const newAnswers = [...answers]
-        newAnswers[i] = val
-        const answer = this.Test[stageIndex].questions[i].answer
-        const answerVal = typeof answer === 'function' ? answer(d) : answer
-        const newTips = [...tips]
-        newTips[i] = val === answerVal ? Tip.Correct : Tip.Wrong
-        this.setState({answers: newAnswers, tips: newTips})
-    }
+        const {props: {playerState: {stageIndex}, game: {params: {d}}}, state: {answers, tips}} = this;
+        const newAnswers = [...answers];
+        newAnswers[i] = val;
+        const answer = this.Test[stageIndex].questions[i].answer;
+        const answerVal = typeof answer === 'function' ? answer(d) : answer;
+        const newTips = [...tips];
+        newTips[i] = val === answerVal ? Tip.Correct : Tip.Wrong;
+        this.setState({answers: newAnswers, tips: newTips});
+    };
 
     calcDisplayData = () => {
-        const {props: {playerState: {groupIndex, roundIndex}, gameState: {groups}, game: {params: {a, b, c, eL, eH, b0, b1, version}}}} = this
-        const curGroup = groups[groupIndex]
+        const {props: {playerState: {groupIndex, roundIndex}, gameState: {groups}, game: {params: {a, b, c, eL, eH, b0, b1, version}}}} = this;
+        const curGroup = groups[groupIndex];
         if (version === Version.V3) {
-            const prob = curGroup.probs[roundIndex]
+            const prob = curGroup.probs[roundIndex];
             return prob
                 ? {
                     p11: a * eL - b0 * eL + c,
@@ -107,31 +118,31 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
                     p11: a * eL - b1 * eL + c,
                     p21: a * eL - b1 * eH + c,
                     p22: a * eH - b1 * eH + c
-                }
+                };
         } else {
             return {
                 p11: a * eL - b * eL + c,
                 p21: a * eL - b * eH + c,
                 p22: a * eH - b * eH + c
-            }
+            };
         }
-    }
+    };
 
     joinWords = (words: Array<Word>) => {
         return <>
             {words.map(({text, color, br}, i) => {
-                let className = ''
-                if (color) className = className ? className + ' ' + style.blueWords : style.blueWords
-                if (br !== undefined) className = className ? className + ' ' + style.newLine : style.newLine
-                return <span key={i} className={className} style={{marginTop: `${br}px`}}>{text}</span>
+                let className = '';
+                if (color) className = className ? className + ' ' + style.blueWords : style.blueWords;
+                if (br !== undefined) className = className ? className + ' ' + style.newLine : style.newLine;
+                return <span key={i} className={className} style={{marginTop: `${br}px`}}>{text}</span>;
             })}
-        </>
-    }
+        </>;
+    };
 
     render() {
-        const {lang, props: {frameEmitter, playerState: {stageIndex}, game: {params: {gameType, version, d}}}, state: {c1, c2, answers, tips}} = this
-        const displayData = this.calcDisplayData()
-        let content
+        const {lang, props: {frameEmitter, playerState: {stageIndex}, game: {params: {gameType, version, d}}}, state: {c1, c2, answers, tips}} = this;
+        const displayData = this.calcDisplayData();
+        let content;
         if (stageIndex === TestStageIndex.Interface) {
             switch (gameType) {
                 case GameType.T1: {
@@ -145,13 +156,13 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
                         <Button width={ButtonProps.Width.small}
                                 label={lang.confirm}
                                 onClick={() => {
-                                    if (!c1) return
-                                    frameEmitter.emit(MoveType.answerTest)
-                                    this.setState({c1: 0})
+                                    if (!c1) return;
+                                    frameEmitter.emit(MoveType.answerTest);
+                                    this.setState({c1: 0});
                                 }}
                         />
-                    </>)
-                    break
+                    </>);
+                    break;
                 }
                 case GameType.T2: {
                     content = (<>
@@ -172,13 +183,13 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
                         <Button width={ButtonProps.Width.small}
                                 label={lang.confirm}
                                 onClick={() => {
-                                    if (!c1 || c2.length !== 2 || c2.includes(undefined)) return
-                                    frameEmitter.emit(MoveType.answerTest)
-                                    this.setState({c1: 0})
+                                    if (!c1 || c2.length !== 2 || c2.includes(undefined)) return;
+                                    frameEmitter.emit(MoveType.answerTest);
+                                    this.setState({c1: 0});
                                 }}
                         />
-                    </>)
-                    break
+                    </>);
+                    break;
                 }
             }
         } else if (stageIndex === TestStageIndex.Next) {
@@ -188,16 +199,16 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
                         style={{marginTop: '10px'}}
                         label={lang.confirm}
                         onClick={() => {
-                            frameEmitter.emit(MoveType.toMain)
+                            frameEmitter.emit(MoveType.toMain);
                         }}
                 />
-            </div>
+            </div>;
         } else if (stageIndex === TestStageIndex.Wait4Others) {
             content = <div>
                 <MaskLoading label={lang.wait4Others}/>
-            </div>
+            </div>;
         } else {
-            const curTest = this.Test[stageIndex]
+            const curTest = this.Test[stageIndex];
             content = <div className={style.testQuestion}>
                 <h3>{lang.pageIndex(stageIndex + 1, this.Test.length)}</h3>
                 <Display data={displayData}/>
@@ -218,10 +229,10 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
                         label={lang.confirm}
                         onClick={this.submit}
                 />
-            </div>
+            </div>;
         }
         return <section className={style.testStage}>
             {content}
-        </section>
+        </section>;
     }
 }

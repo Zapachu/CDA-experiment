@@ -1,9 +1,20 @@
-import * as React from 'react'
-import * as style from './style.scss'
-import {Core, Request} from '@bespoke/client'
-import {Button, Lang} from '@elf/component'
-import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
-import {FetchRoute, MoveType, PushType, SheetType, Stage, namespace} from '../config'
+import * as React from 'react';
+import * as style from './style.scss';
+import {Core, Request} from '@bespoke/client';
+import {Button, Lang} from '@elf/component';
+import {
+    FetchRoute,
+    ICreateParams,
+    IGameState,
+    IMoveParams,
+    IPlayerState,
+    IPushParams,
+    MoveType,
+    namespace,
+    PushType,
+    SheetType,
+    Stage
+} from '../config';
 
 interface IPlay4OwnerState {
   timer?: number

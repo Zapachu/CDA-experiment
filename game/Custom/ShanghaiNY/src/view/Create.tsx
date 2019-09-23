@@ -1,9 +1,11 @@
-import * as React from 'react'
-import * as style from './style.scss'
-import {Input, Label, Lang, RangeInput, Select} from '@elf/component'
-import {Core} from '@bespoke/client'
-import {GameType, Version} from '../config'
-import {ICreateParams} from '../interface'
+import * as React from 'react';
+import {Label, Lang} from '@elf/component';
+import {Core} from '@bespoke/client';
+import {Col, InputNumber, Row, Select, Slider} from 'antd';
+import {GameType, ICreateParams, Mode, Version} from '../config';
+import style from './style.scss';
+
+const {Option} = Select;
 
 interface ICreateState {
     playersPerGroup: number,
@@ -26,13 +28,20 @@ interface ICreateState {
 const gameTypes = [
     {label: 'T1', value: GameType.T1},
     {label: 'T2', value: GameType.T2}
-]
+];
 
 const versions = [
     {label: 'V1', value: Version.V1},
     {label: 'V2', value: Version.V2},
     {label: 'V3', value: Version.V3}
-]
+];
+
+const modes = [
+    {label: 'HR', value: Mode.HR},
+    {label: 'LR', value: Mode.LR},
+    {label: 'BR', value: Mode.BR},
+];
+
 
 export class Create extends Core.Create<ICreateParams, ICreateState> {
     lang = Lang.extractLang({
@@ -40,17 +49,18 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
         playersPerGroup: ['每组人数', 'Players per Group'],
         gameType: ['类型', 'Game Type'],
         version: ['版本', 'Version'],
-        params: ['参数', 'Parameters'],
+        mode: ['模式', 'Mode'],
         participationFee: ['参与费', 'Participation Fee']
-    })
+    });
 
     componentDidMount(): void {
-        const {props: {setParams}} = this
+        const {props: {setParams}} = this;
         let defaultParams: ICreateParams = {
             playersPerGroup: 2,
             rounds: 2,
-            gameType: GameType.T1,
+            gameType: GameType.T2,
             version: Version.V1,
+            mode: Mode.HR,
             participationFee: 0,
             a: 0,
             b: 0,
@@ -62,68 +72,90 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
             p: 0,
             b0: 0,
             b1: 0
-        }
-        setParams(defaultParams)
+        };
+        setParams(defaultParams);
     }
 
     render(): React.ReactNode {
-        const {lang, props: {params, setParams}} = this
-        const gameParams = ['a', 'b', 'c', 'd', 'eH', 'eL', 's', 'p', 'b0', 'b1']
-        return <section className={style.create}>
-            <ul className={style.fields}>
-                <li>
-                    <Label label={lang.playersPerGroup}/>
-                    <RangeInput value={params.playersPerGroup}
-                                min={2}
-                                max={12}
-                                step={2}
-                                onChange={({target: {value: playersPerGroup}}) => setParams({playersPerGroup: Number(playersPerGroup)})}
-                    />
-                </li>
-                <li>
-                    <Label label={lang.round}/>
-                    <RangeInput value={params.rounds}
+        const INPUT_STYLE: React.CSSProperties = {
+            width: '8rem'
+        };
+        const {lang, props: {params, setParams}} = this;
+        const gameParams = ['a', 'b', 'c', 'd', 'eH', 'eL', 's', 'p', 'b0', 'b1'];
+        return <Row>
+            <Col span={10} offset={7}>
+                <ul className={style.create}>
+                    <li>
+                        <Label label={lang.playersPerGroup}/>
+                        <Slider className={style.slider}
+                                tooltipVisible={true}
+                                value={params.playersPerGroup}
                                 min={1}
-                                max={30}
+                                max={12}
                                 step={1}
-                                onChange={({target: {value: rounds}}) => setParams({rounds: Number(rounds)})}
-                    />
-                </li>
-                <li>
-                    <Label label={lang.participationFee}/>
-                    <Input {...{
-                        type: 'number',
-                        value: params.participationFee,
-                        onChange: ({target: {value}}) => setParams({participationFee: Number(value)})
-                    }}/>
-                </li>
-                <li>
-                    <Label label={lang.gameType}/>
-                    <Select value={params.gameType} options={gameTypes} onChange={val => setParams({gameType: +val})}/>
-                </li>
-                <li>
-                    <Label label={lang.version}/>
-                    <Select value={params.version} options={versions} onChange={val => setParams({version: +val})}/>
-                </li>
-            </ul>
-            <p className={style.params}>{lang.params}</p>
-            <ul className={style.fields}>
-                {
-                    gameParams.map(p => {
-                        if (params.gameType === GameType.T1 && p === 'd') return null
-                        if (params.version === Version.V3 && p === 'b') return null
-                        if (params.version !== Version.V3 && ['p', 'b0', 'b1'].includes(p)) return null
-                        return <li key={p}>
-                            <Label label={p}/>
-                            <Input {...{
-                                type: 'number',
-                                value: params[p],
-                                onChange: ({target: {value}}) => setParams({[p]: Number(value)})
-                            }}/>
-                        </li>
-                    })
-                }
-            </ul>
-        </section>
+                                onChange={playersPerGroup => setParams({playersPerGroup: +playersPerGroup})}
+                        />
+                    </li>
+                    <li>
+                        <Label label={lang.round}/>
+                        <Slider className={style.slider}
+                                tooltipVisible={true}
+                                value={params.rounds}
+                                min={1}
+                                max={12}
+                                step={1}
+                                onChange={v => setParams({rounds: +v})}
+                        />
+                    </li>
+                    <li>
+                        <Label label={lang.participationFee}/>
+                        <InputNumber style={INPUT_STYLE} {...{
+                            style: INPUT_STYLE,
+                            value: params.participationFee,
+                            onChange: v => setParams({participationFee: +v})
+                        }}/>
+                    </li>
+                    <li>
+                        <Label label={lang.gameType}/>
+                        <Select value={params.gameType as any} style={INPUT_STYLE} disabled>
+                            {
+                                gameTypes.map(({label, value}) => <Option value={value}>{label}</Option>)
+                            }
+                        </Select>
+                    </li>
+                    <li>
+                        <Label label={lang.version}/>
+                        <Select value={params.version as any} style={INPUT_STYLE}>
+                            {
+                                versions.map(({label, value}) => <Option value={value}>{label}</Option>)
+                            }
+                        </Select>
+                    </li>
+                    <li>
+                        <Label label={lang.mode}/>
+                        <Select value={params.mode as any} style={INPUT_STYLE}>
+                            {
+                                modes.map(({label, value}) => <Option value={value}>{label}</Option>)
+                            }
+                        </Select>
+                    </li>
+                    {
+                        gameParams.map(p => {
+                            if (params.gameType === GameType.T1 && p === 'd') return null;
+                            if (params.version === Version.V3 && p === 'b') return null;
+                            if (params.version !== Version.V3 && ['p', 'b0', 'b1'].includes(p)) return null;
+                            return <li key={p}>
+                                <Label label={p}/>
+                                <InputNumber{...{
+                                    style: INPUT_STYLE,
+                                    value: params[p],
+                                    onChange: v => setParams({[p]: +v})
+                                }}/>
+                            </li>;
+                        })
+                    }
+                </ul>
+            </Col>
+        </Row>;
     }
 }

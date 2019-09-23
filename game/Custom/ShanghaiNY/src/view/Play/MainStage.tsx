@@ -1,12 +1,23 @@
-import * as React from 'react'
-import * as style from './style.scss'
-import {Button, ButtonProps, Lang, MaskLoading, Toast} from '@elf/component'
-import {Core} from '@bespoke/client'
-import {Choice, GameType, MainStageIndex, MoveType, PushType, Version} from '../../config'
-import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface'
-import Display from './Display'
-import Choice1 from './Choice1'
-import Choice2 from './Choice2'
+import * as React from 'react';
+import * as style from './style.scss';
+import {Button, ButtonProps, Lang, MaskLoading, Toast} from '@elf/component';
+import {Core} from '@bespoke/client';
+import {
+    Choice,
+    GameType,
+    ICreateParams,
+    IGameState,
+    IMoveParams,
+    IPlayerState,
+    IPushParams,
+    MainStageIndex,
+    MoveType,
+    PushType,
+    Version
+} from '../../config';
+import Display from './Display';
+import Choice1 from './Choice1';
+import Choice2 from './Choice2';
 
 interface IPlayState {
     c1: number,
@@ -15,23 +26,10 @@ interface IPlayState {
 
 export default class MainStage extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IPlayState> {
 
-    constructor(props) {
-        super(props)
-        this.state = this.initState(props)
-    }
-
-    initState = props => {
-        const {playerState: {groupIndex, choices}, gameState: {groups}} = props
-        const curGroup = groups[groupIndex]
-        const curChoice = choices[curGroup.roundIndex]
-        return curChoice ? {c1: curChoice.c1 || 0, c2: curChoice.c2 || []} : {c1: 0, c2: []}
-    }
-
     state: IPlayState = {
         c1: 0,
         c2: []
-    }
-
+    };
     lang = Lang.extractLang({
         confirm: ['确定', 'Confirm'],
         inputSeatNumberPls: ['请输入座位号', 'Input your seat number please'],
@@ -55,13 +53,25 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
         wait4Others2Choose: ['等待其他玩家选择', 'Waiting for others to choose'],
         wait4Others2Next: ['等待其他玩家进入下一轮', 'Waiting for others to enter the next round'],
         roundIndex: [(m, n) => `第${m}/${n}轮`, (m, n) => `Round ${m}/${n}`]
-    })
+    });
+
+    constructor(props) {
+        super(props);
+        this.state = this.initState(props);
+    }
+
+    initState = props => {
+        const {playerState: {groupIndex, choices}, gameState: {groups}} = props;
+        const curGroup = groups[groupIndex];
+        const curChoice = choices[curGroup.roundIndex];
+        return curChoice ? {c1: curChoice.c1 || 0, c2: curChoice.c2 || []} : {c1: 0, c2: []};
+    };
 
     calcDisplayData = () => {
-        const {props: {playerState: {groupIndex, roundIndex}, gameState: {groups}, game: {params: {a, b, c, eL, eH, b0, b1, version}}}} = this
-        const curGroup = groups[groupIndex]
+        const {props: {playerState: {groupIndex, roundIndex}, gameState: {groups}, game: {params: {a, b, c, eL, eH, b0, b1, version}}}} = this;
+        const curGroup = groups[groupIndex];
         if (version === Version.V3) {
-            const prob = curGroup.probs[roundIndex]
+            const prob = curGroup.probs[roundIndex];
             return prob
                 ? {
                     p11: a * eL - b0 * eL + c,
@@ -72,31 +82,31 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
                     p11: a * eL - b1 * eL + c,
                     p21: a * eL - b1 * eH + c,
                     p22: a * eH - b1 * eH + c
-                }
+                };
         } else {
             return {
                 p11: a * eL - b * eL + c,
                 p21: a * eL - b * eH + c,
                 p22: a * eH - b * eH + c
-            }
+            };
         }
-    }
+    };
 
     renderChoice2 = (c1, c2) => {
-        const {lang} = this
+        const {lang} = this;
         if (c1 !== Choice.Wait) {
-            return <p>{lang.chooseInFirstAction}{c1}</p>
+            return <p>{lang.chooseInFirstAction}{c1}</p>;
         }
-        return <p>{lang.chooseInSecondActionLeft}{c2[0]}{lang.chooseInSecondActionRight}{c2[1]}</p>
-    }
+        return <p>{lang.chooseInSecondActionLeft}{c2[0]}{lang.chooseInSecondActionRight}{c2[1]}</p>;
+    };
 
     renderResult = () => {
-        const {lang, props: {frameEmitter, playerState: {groupIndex, roundIndex, choices, profits, finalProfit}, gameState: {groups}, game: {params: {gameType}}}, state: {c1, c2}} = this
-        const curGroup = groups[groupIndex]
-        const curRoundIndex = roundIndex
-        const curChoice = choices[curRoundIndex]
-        if (!curChoice) return null
-        const curProfit = profits[curRoundIndex]
+        const {lang, props: {frameEmitter, playerState: {groupIndex, roundIndex, choices, profits, finalProfit}, gameState: {groups}, game: {params: {gameType}}}, state: {c1, c2}} = this;
+        const curGroup = groups[groupIndex];
+        const curRoundIndex = roundIndex;
+        const curChoice = choices[curRoundIndex];
+        if (!curChoice) return null;
+        const curProfit = profits[curRoundIndex];
         switch (gameType) {
             case GameType.T1: {
                 return <>
@@ -107,11 +117,11 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
                     <Button width={ButtonProps.Width.small}
                             label={lang.confirm}
                             onClick={() => {
-                                frameEmitter.emit(MoveType.advanceRoundIndex, {nextRoundIndex: curRoundIndex + 1})
-                                this.setState({c1: 0, c2: []})
+                                frameEmitter.emit(MoveType.advanceRoundIndex, {nextRoundIndex: curRoundIndex + 1});
+                                this.setState({c1: 0, c2: []});
                             }}
                     />
-                </>
+                </>;
             }
             case GameType.T2: {
                 return <>
@@ -125,19 +135,19 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
                     <Button width={ButtonProps.Width.small}
                             label={lang.confirm}
                             onClick={() => {
-                                frameEmitter.emit(MoveType.advanceRoundIndex, {nextRoundIndex: curRoundIndex + 1})
-                                this.setState({c1: 0, c2: []})
+                                frameEmitter.emit(MoveType.advanceRoundIndex, {nextRoundIndex: curRoundIndex + 1});
+                                this.setState({c1: 0, c2: []});
                             }}
                     />
-                </>
+                </>;
             }
         }
-    }
+    };
 
     render() {
-        const {lang, props: {frameEmitter, playerState: {stageIndex, roundIndex}, game: {params: {gameType, version, d, rounds}}}, state: {c1, c2}} = this
-        const displayData = this.calcDisplayData()
-        let content
+        const {lang, props: {frameEmitter, playerState: {stageIndex, roundIndex}, game: {params: {gameType, version, d, rounds}}}, state: {c1, c2}} = this;
+        const displayData = this.calcDisplayData();
+        let content;
         switch (stageIndex) {
             case MainStageIndex.Choose: {
                 content = <div>
@@ -150,46 +160,46 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
                         ? <Button width={ButtonProps.Width.small}
                                   label={lang.confirm}
                                   onClick={() => {
-                                      if (!c1) return
+                                      if (!c1) return;
                                       frameEmitter.emit(MoveType.answerMain, {c1}, err => {
-                                          if (err) Toast.warn(err)
-                                      })
+                                          if (err) Toast.warn(err);
+                                      });
                                   }}
                         />
                         : c1
                             ? <Button width={ButtonProps.Width.small}
                                       label={lang.confirm}
                                       onClick={() => {
-                                          if (!c1 || c2.length !== 2 || c2.includes(undefined)) return
+                                          if (!c1 || c2.length !== 2 || c2.includes(undefined)) return;
                                           frameEmitter.emit(MoveType.answerMain, {c1, c2}, err => {
-                                              if (err) Toast.warn(err)
-                                          })
+                                              if (err) Toast.warn(err);
+                                          });
                                       }}
                             />
                             : null
                     }
-                </div>
-                break
+                </div>;
+                break;
             }
             case MainStageIndex.Wait4Result: {
                 content = <div>
                     <Display data={displayData}/>
                     <MaskLoading label={lang.wait4Others2Choose}/>
-                </div>
-                break
+                </div>;
+                break;
             }
             case MainStageIndex.Result: {
                 content = <div>
                     <Display data={displayData}/>
                     <div className={style.resultLines}>{this.renderResult()}</div>
-                </div>
-                break
+                </div>;
+                break;
             }
         }
 
         return <section>
             <p>{lang.roundIndex(roundIndex + 1, rounds)}</p>
             {content}
-        </section>
+        </section>;
     }
 }

@@ -1,8 +1,8 @@
-import * as React from 'react'
-import * as style from './style.scss'
-import {Core} from '@bespoke/client'
-import {Lang} from '@elf/component'
-import {ICreateParams, IGameState, IPlayerState} from '../interface'
+import * as React from 'react';
+import * as style from './style.scss';
+import {Core} from '@bespoke/client';
+import {Lang} from '@elf/component';
+import {ICreateParams, IGameState, IPlayerState} from '../config';
 
 interface IResultState {
 }
