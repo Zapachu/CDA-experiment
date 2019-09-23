@@ -6,15 +6,6 @@ import Controller from './Controller';
 import {FetchRoute, namespace, SheetType} from './config';
 
 const router = Router()
-    .get(FetchRoute.getUserMobile, async (req: any, res: Response) => {
-        const {user: {_id: userId, mobile}, params: {gameId}, query: {token, actorType}} = req as any;
-        const {game, stateManager} = await BaseLogic.getLogic(gameId)
-        if (game.owner.toString() !== userId.toString()) {
-            const playerState = await stateManager.getPlayerState({type: actorType, token})
-            playerState.mobile = mobile || '-'
-        }
-        return res.end()
-    })
     .get(FetchRoute.exportXls, async (req: any, res: Response) => {
         const {params: {gameId}, query: {sheetType}} = req
         const {game, stateManager} = await BaseLogic.getLogic(gameId)

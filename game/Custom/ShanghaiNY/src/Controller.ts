@@ -47,6 +47,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
 
   async initPlayerState(actor: IActor): Promise<TPlayerState<IPlayerState>> {
     const playerState = await super.initPlayerState(actor)
+    playerState.mobile = playerState.user.mobile;
     playerState.stage = Stage.Seat;
     playerState.stageIndex = TestStageIndex.Interface;
     playerState.choices = [];

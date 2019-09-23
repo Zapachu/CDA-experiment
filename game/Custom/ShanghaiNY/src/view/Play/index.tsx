@@ -1,16 +1,14 @@
 import * as React from 'react';
 import * as style from './style.scss';
 import {Button, ButtonProps, Input, Label, Lang, MaskLoading, Toast} from '@elf/component';
-import {Core, Request} from '@bespoke/client';
+import {Core} from '@bespoke/client';
 import {
-    FetchRoute,
     ICreateParams,
     IGameState,
     IMoveParams,
     IPlayerState,
     IPushParams,
     MoveType,
-    namespace,
     PushType,
     Stage
 } from '../../config';
@@ -41,10 +39,6 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     componentDidMount() {
         const {playerState: {actor}, frameEmitter, game} = this.props;
         frameEmitter.emit(MoveType.initPosition);
-        Request.instance(namespace).get(FetchRoute.getUserMobile, {gameId: game.id}, {
-            token: actor.token,
-            actorType: actor.type
-        });
     }
 
     render(): React.ReactNode {

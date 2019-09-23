@@ -1,8 +1,7 @@
 @import "~@elf/component/lib/public";
 
 .play {
-  width: calc(99vw - 2rem);
-  margin: 2rem auto 0;
+  padding-top: 2rem;
 
   .display {
     border-collapse: separate;
@@ -10,9 +9,11 @@
     max-width: 300px;
     border: 1px solid;
     margin: 1rem 0;
+
     td {
       text-align: center;
     }
+
     .data {
       color: red;
     }
@@ -21,15 +22,26 @@
   .choice {
     font-size: 16px;
     min-width: 300px;
+    margin-bottom: 3rem;
     .disabled {
       pointer-events: none;
-      color: #b5b5b5;
+      color: #ccc;
     }
-    .hidden {
-      display: none;
+
+    p {
+      margin: .5rem 0;
+    }
+
+    .tips {
+      font-size: 1rem;
+      color: #999;
+    }
+
+    li {
+      list-style: decimal;
     }
   }
-  
+
   .instruction {
     font-size: 16px;
     font-style: italic;
@@ -47,6 +59,7 @@
 
   .tipWrong {
     color: red;
+
     span {
       color: red;
     }
@@ -54,7 +67,8 @@
 
   .resultLines {
     font-size: 16px;
-    >p {
+
+    > p {
       margin-bottom: 5px;
     }
   }
@@ -64,20 +78,38 @@
     flex-direction: column;
     align-items: center;
   }
+
   .testStage {
     display: flex;
     flex-direction: column;
     align-items: center;
+
     .desc {
       margin-bottom: 20px;
     }
+
     .testQuestion {
       width: 80%;
       min-width: 300px;
     }
   }
+
+  .mainStage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 32rem;
+    margin: auto;
+
+    > div {
+      width: 100%;
+      padding: 1rem;
+    }
+  }
+
   .endStage {
     text-align: center;
+
     p {
       margin: 20px 0;
     }

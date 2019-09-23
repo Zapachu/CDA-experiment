@@ -33,7 +33,8 @@ const gameTypes = [
 const versions = [
     {label: 'V1', value: Version.V1},
     {label: 'V2', value: Version.V2},
-    {label: 'V3', value: Version.V3}
+    {label: 'V3', value: Version.V3},
+    {label: 'V4', value: Version.V4},
 ];
 
 const modes = [
@@ -116,29 +117,34 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
                         }}/>
                     </li>
                     <li>
-                        <Label label={lang.gameType}/>
-                        <Select value={params.gameType as any} style={INPUT_STYLE} disabled>
-                            {
-                                gameTypes.map(({label, value}) => <Option value={value}>{label}</Option>)
-                            }
-                        </Select>
-                    </li>
-                    <li>
                         <Label label={lang.version}/>
-                        <Select value={params.version as any} style={INPUT_STYLE}>
+                        <Select value={params.version as any} style={INPUT_STYLE}
+                                onChange={version => setParams({version})}>
                             {
                                 versions.map(({label, value}) => <Option value={value}>{label}</Option>)
                             }
                         </Select>
                     </li>
-                    <li>
-                        <Label label={lang.mode}/>
-                        <Select value={params.mode as any} style={INPUT_STYLE}>
-                            {
-                                modes.map(({label, value}) => <Option value={value}>{label}</Option>)
-                            }
-                        </Select>
-                    </li>
+                    {
+                        params.version === Version.V4 ?
+                            <li>
+                                <Label label={lang.mode}/>
+                                <Select value={params.mode as any} style={INPUT_STYLE}
+                                        onChange={mode => setParams({mode})}>
+                                    {
+                                        modes.map(({label, value}) => <Option value={value}>{label}</Option>)
+                                    }
+                                </Select>
+                            </li> : <li>
+                                <Label label={lang.gameType}/>
+                                <Select value={params.gameType as any} style={INPUT_STYLE}
+                                        onChange={gameType => setParams({gameType})}>
+                                    {
+                                        gameTypes.map(({label, value}) => <Option value={value}>{label}</Option>)
+                                    }
+                                </Select>
+                            </li>
+                    }
                     {
                         gameParams.map(p => {
                             if (params.gameType === GameType.T1 && p === 'd') return null;

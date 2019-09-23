@@ -30,7 +30,8 @@ export enum Choice {
 export enum Version {
   V1 = 1,
   V2,
-  V3
+  V3,
+  V4,
 }
 
 export enum MainStageIndex {
@@ -70,8 +71,7 @@ export enum PushType {}
 
 export enum FetchRoute {
   exportXls = '/exportXls/:gameId:',
-  exportXlsPlaying = '/exportXlsPlaying/:gameId',
-  getUserMobile = '/getUserMobile/:gameId'
+  exportXlsPlaying = '/exportXlsPlaying/:gameId'
 }
 
 export const Test1 = [
