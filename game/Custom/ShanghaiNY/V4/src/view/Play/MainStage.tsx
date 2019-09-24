@@ -36,9 +36,8 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
         inputSeatNumberPls: ['请输入座位号', 'Input your seat number please'],
         submit: ['提交', 'Submit'],
         invalidSeatNumber: ['座位号有误或已被占用', 'Your seat number is invalid or has been occupied'],
-        chooseInFirstAction: ['在第一阶段选择', 'In the first action chose '],
-        chooseInSecondActionLeft: ['等待, 如果第一阶段有人选1, 则选', 'Wait, if someone has chosen 1 in the first action, choose '],
-        chooseInSecondActionRight: ['; 如果第一阶段没有人选1, 则选', '; if on one has chosen 1 in the first action, choose '],
+        chooseInFirstAction: ['在第一阶段选择 : ', 'In the first action chose :'],
+        chooseInSecondAction: ['在第二阶段选择 : ', 'In the second action chose :'],
         yourFirstChoiceLeft: ['你在第', 'Your choice in round '],
         yourFirstChoiceRight: ['轮的选择为:', ' is:'],
         roundResult0: ['第', 'The lowest choice of the group in round '],
@@ -51,12 +50,15 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
         profitRight: ['轮的积分为:', ' is:'],
         totalProfitLeft: ['截止第', 'Until round '],
         totalProfitRight: ['轮，你的积分为:', ' your total profit is:'],
-        inFirstAction: ['在第一阶段中,', 'In the first action,'],
+        inFirstAction: ['在第一阶段中, ', 'In the first action, '],
         yourSecondChoice: ['你在第二阶段的选择为:', 'Your choice in the second action is:'],
         wait4Others2Choose: ['等待其他玩家选择', 'Waiting for others to choose'],
         wait4Others2Next: ['等待其他玩家进入下一轮', 'Waiting for others to enter the next round'],
         roundIndex: [(m, n) => `第${m}/${n}轮`, (m, n) => `Round ${m}/${n}`],
         checkPls: ['请检查您的选择', 'Check your choice please'],
+        choose1: ['选1', 'Choose 1'],
+        choose2: ['选2', 'Choose 2'],
+        chooseWait: ['等待', 'Wait'],
     });
 
     constructor(props) {
@@ -82,14 +84,22 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
 
     renderChoice2 = (c1, c2) => {
         const {lang} = this;
-        if (c1 !== Choice.Wait) {
-            return <p>{lang.chooseInFirstAction}{c1}</p>;
+        const choice2Lang = {
+            [Choice.One]: lang.choose1,
+            [Choice.Two]: lang.choose2,
+            [Choice.Wait]: lang.chooseWait,
         }
-        return <p>{lang.chooseInSecondActionLeft}{c2[0]}{lang.chooseInSecondActionRight}{c2[1]}</p>;
+        return <>
+            <p>{lang.chooseInFirstAction}{choice2Lang[c1]}</p>
+            <p>{lang.chooseInSecondAction}</p>
+            <table>
+                <tr>{'TODO : ' + JSON.stringify(c2.map(c => choice2Lang[c]))}</tr>
+            </table>
+        </>;
     };
 
     renderResult = () => {
-        const {lang, props: {frameEmitter, game: {params: {min}}, playerState: {groupIndex, roundIndex, choices, profits, finalProfit}, gameState: {groups}}, state: {c1, c2}} = this;
+        const {lang, props: {frameEmitter, game: {params: {min}}, playerState: {groupIndex, roundIndex, choices, profits, finalProfit}, gameState: {groups}}} = this;
         const curRoundIndex = roundIndex;
         const curGroup: IGameGroupState = groups[groupIndex],
             curRound = curGroup.rounds[curRoundIndex];
@@ -98,9 +108,9 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
         const curProfit = profits[curRoundIndex];
         return <>
             <p>{lang.yourFirstChoiceLeft}{curRoundIndex + 1}{lang.yourFirstChoiceRight} </p>
-            {this.renderChoice2(c1, c2)}
-            <p style={{margin: '2rem 0'}}>{lang.inFirstAction}{curRound.x}{lang.roundResult4}{curRound.y}{lang.roundResult5}</p>
-            {curChoice.c1 !== Choice.One ? <p>{lang.yourSecondChoice} {curChoice.c2.toString()}</p> : null}
+            {this.renderChoice2(curChoice.c1, curChoice.c2)}
+            <p style={{margin: '2rem 0'}}>{lang.inFirstAction}{curRound.x1}{lang.roundResult4}{curRound.y1}{lang.roundResult5}</p>
+            {curChoice.c1 !== Choice.One ? <p>{lang.yourSecondChoice} {curChoice.c}</p> : null}
             {
                 min === Min.A ?
                     <p>{lang.roundResult0}{curRoundIndex + 1}{lang.roundResult1} {curRound.min}</p> :

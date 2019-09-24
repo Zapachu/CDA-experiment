@@ -28,21 +28,23 @@ export default function Choice1({test, c1, onChoose, mode, d = 0}: {
             [Choice.Two]: lang.choose2,
             [Choice.Wait]: lang.chooseWait,
         };
-    let options: Array<Choice> = [], tips: string = '';
-    switch (mode) {
-        case Mode.HR:
-            options = [Choice.One, Choice.Wait];
-            tips = lang.choose1;
-            break;
-        case Mode.LR:
-            options = [Choice.Two, Choice.Wait];
-            tips = lang.choose2;
-            break;
-        case Mode.BR:
-            options = [Choice.One, Choice.Two];
-            tips = lang.changeChoice;
-            break;
-    }
+    const {options, tips}: {
+        options: Array<Choice>,
+        tips: string
+    } = {
+        [Mode.HR]: {
+            options: [Choice.One, Choice.Wait],
+            tips: c1 === Choice.Wait ? lang.choose1 : null
+        },
+        [Mode.LR]: {
+            options: [Choice.Two, Choice.Wait],
+            tips: c1 === Choice.Wait ? lang.choose2 : null
+        },
+        [Mode.BR]: {
+            options: [Choice.One, Choice.Two],
+            tips: lang.changeChoice
+        }
+    }[mode];
     return <div className={style.choice}>
         <p>{lang.firstChoiceT2}</p>
         <Radio.Group value={c1} onChange={({target: {value}}) => onChoose(+value)}>
@@ -51,7 +53,7 @@ export default function Choice1({test, c1, onChoose, mode, d = 0}: {
             }
         </Radio.Group>
         <p className={style.tips}
-           style={{visibility: d > 0 && c1 === options[options.length - 1] ? 'visible' : 'hidden'}}>
+           style={{visibility: d > 0 && tips ? 'visible' : 'hidden'}}>
             {`${lang.pay1}${tips}${lang.pay2}${d}${lang.pay3}`}
         </p>
         {

@@ -8,6 +8,7 @@ import {
   IPlayerState,
   IPushParams,
   MainStageIndex,
+  Mode,
   MoveType,
   PushType,
   SheetType,
@@ -37,7 +38,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
     const playerState = await super.initPlayerState(actor);
     playerState.mobile = playerState.user.mobile;
     playerState.stage = Stage.Seat;
-    playerState.stageIndex = TestStageIndex.Interface;
+    playerState.stageIndex = TestStageIndex.Next;
     playerState.choices = [];
     playerState.profits = [];
     playerState.surveyAnswers = [];
@@ -156,7 +157,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         playerState = await this.stateManager.getPlayerState(actor),
         playerStates = await this.stateManager.getPlayerStates(),
         {groups} = gameState,
-        {playersPerGroup, rounds, a, b, c, d, eH, eL, p} = this.game.params;
+        {playersPerGroup, rounds, a, b, c, d, eH, eL, mode} = this.game.params;
     switch (type) {
       case MoveType.initPosition: {
         if (playerState.groupIndex !== undefined) {
@@ -221,23 +222,22 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         const playersInGroup = await this.getPlayersInGroup(playerState.groupIndex);
         const ready = playersInGroup.length === playersPerGroup && playersInGroup.every(ps => !!ps.choices[roundIndex]);
         if (ready) {
-          const choseOne: boolean = playersInGroup.some(ps => ps.choices[roundIndex].c1 === Choice.One);
-          const min = playersInGroup.some(ps => ps.choices[roundIndex].c === Choice.One) ? Choice.One : Choice.Two;
-          groups[playerState.groupIndex].rounds[roundIndex] = {
-            x1: playersInGroup.filter(ps => ps.choices[roundIndex].c1 === Choice.One).length,
-            y1: playersInGroup.filter(ps => ps.choices[roundIndex].c1 === Choice.Two).length,
-            x: playersInGroup.filter(ps => ps.choices[roundIndex].c === Choice.One).length,
-            y: playersInGroup.filter(ps => ps.choices[roundIndex].c === Choice.Two).length,
-            min: playersInGroup.some(ps => ps.choices[roundIndex].c === Choice.One) ? Choice.One : Choice.Two
-          };
+          const x1 = playersInGroup.filter(ps => ps.choices[roundIndex].c1 === Choice.One).length,
+              y1 = playersInGroup.filter(ps => ps.choices[roundIndex].c1 === Choice.Two).length;
           playersInGroup.forEach(ps => {
             const curChoice = ps.choices[roundIndex];
-            const c = curChoice.c1 === Choice.Wait ? (choseOne ? curChoice.c2[0] : curChoice.c2[1]) : curChoice.c1;
-            curChoice.c = c;
+            curChoice.c = curChoice.c1 === Choice.Wait ? curChoice.c2[mode === Mode.LR ? y1 : x1] : curChoice.c1;
           });
+          const min = playersInGroup.some(ps => ps.choices[roundIndex].c === Choice.One) ? Choice.One : Choice.Two;
+          groups[playerState.groupIndex].rounds[roundIndex] = {
+            x1,
+            y1,
+            x: playersInGroup.filter(ps => ps.choices[roundIndex].c === Choice.One).length,
+            y: playersInGroup.filter(ps => ps.choices[roundIndex].c === Choice.Two).length,
+            min
+          };
           playersInGroup.forEach(ps => {
-            const ui = calcProfit(ps, min);
-            ps.profits[roundIndex] = ui;
+            ps.profits[roundIndex] = calcProfit(ps, min);
             ps.finalProfit = ps.profits.reduce((acc, cur) => acc + cur, 0);
             ps.stageIndex = MainStageIndex.Result;
           });
@@ -275,7 +275,9 @@ export default class Controller extends BaseController<ICreateParams, IGameState
       const ei = eH * (x - 1) + eL * (2 - x);
       const emin = min === Choice.One ? eL : eH;
       let ui = a * emin - b * ei + c;
-      if (curChoice.c1 === Choice.Wait && curChoice.c === Choice.One) ui = ui - d;
+      if (curChoice.c1 !== Choice.Wait && curChoice.c !== curChoice.c1) {
+        ui = ui - d;
+      }
       return ui;
     }
   }
