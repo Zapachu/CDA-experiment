@@ -1,16 +1,8 @@
 import * as React from 'react';
 import {Button, ButtonProps, Input, Lang, RadioGroup, Select} from '@elf/component';
 import {Core} from '@bespoke/client';
-import {
-    ICreateParams,
-    IGameState,
-    IMoveParams,
-    IPlayerState,
-    IPushParams,
-    MoveType,
-    PushType,
-    Survey
-} from '../../config';
+import {MoveType, PushType, Survey} from '../../config';
+import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface';
 
 interface IPlayState {
     answers: Array<string>,

@@ -2,19 +2,8 @@ import * as React from 'react';
 import * as style from './style.scss';
 import {Button, ButtonProps, Lang, MaskLoading, Toast} from '@elf/component';
 import {Core} from '@bespoke/client';
-import {
-    Choice,
-    GameType,
-    ICreateParams,
-    IGameState,
-    IMoveParams,
-    IPlayerState,
-    IPushParams,
-    MainStageIndex,
-    MoveType,
-    PushType,
-    Version
-} from '../../config';
+import {Choice, GameType, MainStageIndex, MoveType, PushType, Version} from '../../config';
+import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface';
 import Display from './Display';
 import Choice1 from './Choice1';
 import Choice2 from './Choice2';
@@ -145,19 +134,17 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
     };
 
     render() {
-        const {lang, props: {frameEmitter, playerState: {stageIndex, roundIndex}, game: {params: {playersPerGroup, gameType, version, mode, d, rounds}}}, state: {c1, c2}} = this;
+        const {lang, props: {frameEmitter, playerState: {stageIndex, roundIndex}, game: {params: {gameType, version, d, rounds}}}, state: {c1, c2}} = this;
         const displayData = this.calcDisplayData();
         let content;
         switch (stageIndex) {
             case MainStageIndex.Choose: {
                 content = <div>
                     <Display data={displayData}/>
-                    <Choice1 {...{
-                        c1, d, version, gameType, mode, onChoose: c1 => this.setState({c1, c2: []})
-                    }}/>
-                    <Choice2 {...{
-                        playersPerGroup, c1, c2, d, version, mode, gameType, onChoose: c2 => this.setState({c2})
-                    }}/>
+                    <Choice1 c1={c1} d={d} version={version} gameType={gameType}
+                             onChoose={c1 => this.setState({c1, c2: []})}/>
+                    <Choice2 c1={c1} c2={c2} d={d} version={version} gameType={gameType}
+                             onChoose={c2 => this.setState({c2})}/>
                     {gameType === GameType.T1
                         ? <Button width={ButtonProps.Width.small}
                                   label={lang.confirm}
@@ -199,7 +186,7 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
             }
         }
 
-        return <section className={style.mainStage}>
+        return <section>
             <p>{lang.roundIndex(roundIndex + 1, rounds)}</p>
             {content}
         </section>;

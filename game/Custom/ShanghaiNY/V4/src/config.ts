@@ -1,6 +1,6 @@
 import provinces from './provinces';
 
-export const namespace = 'ShanghaiNY';
+export const namespace = 'ShanghaiNYV4';
 
 export enum Stage {
   Seat,
@@ -10,28 +10,21 @@ export enum Stage {
   End
 }
 
-export enum GameType {
-  T1 = 1,
-  T2 = 2
-}
-
 export enum Mode {
   HR,
   LR,
   BR
 }
 
+export enum Min {
+  A,
+  B
+}
+
 export enum Choice {
   Wait = -1,
   One = 1,
   Two = 2
-}
-
-export enum Version {
-  V1 = 1,
-  V2,
-  V3,
-  V4,
 }
 
 export enum MainStageIndex {
@@ -74,66 +67,8 @@ export enum FetchRoute {
   exportXlsPlaying = '/exportXlsPlaying/:gameId'
 }
 
-export const Test1 = [
-  {
-    desc: [
-      {text: '假设其他三个组员选择“2, 2, 2”'},
-      {text: '', br: 10},
-      {text: '如果你选择“1”'}
-    ],
-    questions: [
-      {
-        title: [{text: '你在这一轮的收益为:'}],
-        options: (displayData, d) => [
-          {label: (displayData.p11 - d).toFixed(2), value: 'a'},
-          {label: (displayData.p21 - d).toFixed(2), value: 'b'},
-          {label: displayData.p22.toFixed(2), value: 'c'}
-        ],
-        answer: 'a'
-      }
-    ]
-  },
-  {
-    desc: [
-      {text: '假设其他三个组员选择“2, 2, 2”'},
-      {text: '', br: 10},
-      {text: '如果你选择“2”'}
-    ],
-    questions: [
-      {
-        title: [{text: '你在这一轮的收益为:'}],
-        options: (displayData, d) => [
-          {label: (displayData.p11 - d).toFixed(2), value: 'a'},
-          {label: (displayData.p21 - d).toFixed(2), value: 'b'},
-          {label: displayData.p22.toFixed(2), value: 'c'}
-        ],
-        answer: 'c'
-      }
-    ]
-  },
-  {
-    desc: [
-      {text: '假设其他三个组员选择“1, 1, 2”'},
-      {text: '', br: 10},
-      {text: '如果你选择“2”'}
-    ],
-    questions: [
-      {
-        title: [{text: '你在这一轮的收益为:'}],
-        options: (displayData, d) => [
-          {label: (displayData.p11 - d).toFixed(2), value: 'a'},
-          {label: (displayData.p21 - d).toFixed(2), value: 'b'},
-          {label: displayData.p22.toFixed(2), value: 'c'}
-        ],
-        answer: 'b'
-      }
-    ]
-  }
-];
-
 export const Test2 = [
   {
-    //2
     desc: [
       {text: '如果你在第一阶段选择等待。'},
       {text: '', br: 10},
@@ -196,7 +131,7 @@ export const Test2 = [
       }
     ]
   },
-  {//3new
+  {
     desc: [
       {text: '假设你在考虑以下两个选择方案'},
       {text: '', br: 10},
@@ -257,7 +192,7 @@ export const Test2 = [
       }
     ]
   },
-  {//4new
+  {
     desc: [
       {text: '假设你在考虑以下两个选择方案'},
       {text: '', br: 10},
@@ -304,35 +239,7 @@ export const Test2 = [
       },
     ]
   },
-  // {
-  //   //3
-  //   desc: [
-  //     { text: "假设其他三个组员都选择" },
-  //     { text: "“在第一阶段选1”", color: true },
-  //     { text: "", br: 10 },
-  //     { text: "如果你选择" },
-  //     { text: "“在第一阶段选1”", color: true }
-  //   ],
-  //   questions: [
-  //     {
-  //       title: [{ text: "第一阶段的结果是：" }],
-  //       options: ["第一阶段有人选1", "第一阶段没有人选1"],
-  //       answer: "第一阶段有人选1"
-  //     },
-  //     {
-  //       title: [{ text: "四个组员的最终选择为：" }],
-  //       options: ["1,1,1,1", "1,2,2,2", "2,2,2,2"],
-  //       answer: "1,1,1,1"
-  //     },
-  //     {
-  //       title: [{ text: "你在这一轮的收益为:" }],
-  //       options: null,
-  //       answer: "a"
-  //     }
-  //   ]
-  // },
   {
-    //5new
     desc: [
       {text: '假设其他三个组员都选择'},
       {text: '“在第一阶段选1”', color: true},
@@ -366,73 +273,7 @@ export const Test2 = [
       }
     ]
   },
-  // {
-  //   //5
-  //   desc: [
-  //     { text: "假设其他三个组员都选择" },
-  //     {
-  //       text: "“在第一阶段等待；无论第一阶段有没有人选1，在第二阶段都选1”",
-  //       color: true
-  //     },
-  //     { text: "", br: 10 },
-  //     { text: "如果你选择" },
-  //     {
-  //       text:
-  //         "“在第一阶段等待；如果第一阶段有人选1则在第二阶段选1；第一阶段没有人选1则在第二阶段选2”",
-  //       color: true
-  //     }
-  //   ],
-  //   questions: [
-  //     {
-  //       title: [{ text: "第一阶段的结果是：" }],
-  //       options: ["第一阶段有人选1", "第一阶段没有人选1"],
-  //       answer: "第一阶段没有人选1"
-  //     },
-  //     {
-  //       title: [{ text: "四个组员的最终选择为：" }],
-  //       options: ["1,1,1,1", "1,1,1,2", "2,2,2,2"],
-  //       answer: "1,1,1,2"
-  //     },
-  //     {
-  //       title: [{ text: "你在这一轮的收益为:" }],
-  //       options: null,
-  //       answer: "b"
-  //     }
-  //   ]
-  // },
-  // {
-  //   //6
-  //   desc: [
-  //     { text: "假设其他三个组员都选择" },
-  //     {
-  //       text:
-  //         "“在第一阶段等待；如果第一阶段有人选1则在第二阶段选1；第一阶段没有人选1则在第二阶段选2”",
-  //       color: true
-  //     },
-  //     { text: "", br: 10 },
-  //     { text: "如果你选择" },
-  //     { text: "“在第一阶段选1”", color: true }
-  //   ],
-  //   questions: [
-  //     {
-  //       title: [{ text: "第一阶段的结果是：" }],
-  //       options: ["第一阶段有人选1", "第一阶段没有人选1"],
-  //       answer: "第一阶段有人选1"
-  //     },
-  //     {
-  //       title: [{ text: "四个组员的最终选择为：" }],
-  //       options: ["1,1,1,1", "1,1,1,2", "2,2,2,2"],
-  //       answer: "1,1,1,1"
-  //     },
-  //     {
-  //       title: [{ text: "你在这一轮的收益为:" }],
-  //       options: null,
-  //       answer: "a"
-  //     }
-  //   ]
-  // },
   {
-    //6new
     desc: [
       {text: '假设其他三个组员都选择'},
       {
@@ -504,9 +345,8 @@ export const Survey = [
 export interface ICreateParams {
   playersPerGroup: number;
   rounds: number;
-  gameType: GameType;
-  version: Version;
   mode: Mode;
+  min: Min
   a: number;
   b: number;
   c: number;
@@ -515,22 +355,22 @@ export interface ICreateParams {
   eL: number;
   s: number;
   p: number;
-  b0: number;
-  b1: number;
   participationFee: number;
 }
 
 export interface IGameState {
-  groups?: (GameState.IGroup[] | null);
+  groups: IGameGroupState[];
 }
 
-export namespace GameState {
-  export interface IGroup {
-    playerNum: number;
-    probs: boolean[]
-    ones: boolean[]
-    mins: number[]
-  }
+export interface IGameGroupState {
+  playerNum: number;
+  rounds: {
+    x1: number
+    y1: number
+    x: number
+    y: number
+    min: number
+  }[]
 }
 
 export interface IPlayerState {
@@ -549,7 +389,7 @@ export interface IPlayerState {
 
 export namespace PlayerState {
   export interface IChoice {
-    c1: number;
+    c1: number
     c2: number[]
     c?: number;
   }

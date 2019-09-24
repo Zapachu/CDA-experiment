@@ -1,10 +1,9 @@
 import * as React from 'react';
 import * as style from './style.scss';
-import {Button, ButtonProps, Lang, MaskLoading, Radio} from '@elf/component';
+import {Lang, MaskLoading} from '@elf/component';
 import {Core} from '@bespoke/client';
+import {Button, Radio} from 'antd';
 import {
-    Choice,
-    GameType,
     ICreateParams,
     IGameState,
     IMoveParams,
@@ -12,10 +11,8 @@ import {
     IPushParams,
     MoveType,
     PushType,
-    Test1,
     Test2,
-    TestStageIndex,
-    Version
+    TestStageIndex
 } from '../../config';
 import Display from './Display';
 import Choice1 from './Choice1';
@@ -63,20 +60,13 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
         instructionTitle: ['本页面是为了帮助你熟悉操作界面。你可以尝试在界面上进行不同的选择。当你确定已经熟悉了操作界面之后，请点击最下方的“确定”按钮。', 'This page aims to help you get familiar with the interface. You can try to make different choices. After you are familiar with the interface, please click the "Confirm" button below.'],
         instructionFirstT1: ['每一轮中，你需要点击按钮做出选择:', 'You should make a choice in every round:'],
         instructionFirstT2: ['首先，做出你在第一阶段的选择:', 'Now, make your choice for the first action:'],
-        instructionSecondWait: ['因为你在第一阶段已经等待，请针对第一阶段可能出现的两种结果，做出你第二阶段的选择:', 'Since you have chosen to wait in the first action, make your choice for the second action based on possible results of the previous action:'],
-        instructionSecond1: ['因为你在第一阶段已经选择了1，第二阶段不需要选择，请点击下面的“确定按钮”:', 'Since you have chosen 1 in the first action, you do not need to make the choice for the second action, please click the "Confirm" button below:'],
         next: ['选择完成后，点击“确定”进入下一轮:', 'After making the choices, click "Confirm" button for the next round:'],
         wait4Others: ['等待其他玩家完成测试', 'Waiting for others to complete the test'],
         wrong: ['(错误)', '(Wrong)'],
         nextToMain: ['理解测试结束，下面进入正式实验', 'The test is over, click "Confirm" button for the main game'],
         pageIndex: [(m, n) => `第${m}/${n}页`, (m, n) => `Page ${m}/${n}`]
     });
-    private Test: Array<Test>;
-
-    constructor(props) {
-        super(props);
-        this.Test = props.game.params.gameType === GameType.T1 ? Test1 : Test2;
-    }
+    Test: Array<Test> = Test2;
 
     submit = () => {
         const {props: {frameEmitter, playerState: {stageIndex}}, state: {answers, tips}} = this;
@@ -104,28 +94,12 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
     };
 
     calcDisplayData = () => {
-        const {props: {playerState: {groupIndex, roundIndex}, gameState: {groups}, game: {params: {a, b, c, eL, eH, b0, b1, version}}}} = this;
-        const curGroup = groups[groupIndex];
-        if (version === Version.V3) {
-            const prob = curGroup.probs[roundIndex];
-            return prob
-                ? {
-                    p11: a * eL - b0 * eL + c,
-                    p21: a * eL - b0 * eH + c,
-                    p22: a * eH - b0 * eH + c
-                }
-                : {
-                    p11: a * eL - b1 * eL + c,
-                    p21: a * eL - b1 * eH + c,
-                    p22: a * eH - b1 * eH + c
-                };
-        } else {
-            return {
-                p11: a * eL - b * eL + c,
-                p21: a * eL - b * eH + c,
-                p22: a * eH - b * eH + c
-            };
-        }
+        const {props: {game: {params: {a, b, c, eL, eH}}}} = this;
+        return {
+            p11: a * eL - b * eL + c,
+            p21: a * eL - b * eH + c,
+            p22: a * eH - b * eH + c
+        };
     };
 
     joinWords = (words: Array<Word>) => {
@@ -140,68 +114,43 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
     };
 
     render() {
-        const {lang, props: {frameEmitter, playerState: {stageIndex}, game: {params: {gameType, version, d}}}, state: {c1, c2, answers, tips}} = this;
+        const {lang, props: {frameEmitter, playerState: {stageIndex}, game: {params: {playersPerGroup, d, mode}}}, state: {c1, c2, answers, tips}} = this;
         const displayData = this.calcDisplayData();
+        const btnStyle: React.CSSProperties = {
+            display: 'block',
+            margin: '1rem auto'
+        };
         let content;
         if (stageIndex === TestStageIndex.Interface) {
-            switch (gameType) {
-                case GameType.T1: {
-                    content = (<>
-                        <p className={style.instruction}>{lang.instructionTitle}</p>
-                        <Display data={displayData}/>
-                        <p className={style.instruction}>{lang.instructionFirstT1}</p>
-                        <Choice1 c1={c1} d={d} version={version} gameType={gameType}
-                                 onChoose={c1 => this.setState({c1})}/>
-                        <p className={style.instruction}>{lang.next}</p>
-                        <Button width={ButtonProps.Width.small}
-                                label={lang.confirm}
-                                onClick={() => {
-                                    if (!c1) return;
-                                    frameEmitter.emit(MoveType.answerTest);
-                                    this.setState({c1: 0});
-                                }}
-                        />
-                    </>);
-                    break;
-                }
-                case GameType.T2: {
-                    content = (<>
-                        <p className={style.instruction}>{lang.instructionTitle}</p>
-                        <Display data={displayData}/>
-                        <p className={style.instruction}>{lang.instructionFirstT2}</p>
-                        <Choice1 c1={c1} d={d} version={version} gameType={gameType}
-                                 onChoose={c1 => this.setState({c1, c2: []})}/>
-                        {c1
-                            ? c1 === Choice.Wait
-                                ? <p className={style.instruction}>{lang.instructionSecondWait}</p>
-                                : <p className={style.instruction}>{lang.instructionSecond1}</p>
-                            : null
-                        }
-                        <Choice2 c1={c1} c2={c2} d={d} version={version} gameType={gameType}
-                                 onChoose={c2 => this.setState({c2})}/>
-                        <p className={style.instruction}>{lang.next}</p>
-                        <Button width={ButtonProps.Width.small}
-                                label={lang.confirm}
-                                onClick={() => {
-                                    if (!c1 || c2.length !== 2 || c2.includes(undefined)) return;
-                                    frameEmitter.emit(MoveType.answerTest);
-                                    this.setState({c1: 0});
-                                }}
-                        />
-                    </>);
-                    break;
-                }
-            }
+            content = <>
+                <p className={style.instruction}>{lang.instructionTitle}</p>
+                <Display data={displayData}/>
+                <div>
+                    <p className={style.instruction}>{lang.instructionFirstT2}</p>
+                    <Choice1 {...{
+                        c1, d, mode, onChoose: c1 => this.setState({c1, c2: []}), test: true
+                    }}/>
+                    <Choice2 {...{
+                        playersPerGroup, c1, c2, d, mode, onChoose: c2 => this.setState({c2})
+                    }}/>
+                    <p className={style.instruction}>{lang.next}</p>
+                </div>
+                <Button style={btnStyle} type='primary' onClick={() => {
+                    if (!c1 || c2.includes(undefined) || c2.length !== playersPerGroup + 1) {
+                        return;
+                    }
+                    frameEmitter.emit(MoveType.answerTest);
+                    this.setState({c1: 0});
+                }}
+                >{lang.confirm}</Button>
+            </>;
         } else if (stageIndex === TestStageIndex.Next) {
             content = <div>
                 <p>{lang.nextToMain}</p>
-                <Button width={ButtonProps.Width.small}
-                        style={{marginTop: '10px'}}
-                        label={lang.confirm}
-                        onClick={() => {
-                            frameEmitter.emit(MoveType.toMain);
-                        }}
-                />
+                <Button style={btnStyle} type='primary' onClick={() => {
+                    frameEmitter.emit(MoveType.toMain);
+                }}
+                >{lang.confirm}</Button>
             </div>;
         } else if (stageIndex === TestStageIndex.Wait4Others) {
             content = <div>
@@ -217,18 +166,20 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
                     {curTest.questions.map(({title, options}, i) => <li key={i} style={{paddingBottom: '20px'}}>
                         <p className={tips[i] === Tip.Wrong ? style.tipWrong : ''}>{this.joinWords(title)} {tips[i] === Tip.Wrong ?
                             <span>{lang.wrong}</span> : null}</p>
-                        <Radio options={typeof options === 'function'
-                            ? options(displayData, d)
-                            : options}
-                               value={answers[i] || ''}
-                               onChange={e => this.answer(e as string, i)}
-                        />
+                        <Radio.Group value={answers[i]} onChange={({target: {value}}) => this.answer(value, i)}>
+                            {
+                                (typeof options === 'function' ? options(displayData, d) : options).map(option => {
+                                        const {value = option, label = option} = option;
+                                        return <Radio style={{
+                                            display: 'block'
+                                        }} value={value}>{label}</Radio>;
+                                    }
+                                )
+                            }
+                        </Radio.Group>
                     </li>)}
                 </ul>
-                <Button width={ButtonProps.Width.small}
-                        label={lang.confirm}
-                        onClick={this.submit}
-                />
+                <Button type='primary' style={btnStyle} onClick={this.submit}>{lang.confirm}</Button>
             </div>;
         }
         return <section className={style.testStage}>

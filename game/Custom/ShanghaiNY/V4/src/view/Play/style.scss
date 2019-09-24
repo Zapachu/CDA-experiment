@@ -20,9 +20,8 @@
   }
 
   .choice {
-    font-size: 16px;
-    min-width: 300px;
-    margin-bottom: 3rem;
+    font-size: 1.2rem;
+    margin: 2rem;
     .disabled {
       pointer-events: none;
       color: #ccc;
@@ -43,9 +42,9 @@
   }
 
   .instruction {
-    font-size: 16px;
-    font-style: italic;
-    margin: 20px 0 10px 0;
+    max-width: 32rem;
+    font-size: 1rem;
+    margin: .5rem 1rem;
     color: rgb(66, 133, 244);
   }
 
@@ -104,6 +103,20 @@
     > div {
       width: 100%;
       padding: 1rem;
+    }
+  }
+
+  .surveyStage {
+    max-width: 36rem;
+    margin: auto;
+    font-size: 1.25rem;
+
+    .questions li {
+      margin: 2rem;
+    }
+
+    p {
+      margin: .5rem 0;
     }
   }
 

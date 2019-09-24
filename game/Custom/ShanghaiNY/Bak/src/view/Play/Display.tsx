@@ -1,6 +1,6 @@
-import * as React from 'react'
-import * as style from './style.scss'
-import {Lang} from '@elf/component'
+import * as React from 'react';
+import * as style from './style.scss';
+import {Lang} from '@elf/component';
 
 interface PropsType {
   data?: {
