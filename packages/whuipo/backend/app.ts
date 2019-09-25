@@ -4,6 +4,7 @@ import compression from 'compression';
 import session from 'express-session';
 import mongoose from 'mongoose';
 import connectRedis from 'connect-redis';
+import errorHandler from 'errorhandler';
 import {csrf} from 'lusca';
 import path from 'path';
 import http from 'http';
@@ -15,23 +16,24 @@ import socketSession from 'express-socket.io-session';
 import socketPassport from 'passport.socketio';
 import cookieParser from 'cookie-parser';
 import router from './router';
-import {handleSocketInit} from './controller';
+import {SocketHandler} from './controller';
 import {elfSetting} from '@elf/setting';
 import {Config} from './config';
-import {csrfCookieKey} from '@micro-experiment/share';
+import {csrfCookieKey, ResCode} from '@micro-experiment/share';
 import {AddressInfo} from 'net';
 import {Log, NetWork} from '@elf/util';
 import {redisClient} from './redis';
 import {User, UserDoc} from './models';
 import {runRPC} from './rpc';
 
-const RedisStore = connectRedis(session)
+const RedisStore = connectRedis(session);
 
 mongoose.connect(
     elfSetting.mongoUri,
     {
         useNewUrlParser: true,
         useCreateIndex: true,
+        useUnifiedTopology: true,
         ...elfSetting.mongoUser ? {
             user: elfSetting.mongoUser,
             pass: elfSetting.mongoPass,
@@ -89,6 +91,15 @@ app.use((req, res, next) => {
 });
 app.use(Config.rootName + '/static', express.static(path.resolve(__dirname, '../dist'), {maxAge: '10d'}));
 app.use(Config.rootName || '/', router);
+app.use(errorHandler({
+    log: (err, str, req, res) => {
+        Log.d(err);
+        res.json({
+            code: ResCode.unexpectError,
+            msg: err.message
+        });
+    }
+}));
 
 const port = process.env.PORT || '3020';
 app.set('port', port);
@@ -104,7 +115,7 @@ io.use(socketPassport.authorize({
     secret: elfSetting.sessionSecret,
     store: sessionStore
 }));
-handleSocketInit(io);
+SocketHandler.init(io);
 server.listen(port)
     .on('error', (error: NodeJS.ErrnoException) => {
         if (error.syscall !== 'listen') {

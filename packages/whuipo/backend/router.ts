@@ -1,15 +1,15 @@
 import {Router} from 'express';
 
-import Controller from './controller';
+import {RequestHandler} from './controller';
 
 const apiRouter = Router();
-apiRouter.get('/initInfo', Controller.getInitInfo);
-apiRouter.post('/login', Controller.login);
-apiRouter.post('/asGuest', Controller.asGuest);
+apiRouter.get('/initInfo', RequestHandler.getInitInfo);
+apiRouter.post('/login', RequestHandler.login);
+apiRouter.post('/asGuest', RequestHandler.asGuest);
 
 const rootRouter = Router();
 rootRouter.use('/api', apiRouter);
-rootRouter.get('/login', Controller.renderLogin);
-rootRouter.get('/*', Controller.loggedIn, Controller.renderIndex);
+rootRouter.get('/login', RequestHandler.renderLogin);
+rootRouter.get('/*', RequestHandler.loggedIn, RequestHandler.renderIndex);
 
 export default rootRouter;

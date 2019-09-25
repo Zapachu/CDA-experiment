@@ -1,130 +1,48 @@
 import Socket from 'socket.io';
 import {NextFunction, Request, Response} from 'express';
-import socketEmitter from 'socket.io-emitter';
 import path from 'path';
 import request from 'request-promise-native';
-import {RedisTools} from './redis';
+import {redisClient, RedisTools} from './redis';
 import {Log} from '@elf/util';
 import {User, UserDoc} from './models';
-import {elfSetting} from '@elf/setting';
 import {Config} from './config';
 import {iLabX, NSocketParam, Phase, ResCode, SocketEvent, UserGameStatus} from '@micro-experiment/share';
 import {RedisCall, Trial} from '@elf/protocol';
 import setting from './setting';
 import XJWT from './XJWT';
+import {cbToPromise} from './util';
 
-const ioEmitter = socketEmitter({
-  host: elfSetting.redisHost,
-  port: elfSetting.redisPort
-});
+class MatchRoom {
+  static matchRoomOfGame: { [gamePhase: number]: string[] } = {};
+  static matchRoomTimerOfGame = {};
 
-function catchError(target: any, key: string, descriptor: PropertyDescriptor) {
-  const func = descriptor.value;
-  descriptor.value = async function (
-      req: Request,
-      res: Response,
-      next: NextFunction
-  ) {
-    try {
-      await func(req, res, next);
-    } catch (e) {
-      console.error(e);
-      res.json({
-        code: ResCode.unexpectError,
-        msg: e.message
-      });
+  static leaveRoom(gamePhase: Phase, uid) {
+    console.log(gamePhase, 'leave room');
+    const matchRoom = MatchRoom.matchRoomOfGame[gamePhase] || [];
+    const findIndex = matchRoom.findIndex(i => i === uid);
+    let flag = false;
+    if (findIndex > -1) {
+      matchRoom.splice(findIndex, 1);
+      flag = true;
     }
-  };
-}
-
-const userSocketMap: { [userId: string]: string[] } = {};
-const pushUserSocket = (uid, socketId) => {
-  const arr = userSocketMap[uid] || [];
-  arr.push(socketId);
-  userSocketMap[uid] = arr;
-};
-const removeUserSocket = (uid, socketId) => {
-  const arr = userSocketMap[uid] || [];
-  const index = arr.findIndex(i => i === socketId);
-  if (index > -1) {
-    arr.splice(index, 1);
-  }
-  return arr;
-};
-
-const matchRoomOfGame: { [gamePhase: number]: string[] } = {};
-const matchRoomTimerOfGame = {};
-
-function initRoom(gamePhase: Phase, params) {
-  const arr = [];
-  matchRoomOfGame[gamePhase] = arr;
-  let i = 0;
-  const timerId = setInterval(async () => {
-    console.log(`${gamePhase} 房间 正在匹配中, 已等待${i}s`);
-    if (i >= Config.matchSeconds) {
-      clearRoom(gamePhase);
-      await emitMatchSuccess(gamePhase, arr, params);
-      return;
+    if (matchRoom.length === 0) {
+      MatchRoom.clearRoom(gamePhase);
     }
-    i++;
-  }, 1000);
-  matchRoomTimerOfGame[gamePhase] = timerId;
-  return arr;
-}
-
-function joinMatchRoom(gamePhase: Phase, uid, params) {
-  let matchRoom = matchRoomOfGame[gamePhase];
-  if (!matchRoom || matchRoom.length === 0) {
-    matchRoom = initRoom(gamePhase, params);
+    return flag;
   }
-  matchRoom.push(uid);
-}
 
-function leaveRoom(gamePhase: Phase, uid) {
-  console.log(gamePhase, 'leave room');
-  const matchRoom = matchRoomOfGame[gamePhase] || [];
-  const findIndex = matchRoom.findIndex(i => i === uid);
-  let flag = false;
-  if (findIndex > -1) {
-    matchRoom.splice(findIndex, 1);
-    flag = true;
-  }
-  if (matchRoom.length === 0) {
-    clearRoom(gamePhase);
-  }
-  return flag;
-}
-
-function clearRoom(gamePhase: Phase) {
-  const timerId = matchRoomTimerOfGame[gamePhase];
-  if (timerId) {
-    clearInterval(timerId);
-    matchRoomTimerOfGame[gamePhase] = null;
-  }
-  matchRoomOfGame[gamePhase] = [];
-}
-
-async function emitMatchSuccess(phase: Phase, uids = [], params = {}) {
-  const {playUrl} = await RedisCall.call<Trial.Create.IReq,
-      Trial.Create.IRes>(Trial.Create.name(phase), params);
-  for (const uid of uids) {
-    const arr = userSocketMap[uid] || [];
-    const playerUrl = playUrl;
-    arr.forEach(socketId => {
-      ioEmitter
-          .to(socketId)
-          .emit(SocketEvent.startGame, {playerUrl});
-    });
-    await RedisTools.setUserGameData(uid, phase, {
-      status: UserGameStatus.started,
-      playerUrl
-    });
-    await RedisTools.recordPlayerUrl(playerUrl, uid);
+  static clearRoom(gamePhase: Phase) {
+    const timerId = MatchRoom.matchRoomTimerOfGame[gamePhase];
+    if (timerId) {
+      clearInterval(timerId);
+      MatchRoom.matchRoomTimerOfGame[gamePhase] = null;
+    }
+    MatchRoom.matchRoomOfGame[gamePhase] = [];
   }
 }
 
-export default class RouterController {
-  @catchError
+export class RequestHandler {
+
   static async loggedIn(req: Request, res: Response, next: NextFunction) {
     const {query: {token}} = req;
     if (req.isAuthenticated()) {
@@ -134,16 +52,14 @@ export default class RouterController {
     if (!isValid) {
       return res.redirect(`${Config.rootName}/login`);
     }
-      await RouterController.loginILabXUser(req, payload.un, payload.dis);
+    await RequestHandler.loginILabXUser(req, payload.un, payload.dis);
     next();
   }
 
-  @catchError
   static async renderIndex(req: Request, res: Response) {
     res.sendFile(path.resolve(__dirname, '../dist/index.html'));
   }
 
-  @catchError
   static async renderLogin(req: Request, res: Response) {
     if (req.isAuthenticated() && (req.user as UserDoc).iLabXUserName) {
       res.redirect(`${Config.rootName}/`);
@@ -152,7 +68,6 @@ export default class RouterController {
     }
   }
 
-  @catchError
   static async login(req: Request, res: Response) {
     const {username, password} = req.body,
         encrypted = XJWT.encryptPassword(password),
@@ -165,13 +80,12 @@ export default class RouterController {
         msg: response.code
       });
     }
-      await RouterController.loginILabXUser(req, response.username, response.name);
+    await RequestHandler.loginILabXUser(req, response.username, response.name);
     res.json({
       code: ResCode.success
     });
   }
 
-  @catchError
   static async asGuest(req: Request, res: Response) {
     if (!req.isAuthenticated()) {
       Log.d('Create Guest');
@@ -187,7 +101,7 @@ export default class RouterController {
     });
   }
 
-    static async loginILabXUser(req: Request, iLabXUserName: string, iLabXUserDis: string) {
+  static async loginILabXUser(req: Request, iLabXUserName: string, iLabXUserDis: string) {
     if (req.isAuthenticated()) {
       await User.findByIdAndUpdate((req.user as UserDoc).id, {iLabXUserName});
     } else {
@@ -195,8 +109,8 @@ export default class RouterController {
       if (!user) {
         user = new User({
           mobile: `null_${iLabXUserName}`,
-            iLabXUserName,
-            iLabXUserDis
+          iLabXUserName,
+          iLabXUserDis
         });
         await user.save();
       }
@@ -204,108 +118,106 @@ export default class RouterController {
     }
   }
 
-  @catchError
   static async getInitInfo(req: Request, res: Response, next: NextFunction) {
-    const count = (await RedisTools.getOnlineSessionKeys()).length
+    const count = SocketHandler.connectionMap.size,
+        waiting = Math.max(count - Object.keys(Phase).length * Config.phaseServerCapacity, 0);
     res.json({
       code: ResCode.success,
       user: req.user,
       count,
-      waiting:count<100?0:~~(Math.random()*5)
+      waiting
     });
   }
 }
 
-export function handleSocketInit(ioServer: Socket.Server) {
-  ioServer.on('connection', function (socket) {
-    const user = socket.request.user;
-    if (socket.request.user.logged_in) {
-      pushUserSocket(user._id, socket.id);
-    }
+export class SocketHandler {
+  static socketServer: Socket.Server;
+  static connectionMap: Map<string, string> = new Map();
+
+  static init(server: Socket.Server) {
+    this.socketServer = server;
+    server.on('connection', function (socket: Socket.Socket) {
+      SocketHandler.connectionMap.set(socket.request.user.id, socket.id);
       socket.on(SocketEvent.reqStartGame, async function (startParams: NSocketParam.StartGame) {
-          const {multiPlayer, phase, force, params} = startParams;
-      try {
-        if (!socket.request.user.logged_in) {
-          throw new Error('没有登陆');
+        Log.d(startParams);
+
+        function startError(e) {
+          Log.e(e);
+          handleSocketError(SocketEvent.reqStartGame, '加入游戏失败!');
         }
-        const uid = socket.request.user._id;
+
+        const {multiPlayer, phase, force, params} = startParams;
+        if (!socket.request.user.logged_in) {
+          return startError('未登录');
+        }
+        const uid = socket.request.user.id;
         const userGameData = await RedisTools.getUserGameData(uid, phase);
-          Log.d(startParams);
-          if (userGameData && userGameData.status === UserGameStatus.started && !force) {
+        if (userGameData && userGameData.status === UserGameStatus.started && !force) {
           socket.emit(SocketEvent.continueGame, {
-              startParams,
+            startParams,
             playerUrl: userGameData.playerUrl
           });
           return;
         }
-          if (userGameData && userGameData.status === UserGameStatus.matching) {
-              throw new Error('正在匹配中, 请稍后');
-          }
-          const user = await User.findById(uid);
-          if (multiPlayer) {
-              joinMatchRoom(phase, user._id, params);
-              const matchRoom = matchRoomOfGame[phase];
-
-              await RedisTools.setUserGameData(uid, phase, {
-                  status: UserGameStatus.matching
-              });
-              socket.emit(SocketEvent.startMatch);
-              if (matchRoom.length === Config.roomSize) {
-                  await emitMatchSuccess(phase, matchRoom, params);
-                  await clearRoom(phase);
-              }
-          } else {
-              await emitMatchSuccess(phase, [user._id], params);
+        if (userGameData && userGameData.status === UserGameStatus.matching) {
+          return startError('匹配中...');
         }
-      } catch (e) {
-        console.error(e);
-        handleSocketError(
-            SocketEvent.reqStartGame,
-            '加入游戏失败!'
-        );
-      }
-    });
-    socket.on(SocketEvent.leaveMatchRoom, async function (
-        gamePhase
-    ) {
-      console.log(' req leave room');
-      try {
-        if (socket.request.user.logged_in) {
-          const uid = socket.request.user._id;
-          const userGameData = await RedisTools.getUserGameData(uid, gamePhase);
-          if (!userGameData) {
-            return;
-          }
-          if (userGameData.status === UserGameStatus.matching) {
-            leaveRoom(gamePhase, uid);
-            userGameData.status = UserGameStatus.notStarted;
-            await RedisTools.setUserGameData(uid, gamePhase, userGameData);
-          }
+        if (+(await redisClient.get(RedisTools.phaseServerUsageKey(phase))) >= Config.phaseServerCapacity) {
+          return startError('排队中...');
         }
-      } catch (e) {
-        console.error(e);
-        handleSocketError(
-            SocketEvent.leaveMatchRoom,
-            '取消匹配失败!'
-        );
-      }
-    });
-    socket.on('disconnect', async function () {
-      console.log('dis connect');
-      try {
-        if (socket.request.user.logged_in) {
-          const uid = socket.request.user._id;
-          const userSockets = removeUserSocket(uid, socket.id);
+        const user = await User.findById(uid);
+        if (multiPlayer) {
+          SocketHandler.joinMatchRoom(phase, user.id, params);
+          const matchRoom = MatchRoom.matchRoomOfGame[phase];
 
-          if (userSockets.length === 0) {
+          await RedisTools.setUserGameData(uid, phase, {
+            status: UserGameStatus.matching
+          });
+          socket.emit(SocketEvent.startMatch);
+          if (matchRoom.length === Config.roomSize) {
+            await SocketHandler.emitMatchSuccess(phase, matchRoom, params);
+            await MatchRoom.clearRoom(phase);
+          }
+        } else {
+          await SocketHandler.emitMatchSuccess(phase, [user.id], params);
+        }
+      });
+      socket.on(SocketEvent.leaveMatchRoom, async function (phase: Phase) {
+        console.log(' req leave room');
+        try {
+          if (socket.request.user.logged_in) {
+            const uid = socket.request.user.id;
+            const userGameData = await RedisTools.getUserGameData(uid, phase);
+            if (!userGameData) {
+              return;
+            }
+            if (userGameData.status === UserGameStatus.matching) {
+              MatchRoom.leaveRoom(phase, uid);
+              userGameData.status = UserGameStatus.notStarted;
+              await RedisTools.setUserGameData(uid, phase, userGameData);
+            }
+          }
+        } catch (e) {
+          console.error(e);
+          handleSocketError(
+              SocketEvent.leaveMatchRoom,
+              '取消匹配失败!'
+          );
+        }
+      });
+      socket.on('disconnect', async function () {
+        console.log('dis connect');
+        try {
+          if (socket.request.user.logged_in) {
+            const uid = socket.request.user.id;
             const games = [
-                Phase.IPO_Median,
-                Phase.IPO_TopK,
-                Phase.IPO_FPSBA,
+              Phase.IPO_Median,
+              Phase.IPO_TopK,
+              Phase.IPO_FPSBA,
               Phase.OpenAuction,
               Phase.TBM,
-                Phase.CBM,
-                Phase.CBM_L,
+              Phase.CBM,
+              Phase.CBM_L,
             ];
             const tasks = games.map(async (game: Phase) => {
               const userGameData = await RedisTools.getUserGameData(uid, game);
@@ -313,38 +225,63 @@ export function handleSocketInit(ioServer: Socket.Server) {
                 return;
               }
               if (userGameData.status === UserGameStatus.matching) {
-                leaveRoom(game, uid);
+                MatchRoom.leaveRoom(game, uid);
                 userGameData.status = UserGameStatus.notStarted;
                 await RedisTools.setUserGameData(uid, game, userGameData);
               }
             });
             await Promise.all(tasks);
           }
+        } catch (e) {
+          console.error(e);
         }
-      } catch (e) {
-        console.error(e);
+      });
+
+      function handleSocketError(event: SocketEvent, msg: string) {
+        socket.emit(SocketEvent.handleError, {
+          eventType: event,
+          msg
+        });
       }
     });
+  }
 
-    function handleSocketError(event: SocketEvent, msg: string) {
-      socket.emit(SocketEvent.handleError, {
-        eventType: event,
-        msg
+  static async emitMatchSuccess(phase: Phase, uids = [], params = {}) {
+    const {playUrl} = await RedisCall.call<Trial.Create.IReq,
+        Trial.Create.IRes>(Trial.Create.name(phase), params);
+    const playerUrl = playUrl;
+    await RedisTools.incrByPhaseServerUsage(phase, uids.length);
+    for (const uid of uids) {
+      this.socketServer.to(SocketHandler.connectionMap.get(uid)).emit(SocketEvent.startGame, {playerUrl});
+      await RedisTools.setUserGameData(uid, phase, {
+        status: UserGameStatus.started,
+        playerUrl
       });
+      await RedisTools.recordPlayerUrl(playerUrl, uid);
     }
-  });
-}
+  }
 
-function cbToPromise(func) {
-  return function (...args) {
-    return new Promise((resolve, reject) => {
-      func(...args, (err, value) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-        resolve(value);
-      });
-    });
-  };
+  static joinMatchRoom(gamePhase: Phase, uid, params) {
+    let matchRoom = MatchRoom.matchRoomOfGame[gamePhase];
+    if (!matchRoom || matchRoom.length === 0) {
+      matchRoom = this.initRoom(gamePhase, params);
+    }
+    matchRoom.push(uid);
+  }
+
+  static initRoom(gamePhase: Phase, params) {
+    const arr = [];
+    MatchRoom.matchRoomOfGame[gamePhase] = arr;
+    let i = 0;
+    MatchRoom.matchRoomTimerOfGame[gamePhase] = setInterval(async () => {
+      console.log(`${gamePhase} 房间 正在匹配中, 已等待${i}s`);
+      if (i >= Config.matchSeconds) {
+        MatchRoom.clearRoom(gamePhase);
+        await this.emitMatchSuccess(gamePhase, arr, params);
+        return;
+      }
+      i++;
+    }, 1000);
+    return arr;
+  }
 }

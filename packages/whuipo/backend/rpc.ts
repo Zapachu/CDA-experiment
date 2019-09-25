@@ -2,7 +2,7 @@ import XJWT, {Type as XJWTType} from './XJWT';
 import {Phase, UserGameStatus} from '@micro-experiment/share';
 import {User} from './models';
 import setting from './setting';
-import {RedisTools} from './redis';
+import {redisClient, RedisTools} from './redis';
 import request from 'request-promise-native';
 import {RedisCall, Trial} from '@elf/protocol';
 import {Log} from '@elf/util';
@@ -51,6 +51,12 @@ export function runRPC() {
             const phase = namespace as Phase;
             const uid = userId;
             const user = await User.findById(uid);
+            const phaseServerUsage = await redisClient.get(RedisTools.phaseServerUsageKey(phase));
+            if (+phaseServerUsage >= 0) {
+                await RedisTools.incrByPhaseServerUsage(phase, -1);
+            } else {
+                await redisClient.set(RedisTools.phaseServerUsageKey(phase), 0);
+            }
             if (user) {
                 await sendUserStatus(user.iLabXUserName);
                 await sendBackData(user.iLabXUserName, {
