@@ -226,7 +226,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
               y1 = playersInGroup.filter(ps => ps.choices[roundIndex].c1 === Choice.Two).length;
           playersInGroup.forEach(ps => {
             const curChoice = ps.choices[roundIndex];
-            curChoice.c = curChoice.c1 === Choice.Wait ? curChoice.c2[mode === Mode.LR ? y1 : x1] : curChoice.c1;
+            curChoice.c = curChoice.c2.some(c => c) ? curChoice.c2[mode === Mode.LR ? y1 : x1] : curChoice.c1;
           });
           const min = playersInGroup.some(ps => ps.choices[roundIndex].c === Choice.One) ? Choice.One : Choice.Two;
           groups[playerState.groupIndex].rounds[roundIndex] = {
@@ -275,7 +275,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
       const ei = eH * (x - 1) + eL * (2 - x);
       const emin = min === Choice.One ? eL : eH;
       let ui = a * emin - b * ei + c;
-      if (curChoice.c1 !== Choice.Wait && curChoice.c !== curChoice.c1) {
+      if (curChoice.c1 === Choice.Wait || curChoice.c !== curChoice.c1) {
         ui = ui - d;
       }
       return ui;

@@ -13,6 +13,7 @@ import {
     IPushParams,
     MainStageIndex,
     Min,
+    Mode,
     MoveType,
     PushType
 } from '../../config';
@@ -59,6 +60,10 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
         choose1: ['选1', 'Choose 1'],
         choose2: ['选2', 'Choose 2'],
         chooseWait: ['等待', 'Wait'],
+        case1: ['如果包括你一共有'],
+        players: ['人', 'players'],
+        yourChoice: ['你的选择', 'your choice is'],
+        impossible: ['不可能发生', 'Impossible'],
     });
 
     constructor(props) {
@@ -83,18 +88,40 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
     };
 
     renderChoice2 = (c1, c2) => {
-        const {lang} = this;
-        const choice2Lang = {
-            [Choice.One]: lang.choose1,
-            [Choice.Two]: lang.choose2,
-            [Choice.Wait]: lang.chooseWait,
-        }
+        const {lang, props: {game: {params: {playersPerGroup, mode}}}} = this;
+        const chooseLabel = {
+                [Mode.HR]: [lang.choose1, lang.chooseWait],
+                [Mode.LR]: [lang.choose2, lang.chooseWait],
+                [Mode.BR]: [lang.choose1, lang.choose2],
+            }[mode],
+            choice2Lang = {
+                [Choice.One]: lang.choose1,
+                [Choice.Two]: lang.choose2,
+                [Choice.Wait]: lang.chooseWait,
+            };
         return <>
             <p>{lang.chooseInFirstAction}{choice2Lang[c1]}</p>
-            <p>{lang.chooseInSecondAction}</p>
-            <table>
-                <tr>{'TODO : ' + JSON.stringify(c2.map(c => choice2Lang[c]))}</tr>
-            </table>
+            {
+                c2.some(c => c) ? <>
+                    <p>{lang.chooseInSecondAction}</p>
+                    <table className={style.yourChoice2}>
+                        <tr>
+                            <td>{lang.case1}</td>
+                            <td>{lang.yourChoice}</td>
+                        </tr>
+                        {
+                            Array(playersPerGroup + 1).fill(null).map((_, i) => {
+                                    const c = c2[i];
+                                    return <tr key={i}>
+                                        <td>{i}{lang.players}{chooseLabel[0]}&nbsp;,&nbsp;{playersPerGroup - i}{lang.players}{chooseLabel[1]}</td>
+                                        <td>{c ? choice2Lang[c] : lang.impossible}</td>
+                                    </tr>;
+                                }
+                            )
+                        }
+                    </table>
+                </> : null
+            }
         </>;
     };
 
@@ -110,7 +137,7 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
             <p>{lang.yourFirstChoiceLeft}{curRoundIndex + 1}{lang.yourFirstChoiceRight} </p>
             {this.renderChoice2(curChoice.c1, curChoice.c2)}
             <p style={{margin: '2rem 0'}}>{lang.inFirstAction}{curRound.x1}{lang.roundResult4}{curRound.y1}{lang.roundResult5}</p>
-            {curChoice.c1 !== Choice.One ? <p>{lang.yourSecondChoice} {curChoice.c}</p> : null}
+            {curChoice.c2.some(c => c) ? <p>{lang.yourSecondChoice} {curChoice.c}</p> : null}
             {
                 min === Min.A ?
                     <p>{lang.roundResult0}{curRoundIndex + 1}{lang.roundResult1} {curRound.min}</p> :
