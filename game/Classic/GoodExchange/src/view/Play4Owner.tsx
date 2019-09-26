@@ -53,7 +53,7 @@ class GroupPlay4Owner extends Extend.Group.Play4Owner<ICreateParams, IGameState,
                                     const {allocation} = gameRoundState;
                                     const {privatePrices} = rounds[i];
                                     return {
-                                        user: user.mobile,
+                                        user: user.stuNum,
                                         playerIndex: index + 1,
                                         initGood: index + 1,
                                         initGoodPrice: privatePrices[index],

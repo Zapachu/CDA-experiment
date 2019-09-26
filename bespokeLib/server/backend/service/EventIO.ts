@@ -8,17 +8,17 @@ import {
     IRobotHandshake,
     IUserWithId,
     SocketEvent
-} from '@bespoke/share'
-import {getSocketPath, IpcConnection, IpcEvent, Log, Token} from '@elf/util'
-import {createServer, Socket} from 'net'
-import {existsSync, unlinkSync} from 'fs'
-import {Server} from 'http'
-import * as SocketIO from 'socket.io'
-import {GameDAO} from './GameDAO'
-import {Setting} from '../util'
-import {EventEmitter} from 'events'
-import {UserModel} from '../model'
-import {elfSetting} from '@elf/setting'
+} from '@bespoke/share';
+import {getSocketPath, IpcConnection, IpcEvent, Log, Token} from '@elf/util';
+import {createServer, Socket} from 'net';
+import {existsSync, unlinkSync} from 'fs';
+import {Server} from 'http';
+import * as SocketIO from 'socket.io';
+import {GameDAO} from './GameDAO';
+import {Setting} from '../util';
+import {EventEmitter} from 'events';
+import {UserModel} from '../model';
+import {elfSetting} from '@elf/setting';
 
 export class EventIO {
     private static robotIOServer: RobotIO.Server
@@ -46,8 +46,8 @@ export class EventIO {
                         {type: Actor.player, token: Token.geneToken(userId || sessionID)}
             let user: IUserWithId = null
             if (userId) {
-                const {id, mobile, name, role, headimg} = await UserModel.findById(userId)
-                user = {id, mobile, name, role, headimg}
+                const {id, mobile, name, role, headimg, stuNum} = await UserModel.findById(userId);
+                user = {id, mobile, name, role, headimg, stuNum};
             }
             subscribeOnConnection(Object.assign(connection, {actor, game, user}) as any)
             connection.emit(SocketEvent.connection, actor)

@@ -29,7 +29,7 @@ export function Play4Owner({game: {}, playerStates, gameState: {logs, groups}}: 
                         ({
                             key: token,
                             name: user.name,
-                            mobile: user.mobile,
+                            mobile: user.stuNum,
                             group: groupIndex + 1,
                             round: groups[groupIndex] ? groups[groupIndex].roundIndex + 1 : null
                         })

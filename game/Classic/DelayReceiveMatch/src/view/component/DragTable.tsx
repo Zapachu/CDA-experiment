@@ -2,6 +2,9 @@ import * as React from 'react';
 import {Table} from 'antd';
 import {DndProvider, DragSource, DropTarget} from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
+import TouchBackend from 'react-dnd-touch-backend';
+
+const DndBackend = 'ontouchstart' in document ? TouchBackend : HTML5Backend;
 
 interface IRowProps {
     index: number
@@ -47,7 +50,7 @@ export function DragTable({data, setData, ...props}) {
         );
     }
 
-    return <DndProvider backend={HTML5Backend}>
+    return <DndProvider backend={DndBackend}>
         <Table
             size="middle"
             pagination={false}

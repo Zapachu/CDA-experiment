@@ -95,7 +95,7 @@ class GroupLogic extends Extend.Group.Logic<ICreateParams, IGameState, IPlayerSt
                 const {allocation} = gameRoundState;
                 const {privatePrices} = rounds[gameState.round];
                 return {
-                    user: user.mobile,
+                    user: user.stuNum,
                     playerIndex: index + 1,
                     initGood: index + 1,
                     initGoodPrice: privatePrices[index],

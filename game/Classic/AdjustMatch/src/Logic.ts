@@ -100,7 +100,7 @@ export class GroupLogic extends Extend.Group.Logic<ICreateParams, IGameState, IP
                 const {initAllocation, allocation} = gameRoundState;
                 const {privatePrices, sort} = rounds[gameState.round];
                 return {
-                    user: user.mobile,
+                    user: user.stuNum,
                     playerIndex: index + 1,
                     initGood: initAllocation[index] === null ? '' : (initAllocation[index] + 1),
                     initGoodPrice: privatePrices[initAllocation[index]] || '',
