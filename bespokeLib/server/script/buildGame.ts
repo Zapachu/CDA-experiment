@@ -1,11 +1,11 @@
-import {resolve} from 'path'
-import * as webpack from 'webpack'
-import * as QiniuPlugin from 'qiniu-webpack-plugin'
-import * as ManifestPlugin from 'webpack-manifest-plugin'
-import {CleanWebpackPlugin} from 'clean-webpack-plugin'
-import {config} from '@bespoke/share'
-import {elfSetting} from '@elf/setting'
-import {NetWork} from '@elf/util'
+import {resolve} from 'path';
+import * as webpack from 'webpack';
+import * as QiniuPlugin from 'qiniu-webpack-plugin';
+import * as ManifestPlugin from 'webpack-manifest-plugin';
+import {CleanWebpackPlugin} from 'clean-webpack-plugin';
+import {config} from '@bespoke/share';
+import {elfSetting} from '@elf/setting';
+import {NetWork} from '@elf/util';
 
 interface IPaths {
   entry?: string
@@ -112,7 +112,7 @@ export function geneClientBuilder(
         },
         {
           type: 'javascript/auto',
-          test: /\.(svg|png|jpg|gif|json|fnt)$/,
+          test: /\.(svg|png|jpg|gif|json|fnt|mp3)$/,
           exclude: /node_modules/,
           use: {
             loader: 'file-loader',

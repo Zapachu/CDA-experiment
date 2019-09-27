@@ -105,7 +105,7 @@ function geneClientBuilder(_a) {
                 },
                 {
                     type: 'javascript/auto',
-                    test: /\.(svg|png|jpg|gif|json|fnt)$/,
+                    test: /\.(svg|png|jpg|gif|json|fnt|mp3)$/,
                     exclude: /node_modules/,
                     use: {
                         loader: 'file-loader',
