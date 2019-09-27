@@ -84,7 +84,7 @@ export class GroupLogic extends Extend.Group.Logic<ICreateParams, IGameState, IP
         const players: IPlayer[] = playerRoundStates.map(({sort}) => ({sort}));
         gameRoundState.initAllocation.forEach((good, i) => players[i].good = good);
         gameRoundState.allocation = match(players);
-        playerStatesArr.forEach(p => p.status = PlayerStatus.result);
+        playerRoundStates.forEach(p => p.status = PlayerRoundStatus.result);
         await this.stateManager.syncState();
         global.setTimeout(async () => {
             gameState.round < this.params.round - 1 ? this.startRound(gameState.round + 1) : playerStatesArr.forEach(p => p.status = PlayerStatus.result);

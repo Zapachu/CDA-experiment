@@ -82,12 +82,8 @@ class GroupLogic extends Extend.Group.Logic<ICreateParams, IGameState, IPlayerSt
         const {gameState, playerStatesArr, gameRoundState} = await this.getState(),
             {allocation} = gameState.rounds[gameState.round];
         allocation.forEach((good, i) => good === null ? allocation[i] = i : null);
-        playerStatesArr.forEach(p => p.status = PlayerStatus.result);
+        gameState.round < this.params.round - 1 ? this.startRound(gameState.round + 1) : playerStatesArr.forEach(p => p.status = PlayerStatus.result);
         await this.stateManager.syncState();
-        global.setTimeout(async () => {
-            gameState.round < this.params.round - 1 ? this.startRound(gameState.round + 1) : playerStatesArr.forEach(p => p.status = PlayerStatus.result);
-            await this.stateManager.syncState();
-        }, 5e3);
         await Model.FreeStyleModel.create({
             game: this.gameId,
             key: `${this.groupIndex}_${gameState.round}`,
