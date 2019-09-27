@@ -1,29 +1,29 @@
 import * as React from 'react';
 import {Core} from '@bespoke/client';
-import {Wrapper} from '@extend/share';
+import {GroupDecorator} from '@extend/share';
 import {FrameEmitter} from '@bespoke/share';
 
 export namespace Group {
-    export interface ICreateProps<ICreateParams> extends Core.ICreateProps<Wrapper.ICreateParams<ICreateParams>> {
+    export interface ICreateProps<ICreateParams> extends Core.ICreateProps<GroupDecorator.ICreateParams<ICreateParams>> {
         groupIndex?: number
         groupParams: ICreateParams
         setGroupParams: Core.TSetCreateParams<ICreateParams>
     }
 
-    export interface IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> extends Core.IPlayProps<Wrapper.ICreateParams<ICreateParams>, Wrapper.IGameState<IGameState>, Wrapper.TPlayerState<IPlayerState>, Wrapper.MoveType<MoveType>, PushType, Wrapper.IMoveParams<IMoveParams>, IPushParams> {
+    export interface IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> extends Core.IPlayProps<GroupDecorator.ICreateParams<ICreateParams>, GroupDecorator.IGameState<IGameState>, GroupDecorator.TPlayerState<IPlayerState>, GroupDecorator.MoveType<MoveType>, PushType, GroupDecorator.IMoveParams<IMoveParams>, IPushParams> {
         groupParams: ICreateParams
         groupGameState: IGameState
         groupFrameEmitter: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
     }
 
-    export interface IPlay4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> extends Core.IPlay4OwnerProps<Wrapper.ICreateParams<ICreateParams>, Wrapper.IGameState<IGameState>, Wrapper.TPlayerState<IPlayerState>, Wrapper.MoveType<MoveType>, PushType, IMoveParams, IPushParams> {
+    export interface IPlay4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> extends Core.IPlay4OwnerProps<GroupDecorator.ICreateParams<ICreateParams>, GroupDecorator.IGameState<IGameState>, GroupDecorator.TPlayerState<IPlayerState>, GroupDecorator.MoveType<MoveType>, PushType, IMoveParams, IPushParams> {
         groupParams: ICreateParams
         groupGameState: IGameState
-        groupPlayerStates: Wrapper.TPlayerState<IPlayerState>[]
+        groupPlayerStates: GroupDecorator.TPlayerState<IPlayerState>[]
         groupFrameEmitter: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
     }
 
-    export interface IResultProps<ICreateParams, IGameState, IPlayerState> extends Core.IResultProps<Wrapper.ICreateParams<ICreateParams>, Wrapper.IGameState<IGameState>, Wrapper.TPlayerState<IPlayerState>> {
+    export interface IResultProps<ICreateParams, IGameState, IPlayerState> extends Core.IResultProps<GroupDecorator.ICreateParams<ICreateParams>, GroupDecorator.IGameState<IGameState>, GroupDecorator.TPlayerState<IPlayerState>> {
         groupParams: ICreateParams
         groupGameState: IGameState
     }

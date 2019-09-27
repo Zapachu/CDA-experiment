@@ -110,7 +110,7 @@ var Logic = /** @class */ (function (_super) {
                         return [4 /*yield*/, this.stateManager.getPlayerState(actor)];
                     case 2:
                         playerState = _d.sent();
-                        if (!(type === share_1.Wrapper.GroupMoveType.getGroup)) return [3 /*break*/, 5];
+                        if (!(type === share_1.GroupDecorator.GroupMoveType.getGroup)) return [3 /*break*/, 5];
                         if (playerState.groupIndex !== undefined) {
                             return [2 /*return*/];
                         }

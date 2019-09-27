@@ -1,6 +1,6 @@
 import * as Extend from '@extend/server';
 import {IActor, IMoveCallback, IUserWithId} from '@bespoke/share';
-import {Wrapper} from '@extend/share';
+import {GroupDecorator} from '@extend/share';
 import {
     CONFIG,
     ICreateParams,
@@ -26,7 +26,7 @@ export class GroupLogic extends Extend.Group.Logic<ICreateParams, IGameState, IP
         return gameState;
     }
 
-    async initPlayerState(user: IUserWithId, index: number): Promise<Wrapper.TPlayerState<IPlayerState>> {
+    async initPlayerState(user: IUserWithId, index: number): Promise<GroupDecorator.TPlayerState<IPlayerState>> {
         const playerState = await super.initPlayerState(user, index);
         playerState.status = PlayerStatus.guide;
         playerState.rounds = [];
@@ -57,14 +57,14 @@ export class GroupLogic extends Extend.Group.Logic<ICreateParams, IGameState, IP
     async getState(): Promise<{
         gameState: IGameState,
         gameRoundState: IGameRoundState,
-        playerStatesArr: Wrapper.TPlayerState<IPlayerState>[],
+        playerStatesArr: GroupDecorator.TPlayerState<IPlayerState>[],
         playerRoundStates: IPlayerRoundState[]
     }> {
         const gameState = await this.stateManager.getGameState(),
             {round} = gameState,
             gameRoundState = gameState.rounds[round],
             playerStates = await this.stateManager.getPlayerStates(),
-            playerStatesArr = Object.values<Wrapper.TPlayerState<IPlayerState>>(playerStates).sort((p1, p2) => p1.index - p2.index),
+            playerStatesArr = Object.values<GroupDecorator.TPlayerState<IPlayerState>>(playerStates).sort((p1, p2) => p1.index - p2.index),
             playerRoundStates = playerStatesArr.map(({rounds}) => rounds[round]);
         return {
             gameState, gameRoundState, playerStatesArr, playerRoundStates

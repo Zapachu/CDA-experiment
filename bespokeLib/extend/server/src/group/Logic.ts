@@ -1,5 +1,5 @@
 import {StateManager} from './StateManager';
-import {Wrapper} from '@extend/share';
+import {GroupDecorator} from '@extend/share';
 import {IActor, IMoveCallback, IUserWithId} from '@bespoke/share';
 
 export class Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
@@ -10,7 +10,7 @@ export class Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, 
         return {} as any;
     }
 
-    async initPlayerState(user: IUserWithId, index: number): Promise<Wrapper.TPlayerState<IPlayerState>> {
+    async initPlayerState(user: IUserWithId, index: number): Promise<GroupDecorator.TPlayerState<IPlayerState>> {
         return {
             user,
             index

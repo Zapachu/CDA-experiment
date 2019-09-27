@@ -58,8 +58,8 @@ var Group;
         function Robot(host) {
             this.host = host;
             var groupIndex = host.playerState.groupIndex, game = host.game, frameEmitter = host.frameEmitter;
-            this.game = share_1.Extractor.game(game, groupIndex);
-            this.frameEmitter = share_1.Extractor.frameEmitter(frameEmitter, groupIndex);
+            this.groupParams = game.params.groupsParams[groupIndex];
+            this.groupFrameEmitter = share_1.GroupDecorator.groupFrameEmitter(frameEmitter, groupIndex);
         }
         Object.defineProperty(Robot.prototype, "meta", {
             get: function () {
@@ -70,14 +70,15 @@ var Group;
         });
         Object.defineProperty(Robot.prototype, "playerState", {
             get: function () {
-                return share_1.Extractor.playerState(this.host.playerState);
+                return this.host.playerState;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Robot.prototype, "gameState", {
+        Object.defineProperty(Robot.prototype, "groupGameState", {
             get: function () {
-                return share_1.Extractor.gameState(this.host.gameState, this.host.playerState.groupIndex);
+                var _a = this.host, gameState = _a.gameState, groupIndex = _a.playerState.groupIndex;
+                return gameState.groups[groupIndex].state;
             },
             enumerable: true,
             configurable: true
@@ -107,7 +108,7 @@ var Robot = /** @class */ (function (_super) {
                     case 0: return [4 /*yield*/, _super.prototype.init.call(this)];
                     case 1:
                         _a.sent();
-                        this.frameEmitter.emit(share_1.Wrapper.GroupMoveType.getGroup);
+                        this.frameEmitter.emit(share_1.GroupDecorator.GroupMoveType.getGroup);
                         interval = setInterval(function () { return __awaiter(_this, void 0, void 0, function () {
                             return __generator(this, function (_a) {
                                 switch (_a.label) {

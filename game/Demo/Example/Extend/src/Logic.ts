@@ -2,7 +2,7 @@ import * as Extend from '@extend/server';
 import {IActor, IMoveCallback, IUserWithId} from '@bespoke/share';
 import {Log} from '@elf/util';
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, MoveType, PushType} from './config';
-import {Wrapper} from '@extend/share';
+import {GroupDecorator} from '@extend/share';
 
 class GroupLogic extends Extend.Group.Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     initGameState(): IGameState {
@@ -11,7 +11,7 @@ class GroupLogic extends Extend.Group.Logic<ICreateParams, IGameState, IPlayerSt
         return gameState;
     }
 
-    async initPlayerState(user: IUserWithId, index: number): Promise<Wrapper.TPlayerState<IPlayerState>> {
+    async initPlayerState(user: IUserWithId, index: number): Promise<GroupDecorator.TPlayerState<IPlayerState>> {
         const playerState = await super.initPlayerState(user, index);
         playerState.count = 0;
         return playerState;

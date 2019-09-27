@@ -89,6 +89,26 @@
         "BESPOKE_WITH_LINKER": "true"
       },
       "log_date_format": "YYYY-MM-DD HH:mm Z"
+    },
+    {
+      "script": "../game/Custom/ShanghaiNY/Bak/build/serve.js",
+      "name": "ShanghaiNYBak",
+      "env": {
+        "NODE_ENV": "production",
+        "BESPOKE_WITH_PROXY": "true",
+        "BESPOKE_WITH_LINKER": "true"
+      },
+      "log_date_format": "YYYY-MM-DD HH:mm Z"
+    },
+    {
+      "script": "../game/Custom/ShanghaiNY/V4/build/serve.js",
+      "name": "ShanghaiNYV4",
+      "env": {
+        "NODE_ENV": "production",
+        "BESPOKE_WITH_PROXY": "true",
+        "BESPOKE_WITH_LINKER": "true"
+      },
+      "log_date_format": "YYYY-MM-DD HH:mm Z"
     }
   ]
 }

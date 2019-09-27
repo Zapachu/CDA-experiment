@@ -1,9 +1,9 @@
 import {BaseLogic, IActor, IMoveCallback, TGameState} from '@bespoke/server';
-import {Wrapper} from '@extend/share';
+import {GroupDecorator} from '@extend/share';
 import * as Group from './group';
 
 export class Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>
-    extends BaseLogic<Wrapper.ICreateParams<ICreateParams>, Wrapper.IGameState<IGameState>, Wrapper.TPlayerState<IPlayerState>, Wrapper.MoveType<MoveType>, PushType, Wrapper.IMoveParams<IMoveParams>, IPushParams> {
+    extends BaseLogic<GroupDecorator.ICreateParams<ICreateParams>, GroupDecorator.IGameState<IGameState>, GroupDecorator.TPlayerState<IPlayerState>, GroupDecorator.MoveType<MoveType>, PushType, GroupDecorator.IMoveParams<IMoveParams>, IPushParams> {
 
     GroupLogic: new(gameId: string, groupIndex: number, groupSize: number, params: ICreateParams, stateManager: Group.StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) => Group.Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>;
 
@@ -18,7 +18,7 @@ export class Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, 
         return this;
     }
 
-    initGameState(): TGameState<Wrapper.IGameState<IGameState>> {
+    initGameState(): TGameState<GroupDecorator.IGameState<IGameState>> {
         const gameState = super.initGameState();
         gameState.groups = Array(this.game.params.group).fill(null).map((_, i) => ({
             playerNum: 0,
@@ -27,16 +27,16 @@ export class Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, 
         return gameState;
     }
 
-    protected async teacherMoveReducer(actor: IActor, type: Wrapper.MoveType<MoveType>, params: Wrapper.IMoveParams<IMoveParams>, cb: IMoveCallback): Promise<void> {
+    protected async teacherMoveReducer(actor: IActor, type: GroupDecorator.MoveType<MoveType>, params: GroupDecorator.IMoveParams<IMoveParams>, cb: IMoveCallback): Promise<void> {
         await this.groupsLogic[params.groupIndex].teacherMoveReducer(actor, type as MoveType, params.params, cb);
         this.startRobot(Math.random());
     }
 
-    protected async playerMoveReducer(actor: IActor, type: Wrapper.MoveType<MoveType>, params: Wrapper.IMoveParams<IMoveParams>, cb: IMoveCallback): Promise<void> {
+    protected async playerMoveReducer(actor: IActor, type: GroupDecorator.MoveType<MoveType>, params: GroupDecorator.IMoveParams<IMoveParams>, cb: IMoveCallback): Promise<void> {
         const {groupSize} = this.game.params;
         const gameState = await this.stateManager.getGameState(),
             playerState = await this.stateManager.getPlayerState(actor);
-        if (type === Wrapper.GroupMoveType.getGroup) {
+        if (type === GroupDecorator.GroupMoveType.getGroup) {
             if (playerState.groupIndex !== undefined) {
                 return;
             }
