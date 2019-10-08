@@ -2,5 +2,7 @@
 
 .label{
   color: lighten($color-black,30%);
+  display: inline-block;
+  min-width: 4rem;
   margin: .5rem;
 }
