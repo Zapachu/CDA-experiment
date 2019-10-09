@@ -1,10 +1,9 @@
-import * as path from 'path'
-import {CleanWebpackPlugin} from 'clean-webpack-plugin'
-import * as HtmlWebpackPlugin from 'html-webpack-plugin'
-import * as QiniuPlugin from 'qiniu-webpack-plugin'
-import * as ManifestPlugin from 'webpack-manifest-plugin'
-import {config} from '@bespoke/share'
-import {elfSetting} from '@elf/setting'
+import * as path from 'path';
+import {CleanWebpackPlugin} from 'clean-webpack-plugin';
+import * as HtmlWebpackPlugin from 'html-webpack-plugin';
+import * as QiniuPlugin from 'qiniu-webpack-plugin';
+import {config} from '@bespoke/share';
+import {elfSetting} from '@elf/setting';
 
 const {qiNiu} = elfSetting
 const buildMode = process.env.npm_config_buildMode || 'dev'
