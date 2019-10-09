@@ -1,0 +1,69 @@
+@import "~@elf/component/lib/public";
+
+.groupGuide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2rem auto;
+  max-width: 48rem;
+
+  p {
+    font-size: $fontSize-middle;
+    margin: 2rem;
+  }
+}
+
+.groupPlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .title {
+    margin: 2rem;
+  }
+
+  .roundPlay {
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    user-select: none;
+
+    .timeLeft {
+      margin-bottom: 1rem;
+    }
+
+    .playTips {
+      margin: 2rem 0;
+      font-size: $fontSize-large;
+    }
+
+    em {
+      font-size: $fontSize-middle;
+      padding: .5rem;
+    }
+  }
+
+  .roundResult {
+    margin: 2rem;
+
+    .toNextRound {
+      margin-top: 2rem;
+      display: block;
+      text-align: center;
+      font-size: 1.5rem;
+    }
+  }
+}
+
+.groupResult {
+  display: flex;
+  justify-content: center;
+  margin: 2rem;
+  font-size: 1.5rem;
+}
+
+.groupResult4Owner {
+  margin: 2rem;
+  text-align: center;
+}
