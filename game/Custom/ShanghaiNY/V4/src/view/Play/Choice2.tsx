@@ -38,7 +38,7 @@ export default function Choice2({playersPerGroup, c1, c2, onChoose, mode, d}: {
                 {label: d > 0 ? `${lang.choose1}${lang.feeLeft}${d}${lang.feeRight}` : lang.choose1, value: Choice.One},
                 {label: lang.choose2, value: Choice.Two}
             ],
-            [Mode.LR]: i === playersPerGroup ? null : [
+            [Mode.LR]: c1 === Choice.Wait && i === playersPerGroup ? null : [
                 {label: lang.choose1, value: Choice.One},
                 {label: d > 0 ? `${lang.choose2}${lang.feeLeft}${d}${lang.feeRight}` : lang.choose2, value: Choice.Two}
             ],
@@ -54,17 +54,17 @@ export default function Choice2({playersPerGroup, c1, c2, onChoose, mode, d}: {
     return <div className={style.choice}>
         <p>{lang.secondAction}:</p>
         <p>{lang.case1}</p>
-        <ol>
+        <table className={style.testStageTable}>
             {
                 questions.map(({question, options}, i) => {
                     const needChoice: boolean = (mode === Mode.BR && !!options) || (c1 === Choice.Wait && i < playersPerGroup);
-                    return <li>
-                        <div style={{display: 'flex'}}>
+                    if(!options) return
+                    return <tr>
                             {
                                 needChoice ? null :
-                                    <div style={{marginRight: '2rem'}}>
-                                        <p>{lang.noChoice}</p>
-                                        <Radio.Group value={c2[i]} onChange={({target: {value}}) => {
+                                    <>
+                                        <td><p>{lang.noChoice}</p></td>
+                                        <td><Radio.Group value={c2[i]} onChange={({target: {value}}) => {
                                             const c = c2.slice();
                                             c[i] = +value;
                                             onChoose(c);
@@ -73,29 +73,23 @@ export default function Choice2({playersPerGroup, c1, c2, onChoose, mode, d}: {
                                                 [{label: lang.ok, value: 0}].map(({label, value}) => <Radio
                                                     value={value}>{label}</Radio>)
                                             }
-                                        </Radio.Group>
-                                    </div>
+                                        </Radio.Group></td>
+                                    </>
                             }
-                            <div className={needChoice ? '' : style.disabled}>
-                                <p>{question} , {lang.yourChoice}:</p>
-                                {
-                                    options ? <Radio.Group disabled={!needChoice} value={c2[i]}
-                                                           onChange={({target: {value}}) => {
-                                                               const c = c2.slice();
-                                                               c[i] = +value;
-                                                               onChoose(c);
-                                                           }}>
+                            <td className={needChoice ? '' : style.disabled}><p>({i+1}) {question} , {lang.yourChoice}:</p></td>
+                            <td className={needChoice ? '' : style.disabled}><Radio.Group disabled={!needChoice} value={c2[i]}
+                                                        onChange={({target: {value}}) => {
+                                                            const c = c2.slice();
+                                                            c[i] = +value;
+                                                            onChoose(c);
+                                                        }}>
                                             {
                                                 options.map(({label, value}) => <Radio value={value}>{label}</Radio>)
                                             }
-                                        </Radio.Group> :
-                                        <p style={{fontSize: '14px', margin: '10px 0 0'}}>{lang.impossible}</p>
-                                }
-                            </div>
-                        </div>
-                    </li>;
+                                        </Radio.Group></td>
+                    </tr>;
                 })
             }
-        </ol>
+        </table>
     </div>;
 };
