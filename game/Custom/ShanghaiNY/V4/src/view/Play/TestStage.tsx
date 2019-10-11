@@ -17,6 +17,8 @@ import {
 import Display from './Display';
 import Choice1 from './Choice1';
 import Choice2 from './Choice2';
+import { copySync } from 'fs-extra';
+import {regC2} from './regC2Group'
 
 interface IPlayState {
     c1: number,
@@ -67,7 +69,6 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
         pageIndex: [(m, n) => `第${m}/${n}页`, (m, n) => `Page ${m}/${n}`]
     });
     Test: Array<Test> = Test2;
-
     submit = () => {
         const {props: {frameEmitter, playerState: {stageIndex}}, state: {answers, tips}} = this;
         const curTest = this.Test[stageIndex];
@@ -130,15 +131,13 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
                     <Choice1 {...{
                         c1, d, mode, onChoose: c1 => this.setState({c1, c2: []}), test: true
                     }}/>
-                    <Choice2 {...{
+                    {c1 !== 0 ? <Choice2 {...{
                         playersPerGroup, c1, c2, d, mode, onChoose: c2 => this.setState({c2})
-                    }}/>
+                    }}/> : null}
                     <p className={style.instruction}>{lang.next}</p>
                 </div>
                 <Button style={btnStyle} type='primary' onClick={() => {
-                    if (!c1 || c2.includes(undefined) || c2.length !== playersPerGroup + 1) {
-                        return;
-                    }
+                    if(regC2({playersPerGroup,c1,c2,mode})) return
                     frameEmitter.emit(MoveType.answerTest);
                     this.setState({c1: 0});
                 }}
