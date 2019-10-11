@@ -33,10 +33,13 @@ function RoundPlay({playerRoundState, gameRoundState, groupParams: {awardA, awar
         submit: ['提交'],
         waiting: ['等待其它玩家提交...'],
         playerNo: ['玩家编号'],
-        x: ['捕获量'],
         result: ['最终收益'],
         you: ['（你）'],
         toNextRound: ['等待进入下一轮...'],
+        roundOver1: ['您已完成本轮实验'],
+        roundOver2: ['您抽中第'],
+        roundOver3: ['组彩票，您的选择是'],
+        roundOver4: [success => `${success ? '中奖了' : '未中奖'},收益为`],
     });
     const [preference, setPreference] = React.useState([]);
     const {timeLeft} = gameRoundState;
@@ -76,10 +79,18 @@ function RoundPlay({playerRoundState, gameRoundState, groupParams: {awardA, awar
             </section>;
         case PlayerRoundStatus.wait:
             return <MaskLoading label={lang.waiting}/>;
-        case PlayerRoundStatus.result:
+        case PlayerRoundStatus.result: {
+            const {result: {caseIndex, award, success}, preference} = playerRoundState;
             return <section className={style.roundResult}>
+                <p>
+                    {lang.roundOver1}&nbsp;,&nbsp;
+                    {lang.roundOver2}<em>{caseIndex + 1}</em>
+                    {lang.roundOver3}<em>{preference[caseIndex] === Choice.A ? 'A' : 'B'}</em>&nbsp;,&nbsp;
+                    {lang.roundOver4(success)}<em>{award}</em>
+                </p>
                 <label className={style.toNextRound}>{lang.toNextRound}</label>
             </section>;
+        }
     }
 }
 

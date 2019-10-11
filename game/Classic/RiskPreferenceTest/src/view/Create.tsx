@@ -2,13 +2,19 @@ import * as React from 'react';
 import * as Extend from '@extend/client';
 import {Label, Lang} from '@elf/component';
 import {Col, Row, Slider} from 'antd';
-import {ICreateParams} from '../config';
+import {awardLimit, ICreateParams} from '../config';
+
+const riskSliderProps = {
+    min: awardLimit >> 1,
+    step: 5
+};
 
 class GroupCreate extends Extend.Group.Create<ICreateParams> {
     lang = Lang.extractLang({
         round: ['轮次(r)', 'Round(r)'],
         t: ['每轮时长(t/秒)', 'ExchangeTime(t/s)'],
-        risk: ['风险', 'Risk']
+        risk: ['风险', 'Risk'],
+        riskInfo: [r => `中奖则获得${r}，否则获得${awardLimit - r}`]
     });
 
     componentDidMount(): void {
@@ -37,14 +43,15 @@ class GroupCreate extends Extend.Group.Create<ICreateParams> {
                     </div>
                 </Col>
             </Row>
+            <Label label={lang.risk}/>
             <Row>
                 <Col offset={4} span={8}>
-                    <Label label={lang.risk}/>
-                    <Slider value={awardA} onChange={v => setGroupParams({awardA: +v})} marks={{[awardA]: awardA}}/>
+                    <Label label={`A : ${lang.riskInfo(awardA)}`}/>
+                    <Slider {...riskSliderProps} value={awardA} onChange={v => setGroupParams({awardA: +v})}/>
                 </Col>
                 <Col span={8}>
-                    <Label label={lang.risk}/>
-                    <Slider value={awardB} onChange={v => setGroupParams({awardB: +v})} marks={{[awardB]: awardB}}/>
+                    <Label label={`B : ${lang.riskInfo(awardB)}`}/>
+                    <Slider {...riskSliderProps} value={awardB} onChange={v => setGroupParams({awardB: +v})}/>
                 </Col>
             </Row>
         </>;

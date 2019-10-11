@@ -53,6 +53,11 @@
       text-align: center;
       font-size: 1.5rem;
     }
+
+    em {
+      font-size: $fontSize-middle;
+      padding: .5rem;
+    }
   }
 }
 
