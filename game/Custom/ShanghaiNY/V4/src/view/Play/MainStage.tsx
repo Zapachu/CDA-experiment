@@ -20,6 +20,7 @@ import {
 import Display from './Display';
 import Choice1 from './Choice1';
 import Choice2 from './Choice2';
+import { regC2 } from './regC2Group';
 
 interface IPlayState {
     c1: number,
@@ -165,12 +166,12 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
                     <Choice1 {...{
                         c1, d, mode, onChoose: c1 => this.setState({c1, c2: []})
                     }}/>
-                    <Choice2 {...{
+                    {c1 ? <Choice2 {...{
                         playersPerGroup, c1, c2, d, mode, onChoose: c2 => this.setState({c2})
-                    }}/>
+                    }}/> : null}
                     <Button type='primary'
                             onClick={() => {
-                                if (!c1 || c2.length !== +playersPerGroup + 1 || c2.includes(undefined)) {
+                                if(regC2({playersPerGroup,c1,c2,mode})) {
                                     return Toast.warn(lang.checkPls);
                                 }
                                 frameEmitter.emit(MoveType.answerMain, {c1, c2}, err => {

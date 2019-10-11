@@ -127,4 +127,13 @@
       margin: 20px 0;
     }
   }
+  .testStageTable {
+    border-collapse: collapse;
+    text-align: center;
+    width: 120%;
+    td {
+      border: 1px solid #000;
+      text-align: center;
+    } 
+  }
 }
