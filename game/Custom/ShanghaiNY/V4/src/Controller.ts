@@ -209,10 +209,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         break;
       }
       case MoveType.answerMain: {
-        if (!validateAnswer(params)) {
-          cb('invalid input');
-          break;
-        }
         const {roundIndex} = playerState;
         if (playerState.choices[roundIndex]) {
           break;
@@ -261,11 +257,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         playerState.stage = Stage.End;
         break;
       }
-    }
-
-    function validateAnswer(params: IMoveParams): boolean {
-      const {c1, c2} = params;
-      return !!c1 && !!c2 && !c2.includes(undefined) && c2.length === playersPerGroup + 1;
     }
 
     function calcProfit(playerState: TPlayerState<IPlayerState>, min: number): number {

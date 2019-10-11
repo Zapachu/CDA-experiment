@@ -20,7 +20,7 @@ import {
 import Display from './Display';
 import Choice1 from './Choice1';
 import Choice2 from './Choice2';
-import { regC2 } from './regC2Group';
+import {regC2} from './regC2Group';
 
 interface IPlayState {
     c1: number,
@@ -63,8 +63,7 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
         chooseWait: ['等待', 'Wait'],
         case1: ['如果包括你一共有'],
         players: ['人', 'players'],
-        yourChoice: ['你的选择', 'your choice is'],
-        impossible: ['不可能发生', 'Impossible'],
+        yourChoice: ['你的选择', 'your choice is']
     });
 
     constructor(props) {
@@ -112,13 +111,13 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
                         </tr>
                         {
                             Array(playersPerGroup + 1).fill(null).map((_, i) => {
-                                    const c = c2[i];
-                                    return <tr key={i}>
-                                        <td>{i}{lang.players}{chooseLabel[0]}&nbsp;,&nbsp;{playersPerGroup - i}{lang.players}{chooseLabel[1]}</td>
-                                        <td>{c ? choice2Lang[c] : lang.impossible}</td>
-                                    </tr>;
-                                }
-                            )
+                                const c = c2[i];
+                                return c ? <tr key={i}>
+                                    <td>{i}{lang.players}{chooseLabel[0]}&nbsp;,&nbsp;{playersPerGroup - i}{lang.players}{chooseLabel[1]}</td>
+                                    <td>{choice2Lang[c]}</td>
+                                </tr> : null;
+                            }
+                        )
                         }
                     </table>
                 </> : null
@@ -171,7 +170,7 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
                     }}/> : null}
                     <Button type='primary'
                             onClick={() => {
-                                if(regC2({playersPerGroup,c1,c2,mode})) {
+                                if (regC2({playersPerGroup, c1, c2, mode})) {
                                     return Toast.warn(lang.checkPls);
                                 }
                                 frameEmitter.emit(MoveType.answerMain, {c1, c2}, err => {
