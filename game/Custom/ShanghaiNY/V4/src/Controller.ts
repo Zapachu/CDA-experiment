@@ -50,7 +50,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
       [Choice.Wait]: 0,
     };
 
-    const resultData: Array<Array<any>> = [['组', '座位号', '手机号', '最终收益', '轮次', '第一阶段选择', '第二阶段选择(结果1)', '第二阶段选择(结果2)', '最终选择', '第一阶段选1人数', '第一阶段选2人数', '组内最低选择', '该轮积分', '专业', '年龄', '年级', '家庭住址', '性别']];
+    const resultData: Array<Array<any>> = [['组', '座位号', '手机号', '最终收益', '轮次', '第一阶段选择', '第二阶段选择', '最终选择', '第一阶段选1人数', '第一阶段选2人数', '组内最低选择', '该轮积分', '专业', '年龄', '年级', '家庭住址', '性别']];
     const playersByGroup = Object.values(playerStates).sort((a, b) => a.groupIndex - b.groupIndex);
     if (!groups) {
       groups = this._rebuildGroups(playersByGroup, this.game.params);
@@ -62,10 +62,10 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         const row = curRound === 0 ? [ps.groupIndex + 1, ps.seatNumber || '-', ps.mobile || '-', participationFee + (ps.finalProfit * s || 0), curRound + 1] : ['', '', '', '', curRound + 1];
         const curChoice = ps.choices[curRound];
         if (curChoice) {
-          row.push(choiceTerms[curChoice.c1], curChoice.c1 === Choice.Wait ? choiceTerms[curChoice.c2[0]] : 0, curChoice.c1 === Choice.Wait ? choiceTerms[curChoice.c2[1]] : 0);
+          row.push(choiceTerms[curChoice.c1], curChoice.c === curChoice.c1 ? '' : curChoice.c2.map(c => choiceTerms[c]).join('/'));
           const curRoundState = curGroup.rounds[curRound];
           if (curRoundState.min) {
-            row.push(curChoice.c ? curChoice.c : curChoice.c1, curRoundState.x1, curRoundState.y1, curRoundState.min, ps.profits[curRound]);
+            row.push(curChoice.c ? curChoice.c : curChoice.c1, curRoundState.one1, curRoundState.two1, curRoundState.min, ps.profits[curRound]);
             if (ps.surveyAnswers.length && curRound === 0) {
               row.push(...this._formatSurveyAnswers(ps.surveyAnswers));
             }
@@ -100,8 +100,9 @@ export default class Controller extends BaseController<ICreateParams, IGameState
       while (roundIndex >= 0) {
         if (playersInGroup.every(ps => !!ps.choices[roundIndex])) {
           group.rounds[roundIndex] = {
-            x1: playersInGroup.filter(ps => ps.choices[roundIndex].c1 === Choice.One).length,
-            y1: playersInGroup.filter(ps => ps.choices[roundIndex].c1 === Choice.Two).length,
+            one1: playersInGroup.filter(ps => ps.choices[roundIndex].c1 === Choice.One).length,
+            two1: playersInGroup.filter(ps => ps.choices[roundIndex].c1 === Choice.Two).length,
+            wait1: playersInGroup.filter(ps => ps.choices[roundIndex].c1 === Choice.Wait).length,
             x: playersInGroup.filter(ps => ps.choices[roundIndex].c === Choice.One).length,
             y: playersInGroup.filter(ps => ps.choices[roundIndex].c === Choice.Two).length,
             min: playersInGroup.some(ps => ps.choices[roundIndex].c === Choice.One) ? Choice.One : Choice.Two
@@ -210,16 +211,18 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         const playersInGroup = await this.getPlayersInGroup(playerState.groupIndex);
         const ready = playersInGroup.length === playersPerGroup && playersInGroup.every(ps => !!ps.choices[roundIndex]);
         if (ready) {
-          const x1 = playersInGroup.filter(ps => ps.choices[roundIndex].c1 === Choice.One).length,
-              y1 = playersInGroup.filter(ps => ps.choices[roundIndex].c1 === Choice.Two).length;
+          const one1 = playersInGroup.filter(ps => ps.choices[roundIndex].c1 === Choice.One).length,
+              two1 = playersInGroup.filter(ps => ps.choices[roundIndex].c1 === Choice.Two).length,
+              wait1 = playersInGroup.filter(ps => ps.choices[roundIndex].c1 === Choice.Two).length
           playersInGroup.forEach(ps => {
             const curChoice = ps.choices[roundIndex];
-            curChoice.c = curChoice.c2.some(c => c) ? curChoice.c2[mode === Mode.LR ? y1 : x1] : curChoice.c1;
+            curChoice.c = curChoice.c2.some(c => [Choice.One, Choice.Two].includes(c)) ? curChoice.c2[mode === Mode.LR ? two1 : one1] : curChoice.c1;
           });
           const min = playersInGroup.some(ps => ps.choices[roundIndex].c === Choice.One) ? Choice.One : Choice.Two;
           groups[playerState.groupIndex].rounds[roundIndex] = {
-            x1,
-            y1,
+            one1,
+            two1,
+            wait1,
             x: playersInGroup.filter(ps => ps.choices[roundIndex].c === Choice.One).length,
             y: playersInGroup.filter(ps => ps.choices[roundIndex].c === Choice.Two).length,
             min

@@ -113,7 +113,7 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
                             Array(playersPerGroup + 1).fill(null).map((_, i) => {
                                     const c = c2[i];
                                     return [Choice.One,Choice.Two].includes(c) ? <tr key={i}>
-                                        <td>{i}{lang.players}{chooseLabel[Choice.Null]}&nbsp;,&nbsp;{playersPerGroup - i}{lang.players}{chooseLabel[1]}</td>
+                                        <td>{i}{lang.players}{chooseLabel[0]}&nbsp;,&nbsp;{playersPerGroup - i}{lang.players}{chooseLabel[1]}</td>
                                         <td>{choice2Lang[c]}</td>
                                     </tr> : null;
                                 }
@@ -129,19 +129,20 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
         const {lang, props: {frameEmitter, game: {params: {min, mode}}, playerState: {groupIndex, roundIndex, choices, profits, finalProfit}, gameState: {groups}}} = this;
         const curRoundIndex = roundIndex;
         const curGroup: IGameGroupState = groups[groupIndex],
-            curRound = curGroup.rounds[curRoundIndex];
+            curRound = curGroup.rounds[curRoundIndex],
+            {one1, two1, wait1} = curRound
         const curChoice = choices[curRoundIndex];
         if (!curChoice) return null;
         const curProfit = profits[curRoundIndex];
-        const chooseLabel = {
-            [Mode.HR]:[lang.choose1, lang.chooseWait],
-            [Mode.LR]:[lang.choose2, lang.chooseWait],
-            [Mode.BR]:[lang.choose1, lang.choose2],
+        const [labelA, labelB, countA, countB] = {
+            [Mode.HR]:[lang.choose1, lang.chooseWait, one1, wait1],
+            [Mode.LR]:[lang.choose2, lang.chooseWait, two1, wait1],
+            [Mode.BR]:[lang.choose1, lang.choose2, one1, two1],
         }[mode]
         return <>
             <p>{lang.yourFirstChoiceLeft}{curRoundIndex + 1}{lang.yourFirstChoiceRight} </p>
             {this.renderChoice2(curChoice.c1, curChoice.c2)}
-            <p style={{margin: '2rem 0'}}>{lang.inFirstAction}{curRound.x1}{lang.players}{chooseLabel[0]}&nbsp;,&nbsp;{curRound.y1}{lang.players}{chooseLabel[1]}</p>
+            <p style={{margin: '2rem 0'}}>{lang.inFirstAction}{countA}{lang.players}{labelA}&nbsp;,&nbsp;{countB}{lang.players}{labelB}</p>
             {curChoice.c2.some(c => [Choice.One,Choice.Two].includes(c)) ? <p>{lang.yourSecondChoice} {curChoice.c}</p> : null}
             {
                 min === Min.A ?

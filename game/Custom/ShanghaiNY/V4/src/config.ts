@@ -394,66 +394,6 @@ export function getTest(mode: Mode): Array<{
     },
     {
       desc: [
-        {text: '假设你在考虑以下两个选择方案'},
-        {text: '', br: 10},
-        {text: '选择方案(A)'},
-        {text: '"在第一阶段选1"', color: true},
-        {text: '', br: 0},
-        {text: '选择方案(B)'},
-        {
-          text: '“第一阶段有0人、1人、2人、3人选1，则在第二阶段选1”（即无论第一阶段有几人选1，在第二阶段都选1）',
-          color: true
-        }
-      ],
-      questions: [
-        {
-          title: [
-            {text: '如果其他三个组员都选择'},
-            {text: '"在第一阶段选1"', color: true},
-            {text: '，以下关于你自己的收益的说法正确的是：'}
-          ],
-          options: [
-            {label: '如果你选方案(A)，你获得收益更大', value: 'a'},
-            {label: '如果你选方案(B)，你获得收益更大', value: 'b'},
-            {label: '你选方案(A)还是(B)能获得的收益一样大', value: 'c'}
-          ],
-          answer: d => (d > 0 ? 'a' : 'c')
-        },
-        {
-          title: [
-            {text: '如果其他三个组员都选择'},
-            {
-              text:
-                  '“第一阶段有0人选1，则在第二阶段选2；有1人、2人、3人选1，则在第二阶段选1”',
-              color: true
-            },
-            {text: '，以下关于你自己的收益的说法正确的是：'}
-          ],
-          options: [
-            {label: '如果你选方案(A)，你获得收益更大', value: 'a'},
-            {label: '如果你选方案(B)，你获得收益更大', value: 'b'},
-            {label: '你选方案(A)还是(B)能获得的收益一样大', value: 'c'}
-          ],
-          answer: d => (d > 0 ? 'a' : 'c')
-        },
-        {
-          title: [
-            {text: '如果你'},
-            {text: '不确定其他组员会怎么选', color: true},
-            {text: '，以下关于你自己的收益的说法正确的是：'}
-          ],
-          options: [
-            {label: '如果你选方案(A)，你获得收益总是更大', value: 'a'},
-            {label: '如果你选方案(B)，你获得收益总是更大', value: 'b'},
-            {label: '不管其他组员怎么选，你选方案(A)还是(B)能获得的收益总是一样大', value: 'c'},
-            {label: '方案(A)和方案(B)的收益哪个大，取决于其他组员怎么选', value: 'd'}
-          ],
-          answer: d => (d > 0 ? 'a' : 'c')
-        }
-      ]
-    },
-    {
-      desc: [
         {text: '假设其他三个组员都选择'},
         {text: '“在第一阶段选1”', color: true},
         {text: '', br: 10},
@@ -547,7 +487,7 @@ export function getTest(mode: Mode): Array<{
       desc: [
         {text: '假设其他三个组员都选择'},
         {
-          text: '“在第一阶段等待； 如果第一阶段有0人、1人选1则在第二阶段选2； 第一阶段没有2人、3人选1则在第二阶段选1”',
+          text: '“在第一阶段等待； 如果第一阶段有0人、1人选1则在第二阶段选2； 第一阶段有2人、3人选1则在第二阶段选1”',
           color: true
         },
         {text: '', br: 10},
@@ -692,8 +632,9 @@ export interface IGameState {
 export interface IGameGroupState {
   playerNum: number;
   rounds: {
-    x1: number
-    y1: number
+    one1,
+    two1,
+    wait1,
     x: number
     y: number
     min: number
