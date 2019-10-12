@@ -30,7 +30,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
     const playerState = await super.initPlayerState(actor);
     playerState.mobile = playerState.user.mobile;
     playerState.stage = Stage.Seat;
-    playerState.stageIndex = TestStageIndex.Next;
+    playerState.stageIndex = TestStageIndex.Interface;
     playerState.choices = [];
     playerState.profits = [];
     playerState.surveyAnswers = [];

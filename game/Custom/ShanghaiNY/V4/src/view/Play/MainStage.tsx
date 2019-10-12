@@ -112,7 +112,7 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
                         {
                             Array(playersPerGroup + 1).fill(null).map((_, i) => {
                                     const c = c2[i];
-                                    return c ? <tr key={i}>
+                                    return [Choice.One,Choice.Two].includes(c) ? <tr key={i}>
                                         <td>{i}{lang.players}{chooseLabel[Choice.Null]}&nbsp;,&nbsp;{playersPerGroup - i}{lang.players}{chooseLabel[1]}</td>
                                         <td>{choice2Lang[c]}</td>
                                     </tr> : null;
