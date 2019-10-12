@@ -1,6 +1,7 @@
 import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from '@bespoke/server';
 import {
   Choice,
+  getTest,
   ICreateParams,
   IGameGroupState,
   IGameState,
@@ -14,19 +15,10 @@ import {
   SheetType,
   Stage,
   Survey,
-  Test2,
   TestStageIndex
 } from './config';
 
 export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
-  private Test: Array<any>;
-
-  //region init
-  async init() {
-    await super.init();
-    this.Test = Test2;
-    return this;
-  }
 
   initGameState(): TGameState<IGameState> {
     const gameState = super.initGameState();
@@ -38,7 +30,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
     const playerState = await super.initPlayerState(actor);
     playerState.mobile = playerState.user.mobile;
     playerState.stage = Stage.Seat;
-    playerState.stageIndex = TestStageIndex.Interface;
+    playerState.stageIndex = TestStageIndex.Next;
     playerState.choices = [];
     playerState.profits = [];
     playerState.surveyAnswers = [];
@@ -189,7 +181,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         if (playerState.stageIndex < TestStageIndex.Interface) {
           break;
         }
-        if (playerState.stageIndex === this.Test.length - 1) {
+        if (playerState.stageIndex === getTest(mode).length - 1) {
           playerState.stageIndex = TestStageIndex.Next;
         } else {
           playerState.stageIndex++;

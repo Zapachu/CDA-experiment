@@ -1,19 +1,19 @@
 @import "~@elf/component/lib/public";
 
 .play {
-  max-width: 36rem;
+  max-width: 48rem;
   margin: auto;
-  padding-top: 2rem;
+  padding: 1rem;
 
   .display {
     border-collapse: separate;
-    width: 100%;
-    max-width: 300px;
     border: 1px solid;
     margin: 1rem auto;
 
     td {
       text-align: center;
+      border: 1px solid #666;
+      padding: .5rem 2rem;
     }
 
     .data {
@@ -24,10 +24,6 @@
   .choice {
     font-size: 1.2rem;
     margin: 2rem;
-    .disabled {
-      pointer-events: none;
-      color: #ccc;
-    }
 
     p {
       margin: .5rem 0;
@@ -44,7 +40,6 @@
   }
 
   .instruction {
-    max-width: 32rem;
     font-size: 1rem;
     margin: .5rem 1rem;
     color: rgb(66, 133, 244);
@@ -94,8 +89,6 @@
     }
 
     .testQuestion {
-      width: 80%;
-      min-width: 300px;
     }
   }
 
@@ -132,8 +125,9 @@
     text-align: center;
     width: 120%;
     td {
-      border: 1px solid #000;
-      text-align: center;
+      border: 1px solid;
+      text-align: left;
+      padding: .2rem 1rem;
     } 
   }
 }
