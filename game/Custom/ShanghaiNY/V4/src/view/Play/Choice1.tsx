@@ -20,7 +20,7 @@ export default function Choice1({test, c1, onChoose, mode, d = 0}: {
             pay1: ['若在第二阶段', '(If you '],
             pay2: ['，需要付出延迟选择费', ' in the next action, you need to pay $ '],
             pay3: ['分', ')'],
-            secondAction: ['因为你在第一阶段已经等待，请针对第一阶段可能出现的各种结果，做出你第二阶段的选择 : ', 'Make your choice for the second action please:'],
+            secondAction: [l => `因为你在第一阶段已经${l}，请针对第一阶段可能出现的各种结果，做出你第二阶段的选择 : `, l => 'Make your choice for the second action please:'],
             confirmOnly: [l => `因为你在第一阶段已经${l}，第二阶段不需要选择，请点击下面所有的“确定按钮”:`, l => 'Since you have chosen in the first action, you do not need to make the choice for the second action, please click the "Confirm" button below:'],
         }),
         choiceLabel = {
@@ -42,7 +42,7 @@ export default function Choice1({test, c1, onChoose, mode, d = 0}: {
         },
         [Mode.BR]: {
             options: [Choice.One, Choice.Two],
-            tips: lang.changeChoice
+            tips: c1 !== Choice.Null ? lang.changeChoice : null
         }
     }[mode];
     return <div className={style.choice}>
@@ -58,7 +58,7 @@ export default function Choice1({test, c1, onChoose, mode, d = 0}: {
         </p>
         {
             test ? <p className={style.instruction} style={{visibility: c1 === Choice.Null ? 'hidden' : 'visible'}}>
-                {c1 === Choice.Wait || mode === Mode.BR ? lang.secondAction : lang.confirmOnly(choiceLabel[c1])}
+                {c1 === Choice.Wait || mode === Mode.BR ? lang.secondAction(choiceLabel[c1]) : lang.confirmOnly(choiceLabel[c1])}
             </p> : null
         }
     </div>;
