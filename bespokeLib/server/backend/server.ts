@@ -174,9 +174,10 @@ export class Server {
             return {playUrl: gameId2PlayUrl(id)}
         })
         heartBeat(Linker.HeartBeat.key(Setting.namespace), () => {
+            const clientPath = Setting.getClientPath()
             const regInfo: Linker.HeartBeat.IHeartBeat = {
                 namespace: Setting.namespace,
-                jsUrl: `${getOrigin()}${Setting.getClientPath()}`
+                jsUrl: clientPath.startsWith('http')?clientPath:`${getOrigin()}${Setting.getClientPath()}`
             }
             return JSON.stringify(regInfo)
         })

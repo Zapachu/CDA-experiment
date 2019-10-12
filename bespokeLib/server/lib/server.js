@@ -248,9 +248,10 @@ var Server = /** @class */ (function () {
             });
         });
         util_1.heartBeat(protocol_1.Linker.HeartBeat.key(util_1.Setting.namespace), function () {
+            var clientPath = util_1.Setting.getClientPath();
             var regInfo = {
                 namespace: util_1.Setting.namespace,
-                jsUrl: "" + util_1.getOrigin() + util_1.Setting.getClientPath()
+                jsUrl: clientPath.startsWith('http') ? clientPath : "" + util_1.getOrigin() + util_1.Setting.getClientPath()
             };
             return JSON.stringify(regInfo);
         });
