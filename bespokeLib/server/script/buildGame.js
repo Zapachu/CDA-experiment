@@ -17,13 +17,13 @@ var QiniuPlugin = require("qiniu-webpack-plugin");
 var ManifestPlugin = require("webpack-manifest-plugin");
 var clean_webpack_plugin_1 = require("clean-webpack-plugin");
 var share_1 = require("@bespoke/share");
+var setting_1 = require("@elf/setting");
 var util_1 = require("@elf/util");
 var defaultPaths = {
     entry: './src/view',
     output: './dist'
 };
 function resolvePaths(basePath, paths) {
-    if (paths === void 0) { paths = defaultPaths; }
     var p = {};
     for (var key in paths) {
         p[key] = path_1.resolve(basePath, paths[key] || defaultPaths[key]);
@@ -32,8 +32,8 @@ function resolvePaths(basePath, paths) {
 }
 function geneClientBuilder(_a) {
     var _b, _c;
-    var namespace = _a.namespace, basePath = _a.basePath, paths = _a.paths, qiNiu = _a.qiNiu;
-    var _d = resolvePaths(basePath, paths), entry = _d.entry, output = _d.output;
+    var namespace = _a.namespace, basePath = _a.basePath, _d = _a.paths, paths = _d === void 0 ? defaultPaths : _d, _e = _a.qiNiu, qiNiu = _e === void 0 ? setting_1.elfSetting.qiNiu : _e;
+    var _f = resolvePaths(basePath, paths), entry = _f.entry, output = _f.output;
     var buildMode = process.env.BUILD_MODE || 'dev', HMR = process.env.HMR === 'true';
     return {
         devtool: buildMode === 'dev' ? 'cheap-module-eval-source-map' : false,
@@ -54,7 +54,7 @@ function geneClientBuilder(_a) {
         output: {
             path: output,
             filename: "[name].js",
-            publicPath: buildMode === 'publish' ? qiNiu.download.jsDomain + "/" + qiNiu.upload.path + "/" + namespace : "/" + share_1.config.rootName + "/" + namespace + "/static/"
+            publicPath: buildMode === 'publish' ? qiNiu.download.jsDomain + "/" + qiNiu.upload.path + "/" : "/" + share_1.config.rootName + "/" + namespace + "/static/"
         },
         resolve: {
             extensions: ['.ts', '.tsx', '.js', '.jsx', '.json']

@@ -1,9 +1,11 @@
 import * as React from 'react';
 import * as style from './style.scss';
-import {Lang, MaskLoading} from '@elf/component';
+import {Lang, MaskLoading, Toast} from '@elf/component';
 import {Core} from '@bespoke/client';
 import {Button, Radio} from 'antd';
 import {
+    Choice,
+    getTest,
     ICreateParams,
     IGameState,
     IMoveParams,
@@ -11,18 +13,17 @@ import {
     IPushParams,
     MoveType,
     PushType,
-    Test2,
-    TestStageIndex
+    TestStageIndex,
+    Word
 } from '../../config';
 import Display from './Display';
 import Choice1 from './Choice1';
 import Choice2 from './Choice2';
-import { copySync } from 'fs-extra';
-import {regC2} from './regC2Group'
+import {checkChoice} from './regC2Group';
 
 interface IPlayState {
-    c1: number,
-    c2: Array<number>,
+    c1: Choice,
+    c2: Array<Choice>,
     answers: Array<string>,
     tips: Array<Tip>
 }
@@ -32,32 +33,17 @@ enum Tip {
     Wrong,
 }
 
-interface Word {
-    text: string,
-    color?: boolean,
-    br?: number
-}
-
-interface Test {
-    desc: Array<Word>,
-    questions: Array<{
-        title: Array<Word>,
-        options: Array<string | { label: string, value: string }> | Function,
-        answer: string | Function
-    }>
-}
-
 export default class TestStage extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams, IPlayState> {
     state: IPlayState = {
-        c1: 0,
+        c1: Choice.Null,
         c2: [],
         answers: [],
         tips: []
     };
     lang = Lang.extractLang({
         confirm: ['确定', 'Confirm'],
+        choseAgain: ['重新选择', 'Chose Again'],
         inputSeatNumberPls: ['请输入座位号', 'Input your seat number please'],
-        submit: ['提交', 'Submit'],
         invalidSeatNumber: ['座位号有误或已被占用', 'Your seat number is invalid or has been occupied'],
         instructionTitle: ['本页面是为了帮助你熟悉操作界面。你可以尝试在界面上进行不同的选择。当你确定已经熟悉了操作界面之后，请点击最下方的“确定”按钮。', 'This page aims to help you get familiar with the interface. You can try to make different choices. After you are familiar with the interface, please click the "Confirm" button below.'],
         instructionFirstT1: ['每一轮中，你需要点击按钮做出选择:', 'You should make a choice in every round:'],
@@ -66,32 +52,40 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
         wait4Others: ['等待其他玩家完成测试', 'Waiting for others to complete the test'],
         wrong: ['(错误)', '(Wrong)'],
         nextToMain: ['理解测试结束，下面进入正式实验', 'The test is over, click "Confirm" button for the main game'],
-        pageIndex: [(m, n) => `第${m}/${n}页`, (m, n) => `Page ${m}/${n}`]
+        pageIndex: [(m, n) => `第${m}/${n}页`, (m, n) => `Page ${m}/${n}`],
+        checkPls: ['请检查您的选择', 'Check your choice please'],
     });
-    Test: Array<Test> = Test2;
-    submit = () => {
-        const {props: {frameEmitter, playerState: {stageIndex}}, state: {answers, tips}} = this;
-        const curTest = this.Test[stageIndex];
-        if (answers.length !== curTest.questions.length) {
-            return;
-        }
-        if (answers.includes(undefined)) return;
-        if (tips.some(tip => tip !== Tip.Correct)) {
-            return;
-        }
-        frameEmitter.emit(MoveType.answerTest);
+
+    get someWrongTips(): boolean {
+        return this.state.tips.some(tip => tip !== Tip.Correct);
+    }
+
+    choseAgain() {
         this.setState({answers: [], tips: []});
+    }
+
+    confirmTest() {
+        const {lang, props: {frameEmitter, playerState: {stageIndex}, game: {params: {d, mode}}}, state: {answers}} = this;
+        const tips = getTest(mode)[stageIndex].questions.map(({answer}, i) => {
+            const answerVal = typeof answer === 'function' ? answer(d) : answer;
+            return answers[i] === answerVal ? Tip.Correct : Tip.Wrong;
+        });
+        if (tips.some(tip => tip !== Tip.Correct)) {
+            this.setState({tips});
+            return Toast.warn(lang.checkPls);
+        } else {
+            frameEmitter.emit(MoveType.answerTest);
+            this.setState({answers: [], tips: []});
+        }
     };
 
     answer = (val: string, i: number) => {
-        const {props: {playerState: {stageIndex}, game: {params: {d}}}, state: {answers, tips}} = this;
-        const newAnswers = [...answers];
-        newAnswers[i] = val;
-        const answer = this.Test[stageIndex].questions[i].answer;
-        const answerVal = typeof answer === 'function' ? answer(d) : answer;
-        const newTips = [...tips];
-        newTips[i] = val === answerVal ? Tip.Correct : Tip.Wrong;
-        this.setState({answers: newAnswers, tips: newTips});
+        if (this.someWrongTips) {
+            return;
+        }
+        const answers = this.state.answers.slice();
+        answers[i] = val;
+        this.setState({answers});
     };
 
     calcDisplayData = () => {
@@ -124,6 +118,7 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
         let content;
         if (stageIndex === TestStageIndex.Interface) {
             content = <>
+                <h3>{lang.pageIndex(stageIndex + 2, getTest(mode).length+1)}</h3>
                 <p className={style.instruction}>{lang.instructionTitle}</p>
                 <Display data={displayData}/>
                 <div>
@@ -131,15 +126,17 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
                     <Choice1 {...{
                         c1, d, mode, onChoose: c1 => this.setState({c1, c2: []}), test: true
                     }}/>
-                    {c1 !== 0 ? <Choice2 {...{
+                    {c1 == Choice.Null ? null : <Choice2 {...{
                         playersPerGroup, c1, c2, d, mode, onChoose: c2 => this.setState({c2})
-                    }}/> : null}
+                    }}/>}
                     <p className={style.instruction}>{lang.next}</p>
                 </div>
                 <Button style={btnStyle} type='primary' onClick={() => {
-                    if(regC2({playersPerGroup,c1,c2,mode})) return
+                    if (!checkChoice({playersPerGroup, c1, c2, mode})) {
+                        return Toast.warn(lang.checkPls);
+                    }
                     frameEmitter.emit(MoveType.answerTest);
-                    this.setState({c1: 0});
+                    this.setState({c1: Choice.Null});
                 }}
                 >{lang.confirm}</Button>
             </>;
@@ -156,13 +153,13 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
                 <MaskLoading label={lang.wait4Others}/>
             </div>;
         } else {
-            const curTest = this.Test[stageIndex];
+            const curTest = getTest(mode)[stageIndex];
             content = <div className={style.testQuestion}>
-                <h3>{lang.pageIndex(stageIndex + 1, this.Test.length)}</h3>
+                <h3>{lang.pageIndex(stageIndex + 2, getTest(mode).length+1)}</h3>
                 <Display data={displayData}/>
                 <p className={style.desc}>{this.joinWords(curTest.desc)}</p>
                 <ul>
-                    {curTest.questions.map(({title, options}, i) => <li key={i} style={{paddingBottom: '20px'}}>
+                    {curTest.questions.map(({title, options}, i) => <li key={i} style={{paddingBottom: '1.5rem'}}>
                         <p className={tips[i] === Tip.Wrong ? style.tipWrong : ''}>{this.joinWords(title)} {tips[i] === Tip.Wrong ?
                             <span>{lang.wrong}</span> : null}</p>
                         <Radio.Group value={answers[i]} onChange={({target: {value}}) => this.answer(value, i)}>
@@ -178,7 +175,15 @@ export default class TestStage extends Core.Play<ICreateParams, IGameState, IPla
                         </Radio.Group>
                     </li>)}
                 </ul>
-                <Button type='primary' style={btnStyle} onClick={this.submit}>{lang.confirm}</Button>
+                {
+                    this.someWrongTips ?
+                        <Button style={btnStyle} onClick={
+                            () => this.choseAgain()
+                        }>{lang.choseAgain}</Button> :
+                        <Button type='primary' style={btnStyle} onClick={
+                            () => this.confirmTest()
+                        }>{lang.confirm}</Button>
+                }
             </div>;
         }
         return <section className={style.testStage}>

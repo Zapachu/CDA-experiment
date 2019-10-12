@@ -5,10 +5,10 @@ import {Lang} from '@elf/component';
 import {Radio} from 'antd';
 
 export default function Choice2({playersPerGroup, c1, c2, onChoose, mode, d}: {
-    c1: number,
-    c2: Array<number>,
+    c1: Choice,
+    c2: Array<Choice>,
     playersPerGroup: number,
-    onChoose: (c2: Array<number>) => void,
+    onChoose: (c2: Array<Choice>) => void,
     mode: Mode,
     d: number
 }) {
@@ -17,28 +17,28 @@ export default function Choice2({playersPerGroup, c1, c2, onChoose, mode, d}: {
             choose2: ['选2', 'Choose 2'],
             chooseWait: ['等待', 'Wait'],
             secondAction: ['第二阶段', 'Second action'],
-            yourChoice: ['你的选择', 'your choice is'],
+            yourChoice: ['你在第二阶段的选择', 'Your choice in second action'],
             feeLeft: ['(延迟选择费', '(extra fee $ '],
             feeRight: ['分)', ')'],
-            noChoice: ['你不需要选择', 'You do not need to chooose'],
-            case1: ['如果第一阶段包括你一共有 : '],
+            case1: ['若第一阶段中，包括你的选择，一共有'],
             case2: ['人'],
             impossible: ['不可能发生', 'Impossible'],
-            ok: ['确定', 'OK']
+            ok: ['你不需要选择，确定', 'You do not need to choose, OK']
         }),
         chooseLabel = {
             [Mode.HR]: [lang.choose1, lang.chooseWait],
             [Mode.LR]: [lang.choose2, lang.chooseWait],
             [Mode.BR]: [lang.choose1, lang.choose2],
-        }[mode];
+        }[mode],
+        OK_OPTIONS = [{label: lang.ok, value: Choice.Null}];
     const questions: Array<{ question: string, options: Array<{ label: string, value: Choice }> }> = Array(playersPerGroup + 1).fill(null).map((_, i) => ({
         question: `${i}${lang.case2}${chooseLabel[0]}, ${playersPerGroup - i}${lang.case2}${chooseLabel[1]}`,
         options: {
-            [Mode.HR]: c1 === Choice.Wait && i === playersPerGroup ? null : [
+            [Mode.HR]: (c1 === Choice.Wait && i === playersPerGroup) || (c1 === Choice.One && i === 0) ? null : [
                 {label: d > 0 ? `${lang.choose1}${lang.feeLeft}${d}${lang.feeRight}` : lang.choose1, value: Choice.One},
                 {label: lang.choose2, value: Choice.Two}
             ],
-            [Mode.LR]: c1 === Choice.Wait && i === playersPerGroup ? null : [
+            [Mode.LR]: (c1 === Choice.Wait && i === playersPerGroup) || (c1 === Choice.Two && i === 0) ? null : [
                 {label: lang.choose1, value: Choice.One},
                 {label: d > 0 ? `${lang.choose2}${lang.feeLeft}${d}${lang.feeRight}` : lang.choose2, value: Choice.Two}
             ],
@@ -51,44 +51,36 @@ export default function Choice2({playersPerGroup, c1, c2, onChoose, mode, d}: {
             ]
         }[mode]
     }));
+    const questionRows = [];
+    questions.forEach(({question, options}, i) => {
+        if (!options) {
+            return;
+        }
+        questionRows.push(<tr>
+            <td><p>({questionRows.length + 1}) {question}</p></td>
+            <td>
+                <Radio.Group value={c2[i]} onChange={({target: {value}}) => {
+                    const c = c2.slice();
+                    c[i] = +value;
+                    onChoose(c);
+                }}>
+                    {
+                        (mode === Mode.BR || c1 === Choice.Wait ? options : OK_OPTIONS).map(({label, value}) => <Radio
+                            value={value}>{label}</Radio>)
+                    }
+                </Radio.Group>
+            </td>
+        </tr>);
+    });
     return <div className={style.choice}>
         <p>{lang.secondAction}:</p>
-        <p>{lang.case1}</p>
         <table className={style.testStageTable}>
+            <tr>
+                <td style={{width: '60%'}}>{lang.case1}</td>
+                <td>{lang.yourChoice}</td>
+            </tr>
             {
-                questions.map(({question, options}, i) => {
-                    const needChoice: boolean = (mode === Mode.BR && !!options) || (c1 === Choice.Wait && i < playersPerGroup);
-                    if(!options) return
-                    return <tr>
-                            {
-                                needChoice ? null :
-                                    <>
-                                        <td><p>{lang.noChoice}</p></td>
-                                        <td><Radio.Group value={c2[i]} onChange={({target: {value}}) => {
-                                            const c = c2.slice();
-                                            c[i] = +value;
-                                            onChoose(c);
-                                        }}>
-                                            {
-                                                [{label: lang.ok, value: 0}].map(({label, value}) => <Radio
-                                                    value={value}>{label}</Radio>)
-                                            }
-                                        </Radio.Group></td>
-                                    </>
-                            }
-                            <td className={needChoice ? '' : style.disabled}><p>({i+1}) {question} , {lang.yourChoice}:</p></td>
-                            <td className={needChoice ? '' : style.disabled}><Radio.Group disabled={!needChoice} value={c2[i]}
-                                                        onChange={({target: {value}}) => {
-                                                            const c = c2.slice();
-                                                            c[i] = +value;
-                                                            onChoose(c);
-                                                        }}>
-                                            {
-                                                options.map(({label, value}) => <Radio value={value}>{label}</Radio>)
-                                            }
-                                        </Radio.Group></td>
-                    </tr>;
-                })
+                questionRows
             }
         </table>
     </div>;

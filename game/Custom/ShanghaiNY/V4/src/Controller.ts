@@ -1,6 +1,7 @@
 import {BaseController, IActor, IMoveCallback, TGameState, TPlayerState} from '@bespoke/server';
 import {
   Choice,
+  getTest,
   ICreateParams,
   IGameGroupState,
   IGameState,
@@ -14,19 +15,10 @@ import {
   SheetType,
   Stage,
   Survey,
-  Test2,
   TestStageIndex
 } from './config';
 
 export default class Controller extends BaseController<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
-  private Test: Array<any>;
-
-  //region init
-  async init() {
-    await super.init();
-    this.Test = Test2;
-    return this;
-  }
 
   initGameState(): TGameState<IGameState> {
     const gameState = super.initGameState();
@@ -189,7 +181,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         if (playerState.stageIndex < TestStageIndex.Interface) {
           break;
         }
-        if (playerState.stageIndex === this.Test.length - 1) {
+        if (playerState.stageIndex === getTest(mode).length - 1) {
           playerState.stageIndex = TestStageIndex.Next;
         } else {
           playerState.stageIndex++;
@@ -209,10 +201,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         break;
       }
       case MoveType.answerMain: {
-        if (!validateAnswer(params)) {
-          cb('invalid input');
-          break;
-        }
         const {roundIndex} = playerState;
         if (playerState.choices[roundIndex]) {
           break;
@@ -261,11 +249,6 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         playerState.stage = Stage.End;
         break;
       }
-    }
-
-    function validateAnswer(params: IMoveParams): boolean {
-      const {c1, c2} = params;
-      return !!c1 && !!c2 && !c2.includes(undefined) && c2.length === playersPerGroup + 1;
     }
 
     function calcProfit(playerState: TPlayerState<IPlayerState>, min: number): number {

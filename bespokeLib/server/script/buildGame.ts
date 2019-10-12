@@ -17,7 +17,7 @@ const defaultPaths: IPaths = {
   output: './dist'
 }
 
-function resolvePaths(basePath, paths: IPaths = defaultPaths): IPaths {
+function resolvePaths(basePath: string, paths: IPaths): IPaths {
   const p: IPaths = {}
   for (let key in paths) {
     p[key] = resolve(basePath, paths[key] || defaultPaths[key])
@@ -36,8 +36,8 @@ export function geneClientBuilder(
     {
       namespace,
       basePath,
-      paths,
-      qiNiu
+      paths = defaultPaths,
+      qiNiu = elfSetting.qiNiu
     }: IBuildOption): webpack.Configuration {
   const {entry, output} = resolvePaths(basePath, paths)
   const buildMode = process.env.BUILD_MODE || 'dev',
@@ -61,7 +61,7 @@ export function geneClientBuilder(
     output: {
       path: output,
       filename: `[name].js`,
-      publicPath: buildMode === 'publish' ? `${qiNiu.download.jsDomain}/${qiNiu.upload.path}/${namespace}` : `/${config.rootName}/${namespace}/static/`
+      publicPath: buildMode === 'publish' ? `${qiNiu.download.jsDomain}/${qiNiu.upload.path}/` : `/${config.rootName}/${namespace}/static/`
     },
     resolve: {
       extensions: ['.ts', '.tsx', '.js', '.jsx', '.json']
