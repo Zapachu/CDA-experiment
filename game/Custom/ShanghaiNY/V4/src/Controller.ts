@@ -213,7 +213,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         if (ready) {
           const one1 = playersInGroup.filter(ps => ps.choices[roundIndex].c1 === Choice.One).length,
               two1 = playersInGroup.filter(ps => ps.choices[roundIndex].c1 === Choice.Two).length,
-              wait1 = playersInGroup.filter(ps => ps.choices[roundIndex].c1 === Choice.Two).length
+              wait1 = playersInGroup.filter(ps => ps.choices[roundIndex].c1 === Choice.Wait).length
           playersInGroup.forEach(ps => {
             const curChoice = ps.choices[roundIndex];
             curChoice.c = curChoice.c2.some(c => [Choice.One, Choice.Two].includes(c)) ? curChoice.c2[mode === Mode.LR ? two1 : one1] : curChoice.c1;
