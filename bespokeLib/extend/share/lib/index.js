@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GroupRange = {
     group: {
         min: 1,
-        max: 8
+        max: 12
     },
     groupSize: {
         min: 1,

@@ -3,7 +3,7 @@ import {FrameEmitter, IUserWithId} from '@bespoke/share';
 export const GroupRange = {
     group: {
         min: 1,
-        max: 8
+        max: 12
     },
     groupSize: {
         min: 1,

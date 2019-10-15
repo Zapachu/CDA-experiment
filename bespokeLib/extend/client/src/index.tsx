@@ -19,7 +19,7 @@ export class Create<ICreateParams, S extends ICreateState = ICreateState> extend
     } as S;
 
     lang = Lang.extractLang({
-        group: ['组', 'Extend.Inner.tsx'],
+        group: ['组', 'Group'],
         groupSize: ['每组人数', 'GroupSize'],
         independentGroup: ['每组单独配置', 'Independent Group'],
         allGroup: ['所有组', 'AllGroup'],
@@ -132,7 +132,7 @@ export class Play4Owner<ICreateParams, IGameState, IPlayerState, MoveType, PushT
     extends Core.Play4Owner<GroupDecorator.ICreateParams<ICreateParams>, GroupDecorator.IGameState<IGameState>, GroupDecorator.TPlayerState<IPlayerState>, GroupDecorator.MoveType<MoveType>, PushType, IMoveParams, IPushParams, S> {
     GroupPlay4Owner: React.ComponentType<Group.IPlay4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>> = Group.Play4Owner;
     lang = Lang.extractLang({
-        group: ['组', 'Extend.Inner.tsx'],
+        group: ['组', 'Group'],
         groupSize: ['每组人数', 'GroupSize'],
         groupIndex: [i => `第${i + 1}组`, i => `Group ${i + 1}`]
     });
