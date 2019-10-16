@@ -31,7 +31,8 @@
 
     .tips {
       font-size: 1rem;
-      color: #999;
+      color: $color-blue;
+      font-weight: bold;
     }
 
     li {
@@ -42,11 +43,11 @@
   .instruction {
     font-size: 1rem;
     margin: .5rem 1rem;
-    color: rgb(66, 133, 244);
+    color: $color-blue;
   }
 
   .blueWords {
-    color: rgb(66, 133, 244);
+    color: $color-blue;
   }
 
   .newLine {
@@ -64,15 +65,27 @@
   .resultLines {
     font-size: 16px;
 
-    > p {
-      margin-bottom: 5px;
-    }
-
     .yourChoice2 {
       td {
         padding: .5rem 1rem;
         border: 1px solid;
       }
+    }
+
+    p {
+      margin-bottom: 5px;
+    }
+
+    b{
+      display: inline-block;
+      padding: .25rem;
+      font-weight: normal;
+      text-decoration: underline;
+    }
+    em{
+      display: inline-block;
+      padding: .25rem;
+      color: $color-red;
     }
   }
 
@@ -120,14 +133,16 @@
       margin: 20px 0;
     }
   }
+
   .testStageTable {
     border-collapse: collapse;
     text-align: center;
     width: 120%;
+
     td {
       border: 1px solid;
       text-align: left;
       padding: .2rem 1rem;
-    } 
+    }
   }
 }

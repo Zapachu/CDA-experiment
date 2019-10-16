@@ -17,9 +17,9 @@ export default function Choice1({test, c1, onChoose, mode, d = 0}: {
             chooseWait: ['等待', 'Wait'],
             changeChoice: ['改变选择', 'change your choice'],
             firstChoiceT2: ['第一阶段: 你的选择', 'In the first action, your choice is'],
-            pay1: ['若在第二阶段', '(If you '],
-            pay2: ['，需要付出延迟选择费', ' in the next action, you need to pay $ '],
-            pay3: ['分', ')'],
+            payHR: [d => `若在第二阶段再选1，因为延迟选1，需要付出${d}积分`],
+            payLR: [d => `若在第二阶段再选2，因为延迟选2，需要付出${d}积分`],
+            payBR: [d => `若在第二阶段改变选择，需要付出${d}积分`],
             secondAction: [l => `因为你在第一阶段已经${l}，请针对第一阶段可能出现的各种结果，做出你第二阶段的选择 : `, l => 'Make your choice for the second action please:'],
             confirmOnly: [l => `因为你在第一阶段已经${l}，第二阶段不需要选择，请点击下面所有的“确定按钮”:`, l => 'Since you have chosen in the first action, you do not need to make the choice for the second action, please click the "Confirm" button below:'],
         }),
@@ -45,6 +45,11 @@ export default function Choice1({test, c1, onChoose, mode, d = 0}: {
             tips: c1 !== Choice.Null ? lang.changeChoice : null
         }
     }[mode];
+    const payLabel = {
+        [Mode.HR]: lang.payHR,
+        [Mode.LR]: lang.payLR,
+        [Mode.BR]: lang.payBR
+    }[mode];
     return <div className={style.choice}>
         <p>{lang.firstChoiceT2}</p>
         <Radio.Group value={c1} onChange={({target: {value}}) => onChoose(+value)}>
@@ -54,7 +59,7 @@ export default function Choice1({test, c1, onChoose, mode, d = 0}: {
         </Radio.Group>
         <p className={style.tips}
            style={{visibility: d > 0 && tips ? 'visible' : 'hidden'}}>
-            {`${lang.pay1}${tips}${lang.pay2}${d}${lang.pay3}`}
+            {payLabel(d)}
         </p>
         {
             test ? <p className={style.instruction} style={{visibility: c1 === Choice.Null ? 'hidden' : 'visible'}}>

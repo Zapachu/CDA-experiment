@@ -29,7 +29,8 @@ export interface IGameState {
 
 export enum PlayerStatus {
     instruction,
-    contribute
+    contribute,
+    questionnaire
 }
 
 export enum Arm {

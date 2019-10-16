@@ -213,7 +213,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
         if (ready) {
           const one1 = playersInGroup.filter(ps => ps.choices[roundIndex].c1 === Choice.One).length,
               two1 = playersInGroup.filter(ps => ps.choices[roundIndex].c1 === Choice.Two).length,
-              wait1 = playersInGroup.filter(ps => ps.choices[roundIndex].c1 === Choice.Wait).length
+              wait1 = playersInGroup.filter(ps => ps.choices[roundIndex].c1 === Choice.Wait).length;
           playersInGroup.forEach(ps => {
             const curChoice = ps.choices[roundIndex];
             curChoice.c = curChoice.c2.some(c => [Choice.One, Choice.Two].includes(c)) ? curChoice.c2[mode === Mode.LR ? two1 : one1] : curChoice.c1;
@@ -261,8 +261,16 @@ export default class Controller extends BaseController<ICreateParams, IGameState
       const ei = eH * (x - 1) + eL * (2 - x);
       const emin = min === Choice.One ? eL : eH;
       let ui = a * emin - b * ei + c;
-      if (curChoice.c1 === Choice.Wait || curChoice.c !== curChoice.c1) {
-        ui = ui - d;
+      switch (mode) {
+        case Mode.HR:
+          curChoice.c1 === Choice.Wait && curChoice.c === Choice.One ? ui = ui - d : null;
+          break;
+        case Mode.LR:
+          curChoice.c1 === Choice.Wait && curChoice.c === Choice.Two ? ui = ui - d : null;
+          break;
+        case Mode.BR:
+          curChoice.c !== curChoice.c1 ? ui = ui - d : null;
+          break;
       }
       return ui;
     }

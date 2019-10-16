@@ -57,6 +57,17 @@
       text-align: center;
     }
   }
+
+  .questionnaire{
+    margin: auto;
+    max-width: 48rem;
+    display: flex;
+    flex-direction: column;
+    .btnSubmitWrapper{
+      margin: 1rem;
+      text-align: center;
+    }
+  }
 }
 
 .projectPopover{

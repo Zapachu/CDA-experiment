@@ -21,7 +21,6 @@ function getRandomEnumItem(e): any {
     return keys[~~(Math.random() * keys.length)];
 }
 
-
 class GroupLogic extends Extend.Group.Logic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     initGameState(): IGameState {
         const gameState = super.initGameState();
@@ -49,8 +48,12 @@ class GroupLogic extends Extend.Group.Logic<ICreateParams, IGameState, IPlayerSt
                 playerState.status = PlayerStatus.contribute;
                 break;
             case MoveType.contribute:
-                gameState.contribution[playerState.index][params.p] = params.c;
+                const myC = gameState.contribution[playerState.index]
+                myC[params.p] = params.c;
                 cb();
+                if(myC.every(p=>p) || myC.reduce((m,n)=>m+n,0) >= this.params.endowment){
+                    playerState.status = PlayerStatus.questionnaire
+                }
                 break;
             case MoveType.toInstruction:
                 playerState.status = PlayerStatus.instruction;

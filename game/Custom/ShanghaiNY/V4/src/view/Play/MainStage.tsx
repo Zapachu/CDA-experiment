@@ -38,8 +38,10 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
         inputSeatNumberPls: ['请输入座位号', 'Input your seat number please'],
         submit: ['提交', 'Submit'],
         invalidSeatNumber: ['座位号有误或已被占用', 'Your seat number is invalid or has been occupied'],
-        chooseInFirstAction: ['在第一阶段选择 : ', 'In the first action chose :'],
-        chooseInSecondAction: ['在第二阶段选择 : ', 'In the second action chose :'],
+        chooseInAction1: ['在', 'In '],
+        chooseInAction2: ['选择 ', ' you chose : '],
+        firstAction: ['第一阶段', ' the first action '],
+        secondAction: ['第二阶段', ' the second action '],
         yourFirstChoiceLeft: ['你在第', 'Your choice in round '],
         yourFirstChoiceRight: ['轮的选择为:', ' is:'],
         roundResult0: ['第', 'The lowest choice of the group in round '],
@@ -52,8 +54,10 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
         profitRight: ['轮的积分为:', ' is:'],
         totalProfitLeft: ['截止第', 'Until round '],
         totalProfitRight: ['轮，你的积分为:', ' your total profit is:'],
-        inFirstAction: ['在第一阶段中, 你的小组一共有', 'In the first action, '],
-        yourSecondChoice: ['你在第二阶段的选择为:', 'Your choice in the second action is:'],
+        inFirstAction1: ['在'],
+        inFirstAction2: ['中, 你的小组一共有'],
+        yourSecondChoice1: ['你在'],
+        yourSecondChoice2: ['的选择为:'],
         wait4Others2Choose: ['等待其他玩家选择', 'Waiting for others to choose'],
         wait4Others2Next: ['等待其他玩家进入下一轮', 'Waiting for others to enter the next round'],
         roundIndex: [(m, n) => `第${m}/${n}轮`, (m, n) => `Round ${m}/${n}`],
@@ -99,11 +103,11 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
                 [Choice.Two]: lang.choose2,
                 [Choice.Wait]: lang.chooseWait,
             };
-        return <>
-            <p>{lang.chooseInFirstAction}{choice2Lang[c1]}</p>
+        return <section className={style.choice2Result}>
+            <p>{lang.chooseInAction1}<b>{lang.firstAction}</b>{lang.chooseInAction2}{choice2Lang[c1]}</p>
             {
                 c2.some(c => [Choice.One,Choice.Two].includes(c)) ? <>
-                    <p>{lang.chooseInSecondAction}</p>
+                    <p>{lang.chooseInAction1}<b>{lang.secondAction}</b>{lang.chooseInAction2}</p>
                     <table className={style.yourChoice2}>
                         <tr>
                             <td>{lang.case1}</td>
@@ -122,7 +126,7 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
                     </table>
                 </> : null
             }
-        </>;
+        </section>;
     };
 
     renderResult = () => {
@@ -142,13 +146,14 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
         return <>
             <p>{lang.yourFirstChoiceLeft}{curRoundIndex + 1}{lang.yourFirstChoiceRight} </p>
             {this.renderChoice2(curChoice.c1, curChoice.c2)}
-            <p style={{margin: '2rem 0'}}>{lang.inFirstAction}{countA}{lang.players}{labelA}&nbsp;,&nbsp;{countB}{lang.players}{labelB}</p>
-            {curChoice.c2.some(c => [Choice.One,Choice.Two].includes(c)) ? <p>{lang.yourSecondChoice} {curChoice.c}</p> : null}
+            <p style={{margin: '2rem 0'}}>{lang.inFirstAction1}<b>{lang.firstAction}</b>{lang.inFirstAction2}<em>{countA}</em>{lang.players}{labelA}&nbsp;,&nbsp;<em>{countB}</em>{lang.players}{labelB}</p>
+            {curChoice.c2.some(c => [Choice.One,Choice.Two].includes(c)) ? <p>{lang.yourSecondChoice1}<b>{lang.secondAction}</b>{lang.yourSecondChoice2} {curChoice.c}</p> : null}<br/>
             {
                 min === Min.A ?
                     <p>{lang.roundResult0}{curRoundIndex + 1}{lang.roundResult1} {curRound.min}</p> :
-                    <p>{lang.roundResult2}{curRoundIndex + 1}{lang.roundResult3}{curRound.x}{lang.roundResult4}{curRound.y}{lang.roundResult5}</p>
+                    <p>{lang.roundResult2}{curRoundIndex + 1}{lang.roundResult3}<em>{curRound.x}</em>{lang.roundResult4}<em>{curRound.y}</em>{lang.roundResult5}</p>
             }
+            <br/>
             <p>{lang.profitLeft}{curRoundIndex + 1}{lang.profitRight} {curProfit.toFixed(2)}</p>
             <p>{lang.totalProfitLeft}{curRoundIndex + 1}{lang.totalProfitRight} {finalProfit.toFixed(2)}</p>
             <Button type='primary'

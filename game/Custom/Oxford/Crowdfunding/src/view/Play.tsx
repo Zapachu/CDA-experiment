@@ -25,51 +25,56 @@ function Project({name, readMore, threshold, payoff, index, arm, treatment, your
         [c, setC] = React.useState();
     const [_threshold, _payoff] = arm === Arm.Arm1 ?
         [commonProjectConfig.threshold, commonProjectConfig.payoff] : [threshold, payoff];
+    const content = <Card className={style.project}>
+        <div className={style.head}>
+            <h1>Project {index + 1}</h1>
+            <h1>{name}</h1>
+            <a onClick={() => setMoreInfoModal(true)}>Read More</a>
+        </div>
+        <h1>Threshold : {_threshold}</h1>
+        <h1>Payoff : {_payoff}</h1>
+
+        <h1>Your contribution : <em>{yourC}</em></h1>
+        <h1>Total contribution : <em>{totalC}</em></h1>
+        <div className={style.btnContributeWrapper}>
+            <Button type='primary' disabled={!!yourC} onClick={() => setContributeModal(true)}>Contribute</Button>
+        </div>
+
+        <Modal visible={moreInfoModal} closable={false} footer={
+            <Button type={'primary'} onClick={() => setMoreInfoModal(false)}>OK</Button>
+        }>
+            <h2>{name}</h2>
+            <br/>
+            <p style={{fontSize: '1.2rem'}}>{readMore}</p>
+            <br/>
+        </Modal>
+        <Modal className={style.contributeModal} visible={contributeModal} closable={false} footer={
+            <div>
+                <Button type={'danger'} onClick={() => setContributeModal(false)}>CANCEL</Button>
+                <Button type={'primary'} onClick={() => {
+                    contribute(c);
+                    setContributeModal(false);
+                }}>CONFIRM</Button>
+            </div>
+        }>
+            <h2>Amount you want to contribute to Project :</h2>
+            <div className={style.inputWrapper}>
+                <InputNumber min={0} value={c} onChange={v => setC(v)}/>
+            </div>
+            <br/>
+        </Modal>
+    </Card>;
+    if ([Treatment.Baseline, Treatment.Statistics].includes(treatment)) {
+        return content;
+    }
     return <Popover content={{
-        [Treatment.Baseline]: null,
-        [Treatment.Statistics]: null,
-        [Treatment.Probability]: <div className={style.projectPopover}>Probability to be funded : {fundProbability}</div>,
+        [Treatment.Probability]: <div className={style.projectPopover}>Probability to be funded
+            : {fundProbability}</div>,
         [Treatment.Uncertainty]: <div className={style.projectPopover}>Success rate if funded : {successRate}%</div>
     }[treatment]} placement="bottom">
-        <Card className={style.project}>
-            <div className={style.head}>
-                <h1>Project {index + 1}</h1>
-                <h1>{name}</h1>
-                <a onClick={() => setMoreInfoModal(true)}>Read More</a>
-            </div>
-            <h1>Threshold : {_threshold}</h1>
-            <h1>Payoff : {_payoff}</h1>
-
-            <h1>Your contribution : <em>{yourC}</em></h1>
-            <h1>Total contribution : <em>{totalC}</em></h1>
-            <div className={style.btnContributeWrapper}>
-                <Button type='primary' disabled={!!yourC} onClick={() => setContributeModal(true)}>Contribute</Button>
-            </div>
-
-            <Modal visible={moreInfoModal} closable={false} footer={
-                <Button type={'primary'} onClick={() => setMoreInfoModal(false)}>OK</Button>
-            }>
-                <h2>{name}</h2>
-                <br/>
-                <p style={{fontSize: '1.2rem'}}>{readMore}</p>
-                <br/>
-            </Modal>
-            <Modal className={style.contributeModal} visible={contributeModal} closable={false} footer={
-                <div>
-                    <Button type={'danger'} onClick={() => setContributeModal(false)}>CANCEL</Button>
-                    <Button type={'primary'} onClick={() => {
-                        contribute(c);
-                        setContributeModal(false);
-                    }}>CONFIRM</Button>
-                </div>
-            }>
-                <h2>Amount you want to contribute to Project :</h2>
-                <div className={style.inputWrapper}>
-                    <InputNumber value={c} onChange={v => setC(v)}/>
-                </div>
-                <br/>
-            </Modal>
-        </Card>
+        {
+            content
+        }
     </Popover>;
 }
 
@@ -98,7 +103,8 @@ function Instruction({groupFrameEmitter, playerState}: Extend.Group.IPlayProps<I
 }
 
 function Contribute({groupFrameEmitter, groupParams: {endowment}, groupGameState: {contribution}, playerState: {index, projectSort, arm, treatment}}: Extend.Group.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {
-    const [helpModal, setHelpModal] = React.useState(false);
+    const [helpModal, setHelpModal] = React.useState(false),
+        [statisticsIndex, setStatisticsIndex] = React.useState(treatment === Treatment.Statistics ? projectConfigs.length - 1 : -1);
     const tokenLeft = endowment - contribution[index].reduce((m, n) => m + n, 0);
     return <section className={style.contribute}>
         <div className={style.tokenInfo}>
@@ -136,13 +142,35 @@ function Contribute({groupFrameEmitter, groupParams: {endowment}, groupGameState
             </Button.Group>
         </div>
         <Modal visible={helpModal} closable={false} onOk={() => alert('TODO')} onCancel={() => setHelpModal(false)}>
-            If you have any questions or comments about the experiment, please detail them below
-            and click submit.
+            If you have any questions or comments about the experiment, please detail them and <a
+            href="mailto:hello@email.com">EMAIL US</a>.
+        </Modal>
+        <Modal visible={statisticsIndex >= 0} closable={false} footer={<div>
+            <Button type='primary' onClick={() => setStatisticsIndex(statisticsIndex - 1)}>Continue</Button>
+        </div>}>
+            {
+                statisticsIndex >= 0 ? <>
+                    <h1>TODO:Statistics</h1>
+                    {
+                        JSON.stringify(projectConfigs[statisticsIndex].readMore)
+                    }
+                </> : null
+            }
         </Modal>
     </section>;
 }
 
+function Questionnaire({groupFrameEmitter, playerState}: Extend.Group.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {
+    return <section className={style.questionnaire}>
+        <p>Thank you for completing this experiment. If you have any questions or comments about the experiment, please detail them below and click submit.</p>
+        <div className={style.btnSubmitWrapper}>
+            <Button type='primary' onClick={()=>alert('TODO')}>Submit</Button>
+        </div>
+    </section>;
+}
+
 class GroupPlay extends Extend.Group.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
+
     render(): React.ReactNode {
         const {playerState: {projectSort, status}, groupGameState: {contribution}} = this.props;
         let content: JSX.Element = null;
@@ -152,6 +180,9 @@ class GroupPlay extends Extend.Group.Play<ICreateParams, IGameState, IPlayerStat
                 break;
             case PlayerStatus.contribute:
                 content = <Contribute {...this.props}/>;
+                break;
+            case PlayerStatus.questionnaire:
+                content = <Questionnaire {...this.props}/>;
                 break;
         }
         return <section className={style.play}>

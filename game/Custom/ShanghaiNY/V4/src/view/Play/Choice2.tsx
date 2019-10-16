@@ -30,25 +30,17 @@ export default function Choice2({playersPerGroup, c1, c2, onChoose, mode, d}: {
             [Mode.LR]: [lang.choose2, lang.chooseWait],
             [Mode.BR]: [lang.choose1, lang.choose2],
         }[mode],
+        ONE_TWO_OPTIONS = [
+            {label: lang.choose1, value: Choice.One},
+            {label: lang.choose2, value: Choice.Two}
+        ],
         OK_OPTIONS = [{label: lang.ok, value: Choice.Null}];
     const questions: Array<{ question: string, options: Array<{ label: string, value: Choice }> }> = Array(playersPerGroup + 1).fill(null).map((_, i) => ({
         question: `${i}${lang.case2}${chooseLabel[0]}, ${playersPerGroup - i}${lang.case2}${chooseLabel[1]}`,
         options: {
-            [Mode.HR]: (c1 === Choice.Wait && i === playersPerGroup) || (c1 === Choice.One && i === 0) ? null : [
-                {label: d > 0 ? `${lang.choose1}${lang.feeLeft}${d}${lang.feeRight}` : lang.choose1, value: Choice.One},
-                {label: lang.choose2, value: Choice.Two}
-            ],
-            [Mode.LR]: (c1 === Choice.Wait && i === playersPerGroup) || (c1 === Choice.Two && i === 0) ? null : [
-                {label: lang.choose1, value: Choice.One},
-                {label: d > 0 ? `${lang.choose2}${lang.feeLeft}${d}${lang.feeRight}` : lang.choose2, value: Choice.Two}
-            ],
-            [Mode.BR]: c1 === Choice.One ? i === 0 ? null : [
-                {label: lang.choose1, value: Choice.One},
-                {label: d > 0 ? `${lang.choose2}${lang.feeLeft}${d}${lang.feeRight}` : lang.choose2, value: Choice.Two}
-            ] : i === playersPerGroup ? null : [
-                {label: d > 0 ? `${lang.choose1}${lang.feeLeft}${d}${lang.feeRight}` : lang.choose1, value: Choice.One},
-                {label: lang.choose2, value: Choice.Two}
-            ]
+            [Mode.HR]: (c1 === Choice.Wait && i === playersPerGroup) || (c1 === Choice.One && i === 0) ? null : ONE_TWO_OPTIONS,
+            [Mode.LR]: (c1 === Choice.Wait && i === playersPerGroup) || (c1 === Choice.Two && i === 0) ? null : ONE_TWO_OPTIONS,
+            [Mode.BR]: c1 === Choice.One ? i === 0 ? null : ONE_TWO_OPTIONS : i === playersPerGroup ? null : ONE_TWO_OPTIONS
         }[mode]
     }));
     const questionRows = [];
