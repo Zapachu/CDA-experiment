@@ -12,6 +12,7 @@ import {
     IPlayerState,
     IProjectConfig,
     IPushParams,
+    LOREM,
     MoveType,
     namespace,
     PlayerStatus,
@@ -84,24 +85,27 @@ function Project({name, readMore, threshold, payoff, index, arm, treatment, your
 function Instruction({groupFrameEmitter, playerState}: Extend.Group.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {
     const [username, setUsername] = React.useState('');
     return <section className={style.instruction}>
-        {
-            playerState.username ? <>
-                    <p>Your username : {playerState.username}</p>
-                    <br/>
-                    <Button type='primary' onClick={() => groupFrameEmitter.emit(MoveType.toContribute)}>
-                        ToContribute
-                    </Button>
-                </> :
-                <>
-                    <Input placeholder='Username' value={username}
-                           onChange={({target: {value}}) => setUsername(value)}/>
-                    <br/>
-                    <br/>
-                    <Button type='primary' onClick={() => groupFrameEmitter.emit(MoveType.username, {username})}>
-                        Start
-                    </Button>
-                </>
-        }
+        <h1 className={style.title}>Instructions</h1>
+        <p className={style.desc}>{LOREM}</p>
+        <div className={style.userNameWrapper}>
+            {
+                playerState.username ? <>
+                        <p>Your username : {playerState.username}</p>
+                        <br/>
+                        <Button type='primary' onClick={() => groupFrameEmitter.emit(MoveType.toContribute)}>
+                            ToContribute
+                        </Button>
+                    </> :
+                    <>
+                        <Input placeholder='Username' value={username}
+                               onChange={({target: {value}}) => setUsername(value)}/>
+                        <br/>
+                        <Button type='primary' onClick={() => groupFrameEmitter.emit(MoveType.username, {username})}>
+                            Start
+                        </Button>
+                    </>
+            }
+        </div>
     </section>;
 }
 
@@ -141,7 +145,7 @@ function Contribute({groupFrameEmitter, groupParams: {endowment}, groupGameState
                 <Button onClick={async () => {
                     const {code} = await Request.instance(namespace).get(FetchRoute.logout);
                     if (code === ResponseCode.success) {
-                        location.reload()
+                        location.reload();
                     }
                 }
                 }>LOGOUT</Button>
@@ -156,9 +160,9 @@ function Contribute({groupFrameEmitter, groupParams: {endowment}, groupGameState
         </div>}>
             {
                 statisticsIndex >= 0 ? <>
-                    <h1>TODO:Statistics</h1>
+                    <h1>TODO:Statistics:{projectConfigs[statisticsIndex].name}</h1>
                     {
-                        JSON.stringify(projectConfigs[statisticsIndex].readMore)
+                        LOREM
                     }
                 </> : null
             }
@@ -170,6 +174,7 @@ function Questionnaire({groupFrameEmitter, playerState}: Extend.Group.IPlayProps
     return <section className={style.questionnaire}>
         <p>Thank you for completing this experiment. If you have any questions or comments about the experiment, please
             detail them below and click submit.</p>
+        <h1 style={{fontSize:'2rem',margin:'2rem auto'}}>TODO : QuestionnaireForm</h1>
         <div className={style.btnSubmitWrapper}>
             <Button type='primary' onClick={() => alert('TODO')}>Submit</Button>
         </div>
@@ -177,6 +182,9 @@ function Questionnaire({groupFrameEmitter, playerState}: Extend.Group.IPlayProps
 }
 
 class GroupPlay extends Extend.Group.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
+    componentDidMount(): void {
+        this.props.groupFrameEmitter.emit(MoveType.login);
+    }
 
     render(): React.ReactNode {
         const {playerState: {projectSort, status}, groupGameState: {contribution}} = this.props;

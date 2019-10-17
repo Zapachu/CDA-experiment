@@ -32,6 +32,7 @@ class GroupLogic extends Extend.Group.Logic<ICreateParams, IGameState, IPlayerSt
 
     async initPlayerState(user: IUserWithId, index: number): Promise<GroupDecorator.TPlayerState<IPlayerState>> {
         const playerState = await super.initPlayerState(user, index);
+        playerState.login = 0;
         playerState.status = PlayerStatus.instruction;
         playerState.projectSort = shuffle(projectConfigs.map((_, i) => i));
         playerState.arm = getRandomEnumItem(Arm);
@@ -43,16 +44,19 @@ class GroupLogic extends Extend.Group.Logic<ICreateParams, IGameState, IPlayerSt
         const gameState = await this.stateManager.getGameState(),
             playerState = await this.stateManager.getPlayerState(actor);
         switch (type) {
+            case MoveType.login:
+                playerState.login++;
+                break;
             case MoveType.username:
                 playerState.username = params.username;
                 playerState.status = PlayerStatus.contribute;
                 break;
             case MoveType.contribute:
-                const myC = gameState.contribution[playerState.index]
+                const myC = gameState.contribution[playerState.index];
                 myC[params.p] = params.c;
                 cb();
-                if(myC.every(p=>p) || myC.reduce((m,n)=>m+n,0) >= this.params.endowment){
-                    playerState.status = PlayerStatus.questionnaire
+                if (myC.every(p => p) || myC.reduce((m, n) => m + n, 0) >= this.params.endowment) {
+                    playerState.status = PlayerStatus.questionnaire;
                 }
                 break;
             case MoveType.toInstruction:

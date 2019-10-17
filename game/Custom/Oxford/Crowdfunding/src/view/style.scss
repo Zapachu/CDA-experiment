@@ -4,9 +4,22 @@
   padding: 2rem;
 
   .instruction {
-    text-align: center;
-    width: 12rem;
-    margin: auto;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    .title{
+      font-size: 2rem;
+      margin: 2rem 0;
+    }
+    .desc{
+      margin: 2rem;
+      width: 32rem;
+    }
+    .userNameWrapper{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
   }
 
   .contribute {
@@ -59,13 +72,24 @@
   }
 
   .questionnaire{
-    margin: auto;
+    margin: 2rem auto;
     max-width: 48rem;
     display: flex;
     flex-direction: column;
     .btnSubmitWrapper{
       margin: 1rem;
       text-align: center;
+    }
+  }
+}
+
+.play4Owner{
+  .contributeCell{
+    display: flex;
+    justify-content: space-between;
+    em{
+      font-weight: bold;
+      color: $color-blue;
     }
   }
 }

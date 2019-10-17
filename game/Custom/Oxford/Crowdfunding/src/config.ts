@@ -1,6 +1,9 @@
 export const namespace = 'Crowdfunding';
 
+export const LOREM = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nullam eget felis eget nunc lobortis mattis. Venenatis urna cursus eget nunc scelerisque. Imperdiet dui accumsan sit amet nulla facilisi morbi tempus iaculis. Sapien eget mi proin sed libero enim sed faucibus. Orci nulla pellentesque dignissim enim sit amet venenatis urna cursus. Sed velit dignissim sodales ut eu sem integer vitae justo. Massa sapien faucibus et molestie ac feugiat sed lectus. Non pulvinar neque laoreet suspendisse interdum consectetur libero. Consequat ac felis donec et odio pellentesque. Risus sed vulputate odio ut enim blandit volutpat maecenas volutpat. Ipsum nunc aliquet bibendum enim. Morbi tristique senectus et netus et malesuada. Ut placerat orci nulla pellentesque dignissim enim sit amet. Curabitur gravida arcu ac tortor dignissim convallis. Tempor orci eu lobortis elementum. Suspendisse faucibus interdum posuere lorem ipsum dolor sit amet. Cras fermentum odio eu feugiat pretium nibh ipsum consequat. Varius sit amet mattis vulputate enim nulla aliquet porttitor. Sed risus ultricies tristique nulla aliquet enim tortor at.'
+
 export enum MoveType {
+    login = 'login',
     username = 'username',
     contribute = 'contribute',
     toInstruction = 'toInstruction',
@@ -48,6 +51,7 @@ export enum Treatment {
 export interface IPlayerState {
     status: PlayerStatus
     username: string
+    login: number
     arm: Arm
     treatment: Treatment
     projectSort: number[]
