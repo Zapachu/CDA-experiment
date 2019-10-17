@@ -31,26 +31,6 @@
       "log_date_format": "YYYY-MM-DD HH:mm Z"
     },
     {
-      "script": "../game/Custom/DecisionSurvey/build/serve.js",
-      "name": "DecisionSurvey",
-      "env": {
-        "NODE_ENV": "production",
-        "BESPOKE_WITH_PROXY": "true",
-        "BESPOKE_WITH_LINKER": "true"
-      },
-      "log_date_format": "YYYY-MM-DD HH:mm Z"
-    },
-    {
-      "script": "../game/Deprecated/Graphical/DelayedReceiveMatch/build/serve.js",
-      "name": "DelayedReceiveMatch",
-      "env": {
-        "NODE_ENV": "production",
-        "BESPOKE_WITH_PROXY": "true",
-        "BESPOKE_WITH_LINKER": "true"
-      },
-      "log_date_format": "YYYY-MM-DD HH:mm Z"
-    },
-    {
       "script": "../game/Demo/FaceRecognition/build/serve.js",
       "name": "FaceRecognition",
       "env": {
@@ -61,48 +41,8 @@
       "log_date_format": "YYYY-MM-DD HH:mm Z"
     },
     {
-      "script": "../game/Classic/PublicGoods/build/serve.js",
-      "name": "PublicGoods",
-      "env": {
-        "NODE_ENV": "production",
-        "BESPOKE_WITH_PROXY": "true",
-        "BESPOKE_WITH_LINKER": "true"
-      },
-      "log_date_format": "YYYY-MM-DD HH:mm Z"
-    },
-    {
       "script": "../game/Proxy/Qualtrics/build/serve.js",
       "name": "Qualtrics",
-      "env": {
-        "NODE_ENV": "production",
-        "BESPOKE_WITH_PROXY": "true",
-        "BESPOKE_WITH_LINKER": "true"
-      },
-      "log_date_format": "YYYY-MM-DD HH:mm Z"
-    },
-    {
-      "script": "../game/Custom/SceneSurvey/build/serve.js",
-      "name": "SceneSurvey",
-      "env": {
-        "NODE_ENV": "production",
-        "BESPOKE_WITH_PROXY": "true",
-        "BESPOKE_WITH_LINKER": "true"
-      },
-      "log_date_format": "YYYY-MM-DD HH:mm Z"
-    },
-    {
-      "script": "../game/Custom/ShanghaiNY/Bak/build/serve.js",
-      "name": "ShanghaiNYBak",
-      "env": {
-        "NODE_ENV": "production",
-        "BESPOKE_WITH_PROXY": "true",
-        "BESPOKE_WITH_LINKER": "true"
-      },
-      "log_date_format": "YYYY-MM-DD HH:mm Z"
-    },
-    {
-      "script": "../game/Custom/ShanghaiNY/V4/build/serve.js",
-      "name": "ShanghaiNYV4",
       "env": {
         "NODE_ENV": "production",
         "BESPOKE_WITH_PROXY": "true",
