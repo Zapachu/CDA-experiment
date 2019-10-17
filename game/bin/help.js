@@ -84,30 +84,32 @@ var TaskHelper;
     TaskHelper.distServer = distServer;
     function distClient(project) {
         execTask({
-            env: { BUILD_MODE: ClientTask.dist },
+            env: { BUILD_MODE: Task.dist },
             command: "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + project + "/script/webpack.config.ts"
         });
     }
     TaskHelper.distClient = distClient;
+    function publishClient(project) {
+        execTask({
+            env: { BUILD_MODE: Task.publish },
+            command: "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + project + "/script/webpack.config.ts"
+        });
+    }
+    TaskHelper.publishClient = publishClient;
 })(TaskHelper || (TaskHelper = {}));
 var Side;
 (function (Side) {
     Side["client"] = "client";
     Side["server"] = "server";
-    Side["both"] = "both(dist)";
+    Side["both"] = "both";
 })(Side || (Side = {}));
-var ClientTask;
-(function (ClientTask) {
-    ClientTask["dev"] = "dev";
-    ClientTask["dist"] = "dist";
-    ClientTask["publish"] = "publish";
-})(ClientTask || (ClientTask = {}));
-var ServerTask;
-(function (ServerTask) {
-    ServerTask["dev"] = "dev";
-    ServerTask["dist"] = "dist";
-    ServerTask["serve"] = "serve";
-})(ServerTask || (ServerTask = {}));
+var Task;
+(function (Task) {
+    Task["dev"] = "dev";
+    Task["dist"] = "dist";
+    Task["publish"] = "publish";
+    Task["serve"] = "serve";
+})(Task || (Task = {}));
 function getProjects(parentProject, projectSet) {
     if (parentProject === void 0) { parentProject = '.'; }
     if (projectSet === void 0) { projectSet = new Set(); }
@@ -127,7 +129,7 @@ function getProjects(parentProject, projectSet) {
 }
 (function () {
     return __awaiter(this, void 0, void 0, function () {
-        var projects, project, taskLog, side, _a, mode, HMR, task, _b, HMR, _c, withProxy, withLinker;
+        var projects, project, taskLog, side, _a, mode, HMR, task, _b, HMR, _c, withProxy, withLinker, mode;
         return __generator(this, function (_d) {
             switch (_d.label) {
                 case 0:
@@ -197,18 +199,18 @@ function getProjects(parentProject, projectSet) {
                         case Side.server: return [3 /*break*/, 9];
                         case Side.both: return [3 /*break*/, 17];
                     }
-                    return [3 /*break*/, 18];
+                    return [3 /*break*/, 19];
                 case 5: return [4 /*yield*/, inquirer_1.prompt([
                         {
                             name: 'mode',
                             type: 'list',
-                            choices: [ClientTask.dev, ClientTask.dist, ClientTask.publish],
+                            choices: [Task.dev, Task.dist, Task.publish],
                             message: 'Mode:'
                         }
                     ])];
                 case 6:
                     mode = (_d.sent()).mode;
-                    if (!(mode === ClientTask.dev)) return [3 /*break*/, 8];
+                    if (!(mode === Task.dev)) return [3 /*break*/, 8];
                     return [4 /*yield*/, inquirer_1.prompt([
                             {
                                 name: 'HMR',
@@ -225,7 +227,7 @@ function getProjects(parentProject, projectSet) {
                             },
                             command: "webpack-dev-server --hot --progress --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + project + "/script/webpack.config.ts"
                         });
-                        return [3 /*break*/, 18];
+                        return [3 /*break*/, 19];
                     }
                     _d.label = 8;
                 case 8:
@@ -233,12 +235,12 @@ function getProjects(parentProject, projectSet) {
                         env: { BUILD_MODE: mode },
                         command: "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + project + "/script/webpack.config.ts"
                     });
-                    return [3 /*break*/, 18];
+                    return [3 /*break*/, 19];
                 case 9: return [4 /*yield*/, inquirer_1.prompt([
                         {
                             name: 'task',
                             type: 'list',
-                            choices: [ServerTask.dev, ServerTask.dist, ServerTask.serve],
+                            choices: [Task.dev, Task.dist, Task.serve],
                             message: 'Task:'
                         }
                     ])];
@@ -246,9 +248,9 @@ function getProjects(parentProject, projectSet) {
                     task = (_d.sent()).task;
                     _b = task;
                     switch (_b) {
-                        case ServerTask.dist: return [3 /*break*/, 11];
-                        case ServerTask.dev: return [3 /*break*/, 12];
-                        case ServerTask.serve: return [3 /*break*/, 14];
+                        case Task.dist: return [3 /*break*/, 11];
+                        case Task.dev: return [3 /*break*/, 12];
+                        case Task.serve: return [3 /*break*/, 14];
                     }
                     return [3 /*break*/, 16];
                 case 11:
@@ -293,14 +295,29 @@ function getProjects(parentProject, projectSet) {
                         command: "node ./" + project + "/build/serve.js"
                     });
                     return [3 /*break*/, 16];
-                case 16: return [3 /*break*/, 18];
-                case 17:
-                    {
-                        TaskHelper.distClient(project);
-                        TaskHelper.distServer(project);
+                case 16: return [3 /*break*/, 19];
+                case 17: return [4 /*yield*/, inquirer_1.prompt([
+                        {
+                            name: 'mode',
+                            type: 'list',
+                            choices: [Task.dist, Task.publish],
+                            message: 'Mode:'
+                        }
+                    ])];
+                case 18:
+                    mode = (_d.sent()).mode;
+                    switch (mode) {
+                        case Task.dist:
+                            TaskHelper.distClient(project);
+                            TaskHelper.distServer(project);
+                            break;
+                        case Task.publish:
+                            TaskHelper.publishClient(project);
+                            TaskHelper.distServer(project);
+                            break;
                     }
-                    _d.label = 18;
-                case 18: return [2 /*return*/];
+                    return [3 /*break*/, 19];
+                case 19: return [2 /*return*/];
             }
         });
     });

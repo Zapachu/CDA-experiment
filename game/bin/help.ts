@@ -5,7 +5,7 @@ import {env, exec} from 'shelljs';
 
 registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
 
-interface Task {
+interface ITask {
     env?: { [key: string]: string }
     command: string,
 }
@@ -19,7 +19,7 @@ enum SpecialProject {
 namespace TaskHelper {
     const logPath = resolve(__dirname, './help.log');
 
-    export function getLogs(): Array<Task> {
+    export function getLogs(): Array<ITask> {
         try {
             return readFileSync(logPath).toString().split('\n').map(row => JSON.parse(row));
         } catch (e) {
@@ -27,7 +27,7 @@ namespace TaskHelper {
         }
     }
 
-    function appendLog({command, env}: Task) {
+    function appendLog({command, env}: ITask) {
         const logs = getLogs().map(log => JSON.stringify(log));
         const newLog = JSON.stringify({command, env});
         if (logs[0] === newLog) {
@@ -37,7 +37,7 @@ namespace TaskHelper {
         writeFileSync(logPath, logs.slice(0, 5).join('\n'));
     }
 
-    export function execTask(task: Task) {
+    export function execTask(task: ITask) {
         appendLog(task);
         Object.assign(env, task.env);
         exec(task.command);
@@ -45,15 +45,22 @@ namespace TaskHelper {
 
     export function distServer(project: string) {
         execTask({
-            env: {PROJECT: project},
-            command: `webpack --env.TS_NODE_PROJECT="tsconfig.json" --config ./bin/webpack.server.ts`
+                env: {PROJECT: project},
+                command: `webpack --env.TS_NODE_PROJECT="tsconfig.json" --config ./bin/webpack.server.ts`
             }
         );
     }
 
     export function distClient(project: string) {
         execTask({
-            env: {BUILD_MODE: ClientTask.dist},
+            env: {BUILD_MODE: Task.dist},
+            command: `webpack --env.TS_NODE_PROJECT="tsconfig.json" --config ./${project}/script/webpack.config.ts`
+        });
+    }
+
+    export function publishClient(project: string) {
+        execTask({
+            env: {BUILD_MODE: Task.publish},
             command: `webpack --env.TS_NODE_PROJECT="tsconfig.json" --config ./${project}/script/webpack.config.ts`
         });
     }
@@ -62,18 +69,13 @@ namespace TaskHelper {
 enum Side {
     client = 'client',
     server = 'server',
-    both = 'both(dist)',
+    both = 'both'
 }
 
-enum ClientTask {
+enum Task {
     dev = 'dev',
     dist = 'dist',
-    publish = 'publish'
-}
-
-enum ServerTask {
-    dev = 'dev',
-    dist = 'dist',
+    publish = 'publish',
     serve = 'serve'
 }
 
@@ -148,15 +150,15 @@ function getProjects(parentProject: string = '.', projectSet = new Set<string>()
 
     switch (side) {
         case Side.client: {
-            const {mode} = await prompt<{ mode: ClientTask }>([
+            const {mode} = await prompt<{ mode: Task }>([
                 {
                     name: 'mode',
                     type: 'list',
-                    choices: [ClientTask.dev, ClientTask.dist, ClientTask.publish],
+                    choices: [Task.dev, Task.dist, Task.publish],
                     message: 'Mode:'
                 }
             ]);
-            if (mode === ClientTask.dev) {
+            if (mode === Task.dev) {
                 const {HMR} = await prompt<{ HMR: boolean }>([
                     {
                         name: 'HMR',
@@ -181,20 +183,20 @@ function getProjects(parentProject: string = '.', projectSet = new Set<string>()
             break;
         }
         case Side.server: {
-            const {task} = await prompt<{ task: ServerTask }>([
+            const {task} = await prompt<{ task: Task }>([
                 {
                     name: 'task',
                     type: 'list',
-                    choices: [ServerTask.dev, ServerTask.dist, ServerTask.serve],
+                    choices: [Task.dev, Task.dist, Task.serve],
                     message: 'Task:'
                 }
             ]);
             switch (task) {
-                case ServerTask.dist: {
+                case Task.dist: {
                     TaskHelper.distServer(project);
                     break;
                 }
-                case ServerTask.dev: {
+                case Task.dev: {
                     const {HMR} = await prompt<{ HMR: boolean }>([
                         {
                             name: 'HMR',
@@ -209,7 +211,7 @@ function getProjects(parentProject: string = '.', projectSet = new Set<string>()
                     });
                     break;
                 }
-                case ServerTask.serve: {
+                case Task.serve: {
                     const {withProxy, withLinker} = await prompt([
                         {
                             name: 'withProxy',
@@ -234,8 +236,25 @@ function getProjects(parentProject: string = '.', projectSet = new Set<string>()
             break;
         }
         case Side.both: {
-            TaskHelper.distClient(project);
-            TaskHelper.distServer(project);
+            const {mode} = await prompt<{ mode: Task }>([
+                {
+                    name: 'mode',
+                    type: 'list',
+                    choices: [Task.dist, Task.publish],
+                    message: 'Mode:'
+                }
+            ]);
+            switch (mode) {
+                case Task.dist:
+                    TaskHelper.distClient(project);
+                    TaskHelper.distServer(project);
+                    break;
+                case Task.publish:
+                    TaskHelper.publishClient(project);
+                    TaskHelper.distServer(project);
+                    break;
+            }
+            break;
         }
     }
 })();
