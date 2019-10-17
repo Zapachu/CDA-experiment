@@ -53,6 +53,10 @@ export interface IPlayerState {
     projectSort: number[]
 }
 
+export enum FetchRoute {
+    logout = '/logout'
+}
+
 export enum Probability {
     HIGH = 'HIGH',
     MEDIUM = 'MEDIUM',

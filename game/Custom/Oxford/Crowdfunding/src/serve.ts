@@ -1,10 +1,16 @@
+import {Response, Router} from 'express';
 import {resolve} from 'path';
-import {namespace} from './config';
-import {Server} from '@bespoke/server';
-import {RobotServer} from '@bespoke/robot';
+import {elfSetting} from '@elf/setting';
+import {ResponseCode, Server} from '@bespoke/server';
 import {Logic} from './Logic';
-import {Robot} from './Robot';
+import {FetchRoute, namespace} from './config';
 
-Server.start(namespace, Logic, resolve(__dirname, '../dist'))
+const router = Router()
+    .get(FetchRoute.logout, async (req: any, res: Response) => {
+        res.clearCookie(elfSetting.sessionName);
+        return res.json({
+            code: ResponseCode.success
+        });
+    });
 
-RobotServer.start(namespace, Robot)
+Server.start(namespace, Logic, resolve(__dirname, '../dist'), router);
