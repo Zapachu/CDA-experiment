@@ -39,13 +39,6 @@ export interface IGameWithId<ICreateParams> extends IGame<ICreateParams> {
     id: string
 }
 
-export interface IGameThumb {
-    id: string
-    namespace: string
-    title: string
-    createAt: number
-}
-
 export type TGameState<IGameState> = IGameState & {
     status: GameStatus
     connectionId?: string

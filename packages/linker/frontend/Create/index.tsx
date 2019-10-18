@@ -1,11 +1,12 @@
 import * as React from 'react';
 import * as style from './style.scss';
 import {Api, GameTemplate, loadScript, TPageProps} from '../util';
-import {Lang} from '@elf/component';
+import {IGameConfig, Lang} from '@elf/component';
 import {Loading} from '../component';
 import {RouteComponentProps} from 'react-router';
-import {Button, Input, message} from 'antd';
+import {Button, Input, List, message, Modal} from 'antd';
 import {ResponseCode} from '@elf/share';
+import * as dateFormat from 'dateformat';
 
 interface ICreateState {
     loading: boolean
@@ -24,7 +25,10 @@ export class Create extends React.Component<TPageProps & RouteComponentProps<{ n
         end: ['结束', 'End'],
         submit: ['提交', 'SUBMIT'],
         submitFailed: ['提交失败', 'Submit failed'],
-        createSuccess: ['创建成功', 'Created successfully']
+        createSuccess: ['创建成功', 'Created successfully'],
+        historyGame: ['历史实验', 'HistoryGame'],
+        loadFromHistory: ['点击从历史实验加载实验配置', 'Click to load configuration from history game'],
+        loadSuccess: ['加载成功', 'Load success'],
     });
 
     state: ICreateState = {
@@ -35,8 +39,12 @@ export class Create extends React.Component<TPageProps & RouteComponentProps<{ n
         submitable: true
     };
 
+    get namespace(): string {
+        return this.props.match.params.namespace;
+    }
+
     async componentDidMount() {
-        const {code, jsUrl} = await Api.getJsUrl(this.props.match.params.namespace);
+        const {code, jsUrl} = await Api.getJsUrl(this.namespace);
         if (code !== ResponseCode.success) {
             return;
         }
@@ -52,7 +60,7 @@ export class Create extends React.Component<TPageProps & RouteComponentProps<{ n
         if (!title || !desc) {
             return message.warn(lang.invalidBaseInfo);
         }
-        const {code, gameId} = await Api.postNewGame(title, desc, GameTemplate.getTemplate().namespace, params);
+        const {code, gameId} = await Api.postNewGame(title, desc, this.namespace, params);
         if (code === ResponseCode.success) {
             message.success(lang.createSuccess);
             history.push(`/info/${gameId}`);
@@ -89,6 +97,25 @@ export class Create extends React.Component<TPageProps & RouteComponentProps<{ n
                                 placeholder={lang.desc}
                                 onChange={({target: {value: desc}}) => this.setState({desc})}/>
             </div>
+            <div className={style.historyGameBtnWrapper}>
+                <a onClick={() => {
+                    const modal = Modal.info({
+                        title: lang.loadFromHistory,
+                        content: <div style={{marginTop: '1rem'}}>
+                            <HistoryGame {...{
+                                namespace: this.namespace,
+                                applyHistoryGame: ({title, params}: IGameConfig<any>) => {
+                                    this.setState({
+                                        title, desc:' ', params
+                                    });
+                                    modal.destroy();
+                                    message.success(lang.loadSuccess);
+                                }
+                            }}/>
+                        </div>
+                    });
+                }}>{lang.historyGame}</a>
+            </div>
             <Create {...{
                 submitable,
                 setSubmitable: submitable => this.setState({submitable}),
@@ -103,4 +130,28 @@ export class Create extends React.Component<TPageProps & RouteComponentProps<{ n
             }
         </section>;
     }
+}
+
+
+function HistoryGame({applyHistoryGame, namespace}: { namespace: string, applyHistoryGame: (gameCfg: IGameConfig<any>) => void }) {
+    const [historyGameThumbs, setHistoryGameThumbs] = React.useState([]);
+    React.useEffect(() => {
+        Api.getHistoryGames(namespace).then(({historyGameThumbs}) => setHistoryGameThumbs(historyGameThumbs));
+    }, []);
+    return <List dataSource={historyGameThumbs} grid={{
+        gutter: 16,
+        md: 2
+    }} renderItem={({id, title, createAt}) =>
+        <List.Item>
+            <div style={{cursor: 'pointer'}} onClick={async () => {
+                const {code, game} = await Api.getGame(id);
+                if (code === ResponseCode.success) {
+                    applyHistoryGame(game);
+                }
+            }}>
+                <List.Item.Meta title={title} description={dateFormat(createAt, 'yyyy-mm-dd')}/>
+            </div>
+        </List.Item>
+    }>
+    </List>;
 }

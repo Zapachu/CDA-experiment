@@ -4,8 +4,9 @@ import {RedisKey} from '../util';
 import {NextFunction, Request, Response} from 'express';
 import {Token} from '@elf/util';
 import {redisClient} from '@elf/protocol';
-import {AcademusRole, Actor, ResponseCode} from '@elf/share';
+import {AcademusRole, Actor, historyGamesListSize, IGameThumb, ResponseCode} from '@elf/share';
 import {GameService, PlayerService} from '../service';
+import {GameModel} from '../model';
 
 const SECONDS_PER_DAY = 86400
 const DEFAULT_PAGE_SIZE = 11
@@ -189,5 +190,26 @@ export class GameCtrl {
             game,
             actor: {token, type, playerId}
         })
+    }
+
+    static async getHistoryGameThumbs(req, res) {
+        const {user, params:{namespace}} = req
+        console.log(namespace)
+        try {
+            const historyGameThumbs: Array<IGameThumb> = (await GameModel.find({
+                owner: user.id,
+                namespace: namespace
+            })
+                .limit(historyGamesListSize)
+                .sort({createAt: -1})).map(({id, namespace, title, createAt}) => ({id, namespace, title, createAt}))
+            res.json({
+                code: ResponseCode.success,
+                historyGameThumbs
+            })
+        } catch (err) {
+            res.json({
+                code: ResponseCode.serverError
+            })
+        }
     }
 }

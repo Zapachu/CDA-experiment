@@ -81,8 +81,6 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
                     <li>
                         <Label label={lang.playersPerGroup}/>
                         <Slider className={style.slider}
-                                tooltipVisible={true}
-                                tooltipPlacement={'right'}
                                 value={params.playersPerGroup}
                                 min={1}
                                 max={12}
@@ -93,8 +91,6 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
                     <li>
                         <Label label={lang.round}/>
                         <Slider className={style.slider}
-                                tooltipVisible={true}
-                                tooltipPlacement={'right'}
                                 value={params.rounds}
                                 min={1}
                                 max={12}

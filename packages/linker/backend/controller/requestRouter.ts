@@ -1,7 +1,7 @@
-import {Router} from 'express'
-import {config} from 'linker-share'
+import {Router} from 'express';
+import {config} from 'linker-share';
 
-import {GameCtrl, UserCtrl} from './requestHandler'
+import {GameCtrl, UserCtrl} from './requestHandler';
 
 const {apiPrefix} = config
 
@@ -10,6 +10,7 @@ const apiRouter = Router()
         .get('/', UserCtrl.getUser)
     )
     .use('/game', Router()
+        .get('/historyThumb/:namespace', GameCtrl.getHistoryGameThumbs)
         .get('/jsUrl/:namespace', GameCtrl.getJsUrl)
         .post('/create', GameCtrl.saveNewGame)
         .get('/list', GameCtrl.getGameList)

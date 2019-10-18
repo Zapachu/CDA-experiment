@@ -1,5 +1,5 @@
-import {config, IBaseGameWithId, IGameWithId, ILinkerActor, IUserWithId} from 'linker-share'
-import {IHttpRes, BaseRequest} from '@elf/component'
+import {config, IBaseGameWithId, IGameWithId, ILinkerActor, IUserWithId} from 'linker-share';
+import {BaseRequest, IGameThumb, IHttpRes} from '@elf/component';
 
 export const Api = new class extends BaseRequest{
     buildUrl(path: string, params: {} = {}, query: {} = {}): string {
@@ -20,6 +20,10 @@ export const Api = new class extends BaseRequest{
         game: IGameWithId
     }> {
         return await this.get('/game/:gameId', {gameId})
+    }
+
+    async getHistoryGames(namespace:string): Promise<IHttpRes & { historyGameThumbs: Array<IGameThumb> }> {
+        return await this.get('/game/historyThumb/:namespace', {namespace})
     }
 
     async joinGameWithCode(code: string): Promise<IHttpRes & { gameId?: string }> {

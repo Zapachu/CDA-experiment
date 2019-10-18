@@ -1,15 +1,15 @@
-import {AcademusRole, IGameThumb, ResponseCode} from '@bespoke/share'
-import {redisClient} from '@elf/protocol'
-import {Request, Response} from 'express'
-import * as passport from 'passport'
-import {elfSetting} from '@elf/setting'
-import {Log, Token} from '@elf/util'
-import {CONFIG, RedisKey, Setting} from '../util'
-import {PassportStrategy} from '../interface'
-import {GameModel, MoveLogModel, SimulatePlayerModel, UserDoc, UserModel} from '../model'
-import {BaseLogic, GameDAO, UserService} from '../service'
-import * as fs from 'fs'
-import * as path from 'path'
+import {AcademusRole, historyGamesListSize, IGameThumb, ResponseCode} from '@bespoke/share';
+import {redisClient} from '@elf/protocol';
+import {Request, Response} from 'express';
+import * as passport from 'passport';
+import {elfSetting} from '@elf/setting';
+import {Log, Token} from '@elf/util';
+import {CONFIG, RedisKey, Setting} from '../util';
+import {PassportStrategy} from '../interface';
+import {GameModel, MoveLogModel, SimulatePlayerModel, UserDoc, UserModel} from '../model';
+import {BaseLogic, GameDAO, UserService} from '../service';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export class UserCtrl {
     static async renderApp(req, res: Response) {
@@ -222,7 +222,7 @@ export class GameCtrl {
                 owner: user.id,
                 namespace: Setting.namespace
             })
-                .limit(CONFIG.historyGamesListSize)
+                .limit(historyGamesListSize)
                 .sort({createAt: -1})).map(({id, namespace, title, createAt}) => ({id, namespace, title, createAt}))
             res.json({
                 code: ResponseCode.success,
