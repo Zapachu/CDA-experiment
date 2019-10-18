@@ -396,7 +396,7 @@ var GameCtrl = /** @class */ (function () {
                                 owner: user.id,
                                 namespace: util_2.Setting.namespace
                             })
-                                .limit(util_2.CONFIG.historyGamesListSize)
+                                .limit(share_1.historyGamesListSize)
                                 .sort({ createAt: -1 })];
                     case 2:
                         historyGameThumbs = (_a.sent()).map(function (_a) {

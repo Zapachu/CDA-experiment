@@ -1,8 +1,8 @@
-import * as React from 'react'
-import * as style from './style.scss'
-import {config, NationCode, ResponseCode} from '@bespoke/share'
-import {Lang, Toast} from '@elf/component'
-import {Api, TPageProps} from '../util'
+import * as React from 'react';
+import * as style from './style.scss';
+import {config, NationCode, ResponseCode} from '@bespoke/share';
+import {Lang, Toast} from '@elf/component';
+import {Api, TPageProps} from '../util';
 
 declare interface ILoginState {
     nationCode: NationCode
@@ -170,7 +170,7 @@ class MobileNumberInput extends React.Component<IMobileCodeInputProps, IMobileCo
                 this.state.showNationSelector &&
                 <ul className={style.nationCodeSelector}>
                     {
-                        Object.entries(NationCode).map(([label, code]) => isNaN(Number(code)) ? null :
+                        Object.entries(NationCode).map(([label, code]:[string, NationCode]) => isNaN(Number(code)) ? null :
                             <li key={label} onClick={() => {
                                 changeNationCode(code)
                                 this.setState({showNationSelector: false})

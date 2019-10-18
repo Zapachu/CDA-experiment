@@ -5,6 +5,5 @@ exports.CONFIG = {
     shareCodeLifeTime: 3 * 24 * 60 * 60,
     memoryCacheLifetime: 3 * 60 * 1000,
     heartBeatSeconds: 3,
-    historyGamesListSize: 12,
     logLevel: util_1.LogLevel.log
 };

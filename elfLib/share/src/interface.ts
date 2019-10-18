@@ -11,3 +11,9 @@ export interface IGameThumb {
     title: string
     createAt: number
 }
+
+export interface IGameConfig<ICreateParams> {
+    title: string
+    desc?: string
+    params: ICreateParams
+}

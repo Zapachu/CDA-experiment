@@ -1,9 +1,10 @@
-import * as React from 'react'
-import * as style from './style.scss'
-import {Lang, Button, FrameEmitter, IGame} from '@elf/component'
-import {BasePhase} from './BasePhase'
-import {MoveType, PushType} from '../../config'
-import {ICreateParams, IMoveParams, IPushParams} from '../../interface'
+import * as React from 'react';
+import * as style from './style.scss';
+import {Button, Lang} from '@elf/component';
+import {FrameEmitter, IGame} from '@bespoke/share';
+import {BasePhase} from './BasePhase';
+import {MoveType, PushType} from '../../config';
+import {ICreateParams, IMoveParams, IPushParams} from '../../interface';
 
 class Play extends BasePhase.Play {
     lang = Lang.extractLang({
@@ -16,17 +17,17 @@ class Play extends BasePhase.Play {
         footLabel2: [' 实验币，可换算为', ' game currency, can be converted to RMB'],
         footLabel3: [' 人民币', ''],
         total: ['合计', 'Total']
-    })
+    });
 
     render() {
         const {lang, props: {game, frameEmitter, playerState}} = this,
             phases = playerState.phases.slice(1, playerState.phases.length - 1),
-            {exchangeRate} = game.params.phases[0].params.positions[playerState.positionIndex]
-        let totalProfit = 0, totalCount = 0
+            {exchangeRate} = game.params.phases[0].params.positions[playerState.positionIndex];
+        let totalProfit = 0, totalCount = 0;
         phases.forEach(({periodProfit, tradedCount}) => {
-            totalProfit += periodProfit
-            totalCount += tradedCount
-        })
+            totalProfit += periodProfit;
+            totalCount += tradedCount;
+        });
         return <section className={style.marketResult}>
             <label>{lang.title1}<em>{phases.length}</em>{lang.title2}</label>
             <table className={style.profitTable}>
@@ -53,11 +54,11 @@ class Play extends BasePhase.Play {
             <label>{lang.footLabel1}<em>{totalProfit}</em>{lang.footLabel2}<em>{(totalProfit / exchangeRate).toFixed(2)}</em>{lang.footLabel3}
             </label>
             <PhaseOver {...{game, frameEmitter}}/>
-        </section>
+        </section>;
     }
 }
 
-export default {Play}
+export default {Play};
 
 export const PhaseOver: React.SFC<{
     game: IGame<ICreateParams>,
@@ -74,5 +75,5 @@ export const PhaseOver: React.SFC<{
                     location.href = '/bespoke/join'
             }}/>
         </div>
-    </section>
-}
+    </section>;
+};

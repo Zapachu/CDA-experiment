@@ -15,7 +15,8 @@ import {
     PlayerStatus,
     PushType
 } from '../config';
-import {FrameEmitter, Lang, MaskLoading} from '@elf/component';
+import {Lang, MaskLoading} from '@elf/component';
+import {FrameEmitter} from '@bespoke/share';
 import {DragTable} from './component/DragTable';
 
 function RoundPlay({groupParams, playerRoundState, gameRoundState, frameEmitter, playerIndex}: {

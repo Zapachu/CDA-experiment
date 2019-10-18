@@ -2,7 +2,7 @@ import {GameStatus, SyncStrategy} from './enum';
 import {EventEmitter} from 'events';
 import {Socket} from 'socket.io-client';
 import {Diff} from 'deep-diff';
-import {AcademusRole, IActor} from '@elf/share';
+import {AcademusRole, IActor, IGameConfig} from '@elf/share';
 
 export type TSocket = typeof Socket
 
@@ -22,11 +22,6 @@ export interface ISimulatePlayer {
     gameId: string
     token: string
     name: string
-}
-
-export interface IGameConfig<ICreateParams> {
-    title: string
-    params: ICreateParams
 }
 
 export interface IGame<ICreateParams> extends IGameConfig<ICreateParams> {

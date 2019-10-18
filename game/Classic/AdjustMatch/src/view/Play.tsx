@@ -16,7 +16,8 @@ import {
     PlayerStatus,
     PushType
 } from '../config';
-import {FrameEmitter, Lang, MaskLoading} from '@elf/component';
+import {Lang, MaskLoading} from '@elf/component';
+import {FrameEmitter} from '@bespoke/share';
 import {DragTable} from '../../../DelayReceiveMatch/src/view/component/DragTable';
 
 function RoundPlay({playerRoundState, gameRoundState, frameEmitter, playerIndex}: {

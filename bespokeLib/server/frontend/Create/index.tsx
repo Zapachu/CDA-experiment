@@ -1,8 +1,7 @@
 import * as React from 'react';
 import * as style from './style.scss';
-import {AcademusRole, Lang, ResponseCode, Toast} from '@elf/component';
-import {IGameConfig} from '@bespoke/share';
-import {Icon} from 'antd';
+import {Lang, Toast} from '@elf/component';
+import {AcademusRole, IGameConfig, ResponseCode} from '@bespoke/share';
 import {Api, Button, Input, List, message, Modal, TPageProps} from '../util';
 import * as dateFormat from 'dateformat';
 
@@ -13,10 +12,10 @@ export function Create({user, history, gameTemplate: {Create: GameCreate}}: TPag
         loadSuccess: ['加载成功', 'Load success'],
         Submit: ['提交', 'Submit'],
         CreateSuccess: ['实验创建成功', 'Create success'],
-        CreateFailed: ['实验创建失败', 'Create Failed']
+        CreateFailed: ['实验创建失败', 'Create Failed'],
+        historyGame: ['历史实验', 'HistoryGame']
     });
-    const [titleReadonly, setTitleReadonly] = React.useState(true),
-        [title, setTitle] = React.useState(''),
+    const [title, setTitle] = React.useState(''),
         [params, setParams] = React.useState({}),
         [submitable, setSubmitable] = React.useState(true);
     React.useEffect(() => {
@@ -27,7 +26,7 @@ export function Create({user, history, gameTemplate: {Create: GameCreate}}: TPag
     }, []);
 
     async function submit() {
-        const {code, gameId} = await Api.newGame({title: title || '---', params});
+        const {code, gameId} = await Api.newGame({title: title || '未命名', params});
         if (code === ResponseCode.success) {
             Toast.success(lang.CreateSuccess);
             setTimeout(() => history.push(`/play/${gameId}`), 1000);
@@ -39,16 +38,14 @@ export function Create({user, history, gameTemplate: {Create: GameCreate}}: TPag
     return <section className={style.create}>
         <div className={style.titleWrapper}>
             <Input size='large' value={title} placeholder={lang.title}
-                   disabled={titleReadonly}
-                   addonAfter={<Icon onClick={() => setTitleReadonly(!titleReadonly)}
-                                     type={titleReadonly ? 'edit' : 'check'}/>}
                    onChange={({target: {value: title}}) => setTitle(title)}/>
         </div>
         <div className={style.historyGameBtnWrapper}>
-            <Button size='small' icon="folder-open" onClick={() => {
+            <a onClick={() => {
                 const modal = Modal.info({
+                    width:'48rem',
                     title: lang.loadFromHistory,
-                    content: <div style={{marginTop: '1rem'}}>
+                    content: <div style={{marginTop: '1rem', width:'48rem'}}>
                         <HistoryGame {...{
                             applyHistoryGame: ({title, params}: IGameConfig<any>) => {
                                 setTitle(title);
@@ -59,7 +56,7 @@ export function Create({user, history, gameTemplate: {Create: GameCreate}}: TPag
                         }}/>
                     </div>
                 });
-            }}/>
+            }}>{lang.historyGame}</a>
         </div>
         <GameCreate {...{
             params,
@@ -82,7 +79,7 @@ function HistoryGame({applyHistoryGame}: { applyHistoryGame: (gameCfg: IGameConf
 
     return <List dataSource={historyGameThumbs} grid={{
         gutter: 16,
-        md: 2
+        column: 2
     }} renderItem={({id, title, createAt}) =>
         <List.Item>
             <div style={{cursor: 'pointer'}} onClick={async () => {

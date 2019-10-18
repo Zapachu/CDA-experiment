@@ -1,15 +1,9 @@
-import * as React from 'react'
-import * as style from './style.scss'
-import {MoveType, PushType} from '../../config'
-import {
-    CreateParams,
-    ICreateParams,
-    IGameState,
-    IMoveParams,
-    IPlayerState,
-    IPushParams
-} from '../../interface'
-import {MaskLoading, FrameEmitter, IGame} from '@elf/component'
+import * as React from 'react';
+import * as style from './style.scss';
+import {MoveType, PushType} from '../../config';
+import {CreateParams, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface';
+import {MaskLoading} from '@elf/component';
+import {FrameEmitter, IGame} from '@bespoke/share';
 
 export namespace BasePhase {
 
@@ -17,15 +11,15 @@ export namespace BasePhase {
         updateParams?: (newParams: Partial<CreateParams.Phase.IParams>) => void
     }, S> {
         constructor(public phases) {
-            super(phases)
+            super(phases);
         }
 
         checkParams({lang, params: {}}): boolean {
-            return true
+            return true;
         }
 
         render() {
-            return <div className={style.blankMsg}>NO PARAM TO CONFIG</div>
+            return <div className={style.blankMsg}>NO PARAM TO CONFIG</div>;
         }
     }
 
@@ -36,7 +30,7 @@ export namespace BasePhase {
 
     export class Info extends React.Component<BaseInfoProps> {
         render() {
-            return <div className={style.blankMsg}>NO CONFIGURATION</div>
+            return <div className={style.blankMsg}>NO CONFIGURATION</div>;
         }
     }
 
@@ -47,7 +41,7 @@ export namespace BasePhase {
         frameEmitter: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
     }, S> {
         render() {
-            return <MaskLoading/>
+            return <MaskLoading/>;
         }
     }
 

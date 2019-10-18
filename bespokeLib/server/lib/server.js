@@ -235,7 +235,7 @@ var Server = /** @class */ (function () {
                     switch (_b.label) {
                         case 0: return [4 /*yield*/, model_1.GameModel.create({
                                 namespace: util_1.Setting.namespace,
-                                title: protocol_1.Linker.Create.name(util_1.Setting.namespace),
+                                title: "WithLinker:" + util_1.Setting.namespace,
                                 elfGameId: elfGameId,
                                 owner: owner,
                                 params: params

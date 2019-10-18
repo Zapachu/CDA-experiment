@@ -1,9 +1,10 @@
-import * as React from 'react'
-import * as style from './style.scss'
-import {Button, ButtonProps, FrameEmitter, IGame, Lang, MaskLoading, Toast} from '@elf/component'
-import {Core} from '@bespoke/client'
-import {GameStage, MoveType, PushType} from '../config'
-import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface'
+import * as React from 'react';
+import * as style from './style.scss';
+import {Button, ButtonProps, Lang, MaskLoading, Toast} from '@elf/component';
+import {FrameEmitter, IGame} from '@bespoke/share';
+import {Core} from '@bespoke/client';
+import {GameStage, MoveType, PushType} from '../config';
+import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../interface';
 
 const PhaseOver: React.SFC<{
     game: IGame<ICreateParams>,
@@ -20,8 +21,8 @@ const PhaseOver: React.SFC<{
                     location.href = '/bespoke/join'
             }}/>
         </div>
-    </section>
-}
+    </section>;
+};
 
 interface IPlayState {
     seatNumber?: number
@@ -34,40 +35,40 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
     state: IPlayState = {
         nums: this.genRandomNums(),
         input: ''
-    }
+    };
     lang = Lang.extractLang({
         confirm: ['确定', 'Confirm'],
         inputSeatNumberPls: ['请输入座位号', 'Input your seat number please'],
         submit: ['提交', 'Submit'],
         invalidSeatNumber: ['座位号有误或已被占用', 'Your seat number is invalid or has been occupied'],
         wait4StartMainTest: ['等待老师开放实验', 'Wait for teacher to start the experiment']
-    })
+    });
 
     render(): React.ReactNode {
-        const {props: {gameState: {gameStage}}} = this
+        const {props: {gameState: {gameStage}}} = this;
         return <section className={style.play}>
             {
                 (() => {
                     switch (gameStage) {
                         case GameStage.seatNumber: {
-                            return this.renderSeatNumberStage()
+                            return this.renderSeatNumberStage();
                         }
                         case GameStage.mainTest: {
-                            return this.renderMainTestStage()
+                            return this.renderMainTestStage();
                         }
                         case GameStage.result: {
-                            return this.renderResultStage()
+                            return this.renderResultStage();
                         }
                     }
                 })()
             }
-        </section>
+        </section>;
     }
 
     renderSeatNumberStage(): React.ReactNode {
-        const {lang, props: {frameEmitter, playerState}, state: {seatNumber}} = this
+        const {lang, props: {frameEmitter, playerState}, state: {seatNumber}} = this;
         if (playerState.seatNumber) {
-            return <MaskLoading label={lang.wait4StartMainTest}/>
+            return <MaskLoading label={lang.wait4StartMainTest}/>;
         }
         return <section className={style.seatNumberStage}>
             <label>{lang.inputSeatNumberPls}</label>
@@ -76,34 +77,34 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                    onChange={({target: {value: seatNumber}}) => this.setState({seatNumber: seatNumber.substr(0, 4)} as any)}/>
             <Button width={ButtonProps.Width.medium} label={lang.submit} onClick={() => {
                 if (isNaN(Number(seatNumber))) {
-                    return Toast.warn(lang.invalidSeatNumber)
+                    return Toast.warn(lang.invalidSeatNumber);
                 }
                 frameEmitter.emit(MoveType.submitSeatNumber, {seatNumber}, success => {
                     if (!success) {
-                        Toast.warn(lang.invalidSeatNumber)
+                        Toast.warn(lang.invalidSeatNumber);
                     }
-                })
+                });
             }}/>
-        </section>
+        </section>;
     }
 
     genRandomNums(): Array<number> {
-        const MIN = 100
-        const MAX = 1000
+        const MIN = 100;
+        const MAX = 1000;
         return new Array(4).fill('').map(_ => {
-            return Math.floor(Math.random() * (MAX - MIN)) + MIN
-        })
+            return Math.floor(Math.random() * (MAX - MIN)) + MIN;
+        });
     }
 
     checkInput(): Boolean {
-        const {nums, input} = this.state
-        if (!input || !parseInt(input)) return false
-        return nums.includes(parseInt(input)) && nums.every(n => n <= parseInt(input))
+        const {nums, input} = this.state;
+        if (!input || !parseInt(input)) return false;
+        return nums.includes(parseInt(input)) && nums.every(n => n <= parseInt(input));
     }
 
     renderMainTestStage(): React.ReactNode {
         const {lang, props: {frameEmitter, game, gameState: {time}}, state: {nums, input}} = this,
-            timeLeft = game.params.timeLimit - time
+            timeLeft = game.params.timeLimit - time;
 
         return <section className={style.mainTestStage}>
             <p style={{fontSize: '18px'}}>倒计时<em>{time > 0 ? timeLeft : ''}</em>
@@ -124,30 +125,30 @@ export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, Mov
                                 label: lang.confirm,
                                 onClick: () => {
                                     if (this.checkInput()) {
-                                        frameEmitter.emit(MoveType.countReaction)
+                                        frameEmitter.emit(MoveType.countReaction);
                                         this.setState({
                                             nums: this.genRandomNums(),
                                             input: ''
-                                        })
+                                        });
                                     } else {
-                                        Toast.info('输入不正确')
+                                        Toast.info('输入不正确');
                                     }
                                 }
                             }}/>
                         </div>
                     </React.Fragment> : <p className={style.gameWillStart}>该部部分实验将在<em>{-time}</em>秒之后开始</p>
             }
-        </section>
+        </section>;
     }
 
     renderResultStage(): React.ReactNode {
-        const {props: {game, frameEmitter, playerState: {correctNumber, point}}} = this
+        const {props: {game, frameEmitter, playerState: {correctNumber, point}}} = this;
         if (isNaN(point)) {
-            return <MaskLoading/>
+            return <MaskLoading/>;
         }
         return <section className={style.result}>
             <p>在该部分的实验中，您一共答对了：<em>{correctNumber}</em>道题，您的收益为：<em>{point}</em> 人民币</p>
             <PhaseOver {...{game, frameEmitter}}/>
-        </section>
+        </section>;
     }
 }

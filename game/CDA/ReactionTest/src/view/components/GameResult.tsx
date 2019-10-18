@@ -1,8 +1,9 @@
-import * as React from 'react'
-import * as style from './style.scss'
-import {MoveType, PushType} from '../../config'
-import {ICreateParams, IMoveParams, IPushParams} from '../../interface'
-import {FrameEmitter, IGame, Button} from '@elf/component'
+import * as React from 'react';
+import * as style from './style.scss';
+import {MoveType, PushType} from '../../config';
+import {ICreateParams, IMoveParams, IPushParams} from '../../interface';
+import {Button} from '@elf/component';
+import {FrameEmitter, IGame} from '@bespoke/share';
 
 interface Props {
   correctNumber: number

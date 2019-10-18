@@ -16,7 +16,8 @@ import {
     PushType,
     Role
 } from '../config';
-import {FrameEmitter, Lang, MaskLoading, Toast} from '@elf/component';
+import {Lang, MaskLoading, Toast} from '@elf/component';
+import {FrameEmitter} from '@bespoke/share';
 
 function RoundPlay({playerRoundState, gameRoundState, frameEmitter, role, playerIndex}: {
     groupParams: ICreateParams,

@@ -20,7 +20,8 @@ import {
     PushType,
     Treatment
 } from '../config';
-import {ResponseCode, Toast} from '@elf/component';
+import {Toast} from '@elf/component';
+import {ResponseCode} from '@bespoke/share';
 import {Request} from '@bespoke/client';
 
 function Project({name, readMore, threshold, payoff, index, arm, treatment, yourC, totalC, contribute, fundProbability, successRate}: IProjectConfig & { index: number, arm: Arm, treatment: Treatment, yourC: number, totalC: number, contribute: (c: number) => void }) {
@@ -174,7 +175,7 @@ function Questionnaire({groupFrameEmitter, playerState}: Extend.Group.IPlayProps
     return <section className={style.questionnaire}>
         <p>Thank you for completing this experiment. If you have any questions or comments about the experiment, please
             detail them below and click submit.</p>
-        <h1 style={{fontSize:'2rem',margin:'2rem auto'}}>TODO : QuestionnaireForm</h1>
+        <h1 style={{fontSize: '2rem', margin: '2rem auto'}}>TODO : QuestionnaireForm</h1>
         <div className={style.btnSubmitWrapper}>
             <Button type='primary' onClick={() => alert('TODO')}>Submit</Button>
         </div>

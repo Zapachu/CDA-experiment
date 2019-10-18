@@ -1,11 +1,11 @@
 import * as React from 'react';
 import * as style from './style.scss';
 import {Api, GameTemplate, loadScript, TPageProps} from '../util';
-import {IGameConfig, Lang} from '@elf/component';
+import {Lang} from '@elf/component';
+import {IGameConfig, ResponseCode} from '@elf/share';
 import {Loading} from '../component';
 import {RouteComponentProps} from 'react-router';
 import {Button, Input, List, message, Modal} from 'antd';
-import {ResponseCode} from '@elf/share';
 import * as dateFormat from 'dateformat';
 
 interface ICreateState {
@@ -100,13 +100,14 @@ export class Create extends React.Component<TPageProps & RouteComponentProps<{ n
             <div className={style.historyGameBtnWrapper}>
                 <a onClick={() => {
                     const modal = Modal.info({
+                        width:'48rem',
                         title: lang.loadFromHistory,
                         content: <div style={{marginTop: '1rem'}}>
                             <HistoryGame {...{
                                 namespace: this.namespace,
-                                applyHistoryGame: ({title, params}: IGameConfig<any>) => {
+                                applyHistoryGame: ({title, desc, params}: IGameConfig<any>) => {
                                     this.setState({
-                                        title, desc:' ', params
+                                        title, desc, params
                                     });
                                     modal.destroy();
                                     message.success(lang.loadSuccess);

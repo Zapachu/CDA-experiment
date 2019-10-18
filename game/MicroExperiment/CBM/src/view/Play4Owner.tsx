@@ -1,5 +1,5 @@
-import * as React from 'react'
-import {Core} from '@bespoke/client'
+import * as React from 'react';
+import {Core} from '@bespoke/client';
 import {
     CONFIG,
     ICreateParams,
@@ -11,13 +11,14 @@ import {
     MoveType,
     PeriodStage,
     PushType
-} from '../config'
-import {Lang, TPlayerState} from '@elf/component'
-import {Col, List, Row, Table} from 'antd'
-import {TradeChart} from './Play'
-import * as style from './style.scss'
+} from '../config';
+import {Lang} from '@elf/component';
+import {TPlayerState} from '@bespoke/share';
+import {Col, List, Row, Table} from 'antd';
+import {TradeChart} from './Play';
+import * as style from './style.scss';
 
-const {prepareTime, tradeTime} = CONFIG
+const {prepareTime, tradeTime} = CONFIG;
 
 type TPlay4OwnerProps = Core.IPlay4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>
 
@@ -32,13 +33,13 @@ function _Play4Owner({frameEmitter, gameState, playerStates}: TPlay4OwnerProps) 
         buyOrders: ['买家订单', 'BuyOrders'],
         marketHistory: ['市场记录', 'Market History'],
         wait4players: ['等待玩家进入市场', 'Wait for players to enter the market']
-    })
-    const [countDown, setCountDown] = React.useState(-1)
+    });
+    const [countDown, setCountDown] = React.useState(-1);
     React.useEffect(() => {
-        frameEmitter.on(PushType.countDown, ({countDown}) => setCountDown(countDown))
-    }, [])
-    const gamePeriodState = gameState.periods[gameState.periodIndex]
-    const timeLeft = tradeTime + prepareTime - countDown
+        frameEmitter.on(PushType.countDown, ({countDown}) => setCountDown(countDown));
+    }, []);
+    const gamePeriodState = gameState.periods[gameState.periodIndex];
+    const timeLeft = tradeTime + prepareTime - countDown;
     switch (gamePeriodState.stage) {
         case PeriodStage.reading:
             return <section className={style.waitInfo}>
@@ -49,22 +50,22 @@ function _Play4Owner({frameEmitter, gameState, playerStates}: TPlay4OwnerProps) 
                 </span> :
                         <span>{lang.wait4players}</span>
                 }
-            </section>
+            </section>;
         case PeriodStage.trading:
-            return renderTrading()
+            return renderTrading();
         case PeriodStage.result:
-            return <span className={style.label}>{lang.roundOver}</span>
+            return <span className={style.label}>{lang.roundOver}</span>;
     }
 
     function renderTrading() {
         const {trades, buyOrderIds, sellOrderIds} = gamePeriodState,
             orderDict: { [id: number]: IOrder } = (() => {
-                const orderDict: { [id: number]: IOrder } = {}
+                const orderDict: { [id: number]: IOrder } = {};
                 gamePeriodState.orders.forEach(order => {
-                    orderDict[order.id] = order
-                })
-                return orderDict
-            })()
+                    orderDict[order.id] = order;
+                });
+                return orderDict;
+            })();
         return <>
             <label
                 className={style.periodInfo}>{`${lang.trading}  ${lang.timeLeft(gameState.periodIndex + 1, countDown < prepareTime ? '' : timeLeft > 0 ? timeLeft : 0)}`}</label>
@@ -90,8 +91,8 @@ function _Play4Owner({frameEmitter, gameState, playerStates}: TPlay4OwnerProps) 
                     <div className={style.chartWrapper}>
                         <TradeChart
                             tradeList={trades.map(({reqOrderId}) => {
-                                const {price, count} = orderDict[reqOrderId]
-                                return {price, count}
+                                const {price, count} = orderDict[reqOrderId];
+                                return {price, count};
                             })}
                             color={{
                                 scalePlate: '#999',
@@ -111,14 +112,14 @@ function _Play4Owner({frameEmitter, gameState, playerStates}: TPlay4OwnerProps) 
                     }
                 </Col>
             </Row>
-        </>
+        </>;
     }
 }
 
 export function Play4Owner(props: TPlay4OwnerProps) {
     return <section className={style.play4owner}>
         <_Play4Owner {...props}/>
-    </section>
+    </section>;
 }
 
 export function playerStatesTable(playerStates: { [token: string]: TPlayerState<IPlayerState> }) {
@@ -128,11 +129,11 @@ export function playerStatesTable(playerStates: { [token: string]: TPlayerState<
         money: ['金额', 'Money'],
         guaranteeCount: ['已融券', 'GuaranteeCount'],
         guaranteeMoney: ['已融资', 'GuaranteeMoney']
-    })
+    });
     return <Table
         dataSource={Object.values(playerStates).map(({actor, user, count, money, guaranteeCount, guaranteeMoney}: TPlayerState<IPlayerState>, i) => ({
             key: actor.token,
-            player: user.name||`Player ${i+1}`,
+            player: user.name || `Player ${i + 1}`,
             money,
             count,
             guaranteeCount,
@@ -164,5 +165,5 @@ export function playerStatesTable(playerStates: { [token: string]: TPlayerState<
                 dataIndex: 'guaranteeCount',
                 key: 'guaranteeCount'
             }
-        ]}/>
+        ]}/>;
 }

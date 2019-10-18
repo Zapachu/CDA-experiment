@@ -17,7 +17,8 @@ import {
     PlayerStatus,
     PushType
 } from '../config';
-import {FrameEmitter, Lang, MaskLoading} from '@elf/component';
+import {Lang, MaskLoading} from '@elf/component';
+import {FrameEmitter} from '@bespoke/share';
 
 function RoundPlay({playerRoundState, gameRoundState, groupParams: {awardA, awardB}, frameEmitter, playerIndex}: {
     groupParams: ICreateParams,

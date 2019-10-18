@@ -1,10 +1,11 @@
-import * as React from 'react'
-import * as style from './style.scss'
-import {Lang, TGameState, Toast, TPlayerState} from '@elf/component'
-import {Core} from '@bespoke/client'
-import {Button, Input, ITestPageQuestion, Line, Loading, TestPage} from '@micro-experiment/component'
-import Joyride, {Step} from 'react-joyride'
-import {Input as AntInput, Radio} from 'antd'
+import * as React from 'react';
+import * as style from './style.scss';
+import {Lang, Toast} from '@elf/component';
+import {TGameState, TPlayerState} from '@bespoke/share';
+import {Core} from '@bespoke/client';
+import {Button, Input, ITestPageQuestion, Line, Loading, TestPage} from '@micro-experiment/component';
+import Joyride, {Step} from 'react-joyride';
+import {Input as AntInput, Radio} from 'antd';
 import {
     ICreateParams,
     IGameState,
@@ -15,7 +16,7 @@ import {
     PlayerStatus,
     PushType,
     ROUNDS
-} from '../config'
+} from '../config';
 
 type TPlayProps = Core.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>
 
