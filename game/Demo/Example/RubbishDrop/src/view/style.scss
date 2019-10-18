@@ -1,0 +1,127 @@
+@import "~@elf/component/lib/public";
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.outWrap {
+  width: 100%;
+  padding: 0.06rem;
+  box-sizing: border-box;
+  background: url('./static/bi_p@3x.png') no-repeat;
+  background-size: 100% 100%;
+  .count {
+    text-align: center;
+    margin-top: 0.25rem;
+  }
+  .trashWrap {
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.55rem;
+    li {
+      flex: 1;
+      height: 1.27rem;
+      margin-right: 0.25rem;
+      font-size: 0.12rem;
+      color: #fff;
+      text-align: center;
+      position: relative;
+      &:last-child {
+        margin-right: 0;
+      }
+      p {
+        width: 100%;
+        position: absolute;
+        text-align: center;
+        bottom: 0.32rem;
+        z-index: 99;
+      }
+      img {
+        width: 100%;
+        position: absolute;
+        left: 0;
+      }
+      .imgT {
+        top: 0;
+        &.open {
+          top: -0.2rem;
+        }
+        transition: top 0.5s;
+      }
+      .imgB {
+        bottom: 0;
+      }
+    }
+  }
+  .progressWrap {
+    text-align: center;
+    .progress {
+      width: 1.6rem;
+      margin-top: 0.72rem;
+      & :global(.ant-progress-inner) {
+        background-color: #020A1E;
+      }
+    }
+  }
+  .peopleWrap {
+    text-align: center;
+    margin-top: 0.1rem;
+    .people {
+      display: inline-block;
+      width: 0.93rem;
+      height: 1.59rem;
+      background: url('./static/me_p@3x.png') no-repeat;
+      background-size: 100% 100%;
+    }
+  }
+  .dashboardWrap {
+    text-align: center;
+    position: relative;
+    .dashboard {
+      width: 1.97rem;
+      height: 1.08rem;
+      & :global(.ant-progress-circle-trail) {
+        stroke: #020A1E!important;
+      }
+      & :global(.ant-progress-inner) {
+        width: 1.97rem!important;
+        height: 1.08rem!important;
+      }
+      & :global(.ant-progress-text) {
+        color: #DA2422!important;
+        font-size: 0.32rem!important;
+      }
+    }
+    span {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+  .rubbishWrap {
+    height: 0.99rem;
+    background: red;
+    margin: 0 -0.06rem -0.06rem -0.06rem;
+    background: url('./static/ljd_2@3x.png') no-repeat;
+    background-size: 100% 100%;
+  }
+  .barrageWrap {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    li {
+      width: 1.33rem;
+      height: 0.28rem;
+      line-height: 0.14rem;
+      padding: 0 0.22rem;
+      border-radius: 0.14rem;
+      font-size: 0.12rem;
+      color: #fff;
+      background: rgba(0,0,0,.3);
+      float: left;
+    }
+  }
+}
