@@ -84,7 +84,7 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
                                 value={params.playersPerGroup}
                                 min={1}
                                 max={12}
-                                step={1}
+                                marks={{[params.playersPerGroup]: params.playersPerGroup}}
                                 onChange={playersPerGroup => setParams({playersPerGroup: +playersPerGroup})}
                         />
                     </li>
@@ -92,8 +92,8 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
                         <Label label={lang.round}/>
                         <Slider className={style.slider}
                                 value={params.rounds}
-                                min={1}
-                                max={12}
+                                marks={{[params.rounds]: params.rounds}}
+                                max={36}
                                 step={1}
                                 onChange={v => setParams({rounds: +v})}
                         />
