@@ -10,6 +10,11 @@ export enum Stage {
     End
 }
 
+export enum MinType {
+    T1 = 0,
+    T2 = 1
+}
+
 export enum GameType {
     T1 = 1,
     T2 = 2

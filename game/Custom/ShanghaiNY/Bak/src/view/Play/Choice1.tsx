@@ -18,8 +18,8 @@ const Choice1: React.FunctionComponent<PropsType> = ({c1, onChoose, gameType, ve
         chooseWait: ['等待', 'Wait'],
         firstChoiceT1: ['你的选择', 'Your choice is'],
         firstChoiceT2: ['第一阶段: 你的选择', 'In the first action, your choice is'],
-        feeLeft: ['(若在第二阶段选1，需要付出延迟选择费', '(If you choose 1 in the next action, you need to pay $ '],
-        feeRight: ['分)', ')']
+        feeLeft: ['(若在第二阶段选1，需要付出延迟费', '(If you choose 1 in the next action, you need to pay $ '],
+        feeRight: ['积分)', ')']
     });
     const options = gameType === GameType.T1
         ? [{label: lang.choose1, value: Choice.One}, {label: lang.choose2, value: Choice.Two}]

@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as style from './style.scss';
 import {Input, Label, Lang, RangeInput, Select} from '@elf/component';
 import {Core} from '@bespoke/client';
-import {GameType, Version} from '../config';
+import {GameType,MinType, Version} from '../config';
 import {ICreateParams} from '../interface';
 
 interface ICreateState {
@@ -11,6 +11,7 @@ interface ICreateState {
     gameType: GameType,
     version: Version,
     participationFee: number,
+    minType: MinType,
     a: number,
     b: number,
     c: number,
@@ -34,12 +35,18 @@ const versions = [
     {label: 'V3', value: Version.V3}
 ];
 
+const minTypes = [
+    {label: '0', value: MinType.T1},
+    {label: '1', value: MinType.T2},
+]
+
 export class Create extends Core.Create<ICreateParams, ICreateState> {
     lang = Lang.extractLang({
         round: ['轮次', 'Round'],
         playersPerGroup: ['每组人数', 'Players per Group'],
         gameType: ['类型', 'Game Type'],
         version: ['版本', 'Version'],
+        minType: ['min','min'],
         params: ['参数', 'Parameters'],
         participationFee: ['参与费', 'Participation Fee']
     });
@@ -51,6 +58,7 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
             rounds: 2,
             gameType: GameType.T1,
             version: Version.V1,
+            minType: MinType.T1,
             participationFee: 0,
             a: 0,
             b: 0,
@@ -104,6 +112,10 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
                 <li>
                     <Label label={lang.version}/>
                     <Select value={params.version} options={versions} onChange={val => setParams({version: +val})}/>
+                </li>
+                <li>
+                    <Label label={lang.minType}/>
+                    <Select value={params.minType} options={minTypes} onChange={val => setParams({minType: +val})}/>
                 </li>
             </ul>
             <p className={style.params}>{lang.params}</p>
