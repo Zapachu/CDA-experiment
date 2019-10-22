@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as style from './style.scss';
 import {Button, ButtonProps, Lang, MaskLoading, Toast} from '@elf/component';
 import {Core} from '@bespoke/client';
-import {Choice, GameType, MainStageIndex, MoveType, PushType, Version} from '../../config';
+import {Choice, GameType, MinType ,MainStageIndex, MoveType, PushType, Version} from '../../config';
 import {ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from '../../interface';
 import Display from './Display';
 import Choice1 from './Choice1';
@@ -31,6 +31,10 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
         yourFirstChoiceRight: ['轮的选择为:', ' is:'],
         lowestChocieLeft: ['第', 'The lowest choice of the group in round '],
         lowestChocieRight: ['轮的组内最低选择为:', ' is:'],
+        totalStatistics1: ['第', 'In round'],
+        totalStatistics2: ['轮组内一共有', ' , '],
+        totalStatistics3: ['人选1，', ' players chose 1'],
+        totalStatistics4: ['人选2，', ' , players chose 2'],
         profitLeft: ['你在第', 'Your profit in round '],
         profitRight: ['轮的积分为:', ' is:'],
         totalProfitLeft: ['截止第', 'Until round '],
@@ -90,17 +94,21 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
     };
 
     renderResult = () => {
-        const {lang, props: {frameEmitter, playerState: {groupIndex, roundIndex, choices, profits, finalProfit}, gameState: {groups}, game: {params: {gameType}}}, state: {c1, c2}} = this;
+        const {lang, props: {frameEmitter, playerState: {groupIndex, roundIndex, choices, profits, finalProfit}, gameState: {groups}, game: {params: {gameType,minType}}}, state: {c1, c2}} = this;
         const curGroup = groups[groupIndex];
         const curRoundIndex = roundIndex;
         const curChoice = choices[curRoundIndex];
+        const curRound = curGroup.rounds[curRoundIndex]
         if (!curChoice) return null;
         const curProfit = profits[curRoundIndex];
+        const statisticsText = minType === MinType.T1 ? 
+        <p>{lang.totalStatistics1}{curRoundIndex + 1}{lang.totalStatistics2} {curRound.x1}{lang.totalStatistics3}{curRound.y1}{lang.totalStatistics4}</p> : 
+        <p>{lang.lowestChocieLeft}{curRoundIndex + 1}{lang.lowestChocieRight} {curGroup.mins[curRoundIndex]}</p>
         switch (gameType) {
             case GameType.T1: {
                 return <>
                     <p>{lang.yourFirstChoiceLeft}{curRoundIndex + 1}{lang.yourFirstChoiceRight} {curChoice.c1}</p>
-                    <p>{lang.lowestChocieLeft}{curRoundIndex + 1}{lang.lowestChocieRight} {curGroup.mins[curRoundIndex]}</p>
+                    {statisticsText}
                     <p>{lang.profitLeft}{curRoundIndex + 1}{lang.profitRight} {curProfit.toFixed(2)}</p>
                     <p>{lang.totalProfitLeft}{curRoundIndex + 1}{lang.totalProfitRight} {finalProfit.toFixed(2)}</p>
                     <Button width={ButtonProps.Width.small}
@@ -118,7 +126,7 @@ export default class MainStage extends Core.Play<ICreateParams, IGameState, IPla
                     {this.renderChoice2(c1, c2)}
                     <p style={{margin: '30px 0'}}>{lang.inFirstAction} {curGroup.ones[curRoundIndex] ? lang.chose1 : lang.notChose1}</p>
                     {curChoice.c1 !== Choice.One ? <p>{lang.yourSecondChoice} {curChoice.c}</p> : null}
-                    <p>{lang.lowestChocieLeft}{curRoundIndex + 1}{lang.lowestChocieRight} {curGroup.mins[curRoundIndex]}</p>
+                    {statisticsText}
                     <p>{lang.profitLeft}{curRoundIndex + 1}{lang.profitRight} {curProfit.toFixed(2)}</p>
                     <p>{lang.totalProfitLeft}{curRoundIndex + 1}{lang.totalProfitRight} {finalProfit.toFixed(2)}</p>
                     <Button width={ButtonProps.Width.small}

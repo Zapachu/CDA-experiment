@@ -76,8 +76,9 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 const curChoice = ps.choices[curRound];
                 if (curChoice) {
                     row.push(choiceTerms[curChoice.c1], curChoice.c1 === Choice.Wait ? choiceTerms[curChoice.c2[0]] : 0, curChoice.c1 === Choice.Wait ? choiceTerms[curChoice.c2[1]] : 0);
+                    const curRoundState = curGroup.rounds[curRound];
                     if (curGroup.mins[curRound]) {
-                        row.push(curChoice.c ? curChoice.c : curChoice.c1, gameType === GameType.T2 ? (curGroup.ones[curRound] ? 1 : 0) : '-', curGroup.mins[curRound], ps.profits[curRound]);
+                        row.push(curChoice.c ? curChoice.c : curChoice.c1, gameType === GameType.T2 ? (curGroup.ones[curRound] ? 1 : 0) : '-', curRoundState.x1, curRoundState.y1, curGroup.mins[curRound], ps.profits[curRound]);
                         if (ps.surveyAnswers.length && curRound === 0) {
                             row.push(...this._formatSurveyAnswers(ps.surveyAnswers));
                         }
@@ -104,6 +105,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                     playerNum: playersPerGroup,
                     mins: [],
                     ones: [],
+                    rounds: [],
                     probs: new Array(rounds).fill('').map(() => this._isP(p))
                 };
             }
@@ -113,6 +115,13 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             let roundIndex = 0;
             while (roundIndex >= 0) {
                 if (playersInGroup.every(ps => !!ps.choices[roundIndex])) {
+                    group.rounds[roundIndex] = {
+                        x1: playersInGroup.filter(ps => ps.choices[roundIndex].c1 === Choice.One).length,
+                        y1: playersInGroup.filter(ps => ps.choices[roundIndex].c1 === Choice.Two).length,
+                        x: playersInGroup.filter(ps => ps.choices[roundIndex].c === Choice.One).length,
+                        y: playersInGroup.filter(ps => ps.choices[roundIndex].c === Choice.Two).length,
+                        min: playersInGroup.some(ps => ps.choices[roundIndex].c === Choice.One) ? Choice.One : Choice.Two
+                    };
                     switch (gameType) {
                         case GameType.T1: {
                             const min = playersInGroup.some(ps => ps.choices[roundIndex].c1 === Choice.One) ? Choice.One : Choice.Two;
@@ -190,6 +199,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                         playerNum: 0,
                         mins: [],
                         ones: [],
+                        rounds: [],
                         probs: new Array(rounds).fill('').map(() => this._isP(p))
                     };
                     openGroupIndex = groups.push(group) - 1;
@@ -245,6 +255,17 @@ export default class Controller extends BaseController<ICreateParams, IGameState
                 const playersInGroup = await this.getPlayersInGroup(playerState.groupIndex);
                 const ready = playersInGroup.length === playersPerGroup && playersInGroup.every(ps => !!ps.choices[curRoundIndex]);
                 if (ready) {
+                    const x1 = playersInGroup.filter(ps => ps.choices[curRoundIndex].c1 === Choice.One).length,
+                        y1 = playersInGroup.filter(ps => ps.choices[curRoundIndex].c1 === Choice.Two).length;
+                    
+                    const min = playersInGroup.some(ps => ps.choices[curRoundIndex].c === Choice.One) ? Choice.One : Choice.Two;
+                    groups[playerState.groupIndex].rounds[curRoundIndex] = {
+                        x1,
+                        y1,
+                        x: playersInGroup.filter(ps => ps.choices[curRoundIndex].c === Choice.One).length,
+                        y: playersInGroup.filter(ps => ps.choices[curRoundIndex].c === Choice.Two).length,
+                        min
+                    };
                     switch (gameType) {
                         case GameType.T1: {
                             const min = playersInGroup.some(ps => ps.choices[curRoundIndex].c1 === Choice.One) ? Choice.One : Choice.Two;
