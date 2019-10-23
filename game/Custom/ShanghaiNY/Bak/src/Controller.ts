@@ -63,7 +63,7 @@ export default class Controller extends BaseController<ICreateParams, IGameState
             [Choice.Wait]: 0,
         };
 
-        const resultData: Array<Array<any>> = [['组', '座位号', '手机号', '最终收益', '轮次', '第一阶段选择', '第二阶段选择(结果1)', '第二阶段选择(结果2)', '最终选择', '第一阶段有人选1', '组内最低选择', '该轮积分', '专业', '年龄', '年级', '家庭住址', '性别']];
+        const resultData: Array<Array<any>> = [['组', '座位号', '手机号', '最终收益', '轮次', '第一阶段选择', '第二阶段选择(结果1)', '第二阶段选择(结果2)', '最终选择', '第一阶段有人选1','第一阶段选1人数','第一阶段选2人数', '组内最低选择', '该轮积分', '专业', '年龄', '年级', '家庭住址', '性别']];
         const playersByGroup = Object.values(playerStates).sort((a, b) => a.groupIndex - b.groupIndex);
         if (!groups) {
             groups = this._rebuildGroups(playersByGroup, this.game.params);
