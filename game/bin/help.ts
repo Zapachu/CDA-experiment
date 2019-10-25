@@ -1,7 +1,8 @@
-import {readdirSync, readFileSync, removeSync, statSync, writeFileSync} from 'fs-extra';
+import {copySync, moveSync, readdirSync, readFileSync, removeSync, statSync, writeFileSync} from 'fs-extra';
 import {resolve} from 'path';
 import {prompt, registerPrompt} from 'inquirer';
-import {env, exec} from 'shelljs';
+import {cd, env, exec} from 'shelljs';
+import * as zip from 'zip-dir';
 
 registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
 
@@ -64,6 +65,36 @@ namespace TaskHelper {
             command: `webpack --env.TS_NODE_PROJECT="tsconfig.json" --config ./${project}/script/webpack.config.ts`
         });
     }
+
+    export function pkg(project: string) {
+        const rootDir = resolve(__dirname, '../../'),
+            pkgDir = resolve(__dirname, `../${project}/pkg/${project.split('/').pop()}`),
+            targetDirs = ['bespokeLib', 'elfLib', 'lerna.json', 'game/package.json'];
+        cd(rootDir);
+        exec('git ls-files', {silent: true}).toString().split('\n').forEach(file => {
+            if (['.ts', '.tsx', '.scss', '.md'].some(a => file.endsWith(a))) {
+                return;
+            }
+            if (targetDirs.some(dir => file.startsWith(dir))) {
+                copySync(resolve(rootDir, file), resolve(pkgDir, file));
+            }
+        });
+        //region package.json
+        const packageJson = require('../../package.json');
+        delete packageJson.scripts.dist;
+        packageJson.scripts.start = `node game/build/serve.js`;
+        writeFileSync(resolve(pkgDir, './package.json'), JSON.stringify(packageJson, null, 2));
+        //endregion
+        copySync(resolve(rootDir, 'elfLib/setting/lib/setting.sample.js'), resolve(pkgDir, 'elfLib/setting/lib/setting.js'));
+        moveSync(resolve(pkgDir, `elfLib`), resolve(pkgDir, 'game/elfLib'));
+        moveSync(resolve(pkgDir, `bespokeLib`), resolve(pkgDir, 'game/bespokeLib'));
+        copySync(resolve(rootDir, `game/${project}/build`), resolve(pkgDir, `game/build`));
+        copySync(resolve(rootDir, `game/${project}/dist`), resolve(pkgDir, `game/dist`));
+        writeFileSync(resolve(pkgDir, `README.txt`), 'npm i\nnpm start');
+        zip(pkgDir, {
+            saveTo: `${pkgDir}.zip`
+        }, err => err ? console.log(err) : removeSync(pkgDir));
+    }
 }
 
 enum Side {
@@ -76,7 +107,8 @@ enum Task {
     dev = 'dev',
     dist = 'dist',
     publish = 'publish',
-    serve = 'serve'
+    serve = 'serve',
+    pkg = 'pkg',
 }
 
 function getProjects(parentProject: string = '.', projectSet = new Set<string>()): Array<string> {
@@ -240,7 +272,7 @@ function getProjects(parentProject: string = '.', projectSet = new Set<string>()
                 {
                     name: 'mode',
                     type: 'list',
-                    choices: [Task.dist, Task.publish],
+                    choices: [Task.dist, Task.publish, Task.pkg],
                     message: 'Mode:'
                 }
             ]);
@@ -252,6 +284,11 @@ function getProjects(parentProject: string = '.', projectSet = new Set<string>()
                 case Task.publish:
                     TaskHelper.publishClient(project);
                     TaskHelper.distServer(project);
+                    break;
+                case Task.pkg:
+                    TaskHelper.distClient(project);
+                    TaskHelper.distServer(project);
+                    TaskHelper.pkg(project);
                     break;
             }
             break;

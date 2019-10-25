@@ -1,0 +1,7 @@
+{
+  "name": "@bespoke-game/graphical",
+  "version": "1.1.1",
+  "dependencies": {
+    "@bespoke-game/graphical-util": "^1.0.0"
+  }
+}

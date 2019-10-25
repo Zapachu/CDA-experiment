@@ -40,6 +40,7 @@ var fs_extra_1 = require("fs-extra");
 var path_1 = require("path");
 var inquirer_1 = require("inquirer");
 var shelljs_1 = require("shelljs");
+var zip = require("zip-dir");
 inquirer_1.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
 var SpecialProject;
 (function (SpecialProject) {
@@ -109,6 +110,7 @@ var Task;
     Task["dist"] = "dist";
     Task["publish"] = "publish";
     Task["serve"] = "serve";
+    Task["pkg"] = "pkg";
 })(Task || (Task = {}));
 function getProjects(parentProject, projectSet) {
     if (parentProject === void 0) { parentProject = '.'; }
@@ -300,7 +302,7 @@ function getProjects(parentProject, projectSet) {
                         {
                             name: 'mode',
                             type: 'list',
-                            choices: [Task.dist, Task.publish],
+                            choices: [Task.dist, Task.publish, Task.pkg],
                             message: 'Mode:'
                         }
                     ])];
@@ -314,6 +316,11 @@ function getProjects(parentProject, projectSet) {
                         case Task.publish:
                             TaskHelper.publishClient(project);
                             TaskHelper.distServer(project);
+                            break;
+                        case Task.pkg:
+                            TaskHelper.distClient(project);
+                            TaskHelper.distServer(project);
+                            TaskHelper.pkg(project);
                             break;
                     }
                     return [3 /*break*/, 19];

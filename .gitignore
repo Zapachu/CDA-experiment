@@ -69,6 +69,7 @@ typings/
 .DS_Store
 build
 dist
+pkg
 
 # setting
 setting.ts

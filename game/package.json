@@ -3,6 +3,7 @@
   "version": "1.1.1",
   "scripts": {
     "tsc-w": "tsc -w",
+    "dist-w": "tsc bin/help bin/update -w",
     "dist": "tsc bin/help bin/update",
     "help": "node bin/help",
     "update": "node bin/update"
@@ -12,9 +13,6 @@
     "@bespoke/robot": "^1.1.1",
     "@bespoke/server": "^1.1.1",
     "@bespoke/share": "^1.1.1",
-    "@bespoke-game/graphical-util": "^1.0.0",
-    "@micro-experiment/component": "^1.1.1",
-    "@micro-experiment/share": "^1.1.1",
     "@extend/client": "^1.1.1",
     "@extend/server": "^1.1.1",
     "@extend/robot": "^1.1.1",
