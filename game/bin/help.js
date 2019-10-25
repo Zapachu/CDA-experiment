@@ -97,6 +97,34 @@ var TaskHelper;
         });
     }
     TaskHelper.publishClient = publishClient;
+    function pkg(project) {
+        var rootDir = path_1.resolve(__dirname, '../../'), pkgDir = path_1.resolve(__dirname, "../" + project + "/pkg/" + project.split('/').pop()), targetDirs = ['bespokeLib', 'elfLib', 'lerna.json', 'game/package.json'];
+        shelljs_1.cd(rootDir);
+        shelljs_1.exec('git ls-files', { silent: true }).toString().split('\n').forEach(function (file) {
+            if (['.ts', '.tsx', '.scss', '.md'].some(function (a) { return file.endsWith(a); })) {
+                return;
+            }
+            if (targetDirs.some(function (dir) { return file.startsWith(dir); })) {
+                fs_extra_1.copySync(path_1.resolve(rootDir, file), path_1.resolve(pkgDir, file));
+            }
+        });
+        //region package.json
+        var packageJson = require('../../package.json');
+        delete packageJson.scripts.dist;
+        packageJson.scripts.start = "node game/build/serve.js";
+        fs_extra_1.writeFileSync(path_1.resolve(pkgDir, './package.json'), JSON.stringify(packageJson, null, 2));
+        //endregion
+        fs_extra_1.copySync(path_1.resolve(rootDir, 'elfLib/setting/lib/setting.sample.js'), path_1.resolve(pkgDir, 'elfLib/setting/lib/setting.js'));
+        fs_extra_1.moveSync(path_1.resolve(pkgDir, "elfLib"), path_1.resolve(pkgDir, 'game/elfLib'));
+        fs_extra_1.moveSync(path_1.resolve(pkgDir, "bespokeLib"), path_1.resolve(pkgDir, 'game/bespokeLib'));
+        fs_extra_1.copySync(path_1.resolve(rootDir, "game/" + project + "/build"), path_1.resolve(pkgDir, "game/build"));
+        fs_extra_1.copySync(path_1.resolve(rootDir, "game/" + project + "/dist"), path_1.resolve(pkgDir, "game/dist"));
+        fs_extra_1.writeFileSync(path_1.resolve(pkgDir, "README.txt"), 'npm i\nnpm start');
+        zip(pkgDir, {
+            saveTo: pkgDir + ".zip"
+        }, function (err) { return err ? console.log(err) : fs_extra_1.removeSync(pkgDir); });
+    }
+    TaskHelper.pkg = pkg;
 })(TaskHelper || (TaskHelper = {}));
 var Side;
 (function (Side) {
