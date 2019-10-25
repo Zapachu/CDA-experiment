@@ -14,7 +14,9 @@ import {asset} from './asset';
 export type TProps = Core.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>
 
 export const CONST = {
-    props: null as TProps
+    props: null as TProps,
+    maxLife: 100,
+    maxEnv: 100
 };
 
 export enum SceneName {

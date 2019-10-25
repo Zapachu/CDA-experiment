@@ -4,6 +4,7 @@ type Key<T extends { [key: string]: string }> = {
 
 export const asset = {
     background: require('./sprites/bg.png'),
+    player:require('./sprites/player.png'),
     harmful:require('./sprites/ashcan/harmful.png'),
     harmful_c:require('./sprites/ashcan/harmful_c.png'),
     kitchen:require('./sprites/ashcan/kitchen.png'),
@@ -12,6 +13,7 @@ export const asset = {
     other_c:require('./sprites/ashcan/other_c.png'),
     recyclable:require('./sprites/ashcan/recyclable.png'),
     recyclable_c:require('./sprites/ashcan/recyclable_c.png'),
+    dump01:require('./sprites/dump/dump01.png'),
 };
 
 export const assetName = (function getAssetName<T extends { [key: string]: string }>(assetMap: T): Key<T> {

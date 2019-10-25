@@ -13,7 +13,7 @@ function Play(props: TProps) {
             require('./Play/index');
         });
     }, []);
-    return <div style={{fontFamily: 'ArcadeClassic', height: '0',overflow:'hidden'}}>
+    return <div style={{fontFamily: 'raster', height: '0',overflow:'hidden'}}>
         Loading...
     </div>;
 }
