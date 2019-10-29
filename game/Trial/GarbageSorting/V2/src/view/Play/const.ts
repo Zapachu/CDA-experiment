@@ -17,7 +17,7 @@ export const CONST = {
     props: null as TProps,
     maxLife: 100,
     maxEnv: 100,
-    envLevel: 4
+    envStep: 40,
 };
 
 export enum SceneName {
