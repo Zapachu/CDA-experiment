@@ -1,37 +1,34 @@
-import {CONST, GarbageTypes, getGarbageConfig, SceneName, TProps} from './const';
-import {GarbageType, PushType} from '../../config';
+import {CONST, SceneName, TProps} from './const';
+import {GarbageType, MoveType, PlayerStatus, PushType} from '../../config';
 import {asset, assetName} from './asset';
+
+const GarbageTypes = [GarbageType.harmful, GarbageType.kitchen, GarbageType.recyclable, GarbageType.other];
+
+function getGarbageConfig(g: GarbageType): { label: string, bodyFrame: string, coverFrame: string } {
+    const [bodyFrame, label] = {
+        [GarbageType.harmful]: ['harmful', '有害垃圾'],
+        [GarbageType.kitchen]: ['kitchen', '厨余垃圾'],
+        [GarbageType.recyclable]: ['recyclable', '可回收垃圾'],
+        [GarbageType.other]: ['other', '其它垃圾'],
+    }[g];
+    return {
+        label,
+        bodyFrame,
+        coverFrame: `${bodyFrame}_c`
+    };
+}
+
 
 interface IPointer {
     x: number
     y: number
 }
 
-const ENV_CONFIG = {
-    x: 189, y: 585, r: 90, w: 18
-};
-
 enum AnimName {
     up = 'down',
     down = 'up',
 }
 
-const PlayerMoveFrames = {
-    down: [
-        {key: assetName.player01, url: asset.player01},
-        {key: assetName.player02, url: asset.player02},
-        {key: assetName.player03, url: asset.player03},
-        {key: assetName.player04, url: asset.player04},
-    ],
-    up: [
-        {key: assetName.player11, url: asset.player11},
-        {key: assetName.player12, url: asset.player12},
-        {key: assetName.player13, url: asset.player13},
-        {key: assetName.player14, url: asset.player14},
-        {key: assetName.player15, url: asset.player15},
-        {key: assetName.player16, url: asset.player16}
-    ]
-};
 const GarbageTextures = [
     {key: assetName.garbage01, url: asset.garbage01},
     {key: assetName.garbage02, url: asset.garbage02},
@@ -45,14 +42,22 @@ const GarbageTextures = [
     {key: assetName.garbage10, url: asset.garbage10},
 ];
 
+let env = 100;
+
 export class MainGame extends Phaser.Scene {
     props: TProps = CONST.props;
     playerContainer: Phaser.GameObjects.Container;
     lifeStrip: Phaser.GameObjects.Container;
     garbageSprite: Phaser.GameObjects.Sprite;
-    garbageCanCovers: Array<Phaser.GameObjects.Sprite> = [];
-    envContainer: Phaser.GameObjects.Container;
-    env = 100;
+    garbageIndex: number;
+    canCovers: Array<Phaser.GameObjects.Sprite> = [];
+    dumpContainer: Phaser.GameObjects.Container;
+    readonly MoveArea = {
+        left: 82, right: 298, top: 180, bottom: 520, border: 40
+    };
+    readonly PlayerInitPosition: IPointer = {
+        x: 190, y: 380
+    };
 
     constructor() {
         super({key: SceneName.mainGame});
@@ -74,25 +79,48 @@ export class MainGame extends Phaser.Scene {
         return this.sys.canvas.height;
     }
 
+    get yRange() {
+        const {MoveArea: {top, bottom, border}} = this;
+        return {
+            max: bottom - border,
+            min: top + border
+        };
+    }
+
     preload() {
-        GarbageTypes.forEach((g) => {
-            const {bodyName, bodySrc, coverName, coverSrc} = getGarbageConfig(g);
-            this.load.image(bodyName, bodySrc);
-            this.load.image(coverName, coverSrc);
-        });
-        PlayerMoveFrames.up.map(({key, url}) => this.load.image(key, url));
-        PlayerMoveFrames.down.map(({key, url}) => this.load.image(key, url));
+        this.load.atlas(assetName.canTexture, asset.canTexture, asset.canAtlas);
+        this.load.atlas(assetName.playerDownTexture, asset.playerDownTexture, asset.playerDownAtlas);
+        this.load.atlas(assetName.playerUpTexture, asset.playerUpTexture, asset.playerUpAtlas);
         GarbageTextures.map(({key, url}) => this.load.image(key, url));
+        this.load.image(assetName.btnSkip, asset.btnSkip);
         this.load.atlas(assetName.dumpTexture, asset.dumpTexture, asset.dumpAtlas);
     }
 
     create() {
         this.layout();
-        this.emitter.on(PushType.sort, ({token, t}) => {
-            if (token !== this.props.playerState.actor.token) {
-                return;
+        this.emitter.on(PushType.sync, ({token, t, env, life, garbageIndex, status}) => {
+            if(!this.sys.game){
+                return
+            }
+            if (this.props.playerState.actor.token === token) {
+                this.setData(env, life, garbageIndex, status);
+            } else {
+                this.setEnv(env);
+                this.showTips(t.toString());
             }
         });
+        const {env} = this.props.gameState, {life, garbageIndex, status} = this.props.playerState;
+        this.setData(env, life, garbageIndex, status);
+    }
+
+    setData(env: number, life: number, garbageIndex: number, status: PlayerStatus) {
+        this.setEnv(env);
+        this.setLife(life);
+        this.setGarbage(garbageIndex);
+        if (status !== PlayerStatus.play) {
+            this.sys.game.destroy(true);
+            CONST.overCallBack();
+        }
     }
 
     layout() {
@@ -104,15 +132,15 @@ export class MainGame extends Phaser.Scene {
         });
         this.drawCans();
         this.drawPlayer();
-        this.setEnv(100);
+        this.setEnv(CONST.maxEnv);
     }
 
     drawCans() {
         GarbageTypes.forEach((type, i) => {
-            const {bodyName, coverName, label} = getGarbageConfig(type),
-                bodySprite = this.add.sprite(48 + i * 92, 180, bodyName),
-                coverSprite = this.add.sprite(48 + i * 92, 120, coverName);
-            this.garbageCanCovers[i] = coverSprite;
+            const {bodyFrame, coverFrame, label} = getGarbageConfig(type),
+                bodySprite = this.add.sprite(48 + i * 92, 180, assetName.canTexture, bodyFrame),
+                coverSprite = this.add.sprite(48 + i * 92, 120, assetName.canTexture, coverFrame);
+            this.canCovers[i] = coverSprite;
             bodySprite.displayWidth = 69;
             bodySprite.displayHeight = 103;
             coverSprite.displayWidth = 83;
@@ -121,7 +149,7 @@ export class MainGame extends Phaser.Scene {
             bodySprite.setInteractive();
             bodySprite.on('pointerdown', pointer => {
                 this.dragPlayer(pointer);
-                window.setTimeout(() => this.endDrag(pointer), 4e2);
+                window.setTimeout(() => this.endDrag(pointer), 5e2);
             });
         });
     }
@@ -129,18 +157,16 @@ export class MainGame extends Phaser.Scene {
     showTips(str: string) {
         const {stageWidth} = this;
         const y = 250 + ~~(Math.random() * 10) * 25;
-        const text = this.add.text(stageWidth, y, str, {
-            fontSize: '20px'
-        });
+        const text = this.add.text(stageWidth, y, str, {fontSize: '16px'});
         const textBg = this.add.graphics({
             x: stageWidth,
             y,
             fillStyle: {color: 0x000, alpha: .6}
-        }).fillRoundedRect(-16, -4, text.width + 32, 26, 13).setDepth(-1);
+        }).fillRoundedRect(-16, -7, text.width + 32, 28, 13).setDepth(-1);
         this.tweens.add({
             targets: [textBg, text],
             x: -stageWidth,
-            duration: 3e3,
+            duration: 8e3,
             onComplete: () => {
                 text.destroy();
                 textBg.destroy();
@@ -149,11 +175,12 @@ export class MainGame extends Phaser.Scene {
     }
 
     formatDragPointer(pointer: IPointer): IPointer {
+        const {MoveArea: {left, right, top, bottom}} = this;
         let x = pointer.x, y = pointer.y;
-        x = Math.max(82, x);
-        x = Math.min(x, 298);
-        y = Math.max(180, y);
-        y = Math.min(y, 590);
+        x = Math.max(left, x);
+        x = Math.min(x, right);
+        y = Math.max(top, y);
+        y = Math.min(y, bottom);
         return {x, y};
     }
 
@@ -182,43 +209,45 @@ export class MainGame extends Phaser.Scene {
     dragPlayer(pointer) {
         const {x, y} = this.formatDragPointer(pointer);
         this.movePlayer(pointer, () => {
-            if (y < 280) {
+            if (y > this.yRange.max) {
+                const dumpSprite = this.dumpContainer.getAt(0) as Phaser.GameObjects.Sprite;
+                dumpSprite.setTint(0x888888);
+            } else if (y < this.yRange.min) {
                 const type = GarbageTypes[Math.round((x - 48) / 92)];
                 GarbageTypes.forEach(t => {
                     t === type ? this.hoverCan(t) : this.leaveCan(t);
                 });
+            } else {
+                this.resetDragEffect();
             }
         });
+    }
+
+    resetDragEffect() {
+        const dumpSprite = this.dumpContainer.getAt(0) as Phaser.GameObjects.Sprite;
+        dumpSprite.clearTint();
+        GarbageTypes.forEach(t => this.leaveCan(t));
     }
 
     endDrag(pointer) {
         const {playerSprite, garbageSprite} = this;
         const {x, y} = this.formatDragPointer(pointer);
-        this.movePlayer({x: 190, y: 400}, () => {
+        this.movePlayer(this.PlayerInitPosition, () => {
+            this.resetDragEffect();
             playerSprite.anims.stop();
-            playerSprite.setTexture(assetName.player01);
+            playerSprite.setTexture(assetName.playerDownTexture);
             garbageSprite.setVisible(true);
         });
-        GarbageTypes.forEach(t => this.leaveCan(t));
-        const dumpSprite = this.envContainer.getAt(0) as Phaser.GameObjects.Sprite;
-        if (y >= Math.min(590, this.stageHeight - dumpSprite.height)) {
-            this.submit();
-        } else if (y < 280) {
+        if (y > this.yRange.max) {
+            this.submit(GarbageType.skip);
+        } else if (y < this.yRange.min) {
             const type = GarbageTypes[Math.round((x - 48) / 92)];
             this.submit(type);
         }
     }
 
-    submit(type?: GarbageType) {
-        if (this.env >= 20) {
-            this.setEnv(this.env -= 20);
-        }
-        if (type === undefined) {
-            this.showTips(`懒得分类，丢入垃圾堆`);
-        } else {
-            this.showTips(`丢入垃圾箱: ${getGarbageConfig(type).label}`);
-        }
-        this.setGarbage(~~(Math.random() * 10));
+    submit(t?: GarbageType) {
+        this.emitter.emit(MoveType.submit, {i: this.garbageIndex, t});
     }
 
     //endregion
@@ -226,23 +255,23 @@ export class MainGame extends Phaser.Scene {
     drawPlayer() {
         this.anims.create({
             key: AnimName.up,
-            frames: PlayerMoveFrames.up as any,
+            frames: this.anims.generateFrameNames(assetName.playerUpTexture),
             frameRate: 16,
             repeat: -1,
         });
         this.anims.create({
             key: AnimName.down,
-            frames: PlayerMoveFrames.down as any,
+            frames: this.anims.generateFrameNames(assetName.playerDownTexture),
             frameRate: 12,
             repeat: -1,
         });
-        const container = this.add.container(190, 400),
+        const container = this.add.container(this.PlayerInitPosition.x, this.PlayerInitPosition.y),
             shadowSprite = this.add.graphics({
                 x: 0,
                 y: 75,
                 fillStyle: {color: 0x000, alpha: .5}
             }).fillCircle(0, 0, 50).setScale(1, .25),
-            playerSprite = this.add.sprite(0, 0, assetName.player01);
+            playerSprite = this.add.sprite(0, 0, assetName.playerDownTexture);
         container.add(shadowSprite);
         container.add(playerSprite);
         this.playerContainer = container;
@@ -258,12 +287,12 @@ export class MainGame extends Phaser.Scene {
         });
         playerSprite.on('drag', pointer => this.dragPlayer(pointer));
         playerSprite.on('dragend', pointer => this.endDrag(pointer));
-        container.add(this.setLife(80));
-        container.add(this.setGarbage(5));
+        container.add(this.setLife(100));
+        container.add(this.setGarbage(0));
     }
 
     hoverCan(type: GarbageType) {
-        const coverSprite = this.garbageCanCovers[type];
+        const coverSprite = this.canCovers[type];
         if (this.tweens.isTweening(coverSprite)) {
             return;
         }
@@ -283,7 +312,7 @@ export class MainGame extends Phaser.Scene {
     }
 
     leaveCan(type: GarbageType) {
-        const coverSprite = this.garbageCanCovers[type];
+        const coverSprite = this.canCovers[type];
         this.tweens.getTweensOf(coverSprite).forEach(t => this.tweens.remove(t));
         this.tweens.add({
             targets: coverSprite,
@@ -298,6 +327,7 @@ export class MainGame extends Phaser.Scene {
     }
 
     setGarbage(n: number) {
+        this.garbageIndex = n;
         if (this.garbageSprite) {
             this.garbageSprite.setTexture(GarbageTextures[n].key);
         } else {
@@ -306,7 +336,7 @@ export class MainGame extends Phaser.Scene {
             garbageSprite.displayHeight = 70;
             this.garbageSprite = garbageSprite;
         }
-        return this.garbageSprite;
+        return this.garbageSprite.setRotation(Math.PI * (Math.random() - .5));
     }
 
     setLife(n: number): Phaser.GameObjects.Container {
@@ -320,57 +350,75 @@ export class MainGame extends Phaser.Scene {
             this.lifeStrip = lifeStrip;
         }
         const lifeStrip = this.lifeStrip.getAt(1) as Phaser.GameObjects.Graphics;
-        lifeStrip.clear().fillRoundedRect(-79.5, -102.5, 153.5 * n / CONST.maxLife, 9, 4.5);
+        lifeStrip.clear();
+        if (n) {
+            lifeStrip.fillRoundedRect(-79.5, -102.5, 153.5 * n / CONST.maxLife, 9, 4.5);
+        }
         return this.lifeStrip;
     }
 
     setEnv(n: number) {
-        const {x, y, r, w} = ENV_CONFIG;
-        if (this.envContainer) {
-            const strip = this.envContainer.getAt(1) as Phaser.GameObjects.Graphics;
-            strip.clear();
-        } else {
-            const envContainer = this.add.container(0, 0);
-            const dumpSprite = this.add.sprite(this.stageWidth >> 1, this.stageHeight, assetName.dumpTexture);
-            envContainer.add(dumpSprite);
-            const bg = this.add.graphics({lineStyle: {width: w, color: 0xd3d3d3}, fillStyle: {color: 0xd3d3d3}});
+        const x = 0, y = -80, r = 90, w = 18;
+        if (!this.dumpContainer) {
+            const dumpSprite = this.add.sprite(0, 0, assetName.dumpTexture);
+            const bg = this.add.graphics({
+                lineStyle: {width: w, color: 0xd3d3d3},
+                fillStyle: {color: 0xd3d3d3}
+            });
             bg.beginPath();
             bg.arc(x, y, r, Phaser.Math.DegToRad(-180), Phaser.Math.DegToRad(0));
             bg.strokePath();
+            bg.slice(x - r, y, w >> 1, 0, Math.PI);
+            bg.fillPath();
+            bg.slice(x + r, y, w >> 1, 0, Math.PI);
+            bg.fillPath();
             bg.closePath();
-            bg.fillCircle(x - r, y, w >> 1);
-            bg.fillCircle(x + r, y, w >> 1);
-            envContainer.add(bg);
-            envContainer.add(this.add.graphics({
-                lineStyle: {width: w, color: 0x5efa2c},
-                fillStyle: {color: 0x5efa2c}
-            }));
-            envContainer.add(this.add.text(x, y - 60, n.toString(), {
+            const stripGraphics = this.add.graphics({lineStyle: {width: w}});
+            const scoreText = this.add.text(x, y - 60, n.toString(), {
                 fontFamily: 'raster',
-                fontSize: '30px',
-                color: '#da2422'
-            }));
-            this.envContainer = envContainer;
+                fontSize: '30px'
+            }).setStroke('#fff', 6).setOrigin(.5);
+            const scoreLabel = this.add.text(x, y - 20, '环境得分', {fontSize: '18px'}).setStroke('#fff', 6).setOrigin(.5);
+            const btnSkip = this.add.image(0, 0, assetName.btnSkip),
+                btnSkipLabel = this.add.text(0, 0, '懒得分类', {
+                    fontSize: '14px',
+                    color: '#ffffff',
+                }).setOrigin(.5, .5).setAlpha(.9);
+            btnSkip.setInteractive();
+            btnSkip.on('pointerdown', pointer => {
+                btnSkip.setTint(0x888888);
+                this.dragPlayer(pointer);
+                window.setTimeout(() => {
+                    this.endDrag(pointer);
+                    btnSkip.clearTint();
+                }, 5e2);
+            });
+            const btnContainer = this.add.container(x, y + 40, [btnSkip, btnSkipLabel]);
+            this.dumpContainer = this.add.container(this.stageWidth >> 1, this.stageHeight, [dumpSprite, bg, stripGraphics, scoreText, scoreLabel, btnContainer]);
         }
-        const {envContainer} = this,
-            [dumpSprite, , strip, score] = envContainer.getAll() as [Phaser.GameObjects.Sprite, Phaser.GameObjects.Graphics, Phaser.GameObjects.Graphics, Phaser.GameObjects.Text];
-        dumpSprite.setInteractive();
-        dumpSprite.setFrame(`0${~~((CONST.maxEnv - n) / CONST.envStep)}.png`);
+        const {dumpContainer} = this,
+            [dumpSprite, , stripGraphics, scoreText, scoreLabel] = dumpContainer.getAll() as [Phaser.GameObjects.Sprite, Phaser.GameObjects.Graphics, Phaser.GameObjects.Graphics, Phaser.GameObjects.Text, Phaser.GameObjects.Text, Phaser.GameObjects.Container];
+        dumpSprite.setFrame(~~((CONST.maxEnv - n) / CONST.envStep));
         dumpSprite.setDisplayOrigin(dumpSprite.width >> 1, dumpSprite.height);
-        dumpSprite.removeAllListeners().on('pointerdown', pointer => {
-            this.dragPlayer(pointer);
-            window.setTimeout(() => this.endDrag(pointer), 4e2);
-        });
         const angle = -Math.PI * (1 - n / CONST.maxEnv);
-        strip.clear().beginPath();
-        strip.arc(x, y, r, -Math.PI, angle);
-        strip.strokePath();
-        strip.closePath();
-        if(n){
-            strip.fillCircle(x - r, y, w >> 1);
-            strip.fillCircle(x + window.Math.cos(angle) * r, y + window.Math.sin(angle) * r, w >> 1);
+        const color = Phaser.Display.Color.HSLToColor(1.2 * n / 360, .8, .43).color,
+            hexColor = '#' + Phaser.Display.Color.ComponentToHex(color);
+        stripGraphics.setDefaultStyles({
+            lineStyle: {width: w, color},
+            fillStyle: {color}
+        });
+        stripGraphics.clear().beginPath();
+        stripGraphics.beginPath();
+        stripGraphics.arc(x, y, r, -Math.PI, angle);
+        stripGraphics.strokePath();
+        stripGraphics.closePath();
+        if (n) {
+            stripGraphics.slice(x - r, y, w >> 1, 0, Math.PI);
+            stripGraphics.fillPath();
+            stripGraphics.slice(x + window.Math.cos(angle) * r, y + window.Math.sin(angle) * r, w >> 1, angle, Math.PI + angle);
+            stripGraphics.fillPath();
         }
-        score.setText(n.toString());
-        score.displayOriginX = score.width>>1
+        scoreText.setColor(hexColor).setText(n.toString());
+        scoreLabel.setColor(hexColor);
     }
 }

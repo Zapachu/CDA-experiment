@@ -1,0 +1,188 @@
+{
+	"textures": [
+		{
+			"image": "can.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 166,
+				"h": 1016
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "harmful",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 137,
+						"h": 206
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 137,
+						"h": 206
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 137,
+						"h": 206
+					}
+				},
+				{
+					"filename": "harmful_c",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 166,
+						"h": 48
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 166,
+						"h": 48
+					},
+					"frame": {
+						"x": 0,
+						"y": 206,
+						"w": 166,
+						"h": 48
+					}
+				},
+				{
+					"filename": "kitchen",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 137,
+						"h": 206
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 137,
+						"h": 206
+					},
+					"frame": {
+						"x": 0,
+						"y": 254,
+						"w": 137,
+						"h": 206
+					}
+				},
+				{
+					"filename": "kitchen_c",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 166,
+						"h": 48
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 166,
+						"h": 48
+					},
+					"frame": {
+						"x": 0,
+						"y": 460,
+						"w": 166,
+						"h": 48
+					}
+				},
+				{
+					"filename": "other",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 137,
+						"h": 206
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 137,
+						"h": 206
+					},
+					"frame": {
+						"x": 0,
+						"y": 508,
+						"w": 137,
+						"h": 206
+					}
+				},
+				{
+					"filename": "other_c",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 166,
+						"h": 48
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 166,
+						"h": 48
+					},
+					"frame": {
+						"x": 0,
+						"y": 714,
+						"w": 166,
+						"h": 48
+					}
+				},
+				{
+					"filename": "recyclable",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 137,
+						"h": 206
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 137,
+						"h": 206
+					},
+					"frame": {
+						"x": 0,
+						"y": 762,
+						"w": 137,
+						"h": 206
+					}
+				},
+				{
+					"filename": "recyclable_c",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 166,
+						"h": 48
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 166,
+						"h": 48
+					},
+					"frame": {
+						"x": 0,
+						"y": 968,
+						"w": 166,
+						"h": 48
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:d9e98b6f421eb7de1993ce2fe330f96f:3b39aeec366355b11ee151c4621f0024:89c64ee1db2666b560276d0ed7e864a9$"
+	}
+}

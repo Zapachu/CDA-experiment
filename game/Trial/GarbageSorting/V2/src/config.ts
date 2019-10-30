@@ -4,31 +4,48 @@ export enum GarbageType {
     harmful,
     kitchen,
     recyclable,
-    other
+    other,
+    skip
+}
+
+export const CONFIG = {
+    maxLife: 100,
+    maxEnv: 100,
+    garbageAmount: 10
 }
 
 export enum MoveType {
-    sort
+    submit
 }
 
 export enum PushType {
-    sort
+    sync
 }
 
 export interface ICreateParams {
 }
 
 export interface IMoveParams {
+    i: number
     t: GarbageType
 }
 
-export interface IPushParams {
+export interface IPushParams extends IGameState, IPlayerState{
     token: string
     t: GarbageType
 }
 
 export interface IGameState {
+    env: number
+}
+
+export enum PlayerStatus{
+    play,
+    wait
 }
 
 export interface IPlayerState {
+    status:PlayerStatus
+    life: number
+    garbageIndex:number
 }

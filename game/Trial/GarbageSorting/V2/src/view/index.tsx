@@ -7,15 +7,18 @@ import {TProps} from './Play/const';
 import './style.scss';
 
 function Play(props: TProps) {
+    const [playing, setPlaying] = React.useState(true);
     useEffect(() => {
         loadScript(['https://cdnjs.cloudflare.com/ajax/libs/phaser/3.19.0/phaser.min.js'], () => {
-            require('./Play/const').CONST.props = props;
+            const {CONST} = require('./Play/const');
+            CONST.props = props;
+            CONST.overCallBack = () => setPlaying(false);
             require('./Play/index');
         });
     }, []);
-    return <div style={{fontFamily: 'raster', height: '0',overflow:'hidden'}}>
+    return playing ? <div style={{fontFamily: 'raster', height: '0', overflow: 'hidden'}}>
         Loading...
-    </div>;
+    </div> : <div>WAITING</div>;
 }
 
 registerOnFramework(namespace, {
