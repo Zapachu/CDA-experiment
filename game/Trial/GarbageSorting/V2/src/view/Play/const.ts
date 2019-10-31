@@ -8,14 +8,15 @@ import {
     MoveType,
     PushType
 } from '../../config';
-import {Core} from '@bespoke/client';
+import {Core,} from '@bespoke/client';
+import {FrameEmitter} from '@bespoke/share';
 
 export type TProps = Core.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>
 
 export const CONST = {
-    overCallBack: ()=>null,
-    props: null as TProps,
-    envStep: 23,
+    overCallBack: () => null,
+    emitter: null as FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>,
+    envStep: 230,
     ...CONFIG
 };
 

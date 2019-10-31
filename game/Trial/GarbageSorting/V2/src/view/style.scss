@@ -6,3 +6,11 @@
 body{
   background: url('./Play/asset/sprites/bg.png')
 }
+
+.result{
+  width: 16rem;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

@@ -1,5 +1,4 @@
 import {MainGame} from './scene';
-import {asset} from './asset';
 
 const config:Phaser.Types.Core.GameConfig = {
     transparent: true,

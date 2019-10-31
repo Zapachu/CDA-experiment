@@ -8,17 +8,35 @@ export enum GarbageType {
     skip
 }
 
+export const Garbage: Array<{ label: string, type: GarbageType }> = [
+    {label: '白菜', type: GarbageType.kitchen},
+    {label: '灯泡', type: GarbageType.kitchen},
+    {label: '电池', type: GarbageType.kitchen},
+    {label: '骨头', type: GarbageType.kitchen},
+    {label: '灰土', type: GarbageType.kitchen},
+    {label: '陶碗', type: GarbageType.kitchen},
+    {label: '衣服', type: GarbageType.kitchen},
+    {label: '纸巾', type: GarbageType.kitchen},
+    {label: '矿泉水', type: GarbageType.kitchen},
+    {label: '易拉罐', type: GarbageType.kitchen},
+];
+
 export const CONFIG = {
+    groupSize: 10,
     maxLife: 100,
-    maxEnv: 100,
-    garbageAmount: 10
-}
+    sortCost: 10,
+    maxEnv: 1000,
+    pollutionOfSkip: 10,
+    pollutionOfWrong: 5,
+};
 
 export enum MoveType {
+    prepare,
     submit
 }
 
 export enum PushType {
+    prepare,
     sync
 }
 
@@ -30,22 +48,24 @@ export interface IMoveParams {
     t: GarbageType
 }
 
-export interface IPushParams extends IGameState, IPlayerState{
-    token: string
-    t: GarbageType
+export interface IPushParams extends IMoveParams, IPlayerState {
+    env: number
 }
 
 export interface IGameState {
     env: number
+    playerNum: number
+    sorts: GarbageType[][]
 }
 
-export enum PlayerStatus{
+export enum PlayerStatus {
     play,
-    wait
+    result
 }
 
 export interface IPlayerState {
-    status:PlayerStatus
+    index: number
+    status: PlayerStatus
     life: number
-    garbageIndex:number
+    garbageIndex: number
 }
