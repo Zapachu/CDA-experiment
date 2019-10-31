@@ -29,21 +29,6 @@ enum AnimName {
     down = 'up',
 }
 
-const GarbageTextures = [
-    {key: assetName.garbage01, url: asset.garbage01},
-    {key: assetName.garbage02, url: asset.garbage02},
-    {key: assetName.garbage03, url: asset.garbage03},
-    {key: assetName.garbage04, url: asset.garbage04},
-    {key: assetName.garbage05, url: asset.garbage05},
-    {key: assetName.garbage06, url: asset.garbage06},
-    {key: assetName.garbage07, url: asset.garbage07},
-    {key: assetName.garbage08, url: asset.garbage08},
-    {key: assetName.garbage09, url: asset.garbage09},
-    {key: assetName.garbage10, url: asset.garbage10},
-];
-
-let env = 100;
-
 export class MainGame extends Phaser.Scene {
     props: TProps = CONST.props;
     playerContainer: Phaser.GameObjects.Container;
@@ -91,22 +76,22 @@ export class MainGame extends Phaser.Scene {
         this.load.atlas(assetName.canTexture, asset.canTexture, asset.canAtlas);
         this.load.atlas(assetName.playerDownTexture, asset.playerDownTexture, asset.playerDownAtlas);
         this.load.atlas(assetName.playerUpTexture, asset.playerUpTexture, asset.playerUpAtlas);
-        GarbageTextures.map(({key, url}) => this.load.image(key, url));
-        this.load.image(assetName.btnSkip, asset.btnSkip);
+        this.load.atlas(assetName.garbageTexture, asset.garbageTexture, asset.garbageAtlas);
         this.load.atlas(assetName.dumpTexture, asset.dumpTexture, asset.dumpAtlas);
+        this.load.image(assetName.btnSkip, asset.btnSkip);
     }
 
     create() {
         this.layout();
         this.emitter.on(PushType.sync, ({token, t, env, life, garbageIndex, status}) => {
-            if(!this.sys.game){
-                return
+            if (!this.sys.game) {
+                return;
             }
             if (this.props.playerState.actor.token === token) {
                 this.setData(env, life, garbageIndex, status);
             } else {
                 this.setEnv(env);
-                this.showTips(t.toString());
+                t === GarbageType.skip ? this.showTips(`XXX随手扔入垃圾堆`) : null;
             }
         });
         const {env} = this.props.gameState, {life, garbageIndex, status} = this.props.playerState;
@@ -329,9 +314,9 @@ export class MainGame extends Phaser.Scene {
     setGarbage(n: number) {
         this.garbageIndex = n;
         if (this.garbageSprite) {
-            this.garbageSprite.setTexture(GarbageTextures[n].key);
+            this.garbageSprite.setFrame(n);
         } else {
-            const garbageSprite = this.add.sprite(0, 38, GarbageTextures[n].key);
+            const garbageSprite = this.add.sprite(0, 38, assetName.garbageTexture);
             garbageSprite.displayWidth = 70;
             garbageSprite.displayHeight = 70;
             this.garbageSprite = garbageSprite;
