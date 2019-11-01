@@ -25,9 +25,12 @@ export const CONFIG = {
     groupSize: 10,
     maxLife: 100,
     sortCost: 10,
+    sortSeconds: 5,
     maxEnv: 1000,
     pollutionOfSkip: 10,
     pollutionOfWrong: 5,
+    rightScore: 10,
+    skipScore: -10
 };
 
 export enum MoveType {

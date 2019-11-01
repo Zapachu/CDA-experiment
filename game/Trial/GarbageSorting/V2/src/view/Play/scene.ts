@@ -29,6 +29,7 @@ enum AnimName {
 }
 
 type IState = Partial<{
+    status: PlayerStatus
     index: number
     env: number
     life: number
@@ -49,6 +50,7 @@ export class MainGame extends Phaser.Scene {
         x: 190, y: 380
     };
     state: IState = {
+        status: PlayerStatus.play,
         index: 0,
         env: 0,
         life: 0,
@@ -90,8 +92,8 @@ export class MainGame extends Phaser.Scene {
 
     create() {
         this.layout();
-        CONST.emitter.on(PushType.prepare, ({env, life, garbageIndex, index}) =>
-            this.updateState({env, life, garbageIndex, index})
+        CONST.emitter.on(PushType.prepare, ({env, life, garbageIndex, index, status}) =>
+            this.updateState({env, life, garbageIndex, index, status})
         );
         CONST.emitter.on(PushType.sync, ({i, t, env, life, garbageIndex, index, status}) => {
             if (!this.sys.game) {
@@ -102,17 +104,17 @@ export class MainGame extends Phaser.Scene {
                 t === GarbageType.skip ? this.showTips(`有人将${Garbage[i].label}随手扔入垃圾堆`) : null;
                 return;
             }
-            if (status === PlayerStatus.play) {
-                this.updateState({env, life, garbageIndex});
-            } else {
-                this.sys.game.destroy(true);
-                CONST.overCallBack();
-            }
+            this.updateState({env, life, garbageIndex, status});
         });
         CONST.emitter.emit(MoveType.prepare);
     }
 
     updateState(state: IState) {
+        if (state.status === PlayerStatus.result) {
+            this.sys.game.destroy(true);
+            CONST.overCallBack();
+            return;
+        }
         Object.assign(this.state, state);
         this.updateEnv();
         this.updateLife();
