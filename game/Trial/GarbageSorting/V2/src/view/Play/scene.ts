@@ -43,6 +43,7 @@ export class MainGame extends Phaser.Scene {
     garbageText: Phaser.GameObjects.Text;
     canCovers: Array<Phaser.GameObjects.Sprite> = [];
     dumpContainer: Phaser.GameObjects.Container;
+    skipContainer: Phaser.GameObjects.Container;
     readonly MoveArea = {
         left: 82, right: 298, top: 180, bottom: 520, border: 40
     };
@@ -56,6 +57,7 @@ export class MainGame extends Phaser.Scene {
         life: 0,
         garbageIndex: 0
     };
+    burningStartTime: number = -1;
 
     constructor() {
         super({key: SceneName.mainGame});
@@ -87,6 +89,7 @@ export class MainGame extends Phaser.Scene {
         this.load.atlas(assetName.playerUpTexture, asset.playerUpTexture, asset.playerUpAtlas);
         this.load.atlas(assetName.garbageTexture, asset.garbageTexture, asset.garbageAtlas);
         this.load.atlas(assetName.dumpTexture, asset.dumpTexture, asset.dumpAtlas);
+        this.load.image(assetName.particle, asset.particle);
         this.load.image(assetName.btnSkip, asset.btnSkip);
     }
 
@@ -113,13 +116,6 @@ export class MainGame extends Phaser.Scene {
                 t === GarbageType.skip ? this.showTips(`有人将${Garbage[i].label}随手扔入垃圾堆`) : null;
                 return;
             }
-            if (this.state.garbageIndex !== garbageIndex) {
-                window.setTimeout(() => {
-                    if (this.state.garbageIndex === garbageIndex) {
-                        this.skipGarbage();
-                    }
-                }, 5e3);
-            }
             this.updateState({env, life, garbageIndex, status});
         });
         CONST.emitter.emit(MoveType.prepare);
@@ -140,6 +136,7 @@ export class MainGame extends Phaser.Scene {
     layout() {
         this.drawCans();
         this.drawPlayer();
+        this.drawBtnSkip();
     }
 
     drawCans() {
@@ -253,11 +250,11 @@ export class MainGame extends Phaser.Scene {
         }
     }
 
+    //endregion
+
     submit(t?: GarbageType) {
         CONST.emitter.emit(MoveType.submit, {i: this.state.garbageIndex, t});
     }
-
-    //endregion
 
     drawPlayer() {
         this.anims.create({
@@ -353,7 +350,29 @@ export class MainGame extends Phaser.Scene {
                 color: '#da2422'
             }).setOrigin(1, 0);
         }
-        return this.garbageSprite.setRotation(n);
+        this.playBurning(n)
+        return this.garbageSprite
+    }
+
+    playBurning(n:number){
+        const duration = 5e3
+        if(!this.skipContainer){
+            return
+        }
+        const particles = this.skipContainer.getAt(2) as Phaser.GameObjects.Particles.ParticleEmitterManager;
+        this.burningStartTime = this.time.now;
+        this.tweens.add({
+            targets: [particles],
+            x: {from: 0, to: -136},
+            y: {from: 0, to: 10},
+            duration
+        });
+        window.setTimeout(() => {
+            if (this.state.garbageIndex === n) {
+                this.burningStartTime = -1;
+                this.skipGarbage();
+            }
+        }, duration);
     }
 
     updateLife(): Phaser.GameObjects.Container {
@@ -380,6 +399,36 @@ export class MainGame extends Phaser.Scene {
         window.setTimeout(() => this.endDrag(pointer), 5e2);
     }
 
+    drawBtnSkip() {
+        const btnSkip = this.add.image(0, 0, assetName.btnSkip);
+        btnSkip.setInteractive();
+        btnSkip.on('pointerdown', pointer => {
+            this.skipGarbage(pointer);
+            btnSkip.setTint(0x888888);
+            window.setTimeout(() => {
+                btnSkip.clearTint();
+            }, 5e2);
+        });
+
+        const particles = this.add.particles(assetName.particle);
+        particles.createEmitter({
+            x: 63,
+            y: -14,
+            angle: -15,
+            speed: {min: 10, max: 30},
+            gravityY: 300,
+            scale: {start: 1, end: 0},
+            lifespan: 1000
+        });
+        const mask = this.make.graphics({x: 80, y: 600}).fillRect(0, 0, 186, 50)
+        btnSkip.mask = new Phaser.Display.Masks.GeometryMask(this, mask);
+        const btnSkipLabel = this.add.text(0, 0, '懒得分类', {
+            fontSize: '14px',
+            color: '#ffffff',
+        }).setOrigin(.5, .5).setAlpha(.9);
+        this.skipContainer = this.add.container(this.stageWidth >> 1, this.stageHeight - 40, [btnSkip, btnSkipLabel, particles, mask]);
+    }
+
     updateEnv() {
         const n = this.state.env;
         const x = 0, y = -80, r = 90, w = 18;
@@ -403,21 +452,7 @@ export class MainGame extends Phaser.Scene {
                 fontSize: '30px'
             }).setStroke('#fff', 6).setOrigin(.5);
             const scoreLabel = this.add.text(x, y - 5, '环境评分', {fontSize: '18px'}).setStroke('#fff', 6).setOrigin(.5);
-            const btnSkip = this.add.image(0, 0, assetName.btnSkip),
-                btnSkipLabel = this.add.text(0, 0, '懒得分类', {
-                    fontSize: '14px',
-                    color: '#ffffff',
-                }).setOrigin(.5, .5).setAlpha(.9);
-            btnSkip.setInteractive();
-            btnSkip.on('pointerdown', pointer => {
-                this.skipGarbage(pointer);
-                btnSkip.setTint(0x888888);
-                window.setTimeout(() => {
-                    btnSkip.clearTint();
-                }, 5e2);
-            });
-            const btnContainer = this.add.container(x, y + 40, [btnSkip, btnSkipLabel]);
-            this.dumpContainer = this.add.container(this.stageWidth >> 1, this.stageHeight, [dumpSprite, bg, stripGraphics, scoreText, scoreLabel, btnContainer]);
+            this.dumpContainer = this.add.container(this.stageWidth >> 1, this.stageHeight, [dumpSprite, bg, stripGraphics, scoreText, scoreLabel]);
         }
         const {dumpContainer} = this,
             [dumpSprite, , stripGraphics, scoreText, scoreLabel] = dumpContainer.getAll() as [Phaser.GameObjects.Sprite, Phaser.GameObjects.Graphics, Phaser.GameObjects.Graphics, Phaser.GameObjects.Text, Phaser.GameObjects.Text, Phaser.GameObjects.Container];
@@ -443,5 +478,12 @@ export class MainGame extends Phaser.Scene {
         }
         scoreText.setColor(hexColor).setText(n.toString());
         scoreLabel.setColor(hexColor);
+    }
+
+    update(time: number, delta: number): void {
+        const [,,particles, mask] = this.skipContainer.getAll() as [Phaser.GameObjects.Sprite,Phaser.GameObjects.Sprite,Phaser.GameObjects.Particles.ParticleEmitterManager, Phaser.GameObjects.Graphics]
+        if(this.burningStartTime>=0 && mask){
+            mask.clear().fillRoundedRect(0,0,178 + particles.x, 50, {br:0,tr:30})
+        }
     }
 }

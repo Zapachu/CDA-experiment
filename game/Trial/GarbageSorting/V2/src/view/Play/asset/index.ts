@@ -15,6 +15,7 @@ export const asset = {
     garbageTexture: require('./sprites/garbage.png'),
     dumpAtlas: require('./sprites/dump.json'),
     dumpTexture: require('./sprites/dump.png'),
+    particle: require('./sprites/particle.png'),
 };
 
 export const assetName = (function getAssetName<T extends { [key: string]: string }>(assetMap: T): Key<T> {
