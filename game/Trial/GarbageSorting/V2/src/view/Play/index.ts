@@ -1,7 +1,9 @@
 import {MainGame} from './scene';
+import {CONST} from './const';
 
-const config:Phaser.Types.Core.GameConfig = {
+const config: Phaser.Types.Core.GameConfig = {
     transparent: true,
+    parent: CONST.phaserParent,
     scene: [MainGame],
     scale: {
         mode: Phaser.Scale.FIT,

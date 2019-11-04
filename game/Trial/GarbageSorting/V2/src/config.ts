@@ -30,7 +30,7 @@ export const CONFIG = {
     pollutionOfSkip: 10,
     pollutionOfWrong: 5,
     rightScore: 10,
-    skipScore: -10
+    skipScore: 0
 };
 
 export enum MoveType {

@@ -33,13 +33,22 @@ function PlayStage() {
             require('./Play/index')
         );
     }, []);
-    return <div style={{fontFamily: 'raster', height: '0', overflow: 'hidden'}}>&nbsp;</div>;
+    return <div id={CONST.phaserParent} style={{fontFamily: 'raster', position: 'fixed', top: '0'}}/>;
+}
+
+interface IRowData {
+    playerIndex: number
+    rightAmount: number
+    skipAmount: number
+    life: number
+    score: number
+    rank?: number
 }
 
 function ResultStage({gameState: {env, sorts}, playerState}: TProps) {
     const [showPrinciple, setShowPrinciple] = React.useState(false);
-    let myData = null;
-    const rowData = sorts.map((sort, playerIndex) => {
+    let myData: IRowData = null;
+    const rowData: IRowData[] = sorts.map((sort, playerIndex) => {
         const rightAmount = sort.filter((t, i) => t === Garbage[i].type).length,
             skipAmount = sort.filter((t, i) => t === GarbageType.skip).length,
             life = CONST.maxLife - CONST.sortCost * sort.filter((t, i) => t !== undefined).length,
@@ -92,7 +101,7 @@ function ResultStage({gameState: {env, sorts}, playerState}: TProps) {
                 <label>环境排名</label>
             </li>
             <li>
-                <span style={{color: Color.golden}}>180</span>
+                <span style={{color: Color.golden}}>{myData.score}</span>
                 <label>我的得分</label>
             </li>
         </ul>

@@ -16,6 +16,7 @@ export type TProps = Core.IPlayProps<ICreateParams, IGameState, IPlayerState, Mo
 export const CONST = {
     overCallBack: () => null,
     emitter: null as FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>,
+    phaserParent:'phaserParent',
     envStep: 230,
     ...CONFIG
 };

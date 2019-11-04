@@ -92,8 +92,17 @@ export class MainGame extends Phaser.Scene {
 
     create() {
         this.layout();
-        CONST.emitter.on(PushType.prepare, ({env, life, garbageIndex, index, status}) =>
-            this.updateState({env, life, garbageIndex, index, status})
+        CONST.emitter.on(PushType.prepare, ({env, life, garbageIndex, index, status}) => {
+                if (index === undefined) {
+                    this.add.text(this.stageWidth >> 1, this.stageHeight - 120, '加入游戏失败！', {
+                        fontSize: '14px',
+                        color: '#da2422'
+                    }).setOrigin(.5);
+                    this.scene.pause();
+                } else {
+                    this.updateState({env, life, garbageIndex, index, status});
+                }
+            }
         );
         CONST.emitter.on(PushType.sync, ({i, t, env, life, garbageIndex, index, status}) => {
             if (!this.sys.game) {
@@ -103,6 +112,13 @@ export class MainGame extends Phaser.Scene {
                 this.updateState({env});
                 t === GarbageType.skip ? this.showTips(`有人将${Garbage[i].label}随手扔入垃圾堆`) : null;
                 return;
+            }
+            if (this.state.garbageIndex !== garbageIndex) {
+                window.setTimeout(() => {
+                    if (this.state.garbageIndex === garbageIndex) {
+                        this.skipGarbage();
+                    }
+                }, 5e3);
             }
             this.updateState({env, life, garbageIndex, status});
         });
@@ -320,7 +336,6 @@ export class MainGame extends Phaser.Scene {
     updateGarbage() {
         const n = this.state.garbageIndex;
         if (this.garbageSprite) {
-            this.garbageSprite.setFrame(n);
             this.garbageText.setText((n + 1).toString());
         } else {
             const garbageSprite = this.add.sprite(0, 38, assetName.garbageTexture);
@@ -338,7 +353,7 @@ export class MainGame extends Phaser.Scene {
                 color: '#da2422'
             }).setOrigin(1, 0);
         }
-        return this.garbageSprite.setRotation(Math.PI * (Math.random() - .5));
+        return this.garbageSprite.setRotation(n);
     }
 
     updateLife(): Phaser.GameObjects.Container {
@@ -358,6 +373,11 @@ export class MainGame extends Phaser.Scene {
             lifeStrip.fillRoundedRect(-79.5, -102.5, 153.5 * n / CONST.maxLife, 9, 4.5);
         }
         return this.lifeStrip;
+    }
+
+    skipGarbage(pointer: IPointer = {x: 190, y: 620}) {
+        this.dragPlayer(pointer);
+        window.setTimeout(() => this.endDrag(pointer), 5e2);
     }
 
     updateEnv() {
@@ -390,10 +410,9 @@ export class MainGame extends Phaser.Scene {
                 }).setOrigin(.5, .5).setAlpha(.9);
             btnSkip.setInteractive();
             btnSkip.on('pointerdown', pointer => {
+                this.skipGarbage(pointer);
                 btnSkip.setTint(0x888888);
-                this.dragPlayer(pointer);
                 window.setTimeout(() => {
-                    this.endDrag(pointer);
                     btnSkip.clearTint();
                 }, 5e2);
             });

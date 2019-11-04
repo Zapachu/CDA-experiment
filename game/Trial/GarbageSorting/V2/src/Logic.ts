@@ -1,4 +1,5 @@
 import {BaseLogic, IActor, IMoveCallback, TGameState, TPlayerState} from '@bespoke/server';
+import {BaseRobot} from '@bespoke/robot';
 import {
     CONFIG,
     Garbage,
@@ -13,7 +14,7 @@ import {
     PushType
 } from './config';
 
-export default class Logic extends BaseLogic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
+export class Logic extends BaseLogic<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
 
     initGameState(): TGameState<IGameState> {
         const gameState = super.initGameState();
@@ -38,6 +39,13 @@ export default class Logic extends BaseLogic<ICreateParams, IGameState, IPlayerS
             case MoveType.prepare: {
                 if (playerState.index === undefined && gameState.playerNum < CONFIG.groupSize) {
                     playerState.index = gameState.playerNum++;
+                    if (playerState.index === 0) {
+                        global.setTimeout(async () => {
+                            for (let i = gameState.playerNum; i < CONFIG.groupSize; i++) {
+                                // await this.startRobot(i);
+                            }
+                        }, 10e3);
+                    }
                 }
                 this.push(actor, PushType.prepare, {
                     env: gameState.env,
@@ -47,6 +55,9 @@ export default class Logic extends BaseLogic<ICreateParams, IGameState, IPlayerS
             }
             case MoveType.submit: {
                 const {i, t} = params;
+                if (gameState.sorts[playerState.index][i] !== undefined) {
+                    break;
+                }
                 gameState.sorts[playerState.index][i] = t;
                 if (t === GarbageType.skip) {
                     gameState.env -= CONFIG.pollutionOfSkip;
@@ -68,5 +79,24 @@ export default class Logic extends BaseLogic<ICreateParams, IGameState, IPlayerS
                 });
             }
         }
+    }
+}
+
+export class Robot extends BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
+    async init(): Promise<this> {
+        super.init();
+        this.frameEmitter.on(PushType.prepare, () => {
+            const interval = global.setInterval(() => {
+                const {garbageIndex, index, status} = this.playerState;
+                if (index === undefined || status === PlayerStatus.result) {
+                    global.clearInterval(interval);
+                    return;
+                }
+                const types: GarbageType[] = Object.keys(GarbageType).map(k=>+k).filter(k => !isNaN(k)) as any;
+                this.frameEmitter.emit(MoveType.submit, {i: garbageIndex, t: types[~~(Math.random() * types.length)]});
+            }, (2 + Math.random()) * 3e3);
+        });
+        global.setTimeout(() => this.frameEmitter.emit(MoveType.prepare), Math.random() * 2000);
+        return this;
     }
 }
