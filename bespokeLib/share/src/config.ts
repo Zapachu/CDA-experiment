@@ -6,6 +6,6 @@ export const config = {
       client:8080,
       server:8081
     },
-    minMoveInterval: 500,
+    minMoveInterval: 250,
     vcodeLifetime: 60
 }
