@@ -81,7 +81,7 @@ function ResultStage({gameState: {env, sorts}, playerState}: TProps) {
         time2End = ~~(maxLife / CONST.sortCost * CONST.sortSeconds);
     return <section className={style.result}>
         <div className={style.envWrapper}>
-            <svg width="400" height="200">
+            <svg height='200' viewBox='0,0,400,200'>
                 <path d="M100 150 A 100 100 0 0 1 300 150" fill="transparent" strokeWidth={w} strokeLinecap="round"
                       stroke="#d3d3d3"/>
                 <path d={`M100 150 A 100 100 0 0 1 ${200 + 100 * Math.cos(d)} ${150 - 100 * Math.sin(d)}`}

@@ -47,10 +47,7 @@ export class Logic extends BaseLogic<ICreateParams, IGameState, IPlayerState, Mo
                         }, 10e3);
                     }
                 }
-                this.push(actor, PushType.prepare, {
-                    env: gameState.env,
-                    ...playerState
-                });
+                cb({env: gameState.env, ...playerState});
                 break;
             }
             case MoveType.submit: {
@@ -85,18 +82,17 @@ export class Logic extends BaseLogic<ICreateParams, IGameState, IPlayerState, Mo
 export class Robot extends BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
     async init(): Promise<this> {
         super.init();
-        this.frameEmitter.on(PushType.prepare, () => {
+        global.setTimeout(() => this.frameEmitter.emit(MoveType.prepare, {}, () => {
             const interval = global.setInterval(() => {
                 const {garbageIndex, index, status} = this.playerState;
                 if (index === undefined || status === PlayerStatus.result) {
                     global.clearInterval(interval);
                     return;
                 }
-                const types: GarbageType[] = Object.keys(GarbageType).map(k=>+k).filter(k => !isNaN(k)) as any;
+                const types: GarbageType[] = Object.keys(GarbageType).map(k => +k).filter(k => !isNaN(k)) as any;
                 this.frameEmitter.emit(MoveType.submit, {i: garbageIndex, t: types[~~(Math.random() * types.length)]});
             }, (2 + Math.random()) * 3e3);
-        });
-        global.setTimeout(() => this.frameEmitter.emit(MoveType.prepare), Math.random() * 2000);
+        }), Math.random() * 2000);
         return this;
     }
 }
