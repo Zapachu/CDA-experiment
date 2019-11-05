@@ -24,5 +24,13 @@ export default {
     coverImg: `${config.rootname}/static/garbage_sorting_cover.png`,
     desc:
         ""
+  },
+  GarbageSortingV2: {
+    img: `${config.rootname}/static/garbage_sorting_cover.png`,
+    name: "垃圾分类V2",
+    nameEn: "Garbage Sorting",
+    coverImg: `${config.rootname}/static/garbage_sorting_cover.png`,
+    desc:
+        ""
   }
 };
