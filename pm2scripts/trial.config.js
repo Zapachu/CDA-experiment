@@ -12,11 +12,11 @@ const apps = [
         name: "ParallelApplication",
     },
     {
-        script: "../game/Trial/GarbageSorting/build/serve.js",
+        script: "../game/Trial/GarbageSorting/V1/build/serve.js",
         name: "GarbageSorting",
     },
     {
-        script: "../game/Trial/GarbageSortingV2/build/serve.js",
+        script: "../game/Trial/GarbageSorting/V2/build/serve.js",
         name: "GarbageSortingV2",
     }
 ];
