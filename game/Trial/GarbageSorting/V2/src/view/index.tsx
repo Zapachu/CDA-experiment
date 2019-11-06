@@ -104,7 +104,10 @@ function ResultStage({gameState: {env, sorts}, playerState}: TProps) {
                   fill="transparent" strokeWidth={w} strokeLinecap="round"
                   stroke={color}/>
             <text x="200" y="130" font-family='raster' font-size="40" fill={color} text-anchor="middle">{env}</text>
-            <text x="200" y="190" fill="#666" text-anchor="middle">等待其它玩家，实验将在&nbsp;{time2End}s&nbsp;内结束</text>
+            {
+                time2End ? <text x="200" y="190" fill="#666" text-anchor="middle">
+                    等待其它玩家，实验将在&nbsp;{time2End}s&nbsp;内结束</text> : null
+            }
         </svg>
         <ul className={style.mainInfo}>
             <li>

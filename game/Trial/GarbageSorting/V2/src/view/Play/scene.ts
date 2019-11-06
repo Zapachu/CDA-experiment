@@ -155,6 +155,7 @@ class BtnSkip {
         }).fillRect(0, 0, 306, 68);
         btnSkip.mask = new Phaser.Display.Masks.GeometryMask(scene, mask);
         const btnSkipLabel = scene.add.text(0, 0, '懒得分类', {
+            fontFamily: 'Open Sans',
             fontSize: '28px',
             color: '#ffffff',
         }).setOrigin(.5, .5).setAlpha(.9);
@@ -306,7 +307,7 @@ class Player {
             targets: container,
             x,
             y,
-            duration: Phaser.Geom.Point.GetMagnitude(new Phaser.Geom.Point(dX, dY))>>1,
+            duration: Phaser.Geom.Point.GetMagnitude(new Phaser.Geom.Point(dX, dY)) >> 1,
             onComplete: () => callback()
         });
     }
@@ -326,7 +327,10 @@ class Can {
         const {bodyFrame, coverFrame, label} = Can.getCanConfig(this.type),
             bodySprite = scene.add.sprite(0, 120, assetName.canTexture, bodyFrame),
             coverSprite = scene.add.sprite(0, 0, assetName.canTexture, coverFrame),
-            nameText = scene.add.text(-16 - label.length * 4, 144, label);
+            nameText = scene.add.text(-18 - label.length * 5, 144, label, {
+                fontSize: '18px',
+                fontFamily: 'Open Sans',
+            });
         bodySprite.setInteractive();
         bodySprite.on('pointerdown', pointer => onClick(pointer));
         this.container = scene.add.container(Can.cfg.baseX + this.type * Can.cfg.xStep, Can.cfg.baseY, [bodySprite, coverSprite, nameText]);
@@ -425,7 +429,10 @@ class Env {
             fontFamily: 'raster',
             fontSize: '60px'
         }).setStroke('#fff', 6).setOrigin(.5);
-        const scoreLabel = scene.add.text(x, y - 10, '环境评分', {fontSize: '36px'}).setStroke('#fff', 6).setOrigin(.5);
+        const scoreLabel = scene.add.text(x, y - 10, '环境评分', {
+            fontSize: '36px',
+            fontFamily: 'Open Sans',
+        }).setStroke('#fff', 6).setOrigin(.5);
         this.container = scene.add.container(scene.sys.canvas.width >> 1, scene.sys.canvas.height, [dumpSprite, bg, stripGraphics, scoreText, scoreLabel]);
     }
 
@@ -476,8 +483,7 @@ class Garbage {
     garbageText: Phaser.GameObjects.Text;
 
     private constructor(private scene: Phaser.Scene, private n: number = 0) {
-        const garbageSprite = scene.add.sprite(0, 76, assetName.garbageTexture);
-        this.garbageSprite = garbageSprite;
+        this.garbageSprite = scene.add.sprite(0, 76, assetName.garbageTexture);
         scene.add.text(scene.sys.canvas.width >> 1, 50, '/10', {
             fontFamily: 'raster',
             fontSize: '60px',
@@ -537,12 +543,14 @@ class Tips {
     static show(scene: Phaser.Scene, str: string) {
         const stageWidth = scene.sys.canvas.width;
         const y = 500 + ~~(Math.random() * 10) * 50;
-        const text = scene.add.text(stageWidth, y, str, {fontSize: '32px'});
+        const text = scene.add.text(stageWidth, y, str, {
+            fontSize: '32px', fontFamily: 'Open Sans',
+        });
         const textBg = scene.add.graphics({
             x: stageWidth,
             y,
             fillStyle: {color: 0x000, alpha: .6}
-        }).fillRoundedRect(-32, -14, text.width + 64, 56, 26).setDepth(-1);
+        }).fillRoundedRect(-32, -10, text.width + 64, 56, 26).setDepth(-1);
         scene.tweens.add({
             targets: [textBg, text],
             x: -stageWidth,

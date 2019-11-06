@@ -26,11 +26,10 @@ export default {
         ""
   },
   GarbageSortingV2: {
-    img: `${config.rootname}/static/garbage_sorting_cover.png`,
+    img: 'https://qn1.ancademy.org/20191061747/Trial/GarbageSorting/V2/src/view/asset/screenshot.png',
     name: "垃圾分类V2",
-    nameEn: "Garbage Sorting",
-    coverImg: `${config.rootname}/static/garbage_sorting_cover.png`,
-    desc:
-        ""
+    nameEn: "Garbage Sorting V2",
+    coverImg: 'https://qn1.ancademy.org/20191061747/Trial/GarbageSorting/V2/src/view/asset/screenshot.png',
+    desc:'规则待补充 '.repeat(1e3)
   }
 };

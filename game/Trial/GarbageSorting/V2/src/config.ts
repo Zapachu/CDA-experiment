@@ -25,7 +25,7 @@ export const CONFIG = {
     groupSize: 10,
     maxLife: 100,
     sortCost: 10,
-    sortSeconds: 10,
+    sortSeconds: 8,
     maxEnv: 1000,
     pollutionOfSkip: 12,
     pollutionOfWrong: 8,
