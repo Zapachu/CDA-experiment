@@ -8,8 +8,8 @@ const config: Phaser.Types.Core.GameConfig = {
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: 375,
-        height: 667
+        width: 750,
+        height: 1334
     },
 };
 

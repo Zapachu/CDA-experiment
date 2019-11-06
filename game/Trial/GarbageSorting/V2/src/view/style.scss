@@ -6,113 +6,118 @@
 }
 
 body {
-  background: url('./Play/asset/sprites/bg.png');
+  //background: url('./Play/asset/sprites/bg.png');
   color: #666;
 }
 
 .result {
-  max-width: 48rem;
+  width: 22rem;
   margin: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
 
-  .envWrapper{
+  .mainInfo {
     width: 100%;
     display: flex;
-    justify-content: center;
-  }
-
-  .playerTable {
-    background: #fff;
-    width: calc(100% - 2rem);
-    text-align: center;
-    th{
-      font-size: .8rem;
-      font-weight: normal;
-      color: #000;
-    }
-    tr {
-      border-bottom: 1px solid #eee;
-      line-height: 4rem;
-      &:nth-child(2){
-        border-bottom: 4px solid #eee;
-        color: $color-red;
-      }
-    }
-    .medal{
-      background: url("./asset/medal.png") no-repeat;
-      color: transparent;
-      background-position-y: center;
-      width: 18px;
-      display: inline-block;
-    }
-    .avatar{
-      text-align: left;
-      padding-left: .5rem;
-      img{
-        width: 2.5rem;
-        height: 2.5rem;
-        margin-right: .6rem;
-        border-radius: 50%;
-        border: 2px solid #bdccff;
-      }
-    }
-    &:before{
-      content:'';
-      width: 100%;
-      height: 4px;
-      background: #aaa;
-    }
-  }
-
-  .mainInfo{
-    margin: 1rem;
-    display: flex;
-    box-shadow:  0 2px 4px 0 rgba(0,0,0,0.35);
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.35);
     padding: 1rem;
-    border-radius: .6rem;
+    border-radius: .5rem;
     background: white;
-    li{
-      padding: 0 2rem;
+
+    li {
+      flex-grow: 1;
       border-right: 1px solid #ddd;
       display: flex;
       flex-direction: column;
       align-items: center;
-      &:last-child{
+
+      &:last-child {
         border-right: none;
       }
-      span{
-        font-size: 1.5rem;
+
+      span {
+        font-size: 1.25rem;
         padding: .25rem;
       }
-      label{
-        font-size: .75rem;
+
+      label {
+        font-size: .8rem;
+      }
+    }
+  }
+
+  .playerTableWrapper {
+    overflow-y: auto;
+    position: absolute;
+    width: 22rem;
+    top: 17rem;
+    bottom: 4rem;
+
+    .playerTable {
+      background: #fff;
+      margin: auto;
+      width: calc(100% - 1rem);
+      text-align: center;
+
+      th {
+        font-size: .8rem;
+        font-weight: normal;
+        color: #000;
+      }
+
+      tr {
+        border-bottom: 1px solid #eee;
+        line-height: 3.5rem;
+
+        &.myRank {
+          background: #f8f8f8;
+          color: $color-red;
+        }
+      }
+
+      .medal {
+        background: url("./asset/medal.png") no-repeat;
+        background-size: 50px;
+        color: transparent;
+        background-position-y: center;
+        width: 17px;
+        display: inline-block;
+      }
+
+      .avatar {
+        text-align: left;
+        padding-left: .5rem;
+
+        img {
+          width: 2rem;
+          height: 2rem;
+          margin-right: .6rem;
+          border-radius: 50%;
+          border: 2px solid #bdccff;
+        }
       }
     }
   }
 
   .btnWrapper {
     position: fixed;
-    padding: 1.5rem 0 .5rem;
-    bottom: 0;
+    bottom: .5rem;
     width: 100%;
     display: flex;
     justify-content: center;
-    background: linear-gradient(transparent, #fff);
 
     button {
       outline: none;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       border: none;
-      width: 9rem;
-      height: 4rem;
-      background: url('./asset/btnShare.png') no-repeat 0 .25rem;
-      font-size: 1.25rem;
+      width: 6rem;
+      height: 3rem;
+      background: url('./asset/btnShare.png') no-repeat center;
+      background-size: 6rem 2.3rem;
+      font-size: 1rem;
       color: #f0f0f0;
       cursor: pointer;
+      padding: 0 0 0.25rem 0;
 
       &:first-child {
         margin-right: 3rem;
@@ -120,34 +125,38 @@ body {
     }
   }
 
-  .principle{
+  .principle {
     position: fixed;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,.7);
+    background: rgba(0, 0, 0, .7);
     z-index: 999;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    .qrCodeWrapper{
+
+    .qrCodeWrapper {
       border-radius: 1rem;
       background: white;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 2rem 4rem;
-      img, p{
-        max-width: 16rem;
+      padding: 2rem 3rem;
+
+      img, p {
+        max-width: 12rem;
       }
-      em{
+
+      em {
         color: $color-blue;
         font-weight: bold;
       }
     }
-    .btnClose{
-      margin-top: 3rem;
-      width: 3rem;
+
+    .btnClose {
+      margin-top: 2rem;
+      width: 2rem;
       cursor: pointer;
     }
   }

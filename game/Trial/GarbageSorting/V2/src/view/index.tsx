@@ -47,7 +47,18 @@ interface IRowData {
 
 function ResultStage({gameState: {env, sorts}, playerState}: TProps) {
     const [showPrinciple, setShowPrinciple] = React.useState(false);
-    let myData: IRowData = null;
+    React.useEffect(() => {
+        function autoRootFontSize() {
+            if (window.innerWidth > window.innerHeight) {
+                return;
+            }
+            document.documentElement.style.fontSize = window.innerWidth / 750 * 32 + 'px';
+        }
+
+        window.addEventListener('resize', autoRootFontSize);
+        autoRootFontSize();
+    }, []);
+    let myRank: number = 0;
     const rowData: IRowData[] = sorts.map((sort, playerIndex) => {
         const rightAmount = sort.filter((t, i) => t === GarbageConfig[i].type).length,
             skipAmount = sort.filter((t, i) => t === GarbageType.skip).length,
@@ -64,7 +75,7 @@ function ResultStage({gameState: {env, sorts}, playerState}: TProps) {
     }).sort((r1, r2) => r2.score - r1.score).map((data, rank) => {
         const d = {...data, rank};
         if (data.playerIndex === playerState.index) {
-            myData = d;
+            myRank = rank;
         }
         return d;
     });
@@ -72,67 +83,72 @@ function ResultStage({gameState: {env, sorts}, playerState}: TProps) {
     let envLevelLabel: string = '良好';
     if (env < CONST.maxEnv / 3) {
         envLevelLabel = '严重';
-    }else if (env < CONST.maxEnv * 2 / 3) {
+    } else if (env < CONST.maxEnv * 2 / 3) {
         envLevelLabel = '较轻';
+    }
+    let myColor: Color = Color.green;
+    if (myRank > rowData.length * 2 / 3) {
+        myColor = Color.red;
+    } else if (myRank > rowData.length / 3) {
+        myColor = Color.golden;
     }
     let maxLife = 0;
     rowData.forEach(({life}) => life > maxLife ? maxLife = life : null);
     const d = (CONST.maxEnv - env) / CONST.maxEnv * Math.PI, w = 16,
         time2End = ~~(maxLife / CONST.sortCost * CONST.sortSeconds);
     return <section className={style.result}>
-        <div className={style.envWrapper}>
-            <svg height='200' viewBox='0,0,400,200'>
-                <path d="M100 150 A 100 100 0 0 1 300 150" fill="transparent" strokeWidth={w} strokeLinecap="round"
-                      stroke="#d3d3d3"/>
-                <path d={`M100 150 A 100 100 0 0 1 ${200 + 100 * Math.cos(d)} ${150 - 100 * Math.sin(d)}`}
-                      fill="transparent" strokeWidth={w} strokeLinecap="round"
-                      stroke={color}/>
-                <text x="200" y="130" font-family='raster' font-size="40" fill={color} text-anchor="middle">{env}</text>
-                <text x="200" y="190" fill="#666" text-anchor="middle">等待其它玩家，实验将在&nbsp;{time2End}s&nbsp;内结束</text>
-            </svg>
-        </div>
+        <svg viewBox='0,0,400,200'>
+            <path d="M100 150 A 100 100 0 0 1 300 150" fill="transparent" strokeWidth={w} strokeLinecap="round"
+                  stroke="#d3d3d3"/>
+            <path d={`M100 150 A 100 100 0 0 1 ${200 + 100 * Math.cos(d)} ${150 - 100 * Math.sin(d)}`}
+                  fill="transparent" strokeWidth={w} strokeLinecap="round"
+                  stroke={color}/>
+            <text x="200" y="130" font-family='raster' font-size="40" fill={color} text-anchor="middle">{env}</text>
+            <text x="200" y="190" fill="#666" text-anchor="middle">等待其它玩家，实验将在&nbsp;{time2End}s&nbsp;内结束</text>
+        </svg>
         <ul className={style.mainInfo}>
             <li>
                 <span style={{color}}>{envLevelLabel}</span>
                 <label>污染程度</label>
             </li>
             <li>
-                <span style={{color: Color.golden}}>5</span>
-                <label>环境排名</label>
+                <span style={{color: myColor}}>{myRank + 1}</span>
+                <label>我的排名</label>
             </li>
             <li>
-                <span style={{color: Color.golden}}>{myData.score}</span>
+                <span style={{color: myColor}}>{rowData[myRank].score}</span>
                 <label>我的得分</label>
             </li>
         </ul>
-        <hr/>
-        <table className={style.playerTable}>
-            <tbody>
-            <tr>
-                <th>排名</th>
-                <th>用户</th>
-                <th>正确分类</th>
-                <th>随手乱扔</th>
-                <th>剩余体力</th>
-                <th>得分</th>
-            </tr>
-            {
-                [myData, ...rowData].map(({rank, playerIndex, rightAmount, skipAmount, life, score}) => <tr>
-                    <td><span className={rank < 3 ? style.medal : null}
-                              style={{backgroundPositionX: rank * -19}}>{rank + 1}</span></td>
-                    <td className={style.avatar}>
-                        <img src={'https://qiniu1.anlint.com/img/head.jpg'}/>
-                        <span>{playerIndex === playerState.index ? '你' : `玩家${playerIndex + 1}`}</span>
-                    </td>
-                    <td>{rightAmount}</td>
-                    <td>{skipAmount}</td>
-                    <td>{life}</td>
-                    <td>{score}</td>
-                </tr>)
-            }
-            </tbody>
-        </table>
-        <div style={{height: '5rem'}}></div>
+        <div className={style.playerTableWrapper}>
+            <table className={style.playerTable}>
+                <tr>
+                    <th>排名</th>
+                    <th>用户</th>
+                    <th>正确分类</th>
+                    <th>随手乱扔</th>
+                    <th>剩余体力</th>
+                    <th>得分</th>
+                </tr>
+                <tbody>
+                {
+                    rowData.map(({rank, playerIndex, rightAmount, skipAmount, life, score}) => <tr
+                        className={rank === myRank ? style.myRank : ''}>
+                        <td><span className={rank < 3 ? style.medal : null}
+                                  style={{backgroundPositionX: rank * -16.5}}>{rank + 1}</span></td>
+                        <td className={style.avatar}>
+                            <img src={'https://qiniu1.anlint.com/img/head.jpg'}/>
+                            <span>{playerIndex === playerState.index ? '你' : `玩家${playerIndex + 1}`}</span>
+                        </td>
+                        <td>{rightAmount}</td>
+                        <td>{skipAmount}</td>
+                        <td>{life}</td>
+                        <td>{score}</td>
+                    </tr>)
+                }
+                </tbody>
+            </table>
+        </div>
         <div className={style.btnWrapper}>
             <button onClick={() => setShowPrinciple(true)}>实验原理</button>
             <button>分享</button>

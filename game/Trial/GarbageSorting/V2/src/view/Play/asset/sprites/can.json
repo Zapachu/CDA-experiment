@@ -5,167 +5,167 @@
 			"frame": {
 				"x": 1,
 				"y": 1,
-				"w": 69,
-				"h": 103
+				"w": 137,
+				"h": 206
 			},
 			"rotated": false,
 			"trimmed": false,
 			"spriteSourceSize": {
 				"x": 0,
 				"y": 0,
-				"w": 69,
-				"h": 103
+				"w": 137,
+				"h": 206
 			},
 			"sourceSize": {
-				"w": 69,
-				"h": 103
+				"w": 137,
+				"h": 206
 			}
 		},
 		{
 			"filename": "harmful_c",
 			"frame": {
 				"x": 1,
-				"y": 106,
-				"w": 83,
-				"h": 24
+				"y": 209,
+				"w": 166,
+				"h": 48
 			},
 			"rotated": false,
 			"trimmed": false,
 			"spriteSourceSize": {
 				"x": 0,
 				"y": 0,
-				"w": 83,
-				"h": 24
+				"w": 166,
+				"h": 48
 			},
 			"sourceSize": {
-				"w": 83,
-				"h": 24
+				"w": 166,
+				"h": 48
 			}
 		},
 		{
 			"filename": "kitchen",
 			"frame": {
 				"x": 1,
-				"y": 132,
-				"w": 69,
-				"h": 103
+				"y": 259,
+				"w": 137,
+				"h": 206
 			},
 			"rotated": false,
 			"trimmed": false,
 			"spriteSourceSize": {
 				"x": 0,
 				"y": 0,
-				"w": 69,
-				"h": 103
+				"w": 137,
+				"h": 206
 			},
 			"sourceSize": {
-				"w": 69,
-				"h": 103
+				"w": 137,
+				"h": 206
 			}
 		},
 		{
 			"filename": "kitchen_c",
 			"frame": {
 				"x": 1,
-				"y": 237,
-				"w": 83,
-				"h": 24
+				"y": 467,
+				"w": 166,
+				"h": 48
 			},
 			"rotated": false,
 			"trimmed": false,
 			"spriteSourceSize": {
 				"x": 0,
 				"y": 0,
-				"w": 83,
-				"h": 24
+				"w": 166,
+				"h": 48
 			},
 			"sourceSize": {
-				"w": 83,
-				"h": 24
+				"w": 166,
+				"h": 48
 			}
 		},
 		{
 			"filename": "other",
 			"frame": {
 				"x": 1,
-				"y": 263,
-				"w": 69,
-				"h": 103
+				"y": 517,
+				"w": 137,
+				"h": 206
 			},
 			"rotated": false,
 			"trimmed": false,
 			"spriteSourceSize": {
 				"x": 0,
 				"y": 0,
-				"w": 69,
-				"h": 103
+				"w": 137,
+				"h": 206
 			},
 			"sourceSize": {
-				"w": 69,
-				"h": 103
+				"w": 137,
+				"h": 206
 			}
 		},
 		{
 			"filename": "other_c",
 			"frame": {
 				"x": 1,
-				"y": 368,
-				"w": 83,
-				"h": 24
+				"y": 725,
+				"w": 166,
+				"h": 48
 			},
 			"rotated": false,
 			"trimmed": false,
 			"spriteSourceSize": {
 				"x": 0,
 				"y": 0,
-				"w": 83,
-				"h": 24
+				"w": 166,
+				"h": 48
 			},
 			"sourceSize": {
-				"w": 83,
-				"h": 24
+				"w": 166,
+				"h": 48
 			}
 		},
 		{
 			"filename": "recyclable",
 			"frame": {
 				"x": 1,
-				"y": 394,
-				"w": 69,
-				"h": 103
+				"y": 775,
+				"w": 137,
+				"h": 206
 			},
 			"rotated": false,
 			"trimmed": false,
 			"spriteSourceSize": {
 				"x": 0,
 				"y": 0,
-				"w": 69,
-				"h": 103
+				"w": 137,
+				"h": 206
 			},
 			"sourceSize": {
-				"w": 69,
-				"h": 103
+				"w": 137,
+				"h": 206
 			}
 		},
 		{
 			"filename": "recyclable_c",
 			"frame": {
 				"x": 1,
-				"y": 499,
-				"w": 83,
-				"h": 24
+				"y": 983,
+				"w": 166,
+				"h": 48
 			},
 			"rotated": false,
 			"trimmed": false,
 			"spriteSourceSize": {
 				"x": 0,
 				"y": 0,
-				"w": 83,
-				"h": 24
+				"w": 166,
+				"h": 48
 			},
 			"sourceSize": {
-				"w": 83,
-				"h": 24
+				"w": 166,
+				"h": 48
 			}
 		}
 	],
@@ -175,8 +175,8 @@
 		"image": "spritesheet",
 		"format": "RGBA8888",
 		"size": {
-			"w": 85,
-			"h": 524
+			"w": 168,
+			"h": 1032
 		},
 		"scale": "1"
 	}

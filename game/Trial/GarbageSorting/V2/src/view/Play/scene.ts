@@ -69,7 +69,7 @@ export class MainGame extends Phaser.Scene {
                 }
             },
             this.state.life, this.state.garbageIndex);
-        BtnSkip.init(this, (pointer: IPointer = {x: 190, y: 620}) => {
+        BtnSkip.init(this, (pointer: IPointer = {x: 380, y: 1040}) => {
             Player.instance.dragPlayer(pointer);
             window.setTimeout(() => Player.instance.endDrag(pointer), 5e2);
         });
@@ -86,8 +86,8 @@ export class MainGame extends Phaser.Scene {
         });
         CONST.emitter.emit(MoveType.prepare, {}, ({env, life, garbageIndex, index, status}) => {
             if (index === undefined) {
-                this.add.text(this.sys.canvas.width >> 1, this.sys.canvas.height - 120, '加入游戏失败！', {
-                    fontSize: '14px',
+                this.add.text(this.sys.canvas.width >> 1, this.sys.canvas.height - 240, '加入游戏失败！', {
+                    fontSize: '28px',
                     color: '#da2422'
                 }).setOrigin(.5);
                 this.scene.pause();
@@ -143,23 +143,23 @@ class BtnSkip {
         const particles = scene.add.particles(assetName.particle);
         particles.createEmitter({
             x: btnSkip.width >> 1,
-            speed: {min: 80, max: 100},
-            gravityY: 180,
-            scale: {start: 1, end: 0},
+            speed: {min: 160, max: 200},
+            gravityY: 360,
+            scale: {start: 2, end: 0},
             lifespan: 2000,
             quantity: 1.5
         });
         const mask = scene.make.graphics({
             x: stageWidth - btnSkip.width >> 1,
-            y: stageHeight - 40 - btnSkip.height / 2
-        }).fillRect(0, 0, 153, 34);
+            y: stageHeight - 80 - btnSkip.height / 2
+        }).fillRect(0, 0, 306, 68);
         btnSkip.mask = new Phaser.Display.Masks.GeometryMask(scene, mask);
         const btnSkipLabel = scene.add.text(0, 0, '懒得分类', {
-            fontSize: '14px',
+            fontSize: '28px',
             color: '#ffffff',
         }).setOrigin(.5, .5).setAlpha(.9);
         btnSkipLabel.mask = btnSkip.mask;
-        this.container = scene.add.container(stageWidth >> 1, stageHeight - 40, [btnSkip, btnSkipLabel, particles, mask]).setDepth(100);
+        this.container = scene.add.container(stageWidth >> 1, stageHeight - 80, [btnSkip, btnSkipLabel, particles, mask]).setDepth(100);
     }
 
     static init(scene: Phaser.Scene, onClick: (pointer: IPointer) => void) {
@@ -206,9 +206,9 @@ enum PlayerAnimation {
 
 class Player {
     static readonly MoveArea = {
-        left: 82, right: 298, top: 180, bottom: 520, bottomTrigger: 480, topTrigger: 220
+        left: 164, right: 596, top: 360, bottom: 1040, bottomTrigger: 960, topTrigger: 440
     };
-    static readonly InitPosition: IPointer = {x: 190, y: 380};
+    static readonly InitPosition: IPointer = {x: 380, y: 760};
     static instance: Player;
     container: Phaser.GameObjects.Container;
 
@@ -216,21 +216,21 @@ class Player {
         scene.anims.create({
             key: PlayerAnimation.up,
             frames: scene.anims.generateFrameNames(assetName.playerUpTexture),
-            frameRate: 16,
+            frameRate: 15,
             repeat: -1,
         });
         scene.anims.create({
             key: PlayerAnimation.down,
             frames: scene.anims.generateFrameNames(assetName.playerDownTexture),
-            frameRate: 12,
+            frameRate: 18,
             repeat: -1,
         });
         const container = scene.add.container(Player.InitPosition.x, Player.InitPosition.y),
             shadowSprite = scene.add.graphics({
                 x: 0,
-                y: 75,
+                y: 150,
                 fillStyle: {color: 0x000, alpha: .5}
-            }).fillCircle(0, 0, 50).setScale(1, .25),
+            }).fillCircle(0, 0, 100).setScale(1, .25),
             playerSprite = scene.add.sprite(0, 0, assetName.playerDownTexture);
         container.add(shadowSprite);
         container.add(playerSprite);
@@ -306,7 +306,7 @@ class Player {
             targets: container,
             x,
             y,
-            duration: Phaser.Geom.Point.GetMagnitude(new Phaser.Geom.Point(dX, dY)),
+            duration: Phaser.Geom.Point.GetMagnitude(new Phaser.Geom.Point(dX, dY))>>1,
             onComplete: () => callback()
         });
     }
@@ -314,9 +314,9 @@ class Player {
 
 class Can {
     static readonly cfg = {
-        baseX: 48,
-        baseY: 120,
-        xStep: 92,
+        baseX: 96,
+        baseY: 240,
+        xStep: 184,
         cans: [GarbageType.harmful, GarbageType.kitchen, GarbageType.recyclable, GarbageType.other]
     };
     static instances: { [key: number]: Can } = {};
@@ -324,9 +324,9 @@ class Can {
 
     private constructor(public type: GarbageType, private scene: Phaser.Scene, onClick: (pointer: IPointer) => void) {
         const {bodyFrame, coverFrame, label} = Can.getCanConfig(this.type),
-            bodySprite = scene.add.sprite(0, 60, assetName.canTexture, bodyFrame),
+            bodySprite = scene.add.sprite(0, 120, assetName.canTexture, bodyFrame),
             coverSprite = scene.add.sprite(0, 0, assetName.canTexture, coverFrame),
-            nameText = scene.add.text(-4 - label.length * 4, 72, label).setScale(.6);
+            nameText = scene.add.text(-16 - label.length * 4, 144, label);
         bodySprite.setInteractive();
         bodySprite.on('pointerdown', pointer => onClick(pointer));
         this.container = scene.add.container(Can.cfg.baseX + this.type * Can.cfg.xStep, Can.cfg.baseY, [bodySprite, coverSprite, nameText]);
@@ -368,7 +368,7 @@ class Can {
             }
             tweens.add({
                 targets: coverSprite,
-                y: -30,
+                y: -60,
                 duration: 1e2
             });
             tweens.add({
@@ -399,9 +399,9 @@ class Env {
     static instance: Env;
     static readonly cfg = {
         x: 0,
-        y: -80,
-        r: 90,
-        w: 18
+        y: -160,
+        r: 180,
+        w: 36
     };
     container: Phaser.GameObjects.Container;
 
@@ -421,11 +421,11 @@ class Env {
         bg.fillPath();
         bg.closePath();
         const stripGraphics = scene.add.graphics({lineStyle: {width: w}});
-        const scoreText = scene.add.text(x, y - 45, n.toString(), {
+        const scoreText = scene.add.text(x, y - 90, n.toString(), {
             fontFamily: 'raster',
-            fontSize: '30px'
+            fontSize: '60px'
         }).setStroke('#fff', 6).setOrigin(.5);
-        const scoreLabel = scene.add.text(x, y - 5, '环境评分', {fontSize: '18px'}).setStroke('#fff', 6).setOrigin(.5);
+        const scoreLabel = scene.add.text(x, y - 10, '环境评分', {fontSize: '36px'}).setStroke('#fff', 6).setOrigin(.5);
         this.container = scene.add.container(scene.sys.canvas.width >> 1, scene.sys.canvas.height, [dumpSprite, bg, stripGraphics, scoreText, scoreLabel]);
     }
 
@@ -476,18 +476,16 @@ class Garbage {
     garbageText: Phaser.GameObjects.Text;
 
     private constructor(private scene: Phaser.Scene, private n: number = 0) {
-        const garbageSprite = scene.add.sprite(0, 38, assetName.garbageTexture);
-        garbageSprite.displayWidth = 70;
-        garbageSprite.displayHeight = 70;
+        const garbageSprite = scene.add.sprite(0, 76, assetName.garbageTexture);
         this.garbageSprite = garbageSprite;
-        scene.add.text(scene.sys.canvas.width >> 1, 25, '/10', {
+        scene.add.text(scene.sys.canvas.width >> 1, 50, '/10', {
             fontFamily: 'raster',
-            fontSize: '30px',
+            fontSize: '60px',
             color: '#999'
         });
-        this.garbageText = scene.add.text(scene.sys.canvas.width >> 1, 25, n.toString(), {
+        this.garbageText = scene.add.text(scene.sys.canvas.width >> 1, 50, n.toString(), {
             fontFamily: 'raster',
-            fontSize: '30px',
+            fontSize: '60px',
             color: '#da2422'
         }).setOrigin(1, 0);
     }
@@ -501,7 +499,7 @@ class Garbage {
     }
 
     update(n: number) {
-        this.garbageSprite.setFrame(n).setRotation(n)
+        this.garbageSprite.setFrame(n).setRotation(n);
         this.garbageText.setText((n + 1).toString());
     }
 }
@@ -513,7 +511,7 @@ class LifeStrip {
     private constructor(private scene: Phaser.Scene, private n: number = 0) {
         const alpha = .8;
         const bg = scene.add.graphics({fillStyle: {color: 0x020a1e, alpha}})
-                .fillRoundedRect(-82.5, -105, 160, 14, 7),
+                .fillRoundedRect(-165, -210, 320, 28, 14),
             strip = scene.add.graphics({fillStyle: {color: 0x18df42, alpha}});
         this.container = scene.add.container(0, 0, [bg, strip]);
     }
@@ -530,7 +528,7 @@ class LifeStrip {
         const lifeStrip = this.container.getAt(1) as Phaser.GameObjects.Graphics;
         lifeStrip.clear();
         if (n) {
-            lifeStrip.fillRoundedRect(-79.5, -102.5, 153.5 * n / CONST.maxLife, 9, 4.5);
+            lifeStrip.fillRoundedRect(-159, -205, 307 * n / CONST.maxLife, 18, 9);
         }
     }
 }
@@ -538,13 +536,13 @@ class LifeStrip {
 class Tips {
     static show(scene: Phaser.Scene, str: string) {
         const stageWidth = scene.sys.canvas.width;
-        const y = 250 + ~~(Math.random() * 10) * 25;
-        const text = scene.add.text(stageWidth, y, str, {fontSize: '16px'});
+        const y = 500 + ~~(Math.random() * 10) * 50;
+        const text = scene.add.text(stageWidth, y, str, {fontSize: '32px'});
         const textBg = scene.add.graphics({
             x: stageWidth,
             y,
             fillStyle: {color: 0x000, alpha: .6}
-        }).fillRoundedRect(-16, -7, text.width + 32, 28, 13).setDepth(-1);
+        }).fillRoundedRect(-32, -14, text.width + 64, 56, 26).setDepth(-1);
         scene.tweens.add({
             targets: [textBg, text],
             x: -stageWidth,

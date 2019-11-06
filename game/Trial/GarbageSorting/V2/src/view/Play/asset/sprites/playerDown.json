@@ -1,87 +1,129 @@
 {
 	"frames": [
 		{
-			"filename": "01.png",
+			"filename": "0.png",
 			"frame": {
 				"x": 1,
 				"y": 1,
-				"w": 94,
-				"h": 162
+				"w": 186,
+				"h": 318
 			},
 			"rotated": false,
 			"trimmed": false,
 			"spriteSourceSize": {
 				"x": 0,
 				"y": 0,
-				"w": 94,
-				"h": 162
+				"w": 186,
+				"h": 318
 			},
 			"sourceSize": {
-				"w": 94,
-				"h": 162
+				"w": 186,
+				"h": 318
 			}
 		},
 		{
-			"filename": "02.png",
+			"filename": "1.png",
 			"frame": {
-				"x": 97,
+				"x": 189,
 				"y": 1,
-				"w": 94,
-				"h": 162
+				"w": 186,
+				"h": 318
 			},
 			"rotated": false,
 			"trimmed": false,
 			"spriteSourceSize": {
 				"x": 0,
 				"y": 0,
-				"w": 94,
-				"h": 162
+				"w": 186,
+				"h": 318
 			},
 			"sourceSize": {
-				"w": 94,
-				"h": 162
+				"w": 186,
+				"h": 318
 			}
 		},
 		{
-			"filename": "03.png",
+			"filename": "2.png",
 			"frame": {
-				"x": 193,
+				"x": 377,
 				"y": 1,
-				"w": 94,
-				"h": 162
+				"w": 186,
+				"h": 318
 			},
 			"rotated": false,
 			"trimmed": false,
 			"spriteSourceSize": {
 				"x": 0,
 				"y": 0,
-				"w": 94,
-				"h": 162
+				"w": 186,
+				"h": 318
 			},
 			"sourceSize": {
-				"w": 94,
-				"h": 162
+				"w": 186,
+				"h": 318
 			}
 		},
 		{
-			"filename": "04.png",
+			"filename": "3.png",
 			"frame": {
-				"x": 289,
+				"x": 565,
 				"y": 1,
-				"w": 94,
-				"h": 162
+				"w": 186,
+				"h": 318
 			},
 			"rotated": false,
 			"trimmed": false,
 			"spriteSourceSize": {
 				"x": 0,
 				"y": 0,
-				"w": 94,
-				"h": 162
+				"w": 186,
+				"h": 318
 			},
 			"sourceSize": {
-				"w": 94,
-				"h": 162
+				"w": 186,
+				"h": 318
+			}
+		},
+		{
+			"filename": "4.png",
+			"frame": {
+				"x": 753,
+				"y": 1,
+				"w": 186,
+				"h": 318
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 186,
+				"h": 318
+			},
+			"sourceSize": {
+				"w": 186,
+				"h": 318
+			}
+		},
+		{
+			"filename": "5.png",
+			"frame": {
+				"x": 941,
+				"y": 1,
+				"w": 186,
+				"h": 318
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 186,
+				"h": 318
+			},
+			"sourceSize": {
+				"w": 186,
+				"h": 318
 			}
 		}
 	],
@@ -91,8 +133,8 @@
 		"image": "spritesheet.png",
 		"format": "RGBA8888",
 		"size": {
-			"w": 384,
-			"h": 164
+			"w": 1128,
+			"h": 320
 		},
 		"scale": "1"
 	}
