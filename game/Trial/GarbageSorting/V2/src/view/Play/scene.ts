@@ -1,5 +1,5 @@
 import {CONST, SceneName} from './const';
-import {Garbage, GarbageType, MoveType, PlayerStatus, PushType} from '../../config';
+import {GarbageConfig, GarbageType, MoveType, PlayerStatus, PushType} from '../../config';
 import {asset, assetName} from './asset';
 
 interface IPointer {
@@ -74,12 +74,12 @@ export class MainGame extends Phaser.Scene {
             window.setTimeout(() => Player.instance.endDrag(pointer), 5e2);
         });
         CONST.emitter.on(PushType.sync, ({i, t, env, life, garbageIndex, index, status}) => {
-            if (!this.sys.game) {
+            if (!this.sys.game || this.scene.isPaused()) {
                 return;
             }
             if (this.state.index !== index) {
                 this.setState({env});
-                t === GarbageType.skip ? Tips.show(this, `有人将${Garbage[i].label}随手扔入垃圾堆`) : null;
+                t === GarbageType.skip ? Tips.show(this, `有人将${GarbageConfig[i].label}随手扔入垃圾堆`) : null;
                 return;
             }
             this.setState({env, life, garbageIndex, status});
@@ -104,15 +104,16 @@ export class MainGame extends Phaser.Scene {
             return;
         }
         Object.assign(this.state, state);
-        Env.setEnv(this, this.state.env);
-        LifeStrip.setLife(this, this.state.life);
-        GGarbage.setGarbage(this, this.state.garbageIndex);
-        BtnSkip.instance.playBurning();
+        state.env !== undefined ? Env.setEnv(this, this.state.env) : null;
+        state.life !== undefined ? LifeStrip.setLife(this, this.state.life) : null;
+        if (state.garbageIndex !== undefined) {
+            Garbage.setGarbage(this, this.state.garbageIndex);
+            BtnSkip.instance.playBurning();
+        }
     }
 
     submit(t: GarbageType) {
         BtnSkip.instance.stopBurning();
-        // return;
         CONST.emitter.emit(MoveType.submit, {i: this.state.garbageIndex, t});
     }
 
@@ -158,7 +159,7 @@ class BtnSkip {
             color: '#ffffff',
         }).setOrigin(.5, .5).setAlpha(.9);
         btnSkipLabel.mask = btnSkip.mask;
-        this.container = scene.add.container(stageWidth >> 1, stageHeight - 40, [btnSkip, btnSkipLabel, particles, mask]);
+        this.container = scene.add.container(stageWidth >> 1, stageHeight - 40, [btnSkip, btnSkipLabel, particles, mask]).setDepth(100);
     }
 
     static init(scene: Phaser.Scene, onClick: (pointer: IPointer) => void) {
@@ -178,7 +179,7 @@ class BtnSkip {
     }
 
     playBurning() {
-        const duration = 10e3;
+        const duration = CONST.sortSeconds * 1000;
         const [btnSkip, , particles] = this.container.getAll() as [Phaser.GameObjects.Sprite, Phaser.GameObjects.Sprite, Phaser.GameObjects.Particles.ParticleEmitterManager, Phaser.GameObjects.Graphics];
         this.burningStartTime = this.scene.time.now;
         this.scene.tweens.add({
@@ -246,7 +247,7 @@ class Player {
         playerSprite.on('drag', pointer => this.dragPlayer(pointer));
         playerSprite.on('dragend', pointer => this.endDrag(pointer));
         container.add(LifeStrip.setLife(scene, life));
-        container.add(GGarbage.setGarbage(scene, garbageIndex));
+        container.add(Garbage.setGarbage(scene, garbageIndex));
         this.container = container;
     }
 
@@ -469,8 +470,8 @@ class Env {
     }
 }
 
-class GGarbage {
-    static instance: GGarbage;
+class Garbage {
+    static instance: Garbage;
     garbageSprite: Phaser.GameObjects.Sprite;
     garbageText: Phaser.GameObjects.Text;
 
@@ -493,13 +494,14 @@ class GGarbage {
 
     static setGarbage(scene: Phaser.Scene, n: number): Phaser.GameObjects.Sprite {
         if (!this.instance) {
-            this.instance = new GGarbage(scene, n);
+            this.instance = new Garbage(scene, n);
         }
         this.instance.update(n);
         return this.instance.garbageSprite;
     }
 
     update(n: number) {
+        this.garbageSprite.setFrame(n).setRotation(n)
         this.garbageText.setText((n + 1).toString());
     }
 }

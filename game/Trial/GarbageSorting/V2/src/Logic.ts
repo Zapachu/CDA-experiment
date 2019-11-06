@@ -2,7 +2,7 @@ import {BaseLogic, IActor, IMoveCallback, TGameState, TPlayerState} from '@bespo
 import {BaseRobot} from '@bespoke/robot';
 import {
     CONFIG,
-    Garbage,
+    GarbageConfig,
     GarbageType,
     ICreateParams,
     IGameState,
@@ -42,7 +42,7 @@ export class Logic extends BaseLogic<ICreateParams, IGameState, IPlayerState, Mo
                     if (playerState.index === 0) {
                         global.setTimeout(async () => {
                             for (let i = gameState.playerNum; i < CONFIG.groupSize; i++) {
-                                // await this.startRobot(i);
+                                await this.startRobot(i);
                             }
                         }, 10e3);
                     }
@@ -60,11 +60,14 @@ export class Logic extends BaseLogic<ICreateParams, IGameState, IPlayerState, Mo
                     gameState.env -= CONFIG.pollutionOfSkip;
                 } else {
                     playerState.life -= CONFIG.sortCost;
-                    if (t !== Garbage[params.i].type) {
+                    if (t !== GarbageConfig[params.i].type) {
                         gameState.env -= CONFIG.pollutionOfWrong;
                     }
                 }
-                if (playerState.garbageIndex < Garbage.length - 1) {
+                if(gameState.env < 0){
+                    gameState.env = 0
+                }
+                if (playerState.garbageIndex < GarbageConfig.length - 1) {
                     playerState.garbageIndex++;
                 } else {
                     playerState.status = PlayerStatus.result;
@@ -91,8 +94,8 @@ export class Robot extends BaseRobot<ICreateParams, IGameState, IPlayerState, Mo
                 }
                 const types: GarbageType[] = Object.keys(GarbageType).map(k => +k).filter(k => !isNaN(k)) as any;
                 this.frameEmitter.emit(MoveType.submit, {i: garbageIndex, t: types[~~(Math.random() * types.length)]});
-            }, (2 + Math.random()) * 3e3);
-        }), Math.random() * 2000);
+            }, (300 + Math.random() * 200) * CONFIG.sortSeconds);
+        }), Math.random() * CONFIG.sortSeconds * 1000);
         return this;
     }
 }

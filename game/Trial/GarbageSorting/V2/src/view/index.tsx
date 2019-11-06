@@ -1,5 +1,5 @@
 import {registerOnFramework} from '@bespoke/client';
-import {Garbage, GarbageType, namespace} from '../config';
+import {GarbageConfig, GarbageType, namespace} from '../config';
 import * as React from 'react';
 import {useEffect} from 'react';
 import {loadScript} from '@elf/component';
@@ -49,11 +49,11 @@ function ResultStage({gameState: {env, sorts}, playerState}: TProps) {
     const [showPrinciple, setShowPrinciple] = React.useState(false);
     let myData: IRowData = null;
     const rowData: IRowData[] = sorts.map((sort, playerIndex) => {
-        const rightAmount = sort.filter((t, i) => t === Garbage[i].type).length,
+        const rightAmount = sort.filter((t, i) => t === GarbageConfig[i].type).length,
             skipAmount = sort.filter((t, i) => t === GarbageType.skip).length,
             life = CONST.maxLife - CONST.sortCost * sort.filter((t, i) => t !== undefined).length,
             envProfit = ~~(env / CONST.groupSize),
-            score = life + rightAmount * CONST.rightScore + skipAmount * CONST.skipScore + envProfit;
+            score = life + rightAmount * CONST.rightScore + (GarbageConfig.length - rightAmount - skipAmount) * CONST.wrongScore + envProfit;
         return {
             playerIndex,
             rightAmount,
@@ -70,10 +70,10 @@ function ResultStage({gameState: {env, sorts}, playerState}: TProps) {
     });
     const [r, g, b] = hslToRgb(.12 * env / 360, .8, .43), color = `rgb(${r},${g},${b})`;
     let envLevelLabel: string = '良好';
-    if (env < CONST.maxEnv * 2 / 3) {
-        envLevelLabel = '较轻';
-    } else if (env < CONST.maxEnv / 3) {
+    if (env < CONST.maxEnv / 3) {
         envLevelLabel = '严重';
+    }else if (env < CONST.maxEnv * 2 / 3) {
+        envLevelLabel = '较轻';
     }
     let maxLife = 0;
     rowData.forEach(({life}) => life > maxLife ? maxLife = life : null);

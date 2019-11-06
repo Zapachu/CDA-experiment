@@ -8,29 +8,29 @@ export enum GarbageType {
     skip
 }
 
-export const Garbage: Array<{ label: string, type: GarbageType }> = [
+export const GarbageConfig: Array<{ label: string, type: GarbageType }> = [
     {label: '白菜', type: GarbageType.kitchen},
-    {label: '灯泡', type: GarbageType.kitchen},
-    {label: '电池', type: GarbageType.kitchen},
+    {label: '灯泡', type: GarbageType.recyclable},
+    {label: '电池', type: GarbageType.harmful},
     {label: '骨头', type: GarbageType.kitchen},
-    {label: '灰土', type: GarbageType.kitchen},
-    {label: '陶碗', type: GarbageType.kitchen},
-    {label: '衣服', type: GarbageType.kitchen},
-    {label: '纸巾', type: GarbageType.kitchen},
-    {label: '矿泉水', type: GarbageType.kitchen},
-    {label: '易拉罐', type: GarbageType.kitchen},
+    {label: '灰土', type: GarbageType.other},
+    {label: '陶碗', type: GarbageType.other},
+    {label: '衣服', type: GarbageType.recyclable},
+    {label: '纸巾', type: GarbageType.recyclable},
+    {label: '矿泉水', type: GarbageType.recyclable},
+    {label: '易拉罐', type: GarbageType.recyclable},
 ];
 
 export const CONFIG = {
     groupSize: 10,
     maxLife: 100,
     sortCost: 10,
-    sortSeconds: 5,
+    sortSeconds: 10,
     maxEnv: 1000,
-    pollutionOfSkip: 10,
-    pollutionOfWrong: 5,
-    rightScore: 10,
-    skipScore: 0
+    pollutionOfSkip: 12,
+    pollutionOfWrong: 8,
+    rightScore: 20,
+    wrongScore: 5
 };
 
 export enum MoveType {
