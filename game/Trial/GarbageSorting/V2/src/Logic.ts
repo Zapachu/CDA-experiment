@@ -29,6 +29,7 @@ export class Logic extends BaseLogic<ICreateParams, IGameState, IPlayerState, Mo
         playerState.status = PlayerStatus.play;
         playerState.garbageIndex = 0;
         playerState.life = CONFIG.maxLife;
+        playerState.score = 0;
         return playerState;
     }
 
@@ -61,7 +62,10 @@ export class Logic extends BaseLogic<ICreateParams, IGameState, IPlayerState, Mo
                 } else {
                     playerState.life -= CONFIG.sortCost;
                     if (t !== GarbageConfig[params.i].type) {
+                        playerState.score += CONFIG.wrongScore
                         gameState.env -= CONFIG.pollutionOfWrong;
+                    }else {
+                        playerState.score += CONFIG.rightScore
                     }
                 }
                 if(gameState.env < 0){

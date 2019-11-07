@@ -64,7 +64,7 @@ function ResultStage({gameState: {env, sorts}, playerState}: TProps) {
             skipAmount = sort.filter((t, i) => t === GarbageType.skip).length,
             life = CONST.maxLife - CONST.sortCost * sort.filter((t, i) => t !== undefined).length,
             envProfit = ~~(env / CONST.groupSize),
-            score = life + rightAmount * CONST.rightScore + (GarbageConfig.length - rightAmount - skipAmount) * CONST.wrongScore + envProfit;
+            score = ~~(life / 5) + rightAmount * CONST.rightScore + (GarbageConfig.length - rightAmount - skipAmount) * CONST.wrongScore + envProfit;
         return {
             playerIndex,
             rightAmount,
@@ -127,9 +127,8 @@ function ResultStage({gameState: {env, sorts}, playerState}: TProps) {
             <table className={style.playerTable}>
                 <tr>
                     <th>排名</th>
-                    <th>用户</th>
-                    <th>正确分类</th>
-                    <th>随手乱扔</th>
+                    <th>玩家</th>
+                    <th>正确/错误/乱扔</th>
                     <th>剩余体力</th>
                     <th>得分</th>
                 </tr>
@@ -143,8 +142,7 @@ function ResultStage({gameState: {env, sorts}, playerState}: TProps) {
                             <img src={'https://qiniu1.anlint.com/img/head.jpg'}/>
                             <span>{playerIndex === playerState.index ? '你' : `玩家${playerIndex + 1}`}</span>
                         </td>
-                        <td>{rightAmount}</td>
-                        <td>{skipAmount}</td>
+                        <td>{rightAmount}/{GarbageConfig.length - rightAmount - skipAmount}/{skipAmount}</td>
                         <td>{life}</td>
                         <td>{score}</td>
                     </tr>)

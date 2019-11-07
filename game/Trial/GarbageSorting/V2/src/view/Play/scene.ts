@@ -8,20 +8,20 @@ interface IPointer {
 }
 
 type IState = Partial<{
-    status: PlayerStatus
     index: number
     env: number
     life: number
     garbageIndex: number
+    score: number
 }>
 
 export class MainGame extends Phaser.Scene {
     state: IState = {
-        status: PlayerStatus.play,
         index: 0,
-        env: 0,
-        life: 0,
-        garbageIndex: 0
+        env: 1000,
+        life: 100,
+        score: 0,
+        garbageIndex: -1
     };
 
     constructor() {
@@ -39,8 +39,10 @@ export class MainGame extends Phaser.Scene {
         this.load.atlas(assetName.playerUpTexture, asset.playerUpTexture, asset.playerUpAtlas);
         this.load.atlas(assetName.garbageTexture, asset.garbageTexture, asset.garbageAtlas);
         this.load.atlas(assetName.dumpTexture, asset.dumpTexture, asset.dumpAtlas);
+        this.load.atlas(assetName.TFTexture, asset.TFTexture, asset.TFAtlas);
         this.load.image(assetName.particle, asset.particle);
         this.load.image(assetName.btnSkip, asset.btnSkip);
+        this.load.image(assetName.guideBg, asset.guideBg);
     }
 
     create() {
@@ -73,7 +75,9 @@ export class MainGame extends Phaser.Scene {
             Player.instance.dragPlayer(pointer);
             window.setTimeout(() => Player.instance.endDrag(pointer), 5e2);
         });
-        CONST.emitter.on(PushType.sync, ({i, t, env, life, garbageIndex, index, status}) => {
+        this.setState(this.state);
+        CONST.emitter.on(PushType.sync, ({i, t, env, life, garbageIndex, index, score, status}) => {
+            this.shouldOver(status);
             if (!this.sys.game || this.scene.isPaused()) {
                 return;
             }
@@ -82,39 +86,54 @@ export class MainGame extends Phaser.Scene {
                 t === GarbageType.skip ? Tips.show(this, `有人将${GarbageConfig[i].label}随手扔入垃圾堆`) : null;
                 return;
             }
-            this.setState({env, life, garbageIndex, status});
+            this.setState({env, life, garbageIndex, score});
         });
-        CONST.emitter.emit(MoveType.prepare, {}, ({env, life, garbageIndex, index, status}) => {
+        CONST.emitter.emit(MoveType.prepare, {}, ({env, life, garbageIndex, index, status, score}) => {
+            this.shouldOver(status);
             if (index === undefined) {
                 this.add.text(this.sys.canvas.width >> 1, this.sys.canvas.height - 240, '加入游戏失败！', {
                     fontSize: '28px',
                     color: '#da2422'
                 }).setOrigin(.5);
                 this.scene.pause();
-            } else {
-                this.setState({env, life, garbageIndex, index, status});
+                return;
             }
+            Guide.init(this, () => this.setState({env, life, garbageIndex, index, score}));
         });
     }
 
-    setState(state: IState) {
-        if (state.status === PlayerStatus.result) {
+    shouldOver(status: PlayerStatus) {
+        if (this.sys.game && status === PlayerStatus.result) {
             this.sys.game.destroy(true);
             CONST.overCallBack();
-            return;
         }
+    }
+
+    setState(state: IState) {
         Object.assign(this.state, state);
         state.env !== undefined ? Env.setEnv(this, this.state.env) : null;
         state.life !== undefined ? LifeStrip.setLife(this, this.state.life) : null;
-        if (state.garbageIndex !== undefined) {
+        state.score !== undefined ? Score.setScore(this, this.state.score) : null;
+        if (state.garbageIndex >= 0) {
             Garbage.setGarbage(this, this.state.garbageIndex);
             BtnSkip.instance.playBurning();
         }
     }
 
     submit(t: GarbageType) {
-        BtnSkip.instance.stopBurning();
-        CONST.emitter.emit(MoveType.submit, {i: this.state.garbageIndex, t});
+        const i = this.state.garbageIndex;
+        if (t === GarbageType.skip) {
+            Env.instance.feedback(CONST.pollutionOfSkip);
+        } else {
+            Can.get(t).feedback(GarbageConfig[i].type === t);
+            if (GarbageConfig[i].type !== t) {
+                Env.instance.feedback(CONST.pollutionOfWrong);
+                Score.instance.feedback(CONST.wrongScore);
+            } else {
+                Score.instance.feedback(CONST.rightScore);
+            }
+        }
+        CONST.emitter.emit(MoveType.submit, {i, t});
     }
 
     update(time: number, delta: number): void {
@@ -125,8 +144,7 @@ export class MainGame extends Phaser.Scene {
 class BtnSkip {
     static instance: BtnSkip;
     container: Phaser.GameObjects.Container;
-    burningStartTime: number = -1;
-    stopTimer: number;
+    burningTween: Phaser.Tweens.Tween;
 
     private constructor(private scene: Phaser.Scene, private onClick: (pointer?: IPointer) => void) {
         const {width: stageWidth, height: stageHeight} = scene.sys.canvas;
@@ -160,6 +178,12 @@ class BtnSkip {
             color: '#ffffff',
         }).setOrigin(.5, .5).setAlpha(.9);
         btnSkipLabel.mask = btnSkip.mask;
+        this.burningTween = scene.tweens.create({
+            targets: [particles],
+            x: {from: 0, to: -btnSkip.width},
+            duration: CONST.sortSeconds * 1000,
+            onComplete: () => this.onClick()
+        });
         this.container = scene.add.container(stageWidth >> 1, stageHeight - 80, [btnSkip, btnSkipLabel, particles, mask]).setDepth(100);
     }
 
@@ -172,31 +196,13 @@ class BtnSkip {
 
     static update() {
         const [btnSkip, , particles, mask] = this.instance.container.getAll() as [Phaser.GameObjects.Sprite, Phaser.GameObjects.Sprite, Phaser.GameObjects.Particles.ParticleEmitterManager, Phaser.GameObjects.Graphics];
-        if (this.instance.burningStartTime >= 0) {
-            mask.clear().fillRoundedRect(0, 0, btnSkip.width + particles.x, btnSkip.height, {
-                tl: 0, bl: 0, tr: btnSkip.height >> 1, br: btnSkip.height >> 1
-            });
-        }
+        mask.clear().fillRoundedRect(0, 0, btnSkip.width + particles.x, btnSkip.height, {
+            tl: 0, bl: 0, tr: btnSkip.height >> 1, br: btnSkip.height >> 1
+        });
     }
 
     playBurning() {
-        const duration = CONST.sortSeconds * 1000;
-        const [btnSkip, , particles] = this.container.getAll() as [Phaser.GameObjects.Sprite, Phaser.GameObjects.Sprite, Phaser.GameObjects.Particles.ParticleEmitterManager, Phaser.GameObjects.Graphics];
-        this.burningStartTime = this.scene.time.now;
-        this.scene.tweens.add({
-            targets: [particles],
-            x: {from: 0, to: -btnSkip.width},
-            duration
-        });
-        this.stopTimer = window.setTimeout(() => {
-            this.burningStartTime = -1;
-            this.onClick();
-        }, duration);
-    }
-
-    stopBurning() {
-        this.burningStartTime = -1;
-        window.clearTimeout(this.stopTimer);
+        this.burningTween.restart().play();
     }
 }
 
@@ -322,6 +328,7 @@ class Can {
     };
     static instances: { [key: number]: Can } = {};
     container: Phaser.GameObjects.Container;
+    feedbackTween: Phaser.Tweens.Tween;
 
     private constructor(public type: GarbageType, private scene: Phaser.Scene, onClick: (pointer: IPointer) => void) {
         const {bodyFrame, coverFrame, label} = Can.getCanConfig(this.type),
@@ -330,10 +337,20 @@ class Can {
             nameText = scene.add.text(-18 - label.length * 5, 144, label, {
                 fontSize: '18px',
                 fontFamily: 'Open Sans',
-            });
+            }),
+            feedbackSprite = scene.add.sprite(0, -50, assetName.TFTexture).setScale(0);
+        this.feedbackTween = this.scene.tweens.create({
+            targets: [feedbackSprite],
+            scale: {from: 0, to: 1},
+            y: -75,
+            ease: 'Power2',
+            yoyo: true,
+            duration: 200,
+            hold: 1e3
+        });
         bodySprite.setInteractive();
         bodySprite.on('pointerdown', pointer => onClick(pointer));
-        this.container = scene.add.container(Can.cfg.baseX + this.type * Can.cfg.xStep, Can.cfg.baseY, [bodySprite, coverSprite, nameText]);
+        this.container = scene.add.container(Can.cfg.baseX + this.type * Can.cfg.xStep, Can.cfg.baseY, [bodySprite, coverSprite, nameText, feedbackSprite]);
     }
 
     static init(scene: Phaser.Scene, onClick: (pointer: IPointer) => void) {
@@ -397,6 +414,12 @@ class Can {
             });
         }
     }
+
+    feedback(b: boolean) {
+        const feedBackSprite = this.feedbackTween.targets[0] as Phaser.GameObjects.Sprite;
+        feedBackSprite.setFrame(b.toString());
+        this.feedbackTween.play();
+    }
 }
 
 class Env {
@@ -408,6 +431,7 @@ class Env {
         w: 36
     };
     container: Phaser.GameObjects.Container;
+    feedbackTween: Phaser.Tweens.Tween;
 
     private constructor(private scene: Phaser.Scene, private n: number = 0) {
         const {x, y, r, w} = Env.cfg;
@@ -424,16 +448,27 @@ class Env {
         bg.slice(x + r, y, w >> 1, 0, Math.PI);
         bg.fillPath();
         bg.closePath();
-        const stripGraphics = scene.add.graphics({lineStyle: {width: w}});
-        const scoreText = scene.add.text(x, y - 90, n.toString(), {
-            fontFamily: 'raster',
-            fontSize: '60px'
-        }).setStroke('#fff', 6).setOrigin(.5);
-        const scoreLabel = scene.add.text(x, y - 10, '环境评分', {
-            fontSize: '36px',
-            fontFamily: 'Open Sans',
-        }).setStroke('#fff', 6).setOrigin(.5);
-        this.container = scene.add.container(scene.sys.canvas.width >> 1, scene.sys.canvas.height, [dumpSprite, bg, stripGraphics, scoreText, scoreLabel]);
+        const stripGraphics = scene.add.graphics({lineStyle: {width: w}}),
+            scoreText = scene.add.text(x, y - 90, n.toString(), {
+                fontFamily: 'raster',
+                fontSize: '60px'
+            }).setStroke('#fff', 6).setOrigin(.5),
+            scoreLabel = scene.add.text(x, y - 10, '环境评分', {
+                fontSize: '36px',
+                fontFamily: 'Open Sans',
+            }).setStroke('#fff', 6).setOrigin(.5),
+            feedBackText = scene.add.text(x, y, '', {
+                fontSize: '40px',
+                fontFamily: 'raster',
+                color: '#da2422'
+            }).setAlpha(0).setOrigin(.5);
+        this.feedbackTween = this.scene.tweens.create({
+            targets: [feedBackText],
+            alpha: {from: 1, to: 0},
+            y: y + r / 2,
+            duration: 1e3
+        });
+        this.container = scene.add.container(scene.sys.canvas.width >> 1, scene.sys.canvas.height, [dumpSprite, bg, stripGraphics, scoreText, scoreLabel, feedBackText]);
     }
 
     static setEnv(scene: Phaser.Scene, n: number) {
@@ -475,6 +510,14 @@ class Env {
         const dumpSprite = this.container.getAt(0) as Phaser.GameObjects.Sprite;
         hover ? dumpSprite.setTint(0x888888) : dumpSprite.clearTint();
     }
+
+    feedback(n: number) {
+        const {x, y, r} = Env.cfg;
+        const feedBackText = this.feedbackTween.targets[0] as Phaser.GameObjects.Text;
+        feedBackText.setPosition(x + 2 * (Math.random() - .5) * r, y - r / 2);
+        feedBackText.setText(`-${n}`);
+        this.feedbackTween.play();
+    }
 }
 
 class Garbage {
@@ -484,15 +527,16 @@ class Garbage {
 
     private constructor(private scene: Phaser.Scene, private n: number = 0) {
         this.garbageSprite = scene.add.sprite(0, 76, assetName.garbageTexture);
-        scene.add.text(scene.sys.canvas.width >> 1, 50, '/10', {
+        const textX = 100;
+        scene.add.text(textX, 70, '/10', {
             fontFamily: 'raster',
-            fontSize: '60px',
+            fontSize: '48px',
             color: '#999'
         });
-        this.garbageText = scene.add.text(scene.sys.canvas.width >> 1, 50, n.toString(), {
+        this.garbageText = scene.add.text(textX, 70, n.toString(), {
             fontFamily: 'raster',
-            fontSize: '60px',
-            color: '#da2422'
+            fontSize: '48px',
+            color: '#999'
         }).setOrigin(1, 0);
     }
 
@@ -514,7 +558,7 @@ class LifeStrip {
     static instance: LifeStrip;
     container: Phaser.GameObjects.Container;
 
-    private constructor(private scene: Phaser.Scene, private n: number = 0) {
+    private constructor(private scene: Phaser.Scene, private n: number = 100) {
         const alpha = .8;
         const bg = scene.add.graphics({fillStyle: {color: 0x020a1e, alpha}})
                 .fillRoundedRect(-165, -210, 320, 28, 14),
@@ -563,3 +607,130 @@ class Tips {
     }
 }
 
+class Score {
+    static instance: Score;
+    container: Phaser.GameObjects.Container;
+    feedbackTween: Phaser.Tweens.Tween;
+
+    private constructor(private scene: Phaser.Scene, private n: number = 0) {
+        const feedBackText = scene.add.text(0, 0, '', {
+            fontSize: '40px',
+            fontFamily: 'raster',
+            color: '#999'
+        }).setAlpha(0).setOrigin(.5);
+        this.feedbackTween = this.scene.tweens.create({
+            targets: [feedBackText],
+            alpha: {from: 1, to: 0},
+            y: 0,
+            duration: 1e3
+        });
+        this.container = scene.add.container(scene.sys.canvas.width - 160, 70, [
+            scene.add.text(-12, 2, '得分', {
+                fontFamily: 'Open Sans',
+                fontSize: '40px',
+                color: '#999'
+            }).setOrigin(1, 0),
+            scene.add.text(24, 0, n.toString(), {
+                fontFamily: 'raster',
+                fontSize: '48px',
+                color: '#999'
+            }),
+            scene.add.text(0, 6, ':', {
+                fontFamily: 'raster',
+                fontSize: '40px',
+                color: '#999'
+            }),
+        ]);
+    }
+
+    static setScore(scene: Phaser.Scene, n: number): Phaser.GameObjects.Container {
+        if (!this.instance) {
+            this.instance = new Score(scene, n);
+        }
+        this.instance.update(n);
+        return this.instance.container;
+    }
+
+    update(n: number) {
+        const scoreText = this.container.getAt(1) as Phaser.GameObjects.Text;
+        scoreText.setText(n.toString());
+    }
+
+    feedback(n: number) {
+        const feedBackText = this.feedbackTween.targets[0] as Phaser.GameObjects.Text;
+        feedBackText.setPosition(this.scene.sys.canvas.width - 120 + 2 * (Math.random() - .5) * 80, 80);
+        feedBackText.setText(`+${n}`);
+        this.feedbackTween.play();
+    }
+}
+
+class Guide {
+    static instance: Guide;
+    container: Phaser.GameObjects.Container;
+
+    private readonly secondTips = '点击上方分类垃圾桶或拖动小人进行垃圾分类;\n进行垃圾分类将会消耗体力值,获取正确的得分';
+
+    private constructor(private scene: Phaser.Scene, private onDone: () => void) {
+        const btnSkip = scene.add.text(-250, 15, '跳过', {
+                fontFamily: 'Open Sans',
+                fontSize: '30px',
+                color: '#aaa'
+            }),
+            btnNext = scene.add.text(130, 15, '我知道了', {
+                fontFamily: 'Open Sans',
+                fontSize: '30px',
+                color: '#ff3434'
+            });
+        this.container = scene.add.container(scene.sys.canvas.width >> 1, 450, [
+            scene.add.graphics({
+                x: -scene.sys.canvas.width >> 1,
+                y: -450,
+                fillStyle: {
+                    color: 0x000000,
+                    alpha: .3
+                }
+            }).fillRect(0, 0, scene.sys.canvas.width, scene.sys.canvas.height),
+            scene.add.sprite(0, 0, assetName.guideBg),
+            scene.add.text(0, -40, '超时未分类或点击"随地乱扔"视为污染环境行为\n会造成对环境总分的下降,但是不会消耗体力值', {
+                fontFamily: 'Open Sans',
+                fontSize: '24px',
+                color: '#666'
+            }).setLineSpacing(5).setOrigin(.5),
+            btnSkip,
+            btnNext
+        ]);
+        btnSkip.setInteractive().on('pointerdown', () => btnSkip.setScale(.9));
+        btnSkip.setInteractive().on('pointerup', () => this.done());
+        btnNext.setInteractive().on('pointerdown', () => btnNext.setScale(.9));
+        btnNext.setInteractive().on('pointerup', () => {
+            btnNext.setScale(1);
+            this.next();
+        });
+    }
+
+    static init(scene: Phaser.Scene, onDone: () => void) {
+        if (!this.instance) {
+            this.instance = new Guide(scene, onDone);
+        }
+    }
+
+    done() {
+        this.container.destroy(true);
+        this.onDone();
+    }
+
+    next() {
+        const tipsText = this.container.getAt(2) as Phaser.GameObjects.Text;
+        if (tipsText.text === this.secondTips) {
+            this.done();
+        } else {
+            tipsText.setText(this.secondTips);
+            this.scene.tweens.add({
+                targets: [tipsText],
+                scaleY: {from: 1, to: 0},
+                yoyo: true,
+                duration: 100
+            });
+        }
+    }
+}

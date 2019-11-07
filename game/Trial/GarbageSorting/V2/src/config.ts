@@ -70,4 +70,5 @@ export interface IPlayerState {
     status: PlayerStatus
     life: number
     garbageIndex: number
+    score: number
 }
