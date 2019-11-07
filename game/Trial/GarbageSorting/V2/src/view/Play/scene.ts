@@ -77,16 +77,17 @@ export class MainGame extends Phaser.Scene {
         });
         this.setState(this.state);
         CONST.emitter.on(PushType.sync, ({i, t, env, life, garbageIndex, index, score, status}) => {
-            this.shouldOver(status);
             if (!this.sys.game || this.scene.isPaused()) {
                 return;
             }
-            if (this.state.index !== index) {
+            if (this.state.index === index) {
+                this.shouldOver(status);
+                this.setState({env, life, garbageIndex, score});
+            } else {
                 this.setState({env});
                 t === GarbageType.skip ? Tips.show(this, `有人将${GarbageConfig[i].label}随手扔入垃圾堆`) : null;
                 return;
             }
-            this.setState({env, life, garbageIndex, score});
         });
         CONST.emitter.emit(MoveType.prepare, {}, ({env, life, garbageIndex, index, status, score}) => {
             this.shouldOver(status);
@@ -184,7 +185,7 @@ class BtnSkip {
             duration: CONST.sortSeconds * 1000,
             onComplete: () => this.onClick()
         });
-        this.container = scene.add.container(stageWidth >> 1, stageHeight - 80, [btnSkip, btnSkipLabel, particles, mask]).setDepth(100);
+        this.container = scene.add.container(stageWidth >> 1, stageHeight - 80, [btnSkip, btnSkipLabel, particles, mask]).setDepth(10);
     }
 
     static init(scene: Phaser.Scene, onClick: (pointer: IPointer) => void) {
@@ -682,14 +683,7 @@ class Guide {
                 color: '#ff3434'
             });
         this.container = scene.add.container(scene.sys.canvas.width >> 1, 450, [
-            scene.add.graphics({
-                x: -scene.sys.canvas.width >> 1,
-                y: -450,
-                fillStyle: {
-                    color: 0x000000,
-                    alpha: .3
-                }
-            }).fillRect(0, 0, scene.sys.canvas.width, scene.sys.canvas.height),
+            scene.add.rectangle(0, 225, scene.sys.canvas.width, scene.sys.canvas.height, 0x00000, .1).setInteractive(),
             scene.add.sprite(0, 0, assetName.guideBg),
             scene.add.text(0, -40, '超时未分类或点击"随地乱扔"视为污染环境行为\n会造成对环境总分的下降,但是不会消耗体力值', {
                 fontFamily: 'Open Sans',
@@ -698,7 +692,7 @@ class Guide {
             }).setLineSpacing(5).setOrigin(.5),
             btnSkip,
             btnNext
-        ]);
+        ]).setDepth(20);
         btnSkip.setInteractive().on('pointerdown', () => btnSkip.setScale(.9));
         btnSkip.setInteractive().on('pointerup', () => this.done());
         btnNext.setInteractive().on('pointerdown', () => btnNext.setScale(.9));
