@@ -33,7 +33,7 @@ function PlayStage() {
             require('./Play/index')
         );
     }, []);
-    return <div id={CONST.phaserParent} style={{fontFamily: 'raster', position: 'fixed', top: '0'}}/>;
+    return <div id={CONST.phaserParent} style={{fontFamily: 'raster', position: 'fixed', top: '0', background:`url(${require('./asset/bg.png')})`}}/>;
 }
 
 interface IRowData {

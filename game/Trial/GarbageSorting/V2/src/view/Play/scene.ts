@@ -672,22 +672,22 @@ class Guide {
     private readonly secondTips = '点击上方分类垃圾桶或拖动小人进行垃圾分类;\n进行垃圾分类将会消耗体力值,获取正确的得分';
 
     private constructor(private scene: Phaser.Scene, private onDone: () => void) {
-        const btnSkip = scene.add.text(-250, 15, '跳过', {
+        const btnSkip = scene.add.text(-295, 12, '跳过', {
                 fontFamily: 'Open Sans',
-                fontSize: '30px',
+                fontSize: '36px',
                 color: '#aaa'
             }),
-            btnNext = scene.add.text(130, 15, '我知道了', {
+            btnNext = scene.add.text(190, 12, '下一步', {
                 fontFamily: 'Open Sans',
-                fontSize: '30px',
+                fontSize: '36px',
                 color: '#ff3434'
             });
         this.container = scene.add.container(scene.sys.canvas.width >> 1, 450, [
-            scene.add.rectangle(0, 225, scene.sys.canvas.width, scene.sys.canvas.height, 0x00000, .1).setInteractive(),
+            scene.add.rectangle(0, 225, scene.sys.canvas.width, scene.sys.canvas.height, 0x00000, 0).setInteractive(),
             scene.add.sprite(0, 0, assetName.guideBg),
             scene.add.text(0, -40, '超时未分类或点击"随地乱扔"视为污染环境行为\n会造成对环境总分的下降,但是不会消耗体力值', {
                 fontFamily: 'Open Sans',
-                fontSize: '24px',
+                fontSize: '28px',
                 color: '#666'
             }).setLineSpacing(5).setOrigin(.5),
             btnSkip,
