@@ -119,7 +119,7 @@ export class RequestHandler {
   }
 
   static async getInitInfo(req: Request, res: Response, next: NextFunction) {
-    const count = SocketHandler.connectionMap.size + 80 + ~~(Math.random() * 10),
+    const count = Math.max(SocketHandler.connectionMap.size, 100 + ~~(Math.random() * 20)),
         waiting = Math.max(count - Object.keys(Phase).length * Config.phaseServerCapacity, 0);
     res.json({
       code: ResCode.success,
