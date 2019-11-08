@@ -972,11 +972,11 @@ export class Hall3D extends React.Component<{}, State> {
       const {eventType, msg} = data;
       if (eventType === SocketEvent.reqStartGame) {
         // Todo
-        Toast.error(msg);
+        Toast.warn(msg);
       }
       if (eventType === SocketEvent.leaveMatchRoom) {
         // TODO
-        Toast.error(msg);
+        Toast.warn(msg);
       }
     });
   }

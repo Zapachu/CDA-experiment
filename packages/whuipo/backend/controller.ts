@@ -119,7 +119,7 @@ export class RequestHandler {
   }
 
   static async getInitInfo(req: Request, res: Response, next: NextFunction) {
-    const count = SocketHandler.connectionMap.size,
+    const count = SocketHandler.connectionMap.size + 80 + ~~(Math.random() * 10),
         waiting = Math.max(count - Object.keys(Phase).length * Config.phaseServerCapacity, 0);
     res.json({
       code: ResCode.success,
@@ -163,7 +163,7 @@ export class SocketHandler {
           return startError('匹配中...');
         }
         if (+(await redisClient.get(RedisTools.phaseServerUsageKey(phase))) >= Config.phaseServerCapacity) {
-          return startError('排队中...');
+          return handleSocketError(SocketEvent.reqStartGame, '排队中...');
         }
         const user = await User.findById(uid);
         if (multiPlayer) {

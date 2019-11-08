@@ -5,5 +5,5 @@ export const Config = {
     domain: 'microExperiment.cn',
     matchSeconds: 10,
     roomSize: 10,
-    phaseServerCapacity: 20
+    phaseServerCapacity: 60
 };
