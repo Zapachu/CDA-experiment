@@ -3,6 +3,7 @@ import {BaseRobot} from '@bespoke/robot';
 import {
     AdjustDirection,
     DBKey,
+    IDENTITY,
     MarketStage,
     MoveType,
     phaseNames,
@@ -17,31 +18,46 @@ import {
 import {CreateParams, GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface';
 import dateFormat = require('dateformat');
 
-interface IZipFreeField {
-    beta: number
-    r: number
-    Gamma: number
-    u: number
-    calcPrice?: number
+export default class Robot extends BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
+    async init(): Promise<this> {
+        await super.init();
+        this.frameEmitter.on(PushType.assignedPosition, () => {
+            setTimeout(() => this.frameEmitter.emit(MoveType.enterMarket, {seatNumber: ~~(Math.random() * 10000)}), Math.random() * 3000);
+        });
+        this.frameEmitter.on(PushType.periodOpen, () => {
+            const {positions} = this.game.params.phases[0].params,
+                {positionIndex} = this.playerState,
+                position = {...positions[positionIndex]};
+            switch (position.identity) {
+                case IDENTITY.ZipRobot:
+                    new ZipRobot(this).init();
+                    break;
+                case IDENTITY.GDRobot:
+                    break;
+            }
+        });
+        return this;
+    }
 }
 
-export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
-    zipActive: boolean;
-    zipFreeField: IZipFreeField;
-
-    get position(): CreateParams.Phase.Params.IPosition {
-        const {positions} = this.game.params.phases[0].params,
-            {positionIndex} = this.playerState,
-            position = {...positions[positionIndex]};
-        position.interval = 1000 * position.interval;
-        return position;
+class CDARobot {
+    constructor(private host: Robot) {
     }
 
-    //region market
-    //region getter
+    get game() {
+        return this.host.game;
+    }
 
-    get sleepTime(): number {
-        return this.position.interval * (0.75 + 0.5 * Math.random());
+    get gameState() {
+        return this.host.gameState;
+    }
+
+    get playerState() {
+        return this.host.playerState;
+    }
+
+    get frameEmitter() {
+        return this.host.frameEmitter;
     }
 
     get gamePhaseState(): GameState.IGamePhaseState {
@@ -69,27 +85,41 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
         }
     }
 
+    get position(): CreateParams.Phase.Params.IPosition {
+        const {positions} = this.game.params.phases[0].params,
+            {positionIndex} = this.playerState,
+            position = {...positions[positionIndex]};
+        position.interval = 1000 * position.interval;
+        return position;
+    }
+
+    formatPrice(price: number) {
+        return Math.round(price);
+    }
+
+    async init(): Promise<CDARobot> {
+        return this;
+    }
+}
+
+interface IZipFreeField {
+    beta: number
+    r: number
+    Gamma: number
+    u: number
+    calcPrice?: number
+}
+
+class ZipRobot extends CDARobot {
+    zipActive: boolean;
+    zipFreeField: IZipFreeField;
+
+    get sleepTime(): number {
+        return this.position.interval * (0.75 + 0.5 * Math.random());
+    }
+
     async init(): Promise<this> {
         await super.init();
-        this.frameEmitter.on(PushType.assignedPosition, () => {
-            setTimeout(() => this.frameEmitter.emit(MoveType.enterMarket, {seatNumber: ~~(Math.random() * 10000)}), Math.random() * 3000);
-        });
-        this.frameEmitter.on(PushType.periodOpen, () => {
-            this.zipActive = false;
-            setTimeout(() => {
-                const u = (this.position.role === ROLE.Seller ? 1 : -1) * (.05 + .3 * Math.random()),
-                    calcPrice = this.formatPrice(this.unitPrice * (1 + u));
-                this.zipActive = true;
-                this.zipFreeField = {
-                    beta: 0.1 + 0.4 * Math.random(),
-                    r: 0.1 * Math.random(),
-                    Gamma: 0,
-                    u,
-                    calcPrice
-                };
-                setTimeout(() => this.wakeUp(), this.sleepTime);
-            }, this.game.params.phases[this.gameState.gamePhaseIndex].params.startTime[this.playerState.positionIndex]);
-        });
         this.frameEmitter.on(PushType.newOrder, ({newOrderId}) => {
             if (!this.zipActive) {
                 return;
@@ -104,17 +134,22 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
             }
             this.respondNewTrade(resOrderId);
         });
+        this.zipActive = false;
+        setTimeout(() => {
+            const u = (this.position.role === ROLE.Seller ? 1 : -1) * (.05 + .3 * Math.random()),
+                calcPrice = this.formatPrice(this.unitPrice * (1 + u));
+            this.zipActive = true;
+            this.zipFreeField = {
+                beta: 0.1 + 0.4 * Math.random(),
+                r: 0.1 * Math.random(),
+                Gamma: 0,
+                u,
+                calcPrice
+            };
+            setTimeout(() => this.wakeUp(), this.sleepTime);
+        }, this.game.params.phases[this.gameState.gamePhaseIndex].params.startTime[this.playerState.positionIndex]);
         return this;
     }
-
-    //endregion
-
-    //region util
-    formatPrice(price: number) {
-        return Math.round(price);
-    }
-
-    //endregion
 
     wakeUp(): void {
         if (this.game.params.phases[this.gameState.gamePhaseIndex].templateName === phaseNames.mainGame &&
@@ -241,6 +276,4 @@ export default class extends BaseRobot<ICreateParams, IGameState, IPlayerState, 
             }).save();
         });
     }
-
-    //endregion
 }

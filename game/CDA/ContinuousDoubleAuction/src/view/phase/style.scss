@@ -94,6 +94,10 @@ $height-tr: 2.4rem;
     }
     .positions {
       @include createTable;
+      width: 90vw;
+      position: relative;
+      left: -20vw;
+
       tr td:last-child span{
         font-size: .8rem;
         cursor: pointer;
@@ -220,7 +224,6 @@ $height-tr: 2.4rem;
   }
 
   &.playContent {
-    margin: 2rem auto;
     width: 95%;
     animation: switchPlayContent .2s linear;
 
@@ -240,7 +243,7 @@ $height-tr: 2.4rem;
     .header {
       display: flex;
       justify-content: space-around;
-      padding-bottom: 1rem;
+      padding: 2rem;
       border-bottom: 1px solid rgba($color-black, .05);
       li {
         em {
