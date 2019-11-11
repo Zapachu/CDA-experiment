@@ -101,6 +101,7 @@ export class MainGame extends Phaser.Scene {
             }
             Guide.init(this, () => this.setState({env, life, garbageIndex, index, score}));
         });
+        // this.add.rectangle(125,145, 750, 1334, 0x000000, .1).setOrigin(0,0)
     }
 
     shouldOver(status: PlayerStatus) {
@@ -170,7 +171,7 @@ class BtnSkip {
         });
         const mask = scene.make.graphics({
             x: stageWidth - btnSkip.width >> 1,
-            y: stageHeight - 80 - btnSkip.height / 2
+            y: stageHeight - 225 - btnSkip.height / 2
         }).fillRect(0, 0, 306, 68);
         btnSkip.mask = new Phaser.Display.Masks.GeometryMask(scene, mask);
         const btnSkipLabel = scene.add.text(0, 0, '懒得分类', {
@@ -185,7 +186,7 @@ class BtnSkip {
             duration: CONST.sortSeconds * 1000,
             onComplete: () => this.onClick()
         });
-        this.container = scene.add.container(stageWidth >> 1, stageHeight - 80, [btnSkip, btnSkipLabel, particles, mask]).setDepth(10);
+        this.container = scene.add.container(stageWidth >> 1, stageHeight - 225, [btnSkip, btnSkipLabel, particles, mask]).setDepth(10);
     }
 
     static init(scene: Phaser.Scene, onClick: (pointer: IPointer) => void) {
@@ -214,9 +215,9 @@ enum PlayerAnimation {
 
 class Player {
     static readonly MoveArea = {
-        left: 164, right: 596, top: 360, bottom: 1040, bottomTrigger: 960, topTrigger: 440
+        left: 289, right: 721, top: 505, bottom: 1185, bottomTrigger: 1105, topTrigger: 585
     };
-    static readonly InitPosition: IPointer = {x: 380, y: 760};
+    static readonly InitPosition: IPointer = {x: 505, y: 905};
     static instance: Player;
     container: Phaser.GameObjects.Container;
 
@@ -322,8 +323,8 @@ class Player {
 
 class Can {
     static readonly cfg = {
-        baseX: 96,
-        baseY: 240,
+        baseX: 221,
+        baseY: 385,
         xStep: 184,
         cans: [GarbageType.harmful, GarbageType.kitchen, GarbageType.recyclable, GarbageType.other]
     };
@@ -469,7 +470,7 @@ class Env {
             y: y + r / 2,
             duration: 1e3
         });
-        this.container = scene.add.container(scene.sys.canvas.width >> 1, scene.sys.canvas.height, [dumpSprite, bg, stripGraphics, scoreText, scoreLabel, feedBackText]);
+        this.container = scene.add.container(scene.sys.canvas.width >> 1, scene.sys.canvas.height - 145, [dumpSprite, bg, stripGraphics, scoreText, scoreLabel, feedBackText]);
     }
 
     static setEnv(scene: Phaser.Scene, n: number) {
@@ -528,13 +529,13 @@ class Garbage {
 
     private constructor(private scene: Phaser.Scene, private n: number = 0) {
         this.garbageSprite = scene.add.sprite(0, 76, assetName.garbageTexture);
-        const textX = 100;
-        scene.add.text(textX, 70, '/10', {
+        const textX = 225, textY = 180
+        scene.add.text(textX, textY, '/10', {
             fontFamily: 'raster',
             fontSize: '48px',
             color: '#999'
         });
-        this.garbageText = scene.add.text(textX, 70, n.toString(), {
+        this.garbageText = scene.add.text(textX, textY, n.toString(), {
             fontFamily: 'raster',
             fontSize: '48px',
             color: '#999'
@@ -625,7 +626,7 @@ class Score {
             y: 0,
             duration: 1e3
         });
-        this.container = scene.add.container(scene.sys.canvas.width - 160, 70, [
+        this.container = scene.add.container(scene.sys.canvas.width - 285, 180, [
             scene.add.text(-12, 2, '得分', {
                 fontFamily: 'Open Sans',
                 fontSize: '40px',
@@ -659,7 +660,7 @@ class Score {
 
     feedback(n: number) {
         const feedBackText = this.feedbackTween.targets[0] as Phaser.GameObjects.Text;
-        feedBackText.setPosition(this.scene.sys.canvas.width - 120 + 2 * (Math.random() - .5) * 80, 80);
+        feedBackText.setPosition(this.scene.sys.canvas.width - 245 + 2 * (Math.random() - .5) * 80, 225);
         feedBackText.setText(`+${n}`);
         this.feedbackTween.play();
     }
@@ -682,7 +683,7 @@ class Guide {
                 fontSize: '36px',
                 color: '#ff3434'
             });
-        this.container = scene.add.container(scene.sys.canvas.width >> 1, 450, [
+        this.container = scene.add.container(scene.sys.canvas.width >> 1, 595, [
             scene.add.rectangle(0, 225, scene.sys.canvas.width, scene.sys.canvas.height, 0x00000, 0).setInteractive(),
             scene.add.sprite(0, 0, assetName.guideBg),
             scene.add.text(0, -40, '超时未分类或点击"随地乱扔"视为污染环境行为\n会造成对环境总分的下降,但是不会消耗体力值', {

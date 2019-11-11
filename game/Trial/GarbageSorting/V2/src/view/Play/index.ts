@@ -6,10 +6,10 @@ const config: Phaser.Types.Core.GameConfig = {
     parent: CONST.phaserParent,
     scene: [MainGame],
     scale: {
-        mode: Phaser.Scale.FIT,
+        mode: window.innerHeight / window.innerWidth >= 1.624 ? Phaser.Scale.HEIGHT_CONTROLS_WIDTH : Phaser.Scale.WIDTH_CONTROLS_HEIGHT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: 750,
-        height: 1334
+        width: 1000,
+        height: 1624
     },
 };
 
