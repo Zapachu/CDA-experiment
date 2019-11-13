@@ -5,7 +5,8 @@ import {
     DBKey,
     IDENTITY,
     MarketStage,
-    MoveType, orderNumberLimit,
+    MoveType,
+    orderNumberLimit,
     phaseNames,
     PushType,
     ReactionType,
@@ -15,7 +16,7 @@ import {
     ROLE,
     ShoutResult
 } from './config';
-import {pointPair2Curve} from './util';
+import {IPoint, pointPair2Curve} from './util';
 import {CreateParams, GameState, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams} from './interface';
 import dateFormat = require('dateformat');
 
@@ -303,7 +304,7 @@ class GDRobot extends CDARobot {
 
     async init(): Promise<this> {
         await super.init();
-        global.setTimeout(()=>this.sleepLoop(), Math.random() * 5e3)
+        global.setTimeout(() => this.sleepLoop(), Math.random() * 5e3);
         return this;
     }
 
@@ -336,17 +337,14 @@ class GDRobot extends CDARobot {
             recentReqOrders = recentTrades.map(({reqId}) => reqId),
             recentResOrders = recentTrades.map(({resId}) => resId),
             M = this.getM();
-        let anchorPoints: Array<{
-            price: number
-            p: number
-        }> = this.position.role === ROLE.Seller ?
-            [{price: 0, p: 1}, {price: M, p: 0}] :
-            [{price: 0, p: 0}, {price: M, p: 1}];
+        let anchorPoints: Array<IPoint> = this.position.role === ROLE.Seller ?
+            [{x: 0, y: 1}, {x: M, y: 0}] :
+            [{x: 0, y: 0}, {x: M, y: 1}];
         const markedOrderId = recentResOrders[0] || orderNumberLimit * gamePhaseIndex,
             historyOrder = orders.filter(({id}) => (id > markedOrderId) && !recentResOrders.includes(id));
         historyOrder.map(({price}) => {
-            if(anchorPoints.some(p=>p.price === price)){
-                return
+            if (anchorPoints.some(p => p.x === price)) {
+                return;
             }
             let TA = 0, B = 0, RA = 0, TB = 0, A = 0, RB = 0;
             for (let order of historyOrder) {
@@ -358,16 +356,15 @@ class GDRobot extends CDARobot {
                     isSeller ? A++ : recentReqOrders.includes(order.id) ? TB++ : RB++;
                 }
             }
-            const p = this.position.role === ROLE.Seller ? (TA + B) / (TA + B + RA) : (TB + A) / (TB + A + RB);
-            anchorPoints.push({price, p});
+            const y = this.position.role === ROLE.Seller ? (TA + B) / (TA + B + RA) : (TB + A) / (TB + A + RB);
+            anchorPoints.push({x: price, y});
         });
-        anchorPoints = anchorPoints.sort((p1, p2) => p1.price - p2.price);
-        Log.d(this.position.role === ROLE.Seller, this.unitPrice, anchorPoints)
+        anchorPoints = anchorPoints.sort((p1, p2) => p1.x - p2.x);
         return anchorPoints.slice(1).map((p2, i) => {
             const p1 = anchorPoints[i];
             return {
-                from: p1.price,
-                to: p2.price,
+                from: p1.x,
+                to: p2.x,
                 curve: pointPair2Curve(p1, p2)
             };
         });
@@ -377,18 +374,17 @@ class GDRobot extends CDARobot {
         price: number,
         curveIndex: number
     } {
+        const _curves = curves.filter(({from, to, curve}) => from < t && to > f && (curve(from) > Number.EPSILON || curve(to) > Number.EPSILON));
         let curveIndex = 0, maxE = 0, maxEPrice = f;
-        for (let price = f+1; price < t; price++) {
-            const {to, curve} = curves[curveIndex];
-            const e = coefficient(price) * curve(price);
-            if (e > maxE) {
-                maxE = e;
-                maxEPrice = price;
+        _curves.forEach(({from, to, curve}) => {
+            for (let price = from + 1; price < to; price++) {
+                const e = coefficient(price) * curve(price);
+                if (e > maxE) {
+                    maxE = e;
+                    maxEPrice = price;
+                }
             }
-            if (price === to) {
-                curveIndex++;
-            }
-        }
+        });
         return {price: maxEPrice, curveIndex};
     }
 
@@ -406,7 +402,6 @@ class GDRobot extends CDARobot {
         }
         this.calcPrice = this.getCurvesTopPoint(curves, f, t, price => (price - this.unitPrice) * profitSign).price;
     }
-
 
     submitOrder(seq: number): void {
         const {gameState: {gamePhaseIndex}, calcPrice, unitIndex} = this;

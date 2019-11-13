@@ -6,21 +6,26 @@
     "dist-w": "tsc bin/help bin/update -w",
     "dist": "tsc bin/help bin/update",
     "help": "node bin/help",
-    "update": "node bin/update"
+    "update": "node bin/update",
+    "test": "jest"
   },
   "dependencies": {
     "@bespoke/client": "^1.1.1",
     "@bespoke/robot": "^1.1.1",
     "@bespoke/server": "^1.1.1",
     "@bespoke/share": "^1.1.1",
-    "@extend/client": "^1.1.1",
-    "@extend/server": "^1.1.1",
-    "@extend/robot": "^1.1.1",
-    "@extend/share": "^1.1.1",
     "@elf/component": "^1.1.1",
     "@elf/protocol": "^1.1.1",
     "@elf/setting": "^1.1.1",
     "@elf/util": "^1.1.1",
+    "@extend/client": "^1.1.1",
+    "@extend/robot": "^1.1.1",
+    "@extend/server": "^1.1.1",
+    "@extend/share": "^1.1.1"
+  },
+  "devDependencies": {
+    "jest": "^24.9.0",
+    "ts-jest": "^24.1.0",
     "ts-node": "^8.0.3",
     "typescript": "^3.3.3333",
     "webpack": "^4.29.6",
