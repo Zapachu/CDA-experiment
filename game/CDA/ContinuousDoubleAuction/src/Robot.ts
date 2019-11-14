@@ -1,4 +1,4 @@
-import {Log, Model, redisClient} from '@bespoke/server';
+import {GameStatus, Log, Model, redisClient} from '@bespoke/server';
 import {BaseRobot} from '@bespoke/robot';
 import {
     AdjustDirection,
@@ -297,6 +297,12 @@ class ZipRobot extends CDARobot {
     }
 }
 
+interface ICurveFragment {
+    from: number,
+    to: number,
+    curve: (price: number) => number
+}
+
 class GDRobot extends CDARobot {
     alpha = .95;
     beta = 400;
@@ -309,7 +315,8 @@ class GDRobot extends CDARobot {
     }
 
     sleepLoop() {
-        const playing = this.game.params.phases[this.gameState.gamePhaseIndex].templateName === phaseNames.mainGame &&
+        const playing = this.gameState.status === GameStatus.started &&
+            this.game.params.phases[this.gameState.gamePhaseIndex].templateName === phaseNames.mainGame &&
             this.gamePhaseState.marketStage === MarketStage.trading && this.unitPrice;
         if (!playing) {
             return;
@@ -331,8 +338,8 @@ class GDRobot extends CDARobot {
         return Math.pow(2, 2 + ~~Math.log2(M));
     }
 
-    getExpectationCurve(): Array<{ from: number, to: number, curve: (price: number) => number }> {
-        const {gameState: {orders, gamePhaseIndex}, gamePhaseState: {trades}} = this,
+    getExpectationCurve(): Array<ICurveFragment> {
+        const {gameState: {orders, gamePhaseIndex}, gamePhaseState: {trades, buyOrderIds, sellOrderIds}} = this,
             recentTrades = trades.slice(-5),
             recentReqOrders = recentTrades.map(({reqId}) => reqId),
             recentResOrders = recentTrades.map(({resId}) => resId),
@@ -340,23 +347,34 @@ class GDRobot extends CDARobot {
         let anchorPoints: Array<IPoint> = this.position.role === ROLE.Seller ?
             [{x: 0, y: 1}, {x: M, y: 0}] :
             [{x: 0, y: 0}, {x: M, y: 1}];
-        const markedOrderId = recentResOrders[0] || orderNumberLimit * gamePhaseIndex,
-            historyOrder = orders.filter(({id}) => (id > markedOrderId) && !recentResOrders.includes(id));
+        const markedOrderId = recentResOrders.length === 5 ? recentResOrders[0] : orderNumberLimit * gamePhaseIndex,
+            historyOrder = orders.filter(({id}) => ((id > markedOrderId) && !recentResOrders.includes(id)) || id === buyOrderIds[0] || id === sellOrderIds[0]);
         historyOrder.map(({price}) => {
             if (anchorPoints.some(p => p.x === price)) {
                 return;
             }
-            let TA = 0, B = 0, RA = 0, TB = 0, A = 0, RB = 0;
+            let TA = 0, B = 0, TB = 0, ta = 0, tb = 0, a = 0;
             for (let order of historyOrder) {
-                const isSeller = this.getPosition(order.positionIndex);
+                const isSeller = this.getPosition(order.positionIndex).role === ROLE.Seller;
                 if (order.price >= price) {
-                    isSeller ? recentReqOrders.includes(order.id) ? TA++ : RA++ : B++;
+                    if (!isSeller) {
+                        B++;
+                    }
+                    if (recentReqOrders.includes(order.id)) {
+                        isSeller ? TA++ : TB++;
+                    }
                 }
                 if (order.price <= price) {
-                    isSeller ? A++ : recentReqOrders.includes(order.id) ? TB++ : RB++;
+                    if (isSeller) {
+                        a++;
+                    }
+                    if (recentReqOrders.includes(order.id)) {
+                        isSeller ? ta++ : tb++;
+                    }
                 }
             }
-            const y = this.position.role === ROLE.Seller ? (TA + B) / (TA + B + RA) : (TB + A) / (TB + A + RB);
+            Log.d(historyOrder.map(({price}) => price).join(','), this.position.role === ROLE.Seller ? [this.playerState.positionIndex, 'Seller', TA, B, a, ta] : [this.playerState.positionIndex, 'Buyer', tb, a, B, TB]);
+            const y = this.position.role === ROLE.Seller ? (TA + B) / (TA + B + a - ta) : (tb + a) / (tb + a + B - TB);
             anchorPoints.push({x: price, y});
         });
         anchorPoints = anchorPoints.sort((p1, p2) => p1.x - p2.x);
@@ -370,22 +388,27 @@ class GDRobot extends CDARobot {
         });
     }
 
-    getCurvesTopPoint(curves: Array<{ from: number, to: number, curve: (price: number) => number }>, f: number, t: number, coefficient: (price: number) => number): {
-        price: number,
-        curveIndex: number
-    } {
+    getCurvesTopPoint(curves: Array<ICurveFragment>, f: number, t: number, coefficient: (price: number) => number): number {
         const _curves = curves.filter(({from, to, curve}) => from < t && to > f && (curve(from) > Number.EPSILON || curve(to) > Number.EPSILON));
-        let curveIndex = 0, maxE = 0, maxEPrice = f;
-        _curves.forEach(({from, to, curve}) => {
-            for (let price = from + 1; price < to; price++) {
+        let targetFragment: ICurveFragment = null, maxE = 0, maxEPrice = f;
+        _curves.forEach(fragment => {
+            const {from, to, curve} = fragment;
+            for (let price = from; price <= to; price++) {
                 const e = coefficient(price) * curve(price);
                 if (e > maxE) {
                     maxE = e;
                     maxEPrice = price;
+                    targetFragment = fragment;
                 }
             }
         });
-        return {price: maxEPrice, curveIndex};
+        if (targetFragment) {
+            const {unitPrice} = this, {from, to, curve} = targetFragment;
+            if (Math.abs(curve(from) - curve(to)) < Number.EPSILON && unitPrice >= from && unitPrice <= to) {
+                maxEPrice = unitPrice;
+            }
+        }
+        return maxEPrice;
     }
 
     calc() {
@@ -400,13 +423,43 @@ class GDRobot extends CDARobot {
             f = buyOrderIds[0] ? orderDict[buyOrderIds[0]].price : curves[0].from;
             t = this.unitPrice;
         }
-        this.calcPrice = this.getCurvesTopPoint(curves, f, t, price => (price - this.unitPrice) * profitSign).price;
+        const newPrice = this.getCurvesTopPoint(curves, f, t, price => (price - this.unitPrice) * profitSign);
+        if (newPrice !== this.calcPrice) {
+            this.calcPrice = newPrice;
+            redisClient.incr(RedisKey.robotActionSeq(this.game.id)).then(async seq => {
+                const data: RobotCalcLog = {
+                    seq,
+                    playerSeq: this.playerState.positionIndex + 1,
+                    unitIndex: this.unitIndex,
+                    role: ROLE[this.position.role],
+                    R: '',
+                    A: '',
+                    q: '',
+                    tau: '',
+                    beta: '',
+                    p: '',
+                    delta: '',
+                    r: '',
+                    LagGamma: '',
+                    Gamma: '',
+                    ValueCost: this.unitPrice,
+                    u: '',
+                    CalculatedPrice: newPrice,
+                    timestamp: `(0,${curves[0].curve(0)})` + curves.map(({to, curve}) => `(${to},${curve(to)})`).join(',')
+                };
+                await new Model.FreeStyleModel({
+                    game: this.game.id,
+                    key: DBKey.robotCalcLog,
+                    data
+                }).save();
+            });
+        }
     }
 
     submitOrder(seq: number): void {
         const {gameState: {gamePhaseIndex}, calcPrice, unitIndex} = this;
         const [wouldBeRejected = false, rejectPrice] = this.wouldBeRejected(this.calcPrice);
-        if (wouldBeRejected) {
+        if (calcPrice <= 0 || wouldBeRejected) {
             Log.i('Reject', rejectPrice);
             return;
         }
