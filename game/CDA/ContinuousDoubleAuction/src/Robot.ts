@@ -323,7 +323,7 @@ class GDRobot extends CDARobot {
         }
         this.calc();
         const {alpha, beta, calcPrice} = this,
-            sleepTime = beta * (1 - alpha) * calcPrice;
+            sleepTime = -(beta * (1 - alpha) * calcPrice) * Math.log(Math.random());
         setTimeout(() => {
             redisClient.incr(RedisKey.robotActionSeq(this.game.id)).then(seq => this.submitOrder(seq));
             this.sleepLoop();
@@ -432,7 +432,7 @@ class GDRobot extends CDARobot {
                     playerSeq: this.playerState.positionIndex + 1,
                     unitIndex: this.unitIndex,
                     role: ROLE[this.position.role],
-                    R: '',
+                    R: `(0,${curves[0].curve(0)})` + curves.map(({to, curve}) => `(${to},${curve(to)})`).join(','),
                     A: '',
                     q: '',
                     tau: '',
@@ -445,7 +445,7 @@ class GDRobot extends CDARobot {
                     ValueCost: this.unitPrice,
                     u: '',
                     CalculatedPrice: newPrice,
-                    timestamp: `(0,${curves[0].curve(0)})` + curves.map(({to, curve}) => `(${to},${curve(to)})`).join(',')
+                    timestamp:dateFormat(Date.now(), 'HH:MM:ss:l')
                 };
                 await new Model.FreeStyleModel({
                     game: this.game.id,
