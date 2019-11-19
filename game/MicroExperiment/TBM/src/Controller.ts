@@ -21,38 +21,36 @@ import {
   Role,
   SHOUT_TIMER
 } from './config'
-import {STOCKS} from '@micro-experiment/share'
-import {Trial} from '@elf/protocol'
+import { STOCKS } from '@micro-experiment/share'
+import { Trial } from '@elf/protocol'
 
-export default class Controller extends BaseController<ICreateParams,
-    IGameState,
-    IPlayerState,
-    MoveType,
-    PushType,
-    IMoveParams,
-    IPushParams> {
+export default class Controller extends BaseController<
+  ICreateParams,
+  IGameState,
+  IPlayerState,
+  MoveType,
+  PushType,
+  IMoveParams,
+  IPushParams
+> {
   private role = Role.Buyer
   private robotJoined = false
   private shoutTimer: NodeJS.Timer
 
-  private static invalidParams(
-      playerState: IPlayerState,
-      params: IMoveParams
-  ): boolean {
-    const {price, num} = params
-    const {role, startingPrice, startingQuota, privateValue} = playerState
+  private static invalidParams(playerState: IPlayerState, params: IMoveParams): boolean {
+    const { price, num } = params
+    const { role, startingPrice, startingQuota, privateValue } = playerState
     return (
-        !price ||
-        !num ||
-        (role === Role.Buyer &&
-            (price * num > startingPrice || price > privateValue)) ||
-        (role == Role.Seller && (num > startingQuota || price < privateValue))
+      !price ||
+      !num ||
+      (role === Role.Buyer && (price * num > startingPrice || price > privateValue)) ||
+      (role == Role.Seller && (num > startingQuota || price < privateValue))
     )
   }
 
   private static strikeDeal(
-      buyerList: Array<IPlayerState>,
-      sellerList: Array<IPlayerState>
+    buyerList: Array<IPlayerState>,
+    sellerList: Array<IPlayerState>
   ): { strikePrice: number; strikeNum: number } {
     let buyerIndex = 0
     let sellerIndex = 0
@@ -62,10 +60,7 @@ export default class Controller extends BaseController<ICreateParams,
       const buyer = buyerList[buyerIndex]
       const seller = sellerList[sellerIndex]
       if (buyer.price >= seller.price) {
-        const num = Math.min(
-            buyer.bidNum - buyer.actualNum,
-            seller.bidNum - seller.actualNum
-        )
+        const num = Math.min(buyer.bidNum - buyer.actualNum, seller.bidNum - seller.actualNum)
         buyer.actualNum += num
         seller.actualNum += num
         strikeNum += num
@@ -79,14 +74,10 @@ export default class Controller extends BaseController<ICreateParams,
         break
       }
     }
-    return {strikePrice, strikeNum}
+    return { strikePrice, strikeNum }
   }
 
-  private static updateGameState(
-      gameState: IGameState,
-      strikePrice: number,
-      strikeNum: number
-  ) {
+  private static updateGameState(gameState: IGameState, strikePrice: number, strikeNum: number) {
     gameState.strikePrice = strikePrice
     gameState.strikeNum = strikeNum
   }
@@ -108,15 +99,15 @@ export default class Controller extends BaseController<ICreateParams,
   }
 
   protected async playerMoveReducer(
-      actor: IActor,
-      type: string,
-      params: IMoveParams,
-      cb: IMoveCallback
+    actor: IActor,
+    type: string,
+    params: IMoveParams,
+    cb: IMoveCallback
   ): Promise<void> {
-    const {groupSize} = this.game.params
+    const { groupSize } = this.game.params
     const playerState = await this.stateManager.getPlayerState(actor),
-        gameState = await this.stateManager.getGameState(),
-        playerStates = await this.stateManager.getPlayerStates()
+      gameState = await this.stateManager.getGameState(),
+      playerStates = await this.stateManager.getPlayerStates()
     switch (type) {
       case MoveType.guideDone: {
         playerState.status = PlayerStatus.test
@@ -138,11 +129,7 @@ export default class Controller extends BaseController<ICreateParams,
           return
         }
         if (Controller.invalidParams(playerState, params)) {
-          return cb(
-              playerState.role === Role.Buyer
-                  ? '价格应不大于估值'
-                  : '价格应不小于估值'
-          )
+          return cb(playerState.role === Role.Buyer ? '价格应不大于估值' : '价格应不小于估值')
         }
         playerState.price = params.price
         playerState.bidNum = params.num
@@ -152,48 +139,32 @@ export default class Controller extends BaseController<ICreateParams,
           this.initRobots(groupSize - playerStateArray.length)
           this.robotJoined = true
         }
-        if (
-            playerStateArray.length === groupSize &&
-            playerStateArray.every(ps => ps.price !== undefined)
-        ) {
+        if (playerStateArray.length === groupSize && playerStateArray.every(ps => ps.price !== undefined)) {
           this.processProfits(gameState, playerStateArray)
         }
         break
       }
       case MoveType.nextStage: {
-        const {onceMore} = params
-        const res = await RedisCall.call<Trial.Done.IReq, Trial.Done.IRes>(
-            Trial.Done.name,
-            {
-              userId: playerState.user.id,
-              namespace
-            }
-        )
-        res ? cb(res.lobbyUrl + (onceMore ? this.game.params.onceMoreSuffix : '')) : null;
+        const { onceMore } = params
+        const res = await RedisCall.call<Trial.Done.IReq, Trial.Done.IRes>(Trial.Done.name, {
+          userId: playerState.user.id,
+          namespace
+        })
+        res ? cb(res.lobbyUrl + (onceMore ? this.game.params.onceMoreSuffix : '')) : null
         break
       }
     }
   }
 
-  private processProfits(
-      gameState: IGameState,
-      playerStates: Array<IPlayerState>
-  ) {
-    const buyerList = playerStates
-        .filter(ps => ps.role === Role.Buyer)
-        .sort((a, b) => b.price - a.price)
-    const sellerList = playerStates
-        .filter(ps => ps.role === Role.Seller)
-        .sort((a, b) => a.price - b.price)
-    const {strikePrice, strikeNum} = Controller.strikeDeal(buyerList, sellerList)
+  private processProfits(gameState: IGameState, playerStates: Array<IPlayerState>) {
+    const buyerList = playerStates.filter(ps => ps.role === Role.Buyer).sort((a, b) => b.price - a.price)
+    const sellerList = playerStates.filter(ps => ps.role === Role.Seller).sort((a, b) => a.price - b.price)
+    const { strikePrice, strikeNum } = Controller.strikeDeal(buyerList, sellerList)
     Controller.updateGameState(gameState, strikePrice, strikeNum)
     this._updatePlayerStates(playerStates, strikePrice)
   }
 
-  private _updatePlayerStates(
-      playerStates: Array<IPlayerState>,
-      strikePrice: number
-  ) {
+  private _updatePlayerStates(playerStates: Array<IPlayerState>, strikePrice: number) {
     playerStates.forEach(ps => {
       if (!ps.actualNum) {
         return
@@ -228,26 +199,19 @@ export default class Controller extends BaseController<ICreateParams,
     if (this.shoutTimer) {
       return
     }
-    const {groupSize} = this.game.params
+    const { groupSize } = this.game.params
     let shoutTime = 1
     this.shoutTimer = global.setInterval(async () => {
       const playerStates = await this.stateManager.getPlayerStates()
       const playerStateArray = Object.values(playerStates)
       playerStateArray.forEach(s => {
-        this.push(s.actor, PushType.shoutTimer, {shoutTime})
+        this.push(s.actor, PushType.shoutTimer, { shoutTime })
       })
-      if (
-          playerStateArray.length === groupSize &&
-          playerStateArray.every(ps => ps.price !== undefined)
-      ) {
+      if (playerStateArray.length === groupSize && playerStateArray.every(ps => ps.price !== undefined)) {
         clearInterval(this.shoutTimer)
         return
       }
-      if (
-          !this.robotJoined &&
-          playerStateArray.length < groupSize &&
-          SHOUT_TIMER - shoutTime < 30
-      ) {
+      if (!this.robotJoined && playerStateArray.length < groupSize && SHOUT_TIMER - shoutTime < 30) {
         // 倒计时30秒时补满机器人
         this.initRobots(groupSize - playerStateArray.length)
         this.robotJoined = true
@@ -281,12 +245,7 @@ export default class Controller extends BaseController<ICreateParams,
   }
 
   private _getPrivatePrice(role: Role): number {
-    const {
-      buyerPrivateMin,
-      buyerPrivateMax,
-      sellerPrivateMin,
-      sellerPrivateMax
-    } = this.game.params
+    const { buyerPrivateMin, buyerPrivateMax, sellerPrivateMin, sellerPrivateMax } = this.game.params
     let min: number, max: number
     if (role === Role.Buyer) {
       min = buyerPrivateMin
@@ -299,12 +258,12 @@ export default class Controller extends BaseController<ICreateParams,
   }
 
   private _getStartingPrice(): number {
-    const {buyerCapitalMin, buyerCapitalMax} = this.game.params
+    const { buyerCapitalMin, buyerCapitalMax } = this.game.params
     return genRandomInt(buyerCapitalMin / 100, buyerCapitalMax / 100) * 100
   }
 
   private _getStartingQuota(): number {
-    const {sellerQuotaMin, sellerQuotaMax} = this.game.params
+    const { sellerQuotaMin, sellerQuotaMax } = this.game.params
     return genRandomInt(sellerQuotaMin / 100, sellerQuotaMax / 100) * 100
   }
 }

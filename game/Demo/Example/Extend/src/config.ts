@@ -1,27 +1,24 @@
 export const namespace = 'Extend'
 
 export enum MoveType {
-    add = 'add',
-    reset = 'reset'
+  add = 'add',
+  reset = 'reset'
 }
 
-export enum PushType {
-}
+export enum PushType {}
 
-export interface IMoveParams {
-}
+export interface IMoveParams {}
 
-export interface IPushParams {
-}
+export interface IPushParams {}
 
 export interface ICreateParams {
-    goal: number
+  goal: number
 }
 
 export interface IGameState {
-    total: number
+  total: number
 }
 
 export interface IPlayerState {
-    count: number
+  count: number
 }

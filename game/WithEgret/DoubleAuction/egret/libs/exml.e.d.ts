@@ -1,4 +1,4 @@
-declare module eui{
+declare namespace eui{
 	class ButtonSkin extends eui.Skin{
 	}
 }
@@ -6,7 +6,7 @@ declare class PrepareSkin extends eui.Skin{
 }
 declare class ResultSkin extends eui.Skin{
 }
-declare module eui{
+declare namespace eui{
 	class TextInputSkin extends eui.Skin{
 	}
 }

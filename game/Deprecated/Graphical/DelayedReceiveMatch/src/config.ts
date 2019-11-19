@@ -1,20 +1,20 @@
 export const namespace = 'DelayedReceiveMatch'
 
 export enum MoveType {
-    enterMarket = 'enterMarket',
-    getPosition = 'getPosition',
-    submit = 'submit'
+  enterMarket = 'enterMarket',
+  getPosition = 'getPosition',
+  submit = 'submit'
 }
 
 export enum PushType {
-    newRoundTimer
+  newRoundTimer
 }
 
 export enum PlayerStatus {
-    outside,
-    prepared,
-    submitted,
-    matched
+  outside,
+  prepared,
+  submitted,
+  matched
 }
 
 export const DEAL_TIMER = 5

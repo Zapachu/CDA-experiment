@@ -139,4 +139,4 @@ export default [
     pid: '100000',
     pname: '其它地区\r'
   }
-];
+]

@@ -1,6 +1,6 @@
-import * as React from "react";
-import * as style from "./style.scss";
-import { Core, Request } from "@bespoke/client";
+import * as React from 'react'
+import * as style from './style.scss'
+import { Core, Request } from '@bespoke/client'
 import {
   ICreateParams,
   IGameState,
@@ -10,19 +10,13 @@ import {
   MoveType,
   namespace,
   SheetType
-} from "../config";
+} from '../config'
 
-export class Result4Owner extends Core.Result4Owner<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
-  IMoveParams
-> {
+export class Result4Owner extends Core.Result4Owner<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams> {
   render(): React.ReactNode {
     const {
       props: { game }
-    } = this;
+    } = this
     return (
       <section className={style.result4Owner}>
         <a
@@ -36,6 +30,6 @@ export class Result4Owner extends Core.Result4Owner<
           导出结果
         </a>
       </section>
-    );
+    )
   }
 }

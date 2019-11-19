@@ -9,8 +9,7 @@ export enum MoveType {
   startMainTest = 'startMainTest'
 }
 
-export enum PushType {
-}
+export enum PushType {}
 
 export enum GameStage {
   seatNumber,

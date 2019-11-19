@@ -1,74 +1,73 @@
 export const namespace = 'EgretDoubleAuction'
 
 export const Config = {
-    ROUND : 3,
-    PREPARE_TIME : 5,
-    TRADE_TIME : 120,
-    RESULT_TIME : 10,
-    PLAYER_NUM : 6
+  ROUND: 3,
+  PREPARE_TIME: 5,
+  TRADE_TIME: 120,
+  RESULT_TIME: 10,
+  PLAYER_NUM: 6
 }
 
 export enum GameScene {
-    prepare,
-    trade,
-    result
+  prepare,
+  trade,
+  result
 }
 
 export enum Role {
-    seller,
-    buyer
+  seller,
+  buyer
 }
 
 export enum MoveType {
-    getIndex = 'getIndex',
-    shout = 'shout',
-    onceMore = 'onceMore'
+  getIndex = 'getIndex',
+  shout = 'shout',
+  onceMore = 'onceMore'
 }
 
 export enum PushType {
-    beginRound
+  beginRound
 }
 
-export interface ICreateParams {
-}
+export interface ICreateParams {}
 
 export interface IMoveParams {
-    price: number,
+  price: number
 }
 
 export interface IPushParams {
-    round:number
+  round: number
 }
 
 export interface IGameState {
-    prepareTime: number
-    roundIndex: number
-    rounds: IGameRoundState[]
-    playerIndex: number
-    scene: GameScene
+  prepareTime: number
+  roundIndex: number
+  rounds: IGameRoundState[]
+  playerIndex: number
+  scene: GameScene
 }
 
 export interface IShout {
-    role: Role,
-    price: number,
-    traded?: boolean
+  role: Role
+  price: number
+  traded?: boolean
 }
 
 export interface ITrade {
-    reqIndex: number
-    resIndex: number
-    price: number
+  reqIndex: number
+  resIndex: number
+  price: number
 }
 
 export interface IGameRoundState {
-    time: number
-    shouts: IShout[]
-    trades: ITrade[]
+  time: number
+  shouts: IShout[]
+  trades: ITrade[]
 }
 
 export interface IPlayerState {
-    role: Role
-    privatePrices: number[]
-    index: number
-    profits: number[]
+  role: Role
+  privatePrices: number[]
+  index: number
+  profits: number[]
 }

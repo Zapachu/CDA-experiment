@@ -1,73 +1,71 @@
-export const namespace = 'RiskPreferenceTest';
+export const namespace = 'RiskPreferenceTest'
 
 export enum FetchRoute {
-    exportXls = '/exportXls/:gameId'
+  exportXls = '/exportXls/:gameId'
 }
 
-export const TRange: [number, number] = [5, 10];
+export const TRange: [number, number] = [5, 10]
 
 export enum MoveType {
-    guideDone,
-    submit,
+  guideDone,
+  submit
 }
 
-export enum PushType {
-}
+export enum PushType {}
 
 export enum Choice {
-    A,
-    B
+  A,
+  B
 }
 
 export interface IMoveParams {
-    preference: Choice[]
+  preference: Choice[]
 }
 
-export interface IPushParams {
-}
+export interface IPushParams {}
 
-export const awardLimit = 100;
+export const awardLimit = 100
 
 export interface ICreateParams {
-    round: number
-    t: number
-    awardA: number
-    awardB: number
+  round: number
+  t: number
+  awardA: number
+  awardB: number
 }
 
 export interface IGameRoundState {
-    timeLeft: number
+  timeLeft: number
 }
 
 export interface IGameState {
-    round: number
-    rounds: IGameRoundState[]
+  round: number
+  rounds: IGameRoundState[]
 }
 
 export enum PlayerRoundStatus {
-    play,
-    wait,
-    result
+  play,
+  wait,
+  result
 }
 
 export interface IPlayerRoundState {
-    status: PlayerRoundStatus
-    T: number
-    preference?: Choice[]
-    result?: {
-        caseIndex: number
-        success: boolean
-        award: number
-    }
+  status: PlayerRoundStatus
+  T: number
+  preference?: Choice[]
+  result?: {
+    caseIndex: number
+    success: boolean
+    award: number
+  }
 }
 
 export enum PlayerStatus {
-    guide,
-    round,
-    result
+  guide,
+  round,
+  result
 }
 
 export interface IPlayerState {
-    status: PlayerStatus
-    rounds: IPlayerRoundState[]
+  status: PlayerStatus
+  rounds: IPlayerRoundState[]
 }

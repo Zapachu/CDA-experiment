@@ -1,18 +1,18 @@
 export const namespace = 'FirstPriceSealed'
 
 export enum MoveType {
-    shout = 'shout',
-    getPosition = 'getPosition',
+  shout = 'shout',
+  getPosition = 'getPosition'
 }
 
 export enum PushType {
-    newRoundTimer
+  newRoundTimer
 }
 
 export enum PlayerStatus {
-    prepared,
-    shouted,
-    gameOver
+  prepared,
+  shouted,
+  gameOver
 }
 
 export const NEW_ROUND_TIMER = 3

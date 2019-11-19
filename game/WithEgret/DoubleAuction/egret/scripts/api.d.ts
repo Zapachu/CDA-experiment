@@ -6,20 +6,20 @@ type ResourceManagerConfig = {
     /**
      * 构建与发布配置
      */
-    buildConfig: (param: BuildConfigParam) => UserConfig,
+    buildConfig: (param: BuildConfigParam) => UserConfig;
     /**
      * 设置资源类型
      */
-    typeSelector: (path: string) => (string | null | undefined)
+    typeSelector: (path: string) => (string | null | undefined);
     /**
      * 设置资源的合并策略
      */
-    mergeSelector?: (path: string) => (string | null | undefined),
+    mergeSelector?: (path: string) => (string | null | undefined);
     /**
      * 设置资源的命名策略
      * beta 功能，请勿随意使用
      */
-    nameSelector?: (path: string) => (string | null | undefined)
+    nameSelector?: (path: string) => (string | null | undefined);
 }
 /**
  * 构建配置
@@ -28,11 +28,11 @@ type UserConfig = {
     /**
      * 输出路径
      */
-    outputDir: string,
+    outputDir: string;
     /**
      * 插件
      */
-    commands: (string | plugins.Command)[]
+    commands: (string | plugins.Command)[];
 }
 
 type BuildConfigParam = {
@@ -88,9 +88,9 @@ type ProjectConfig = {
    */
 type Matcher = {
 
-    from: string,
+    from: string;
 
-    to: string
+    to: string;
 
 }
 
@@ -129,13 +129,13 @@ declare namespace plugins {
         /**
          * 项目中的每个文件都会执行此函数，返回 file 表示保留此文件，返回 null 表示将此文件从构建管线中删除，即不会发布
          */
-        onFile?(file: File): Promise<File | null>
+        onFile?(file: File): Promise<File | null>;
 
         /**
          * 项目中所有文件均执行完后，最终会执行此函数。
          * 这个函数主要被用于创建新文件
          */
-        onFinish?(pluginContext?: CommandContext): Promise<void>
+        onFinish?(pluginContext?: CommandContext): Promise<void>;
 
         [options: string]: any;
     }
@@ -214,7 +214,7 @@ declare module 'built-in' {
     /**
      * 混淆插件参数，设置源代码和目标代码
      */
-    type UglifyPluginOption = { sources: string[], target: string };
+    type UglifyPluginOption = { sources: string[]; target: string };
 
     type UglifyPluginOptions = UglifyPluginOption[];
 
@@ -230,7 +230,7 @@ declare module 'built-in' {
 
     type LibraryType = "debug" | "release";
 
-    type CompilePluginOptions = { libraryType: LibraryType, defines?: any };
+    type CompilePluginOptions = { libraryType: LibraryType; defines?: any };
     /**
      * 编译命令
      */
@@ -275,14 +275,14 @@ declare module 'built-in' {
      */
     type ManifestPluginOptions = {
 
-        output: string,
+        output: string;
 
-        hash?: "crc32",
+        hash?: "crc32";
 
         /**
          * 是否输出转换过程
          */
-        verbose?: boolean
+        verbose?: boolean;
 
 
     }
@@ -295,10 +295,10 @@ declare module 'built-in' {
      * * groupSelector: 根据文件路径决定资源所述的资源组 
      */
     type EmitResConfigFilePluginOptions = {
-        output: string,
-        typeSelector: (path: string) => string | null | undefined,
-        nameSelector: (path: string) => string | null | undefined,
-        groupSelector: (path: string) => string | null | undefined,
+        output: string;
+        typeSelector: (path: string) => string | null | undefined;
+        nameSelector: (path: string) => string | null | undefined;
+        groupSelector: (path: string) => string | null | undefined;
     }
 
 
@@ -313,7 +313,7 @@ declare module 'built-in' {
 
     export type ConvertResourceConfigPluginOption = {
 
-        resourceConfigFiles: { filename: string, root: string }[];
+        resourceConfigFiles: { filename: string; root: string }[];
 
         nameSelector: (url: string) => string;
 
@@ -350,7 +350,7 @@ declare module 'built-in' {
 
     type CleanPluginOptions = {
 
-        matchers: string[]
+        matchers: string[];
     }
 
 
@@ -364,19 +364,19 @@ declare module 'built-in' {
         /**
          * 是否输出日志
          */
-        verbose?: boolean
+        verbose?: boolean;
 
         /**
          * 采用何种 hash 算法，目前暂时只支持 crc32
          */
-        hash?: "crc32"
+        hash?: "crc32";
 
 
         /**
          * 设置匹配规则，将指定文件进行改名
          * 该参数是个数组，允许设置多个匹配规则
          */
-        matchers: Matcher[]
+        matchers: Matcher[];
     }
 
 
@@ -392,13 +392,13 @@ declare module 'built-in' {
         /**
          * 是否输出日志
          */
-        verbose?: boolean
+        verbose?: boolean;
 
         /**
          * 设置匹配规则，将指定文件拷贝至其他文件夹
          * 该参数是个数组，允许设置多个匹配规则
          */
-        matchers: Matcher[]
+        matchers: Matcher[];
     }
 
     export class ResSplitPlugin implements plugins.Command {
@@ -408,7 +408,7 @@ declare module 'built-in' {
 
     type ZipPluginOptions = {
 
-        mergeSelector: (p: string) => string
+        mergeSelector: (p: string) => string;
     }
 
     export class ZipPlugin implements plugins.Command {
@@ -418,9 +418,9 @@ declare module 'built-in' {
 
     type MergeEuiJsonPluginOptions = {
 
-        mergeSelector?: (p: string) => string | null,
+        mergeSelector?: (p: string) => string | null;
 
-        createConfig?: boolean
+        createConfig?: boolean;
     }
     export class MergeEuiJsonPlugin implements plugins.Command {
 

@@ -1,59 +1,57 @@
-export const namespace = 'GoodExchange';
+export const namespace = 'GoodExchange'
 
 export enum FetchRoute {
-    exportXls = '/exportXls/:gameId'
+  exportXls = '/exportXls/:gameId'
 }
 
 export enum MoveType {
-    guideDone,
-    exchange,
+  guideDone,
+  exchange
 }
 
-export enum PushType {
-}
+export enum PushType {}
 
 export interface IMoveParams {
-    good: number
+  good: number
 }
 
-export interface IPushParams {
-}
+export interface IPushParams {}
 
 export interface ICreateParams {
-    round: number
-    t: number
-    minPrivateValue: number
-    maxPrivateValue: number
+  round: number
+  t: number
+  minPrivateValue: number
+  maxPrivateValue: number
 }
 
 export enum ExchangeStatus {
-    null,
-    waiting,
-    exchanged
+  null,
+  waiting,
+  exchanged
 }
 
 export interface IGameRoundState {
-    timeLeft: number
-    exchangeMatrix: ExchangeStatus[][]
-    allocation: number[]
+  timeLeft: number
+  exchangeMatrix: ExchangeStatus[][]
+  allocation: number[]
 }
 
 export interface IGameState {
-    round: number
-    rounds: IGameRoundState[]
+  round: number
+  rounds: IGameRoundState[]
 }
 
 export interface IPlayerRoundState {
-    privatePrices: number[]
+  privatePrices: number[]
 }
 
 export enum PlayerStatus {
-    guide,
-    round,
-    result
+  guide,
+  round,
+  result
 }
 
 export interface IPlayerState {
-    status: PlayerStatus
-    rounds: IPlayerRoundState[]
+  status: PlayerStatus
+  rounds: IPlayerRoundState[]
 }

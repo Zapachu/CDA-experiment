@@ -1,22 +1,15 @@
 export const namespace = 'Scaffold'
 
-export enum MoveType {
-}
+export enum MoveType {}
 
-export enum PushType {
-}
+export enum PushType {}
 
-export interface IMoveParams {
-}
+export interface IMoveParams {}
 
-export interface IPushParams {
-}
+export interface IPushParams {}
 
-export interface ICreateParams {
-}
+export interface ICreateParams {}
 
-export interface IGameState {
-}
+export interface IGameState {}
 
-export interface IPlayerState {
-}
+export interface IPlayerState {}

@@ -1,21 +1,21 @@
 export const namespace = 'BetrandCompetitionGraphical'
 
 export enum MoveType {
-    enterMarket = 'enterMarket',
-    shout = 'shout',
-    getPosition = 'getPosition',
-    nextRound = 'nextRound'
+  enterMarket = 'enterMarket',
+  shout = 'shout',
+  getPosition = 'getPosition',
+  nextRound = 'nextRound'
 }
 
 export enum PushType {
-    newRoundTimer
+  newRoundTimer
 }
 
 export enum PlayerStatus {
-    outside,
-    prepared,
-    shouted,
-    next
+  outside,
+  prepared,
+  shouted,
+  next
 }
 
 export const DEAL_TIMER = 5

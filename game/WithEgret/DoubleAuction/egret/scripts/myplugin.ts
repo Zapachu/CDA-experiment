@@ -3,15 +3,11 @@
  * 了解如何开发一个自定义插件
  */
 export class CustomPlugin implements plugins.Command {
+  constructor() {}
 
-    constructor() {
-    }
+  async onFile(file: plugins.File) {
+    return file
+  }
 
-    async onFile(file: plugins.File) {
-        return file;
-    }
-
-    async onFinish(commandContext: plugins.CommandContext) {
-
-    }
+  async onFinish(commandContext: plugins.CommandContext) {}
 }

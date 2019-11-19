@@ -1,3 +1,3 @@
 class Main extends BaseMain {
-    sceneClasses: Array<{ new(): Scene }> = [Prepare, Trade, Result]
+  sceneClasses: Array<{ new (): Scene }> = [Prepare, Trade, Result]
 }

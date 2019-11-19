@@ -1,3 +1,3 @@
-import {Phase} from '@micro-experiment/share';
+import { Phase } from '@micro-experiment/share'
 
-export const namespace = Phase.IPO_FPSBA;
+export const namespace = Phase.IPO_FPSBA

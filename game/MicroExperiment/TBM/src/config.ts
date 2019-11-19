@@ -1,57 +1,57 @@
-import {NCreateParams, Phase} from '@micro-experiment/share';
+import { NCreateParams, Phase } from '@micro-experiment/share'
 export const namespace = Phase.TBM
 
 export enum PlayerStatus {
-    guide,
-    test,
-    play
+  guide,
+  test,
+  play
 }
 
 export enum Role {
-    Buyer = 1,
-    Seller = 2
+  Buyer = 1,
+  Seller = 2
 }
 
 export enum MoveType {
-    guideDone = 'guideDone',
-    join = 'join',
-    shout = 'shout',
-    nextStage = 'nextStage'
+  guideDone = 'guideDone',
+  join = 'join',
+  shout = 'shout',
+  nextStage = 'nextStage'
 }
 
 export enum PushType {
-    robotShout,
-    shoutTimer
+  robotShout,
+  shoutTimer
 }
 
 export type ICreateParams = NCreateParams.TBM
 
 export interface IMoveParams {
-    price: number;
-    num: number;
-    onceMore: boolean;
+  price: number
+  num: number
+  onceMore: boolean
 }
 
 export interface IPushParams {
-    shoutTime: number;
+  shoutTime: number
 }
 
 export interface IGameState {
-    strikePrice: number;
-    strikeNum: number;
-    stockIndex: number;
+  strikePrice: number
+  strikeNum: number
+  stockIndex: number
 }
 
 export interface IPlayerState {
-    status: PlayerStatus
-    startingPrice: number;
-    startingQuota: number;
-    privateValue: number;
-    role: Role;
-    price: number;
-    bidNum: number;
-    actualNum: number;
-    profit: number;
+  status: PlayerStatus
+  startingPrice: number
+  startingQuota: number
+  privateValue: number
+  role: Role
+  price: number
+  bidNum: number
+  actualNum: number
+  profit: number
 }
 
 export const SHOUT_TIMER = 60

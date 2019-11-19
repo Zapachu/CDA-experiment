@@ -1,21 +1,21 @@
 export const namespace = 'CommonValueAuction'
 
 export enum MoveType {
-    shout = 'shout',
-    getPosition = 'getPosition'
+  shout = 'shout',
+  getPosition = 'getPosition'
 }
 
 export enum PushType {
-    dealTimer,
-    newRoundTimer
+  dealTimer,
+  newRoundTimer
 }
 
 export enum PlayerStatus {
-    outside,
-    prepared,
-    shouted,
-    won,
-    gameOver
+  outside,
+  prepared,
+  shouted,
+  won,
+  gameOver
 }
 
 export const NEW_ROUND_TIMER = 3

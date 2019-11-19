@@ -1,30 +1,27 @@
 export const namespace = 'qualtrics'
 
 export enum MoveType {
-    getIndex = 'getIndex'
+  getIndex = 'getIndex'
 }
 
-export enum PushType {
-}
+export enum PushType {}
 
-export interface IMoveParams {
-}
+export interface IMoveParams {}
 
-export interface IPushParams {
-}
+export interface IPushParams {}
 
 export interface ICreateParams {
-    surveyUrl: string
+  surveyUrl: string
 }
 
 export interface IGameState {
-    playerIndex: number
+  playerIndex: number
 }
 
 export interface IPlayerState {
-    playerIndex: number
+  playerIndex: number
 }
 
 export function getAncademyId(token, index) {
-    return `${token}_${index}`
+  return `${token}_${index}`
 }

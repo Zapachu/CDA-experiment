@@ -1,1 +1,1 @@
-export {match, IPlayer} from '../../../AdjustMatch/src/util/Match';
+export { match, IPlayer } from '../../../AdjustMatch/src/util/Match'

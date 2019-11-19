@@ -1,66 +1,56 @@
-export const namespace = 'RubbishDrop';
+export const namespace = 'RubbishDrop'
 
-export interface ICreateParams {
-}
+export interface ICreateParams {}
 
 export enum Piece {
-    null,
-    x,
-    o,
+  null,
+  x,
+  o
 }
 
 export enum GameStatus {
-    matching,
-    play,
-    result,
+  matching,
+  play,
+  result
 }
 
 export interface IGameGroupState {
-    playerNum: number
-    status: GameStatus
-    pieces: Array<Piece>
-    pieceTurn: Piece
+  playerNum: number
+  status: GameStatus
+  pieces: Array<Piece>
+  pieceTurn: Piece
 }
 
 export interface IGameState {
-    groups: Array<IGameGroupState>
+  groups: Array<IGameGroupState>
 }
 
 export interface IPlayerState {
-    groupIndex: number
-    piece: Piece
+  groupIndex: number
+  piece: Piece
 }
 
 export enum MoveType {
-    getGroup,
-    move
+  getGroup,
+  move
 }
 
-export enum PushType {
-}
+export enum PushType {}
 
 export interface IMoveParams {
-    index: number // piece index
+  index: number // piece index
 }
 
-export interface IPushParams {
-}
+export interface IPushParams {}
 
 export const Const = {
-    roomSize: 2,
-    matrixSize: 3
-};
-
-export enum trashType {
-    harmfulWaste= 'harmfulWaste',
-    kitchenWaste= 'kitchenWaste',
-    recyclableWaste= 'recyclableWaste',
-    otherWaste= 'otherWaste'
+  roomSize: 2,
+  matrixSize: 3
 }
 
-
-
-
-
-
-
+export enum trashType {
+  harmfulWaste = 'harmfulWaste',
+  kitchenWaste = 'kitchenWaste',
+  recyclableWaste = 'recyclableWaste',
+  otherWaste = 'otherWaste'
+}

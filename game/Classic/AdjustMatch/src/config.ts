@@ -1,73 +1,71 @@
-export const namespace = 'AdjustMatch';
+export const namespace = 'AdjustMatch'
 
 export const CONFIG = {
-    tradeSeconds: 30,
-    resultSeconds: 5,
-};
+  tradeSeconds: 30,
+  resultSeconds: 5
+}
 
 export enum FetchRoute {
-    exportXls = '/exportXls/:gameId'
+  exportXls = '/exportXls/:gameId'
 }
 
 export enum MoveType {
-    guideDone,
-    submit
+  guideDone,
+  submit
 }
 
-export enum PushType {
-}
+export enum PushType {}
 
 export interface IMoveParams {
-    sort: number[]
+  sort: number[]
 }
 
-export interface IPushParams {
-}
+export interface IPushParams {}
 
 export interface ICreateParams {
-    round: number
-    oldPlayer: number
-    minPrivateValue: number
-    maxPrivateValue: number
+  round: number
+  oldPlayer: number
+  minPrivateValue: number
+  maxPrivateValue: number
 }
 
 export enum GoodStatus {
-    new,
-    old,
-    left,
+  new,
+  old,
+  left
 }
 
 export interface IGameRoundState {
-    timeLeft: number
-    initAllocation: number[]
-    allocation: number[]
-    goodStatus: GoodStatus[]
+  timeLeft: number
+  initAllocation: number[]
+  allocation: number[]
+  goodStatus: GoodStatus[]
 }
 
 export interface IGameState {
-    round: number
-    rounds: IGameRoundState[]
+  round: number
+  rounds: IGameRoundState[]
 }
 
 export enum PlayerRoundStatus {
-    play,
-    wait,
-    result
+  play,
+  wait,
+  result
 }
 
 export interface IPlayerRoundState {
-    privatePrices: number[]
-    sort: number[]
-    status: PlayerRoundStatus
+  privatePrices: number[]
+  sort: number[]
+  status: PlayerRoundStatus
 }
 
 export enum PlayerStatus {
-    guide,
-    round,
-    result
+  guide,
+  round,
+  result
 }
 
 export interface IPlayerState {
-    status: PlayerStatus
-    rounds: IPlayerRoundState[]
+  status: PlayerStatus
+  rounds: IPlayerRoundState[]
 }

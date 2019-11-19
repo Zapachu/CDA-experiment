@@ -1,76 +1,74 @@
-export const namespace = 'CallAuction';
+export const namespace = 'CallAuction'
 
 export enum FetchRoute {
-    exportXls = '/exportXls/:gameId'
+  exportXls = '/exportXls/:gameId'
 }
 
 export enum MoveType {
-    guideDone,
-    shout,
+  guideDone,
+  shout
 }
 
-export enum PushType {
-}
+export enum PushType {}
 
 export interface IMoveParams {
-    price: number
+  price: number
 }
 
-export interface IPushParams {
-}
+export interface IPushParams {}
 
 export interface ICreateParams {
-    round: number
-    t: number
-    buyPriceRange: [number, number],
-    sellPriceRange: [number, number]
+  round: number
+  t: number
+  buyPriceRange: [number, number]
+  sellPriceRange: [number, number]
 }
 
 export interface IOrder {
-    player: number
-    price: number
+  player: number
+  price: number
 }
 
 export interface ITrade {
-    buy: IOrder
-    sell: IOrder
+  buy: IOrder
+  sell: IOrder
 }
 
 export interface IGameRoundState {
-    timeLeft: number
-    trades: Array<ITrade>
+  timeLeft: number
+  trades: Array<ITrade>
 }
 
 export enum Role {
-    buyer,
-    seller
+  buyer,
+  seller
 }
 
 export interface IGameState {
-    round: number
-    rounds: IGameRoundState[]
+  round: number
+  rounds: IGameRoundState[]
 }
 
 export enum PlayerRoundStatus {
-    play,
-    wait,
-    result
+  play,
+  wait,
+  result
 }
 
 export interface IPlayerRoundState {
-    price: number
-    status: PlayerRoundStatus
+  price: number
+  status: PlayerRoundStatus
 }
 
 export enum PlayerStatus {
-    guide,
-    round,
-    result
+  guide,
+  round,
+  result
 }
 
 export interface IPlayerState {
-    role: Role
-    status: PlayerStatus
-    privatePrices: number[]
-    rounds: IPlayerRoundState[]
+  role: Role
+  status: PlayerStatus
+  privatePrices: number[]
+  rounds: IPlayerRoundState[]
 }

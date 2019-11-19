@@ -1,20 +1,20 @@
-import * as React from 'react';
-import * as style from './style.scss';
-import {Lang, MaskLoading} from '@elf/component';
-import {Core} from '@bespoke/client';
-import {Progress} from 'antd';
+import * as React from 'react'
+import * as style from './style.scss'
+import { Lang, MaskLoading } from '@elf/component'
+import { Core } from '@bespoke/client'
+import { Progress } from 'antd'
 import {
-	Const,
-	GameStatus,
-	ICreateParams,
-	IGameState,
-	IMoveParams,
-	IPlayerState,
-	IPushParams,
-	MoveType,
-	Piece,
-	PushType
-} from '../config';
+  Const,
+  GameStatus,
+  ICreateParams,
+  IGameState,
+  IMoveParams,
+  IPlayerState,
+  IPushParams,
+  MoveType,
+  Piece,
+  PushType
+} from '../config'
 
 const harmfulWasteT = require('./static/yhljg_p@3x.png')
 const harmfulWasteB = require('./static/yhlj_p@3x.png')
@@ -23,9 +23,7 @@ const kitchenWasteB = require('./static/cylj_p@3x.png')
 const recyclableWasteT = require('./static/khsljg_p@3x.png')
 const recyclableWasteB = require('./static/khslj_p@3x.png')
 const otherWasteT = require('./static/qtljg_p@3x.png')
-const otherWasteB= require('./static/qtlj_p@3x.png')
-
-
+const otherWasteB = require('./static/qtlj_p@3x.png')
 
 // const {matrixSize} = Const,
 //     PieceNode: React.ReactNode = {
@@ -82,73 +80,111 @@ const otherWasteB= require('./static/qtlj_p@3x.png')
 //         </table>
 //     </section>;
 // }
- 
+
 interface TrashState {
-	trashOpen: Array<boolean>
+  trashOpen: Array<boolean>
 }
 
-export class Play extends Core.Play<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams> {
-	state: TrashState ={
-		trashOpen: [false,false,true,false]
-	}
-	lang = Lang.extractLang({
-		dropRubbish: ['随地乱扔', 'drop anywhere'],
-		harmfulWaste: ['有害垃圾','harmfulWaste'],
-		kitchenWaste: ['厨余垃圾','kitchenWaste'],
-		recyclableWaste: ['可回收垃圾','recyclableWaste'],
-		otherWaste: ['其他垃圾','otherWaste']
-	})
-	trashList = [
-		{title: this.lang.harmfulWaste,imgT: harmfulWasteT,imgB: harmfulWasteB},
-		{title: this.lang.kitchenWaste,imgT: kitchenWasteT,imgB: kitchenWasteB},
-		{title: this.lang.recyclableWaste,imgT: recyclableWasteT,imgB: recyclableWasteB},
-		{title: this.lang.otherWaste,imgT: otherWasteT,imgB: otherWasteB},
-	]
-	componentDidMount() {
-		console.log(this.props)
-	}
-	trashClick(index:number):void {
-		let trashOpenCopy = this.state.trashOpen
-		trashOpenCopy[index] = !trashOpenCopy[index]
-		this.setState({
-			trashOpen: trashOpenCopy
-		},() => {setTimeout(()=>{this.setState({trashOpen: trashOpenCopy})},1000)})
-	}
-	render() { 
-		const {lang,trashList} = this
-		const trashOpen = this.state.trashOpen
-		return ( 
-			<div className={style.outWrap}>
-				<p className={style.count}>1/10</p>
-				<ul className={style.trashWrap}>
-					{
-						trashList.map((val,index) => {
-							return <li onClick={()=>{this.trashClick(index)}}>
-										<p>{val.title}</p>
-										<img className={style.imgT+' '+(trashOpen[index] ? style.open : null)} src={val.imgT} alt=""/>
-										<img className={style.imgB} src={val.imgB} alt=""/>
-									</li>
-						})
-					}
-				</ul>
-				<div className={style.progressWrap}>
-					<Progress className={style.progress} percent={50} showInfo={false} strokeWidth={14} strokeColor="#18DF42"/>
-				</div>
-				<div className={style.peopleWrap}>
-					<div className={style.people}>
-					</div>
-				</div>
-				<div className={style.dashboardWrap}>
-					<Progress type="dashboard" className={style.dashboard} percent={30} showInfo={true} strokeWidth={7} strokeColor="#18DF42" gapDegree={150} gapPosition="bottom"/>
-					<span>环境得分</span>
-				</div>
-				<div className={style.rubbishWrap}></div>
-				<ul className={style.barrageWrap}>
-					<li>xxx<br/>将xx丢进垃圾桶</li>
-					<li>xxx<br/>将xx丢进垃圾桶</li>
-				</ul>
-			</div>
-		);
-	}
+export class Play extends Core.Play<
+  ICreateParams,
+  IGameState,
+  IPlayerState,
+  MoveType,
+  PushType,
+  IMoveParams,
+  IPushParams
+> {
+  state: TrashState = {
+    trashOpen: [false, false, true, false]
+  }
+  lang = Lang.extractLang({
+    dropRubbish: ['随地乱扔', 'drop anywhere'],
+    harmfulWaste: ['有害垃圾', 'harmfulWaste'],
+    kitchenWaste: ['厨余垃圾', 'kitchenWaste'],
+    recyclableWaste: ['可回收垃圾', 'recyclableWaste'],
+    otherWaste: ['其他垃圾', 'otherWaste']
+  })
+  trashList = [
+    { title: this.lang.harmfulWaste, imgT: harmfulWasteT, imgB: harmfulWasteB },
+    { title: this.lang.kitchenWaste, imgT: kitchenWasteT, imgB: kitchenWasteB },
+    {
+      title: this.lang.recyclableWaste,
+      imgT: recyclableWasteT,
+      imgB: recyclableWasteB
+    },
+    { title: this.lang.otherWaste, imgT: otherWasteT, imgB: otherWasteB }
+  ]
+  componentDidMount() {
+    console.log(this.props)
+  }
+  trashClick(index: number): void {
+    const trashOpenCopy = this.state.trashOpen
+    trashOpenCopy[index] = !trashOpenCopy[index]
+    this.setState(
+      {
+        trashOpen: trashOpenCopy
+      },
+      () => {
+        setTimeout(() => {
+          this.setState({ trashOpen: trashOpenCopy })
+        }, 1000)
+      }
+    )
+  }
+  render() {
+    const { lang, trashList } = this
+    const trashOpen = this.state.trashOpen
+    return (
+      <div className={style.outWrap}>
+        <p className={style.count}>1/10</p>
+        <ul className={style.trashWrap}>
+          {trashList.map((val, index) => {
+            return (
+              <li
+                onClick={() => {
+                  this.trashClick(index)
+                }}
+              >
+                <p>{val.title}</p>
+                <img className={style.imgT + ' ' + (trashOpen[index] ? style.open : null)} src={val.imgT} alt="" />
+                <img className={style.imgB} src={val.imgB} alt="" />
+              </li>
+            )
+          })}
+        </ul>
+        <div className={style.progressWrap}>
+          <Progress className={style.progress} percent={50} showInfo={false} strokeWidth={14} strokeColor="#18DF42" />
+        </div>
+        <div className={style.peopleWrap}>
+          <div className={style.people}></div>
+        </div>
+        <div className={style.dashboardWrap}>
+          <Progress
+            type="dashboard"
+            className={style.dashboard}
+            percent={30}
+            showInfo={true}
+            strokeWidth={7}
+            strokeColor="#18DF42"
+            gapDegree={150}
+            gapPosition="bottom"
+          />
+          <span>环境得分</span>
+        </div>
+        <div className={style.rubbishWrap}></div>
+        <ul className={style.barrageWrap}>
+          <li>
+            xxx
+            <br />
+            将xx丢进垃圾桶
+          </li>
+          <li>
+            xxx
+            <br />
+            将xx丢进垃圾桶
+          </li>
+        </ul>
+      </div>
+    )
+  }
 }
- 

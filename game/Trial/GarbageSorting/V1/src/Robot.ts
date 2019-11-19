@@ -4,9 +4,18 @@
  *      如果在规定时间内匹配到玩家，则玩家间相互交互
  * */
 
-import {BaseRobot} from '@bespoke/robot';
-import {GARBAGE, ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, MoveType, PushType} from './config';
-import {ITEMS} from './Controller';
+import { BaseRobot } from '@bespoke/robot'
+import {
+  GARBAGE,
+  ICreateParams,
+  IGameState,
+  IMoveParams,
+  IPlayerState,
+  IPushParams,
+  MoveType,
+  PushType
+} from './config'
+import { ITEMS } from './Controller'
 
 export default class extends BaseRobot<
   ICreateParams,
@@ -18,40 +27,34 @@ export default class extends BaseRobot<
   IPushParams
 > {
   async init() {
-    await super.init();
-    setTimeout(() => this.frameEmitter.emit(MoveType.prepare), 1000);
-    this.frameEmitter.on(PushType.robotShout, () => this.shoutIndex(0));
-    return this;
+    await super.init()
+    setTimeout(() => this.frameEmitter.emit(MoveType.prepare), 1000)
+    this.frameEmitter.on(PushType.robotShout, () => this.shoutIndex(0))
+    return this
   }
 
   private shoutIndex(index: number) {
     if (index >= ITEMS.length) {
-      return;
+      return
     }
     setTimeout(() => {
       this.frameEmitter.emit(MoveType.shout, {
         answer: genRandomGarbage(),
         index
-      });
-      this.shoutIndex(index + 1);
-    }, 1000);
+      })
+      this.shoutIndex(index + 1)
+    }, 1000)
   }
 }
 
 function genRandomGarbage(): GARBAGE {
   // const arr = Object.values(GARBAGE);
   // const garbages = arr.slice(arr.length / 2);
-  const garbages = [
-    GARBAGE.pass,
-    GARBAGE.kitchen,
-    GARBAGE.other,
-    GARBAGE.recyclable,
-    GARBAGE.hazardous
-  ];
-  const rand = genRandomInt(0, garbages.length - 1);
-  return garbages[rand];
+  const garbages = [GARBAGE.pass, GARBAGE.kitchen, GARBAGE.other, GARBAGE.recyclable, GARBAGE.hazardous]
+  const rand = genRandomInt(0, garbages.length - 1)
+  return garbages[rand]
 }
 
 function genRandomInt(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+  return Math.floor(Math.random() * (max - min + 1)) + min
 }

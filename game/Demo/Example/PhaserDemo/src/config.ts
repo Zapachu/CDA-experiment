@@ -1,29 +1,31 @@
-export const namespace = 'PhaserDemo';
+export const namespace = 'PhaserDemo'
 
-export enum Direction {U, R, D, L}
+export enum Direction {
+  U,
+  R,
+  D,
+  L
+}
 
 export enum MoveType {
-    move
+  move
 }
 
 export enum PushType {
-    move
+  move
 }
 
-export interface ICreateParams {
-}
+export interface ICreateParams {}
 
 export interface IMoveParams {
-    d: Direction
+  d: Direction
 }
 
 export interface IPushParams {
-    token: string
-    d: Direction
+  token: string
+  d: Direction
 }
 
-export interface IGameState {
-}
+export interface IGameState {}
 
-export interface IPlayerState {
-}
+export interface IPlayerState {}

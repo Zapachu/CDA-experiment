@@ -1,20 +1,20 @@
 export const namespace = 'VickreyAuction'
 
 export enum MoveType {
-    enterMarket = 'enterMarket',
-    shout = 'shout',
-    getPosition = 'getPosition'
+  enterMarket = 'enterMarket',
+  shout = 'shout',
+  getPosition = 'getPosition'
 }
 
 export enum PushType {
-    newRoundTimer
+  newRoundTimer
 }
 
 export enum PlayerStatus {
-    outside,
-    prepared,
-    shouted,
-    won
+  outside,
+  prepared,
+  shouted,
+  won
 }
 
 export const DEAL_TIMER = 5
