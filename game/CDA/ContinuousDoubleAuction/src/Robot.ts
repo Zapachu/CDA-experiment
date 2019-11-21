@@ -371,6 +371,7 @@ class GDRobot extends CDARobot {
   alpha = 0.95
   beta = 400
   calcPrice = 0
+  calcUnitIndex = 0
 
   async init(): Promise<this> {
     await super.init()
@@ -392,7 +393,6 @@ class GDRobot extends CDARobot {
       sleepTime =
         -((beta * (1 - (alpha * this.periodCountDown) / this.phaseParams.durationOfEachPeriod)) / calcPrice) *
         Math.log(Math.random())
-    Log.d(this.periodCountDown, this.phaseParams.durationOfEachPeriod, sleepTime)
     setTimeout(() => {
       redisClient.incr(RedisKey.robotActionSeq(this.game.id)).then(seq => {
         this.submitOrder(seq)
@@ -406,7 +406,7 @@ class GDRobot extends CDARobot {
     for (const price of this.unitPrices) {
       price > M ? (M = price) : null
     }
-    return Math.pow(2, 1 + ~~Math.log2(M))
+    return Math.pow(2, 1.5 + ~~Math.log2(M))
   }
 
   getExpectationCurve(): [GameState.IOrder[], ICurveFragment[]] {
@@ -462,12 +462,6 @@ class GDRobot extends CDARobot {
           }
         }
       }
-      Log.d(
-        historyOrder.map(({ price }) => price).join(','),
-        this.position.role === ROLE.Seller
-          ? [this.playerState.positionIndex, 'Seller', TA, B, a, ta]
-          : [this.playerState.positionIndex, 'Buyer', tb, a, B, TB]
-      )
       const y = this.position.role === ROLE.Seller ? (TA + B) / (TA + B + a - ta) : (tb + a) / (tb + a + B - TB)
       anchorPoints.push({ x: price, y })
     })
@@ -538,13 +532,14 @@ class GDRobot extends CDARobot {
     const newPrice = this.getCurvesTopPoint(curves, f, t, price => (price - this.unitPrice) * profitSign)
     if (newPrice !== this.calcPrice) {
       this.calcPrice = newPrice
+      this.calcUnitIndex = this.unitIndex
       redisClient.incr(RedisKey.robotActionSeq(this.game.id)).then(async seq => {
         const data: RobotCalcLog = {
           seq,
           playerSeq: this.playerState.positionIndex + 1,
           unitIndex: this.unitIndex,
           role: ROLE[this.position.role],
-          R: `(0,${curves[0].curve(0)})` + curves.map(({ to, curve }) => `(${to},${curve(to)})`).join(','),
+          R: `(0,${curves[0].curve(0)})` + curves.map(({ to, curve }) => `(${to},${curve(to).toFixed(1)})`).join(','),
           A: 'BuyOrders:' + buyOrderIds.map(id => orderDict[id].price).join(','),
           q: 'SellOrders:' + sellOrderIds.map(id => orderDict[id].price).join(','),
           tau:
@@ -584,7 +579,7 @@ class GDRobot extends CDARobot {
       unitIndex
     } = this
     const [wouldBeRejected = false, rejectPrice] = this.wouldBeRejected(this.calcPrice)
-    if (calcPrice <= 0 || wouldBeRejected) {
+    if (calcPrice <= 0 || this.calcUnitIndex !== this.unitIndex || wouldBeRejected) {
       Log.i('Reject', rejectPrice)
       return
     }
