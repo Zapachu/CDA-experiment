@@ -1,10 +1,10 @@
-import { MainGame } from './scene'
+import { Boot, Chose } from './scene'
 import { CONST } from './const'
 
 const config: Phaser.Types.Core.GameConfig = {
   transparent: true,
   parent: CONST.phaserParent,
-  scene: [MainGame],
+  scene: [Chose, Boot],
   scale: {
     mode:
       window.innerHeight / window.innerWidth >= 1.624

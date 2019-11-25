@@ -22,13 +22,12 @@ export type TProps = Core.IPlayProps<
 >
 
 export const CONST = {
-  overCallBack: () => null,
   emitter: null as FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>,
   phaserParent: 'phaserParent',
-  envStep: 230,
   ...CONFIG
 }
 
 export enum SceneName {
-  mainGame = 'mainGame'
+  boot = 'boot',
+  chose = 'chose'
 }
