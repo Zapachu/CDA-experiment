@@ -7,7 +7,7 @@ export class Chose extends Phaser.Scene {
   btnClear: Button
   btnNext: Button
   universities: University[]
-  selection: number[] = [null, null, null]
+  selection: number[]
 
   constructor() {
     super({ key: SceneName.chose })
@@ -20,6 +20,7 @@ export class Chose extends Phaser.Scene {
   }
 
   create() {
+    this.selection = [null, null, null]
     this.add.graphics({ lineStyle: { color: 0x666666, width: 4 } }).strokeRect(125, 145, 750, 1334)
     this.intro = new Intro(this, 160, 160)
     this.btnClear = new Button(
@@ -33,16 +34,16 @@ export class Chose extends Phaser.Scene {
       '清空',
       assetName.button2
     )
-    this.btnNext = new Button(this, 680, 1400, () => this.scene.start(SceneName.boot))
+    this.btnNext = new Button(this, 680, 1400, () => this.scene.start(SceneName.confirm, this.selection))
     this.universities = CONST.universities.map(
       (label, i) =>
         new University(this, 310 + (i % 2) * 375, 570 + ~~(i / 2) * 130, label, () => {
-          const seq = this.selection.findIndex(s => s === null)
-          if (seq === -1) {
+          const rIndex = this.selection.findIndex(s => s === null || s === i)
+          if (rIndex === -1) {
             return -1
           }
-          this.selection[seq] = i
-          return seq
+          this.selection[rIndex] = i
+          return rIndex
         })
     )
   }
@@ -83,6 +84,8 @@ class University extends Phaser.GameObjects.Container {
         })
         .fillRoundedRect(-this.width >> 1, -this.height >> 1, this.width, this.height, this.radius)
     )
+    this.clickTint = scene.add.rectangle(0, 0, this.width, this.height, 0x91afff, 0.5)
+    this.add(this.clickTint.setVisible(false))
     const seqTextLabel = scene.add
       .text(0, 0, '', {
         fontSize: '24px',
@@ -114,8 +117,6 @@ class University extends Phaser.GameObjects.Container {
         })
         .strokeRoundedRect(-this.width >> 1, -this.height >> 1, this.width, this.height, this.radius)
     )
-    this.clickTint = scene.add.rectangle(0, 0, this.width, this.height, 0x91afff, 0.4)
-    this.add(this.clickTint.setVisible(false))
     scene.add.existing(this)
     this.setInteractive()
     this.on('pointerdown', () => this.clickTint.setVisible(true))

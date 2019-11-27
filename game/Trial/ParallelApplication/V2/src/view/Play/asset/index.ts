@@ -5,7 +5,9 @@ type Key<T extends { [key: string]: string }> = {
 export const asset = {
   button: require('./sprite/button.png'),
   button2: require('./sprite/button2.png'),
-  bootIntroBg: require('./sprite/bootIntroBg.png')
+  bootIntroBg: require('./sprite/bootIntroBg.png'),
+  universityAtlas: require('./sprite/university.json'),
+  universityTexture: require('./sprite/university.png')
 }
 
 export const assetName = (function getAssetName<T extends { [key: string]: string }>(assetMap: T): Key<T> {

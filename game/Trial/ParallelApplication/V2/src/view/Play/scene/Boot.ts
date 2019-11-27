@@ -17,7 +17,7 @@ export class Boot extends Phaser.Scene {
   }
 
   create() {
-    this.add.rectangle(125, 145, 750, 1334, 0x000000, 0.1).setOrigin(0, 0)
+    this.add.graphics({ lineStyle: { color: 0x666666, width: 4 } }).strokeRect(125, 145, 750, 1334)
     this.btnNext = new Button(this, 500, 1400, () => this.scene.start(SceneName.chose))
     this.intro = new Intro(this, 160, 160)
     this.detail = new Detail(this, 125, 530)
