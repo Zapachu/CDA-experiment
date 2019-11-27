@@ -369,9 +369,12 @@ interface ICurveFragment {
 
 class GDRobot extends CDARobot {
   alpha = 0.95
-  beta = 400
-  calcPrice = 0
-  calcUnitIndex = 0
+  beta = 250e3
+  calcPkg: {
+    unitIndex: number
+    price: number
+    e: number
+  } = null
 
   async init(): Promise<this> {
     await super.init()
@@ -389,16 +392,18 @@ class GDRobot extends CDARobot {
       return
     }
     this.calc()
-    const { alpha, beta, calcPrice } = this,
+    const { alpha, beta, calcPkg } = this,
       sleepTime =
-        -((beta * (1 - (alpha * this.periodCountDown) / this.phaseParams.durationOfEachPeriod)) / calcPrice) *
-        Math.log(Math.random())
+        calcPkg && calcPkg.e
+          ? ((beta * (1 - (alpha * this.periodCountDown) / this.phaseParams.durationOfEachPeriod)) / calcPkg.e) *
+            Math.log(1 / Math.random())
+          : 5e3
     setTimeout(() => {
       redisClient.incr(RedisKey.robotActionSeq(this.game.id)).then(seq => {
         this.submitOrder(seq)
         this.sleepLoop()
       })
-    }, sleepTime * 1e3)
+    }, ~~sleepTime)
   }
 
   getM() {
@@ -412,11 +417,13 @@ class GDRobot extends CDARobot {
   getExpectationCurve(): [GameState.IOrder[], ICurveFragment[]] {
     const {
         gameState: { orders, gamePhaseIndex },
-        gamePhaseState: { trades, buyOrderIds, sellOrderIds }
+        gamePhaseState: { trades }
       } = this,
       recentTrades = trades.slice(-5),
       recentReqOrders = recentTrades.map(({ reqId }) => reqId),
       recentResOrders = recentTrades.map(({ resId }) => resId),
+      recentTopBuyOrders = recentTrades.map(({ topBuyOrderId }) => topBuyOrderId),
+      recentTopSellOrders = recentTrades.map(({ topSellOrderId }) => topSellOrderId),
       M = this.getM()
     let anchorPoints: Array<IPoint> =
       this.position.role === ROLE.Seller
@@ -431,7 +438,9 @@ class GDRobot extends CDARobot {
     const markedOrderId = recentResOrders.length === 5 ? recentResOrders[0] : orderNumberLimit * gamePhaseIndex,
       historyOrder = orders.filter(
         ({ id }) =>
-          (id > markedOrderId && !recentResOrders.includes(id)) || id === buyOrderIds[0] || id === sellOrderIds[0]
+          (id > markedOrderId && !recentResOrders.includes(id)) ||
+          recentTopBuyOrders.includes(id) ||
+          recentTopSellOrders.includes(id)
       )
     historyOrder.map(({ price }) => {
       if (anchorPoints.some(p => p.x === price)) {
@@ -484,7 +493,7 @@ class GDRobot extends CDARobot {
     f: number,
     t: number,
     coefficient: (price: number) => number
-  ): number {
+  ): { price: number; e: number } {
     const _curves = curves.filter(
       ({ from, to, curve }) => from < t && to > f && (curve(from) > Number.EPSILON || curve(to) > Number.EPSILON)
     )
@@ -509,10 +518,14 @@ class GDRobot extends CDARobot {
         maxEPrice = unitPrice
       }
     }
-    return maxEPrice
+    return {
+      price: maxEPrice,
+      e: maxE
+    }
   }
 
   calc() {
+    this.calcPkg = null
     const {
       gamePhaseState: { sellOrderIds, buyOrderIds },
       orderDict
@@ -529,66 +542,80 @@ class GDRobot extends CDARobot {
       f = buyOrderIds[0] ? orderDict[buyOrderIds[0]].price : curves[0].from
       t = this.unitPrice
     }
-    const newPrice = this.getCurvesTopPoint(curves, f, t, price => (price - this.unitPrice) * profitSign)
-    if (newPrice !== this.calcPrice) {
-      this.calcPrice = newPrice
-      this.calcUnitIndex = this.unitIndex
-      redisClient.incr(RedisKey.robotActionSeq(this.game.id)).then(async seq => {
-        const data: RobotCalcLog = {
-          seq,
-          playerSeq: this.playerState.positionIndex + 1,
-          unitIndex: this.unitIndex,
-          role: ROLE[this.position.role],
-          R: `(0,${curves[0].curve(0)})` + curves.map(({ to, curve }) => `(${to},${curve(to).toFixed(1)})`).join(','),
-          A: 'BuyOrders:' + buyOrderIds.map(id => orderDict[id].price).join(','),
-          q: 'SellOrders:' + sellOrderIds.map(id => orderDict[id].price).join(','),
-          tau:
-            'HistoryOrders:' +
-            historyOrders
-              .map(
-                ({ unitIndex, positionIndex, price }) =>
-                  `box:${unitIndex + 1},role:${
-                    this.getPosition(positionIndex).role === ROLE.Seller ? 'S' : 'B'
-                  }, price:${price}`
-              )
-              .join('/'),
-          beta: '',
-          p: '',
-          delta: '',
-          r: '',
-          LagGamma: '',
-          Gamma: '',
-          ValueCost: this.unitPrice,
-          u: this.calcPrice,
-          CalculatedPrice: newPrice,
-          timestamp: dateFormat(Date.now(), 'HH:MM:ss:l')
-        }
-        await new Model.FreeStyleModel({
-          game: this.game.id,
-          key: DBKey.robotCalcLog,
-          data
-        }).save()
-      })
+    if (f >= t) {
+      return
     }
+    const { price, e } = this.getCurvesTopPoint(curves, f, t, price => (price - this.unitPrice) * profitSign)
+    if (e === 0) {
+      return
+    }
+    this.calcPkg = {
+      price,
+      unitIndex: this.unitIndex,
+      e
+    }
+    Log.d(this.position.role === ROLE.Seller ? 'S' : 'B', this.calcPkg)
+    redisClient.incr(RedisKey.robotActionSeq(this.game.id)).then(async seq => {
+      const data: RobotCalcLog = {
+        seq,
+        playerSeq: this.playerState.positionIndex + 1,
+        unitIndex: this.unitIndex,
+        role: ROLE[this.position.role],
+        R: `(0,${curves[0].curve(0)})` + curves.map(({ to, curve }) => `(${to},${curve(to).toFixed(1)})`).join(','),
+        A: 'BuyOrders:' + buyOrderIds.map(id => orderDict[id].price).join(','),
+        q: 'SellOrders:' + sellOrderIds.map(id => orderDict[id].price).join(','),
+        tau:
+          'HistoryOrders:' +
+          historyOrders
+            .map(
+              ({ unitIndex, positionIndex, price }) =>
+                `box:${unitIndex + 1},role:${
+                  this.getPosition(positionIndex).role === ROLE.Seller ? 'S' : 'B'
+                }, price:${price}`
+            )
+            .join('/'),
+        beta: '',
+        p: '',
+        delta: '',
+        r: '',
+        LagGamma: '',
+        Gamma: '',
+        ValueCost: this.unitPrice,
+        u: '',
+        CalculatedPrice: price,
+        timestamp: dateFormat(Date.now(), 'HH:MM:ss:l')
+      }
+      await new Model.FreeStyleModel({
+        game: this.game.id,
+        key: DBKey.robotCalcLog,
+        data
+      }).save()
+    })
   }
 
   submitOrder(seq: number): void {
     const {
       gameState: { gamePhaseIndex },
-      calcPrice,
-      unitIndex
+      calcPkg
     } = this
-    const [wouldBeRejected = false, rejectPrice] = this.wouldBeRejected(this.calcPrice)
-    if (calcPrice <= 0 || this.calcUnitIndex !== this.unitIndex || wouldBeRejected) {
-      Log.i('Reject', rejectPrice)
+    if (!calcPkg) {
+      Log.d('No price to submit')
       return
     }
-    const data = this.buildRobotSubmitLog(seq, this.calcPrice)
+    if (this.calcPkg.unitIndex !== this.unitIndex) {
+      Log.d('Box already traded')
+      return
+    }
+    if (this.wouldBeRejected(this.calcPkg.price)[0]) {
+      Log.d('Reject')
+      return
+    }
+    const data = this.buildRobotSubmitLog(seq, this.calcPkg.unitIndex)
     this.frameEmitter.emit(
       MoveType.submitOrder,
       {
-        price: calcPrice,
-        unitIndex,
+        price: calcPkg.price,
+        unitIndex: calcPkg.unitIndex,
         gamePhaseIndex
       },
       async (shoutResult: ShoutResult, marketBuyOrders, marketSellOrders) => {

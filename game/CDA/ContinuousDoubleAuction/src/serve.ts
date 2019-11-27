@@ -190,6 +190,6 @@ const router = Router().get(FetchRoute.exportXls, async (req: any, res) => {
   return res.end(buffer, 'binary')
 })
 
-Server.start(namespace, Controller, resolve(__dirname, '../dist'), router)
+Server.start(namespace, Controller, resolve(__dirname, '../dist'), router, { port: 4000 })
 
 RobotServer.start(namespace, Robot)

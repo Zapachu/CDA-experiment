@@ -227,7 +227,9 @@ export default class Controller extends BaseController<
       const pairOrderId = role === ROLE.Seller ? buyOrderIds.shift() : sellOrderIds.shift()
       trades.push({
         reqId: pairOrderId,
-        resId: order.id
+        resId: order.id,
+        topBuyOrderId: buyOrderIds[0],
+        topSellOrderId: sellOrderIds[0]
       })
       positionUnitIndex[orders.find(({ id }) => id === pairOrderId).positionIndex] += 1
       positionUnitIndex[order.positionIndex] += 1

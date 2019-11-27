@@ -61,6 +61,8 @@ export namespace GameState {
     interface ITrade {
       reqId: number;
       resId: number;
+      topBuyOrderId:number;
+      topSellOrderId:number;
     }
   }
 }
