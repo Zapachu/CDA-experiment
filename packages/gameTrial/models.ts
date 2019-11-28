@@ -1,6 +1,6 @@
-import { Schema, model } from 'mongoose';
-const { ObjectId } = Schema.Types;
-import { UserDoc } from './interface';
+import { Schema, model } from 'mongoose'
+const { ObjectId } = Schema.Types
+import { UserDoc } from './interface'
 
 const UserSchema = new Schema({
   createAt: Date,
@@ -42,7 +42,7 @@ const UserSchema = new Schema({
 
   lastLogin: { type: Date }, //记录上次登录时间
 
-  birth: Date, //出生日期
-});
+  birth: Date //出生日期
+})
 
 export const User = model<UserDoc>('User', UserSchema)
