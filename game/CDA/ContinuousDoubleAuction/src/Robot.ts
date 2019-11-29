@@ -610,7 +610,7 @@ class GDRobot extends CDARobot {
       Log.d('Reject')
       return
     }
-    const data = this.buildRobotSubmitLog(seq, this.calcPkg.unitIndex)
+    const data = this.buildRobotSubmitLog(seq, this.calcPkg.price)
     this.frameEmitter.emit(
       MoveType.submitOrder,
       {
