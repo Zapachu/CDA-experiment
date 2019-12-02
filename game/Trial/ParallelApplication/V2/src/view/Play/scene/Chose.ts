@@ -36,8 +36,8 @@ export class Chose extends Phaser.Scene {
     )
     this.btnNext = new Button(this, 680, 1400, () => this.scene.start(SceneName.confirm, this.selection))
     this.universities = CONST.universities.map(
-      (label, i) =>
-        new University(this, 310 + (i % 2) * 375, 570 + ~~(i / 2) * 130, label, () => {
+      ({ name }, i) =>
+        new University(this, 310 + (i % 2) * 375, 570 + ~~(i / 2) * 130, name, () => {
           const rIndex = this.selection.findIndex(s => s === null || s === i)
           if (rIndex === -1) {
             return -1

@@ -59,6 +59,46 @@
 				"w": 210,
 				"h": 210
 			}
+		},
+		"offer": {
+			"frame": {
+				"x": 665,
+				"y": 1,
+				"w": 606,
+				"h": 393
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 606,
+				"h": 393
+			},
+			"sourceSize": {
+				"w": 606,
+				"h": 393
+			}
+		},
+		"smile": {
+			"frame": {
+				"x": 1273,
+				"y": 1,
+				"w": 60,
+				"h": 60
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 60,
+				"h": 60
+			},
+			"sourceSize": {
+				"w": 60,
+				"h": 60
+			}
 		}
 	},
 	"meta": {
@@ -67,8 +107,8 @@
 		"image": "spritesheet",
 		"format": "RGBA8888",
 		"size": {
-			"w": 664,
-			"h": 226
+			"w": 1334,
+			"h": 395
 		},
 		"scale": "1"
 	}

@@ -1,4 +1,4 @@
-import { CONST, SceneName } from '../const'
+import { CONST, SceneName, Util } from '../const'
 import { Button } from '../component'
 import { asset, assetName } from '../asset'
 
@@ -78,14 +78,14 @@ class Application extends Phaser.GameObjects.Container {
     this.add(this.cornerText)
     this.add(scene.add.sprite(-280, 0, assetName.universityTexture, universityIndex).setDisplaySize(96, 96))
     this.add(
-      scene.add.text(-215, -25, CONST.universities[universityIndex], {
+      scene.add.text(-215, -25, CONST.universities[universityIndex].name, {
         fontSize: '40px',
         fontFamily: 'Open Sans',
         color: '#000'
       })
     )
     this.add(
-      scene.add.text(110, -25, `第一志愿`, {
+      scene.add.text(110, -25, `第${Util.index2ChineseNumber(applicationIndex)}志愿`, {
         fontSize: '40px',
         fontFamily: 'Open Sans',
         color: '#1c4ed3'
