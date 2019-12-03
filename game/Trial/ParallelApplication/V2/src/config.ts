@@ -1,5 +1,13 @@
 export const namespace = 'ParallelApplicationV2'
 
+export enum SceneName {
+  boot = 'boot',
+  chose = 'chose',
+  confirm = 'confirm',
+  match = 'match',
+  result = 'result'
+}
+
 export const CONFIG = {
   universities: [
     { name: '北京大学', quota: 10 },
@@ -17,13 +25,20 @@ export const CONFIG = {
   ]
 }
 
-export enum MoveType {}
+export enum MoveType {
+  toChose,
+  toConfirm,
+  reChose,
+  toMatch
+}
 
 export enum PushType {}
 
 export interface ICreateParams {}
 
-export interface IMoveParams {}
+export interface IMoveParams {
+  applications: number[]
+}
 
 export interface IPushParams extends IMoveParams, IPlayerState {}
 
@@ -31,4 +46,10 @@ export interface IGameState {}
 
 export enum PlayerStatus {}
 
-export interface IPlayerState {}
+export interface IPlayerState {
+  scene: SceneName
+  score: number[]
+  candidateNumber: string
+  applications: number[]
+  offer: number
+}

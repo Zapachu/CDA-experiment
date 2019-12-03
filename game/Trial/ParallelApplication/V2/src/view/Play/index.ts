@@ -1,9 +1,9 @@
 import { scene } from './scene'
-import { CONST } from './const'
+import { PHASER_PARENT_ID } from './const'
 
 const config: Phaser.Types.Core.GameConfig = {
   transparent: true,
-  parent: CONST.phaserParent,
+  parent: PHASER_PARENT_ID,
   scene,
   scale: {
     mode:

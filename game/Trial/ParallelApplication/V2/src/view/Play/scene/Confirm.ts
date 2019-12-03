@@ -1,20 +1,16 @@
-import { CONST, SceneName, Util } from '../const'
+import { CONFIG, Bridge, MoveType, SceneName, Util } from '../const'
 import { Button } from '../component'
 import { asset, assetName } from '../asset'
+import { BaseScene } from './BaseScene'
 
-export class Confirm extends Phaser.Scene {
+export class Confirm extends BaseScene {
   intro: Intro
-  applications: Application[]
+  applications: Application[] = []
   btnClear: Button
   btnNext: Button
-  selection: number[]
 
   constructor() {
     super({ key: SceneName.confirm })
-  }
-
-  init(data) {
-    this.selection = data
   }
 
   preload() {
@@ -27,9 +23,18 @@ export class Confirm extends Phaser.Scene {
   create() {
     this.add.graphics({ lineStyle: { color: 0x666666, width: 4 } }).strokeRect(125, 145, 750, 1334)
     this.intro = new Intro(this, 160, 160)
-    this.applications = this.selection.map((j, i) => new Application(this, 500, 670 + i * 170, i, j))
-    this.btnClear = new Button(this, 320, 1400, () => this.scene.start(SceneName.chose), '重新选择', assetName.button2)
-    this.btnNext = new Button(this, 680, 1400, () => this.scene.start(SceneName.match), '提交并投档')
+    this.applications = Bridge.props.playerState.applications.map(
+      (j, i) => new Application(this, 500, 670 + i * 170, i, j)
+    )
+    this.btnClear = new Button(
+      this,
+      320,
+      1400,
+      () => Bridge.emitter.emit(MoveType.reChose),
+      '重新选择',
+      assetName.button2
+    )
+    this.btnNext = new Button(this, 680, 1400, () => Bridge.emitter.emit(MoveType.toMatch), '提交并投档')
   }
 }
 
@@ -78,7 +83,7 @@ class Application extends Phaser.GameObjects.Container {
     this.add(this.cornerText)
     this.add(scene.add.sprite(-280, 0, assetName.universityTexture, universityIndex).setDisplaySize(96, 96))
     this.add(
-      scene.add.text(-215, -25, CONST.universities[universityIndex].name, {
+      scene.add.text(-215, -25, CONFIG.universities[universityIndex].name, {
         fontSize: '40px',
         fontFamily: 'Open Sans',
         color: '#000'

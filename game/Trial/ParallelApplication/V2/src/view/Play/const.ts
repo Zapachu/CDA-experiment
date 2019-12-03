@@ -1,15 +1,8 @@
-import {
-  CONFIG,
-  ICreateParams,
-  IGameState,
-  IMoveParams,
-  IPlayerState,
-  IPushParams,
-  MoveType,
-  PushType
-} from '../../config'
+import { ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, MoveType, PushType } from '../../config'
 import { Core } from '@bespoke/client'
 import { FrameEmitter } from '@bespoke/share'
+
+export * from '../../config'
 
 export type TProps = Core.IPlayProps<
   ICreateParams,
@@ -21,22 +14,15 @@ export type TProps = Core.IPlayProps<
   IPushParams
 >
 
-export const CONST = {
+export const PHASER_PARENT_ID = 'phaserParent'
+
+export const Bridge = {
   emitter: null as FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>,
-  phaserParent: 'phaserParent',
-  ...CONFIG
+  props: null as TProps
 }
 
 export namespace Util {
   export function index2ChineseNumber(i: number) {
     return ['一', '二', '三'][i]
   }
-}
-
-export enum SceneName {
-  boot = 'boot',
-  chose = 'chose',
-  confirm = 'confirm',
-  match = 'match',
-  result = 'result'
 }

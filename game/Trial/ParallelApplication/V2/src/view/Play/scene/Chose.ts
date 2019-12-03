@@ -1,13 +1,14 @@
-import { CONST, SceneName } from '../const'
+import { CONFIG, Bridge, MoveType, SceneName } from '../const'
 import { Button } from '../component'
 import { asset, assetName } from '../asset'
+import { BaseScene } from './BaseScene'
 
-export class Chose extends Phaser.Scene {
+export class Chose extends BaseScene {
   intro: Intro
   btnClear: Button
   btnNext: Button
   universities: University[]
-  selection: number[]
+  applications: number[]
 
   constructor() {
     super({ key: SceneName.chose })
@@ -20,7 +21,7 @@ export class Chose extends Phaser.Scene {
   }
 
   create() {
-    this.selection = [null, null, null]
+    this.applications = [null, null, null]
     this.add.graphics({ lineStyle: { color: 0x666666, width: 4 } }).strokeRect(125, 145, 750, 1334)
     this.intro = new Intro(this, 160, 160)
     this.btnClear = new Button(
@@ -28,21 +29,23 @@ export class Chose extends Phaser.Scene {
       320,
       1400,
       () => {
-        this.selection.fill(null)
+        this.applications.fill(null)
         this.universities.forEach(u => u.setSeq(-1))
       },
       '清空',
       assetName.button2
     )
-    this.btnNext = new Button(this, 680, 1400, () => this.scene.start(SceneName.confirm, this.selection))
-    this.universities = CONST.universities.map(
+    this.btnNext = new Button(this, 680, 1400, () =>
+      Bridge.emitter.emit(MoveType.toConfirm, { applications: this.applications })
+    )
+    this.universities = CONFIG.universities.map(
       ({ name }, i) =>
         new University(this, 310 + (i % 2) * 375, 570 + ~~(i / 2) * 130, name, () => {
-          const rIndex = this.selection.findIndex(s => s === null || s === i)
+          const rIndex = this.applications.findIndex(s => s === null || s === i)
           if (rIndex === -1) {
             return -1
           }
-          this.selection[rIndex] = i
+          this.applications[rIndex] = i
           return rIndex
         })
     )

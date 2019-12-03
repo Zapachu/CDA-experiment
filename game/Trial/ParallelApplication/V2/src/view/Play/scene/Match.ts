@@ -1,7 +1,8 @@
-import { CONST, SceneName, Util } from '../const'
+import { Bridge, CONFIG, SceneName, Util } from '../const'
 import { asset, assetName } from '../asset'
+import { BaseScene } from './BaseScene'
 
-export class Match extends Phaser.Scene {
+export class Match extends BaseScene {
   playerSection: PlayerSection
   universitySection: UniversitySection
   offer: Offer
@@ -18,7 +19,17 @@ export class Match extends Phaser.Scene {
     this.add.graphics({ lineStyle: { color: 0x666666, alpha: 0.1, width: 4 } }).strokeRect(125, 145, 750, 1334)
     this.playerSection = new PlayerSection(this, 0, 200)
     this.universitySection = new UniversitySection(this, 0, 500)
-    this.offer = new Offer(this, 0, 0, '浙江大学')
+    this.offer = new Offer(this, 500, 700, '浙江大学')
+  }
+
+  update() {
+    super.update()
+    const {
+      playerState: { offer }
+    } = Bridge.props
+    if (offer !== undefined && !this.offer.envelopeMask.visible) {
+      this.offer.showUp()
+    }
   }
 }
 
@@ -83,7 +94,7 @@ class UniversitySection extends Phaser.GameObjects.Container {
 
   constructor(public scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y)
-    this.universityBoxes = CONST.universities.map(
+    this.universityBoxes = CONFIG.universities.map(
       (_, i) => new UniversityBox(scene, 260 + (i % 3) * 240, 190 + ~~(i / 3) * 220, i)
     )
     this.universityBoxes.map((u, i) => u.setIsActive(!!(i % 2)))
@@ -98,7 +109,7 @@ class UniversitySection extends Phaser.GameObjects.Container {
 class MiniUniversityBox extends Phaser.GameObjects.Container {
   constructor(public scene: Phaser.Scene, x: number, y: number, i: number, active?: boolean) {
     super(scene, x, y)
-    const { name, quota } = CONST.universities[i]
+    const { name, quota } = CONFIG.universities[i]
     const BG = {
       width: 240,
       height: 60,
@@ -131,7 +142,7 @@ class UniversityBox extends Phaser.GameObjects.Container {
 
   constructor(public scene: Phaser.Scene, x: number, y: number, i: number, applicationIndex: number = 1) {
     super(scene, x, y)
-    const { name, quota } = CONST.universities[i]
+    const { name, quota } = CONFIG.universities[i]
     this.bg = scene.add.rectangle(0, 0, 200, 200, 0xffffff)
     this.border = scene.add.sprite(0, 0, assetName.matchTexture, '2').setOrigin(0.5)
     this.nameText = scene.add
@@ -176,34 +187,50 @@ class UniversityBox extends Phaser.GameObjects.Container {
 }
 
 class Offer extends Phaser.GameObjects.Container {
+  scale = 0
+  envelopeMask: Phaser.GameObjects.Graphics
+
   constructor(public scene: Phaser.Scene, x: number, y: number, label: string) {
     super(scene, x, y)
-    this.add(scene.add.graphics({ fillStyle: { color: 0x0, alpha: 0.7 } }).fillRect(0, 0, 1000, 1624))
-    this.add(scene.add.sprite(500, 800, assetName.matchTexture, 'offer'))
-    this.add(
+    this.envelopeMask = this.scene.add
+      .graphics({
+        fillStyle: {
+          color: 0x0,
+          alpha: 0.7
+        }
+      })
+      .fillRect(0, 0, 1000, 1624)
+      .setVisible(false)
+    this.add([
+      scene.add.sprite(0, 100, assetName.matchTexture, 'offer'),
       scene.add
-        .text(550 - label.length * 19, 700, '恭喜您被', {
+        .text(50 - label.length * 19, 0, '恭喜您被', {
           font: '35px Open Sans',
           fill: '#333'
         })
-        .setOrigin(1, 0.5)
-    )
-    this.add(
+        .setOrigin(1, 0.5),
       scene.add
-        .text(550, 700, label, {
+        .text(50, 0, label, {
           font: '35px Open Sans',
           fill: '#ff3312'
         })
-        .setOrigin(0.5, 0.5)
-    )
-    this.add(
+        .setOrigin(0.5, 0.5),
       scene.add
-        .text(550 + label.length * 19, 700, '录取', {
+        .text(50 + label.length * 19, 0, '录取', {
           font: '35px Open Sans',
           fill: '#333'
         })
         .setOrigin(0, 0.5)
-    )
+    ])
     scene.add.existing(this)
+  }
+
+  showUp() {
+    this.envelopeMask.visible = true
+    this.scene.tweens.add({
+      targets: [this],
+      scale: { from: 0.3, to: 1 },
+      duration: 2e2
+    })
   }
 }
