@@ -74,258 +74,6 @@ export interface Word {
   br?: number
 }
 
-export const Test2 = [
-  {
-    desc: [
-      { text: '如果你在第一阶段选择等待。' },
-      { text: '', br: 10 },
-      { text: '并且第一阶段的结果为：有人选1。', color: true }
-    ],
-    questions: [
-      {
-        title: [
-          { text: '如果你选择' },
-          {
-            text:
-              '“第一阶段有人选1则在第二阶段选1；第一阶段没有人选1则在第二阶段选1”（无论第一阶段有没有人选1，在第二阶段都选1）',
-            color: true
-          },
-          { text: '', br: 0 },
-          { text: '你在这一轮的收益为' }
-        ],
-        options: (displayData, d) => [
-          { label: (displayData.p11 - d).toFixed(2), value: 'a' },
-          { label: displayData.p21.toFixed(2), value: 'b' },
-          { label: displayData.p22.toFixed(2), value: 'c' }
-        ],
-        answer: 'a'
-      },
-      {
-        title: [
-          { text: '如果你选择' },
-          {
-            text: '“第一阶段有人选1则在第二阶段选1；第一阶段没有人选1则在第二阶段选2”',
-            color: true
-          },
-          { text: '', br: 0 },
-          { text: '你在这一轮的收益为' }
-        ],
-        options: (displayData, d) => [
-          { label: (displayData.p11 - d).toFixed(2), value: 'a' },
-          { label: displayData.p21.toFixed(2), value: 'b' },
-          { label: displayData.p22.toFixed(2), value: 'c' }
-        ],
-        answer: 'a'
-      },
-      {
-        title: [
-          { text: '如果你选择' },
-          {
-            text:
-              '“第一阶段有人选1则在第二阶段选2；第一阶段没有人选1则在第二阶段选2”（无论第一阶段有没有人选1，在第二阶段都选2）',
-            color: true
-          },
-          { text: '', br: 0 },
-          { text: '你在这一轮的收益为' }
-        ],
-        options: (displayData, d) => [
-          { label: displayData.p11.toFixed(2), value: 'a' },
-          { label: displayData.p21.toFixed(2), value: 'b' },
-          { label: displayData.p22.toFixed(2), value: 'c' }
-        ],
-        answer: 'b'
-      }
-    ]
-  },
-  {
-    desc: [
-      { text: '假设你在考虑以下两个选择方案' },
-      { text: '', br: 10 },
-      { text: '选择方案(A)' },
-      { text: '"在第一阶段选1"', color: true },
-      { text: '', br: 0 },
-      { text: '选择方案(B)' },
-      {
-        text:
-          '"等待，第一阶段有人选1则在第二阶段选1；第一阶段没有人选1则在第二阶段选1"（无论第一阶段有没有人选1，在第二阶段都选1）',
-        color: true
-      }
-    ],
-    questions: [
-      {
-        title: [
-          { text: '如果其他三个组员都选择' },
-          { text: '"在第一阶段选1"', color: true },
-          { text: '，以下关于你自己的收益的说法正确的是：' }
-        ],
-        options: [
-          { label: '如果你选方案(A)，你获得收益更大', value: 'a' },
-          { label: '如果你选方案(B)，你获得收益更大', value: 'b' },
-          { label: '你选方案(A)还是(B)能获得的收益一样大', value: 'c' }
-        ],
-        answer: d => (d > 0 ? 'a' : 'c')
-      },
-      {
-        title: [
-          { text: '如果其他三个组员都选择' },
-          {
-            text: '"等待，第一阶段有人选1则在第二阶段选1；第一阶段无人选1则在第二阶段选2"',
-            color: true
-          },
-          { text: '，以下关于你自己的收益的说法正确的是：' }
-        ],
-        options: [
-          { label: '如果你选方案(A)，你获得收益更大', value: 'a' },
-          { label: '如果你选方案(B)，你获得收益更大', value: 'b' },
-          { label: '你选方案(A)还是(B)能获得的收益一样大', value: 'c' }
-        ],
-        answer: d => (d > 0 ? 'a' : 'c')
-      },
-      {
-        title: [
-          { text: '如果你' },
-          { text: '不确定其他组员会怎么选', color: true },
-          { text: '，以下关于你自己的收益的说法正确的是：' }
-        ],
-        options: [
-          { label: '如果你选方案(A)，你获得收益总是更大', value: 'a' },
-          { label: '如果你选方案(B)，你获得收益总是更大', value: 'b' },
-          {
-            label: '不管其他组员怎么选，你选方案(A)还是(B)能获得的收益总是一样大',
-            value: 'c'
-          },
-          {
-            label: '方案(A)和方案(B)的收益哪个大，取决于其他组员怎么选',
-            value: 'd'
-          }
-        ],
-        answer: d => (d > 0 ? 'a' : 'c')
-      }
-    ]
-  },
-  {
-    desc: [
-      { text: '假设你在考虑以下两个选择方案' },
-      { text: '', br: 10 },
-      { text: '选择方案(A)' },
-      { text: '"在第一阶段选1"', color: true },
-      { text: '', br: 0 },
-      { text: '选择方案(B)' },
-      {
-        text:
-          '"等待，第一阶段有人选1则在第二阶段选1；第一阶段没有人选1则在第二阶段选1"（无论第一阶段有没有人选1，在第二阶段都选1）',
-        color: true
-      }
-    ],
-    questions: [
-      {
-        title: [
-          { text: '如果其他三个组员都选择' },
-          { text: '"在第一阶段选1"', color: true },
-          { text: '，以下关于其他组员收益的说法正确的是：' }
-        ],
-        options: [
-          { label: '如果你选方案(A)，其他组员获得收益更小', value: 'a' },
-          { label: '如果你选方案(B)，其他组员获得收益更小', value: 'b' },
-          {
-            label: '不管你选方案(A)还是(B)，其他组员获得的收益一样大',
-            value: 'c'
-          }
-        ],
-        answer: 'c'
-      },
-      {
-        title: [
-          { text: '如果其他三个组员都选择' },
-          {
-            text: '"等待，第一阶段有人选1则在第二阶段选1；第一阶段无人选1则在第二阶段选2"',
-            color: true
-          },
-          { text: '，以下关于其他组员收益的说法正确的是：' }
-        ],
-        options: [
-          { label: '如果你选方案(A)，其他组员获得收益更小', value: 'a' },
-          { label: '如果你选方案(B)，其他组员获得收益更小', value: 'b' },
-          {
-            label: '不管你选方案(A)还是(B)，其他组员获得的收益一样大',
-            value: 'c'
-          }
-        ],
-        answer: 'b'
-      }
-    ]
-  },
-  {
-    desc: [
-      { text: '假设其他三个组员都选择' },
-      { text: '“在第一阶段选1”', color: true },
-      { text: '', br: 10 },
-      { text: '如果你选择' },
-      {
-        text: '“在第一阶段等待；如果第一阶段有人选1则在第二阶段选1；第一阶段没有人选1则在第二阶段选2”',
-        color: true
-      }
-    ],
-    questions: [
-      {
-        title: [{ text: '第一阶段的结果是：' }],
-        options: ['第一阶段有人选1', '第一阶段没有人选1'],
-        answer: '第一阶段有人选1'
-      },
-      {
-        title: [{ text: '四个组员的最终选择为：' }],
-        options: ['1,1,1,1', '1,2,2,2', '2,2,2,2'],
-        answer: '1,1,1,1'
-      },
-      {
-        title: [{ text: '你在这一轮的收益为:' }],
-        options: (displayData, d) => [
-          { label: (displayData.p11 - d).toFixed(2), value: 'a' },
-          { label: displayData.p21.toFixed(2), value: 'b' },
-          { label: displayData.p22.toFixed(2), value: 'c' }
-        ],
-        answer: 'a'
-      }
-    ]
-  },
-  {
-    desc: [
-      { text: '假设其他三个组员都选择' },
-      {
-        text: '“在第一阶段等待；如果第一阶段有人选1则在第二阶段选1；第一阶段没有人选1则在第二阶段选2”',
-        color: true
-      },
-      { text: '', br: 10 },
-      { text: '如果你选择' },
-      {
-        text: '“在第一阶段等待；如果第一阶段有人选1则在第二阶段选1；第一阶段没有人选1则在第二阶段选2”',
-        color: true
-      }
-    ],
-    questions: [
-      {
-        title: [{ text: '第一阶段的结果是：' }],
-        options: ['第一阶段有人选1', '第一阶段没有人选1'],
-        answer: '第一阶段没有人选1'
-      },
-      {
-        title: [{ text: '四个组员的最终选择为：' }],
-        options: ['1,1,1,1', '1,2,2,2', '2,2,2,2'],
-        answer: '2,2,2,2'
-      },
-      {
-        title: [{ text: '你在这一轮的收益为:' }],
-        options: (displayData, d) => [
-          { label: (displayData.p11 - d).toFixed(2), value: 'a' },
-          { label: displayData.p21.toFixed(2), value: 'b' },
-          { label: displayData.p22.toFixed(2), value: 'c' }
-        ],
-        answer: 'c'
-      }
-    ]
-  }
-]
-
 export function getTest(
   mode: Mode
 ): Array<{
@@ -336,8 +84,9 @@ export function getTest(
     answer: string | Function
   }>
 }> {
-  return mode === Mode.HR
-    ? [
+  switch (mode) {
+    case Mode.HR:
+      return [
         {
           desc: [
             { text: '如果你在第一阶段选择等待。' },
@@ -584,7 +333,237 @@ export function getTest(
           ]
         }
       ]
-    : Test2
+    case Mode.LR:
+      return [
+        {
+          desc: [
+            { text: '假设其他三个组员都选择' },
+            { text: '“在第一阶段等待；在第二阶段，如果有0、1人选2，则选1；如果有2、3人选2，则选2”', color: true },
+            { text: '', br: 10 },
+            { text: '如果你选择' },
+            { text: '“在第一阶段选2”', color: true }
+          ],
+          questions: [
+            {
+              title: [{ text: '第一阶段的结果是：' }],
+              options: [
+                { label: '第一阶段有0人选2', value: 'a' },
+                { label: '第一阶段有1人选2', value: 'b' },
+                { label: '第一阶段有2人选2', value: 'c' },
+                { label: '第一阶段有3人选2', value: 'd' },
+                { label: '第一阶段有4人选2', value: 'e' }
+              ],
+              answer: 'b'
+            },
+            {
+              title: [{ text: '四个组员的最终选择为：' }],
+              options: [
+                { label: '1,1,1,1', value: 'a' },
+                { label: '2,1,1,1', value: 'b' },
+                { label: '2,2,2,2', value: 'c' }
+              ],
+              answer: 'b'
+            },
+            {
+              title: [{ text: '你在这一轮的收益为:' }],
+              options: (displayData, d) => [
+                { label: displayData.p11.toFixed(2), value: 'a' },
+                { label: displayData.p21.toFixed(2), value: 'b' },
+                { label: displayData.p22.toFixed(2), value: 'c' }
+              ],
+              answer: 'b'
+            }
+          ]
+        },
+        {
+          desc: [
+            { text: '假设其他三个组员都选择' },
+            {
+              text: '“在第一阶段等待；在第二阶段，如果有0人选2，则选1；如果有1、2、3人选2，则选2”',
+              color: true
+            },
+            { text: '', br: 10 },
+            { text: '如果你选择' },
+            {
+              text: '“在第一阶段等待；在第二阶段，如果有0、1人选2，则选1；如果有2、3人选2，则选2”',
+              color: true
+            }
+          ],
+          questions: [
+            {
+              title: [{ text: '第一阶段的结果是：' }],
+              options: [
+                { label: '第一阶段有0人选2', value: 'a' },
+                { label: '第一阶段有1人选2', value: 'b' },
+                { label: '第一阶段有2人选2', value: 'c' },
+                { label: '第一阶段有3人选2', value: 'd' },
+                { label: '第一阶段有4人选2', value: 'e' }
+              ],
+              answer: 'a'
+            },
+            {
+              title: [{ text: '四个组员的最终选择为：' }],
+              options: [
+                { label: '1,1,1,1', value: 'a' },
+                { label: '1,2,2,2', value: 'b' },
+                { label: '2,2,2,2', value: 'c' }
+              ],
+              answer: 'a'
+            },
+            {
+              title: [{ text: '你在这一轮的收益为:' }],
+              options: (displayData, d) => [
+                { label: displayData.p11.toFixed(2), value: 'a' },
+                { label: displayData.p21.toFixed(2), value: 'b' },
+                { label: displayData.p22.toFixed(2), value: 'c' }
+              ],
+              answer: 'a'
+            }
+          ]
+        }
+      ]
+    case Mode.BR:
+      return [
+        {
+          desc: [
+            { text: '假设其他三个组员都选择' },
+            {
+              text: '“在第一阶段选2；在第二阶段，如果第一阶段有1、2、3人选1，则选1；如果第一阶段有0人选1，则选2”',
+              color: true
+            },
+            { text: '', br: 10 },
+            { text: '如果你选择' },
+            {
+              text: '“在第一阶段选2；在第二阶段，如果第一阶段有1、2、3人选1，则选1；如果第一阶段有0人选1，则选2”',
+              color: true
+            }
+          ],
+          questions: [
+            {
+              title: [{ text: '第一阶段的结果是：' }],
+              options: [
+                { label: '第一阶段有0人选1', value: 'a' },
+                { label: '第一阶段有1人选1', value: 'b' },
+                { label: '第一阶段有2人选1', value: 'c' },
+                { label: '第一阶段有3人选1', value: 'd' },
+                { label: '第一阶段有4人选1', value: 'e' }
+              ],
+              answer: 'a'
+            },
+            {
+              title: [{ text: '四个组员的最终选择为：' }],
+              options: [
+                { label: '1,1,1,1', value: 'a' },
+                { label: '1,2,2,2', value: 'b' },
+                { label: '2,2,2,2', value: 'c' }
+              ],
+              answer: 'c'
+            },
+            {
+              title: [{ text: '你在这一轮的收益为:' }],
+              options: (displayData, d) => [
+                { label: displayData.p11.toFixed(2), value: 'a' },
+                { label: displayData.p21.toFixed(2), value: 'b' },
+                { label: displayData.p22.toFixed(2), value: 'c' }
+              ],
+              answer: 'c'
+            }
+          ]
+        },
+        {
+          desc: [
+            { text: '假设其他三个组员都选择' },
+            {
+              text: '“在第一阶段选1；在第二阶段，如果第一阶段有3、4人选1，则选1；如果第一阶段有1、2人选1，则选2”',
+              color: true
+            },
+            { text: '', br: 10 },
+            { text: '如果你选择' },
+            {
+              text: '“在第一阶段选2；在第二阶段，如果第一阶段有1、2、3人选1，则选1；如果第一阶段有0人选1，则选2”',
+              color: true
+            }
+          ],
+          questions: [
+            {
+              title: [{ text: '第一阶段的结果是：' }],
+              options: [
+                { label: '第一阶段有0人选1', value: 'a' },
+                { label: '第一阶段有1人选1', value: 'b' },
+                { label: '第一阶段有2人选1', value: 'c' },
+                { label: '第一阶段有3人选1', value: 'd' },
+                { label: '第一阶段有4人选1', value: 'e' }
+              ],
+              answer: 'd'
+            },
+            {
+              title: [{ text: '四个组员的最终选择为：' }],
+              options: [
+                { label: '1,1,1,1', value: 'a' },
+                { label: '1,2,2,2', value: 'b' },
+                { label: '2,2,2,2', value: 'c' }
+              ],
+              answer: 'a'
+            },
+            {
+              title: [{ text: '你在这一轮的收益为:' }],
+              options: (displayData, d) => [
+                { label: (displayData.p11 - d).toFixed(2), value: 'a' },
+                { label: (displayData.p21 - d).toFixed(2), value: 'b' },
+                { label: displayData.p22.toFixed(2), value: 'c' }
+              ],
+              answer: 'a'
+            }
+          ]
+        },
+        {
+          desc: [
+            { text: '假设其他三个组员都选择' },
+            {
+              text: '“在第一阶段选2；在第二阶段，如果第一阶段有1、2、3人选1，则选1；如果第一阶段有0人选1，则选2”',
+              color: true
+            },
+            { text: '', br: 10 },
+            { text: '如果你选择' },
+            {
+              text: '“在第一阶段选1；在第二阶段，如果第一阶段有2、3、4人选1，则选1；如果第一阶段有1人选1，则选2”',
+              color: true
+            }
+          ],
+          questions: [
+            {
+              title: [{ text: '第一阶段的结果是：' }],
+              options: [
+                { label: '第一阶段有0人选1', value: 'a' },
+                { label: '第一阶段有1人选1', value: 'b' },
+                { label: '第一阶段有2人选1', value: 'c' },
+                { label: '第一阶段有3人选1', value: 'd' },
+                { label: '第一阶段有4人选1', value: 'e' }
+              ],
+              answer: 'b'
+            },
+            {
+              title: [{ text: '四个组员的最终选择为：' }],
+              options: [
+                { label: '1,1,1,1', value: 'a' },
+                { label: '2,1,1,1', value: 'b' },
+                { label: '2,2,2,2', value: 'c' }
+              ],
+              answer: 'b'
+            },
+            {
+              title: [{ text: '你在这一轮的收益为:' }],
+              options: (displayData, d) => [
+                { label: (displayData.p11 - d).toFixed(2), value: 'a' },
+                { label: (displayData.p21 - d).toFixed(2), value: 'b' },
+                { label: (displayData.p22 - d).toFixed(2), value: 'c' }
+              ],
+              answer: 'b'
+            }
+          ]
+        }
+      ]
+  }
 }
 
 export const Survey = [
