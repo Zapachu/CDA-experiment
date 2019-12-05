@@ -1,4 +1,4 @@
-import { CONFIG, Bridge, MoveType, SceneName } from '../const'
+import { Bridge, CONFIG, MoveType, SceneName } from '../const'
 import { Button } from '../component'
 import { asset, assetName } from '../asset'
 import { BaseScene } from './BaseScene'
@@ -35,9 +35,13 @@ export class Chose extends BaseScene {
       '清空',
       assetName.button2
     )
-    this.btnNext = new Button(this, 680, 1400, () =>
+    this.btnNext = new Button(this, 680, 1400, () => {
+      console.log(this.applications)
+      if (this.applications.includes(null)) {
+        return alert('TODO')
+      }
       Bridge.emitter.emit(MoveType.toConfirm, { applications: this.applications })
-    )
+    })
     this.universities = CONFIG.universities.map(
       ({ name }, i) =>
         new University(this, 310 + (i % 2) * 375, 570 + ~~(i / 2) * 130, name, () => {

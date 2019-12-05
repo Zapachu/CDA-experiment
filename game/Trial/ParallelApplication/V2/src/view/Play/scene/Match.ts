@@ -1,4 +1,4 @@
-import { Bridge, CONFIG, SceneName, Util } from '../const'
+import { Bridge, CONFIG, PushType, SceneName, Util } from '../const'
 import { asset, assetName } from '../asset'
 import { BaseScene } from './BaseScene'
 
@@ -6,6 +6,7 @@ export class Match extends BaseScene {
   playerSection: PlayerSection
   universitySection: UniversitySection
   offer: Offer
+  applyToast: ApplyToast
 
   constructor() {
     super({ key: SceneName.match })
@@ -19,17 +20,15 @@ export class Match extends BaseScene {
     this.add.graphics({ lineStyle: { color: 0x666666, alpha: 0.1, width: 4 } }).strokeRect(125, 145, 750, 1334)
     this.playerSection = new PlayerSection(this, 0, 200)
     this.universitySection = new UniversitySection(this, 0, 500)
-    this.offer = new Offer(this, 500, 700, '浙江大学')
-  }
-
-  update() {
-    super.update()
-    const {
-      playerState: { offer }
-    } = Bridge.props
-    if (offer !== undefined && !this.offer.envelopeMask.visible) {
-      this.offer.showUp()
-    }
+    this.offer = new Offer(this, 500, 700)
+    this.applyToast = new ApplyToast(this, 500, 800)
+    Bridge.emitter.on(PushType.match, ({ applications, applicationIndex }) => {
+      this.universitySection.setMatching(applications, applications[applicationIndex])
+    })
+    Bridge.emitter.on(PushType.apply, ({ index, universityIndex }) => {
+      const { name } = CONFIG.universities[universityIndex]
+      this.applyToast.showUp(name)
+    })
   }
 }
 
@@ -42,49 +41,82 @@ enum PlayerColor {
 class PlayerSection extends Phaser.GameObjects.Container {
   readonly playerY: number = 100
   statusTips: Phaser.GameObjects.Text
+  players: Player[]
 
   constructor(public scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y)
-    this.add(new Player(scene, 195, this.playerY, PlayerColor.gray))
-    this.add(new Player(scene, 310, this.playerY, PlayerColor.gray))
-    this.add(new CurPlayer(scene, 500, this.playerY, 14, 645))
-    this.add(new Player(scene, 690, this.playerY, PlayerColor.blue))
-    this.add(new Player(scene, 805, this.playerY, PlayerColor.red))
+    this.players = Array(CONFIG.groupSize)
+      .fill(null)
+      .map((_, i) => new Player(scene, 500, this.playerY, PlayerColor.gray))
     this.statusTips = scene.add
-      .text(500, 450, '正在根据考生分数由高到低进行录取，请耐心等候...', {
+      .text(500, 250, '正在根据考生分数由高到低进行录取，请耐心等候...', {
         fontSize: '26px',
         fontFamily: 'Open Sans',
         color: '#000'
       })
       .setOrigin(0.5)
+    this.add([...this.players, this.statusTips])
     scene.add.existing(this)
+    let i = 0
+    window.setInterval(() => {
+      this.match(i++)
+    }, 1e3)
+  }
+
+  match(index: number, isMe: boolean = false) {
+    this.players.forEach((p, i) => {
+      if (index === i) {
+        p.setMatching(true)
+      } else {
+        p.setMatching(false)
+      }
+      this.scene.tweens.add({
+        targets: [p],
+        x: 500 + (i - index) * 110 + 100 * (i < index ? -1 : i > index ? 1 : 0),
+        duration: 200
+      })
+    })
   }
 }
 
 class Player extends Phaser.GameObjects.Container {
-  constructor(public scene: Phaser.Scene, x: number, y: number, color: PlayerColor) {
-    super(scene, x, y)
-    const sprite = scene.add.sprite(0, 0, assetName.matchTexture, 'smile').setTintFill(color)
-    this.add(sprite)
-    this.add(scene.add.graphics({ lineStyle: { width: 4, color: 0 } }).strokeCircle(0, 0, 42))
-    scene.add.existing(this)
-  }
-}
+  matchingContainer: Phaser.GameObjects.Container
+  normalContainer: Phaser.GameObjects.Container
 
-class CurPlayer extends Phaser.GameObjects.Container {
-  constructor(public scene: Phaser.Scene, x: number, y: number, seq: number, score: number) {
+  constructor(public scene: Phaser.Scene, x: number, y: number, color: PlayerColor) {
     super(scene, x, y)
     const fontStyle = {
       fontSize: '32px',
       fontFamily: 'Open Sans',
       color: '#696969'
     }
-    this.add(scene.add.sprite(0, 0, assetName.matchTexture).setOrigin(0.5))
-    this.add(scene.add.text(0, 0, '组员:', fontStyle).setOrigin(1, 1))
-    this.add(scene.add.text(20, 0, seq.toString(), { ...fontStyle, color: '#ff3312' }).setOrigin(0, 1))
-    this.add(scene.add.text(0, 45, '成绩:', fontStyle).setOrigin(1, 1))
-    this.add(scene.add.text(10, 45, score.toString(), { ...fontStyle, color: '#ff3312' }).setOrigin(0, 1))
+    this.matchingContainer = scene.add
+      .container(0, 0, [
+        scene.add.sprite(0, 0, assetName.matchTexture).setOrigin(0.5),
+        scene.add.text(0, 0, '组员:', fontStyle).setOrigin(1, 1),
+        scene.add.text(20, 0, '', { ...fontStyle, color: '#ff3312' }).setOrigin(0, 1),
+        scene.add.text(0, 45, '成绩:', fontStyle).setOrigin(1, 1),
+        scene.add.text(10, 45, '', { ...fontStyle, color: '#ff3312' }).setOrigin(0, 1)
+      ])
+      .setScale(0)
+      .setVisible(false)
+    this.normalContainer = scene.add.container(0, 0, [
+      scene.add.sprite(0, 0, assetName.matchTexture, 'smile').setTintFill(color),
+      scene.add.graphics({ lineStyle: { width: 4, color: 0 } }).strokeCircle(0, 0, 42)
+    ])
+    this.add([this.normalContainer, this.matchingContainer])
     scene.add.existing(this)
+  }
+
+  setMatching(matching: boolean, seq: number = 0, score: number = 0, isMe: boolean = false): Player {
+    this.normalContainer.setVisible(!matching)
+    this.matchingContainer.setVisible(matching)
+    this.scene.tweens.add({
+      targets: [this.matchingContainer],
+      scale: matching ? 1 : 0,
+      duration: 200
+    })
+    return this
   }
 }
 
@@ -94,41 +126,68 @@ class UniversitySection extends Phaser.GameObjects.Container {
 
   constructor(public scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y)
+    const { applications } = Bridge.props.playerState
     this.universityBoxes = CONFIG.universities.map(
-      (_, i) => new UniversityBox(scene, 260 + (i % 3) * 240, 190 + ~~(i / 3) * 220, i)
+      (_, i) =>
+        new UniversityBox(
+          scene,
+          260 + (i % 3) * 240,
+          190 + ~~(i / 3) * 220,
+          i,
+          applications.findIndex(a => a === i)
+        )
     )
-    this.universityBoxes.map((u, i) => u.setIsActive(!!(i % 2)))
-    this.miniUniversityBoxes = [2, 5, 7].map(
-      (index, i) => new MiniUniversityBox(scene, 130 + i * 250, 0, index, !!(i % 2))
-    )
+    this.miniUniversityBoxes = Array(3)
+      .fill(null)
+      .map((_, i) => new MiniUniversityBox(scene, 130 + i * 250, 0))
     this.add([...this.universityBoxes, ...this.miniUniversityBoxes])
     scene.add.existing(this)
+  }
+
+  setMatching(applications: number[], activeApplication: number) {
+    this.universityBoxes.forEach((box, i) =>
+      box.setInApplication(applications.includes(i)).setIsActive(activeApplication === i)
+    )
+    this.miniUniversityBoxes.forEach((box, i) =>
+      box.setIndex(applications[i]).setIsActive(activeApplication === applications[i])
+    )
   }
 }
 
 class MiniUniversityBox extends Phaser.GameObjects.Container {
-  constructor(public scene: Phaser.Scene, x: number, y: number, i: number, active?: boolean) {
+  bg: Phaser.GameObjects.Graphics
+  quotaText: Phaser.GameObjects.Text
+
+  constructor(public scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y)
+    this.bg = scene.add.graphics({ lineStyle: { color: 0x0, width: 4 } })
+    this.quotaText = scene.add
+      .text(120, 30, '', {
+        font: '24px Open Sans'
+      })
+      .setOrigin(0.5, 0.5)
+    this.add([this.bg, this.quotaText])
+    scene.add.existing(this)
+  }
+
+  setIndex(i: number): MiniUniversityBox {
     const { name, quota } = CONFIG.universities[i]
+    this.quotaText.setText(`${name}招录: ${quota}`)
+    return this
+  }
+
+  setIsActive(b: boolean): MiniUniversityBox {
     const BG = {
       width: 240,
       height: 60,
       radius: 12
     }
-    this.add(
-      scene.add
-        .graphics({ fillStyle: { color: active ? 0xff3312 : 0x00b6f4 }, lineStyle: { color: 0x0, width: 4 } })
-        .fillRoundedRect(0, 0, BG.width, BG.height, BG.radius)
-        .strokeRoundedRect(0, 0, BG.width, BG.height, BG.radius)
-    )
-    this.add(
-      scene.add
-        .text(120, 30, `${name}招录: ${quota}`, {
-          font: '24px Open Sans'
-        })
-        .setOrigin(0.5, 0.5)
-    )
-    scene.add.existing(this)
+    this.bg
+      .clear()
+      .setDefaultStyles({ fillStyle: { color: b ? 0xff3312 : 0x00b6f4 }, lineStyle: { color: 0x0, width: 4 } })
+      .fillRoundedRect(0, 0, BG.width, BG.height, BG.radius)
+      .strokeRoundedRect(0, 0, BG.width, BG.height, BG.radius)
+    return this
   }
 }
 
@@ -140,7 +199,7 @@ class UniversityBox extends Phaser.GameObjects.Container {
   applicationText: Phaser.GameObjects.Text
   applicationBg: Phaser.GameObjects.Rectangle
 
-  constructor(public scene: Phaser.Scene, x: number, y: number, i: number, applicationIndex: number = 1) {
+  constructor(public scene: Phaser.Scene, x: number, y: number, i: number, applicationIndex: number) {
     super(scene, x, y)
     const { name, quota } = CONFIG.universities[i]
     this.bg = scene.add.rectangle(0, 0, 200, 200, 0xffffff)
@@ -177,12 +236,18 @@ class UniversityBox extends Phaser.GameObjects.Container {
     scene.add.existing(this)
   }
 
-  setIsActive(b: boolean) {
+  setInApplication(b: boolean): UniversityBox {
+    this.quota.setVisible(b)
+    return this
+  }
+
+  setIsActive(b: boolean): UniversityBox {
     this.bg.setFillStyle(b ? 0xff3312 : 0xffffff)
     this.nameText.setColor(b ? '#fff' : '#1c4ed3')
     this.quota.setColor(b ? '#fff' : '#000')
     this.applicationText.setColor(b ? '#ff3312' : '#fff')
     this.applicationBg.setFillStyle(b ? 0xffffff : 0xff3312)
+    return this
   }
 }
 
@@ -190,8 +255,8 @@ class Offer extends Phaser.GameObjects.Container {
   scale = 0
   envelopeMask: Phaser.GameObjects.Graphics
 
-  constructor(public scene: Phaser.Scene, x: number, y: number, label: string) {
-    super(scene, x, y)
+  constructor(public scene: Phaser.Scene, x: number, y: number) {
+    super(scene, x + 50, y)
     this.envelopeMask = this.scene.add
       .graphics({
         fillStyle: {
@@ -204,19 +269,19 @@ class Offer extends Phaser.GameObjects.Container {
     this.add([
       scene.add.sprite(0, 100, assetName.matchTexture, 'offer'),
       scene.add
-        .text(50 - label.length * 19, 0, '恭喜您被', {
+        .text(0, 0, '恭喜您被', {
           font: '35px Open Sans',
           fill: '#333'
         })
         .setOrigin(1, 0.5),
       scene.add
-        .text(50, 0, label, {
+        .text(0, 0, '', {
           font: '35px Open Sans',
           fill: '#ff3312'
         })
         .setOrigin(0.5, 0.5),
       scene.add
-        .text(50 + label.length * 19, 0, '录取', {
+        .text(0, 0, '录取', {
           font: '35px Open Sans',
           fill: '#333'
         })
@@ -225,12 +290,62 @@ class Offer extends Phaser.GameObjects.Container {
     scene.add.existing(this)
   }
 
-  showUp() {
+  showUp(label: string) {
     this.envelopeMask.visible = true
+    const [, textA, textB, textC] = this.getAll() as Phaser.GameObjects.Text[]
+    textA.x = -label.length * 19
+    textB.text = label
+    textC.x = label.length * 19
     this.scene.tweens.add({
       targets: [this],
       scale: { from: 0.3, to: 1 },
       duration: 2e2
+    })
+  }
+}
+
+class ApplyToast extends Phaser.GameObjects.Container {
+  scaleY = 0
+
+  constructor(public scene: Phaser.Scene, x: number, y: number) {
+    super(scene, x + 20, y)
+    this.add([
+      scene.add
+        .graphics({
+          fillStyle: { color: 0x000, alpha: 0.8 }
+        })
+        .fillRoundedRect(-280, -45, 560, 90, 10),
+      scene.add
+        .text(0, 0, 'XXX被', {
+          font: '35px Open Sans'
+        })
+        .setOrigin(1, 0.5),
+      scene.add
+        .text(0, 0, '', {
+          font: '35px Open Sans',
+          fill: '#ff3312'
+        })
+        .setOrigin(0.5, 0.5),
+      scene.add
+        .text(0, 0, '录取', {
+          font: '35px Open Sans'
+        })
+        .setOrigin(0, 0.5)
+    ])
+    scene.add.existing(this)
+  }
+
+  showUp(label: string) {
+    const [, textA, textB, textC] = this.getAll() as Phaser.GameObjects.Text[]
+    textA.x = -label.length * 19
+    textB.text = label
+    textC.x = label.length * 19
+    this.scene.tweens.add({
+      targets: [this],
+      scaleY: { from: 0, to: 1 },
+      duration: 100,
+      hold: 2e3,
+      yoyo: true
     })
   }
 }

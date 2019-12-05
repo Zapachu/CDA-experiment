@@ -3,13 +3,13 @@ import { Button } from '../component'
 import { asset, assetName } from '../asset'
 import { BaseScene } from './BaseScene'
 
-export class Boot extends BaseScene {
+export class Start extends BaseScene {
   intro: Intro
   detail: Detail
   btnNext: Button
 
   constructor() {
-    super({ key: SceneName.boot })
+    super({ key: SceneName.start })
   }
 
   preload() {
