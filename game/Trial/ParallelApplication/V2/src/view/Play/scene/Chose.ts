@@ -21,8 +21,8 @@ export class Chose extends BaseScene {
   }
 
   create() {
+    this.drawEdge()
     this.applications = [null, null, null]
-    this.add.graphics({ lineStyle: { color: 0x666666, width: 4 } }).strokeRect(125, 145, 750, 1334)
     this.intro = new Intro(this, 160, 160)
     this.btnClear = new Button(
       this,

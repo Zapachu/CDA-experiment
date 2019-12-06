@@ -21,7 +21,7 @@ export class Confirm extends BaseScene {
   }
 
   create() {
-    this.add.graphics({ lineStyle: { color: 0x666666, width: 4 } }).strokeRect(125, 145, 750, 1334)
+    this.drawEdge()
     this.intro = new Intro(this, 160, 160)
     this.applications = Bridge.props.playerState.applications.map(
       (j, i) => new Application(this, 500, 670 + i * 170, i, j)

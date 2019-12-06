@@ -18,7 +18,7 @@ export class Start extends BaseScene {
   }
 
   create() {
-    this.add.graphics({ lineStyle: { color: 0x666666, width: 4 } }).strokeRect(125, 145, 750, 1334)
+    this.drawEdge()
     this.btnNext = new Button(this, 500, 1400, () => Bridge.emitter.emit(MoveType.toChose))
     this.intro = new Intro(this, 160, 160)
     this.detail = new Detail(this, 125, 530)

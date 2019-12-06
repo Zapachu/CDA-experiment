@@ -19,7 +19,7 @@ export class Result extends BaseScene {
   }
 
   create() {
-    this.add.graphics({ lineStyle: { color: 0x666666, width: 4 } }).strokeRect(125, 145, 750, 1334)
+    this.drawEdge()
     this.btnNext = new Button(this, 320, 1400, () => this.scene.start(SceneName.chose), '再来一局')
     this.btnNext = new Button(this, 680, 1400, () => this.scene.start(SceneName.chose), '分享')
     this.mainBox = new MainBox(this, 125, 250)
