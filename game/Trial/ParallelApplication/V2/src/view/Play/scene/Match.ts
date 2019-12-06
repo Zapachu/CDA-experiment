@@ -22,26 +22,26 @@ export class Match extends BaseScene {
     this.universitySection = new UniversitySection(this, 0, 500)
     this.offer = new Offer(this, 500, 700)
     this.applyToast = new ApplyToast(this, 500, 800)
-    Bridge.emitter.on(PushType.match, ({ index, score, applications, applicationIndex }) => {
+    Bridge.emitter.on(PushType.match, ({ rank, score, applications, applicationIndex }) => {
       if (!this.scene.isActive()) {
         return
       }
       this.universitySection.setMatching(applications, applications[applicationIndex])
       this.playerSection.match(
-        index,
+        rank,
         score.reduce((m, n) => m + n),
-        index === Bridge.props.playerState.index
+        rank === Bridge.props.playerState.rank
       )
     })
-    Bridge.emitter.on(PushType.apply, ({ index, universityIndex }) => {
+    Bridge.emitter.on(PushType.apply, ({ rank, universityIndex }) => {
       if (!this.scene.isActive()) {
         return
       }
       const { name } = CONFIG.universities[universityIndex]
-      if (index === Bridge.props.playerState.index) {
+      if (rank === Bridge.props.playerState.rank) {
         this.offer.showUp(name)
       } else {
-        this.applyToast.showUp(index, name)
+        this.applyToast.showUp(rank, name)
       }
     })
   }
@@ -64,7 +64,7 @@ class PlayerSection extends Phaser.GameObjects.Container {
       .fill(null)
       .map((_, i) => new Player(scene, 500, this.playerY, PlayerColor.gray))
     this.statusTips = scene.add
-      .text(500, 250, '正在根据考生分数由高到低进行录取，请耐心等候...', {
+      .text(500, 250, '', {
         fontSize: '26px',
         fontFamily: 'Open Sans',
         color: '#000'
@@ -74,16 +74,17 @@ class PlayerSection extends Phaser.GameObjects.Container {
     scene.add.existing(this)
   }
 
-  match(index: number, score: number, isMe: boolean) {
+  match(rank: number, score: number, isMe: boolean) {
+    this.statusTips.setText(isMe ? '终于轮到你了' : '正在根据考生分数由高到低进行录取，请耐心等候...')
     this.players.forEach((p, i) => {
-      if (index === i) {
-        p.setMatching(true, index, score, isMe)
+      if (rank === i) {
+        p.setMatching(true, rank, score, isMe)
       } else {
         p.setMatching(false)
       }
       this.scene.tweens.add({
         targets: [p],
-        x: 500 + (i - index) * 110 + 100 * (i < index ? -1 : i > index ? 1 : 0),
+        x: 500 + (i - rank) * 110 + 100 * (i < rank ? -1 : i > rank ? 1 : 0),
         duration: 200
       })
     })
@@ -112,10 +113,12 @@ class Player extends Phaser.GameObjects.Container {
       ])
       .setScale(0.4)
       .setVisible(false)
-    this.normalContainer = scene.add.container(0, 0, [
-      scene.add.sprite(0, 0, assetName.matchTexture, 'smile').setTintFill(color),
-      scene.add.graphics({ lineStyle: { width: 4, color: 0 } }).strokeCircle(0, 0, 42)
-    ])
+    this.normalContainer = scene.add
+      .container(0, 0, [
+        scene.add.sprite(0, 0, assetName.matchTexture, 'smile').setTintFill(color),
+        scene.add.graphics({ lineStyle: { width: 4, color: 0 } }).strokeCircle(0, 0, 42)
+      ])
+      .setVisible(false)
     this.add([this.normalContainer, this.matchingContainer])
     scene.add.existing(this)
   }
@@ -282,7 +285,7 @@ class Offer extends Phaser.GameObjects.Container {
   labelContainer: Phaser.GameObjects.Container
 
   constructor(public scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x + 50, y)
+    super(scene, x, y)
     this.envelopeMask = this.scene.add
       .graphics({
         fillStyle: {

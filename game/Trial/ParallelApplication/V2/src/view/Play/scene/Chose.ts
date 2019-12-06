@@ -36,7 +36,6 @@ export class Chose extends BaseScene {
       assetName.button2
     )
     this.btnNext = new Button(this, 680, 1400, () => {
-      console.log(this.applications)
       if (this.applications.includes(null)) {
         return alert('TODO')
       }

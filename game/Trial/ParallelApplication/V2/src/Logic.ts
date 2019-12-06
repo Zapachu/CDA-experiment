@@ -12,6 +12,7 @@ import {
   PushType,
   SceneName
 } from './config'
+import shuffle = require('lodash/shuffle')
 
 export class Logic extends BaseLogic<
   ICreateParams,
@@ -22,15 +23,30 @@ export class Logic extends BaseLogic<
   IMoveParams,
   IPushParams
 > {
-  scores = Array(CONFIG.groupSize)
-    .fill(null)
-    .map(() => [
-      ~~(Math.random() * 30) + 120,
-      ~~(Math.random() * 15) + 135,
-      ~~(Math.random() * 20) + 130,
-      ~~(Math.random() * 50) + 250
-    ])
-    .sort((s1, s2) => s2.reduce((a, b) => a + b, 0) - s1.reduce((a, b) => a + b, 0))
+  positions: Array<{
+    score: number[]
+    totalScore: number
+    rank: number
+  }> = shuffle(
+    Array(CONFIG.groupSize)
+      .fill(null)
+      .map(() => {
+        const score = [
+            ~~(Math.random() * 30) + 120,
+            ~~(Math.random() * 15) + 135,
+            ~~(Math.random() * 20) + 130,
+            ~~(Math.random() * 50) + 250
+          ],
+          totalScore = score.reduce((a, b) => a + b, 0)
+        return {
+          score,
+          totalScore,
+          rank: -1
+        }
+      })
+      .sort((s1, s2) => s2.totalScore - s1.totalScore)
+      .map((s, rank) => ({ ...s, rank }))
+  )
 
   initGameState(): TGameState<IGameState> {
     const gameState = super.initGameState()
@@ -54,11 +70,12 @@ export class Logic extends BaseLogic<
       playerState = await this.stateManager.getPlayerState(actor)
     switch (type) {
       case MoveType.init:
-        if (playerState.index === undefined && gameState.playerNum < CONFIG.groupSize) {
+        if (playerState.rank === undefined && gameState.playerNum < CONFIG.groupSize) {
           playerState.scene = SceneName.start
-          playerState.index = gameState.playerNum++
-          playerState.score = this.scores[playerState.index]
-          if (playerState.index === 0) {
+          const position = this.positions[gameState.playerNum++]
+          playerState.rank = position.rank
+          playerState.score = position.score
+          if (gameState.playerNum === 1) {
             global.setTimeout(async () => {
               for (let i = gameState.playerNum; i < CONFIG.groupSize; i++) {
                 await this.startRobot(i)
@@ -80,26 +97,26 @@ export class Logic extends BaseLogic<
         break
       case MoveType.toMatch: {
         const { playerSubmit } = gameState
-        playerSubmit[playerState.index] = true
+        playerSubmit[playerState.rank] = true
         playerState.scene = SceneName.match
         if (playerSubmit.every(s => s)) {
-          global.setTimeout(async () => await this.match(0), 0)
+          global.setTimeout(async () => await this.match(0), 1e3)
         }
         break
       }
     }
   }
 
-  async match(playerIndex: number, applicationIndex: number = 0) {
+  async match(rank: number, applicationIndex: number = 0) {
     const gameState = await this.stateManager.getGameState(),
       playerStates = await this.stateManager.getPlayerStates(),
-      playerState = Object.values(playerStates).find(s => s.index === playerIndex)
+      playerState = Object.values(playerStates).find(s => s.rank === rank)
     if (!playerState) {
       this.end()
       return
     }
     this.broadcast(PushType.match, {
-      index: playerIndex,
+      rank,
       score: playerState.score,
       applications: playerState.applications,
       applicationIndex
@@ -109,14 +126,14 @@ export class Logic extends BaseLogic<
     if (gameState.quota[universityIndex] > 0) {
       gameState.quota[universityIndex]--
       playerState.offer = universityIndex
-      this.broadcast(PushType.apply, { index: playerIndex, universityIndex })
+      this.broadcast(PushType.apply, { rank, universityIndex })
       await Util.sleep(2)
-      await this.match(playerIndex + 1)
+      await this.match(rank + 1)
     } else if (applicationIndex < 2) {
-      await this.match(playerIndex, applicationIndex + 1)
+      await this.match(rank, applicationIndex + 1)
     } else {
       Log.i('落榜')
-      await this.match(playerIndex + 1)
+      await this.match(rank + 1)
     }
   }
 
@@ -132,17 +149,6 @@ export class Util {
     return new Promise(resolve => {
       global.setTimeout(() => resolve(), second * (900 + Math.random() * 200))
     })
-  }
-
-  static getRandomApplications(): number[] {
-    const indices = CONFIG.universities.map((_, i) => i)
-    for (let i = 0; i < 3; i++) {
-      const j = ~~(Math.random() * indices.length),
-        temp = indices[j]
-      indices[j] = indices[i]
-      indices[i] = temp
-    }
-    return indices.slice(0, 3)
   }
 }
 
@@ -165,12 +171,14 @@ export class Robot extends BaseRobot<
     await Util.sleep(Math.random() * 5)
     this.frameEmitter.emit(MoveType.init)
     await Util.sleep()
-    if (this.playerState.index === undefined) {
+    if (this.playerState.rank === undefined) {
       return
     }
     this.frameEmitter.emit(MoveType.toChose)
     await Util.sleep()
-    this.frameEmitter.emit(MoveType.toConfirm, { applications: Util.getRandomApplications() })
+    this.frameEmitter.emit(MoveType.toConfirm, {
+      applications: shuffle(CONFIG.universities.map((_, i) => i)).slice(0, 3)
+    })
     await Util.sleep()
     this.frameEmitter.emit(MoveType.toMatch)
   }

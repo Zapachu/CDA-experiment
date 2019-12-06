@@ -60,7 +60,7 @@ export interface IGameState {
 export enum PlayerStatus {}
 
 export interface IPlayerState {
-  index: number
+  rank: number
   scene: SceneName
   score: number[]
   candidateNumber: string
