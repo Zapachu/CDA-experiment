@@ -1,7 +1,7 @@
 import { CONST, span } from './const'
 import { MainGame } from './scene'
 
-const config: GameConfig = {
+const config = {
   backgroundColor: CONST.backgroundColor,
   width: span(CONST.col),
   height: span(CONST.row + CONST.col),

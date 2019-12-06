@@ -67,7 +67,7 @@ export class Create extends Core.Create<ICreateParams> {
         params: {}
       }
     ]
-    setParams({ phases })
+    setParams({ phases } as any)
   }
 
   updateCreateParams(phaseIndex: number, newPhaseParams: Partial<CreateParams.Phase.IParams>) {
