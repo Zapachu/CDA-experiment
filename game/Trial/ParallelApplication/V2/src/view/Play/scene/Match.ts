@@ -78,9 +78,9 @@ class PlayerSection extends Phaser.GameObjects.Container {
     this.statusTips.setText(isMe ? '终于轮到你了' : '正在根据考生分数由高到低进行录取，请耐心等候...')
     this.players.forEach((p, i) => {
       if (rank === i) {
-        p.setMatching(true, rank, score, isMe)
+        p.setMatching(true, rank === Bridge.props.playerState.rank ? PlayerColor.red : PlayerColor.blue, rank, score)
       } else {
-        p.setMatching(false)
+        p.setMatching(false, i < rank ? PlayerColor.gray : PlayerColor.blue)
       }
       this.scene.tweens.add({
         targets: [p],
@@ -123,7 +123,7 @@ class Player extends Phaser.GameObjects.Container {
     scene.add.existing(this)
   }
 
-  setMatching(matching: boolean, index: number = 0, score: number = 0, isMe: boolean = false): Player {
+  setMatching(matching: boolean, color: PlayerColor, index: number = 0, score: number = 0): Player {
     this.normalContainer.setVisible(!matching)
     this.matchingContainer.setVisible(matching !== this.lastMatch)
     if (matching) {
@@ -131,9 +131,12 @@ class Player extends Phaser.GameObjects.Container {
         Phaser.GameObjects.Sprite,
         ...Phaser.GameObjects.Text[]
       ]
-      bg.setFrame(isMe ? '1' : '0')
+      bg.setFrame(color === PlayerColor.blue ? '0' : '1')
       playerText.setText((index + 1).toString())
       scoreText.setText(score.toString())
+    } else {
+      const [smileSprite] = this.normalContainer.getAll() as [Phaser.GameObjects.Sprite]
+      smileSprite.setTintFill(color)
     }
     this.scene.tweens.add({
       targets: [this.matchingContainer],

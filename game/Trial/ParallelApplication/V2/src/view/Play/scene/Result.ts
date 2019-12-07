@@ -1,4 +1,4 @@
-import { CONFIG, SceneName } from '../const'
+import { CONFIG, namespace, SceneName } from '../const'
 import { Button } from '../component'
 import { asset, assetName } from '../asset'
 import { BaseScene } from './BaseScene'
@@ -20,8 +20,14 @@ export class Result extends BaseScene {
 
   create() {
     this.drawEdge()
-    this.btnNext = new Button(this, 320, 1400, () => this.scene.start(SceneName.chose), '再来一局')
-    this.btnNext = new Button(this, 680, 1400, () => this.scene.start(SceneName.chose), '分享')
+    this.btnNext = new Button(
+      this,
+      320,
+      1400,
+      () => (window.location.href = `/gametrial/game/${namespace}`),
+      '再来一局'
+    )
+    this.btnNext = new Button(this, 680, 1400, () => alert('TODO'), '分享')
     this.mainBox = new MainBox(this, 125, 250)
     this.publicAccount = new PublicAccount(this, 125, 1000)
   }
