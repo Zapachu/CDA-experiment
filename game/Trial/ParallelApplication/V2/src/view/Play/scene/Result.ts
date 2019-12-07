@@ -19,7 +19,7 @@ export class Result extends BaseScene {
   }
 
   create() {
-    this.drawEdge()
+    super.create()
     this.btnNext = new Button(
       this,
       320,
@@ -27,7 +27,7 @@ export class Result extends BaseScene {
       () => (window.location.href = `/gametrial/game/${namespace}`),
       '再来一局'
     )
-    this.btnNext = new Button(this, 680, 1400, () => alert('TODO'), '分享')
+    this.btnNext = new Button(this, 680, 1400, () => this.toast.showUp('TODO'), '分享')
     this.mainBox = new MainBox(this, 125, 250)
     this.publicAccount = new PublicAccount(this, 125, 1000)
   }

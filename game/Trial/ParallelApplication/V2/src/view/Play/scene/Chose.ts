@@ -21,7 +21,7 @@ export class Chose extends BaseScene {
   }
 
   create() {
-    this.drawEdge()
+    super.create()
     this.applications = [null, null, null]
     this.intro = new Intro(this, 160, 160)
     this.btnClear = new Button(
@@ -37,7 +37,7 @@ export class Chose extends BaseScene {
     )
     this.btnNext = new Button(this, 680, 1400, () => {
       if (this.applications.includes(null)) {
-        return alert('TODO')
+        return this.toast.showUp('请选择您的志愿')
       }
       Bridge.emitter.emit(MoveType.toConfirm, { applications: this.applications })
     })

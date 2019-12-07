@@ -18,7 +18,7 @@ export class Start extends BaseScene {
   }
 
   create() {
-    this.drawEdge()
+    super.create()
     this.btnNext = new Button(this, 500, 1400, () => Bridge.emitter.emit(MoveType.toChose))
     this.intro = new Intro(this, 160, 160)
     this.detail = new Detail(this, 125, 530)

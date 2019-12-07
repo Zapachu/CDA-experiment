@@ -21,7 +21,7 @@ export class Confirm extends BaseScene {
   }
 
   create() {
-    this.drawEdge()
+    super.create()
     this.intro = new Intro(this, 160, 160)
     this.applications = Bridge.props.playerState.applications.map(
       (j, i) => new Application(this, 500, 670 + i * 170, i, j)
