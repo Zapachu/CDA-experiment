@@ -98,19 +98,10 @@ export default class Controller extends BaseController<
             : ['', '', '', '', curRound + 1]
         const curChoice = ps.choices[curRound]
         if (curChoice) {
-          row.push(
-            choiceTerms[curChoice.c1],
-            curChoice.c === curChoice.c1 ? '' : curChoice.c2.map(c => choiceTerms[c]).join('/')
-          )
+          row.push(choiceTerms[curChoice.c1], curChoice.c2.map(c => choiceTerms[c]).join('/'), curChoice.c)
           const curRoundState = curGroup.rounds[curRound]
-          if (curRoundState.min) {
-            row.push(
-              curChoice.c ? curChoice.c : curChoice.c1,
-              curRoundState.one1,
-              curRoundState.two1,
-              curRoundState.min,
-              ps.profits[curRound]
-            )
+          if (curRoundState && curRoundState.min) {
+            row.push(curRoundState.one1, curRoundState.two1, curRoundState.min, ps.profits[curRound])
             if (ps.surveyAnswers.length && curRound === 0) {
               row.push(...this._formatSurveyAnswers(ps.surveyAnswers))
             }

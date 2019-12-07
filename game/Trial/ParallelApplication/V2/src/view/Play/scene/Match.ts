@@ -6,7 +6,6 @@ export class Match extends BaseScene {
   playerSection: PlayerSection
   universitySection: UniversitySection
   offer: Offer
-  applyToast: ApplyToast
 
   constructor() {
     super({ key: SceneName.match })
@@ -17,11 +16,10 @@ export class Match extends BaseScene {
   }
 
   create() {
-    this.drawEdge()
+    super.create()
     this.playerSection = new PlayerSection(this, 0, 200)
     this.universitySection = new UniversitySection(this, 0, 500)
     this.offer = new Offer(this, 500, 700)
-    this.applyToast = new ApplyToast(this, 500, 800)
     Bridge.emitter.on(PushType.match, ({ rank, score, applications, applicationIndex }) => {
       if (!this.scene.isActive()) {
         return
@@ -37,11 +35,12 @@ export class Match extends BaseScene {
       if (!this.scene.isActive()) {
         return
       }
+      this.universitySection.apply(universityIndex)
       const { name } = CONFIG.universities[universityIndex]
       if (rank === Bridge.props.playerState.rank) {
         this.offer.showUp(name)
       } else {
-        this.applyToast.showUp(rank, name)
+        this.toast.showUp(`玩家${rank + 1}被`, name, '录取')
       }
     })
   }
@@ -183,6 +182,10 @@ class UniversitySection extends Phaser.GameObjects.Container {
       box.setIndex(applications[i]).setIsActive(activeApplication === applications[i])
     )
   }
+
+  apply(universityIndex: number) {
+    this.universityBoxes[universityIndex].apply()
+  }
 }
 
 class MiniUniversityBox extends Phaser.GameObjects.Container {
@@ -224,7 +227,6 @@ class MiniUniversityBox extends Phaser.GameObjects.Container {
 
 class UniversityBox extends Phaser.GameObjects.Container {
   bg: Phaser.GameObjects.Rectangle
-  border: Phaser.GameObjects.Sprite
   nameText: Phaser.GameObjects.Text
   quota: Phaser.GameObjects.Text
   applicationText: Phaser.GameObjects.Text
@@ -234,7 +236,6 @@ class UniversityBox extends Phaser.GameObjects.Container {
     super(scene, x, y)
     const { name, quota } = CONFIG.universities[i]
     this.bg = scene.add.rectangle(0, 0, 200, 200, 0xffffff)
-    this.border = scene.add.sprite(0, 0, assetName.matchTexture, '2').setOrigin(0.5)
     this.nameText = scene.add
       .text(0, 0, name, {
         font: 'bold 36px Open Sans',
@@ -263,8 +264,12 @@ class UniversityBox extends Phaser.GameObjects.Container {
       })
       .setOrigin(0.5, 0.5)
       .setVisible(applicationIndex > -1)
-    this.add([this.bg, this.border, this.nameText, this.quota, this.applicationBg, this.applicationText])
+    this.add([this.bg, this.nameText, this.quota, this.applicationBg, this.applicationText])
     scene.add.existing(this)
+    scene.add
+      .sprite(x, y + 500, assetName.matchTexture, '2')
+      .setOrigin(0.5)
+      .setDepth(1e3)
   }
 
   setInApplication(b: boolean): UniversityBox {
@@ -279,6 +284,16 @@ class UniversityBox extends Phaser.GameObjects.Container {
     this.applicationText.setColor(b ? '#ff3312' : '#fff')
     this.applicationBg.setFillStyle(b ? 0xffffff : 0xff3312)
     return this
+  }
+
+  apply() {
+    this.scene.tweens.add({
+      targets: [this],
+      y: { from: this.y, to: this.y - 20 },
+      scaleY: { from: 1, to: 0.6 },
+      duration: 250,
+      yoyo: true
+    })
   }
 }
 
@@ -335,57 +350,6 @@ class Offer extends Phaser.GameObjects.Container {
       hold: 2e3,
       yoyo: true,
       onComplete: () => (this.envelopeMask.visible = false)
-    })
-  }
-}
-
-class ApplyToast extends Phaser.GameObjects.Container {
-  scaleY = 0
-  labelContainer: Phaser.GameObjects.Container
-
-  constructor(public scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y)
-    this.labelContainer = scene.add.container(25, 0, [
-      scene.add
-        .text(0, 0, 'XXX被', {
-          font: '35px Open Sans'
-        })
-        .setOrigin(1, 0.5),
-      scene.add
-        .text(0, 0, '', {
-          font: '35px Open Sans',
-          fill: '#ff3312'
-        })
-        .setOrigin(0.5, 0.5),
-      scene.add
-        .text(0, 0, '录取', {
-          font: '35px Open Sans'
-        })
-        .setOrigin(0, 0.5)
-    ])
-    this.add([
-      scene.add
-        .graphics({
-          fillStyle: { color: 0x000, alpha: 0.8 }
-        })
-        .fillRoundedRect(-280, -45, 560, 90, 10),
-      this.labelContainer
-    ])
-    scene.add.existing(this)
-  }
-
-  showUp(playerIndex: number, label: string) {
-    const [textA, textB, textC] = this.labelContainer.getAll() as Phaser.GameObjects.Text[]
-    textA.x = -label.length * 20
-    textA.text = `组员${playerIndex + 1}被`
-    textB.text = label
-    textC.x = label.length * 20
-    this.scene.tweens.add({
-      targets: [this],
-      scaleY: { from: 0, to: 1 },
-      duration: 100,
-      hold: 2e3,
-      yoyo: true
     })
   }
 }
