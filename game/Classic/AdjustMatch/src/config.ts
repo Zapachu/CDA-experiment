@@ -11,12 +11,14 @@ export enum FetchRoute {
 
 export enum MoveType {
   guideDone,
+  oldPlayerDecide,
   submit
 }
 
 export enum PushType {}
 
 export interface IMoveParams {
+  join: boolean
   sort: number[]
 }
 
@@ -48,6 +50,7 @@ export interface IGameState {
 }
 
 export enum PlayerRoundStatus {
+  prePlay,
   play,
   wait,
   result

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as Extend from '@extend/client'
-import { Button, Tag } from 'antd'
+import { Button, Table, Tag } from 'antd'
 import * as style from './style.scss'
 import {
   GoodStatus,
@@ -39,8 +39,10 @@ function RoundPlay({
     leftMarket: ['已离开市场', 'Left market'],
     beingOwned: ['被持有', 'Being owned'],
     beingOwnedByYou: ['被你持有', 'Being owned by you'],
+    wait4OldPlayers: ['等待老参与者决定是否参与交换......'],
     wait4Others: ['等待其它玩家提交......'],
-    leave: ['不参与', "Don't Participate in"],
+    join: ['参与'],
+    leave: ['不参与'],
     submit: ['提交', 'Submit'],
     roundOver1: ['您已完成本轮实验'],
     roundOver2: ['初始分配到的物品为'],
@@ -54,6 +56,8 @@ function RoundPlay({
     { privatePrices, status } = playerRoundState
   const [sort, setSort] = React.useState(privatePrices.map((_, i) => i))
   switch (status) {
+    case PlayerRoundStatus.prePlay:
+      return <PrePlay />
     case PlayerRoundStatus.play:
       return <Play />
     case PlayerRoundStatus.wait:
@@ -80,6 +84,71 @@ function RoundPlay({
           <label className={style.toNextRound}>{lang.toNextRound}</label>
         </div>
       )
+  }
+
+  function PrePlay() {
+    const colStyle: React.CSSProperties = {
+      minWidth: '6rem',
+      maxWidth: '12rem'
+    }
+    return (
+      <section className={style.roundPlay}>
+        <Table
+          size="middle"
+          pagination={false}
+          columns={[
+            {
+              title: lang.goodNo,
+              dataIndex: 'key',
+              key: 'key',
+              render: v => <div style={colStyle}>{String.fromCharCode(65 + v)}</div>
+            },
+            {
+              title: lang.privateValue,
+              dataIndex: 'price',
+              key: 'price',
+              render: v => <div style={colStyle}>{v}</div>
+            },
+            {
+              title: lang.goodStatus,
+              dataIndex: 'goodStatus',
+              key: 'goodStatus',
+              render: (goodStatus, { isYou }) => (
+                <div style={colStyle}>
+                  {goodStatus === GoodStatus.left ? (
+                    <Tag color="gray">{lang.leftMarket}</Tag>
+                  ) : goodStatus === GoodStatus.old ? (
+                    isYou ? (
+                      <Tag color="green">{lang.beingOwnedByYou}</Tag>
+                    ) : (
+                      <Tag color="blue">{lang.beingOwned}</Tag>
+                    )
+                  ) : null}
+                </div>
+              )
+            }
+          ]}
+          dataSource={sort.map(i => ({
+            key: i,
+            price: privatePrices[i],
+            goodStatus: goodStatus[i],
+            isYou: i === initAllocation[playerIndex]
+          }))}
+        />
+        <div className={style.btnsWrapper}>
+          {initAllocation[playerIndex] === null ? (
+            lang.wait4OldPlayers
+          ) : (
+            <>
+              <Button onClick={() => frameEmitter.emit(MoveType.oldPlayerDecide, { join: false })}>{lang.leave}</Button>
+              <Button onClick={() => frameEmitter.emit(MoveType.oldPlayerDecide, { join: true })} type={'primary'}>
+                {lang.join}
+              </Button>
+            </>
+          )}
+        </div>
+      </section>
+    )
   }
 
   function Play() {
@@ -132,7 +201,7 @@ function RoundPlay({
             key: i,
             price: privatePrices[i],
             goodStatus: goodStatus[i],
-            isYou: i === playerIndex,
+            isYou: i === initAllocation[playerIndex],
             preferNo: j
           }))}
           setData={data => setSort(data.map(({ key }) => key))}

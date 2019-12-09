@@ -64,7 +64,7 @@ export class GroupLogic extends Extend.Group.Logic<
     Object.values(playerStates).forEach(
       p =>
         (p.rounds[r] = {
-          status: PlayerRoundStatus.play,
+          status: PlayerRoundStatus.prePlay,
           sort: [],
           privatePrices: Array(this.groupSize)
             .fill(null)
