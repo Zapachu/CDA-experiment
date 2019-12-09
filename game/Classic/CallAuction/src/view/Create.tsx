@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as Extend from '@extend/client'
 import { Label, Lang } from '@elf/component'
-import { Col, Row, Slider } from 'antd'
+import { Col, InputNumber, Row } from 'antd'
 import { ICreateParams } from '../config'
 
 const SliderProps = {
@@ -39,7 +39,7 @@ class GroupCreate extends Extend.Group.Create<ICreateParams> {
   render() {
     const {
       props: {
-        groupParams: { round, t, buyPriceRange, sellPriceRange },
+        groupParams: { round, t, buyPriceRange = [], sellPriceRange = [] },
         setGroupParams
       },
       lang
@@ -49,26 +49,42 @@ class GroupCreate extends Extend.Group.Create<ICreateParams> {
         <Col span={12} offset={6}>
           <div>
             <Label label={lang.round} />
-            <Slider value={round} onChange={v => setGroupParams({ round: +v })} max={6} marks={{ [round]: round }} />
+            <InputNumber value={round} onChange={v => setGroupParams({ round: +v })} max={6} />
           </div>
           <div>
             <Label label={lang.t} />
-            <Slider value={t} onChange={v => setGroupParams({ t: +v })} min={30} max={60} marks={{ [t]: t }} />
+            <InputNumber value={t} onChange={v => setGroupParams({ t: +v })} min={30} max={60} />
           </div>
           <div>
             <Label label={lang.buyPriceRange} />
-            <Slider
-              {...SliderProps}
-              value={buyPriceRange}
-              onChange={v => setGroupParams({ buyPriceRange: v as any })}
+            <InputNumber
+              value={buyPriceRange[0]}
+              onChange={v => setGroupParams({ buyPriceRange: [+v, buyPriceRange[1]] })}
+              min={0}
+              max={100}
+            />
+            &nbsp;~&nbsp;
+            <InputNumber
+              value={buyPriceRange[1]}
+              onChange={v => setGroupParams({ buyPriceRange: [buyPriceRange[0], +v] })}
+              min={0}
+              max={100}
             />
           </div>
           <div>
             <Label label={lang.sellPriceRange} />
-            <Slider
-              {...SliderProps}
-              value={sellPriceRange}
-              onChange={v => setGroupParams({ sellPriceRange: v as any })}
+            <InputNumber
+              value={sellPriceRange[0]}
+              onChange={v => setGroupParams({ sellPriceRange: [+v, sellPriceRange[1]] })}
+              min={0}
+              max={100}
+            />
+            &nbsp;~&nbsp;
+            <InputNumber
+              value={sellPriceRange[1]}
+              onChange={v => setGroupParams({ buyPriceRange: [sellPriceRange[0], +v] })}
+              min={0}
+              max={100}
             />
           </div>
         </Col>
