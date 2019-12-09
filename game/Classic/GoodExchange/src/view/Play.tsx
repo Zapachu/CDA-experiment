@@ -30,7 +30,7 @@ function RoundPlay({
   playerIndex: number
 }) {
   const lang = Lang.extractLang({
-    goodNo: ['物品编号', 'Good No.'],
+    goodNo: ['物品', 'Good'],
     privateValue: ['心理价值', 'Private Value'],
     goodStatus: ['物品状态', 'Good Status'],
     operate: ['操作', 'Operate'],
@@ -69,7 +69,7 @@ function RoundPlay({
               title: lang.goodNo,
               dataIndex: 'good',
               key: 'good',
-              render: v => <div style={colStyle}>{v + 1}</div>
+              render: v => <div style={colStyle}>{String.fromCharCode(65 + v)}</div>
             },
             {
               title: lang.privateValue,

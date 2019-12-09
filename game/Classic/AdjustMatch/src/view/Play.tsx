@@ -33,7 +33,7 @@ function RoundPlay({
 }) {
   const lang = Lang.extractLang({
     dragPlease: ['请拖拽下方物品列表进行偏好表达'],
-    goodNo: ['物品编号', 'Good No.'],
+    goodNo: ['物品', 'Good'],
     privateValue: ['心理价值', 'Private Value'],
     goodStatus: ['物品状态', 'Good Status'],
     leftMarket: ['已离开市场', 'Left market'],
@@ -46,7 +46,9 @@ function RoundPlay({
     roundOver2: ['初始分配到的物品为'],
     roundOver3: ['其价值为'],
     roundOver4: ['最终分配到的物品为'],
-    toNextRound: ['即将进入下一轮...']
+    toNextRound: ['即将进入下一轮...'],
+    preference: ['偏好'],
+    preferNo: [n => `第${n}喜欢`]
   })
   const { goodStatus, initAllocation, allocation } = gameRoundState,
     { privatePrices, status } = playerRoundState
@@ -91,10 +93,15 @@ function RoundPlay({
         <DragTable
           columns={[
             {
+              title: lang.preference,
+              dataIndex: 'preferNo',
+              render: v => <div style={colStyle}>{lang.preferNo(v + 1)}</div>
+            },
+            {
               title: lang.goodNo,
               dataIndex: 'key',
               key: 'key',
-              render: v => <div style={colStyle}>{v + 1}</div>
+              render: v => <div style={colStyle}>{String.fromCharCode(65 + v)}</div>
             },
             {
               title: lang.privateValue,
@@ -121,11 +128,12 @@ function RoundPlay({
               )
             }
           ]}
-          data={sort.map(i => ({
+          data={sort.map((i, j) => ({
             key: i,
             price: privatePrices[i],
             goodStatus: goodStatus[i],
-            isYou: i === playerIndex
+            isYou: i === playerIndex,
+            preferNo: j
           }))}
           setData={data => setSort(data.map(({ key }) => key))}
         />

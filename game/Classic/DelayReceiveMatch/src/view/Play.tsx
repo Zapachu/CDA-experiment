@@ -33,8 +33,9 @@ function RoundPlay({
   playerIndex: number
 }) {
   const lang = Lang.extractLang({
-    dragPlease: ['请拖拽下方物品列表进行偏好表达'],
-    goodNo: ['物品编号', 'Good No.'],
+    yourSeq: ['您的优先序为'],
+    dragPlease: ['，请拖拽下方物品列表进行偏好表达'],
+    goodNo: ['物品', 'Good'],
     privateValue: ['心理价值', 'Private Value'],
     leftMarket: ['已离开市场', 'Left market'],
     beingOwned: ['被持有', 'Being owned'],
@@ -44,7 +45,9 @@ function RoundPlay({
     roundOver1: ['您已完成本轮实验'],
     roundOver3: ['其价值为'],
     roundOver4: ['最终分配到的物品为'],
-    toNextRound: ['即将进入下一轮...']
+    toNextRound: ['即将进入下一轮...'],
+    preference: ['偏好'],
+    preferNo: [n => `第${n}喜欢`]
   })
   const { allocation } = gameRoundState,
     { privatePrices, status } = playerRoundState
@@ -81,26 +84,34 @@ function RoundPlay({
     }
     return (
       <section className={style.roundPlay}>
-        <label style={{ marginBottom: '1rem' }}>{lang.dragPlease}</label>
+        <label style={{ marginBottom: '1rem' }}>
+          {lang.yourSeq}
+          <em style={{ padding: '.5rem', fontSize: '1.5rem' }}>{playerIndex + 1}</em>
+          {lang.dragPlease}
+        </label>
         <DragTable
           columns={[
             {
+              title: lang.preference,
+              dataIndex: 'preferNo',
+              render: v => <div style={colStyle}>{lang.preferNo(v + 1)}</div>
+            },
+            {
               title: lang.goodNo,
               dataIndex: 'key',
-              key: 'key',
-              render: v => <div style={colStyle}>{v + 1}</div>
+              render: v => <div style={colStyle}>{String.fromCharCode(65 + v)}</div>
             },
             {
               title: lang.privateValue,
               dataIndex: 'price',
-              key: 'price',
               render: v => <div style={colStyle}>{v}</div>
             }
           ]}
-          data={sort.map(i => ({
+          data={sort.map((i, j) => ({
             key: i,
             price: privatePrices[i],
-            isYou: i === playerIndex
+            isYou: i === playerIndex,
+            preferNo: j
           }))}
           setData={data => setSort(data.map(({ key }) => key))}
         />
