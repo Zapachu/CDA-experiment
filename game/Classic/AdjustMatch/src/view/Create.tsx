@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as Extend from '@extend/client'
 import { Label, Lang } from '@elf/component'
-import { Col, Row, Slider } from 'antd'
+import { Col, InputNumber, Row } from 'antd'
 import { ICreateParams } from '../config'
 
 class GroupCreate extends Extend.Group.Create<ICreateParams> {
@@ -41,19 +41,29 @@ class GroupCreate extends Extend.Group.Create<ICreateParams> {
         <Col span={12} offset={6}>
           <div>
             <Label label={lang.round} />
-            <Slider value={round} onChange={v => setGroupParams({ round: +v })} max={6} />
+            <InputNumber value={round} onChange={v => setGroupParams({ round: +v })} min={0} max={6} />
           </div>
           <div>
             <Label label={lang.oldPlayer} />
-            <Slider value={oldPlayer} onChange={v => setGroupParams({ oldPlayer: +v })} max={groupSize} />
+            <InputNumber value={oldPlayer} onChange={v => setGroupParams({ oldPlayer: +v })} min={0} max={groupSize} />
           </div>
           <div>
             <Label label={lang.minPrivateValue} />
-            <Slider value={minPrivateValue} onChange={v => setGroupParams({ minPrivateValue: +v })} max={50} />
+            <InputNumber
+              value={minPrivateValue}
+              onChange={v => setGroupParams({ minPrivateValue: +v })}
+              min={0}
+              max={50}
+            />
           </div>
           <div>
             <Label label={lang.maxPrivateValue} />
-            <Slider value={maxPrivateValue} onChange={v => setGroupParams({ maxPrivateValue: +v })} min={50} />
+            <InputNumber
+              value={maxPrivateValue}
+              onChange={v => setGroupParams({ maxPrivateValue: +v })}
+              min={50}
+              max={100}
+            />
           </div>
         </Col>
       </Row>

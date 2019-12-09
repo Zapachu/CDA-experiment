@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as Extend from '@extend/client'
 import { Label, Lang } from '@elf/component'
-import { Col, Row, Slider } from 'antd'
+import { Col, InputNumber, Row } from 'antd'
 import { awardLimit, ICreateParams } from '../config'
 
 const riskSliderProps = {
@@ -43,11 +43,11 @@ class GroupCreate extends Extend.Group.Create<ICreateParams> {
           <Col span={12} offset={6}>
             <div>
               <Label label={lang.round} />
-              <Slider value={round} onChange={v => setGroupParams({ round: +v })} max={6} marks={{ [round]: round }} />
+              <InputNumber value={round} onChange={v => setGroupParams({ round: +v })} max={6} />
             </div>
             <div>
               <Label label={lang.t} />
-              <Slider value={t} onChange={v => setGroupParams({ t: +v })} min={30} max={60} marks={{ [t]: t }} />
+              <InputNumber value={t} onChange={v => setGroupParams({ t: +v })} min={30} max={60} />
             </div>
           </Col>
         </Row>
@@ -55,11 +55,11 @@ class GroupCreate extends Extend.Group.Create<ICreateParams> {
         <Row>
           <Col offset={4} span={8}>
             <Label label={`A : ${lang.riskInfo(awardA)}`} />
-            <Slider {...riskSliderProps} value={awardA} onChange={v => setGroupParams({ awardA: +v })} />
+            <InputNumber {...riskSliderProps} value={awardA} onChange={v => setGroupParams({ awardA: +v })} />
           </Col>
           <Col span={8}>
             <Label label={`B : ${lang.riskInfo(awardB)}`} />
-            <Slider {...riskSliderProps} value={awardB} onChange={v => setGroupParams({ awardB: +v })} />
+            <InputNumber {...riskSliderProps} value={awardB} onChange={v => setGroupParams({ awardB: +v })} />
           </Col>
         </Row>
       </>

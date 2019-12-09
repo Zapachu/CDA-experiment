@@ -3,7 +3,7 @@ import * as style from './style.scss'
 import { Core } from '@bespoke/client'
 import { Label, Lang, MaskLoading, Toast } from '@elf/component'
 import { ICreateParams, IGroupParams } from '../interface'
-import { Button, Collapse, InputNumber, Slider, Tabs, Table } from 'antd'
+import { Button, Collapse, InputNumber, Table, Tabs } from 'antd'
 import cloneDeep = require('lodash/cloneDeep')
 
 const RANGE = {
@@ -192,7 +192,7 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
             <ul className={style.configFields}>
               <li>
                 <Label label={lang.group} />
-                <Slider
+                <InputNumber
                   {...RANGE.group}
                   value={group}
                   onChange={value =>
@@ -207,7 +207,7 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
               </li>
               <li>
                 <Label label={lang.groupSize} />
-                <Slider
+                <InputNumber
                   {...RANGE.groupSize}
                   value={groupSize}
                   onChange={value =>
@@ -222,11 +222,11 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
               </li>
               <li>
                 <Label label={lang.round} />
-                <Slider {...RANGE.round} value={round} onChange={value => setParams({ round: +value })} />
+                <InputNumber {...RANGE.round} value={round} onChange={value => setParams({ round: +value })} />
               </li>
               <li>
                 <Label label={lang.minInitialMoney} />
-                <Slider
+                <InputNumber
                   {...RANGE.minInitialMoney}
                   value={minInitialMoney}
                   onChange={value => {
@@ -239,7 +239,7 @@ export class Create extends Core.Create<ICreateParams, ICreateState> {
               </li>
               <li>
                 <Label label={lang.maxInitialMoney} />
-                <Slider
+                <InputNumber
                   {...RANGE.maxInitialMoney}
                   value={maxInitialMoney}
                   onChange={value => {
