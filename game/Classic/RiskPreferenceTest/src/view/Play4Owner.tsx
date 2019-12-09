@@ -34,8 +34,11 @@ class GroupPlay4Owner extends Extend.Group.Play4Owner<
     const columns = [
       {
         title: '玩家',
-        dataIndex: 'user',
-        key: 'user'
+        dataIndex: 'userName'
+      },
+      {
+        title: '学号',
+        dataIndex: 'stuNum'
       },
       {
         title: '编号',
@@ -86,7 +89,8 @@ class GroupPlay4Owner extends Extend.Group.Play4Owner<
                   } = rounds[i]
                   const { caseIndex, success, award } = result
                   return {
-                    user: user.stuNum,
+                    userName: user.name,
+                    stuNum: user.stuNum,
                     playerIndex: index + 1,
                     T,
                     preference: (preference ? preference.map(c => (c === Choice.A ? 'A' : 'B')) : []).join('>'),
