@@ -40,7 +40,6 @@ function RoundPlay({
     leftMarket: ['已离开市场', 'Left market'],
     beingOwnedByYou: ['被你持有', 'Being owned by you'],
     wait4Others: ['等待其它玩家提交......'],
-    leave: ['不参与', "Don't Participate in"],
     submit: ['提交', 'Submit'],
     roundOver1: ['您已完成本轮实验'],
     roundOver2: ['初始分配到的物品为'],
@@ -138,9 +137,6 @@ function RoundPlay({
           setData={data => setSort(data.map(({ key }) => key))}
         />
         <div className={style.btnsWrapper}>
-          {initAllocation[playerIndex] === null ? null : (
-            <Button onClick={() => frameEmitter.emit(MoveType.submit, { sort: [] })}>{lang.leave}</Button>
-          )}
           <Button type={'primary'} onClick={() => frameEmitter.emit(MoveType.submit, { sort })}>
             {lang.submit}
           </Button>
