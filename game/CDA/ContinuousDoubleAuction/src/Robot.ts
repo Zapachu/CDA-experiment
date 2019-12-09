@@ -1,4 +1,4 @@
-import { GameStatus, Log, Model, redisClient } from '@bespoke/server'
+import { GameStatus, Model, redisClient } from '@bespoke/server'
 import { BaseRobot } from '@bespoke/robot'
 import {
   AdjustDirection,
@@ -417,7 +417,8 @@ class GDRobot extends CDARobot {
   getExpectationCurve(): [GameState.IOrder[], ICurveFragment[]] {
     const {
         gameState: { orders, gamePhaseIndex },
-        gamePhaseState: { trades }
+        gamePhaseState: { trades, buyOrderIds, sellOrderIds },
+        orderDict
       } = this,
       recentTrades = trades.slice(-5),
       recentReqOrders = recentTrades.map(({ reqId }) => reqId),
@@ -471,7 +472,14 @@ class GDRobot extends CDARobot {
           }
         }
       }
-      const y = this.position.role === ROLE.Seller ? (TA + B) / (TA + B + a - ta) : (tb + a) / (tb + a + B - TB)
+      const y =
+        this.position.role === ROLE.Seller
+          ? sellOrderIds[0] && price >= orderDict[sellOrderIds[0]].price
+            ? 0
+            : (TA + B) / (TA + B + a - ta)
+          : buyOrderIds[0] && price <= orderDict[buyOrderIds[0]].price
+          ? 0
+          : (tb + a) / (tb + a + B - TB)
       anchorPoints.push({ x: price, y })
     })
     anchorPoints = anchorPoints.sort((p1, p2) => p1.x - p2.x)
@@ -554,7 +562,6 @@ class GDRobot extends CDARobot {
       unitIndex: this.unitIndex,
       e
     }
-    Log.d(this.position.role === ROLE.Seller ? 'S' : 'B', this.calcPkg)
     redisClient.incr(RedisKey.robotActionSeq(this.game.id)).then(async seq => {
       const data: RobotCalcLog = {
         seq,
@@ -599,15 +606,12 @@ class GDRobot extends CDARobot {
       calcPkg
     } = this
     if (!calcPkg) {
-      Log.d('No price to submit')
       return
     }
     if (this.calcPkg.unitIndex !== this.unitIndex) {
-      Log.d('Box already traded')
       return
     }
     if (this.wouldBeRejected(this.calcPkg.price)[0]) {
-      Log.d('Reject')
       return
     }
     const data = this.buildRobotSubmitLog(seq, this.calcPkg.price)
