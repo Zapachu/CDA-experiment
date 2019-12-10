@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "outDir": "./lib",
+    "module": "commonjs",
+    "target": "es5",
+    "jsx": "react",
+    "lib": ["esnext", "dom"],
+    "include": ["src"],
+    "noUnusedLocals": true
+  }
+}

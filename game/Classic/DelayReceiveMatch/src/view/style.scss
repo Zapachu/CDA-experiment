@@ -1,55 +1,32 @@
-@import "~@elf/component/lib/public";
+@import '~@elf/component/lib/public';
 
-.groupGuide {
-  display: flex;
-  justify-content: center;
-  margin: 2rem;
-}
-
-.groupPlay {
+.roundPlay {
+  margin: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
 
-  .title {
-    margin: 2rem;
-  }
-
-  .roundPlay {
-    margin: auto;
+  .btnsWrapper {
+    width: 16rem;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    .btnsWrapper {
-      width: 16rem;
-      display: flex;
-      justify-content: space-around;
-      margin: 1rem;
-    }
-  }
-
-  .roundResult {
-    em {
-      font-size: 2rem;
-      padding: .5rem;
-      color: $color-blue;
-    }
-
-    .toNextRound {
-      margin-top: 2rem;
-      display: block;
-      text-align: center;
-      font-size: 1.5rem;
-    }
+    justify-content: space-around;
+    margin: 1rem;
   }
 }
 
-.groupResult {
-  display: flex;
-  justify-content: center;
-  margin: 2rem;
-  font-size: 1.5rem;
+.roundResult {
+  em {
+    font-size: 2rem;
+    padding: 0.5rem;
+    color: $color-blue;
+  }
+
+  .toNextRound {
+    margin-top: 2rem;
+    display: block;
+    text-align: center;
+    font-size: 1.5rem;
+  }
 }
 
 .groupResult4Owner {

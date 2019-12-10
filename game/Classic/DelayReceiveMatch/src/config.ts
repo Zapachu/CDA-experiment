@@ -10,8 +10,8 @@ export enum FetchRoute {
 }
 
 export enum MoveType {
-  guideDone,
-  submit
+  guideDone = 'guideDone',
+  submit = 'submit'
 }
 
 export enum PushType {}
