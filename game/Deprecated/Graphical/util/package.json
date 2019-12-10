@@ -1,9 +1,0 @@
-{
-  "name": "@bespoke-game/graphical-util",
-  "version": "1.0.0",
-  "main": "lib/index",
-  "types": "lib/index",
-  "devDependencies": {
-    "ts-node": "^8.0.3"
-  }
-}

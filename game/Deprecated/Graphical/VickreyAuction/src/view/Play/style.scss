@@ -1,9 +1,0 @@
-@import "~@elf/component/lib/public";
-
-.play {
-  width: calc(99vh - 2rem);
-  margin: 2rem auto 0;
-  @media (max-width: $layout-mediaWidth) {
-    width: 100%;
-  }
-}
