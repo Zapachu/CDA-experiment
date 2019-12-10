@@ -1,16 +1,5 @@
 import { FrameEmitter, IUserWithId } from "@bespoke/share";
 
-export const GroupRange = {
-  group: {
-    min: 1,
-    max: 12
-  },
-  groupSize: {
-    min: 1,
-    max: 12
-  }
-};
-
 export namespace GroupDecorator {
   export enum GroupMoveType {
     getGroup = "getGroup"
@@ -75,6 +64,12 @@ export namespace RoundDecorator {
   }
 
   export type MoveType<MoveType> = MoveType | RoundMoveType;
+
+  export interface ICreateParams<IRoundCreateParams> {
+    round: number;
+    roundTime: number;
+    roundsParams: IRoundCreateParams[];
+  }
 
   export interface IGameState<IRoundGameState> {
     round: number;

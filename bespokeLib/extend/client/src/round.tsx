@@ -1,11 +1,21 @@
 import * as React from "react";
 import { RoundDecorator } from "@extend/share";
 import { Group } from "./group";
+import { Core } from "@bespoke/client";
 import { Button } from "antd";
 import { Lang, MaskLoading } from "@elf/component";
 import * as style from "./style.scss";
 
 export namespace Round {
+  export interface ICreateProps<IRoundCreateParams>
+    extends Group.ICreateProps<
+      RoundDecorator.ICreateParams<IRoundCreateParams>
+    > {
+    roundIndex?: number;
+    roundParams: IRoundCreateParams;
+    setRoundParams: Core.TSetCreateParams<IRoundCreateParams>;
+  }
+
   export interface IPlayProps<
     IGroupCreateParams,
     IRoundGameState,
@@ -27,6 +37,11 @@ export namespace Round {
     roundGameState: IRoundGameState;
     roundPlayerState: IRoundPlayerState;
   }
+
+  export class Create<IRoundCreateParams, S = {}> extends React.Component<
+    ICreateProps<IRoundCreateParams>,
+    S
+  > {}
 
   export class Play<
     IGroupCreateParams,

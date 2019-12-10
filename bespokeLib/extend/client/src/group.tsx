@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Core } from "@bespoke/client";
-import { GroupDecorator, GroupRange } from "@extend/share";
+import { GroupDecorator } from "@extend/share";
 import { Col, InputNumber, Row, Spin, Switch, Tabs } from "antd";
 import { Label, Lang, MaskLoading } from "@elf/component";
 import { FrameEmitter } from "@bespoke/share";
@@ -188,6 +188,15 @@ export class Create<
   GroupDecorator.ICreateParams<Core.TCreateParams<IGroupCreateParams>>,
   S
 > {
+  static readonly GROUP_RANGE = {
+    min: 1,
+    max: 12
+  };
+  static readonly GROUP_SIZE_RANGE = {
+    min: 1,
+    max: 12
+  };
+
   GroupCreate: React.ComponentType<Group.ICreateProps<IGroupCreateParams>> =
     Group.Create;
 
@@ -232,9 +241,12 @@ export class Create<
       props: { setParams }
     } = this;
     const initParams: GroupDecorator.ICreateParams<IGroupCreateParams> = {
-      group: ~~((GroupRange.group.max + GroupRange.group.min) >> 1),
-      groupSize: ~~((GroupRange.groupSize.max + GroupRange.groupSize.min) >> 1),
-      groupsParams: Array(GroupRange.group.max)
+      group: ~~((Create.GROUP_RANGE.max + Create.GROUP_RANGE.min) >> 1),
+      groupSize: ~~(
+        (Create.GROUP_SIZE_RANGE.max + Create.GROUP_SIZE_RANGE.min) >>
+        1
+      ),
+      groupsParams: Array(Create.GROUP_RANGE.max)
         .fill(null)
         .map(() => ({} as any))
     };
@@ -258,7 +270,7 @@ export class Create<
             <div>
               <Label label={lang.group} />
               <InputNumber
-                {...GroupRange.group}
+                {...Create.GROUP_RANGE}
                 value={params.group}
                 onChange={value => setParams({ group: +value })}
               />
@@ -266,7 +278,7 @@ export class Create<
             <div>
               <Label label={lang.groupSize} />
               <InputNumber
-                {...GroupRange.groupSize}
+                {...Create.GROUP_SIZE_RANGE}
                 value={params.groupSize}
                 onChange={value => setParams({ groupSize: +value })}
               />
