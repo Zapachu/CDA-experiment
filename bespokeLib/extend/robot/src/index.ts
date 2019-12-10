@@ -1,1 +1,3 @@
-export * from './Robot'
+import * as Group from "./group";
+
+export { Group };

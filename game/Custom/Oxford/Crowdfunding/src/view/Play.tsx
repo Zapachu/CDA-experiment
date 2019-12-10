@@ -1,5 +1,5 @@
 import * as React from 'react'
-import * as Extend from '@extend/client'
+import { Group } from '@extend/client'
 import * as style from './style.scss'
 import { Button, Card, Col, Input, InputNumber, Modal, Popover, Row } from 'antd'
 import {
@@ -138,7 +138,7 @@ function Project({
 function Instruction({
   groupFrameEmitter,
   playerState
-}: Extend.Group.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {
+}: Group.Group.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {
   const [username, setUsername] = React.useState('')
   return (
     <section className={style.instruction}>
@@ -172,7 +172,7 @@ function Contribute({
   groupParams: { endowment },
   groupGameState: { contribution },
   playerState: { index, projectSort, arm, treatment }
-}: Extend.Group.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {
+}: Group.Group.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {
   const [helpModal, setHelpModal] = React.useState(false),
     [statisticsIndex, setStatisticsIndex] = React.useState(
       treatment === Treatment.Statistics ? projectConfigs.length - 1 : -1
@@ -251,7 +251,7 @@ function Contribute({
 function Questionnaire({
   groupFrameEmitter,
   playerState
-}: Extend.Group.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {
+}: Group.Group.IPlayProps<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>) {
   return (
     <section className={style.questionnaire}>
       <p>
@@ -268,7 +268,7 @@ function Questionnaire({
   )
 }
 
-class GroupPlay extends Extend.Group.Play<
+class GroupPlay extends Group.Group.Play<
   ICreateParams,
   IGameState,
   IPlayerState,
@@ -302,7 +302,7 @@ class GroupPlay extends Extend.Group.Play<
   }
 }
 
-export class Play extends Extend.Play<
+export class Play extends Group.Play<
   ICreateParams,
   IGameState,
   IPlayerState,

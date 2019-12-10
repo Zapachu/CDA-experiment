@@ -1,10 +1,10 @@
-import * as Extend from '@extend/server'
+import { Group } from '@extend/server'
 import { IActor, IMoveCallback, IUserWithId } from '@bespoke/share'
 import { Log } from '@elf/util'
 import { ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, MoveType, PushType } from './config'
 import { GroupDecorator } from '@extend/share'
 
-class GroupLogic extends Extend.Group.Logic<
+class GroupLogic extends Group.Group.Logic<
   ICreateParams,
   IGameState,
   IPlayerState,
@@ -45,7 +45,7 @@ class GroupLogic extends Extend.Group.Logic<
   }
 }
 
-export class Logic extends Extend.Logic<
+export class Logic extends Group.Logic<
   ICreateParams,
   IGameState,
   IPlayerState,

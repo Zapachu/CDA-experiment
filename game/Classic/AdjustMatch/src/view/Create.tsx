@@ -1,10 +1,10 @@
 import * as React from 'react'
-import * as Extend from '@extend/client'
+import { Group } from '@extend/client'
 import { Label, Lang } from '@elf/component'
 import { Col, InputNumber, Row } from 'antd'
 import { ICreateParams } from '../config'
 
-class GroupCreate extends Extend.Group.Create<ICreateParams> {
+class GroupCreate extends Group.Group.Create<ICreateParams> {
   lang = Lang.extractLang({
     round: ['轮次(r)', 'Round(r)'],
     oldPlayer: ['旧参与者(m)', 'OldPlayer(m)'],
@@ -71,6 +71,6 @@ class GroupCreate extends Extend.Group.Create<ICreateParams> {
   }
 }
 
-export class Create extends Extend.Create<ICreateParams> {
+export class Create extends Group.Create<ICreateParams> {
   GroupCreate = GroupCreate
 }

@@ -1,4 +1,4 @@
-import * as Extend from '@extend/server'
+import { Group } from '@extend/server'
 import { IActor, IMoveCallback, IUserWithId } from '@bespoke/share'
 import { GroupDecorator } from '@extend/share'
 import { Model } from '@bespoke/server'
@@ -19,7 +19,7 @@ import {
   TRange
 } from './config'
 
-class GroupLogic extends Extend.Group.Logic<
+class GroupLogic extends Group.Group.Logic<
   ICreateParams,
   IGameState,
   IPlayerState,
@@ -160,7 +160,7 @@ class GroupLogic extends Extend.Group.Logic<
   }
 }
 
-export class Logic extends Extend.Logic<
+export class Logic extends Group.Logic<
   ICreateParams,
   IGameState,
   IPlayerState,

@@ -1,9 +1,9 @@
 import * as React from 'react'
-import * as Extend from '@extend/client'
+import { Group } from '@extend/client'
 import { InputNumber } from 'antd'
 import { ICreateParams } from '../config'
 
-class GroupCreate extends Extend.Group.Create<ICreateParams> {
+class GroupCreate extends Group.Group.Create<ICreateParams> {
   componentDidMount(): void {
     const {
       props: { setGroupParams }
@@ -22,6 +22,6 @@ class GroupCreate extends Extend.Group.Create<ICreateParams> {
   }
 }
 
-export class Create extends Extend.Create<ICreateParams> {
+export class Create extends Group.Create<ICreateParams> {
   GroupCreate = GroupCreate
 }

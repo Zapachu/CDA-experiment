@@ -1,5 +1,5 @@
 import * as React from 'react'
-import * as Extend from '@extend/client'
+import { Group } from '@extend/client'
 import { Button, Radio } from 'antd'
 import * as style from './style.scss'
 import {
@@ -126,7 +126,7 @@ function RoundPlay({
   }
 }
 
-class GroupPlay extends Extend.Group.Play<
+class GroupPlay extends Group.Group.Play<
   ICreateParams,
   IGameState,
   IPlayerState,
@@ -188,7 +188,7 @@ class GroupPlay extends Extend.Group.Play<
   }
 }
 
-export class Play extends Extend.Play<
+export class Play extends Group.Play<
   ICreateParams,
   IGameState,
   IPlayerState,

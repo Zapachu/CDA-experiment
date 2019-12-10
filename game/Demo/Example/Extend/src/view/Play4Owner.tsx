@@ -1,9 +1,9 @@
 import * as React from 'react'
-import * as Extend from '@extend/client'
+import { Group } from '@extend/client'
 import { Button } from 'antd'
 import { ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, MoveType, PushType } from '../config'
 
-class GroupPlay4Owner extends Extend.Group.Play4Owner<
+class GroupPlay4Owner extends Group.Group.Play4Owner<
   ICreateParams,
   IGameState,
   IPlayerState,
@@ -26,7 +26,7 @@ class GroupPlay4Owner extends Extend.Group.Play4Owner<
   }
 }
 
-export class Play4Owner extends Extend.Play4Owner<
+export class Play4Owner extends Group.Play4Owner<
   ICreateParams,
   IGameState,
   IPlayerState,

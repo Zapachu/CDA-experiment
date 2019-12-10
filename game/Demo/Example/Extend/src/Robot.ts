@@ -1,7 +1,7 @@
-import * as Extend from '@extend/robot'
+import { Group } from '@extend/robot'
 import { ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, MoveType, PushType } from './config'
 
-export class GroupRobot extends Extend.Group.Robot<
+export class GroupRobot extends Group.Group.Robot<
   ICreateParams,
   IGameState,
   IPlayerState,
@@ -17,7 +17,7 @@ export class GroupRobot extends Extend.Group.Robot<
   }
 }
 
-export class Robot extends Extend.Robot<
+export class Robot extends Group.Robot<
   ICreateParams,
   IGameState,
   IPlayerState,
