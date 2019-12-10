@@ -45,7 +45,7 @@ function RoundPlay({
     roundOver1: ['您已完成本轮实验'],
     roundOver3: ['其价值为'],
     roundOver4: ['最终分配到的物品为'],
-    toNextRound: ['即将进入下一轮...'],
+    toNextRound: ['等待进入下一轮...'],
     preference: ['偏好'],
     preferNo: [n => `第${n}喜欢`]
   })

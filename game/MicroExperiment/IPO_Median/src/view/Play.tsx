@@ -126,7 +126,7 @@ export const getPlay = (IPOTypeConfig: IPOTypeConfig) => ({
         />
         <TableInfo dataList={dataList} style={{ margin: '30px auto' }} />
         {gameState.round < CONFIG.round - 1 ? (
-          <Loading label={'即将进入下一轮'} />
+          <Loading label={'等待进入下一轮'} />
         ) : (
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <Button

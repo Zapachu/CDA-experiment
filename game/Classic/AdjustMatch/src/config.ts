@@ -11,7 +11,7 @@ export enum FetchRoute {
 
 export enum MoveType {
   guideDone,
-  oldPlayerDecide,
+  overPrePlay,
   submit
 }
 
@@ -40,6 +40,7 @@ export enum GoodStatus {
 export interface IGameRoundState {
   timeLeft: number
   initAllocation: number[]
+  overPrePlay: boolean[]
   allocation: number[]
   goodStatus: GoodStatus[]
 }

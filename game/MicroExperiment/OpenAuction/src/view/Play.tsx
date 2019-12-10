@@ -278,7 +278,7 @@ function Result({
           </div>
         </>
       ) : (
-        <Loading label={'即将进入下一轮'} />
+        <Loading label={'等待进入下一轮'} />
       )}
     </section>
   )

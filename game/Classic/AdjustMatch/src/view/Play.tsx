@@ -32,14 +32,15 @@ function RoundPlay({
   playerIndex: number
 }) {
   const lang = Lang.extractLang({
-    dragPlease: ['请拖拽下方物品列表进行偏好表达'],
+    yourSeq: ['您的优先序为'],
+    dragPlease: ['，请拖拽下方物品列表进行偏好表达'],
     goodNo: ['物品', 'Good'],
     privateValue: ['心理价值', 'Private Value'],
     goodStatus: ['物品状态', 'Good Status'],
     leftMarket: ['已离开市场', 'Left market'],
     beingOwned: ['被持有', 'Being owned'],
     beingOwnedByYou: ['被你持有', 'Being owned by you'],
-    wait4OldPlayers: ['等待老参与者决定是否参与交换......'],
+    wait4OldPlayers: ['等待旧租户决定是否参与交换......'],
     wait4Others: ['等待其它玩家提交......'],
     join: ['参与'],
     leave: ['不参与'],
@@ -48,13 +49,19 @@ function RoundPlay({
     roundOver2: ['初始分配到的物品为'],
     roundOver3: ['其价值为'],
     roundOver4: ['最终分配到的物品为'],
-    toNextRound: ['即将进入下一轮...'],
+    toNextRound: ['等待进入下一轮...'],
     preference: ['偏好'],
-    preferNo: [n => `第${n}喜欢`]
+    preferNo: [n => `第${n}喜欢`],
+    yourRole: ['您本轮的身份为'],
+    oldPlayer: ['旧租户'],
+    newPlayer: ['新租户']
   })
   const { goodStatus, initAllocation, allocation } = gameRoundState,
     { privatePrices, status } = playerRoundState
-  const [sort, setSort] = React.useState(privatePrices.map((_, i) => i))
+  const colStyle: React.CSSProperties = {
+    minWidth: '6rem',
+    maxWidth: '12rem'
+  }
   switch (status) {
     case PlayerRoundStatus.prePlay:
       return <PrePlay />
@@ -87,12 +94,14 @@ function RoundPlay({
   }
 
   function PrePlay() {
-    const colStyle: React.CSSProperties = {
-      minWidth: '6rem',
-      maxWidth: '12rem'
-    }
     return (
       <section className={style.roundPlay}>
+        <label style={{ marginBottom: '1rem' }}>
+          {lang.yourRole}
+          <em style={{ padding: '.5rem', fontSize: '1.5rem' }}>
+            {initAllocation[playerIndex] === null ? lang.newPlayer : lang.oldPlayer}
+          </em>
+        </label>
         <Table
           size="middle"
           pagination={false}
@@ -128,7 +137,7 @@ function RoundPlay({
               )
             }
           ]}
-          dataSource={sort.map(i => ({
+          dataSource={goodStatus.map((_, i) => ({
             key: i,
             price: privatePrices[i],
             goodStatus: goodStatus[i],
@@ -140,8 +149,8 @@ function RoundPlay({
             lang.wait4OldPlayers
           ) : (
             <>
-              <Button onClick={() => frameEmitter.emit(MoveType.oldPlayerDecide, { join: false })}>{lang.leave}</Button>
-              <Button onClick={() => frameEmitter.emit(MoveType.oldPlayerDecide, { join: true })} type={'primary'}>
+              <Button onClick={() => frameEmitter.emit(MoveType.overPrePlay, { join: false })}>{lang.leave}</Button>
+              <Button onClick={() => frameEmitter.emit(MoveType.overPrePlay, { join: true })} type={'primary'}>
                 {lang.join}
               </Button>
             </>
@@ -152,13 +161,24 @@ function RoundPlay({
   }
 
   function Play() {
-    const colStyle: React.CSSProperties = {
-      minWidth: '6rem',
-      maxWidth: '12rem'
-    }
+    const sortableGoods = [],
+      leftGoods = []
+    goodStatus.forEach((s, i) => (s === GoodStatus.left ? leftGoods : sortableGoods).push(i))
+    const [sort, setSort] = React.useState(sortableGoods)
     return (
       <section className={style.roundPlay}>
-        <label style={{ marginBottom: '1rem' }}>{lang.dragPlease}</label>
+        <label style={{ marginBottom: '1rem' }}>
+          {lang.yourSeq}
+          <em
+            style={{
+              padding: '.5rem',
+              fontSize: '1.5rem'
+            }}
+          >
+            {playerIndex + 1 - allocation.filter((s, i) => s !== null && i < playerIndex).length}
+          </em>
+          {lang.dragPlease}
+        </label>{' '}
         <DragTable
           columns={[
             {
@@ -207,9 +227,6 @@ function RoundPlay({
           setData={data => setSort(data.map(({ key }) => key))}
         />
         <div className={style.btnsWrapper}>
-          {initAllocation[playerIndex] === null ? null : (
-            <Button onClick={() => frameEmitter.emit(MoveType.submit, { sort: [] })}>{lang.leave}</Button>
-          )}
           <Button type={'primary'} onClick={() => frameEmitter.emit(MoveType.submit, { sort })}>
             {lang.submit}
           </Button>
@@ -234,6 +251,10 @@ class GroupPlay extends Extend.Group.Play<
     wait4OtherPlayers: ['等待其它玩家加入......'],
     gameOver: ['所有轮次结束，等待老师关闭实验']
   })
+
+  componentDidMount(): void {
+    window.setTimeout(() => this.props.groupFrameEmitter.emit(MoveType.guideDone), 1e3)
+  }
 
   render(): React.ReactNode {
     const {

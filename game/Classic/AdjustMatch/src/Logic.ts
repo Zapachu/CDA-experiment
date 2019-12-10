@@ -51,14 +51,17 @@ export class GroupLogic extends Extend.Group.Logic<
     const gameState = await this.stateManager.getGameState(),
       playerStates = await this.stateManager.getPlayerStates()
     gameState.round = r
-    const goodStatus = shuffle([
-      ...Array(oldPlayer).fill(GoodStatus.old),
-      ...Array(this.groupSize - oldPlayer).fill(GoodStatus.new)
-    ])
+    const goodStatus = [
+        ...Array(oldPlayer).fill(GoodStatus.old),
+        ...Array(this.groupSize - oldPlayer).fill(GoodStatus.new)
+      ],
+      initAllocation = shuffle(goodStatus.map((s, i) => (s === GoodStatus.new ? null : i)))
+
     gameState.rounds[r] = {
       timeLeft: CONFIG.tradeSeconds,
       goodStatus,
-      initAllocation: shuffle(goodStatus.map((s, i) => (s === GoodStatus.new ? null : i))),
+      initAllocation,
+      overPrePlay: initAllocation.map(a => a === null),
       allocation: []
     }
     Object.values(playerStates).forEach(
@@ -143,20 +146,41 @@ export class GroupLogic extends Extend.Group.Logic<
       playerRoundState = playerState.rounds[round]
     switch (type) {
       case MoveType.guideDone: {
+        if (playerState.status === PlayerStatus.round) {
+          break
+        }
         playerState.status = PlayerStatus.round
         if (playerStatesArr.length === groupSize && playerStatesArr.every(p => p.status === PlayerStatus.round)) {
           this.startRound(0)
         }
         break
       }
-      case MoveType.submit: {
-        playerRoundState.status = PlayerRoundStatus.wait
-        playerRoundState.sort = params.sort
-        if (params.sort.length === 0) {
-          const { goodStatus, initAllocation } = gameRoundState
-          goodStatus[initAllocation[playerState.index]] = GoodStatus.left
+      case MoveType.overPrePlay: {
+        const { goodStatus, initAllocation, allocation, overPrePlay } = gameRoundState
+        overPrePlay[playerState.index] = true
+        if (params.join) {
+          playerRoundState.status = PlayerRoundStatus.play
+        } else {
+          const initGood = initAllocation[playerState.index]
+          goodStatus[initGood] = GoodStatus.left
+          allocation[playerState.index] = initGood
+          playerRoundState.status = PlayerRoundStatus.result
         }
-        if (playerRoundStates.every(p => p.status === PlayerRoundStatus.wait)) {
+        if (overPrePlay.every(o => o)) {
+          for (let s of playerRoundStates) {
+            if (s.status === PlayerRoundStatus.prePlay) {
+              s.status = PlayerRoundStatus.play
+            }
+          }
+        }
+        break
+      }
+      case MoveType.submit: {
+        playerRoundState.sort = params.sort
+        playerRoundState.status = PlayerRoundStatus.wait
+        if (
+          playerRoundStates.every(p => p.status === PlayerRoundStatus.wait || p.status === PlayerRoundStatus.result)
+        ) {
           this.roundOver()
         }
         break
