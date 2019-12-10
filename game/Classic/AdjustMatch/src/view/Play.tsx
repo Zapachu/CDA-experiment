@@ -252,10 +252,6 @@ class GroupPlay extends Extend.Group.Play<
     gameOver: ['所有轮次结束，等待老师关闭实验']
   })
 
-  componentDidMount(): void {
-    window.setTimeout(() => this.props.groupFrameEmitter.emit(MoveType.guideDone), 1e3)
-  }
-
   render(): React.ReactNode {
     const {
       lang,
