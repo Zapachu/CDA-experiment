@@ -32,11 +32,6 @@ class GroupPlay4Owner extends Extend.Group.Play4Owner<
         dataIndex: 'stuNum'
       },
       {
-        title: '优先序',
-        dataIndex: 'playerIndex',
-        key: 'playerIndex'
-      },
-      {
         title: '初始物品编号',
         dataIndex: 'initGood',
         key: 'initGood'
