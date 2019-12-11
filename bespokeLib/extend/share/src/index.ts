@@ -76,8 +76,8 @@ export namespace RoundDecorator {
     rounds: IRoundGameState[];
   }
 
-  export type TPlayerState<IPlayerRoundState> = IPlayerRoundState & {
+  export interface IPlayerState<IPlayerRoundState> {
     status: PlayerStatus;
     rounds: IPlayerRoundState[];
-  };
+  }
 }

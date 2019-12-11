@@ -1,14 +1,14 @@
 import * as React from 'react'
-import { Group } from '@extend/client'
+import { Group, Round } from '@extend/client'
 import { Label, Lang } from '@elf/component'
 import { Col, InputNumber, Row } from 'antd'
-import { ICreateParams } from '../config'
+import { IRoundCreateParams } from '../config'
+import { RoundDecorator } from '@extend/share'
 
 const maxGoodAmount = 12
 
-class GroupCreate extends Group.Group.Create<ICreateParams> {
+class RoundCreate extends Round.Round.Create<IRoundCreateParams> {
   lang = Lang.extractLang({
-    round: ['轮次(r)', 'Round(r)'],
     goodAmount: ['物品数量(M)', 'OldPlayer(M)'],
     minPrivateValue: ['最低心理价值(v1)', 'MinPrivateValue(v1)'],
     maxPrivateValue: ['最高心理价值(v2)', 'MaxPrivateValue(v2)']
@@ -16,10 +16,9 @@ class GroupCreate extends Group.Group.Create<ICreateParams> {
 
   componentDidMount(): void {
     const {
-      props: { setGroupParams }
+      props: { setRoundParams }
     } = this
-    setGroupParams({
-      round: 3,
+    setRoundParams({
       goodAmount: ~~(maxGoodAmount >> 1),
       minPrivateValue: 25,
       maxPrivateValue: 75
@@ -29,8 +28,8 @@ class GroupCreate extends Group.Group.Create<ICreateParams> {
   render() {
     const {
       props: {
-        groupParams: { round, goodAmount, minPrivateValue, maxPrivateValue },
-        setGroupParams
+        roundParams: { goodAmount, minPrivateValue, maxPrivateValue },
+        setRoundParams
       },
       lang
     } = this
@@ -38,20 +37,16 @@ class GroupCreate extends Group.Group.Create<ICreateParams> {
       <Row>
         <Col span={12} offset={6}>
           <div>
-            <Label label={lang.round} />
-            <InputNumber value={round} onChange={v => setGroupParams({ round: +v })} max={6} />
-          </div>
-          <div>
             <Label label={lang.goodAmount} />
-            <InputNumber value={goodAmount} onChange={v => setGroupParams({ goodAmount: +v })} max={maxGoodAmount} />
+            <InputNumber value={goodAmount} onChange={v => setRoundParams({ goodAmount: +v })} max={maxGoodAmount} />
           </div>
           <div>
             <Label label={lang.minPrivateValue} />
-            <InputNumber value={minPrivateValue} onChange={v => setGroupParams({ minPrivateValue: +v })} max={50} />
+            <InputNumber value={minPrivateValue} onChange={v => setRoundParams({ minPrivateValue: +v })} max={50} />
           </div>
           <div>
             <Label label={lang.maxPrivateValue} />
-            <InputNumber value={maxPrivateValue} onChange={v => setGroupParams({ maxPrivateValue: +v })} min={50} />
+            <InputNumber value={maxPrivateValue} onChange={v => setRoundParams({ maxPrivateValue: +v })} min={50} />
           </div>
         </Col>
       </Row>
@@ -59,6 +54,10 @@ class GroupCreate extends Group.Group.Create<ICreateParams> {
   }
 }
 
-export class Create extends Group.Create<ICreateParams> {
+class GroupCreate extends Round.Create<IRoundCreateParams> {
+  RoundCreate = RoundCreate
+}
+
+export class Create extends Group.Create<RoundDecorator.ICreateParams<IRoundCreateParams>> {
   GroupCreate = GroupCreate
 }

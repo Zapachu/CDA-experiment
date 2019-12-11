@@ -42,7 +42,8 @@ export class GroupLogic extends Group.Group.Logic<
   }
 
   async startRound(r: number) {
-    const { round, minPrivateValue, maxPrivateValue } = this.params
+    const { round, roundsParams } = this.params,
+      { minPrivateValue, maxPrivateValue, goodAmount } = roundsParams[round]
     if (r >= round) {
       return
     }
@@ -58,7 +59,7 @@ export class GroupLogic extends Group.Group.Logic<
         (p.rounds[r] = {
           status: PlayerRoundStatus.play,
           sort: [],
-          privatePrices: Array(this.params.goodAmount)
+          privatePrices: Array(goodAmount)
             .fill(null)
             .map(() => ~~(minPrivateValue + Math.random() * (maxPrivateValue - minPrivateValue)))
         })
@@ -127,7 +128,6 @@ export class GroupLogic extends Group.Group.Logic<
     const { gameState, playerStatesArr, playerRoundStates } = await this.getState(),
       playerState = await this.stateManager.getPlayerState(actor),
       { round } = gameState,
-      gameRoundState = gameState.rounds[round],
       playerRoundState = playerState.rounds[round]
     switch (type) {
       case MoveType.guideDone: {

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Core } from "@bespoke/client";
 import { GroupDecorator } from "@extend/share";
-import { Col, InputNumber, Row, Spin, Switch, Tabs } from "antd";
+import { Col, InputNumber, Row, Spin, Switch, Tabs, Tooltip } from "antd";
 import { Label, Lang, MaskLoading } from "@elf/component";
 import { FrameEmitter } from "@bespoke/share";
 
@@ -283,18 +283,20 @@ export class Create<
                 onChange={value => setParams({ groupSize: +value })}
               />
             </div>
-            <div style={{ margin: "1.5rem" }}>
-              <Label label={lang.independentGroup} />
+          </Col>
+        </Row>
+        <Tabs
+          tabBarExtraContent={
+            <Tooltip title={lang.independentGroup}>
               <Switch
                 checked={independentGroup}
                 onChange={independentGroup =>
                   this.setState({ independentGroup })
                 }
               />
-            </div>
-          </Col>
-        </Row>
-        <Tabs>
+            </Tooltip>
+          }
+        >
           {independentGroup ? (
             Array(params.group)
               .fill(null)

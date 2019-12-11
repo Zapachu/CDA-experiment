@@ -1,15 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GroupRange = {
-    group: {
-        min: 1,
-        max: 12
-    },
-    groupSize: {
-        min: 1,
-        max: 12
-    }
-};
 var GroupDecorator;
 (function (GroupDecorator) {
     var GroupMoveType;

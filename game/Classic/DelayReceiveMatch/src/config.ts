@@ -1,3 +1,5 @@
+import { RoundDecorator } from '@extend/share'
+
 export const namespace = 'DelayReceiveMatch'
 
 export const CONFIG = {
@@ -22,8 +24,9 @@ export interface IMoveParams {
 
 export interface IPushParams {}
 
-export interface ICreateParams {
-  round: number
+export type ICreateParams = RoundDecorator.ICreateParams<IRoundCreateParams>
+
+export interface IRoundCreateParams {
   goodAmount: number
   minPrivateValue: number
   maxPrivateValue: number
@@ -34,10 +37,7 @@ export interface IGameRoundState {
   allocation: number[]
 }
 
-export interface IGameState {
-  round: number
-  rounds: IGameRoundState[]
-}
+export type IGameState = RoundDecorator.IGameState<IGameRoundState>
 
 export enum PlayerRoundStatus {
   play,
@@ -57,7 +57,4 @@ export enum PlayerStatus {
   result
 }
 
-export interface IPlayerState {
-  status: PlayerStatus
-  rounds: IPlayerRoundState[]
-}
+export type IPlayerState = RoundDecorator.IPlayerState<IPlayerRoundState>

@@ -10,6 +10,7 @@ import {
   IPlayerRoundState,
   IPlayerState,
   IPushParams,
+  IRoundCreateParams,
   MoveType,
   PlayerRoundStatus,
   PushType
@@ -19,13 +20,13 @@ import { FrameEmitter } from '@bespoke/share'
 import { DragTable } from './component/DragTable'
 
 function RoundPlay({
-  groupParams,
+  roundParams,
   roundPlayerState,
   roundGameState,
   frameEmitter,
   playerIndex
 }: {
-  groupParams: ICreateParams
+  roundParams: IRoundCreateParams
   roundPlayerState: IPlayerRoundState
   roundGameState: IGameRoundState
   frameEmitter: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
@@ -51,7 +52,7 @@ function RoundPlay({
   const { allocation } = roundGameState,
     { privatePrices, status } = roundPlayerState
   const [sort, setSort] = React.useState(
-    Array(groupParams.goodAmount)
+    Array(roundParams.goodAmount)
       .fill(null)
       .map((_, i) => i)
   )
@@ -125,7 +126,7 @@ function RoundPlay({
 }
 
 class RoundPlayWrapper extends Round.Round.Play<
-  ICreateParams,
+  IRoundCreateParams,
   IGameRoundState,
   IPlayerRoundState,
   MoveType,
@@ -134,11 +135,11 @@ class RoundPlayWrapper extends Round.Round.Play<
   IPushParams
 > {
   render() {
-    const { groupParams, roundPlayerState, roundGameState, groupFrameEmitter, playerState } = this.props
+    const { roundParams, roundPlayerState, roundGameState, groupFrameEmitter, playerState } = this.props
     return (
       <RoundPlay
         {...{
-          groupParams,
+          roundParams,
           roundGameState,
           roundPlayerState,
           frameEmitter: groupFrameEmitter,
@@ -150,7 +151,7 @@ class RoundPlayWrapper extends Round.Round.Play<
 }
 
 class GroupPlay extends Round.Play<
-  ICreateParams,
+  IRoundCreateParams,
   IGameRoundState,
   IPlayerRoundState,
   MoveType,
