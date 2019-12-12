@@ -78,6 +78,11 @@ export namespace RoundDecorator {
     roundsParams: IRoundCreateParams[];
   }
 
+  export interface IMoveParams<IMoveParams> {
+    roundIndex: number;
+    params: IMoveParams;
+  }
+
   export interface IGameState<IRoundGameState> {
     round: number;
     rounds: IRoundGameState[];

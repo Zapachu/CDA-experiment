@@ -10,9 +10,9 @@ import { IUserWithId } from "@bespoke/share";
 
 export namespace Group {
   export class StateManager<
-    ICreateParams,
-    IGameState,
-    IPlayerState,
+    IGroupCreateParams,
+    IGroupGameState,
+    IGroupPlayerState,
     MoveType,
     PushType,
     IMoveParams,
@@ -21,9 +21,9 @@ export namespace Group {
     constructor(
       private groupIndex: number,
       private stateManager: BespokeStateManager<
-        ICreateParams,
-        GroupDecorator.IGameState<IGameState>,
-        GroupDecorator.TPlayerState<IPlayerState>,
+        GroupDecorator.ICreateParams<IGroupCreateParams>,
+        GroupDecorator.IGameState<IGroupGameState>,
+        GroupDecorator.TPlayerState<IGroupPlayerState>,
         MoveType,
         PushType,
         IMoveParams,
@@ -32,28 +32,29 @@ export namespace Group {
     ) {}
 
     async getPlayerState(
-      actor: IActor
-    ): Promise<GroupDecorator.TPlayerState<IPlayerState>> {
-      return await this.stateManager.getPlayerState(actor);
+      index: number
+    ): Promise<GroupDecorator.TPlayerState<IGroupPlayerState>> {
+      const playerStates = await this.getPlayerStates();
+      return playerStates[index];
     }
 
-    async getGameState(): Promise<IGameState> {
+    async getGameState(): Promise<IGroupGameState> {
       const { groups } = await this.stateManager.getGameState();
       return groups[this.groupIndex].state;
     }
 
-    async getPlayerStates(): Promise<{
-      [token: string]: GroupDecorator.TPlayerState<IPlayerState>;
-    }> {
-      const playerStates = {};
+    async getPlayerStates(): Promise<
+      GroupDecorator.TPlayerState<IGroupPlayerState>[]
+    > {
+      const playerStates: GroupDecorator.TPlayerState<IGroupPlayerState>[] = [];
       Object.values(
         await this.stateManager.getPlayerStates()
       ).forEach(playerState =>
         playerState.groupIndex === this.groupIndex
-          ? (playerStates[playerState.actor.token] = playerState)
+          ? (playerStates[playerState.index] = playerState)
           : null
       );
-      return playerStates;
+      return playerStates.sort((p1, p2) => p1.index - p2.index);
     }
 
     async syncState() {
@@ -62,9 +63,9 @@ export namespace Group {
   }
 
   export class Logic<
-    ICreateParams,
-    IGameState,
-    IPlayerState,
+    IGroupCreateParams,
+    IGroupGameState,
+    IGroupPlayerState,
     MoveType,
     PushType,
     IMoveParams,
@@ -74,11 +75,11 @@ export namespace Group {
       protected gameId: string,
       protected groupIndex: number,
       protected groupSize: number,
-      protected params: ICreateParams,
+      protected params: IGroupCreateParams,
       protected stateManager: StateManager<
-        ICreateParams,
-        IGameState,
-        IPlayerState,
+        IGroupCreateParams,
+        IGroupGameState,
+        IGroupPlayerState,
         MoveType,
         PushType,
         IMoveParams,
@@ -86,29 +87,34 @@ export namespace Group {
       >
     ) {}
 
-    initGameState(): IGameState {
+    init(): this {
+      return this;
+    }
+
+    initGameState(): IGroupGameState {
       return {} as any;
     }
 
     async initPlayerState(
       user: IUserWithId,
+      groupIndex: number,
       index: number
-    ): Promise<GroupDecorator.TPlayerState<IPlayerState>> {
+    ): Promise<GroupDecorator.TPlayerState<IGroupPlayerState>> {
       return {
         user,
+        groupIndex,
         index
       } as any;
     }
 
     async teacherMoveReducer(
-      actor: IActor,
       type: MoveType,
       params: IMoveParams,
       cb: IMoveCallback
     ): Promise<void> {}
 
     async playerMoveReducer(
-      actor: IActor,
+      index: number,
       type: MoveType,
       params: IMoveParams,
       cb: IMoveCallback
@@ -117,17 +123,17 @@ export namespace Group {
 }
 
 export class Logic<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupPlayerState,
   MoveType,
   PushType,
   IMoveParams,
   IPushParams
 > extends BaseLogic<
-  GroupDecorator.ICreateParams<ICreateParams>,
-  GroupDecorator.IGameState<IGameState>,
-  GroupDecorator.TPlayerState<IPlayerState>,
+  GroupDecorator.ICreateParams<IGroupCreateParams>,
+  GroupDecorator.IGameState<IGroupGameState>,
+  GroupDecorator.TPlayerState<IGroupPlayerState>,
   GroupDecorator.MoveType<MoveType>,
   PushType,
   GroupDecorator.IMoveParams<IMoveParams>,
@@ -137,20 +143,20 @@ export class Logic<
     gameId: string,
     groupIndex: number,
     groupSize: number,
-    params: ICreateParams,
+    params: IGroupCreateParams,
     stateManager: Group.StateManager<
-      ICreateParams,
-      IGameState,
-      IPlayerState,
+      IGroupCreateParams,
+      IGroupGameState,
+      IGroupPlayerState,
       MoveType,
       PushType,
       IMoveParams,
       IPushParams
     >
   ) => Group.Logic<
-    ICreateParams,
-    IGameState,
-    IPlayerState,
+    IGroupCreateParams,
+    IGroupGameState,
+    IGroupPlayerState,
     MoveType,
     PushType,
     IMoveParams,
@@ -158,17 +164,17 @@ export class Logic<
   >;
 
   groupsLogic: Group.Logic<
-    ICreateParams,
-    IGameState,
-    IPlayerState,
+    IGroupCreateParams,
+    IGroupGameState,
+    IGroupPlayerState,
     MoveType,
     PushType,
     IMoveParams,
     IPushParams
   >[];
 
-  async init(): Promise<this> {
-    await super.init();
+  init(): this {
+    super.init();
     const {
       game: {
         id,
@@ -177,28 +183,27 @@ export class Logic<
     } = this;
     this.groupsLogic = Array(group)
       .fill(null)
-      .map(
-        (_, i) =>
-          new this.GroupLogic(
-            id,
-            i,
-            groupSize,
-            groupsParams[i],
-            new Group.StateManager<
-              ICreateParams,
-              IGameState,
-              IPlayerState,
-              MoveType,
-              PushType,
-              IMoveParams,
-              IPushParams
-            >(i, this.stateManager)
-          )
+      .map((_, i) =>
+        new this.GroupLogic(
+          id,
+          i,
+          groupSize,
+          groupsParams[i],
+          new Group.StateManager<
+            IGroupCreateParams,
+            IGroupGameState,
+            IGroupPlayerState,
+            MoveType,
+            PushType,
+            IMoveParams,
+            IPushParams
+          >(i, this.stateManager)
+        ).init()
       );
     return this;
   }
 
-  initGameState(): TGameState<GroupDecorator.IGameState<IGameState>> {
+  initGameState(): TGameState<GroupDecorator.IGameState<IGroupGameState>> {
     const gameState = super.initGameState();
     gameState.groups = Array(this.game.params.group)
       .fill(null)
@@ -209,22 +214,20 @@ export class Logic<
     return gameState;
   }
 
-  protected async teacherMoveReducer(
+  async teacherMoveReducer(
     actor: IActor,
     type: GroupDecorator.MoveType<MoveType>,
     params: GroupDecorator.IMoveParams<IMoveParams>,
     cb: IMoveCallback
   ): Promise<void> {
     await this.groupsLogic[params.groupIndex].teacherMoveReducer(
-      actor,
       type as MoveType,
       params.params,
       cb
     );
-    this.startRobot(Math.random());
   }
 
-  protected async playerMoveReducer(
+  async playerMoveReducer(
     actor: IActor,
     type: GroupDecorator.MoveType<MoveType>,
     params: GroupDecorator.IMoveParams<IMoveParams>,
@@ -243,18 +246,18 @@ export class Logic<
       if (groupIndex === -1) {
         return;
       }
-      playerState.groupIndex = groupIndex;
       Object.assign(
         playerState,
         await this.groupsLogic[groupIndex].initPlayerState(
           playerState.user,
+          groupIndex,
           gameState.groups[groupIndex].playerNum++
         )
       );
       await this.stateManager.syncState();
     } else {
       await this.groupsLogic[params.groupIndex].playerMoveReducer(
-        actor,
+        playerState.index,
         type,
         params.params,
         cb

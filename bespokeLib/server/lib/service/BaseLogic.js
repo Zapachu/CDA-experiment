@@ -56,33 +56,25 @@ var BaseLogic = /** @class */ (function () {
     };
     BaseLogic.getLogic = function (gameId) {
         return __awaiter(this, void 0, void 0, function () {
-            var game, _a, _b, _c;
-            return __generator(this, function (_d) {
-                switch (_d.label) {
+            var game;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
                     case 0:
-                        if (!!this.controllers.get(gameId)) return [3 /*break*/, 3];
+                        if (!!this.controllers.get(gameId)) return [3 /*break*/, 2];
                         return [4 /*yield*/, GameDAO_1.GameDAO.getGame(gameId)];
                     case 1:
-                        game = _d.sent();
-                        _b = (_a = this.controllers).set;
-                        _c = [gameId];
-                        return [4 /*yield*/, new this.Controller(game).init()];
-                    case 2:
-                        _b.apply(_a, _c.concat([_d.sent()]));
-                        _d.label = 3;
-                    case 3: return [2 /*return*/, this.controllers.get(gameId)];
+                        game = _a.sent();
+                        this.controllers.set(gameId, new this.Controller(game).init());
+                        _a.label = 2;
+                    case 2: return [2 /*return*/, this.controllers.get(gameId)];
                 }
             });
         });
     };
     BaseLogic.prototype.init = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                this.stateManager = new StateManager_1.StateManager(BaseLogic.sncStrategy, this);
-                this.moveQueue = new MoveQueue_1.MoveQueue(this.game, this.stateManager);
-                return [2 /*return*/, this];
-            });
-        });
+        this.stateManager = new StateManager_1.StateManager(BaseLogic.sncStrategy, this);
+        this.moveQueue = new MoveQueue_1.MoveQueue(this.game, this.stateManager);
+        return this;
     };
     BaseLogic.prototype.getGame4Player = function () {
         return this.game;

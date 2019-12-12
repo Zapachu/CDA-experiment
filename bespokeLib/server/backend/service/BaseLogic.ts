@@ -33,7 +33,7 @@ export class BaseLogic<ICreateParams, IGameState, IPlayerState, MoveType, PushTy
     static async getLogic(gameId: string): Promise<AnyLogic> {
         if (!this.controllers.get(gameId)) {
             const game = await GameDAO.getGame(gameId)
-            this.controllers.set(gameId, await new this.Controller(game).init())
+            this.controllers.set(gameId, new this.Controller(game).init())
         }
         return this.controllers.get(gameId)
     }
@@ -45,7 +45,7 @@ export class BaseLogic<ICreateParams, IGameState, IPlayerState, MoveType, PushTy
     constructor(public game?: IGameWithId<ICreateParams>) {
     }
 
-    async init() {
+    init():this {
         this.stateManager = new StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>(BaseLogic.sncStrategy, this)
         this.moveQueue = new MoveQueue(this.game, this.stateManager)
         return this

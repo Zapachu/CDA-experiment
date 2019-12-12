@@ -27,8 +27,8 @@ export default class Controller extends BaseController<
   private Test: Array<any>
 
   //region init
-  async init() {
-    await super.init()
+  init() {
+    super.init()
     switch (this.game.params.gameType) {
       case GameType.T1: {
         this.Test = Test1

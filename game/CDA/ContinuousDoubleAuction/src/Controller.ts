@@ -58,8 +58,8 @@ export default class Controller extends BaseController<
   //endregion
 
   //region init
-  async init() {
-    await super.init()
+  init() {
+    super.init()
     const { positions } = this.game.params.phases[0].params
     const player = [],
       robot = []

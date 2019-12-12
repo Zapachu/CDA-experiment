@@ -55,8 +55,12 @@ class GroupLogic extends Group.Group.Logic<
     return gameState
   }
 
-  async initPlayerState(user: IUserWithId, index: number): Promise<GroupDecorator.TPlayerState<IPlayerState>> {
-    const playerState = await super.initPlayerState(user, index)
+  async initPlayerState(
+    user: IUserWithId,
+    groupIndex: number,
+    index: number
+  ): Promise<GroupDecorator.TPlayerState<IPlayerState>> {
+    const playerState = await super.initPlayerState(user, groupIndex, index)
     playerState.status = PlayerStatus.guide
     playerState.rounds = []
     return playerState
@@ -153,9 +157,9 @@ class GroupLogic extends Group.Group.Logic<
     })
   }
 
-  async playerMoveReducer(actor: IActor, type: MoveType, params: IMoveParams, cb: IMoveCallback): Promise<void> {
+  async playerMoveReducer(index: number, type: MoveType, params: IMoveParams, cb: IMoveCallback): Promise<void> {
     const { groupSize } = this
-    const playerState = await this.stateManager.getPlayerState(actor),
+    const playerState = await this.stateManager.getPlayerState(index),
       { gameState, playerStatesArr, playerRoundStates } = await this.getState(),
       { round } = gameState,
       playerRoundState = playerState.rounds[round]

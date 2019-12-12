@@ -13,7 +13,7 @@ export declare class BaseLogic<ICreateParams, IGameState, IPlayerState, MoveType
     connections: Map<string, IConnection>;
     stateManager: StateManager<ICreateParams, IGameState, IPlayerState, MoveType, PushType, IMoveParams, IPushParams>;
     constructor(game?: IGameWithId<ICreateParams>);
-    init(): Promise<this>;
+    init(): this;
     getGame4Player(): IGameWithId<ICreateParams>;
     initGameState(): TGameState<IGameState>;
     filterGameState(gameState: TGameState<IGameState>): any;
