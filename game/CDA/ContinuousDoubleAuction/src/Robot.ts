@@ -377,7 +377,10 @@ interface ICalcPkg {
 class GDRobot extends CDARobot {
   alpha = 0.95
   beta = 250e3
-  defaultSleepTime = 5e3
+  sleepRange = {
+    min: 1e3,
+    max: 5e3
+  }
 
   async init(): Promise<this> {
     await super.init()
@@ -533,7 +536,7 @@ class GDRobot extends CDARobot {
 
   calc(): ICalcPkg {
     const calcPkg: ICalcPkg = {
-      sleepTime: this.defaultSleepTime
+      sleepTime: this.sleepRange.max
     }
     const {
       beta,
@@ -559,10 +562,11 @@ class GDRobot extends CDARobot {
         calcPkg.price = price
         calcPkg.unitIndex = this.unitIndex
         calcPkg.e = +e.toFixed(2)
-        calcPkg.sleepTime = ~~(
+        const sleepTime = ~~(
           ((beta * (1 - (alpha * this.periodCountDown) / this.phaseParams.durationOfEachPeriod)) / calcPkg.e) *
           Math.log(1 / Math.random())
         )
+        calcPkg.sleepTime = Math.min(this.sleepRange.max, Math.max(this.sleepRange.min, sleepTime))
       }
     }
     redisClient.incr(RedisKey.robotActionSeq(this.game.id)).then(async seq => {
