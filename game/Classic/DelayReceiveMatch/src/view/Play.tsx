@@ -3,17 +3,19 @@ import { Group, Round } from '@extend/client'
 import { Button } from 'antd'
 import * as style from './style.scss'
 import {
-  ICreateParams,
-  IGameRoundState,
-  IGameState,
-  IMoveParams,
-  IPlayerRoundState,
-  IPlayerState,
+  GroupMoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupMoveParams,
+  IGroupPlayerState,
   IPushParams,
   IRoundCreateParams,
-  MoveType,
+  IRoundGameState,
+  IRoundMoveParams,
+  IRoundPlayerState,
   PlayerRoundStatus,
-  PushType
+  PushType,
+  RoundMoveType
 } from '../config'
 import { Lang, MaskLoading } from '@elf/component'
 import { FrameEmitter } from '@bespoke/share'
@@ -23,13 +25,13 @@ function RoundPlay({
   roundParams,
   roundPlayerState,
   roundGameState,
-  frameEmitter,
+  roundFrameEmitter,
   playerIndex
 }: {
   roundParams: IRoundCreateParams
-  roundPlayerState: IPlayerRoundState
-  roundGameState: IGameRoundState
-  frameEmitter: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
+  roundPlayerState: IRoundPlayerState
+  roundGameState: IRoundGameState
+  roundFrameEmitter: FrameEmitter<RoundMoveType, PushType, IRoundMoveParams, IPushParams>
   playerIndex: number
 }) {
   const lang = Lang.extractLang({
@@ -116,7 +118,7 @@ function RoundPlay({
           setData={data => setSort(data.map(({ key }) => key))}
         />
         <div className={style.btnsWrapper}>
-          <Button type={'primary'} onClick={() => frameEmitter.emit(MoveType.submit, { sort })}>
+          <Button type={'primary'} onClick={() => roundFrameEmitter.emit(RoundMoveType.submit, { sort })}>
             {lang.submit}
           </Button>
         </div>
@@ -127,22 +129,22 @@ function RoundPlay({
 
 class RoundPlayWrapper extends Round.Round.Play<
   IRoundCreateParams,
-  IGameRoundState,
-  IPlayerRoundState,
-  MoveType,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
   PushType,
-  IMoveParams,
+  IRoundMoveParams,
   IPushParams
 > {
   render() {
-    const { roundParams, roundPlayerState, roundGameState, groupFrameEmitter, playerState } = this.props
+    const { roundParams, roundPlayerState, roundGameState, roundFrameEmitter, playerState } = this.props
     return (
       <RoundPlay
         {...{
           roundParams,
           roundGameState,
           roundPlayerState,
-          frameEmitter: groupFrameEmitter,
+          roundFrameEmitter,
           playerIndex: playerState.index
         }}
       />
@@ -152,23 +154,23 @@ class RoundPlayWrapper extends Round.Round.Play<
 
 class GroupPlay extends Round.Play<
   IRoundCreateParams,
-  IGameRoundState,
-  IPlayerRoundState,
-  MoveType,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
   PushType,
-  IMoveParams,
+  IRoundMoveParams,
   IPushParams
 > {
   RoundPlay = RoundPlayWrapper
 }
 
 export class Play extends Group.Play<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupPlayerState,
+  GroupMoveType,
   PushType,
-  IMoveParams,
+  IGroupMoveParams,
   IPushParams
 > {
   GroupPlay = GroupPlay
