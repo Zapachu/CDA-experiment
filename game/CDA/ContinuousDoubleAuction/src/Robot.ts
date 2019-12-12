@@ -367,14 +367,17 @@ interface ICurveFragment {
   curve: (price: number) => number
 }
 
+interface ICalcPkg {
+  unitIndex?: number
+  price?: number
+  e?: number
+  sleepTime: number
+}
+
 class GDRobot extends CDARobot {
   alpha = 0.95
   beta = 250e3
-  calcPkg: {
-    unitIndex: number
-    price: number
-    e: number
-  } = null
+  defaultSleepTime = 5e3
 
   async init(): Promise<this> {
     await super.init()
@@ -391,19 +394,15 @@ class GDRobot extends CDARobot {
     if (!playing) {
       return
     }
-    this.calc()
-    const { alpha, beta, calcPkg } = this,
-      sleepTime =
-        calcPkg && calcPkg.e
-          ? ((beta * (1 - (alpha * this.periodCountDown) / this.phaseParams.durationOfEachPeriod)) / calcPkg.e) *
-            Math.log(1 / Math.random())
-          : 5e3
+    const calcPkg = this.calc()
     setTimeout(() => {
       redisClient.incr(RedisKey.robotActionSeq(this.game.id)).then(seq => {
-        this.submitOrder(seq)
+        if (calcPkg.price !== undefined) {
+          this.submitOrder(seq, calcPkg)
+        }
         this.sleepLoop()
       })
-    }, ~~sleepTime)
+    }, calcPkg.sleepTime)
   }
 
   getM() {
@@ -411,7 +410,7 @@ class GDRobot extends CDARobot {
     for (const price of this.unitPrices) {
       price > M ? (M = price) : null
     }
-    return Math.pow(2, 1.5 + ~~Math.log2(M))
+    return ~~Math.pow(2, 1.5 + ~~Math.log2(M))
   }
 
   getExpectationCurve(): [GameState.IOrder[], ICurveFragment[]] {
@@ -532,9 +531,13 @@ class GDRobot extends CDARobot {
     }
   }
 
-  calc() {
-    this.calcPkg = null
+  calc(): ICalcPkg {
+    const calcPkg: ICalcPkg = {
+      sleepTime: this.defaultSleepTime
+    }
     const {
+      beta,
+      alpha,
       gamePhaseState: { sellOrderIds, buyOrderIds },
       orderDict
     } = this
@@ -550,17 +553,17 @@ class GDRobot extends CDARobot {
       f = buyOrderIds[0] ? orderDict[buyOrderIds[0]].price : curves[0].from
       t = this.unitPrice
     }
-    if (f >= t) {
-      return
-    }
-    const { price, e } = this.getCurvesTopPoint(curves, f, t, price => (price - this.unitPrice) * profitSign)
-    if (e === 0) {
-      return
-    }
-    this.calcPkg = {
-      price,
-      unitIndex: this.unitIndex,
-      e
+    if (f < t) {
+      const { price, e } = this.getCurvesTopPoint(curves, f, t, price => (price - this.unitPrice) * profitSign)
+      if (e > 0) {
+        calcPkg.price = price
+        calcPkg.unitIndex = this.unitIndex
+        calcPkg.e = +e.toFixed(2)
+        calcPkg.sleepTime = ~~(
+          ((beta * (1 - (alpha * this.periodCountDown) / this.phaseParams.durationOfEachPeriod)) / calcPkg.e) *
+          Math.log(1 / Math.random())
+        )
+      }
     }
     redisClient.incr(RedisKey.robotActionSeq(this.game.id)).then(async seq => {
       const data: RobotCalcLog = {
@@ -581,16 +584,16 @@ class GDRobot extends CDARobot {
                 }, price:${price}`
             )
             .join('/'),
-        beta: '',
-        p: '',
-        delta: '',
-        r: '',
-        LagGamma: '',
-        Gamma: '',
-        ValueCost: this.unitPrice,
-        u: '',
-        CalculatedPrice: price,
-        timestamp: dateFormat(Date.now(), 'HH:MM:ss:l')
+        beta: `PrivateCost:${this.unitPrice}`,
+        p: `Price:${calcPkg.price || '---'}`,
+        delta: `E:${calcPkg.e || '---'}`,
+        r: `Sleep:${calcPkg.sleepTime}`,
+        LagGamma: `Time:${dateFormat(Date.now(), 'HH:MM:ss:l')}`,
+        Gamma: ``,
+        ValueCost: ``,
+        u: ``,
+        CalculatedPrice: ``,
+        timestamp: ``
       }
       await new Model.FreeStyleModel({
         game: this.game.id,
@@ -598,23 +601,23 @@ class GDRobot extends CDARobot {
         data
       }).save()
     })
+    return calcPkg
   }
 
-  submitOrder(seq: number): void {
+  submitOrder(seq: number, calcPkg: ICalcPkg): void {
     const {
-      gameState: { gamePhaseIndex },
-      calcPkg
+      gameState: { gamePhaseIndex }
     } = this
     if (!calcPkg) {
       return
     }
-    if (this.calcPkg.unitIndex !== this.unitIndex) {
+    if (calcPkg.unitIndex !== this.unitIndex) {
       return
     }
-    if (this.wouldBeRejected(this.calcPkg.price)[0]) {
+    if (this.wouldBeRejected(calcPkg.price)[0]) {
       return
     }
-    const data = this.buildRobotSubmitLog(seq, this.calcPkg.price)
+    const data = this.buildRobotSubmitLog(seq, calcPkg.price)
     this.frameEmitter.emit(
       MoveType.submitOrder,
       {
