@@ -74,7 +74,6 @@ export namespace RoundDecorator {
 
   export interface ICreateParams<IRoundCreateParams> {
     round: number;
-    roundTime: number;
     roundsParams: IRoundCreateParams[];
   }
 

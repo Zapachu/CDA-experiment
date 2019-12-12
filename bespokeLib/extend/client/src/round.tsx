@@ -79,7 +79,6 @@ export class Create<IRoundCreateParams,
 
   lang = Lang.extractLang({
     round: ['轮数', 'Round'],
-    roundTime: ['每轮时长', 'RoundTime'],
     roundConfiguration: ['每轮参数', 'RoundConfiguration'],
     configAll: ['统一设置'],
     configIndependent: ['独立设置'],
@@ -120,10 +119,6 @@ export class Create<IRoundCreateParams,
     }
     const initParams: RoundDecorator.ICreateParams<IRoundCreateParams> = {
       round: ~~((Create.ROUND_RANGE.max + Create.ROUND_RANGE.min) >> 1),
-      roundTime: ~~(
-        (Create.ROUND_TIME_RANGE.max + Create.ROUND_TIME_RANGE.min) >>
-        1
-      ),
       roundsParams: Array(Create.ROUND_RANGE.max)
         .fill(null)
         .map(() => ({} as any))
@@ -149,13 +144,6 @@ export class Create<IRoundCreateParams,
             {...Create.ROUND_RANGE}
             value={groupParams.round}
             onChange={value => setGroupParams({ round: +value })}
-          />
-          &nbsp;&nbsp;&nbsp;
-          <Label label={lang.roundTime}/>
-          <InputNumber
-            {...Create.ROUND_TIME_RANGE}
-            value={groupParams.roundTime}
-            onChange={value => setGroupParams({ roundTime: +value })}
           />
           &nbsp;&nbsp;&nbsp;
           <Label label={lang.roundConfiguration}/>
