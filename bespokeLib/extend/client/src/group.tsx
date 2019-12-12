@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Core } from "@bespoke/client";
 import { GroupDecorator } from "@extend/share";
-import { Col, InputNumber, Row, Spin, Switch, Tabs, Tooltip } from "antd";
+import { InputNumber, Radio, Row, Spin, Tabs } from "antd";
 import { Label, Lang, MaskLoading } from "@elf/component";
 import { FrameEmitter } from "@bespoke/share";
 
@@ -205,11 +205,17 @@ export class Create<
   } as S;
 
   lang = Lang.extractLang({
-    group: ["组", "Group"],
+    group: ["组数", "Group"],
     groupSize: ["每组人数", "GroupSize"],
-    independentGroup: ["每组单独配置", "Independent Group"],
+    groupConfiguration: ["每组参数", "GroupConfiguration"],
+    configAll: ["统一设置"],
+    configIndependent: ["独立设置"],
     allGroup: ["所有组", "AllGroup"],
-    groupIndex: [i => `第${i + 1}组`, i => `Group ${i + 1}`]
+    groupIndex: [i => `第${i + 1}组`, i => `Group ${i + 1}`],
+    history: ["历史记录"],
+    hide: ["不显示"],
+    selfOnly: ["仅显示自己"],
+    showAll: ["显示所有人"]
   });
 
   setParams<P>(
@@ -246,6 +252,7 @@ export class Create<
         (Create.GROUP_SIZE_RANGE.max + Create.GROUP_SIZE_RANGE.min) >>
         1
       ),
+      showHistory: GroupDecorator.ShowHistory.hide,
       groupsParams: Array(Create.GROUP_RANGE.max)
         .fill(null)
         .map(() => ({} as any))
@@ -266,37 +273,50 @@ export class Create<
     return (
       <div>
         <Row>
-          <Col span={12} offset={6}>
-            <div>
-              <Label label={lang.group} />
-              <InputNumber
-                {...Create.GROUP_RANGE}
-                value={params.group}
-                onChange={value => setParams({ group: +value })}
-              />
-            </div>
-            <div>
-              <Label label={lang.groupSize} />
-              <InputNumber
-                {...Create.GROUP_SIZE_RANGE}
-                value={params.groupSize}
-                onChange={value => setParams({ groupSize: +value })}
-              />
-            </div>
-          </Col>
+          <Label label={lang.history} />
+          <Radio.Group
+            value={params.showHistory}
+            onChange={({ target: { value } }) =>
+              setParams({ showHistory: value })
+            }
+          >
+            <Radio value={GroupDecorator.ShowHistory.hide}>{lang.hide}</Radio>
+            <Radio value={GroupDecorator.ShowHistory.selfOnly}>
+              {lang.selfOnly}
+            </Radio>
+            <Radio value={GroupDecorator.ShowHistory.showAll}>
+              {lang.showAll}
+            </Radio>
+          </Radio.Group>
         </Row>
-        <Tabs
-          tabBarExtraContent={
-            <Tooltip title={lang.independentGroup}>
-              <Switch
-                checked={independentGroup}
-                onChange={independentGroup =>
-                  this.setState({ independentGroup })
-                }
-              />
-            </Tooltip>
-          }
-        >
+        <br />
+        <Row>
+          <Label label={lang.group} />
+          <InputNumber
+            {...Create.GROUP_RANGE}
+            value={params.group}
+            onChange={value => setParams({ group: +value })}
+          />
+          &nbsp;&nbsp;&nbsp;
+          <Label label={lang.groupSize} />
+          <InputNumber
+            {...Create.GROUP_SIZE_RANGE}
+            value={params.groupSize}
+            onChange={value => setParams({ groupSize: +value })}
+          />
+          &nbsp;&nbsp;&nbsp;
+          <Label label={lang.groupConfiguration} />
+          <Radio.Group
+            value={independentGroup}
+            onChange={({ target: { value } }) =>
+              this.setState({ independentGroup: value })
+            }
+          >
+            <Radio value={false}>{lang.configAll}</Radio>
+            <Radio value={true}>{lang.configIndependent}</Radio>
+          </Radio.Group>
+        </Row>
+        <Tabs>
           {independentGroup ? (
             Array(params.group)
               .fill(null)

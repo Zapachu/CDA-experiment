@@ -6,6 +6,12 @@ var GroupDecorator;
     (function (GroupMoveType) {
         GroupMoveType["getGroup"] = "getGroup";
     })(GroupMoveType = GroupDecorator.GroupMoveType || (GroupDecorator.GroupMoveType = {}));
+    var ShowHistory;
+    (function (ShowHistory) {
+        ShowHistory[ShowHistory["hide"] = 0] = "hide";
+        ShowHistory[ShowHistory["selfOnly"] = 1] = "selfOnly";
+        ShowHistory[ShowHistory["showAll"] = 2] = "showAll";
+    })(ShowHistory = GroupDecorator.ShowHistory || (GroupDecorator.ShowHistory = {}));
     function groupFrameEmitter(frameEmitter, groupIndex) {
         var f = Object.create(frameEmitter);
         f.emit = function (moveType, params, cb) {

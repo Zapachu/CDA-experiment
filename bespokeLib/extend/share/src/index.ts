@@ -5,11 +5,18 @@ export namespace GroupDecorator {
     getGroup = "getGroup"
   }
 
+  export enum ShowHistory {
+    hide,
+    selfOnly,
+    showAll
+  }
+
   export type MoveType<MoveType> = MoveType | GroupMoveType;
 
   export interface ICreateParams<IGroupCreateParams> {
     group: number;
     groupSize: number;
+    showHistory: ShowHistory;
     groupsParams: IGroupCreateParams[];
   }
 
