@@ -72,7 +72,7 @@ export namespace Round {
         IMoveParams,
         IPushParams
       >,
-      protected overCallback: () => void
+      protected overCallback: () => Promise<void>
     ) {}
 
     initGameState(): IRoundGameState {
@@ -122,7 +122,7 @@ export class Logic<
       IRoundMoveParams,
       IPushParams
     >,
-    overCallback: () => void
+    overCallback: () => Promise<void>
   ) => Round.Logic<
     IRoundCreateParams,
     IRoundGameState,
@@ -166,7 +166,10 @@ export class Logic<
               IRoundMoveParams,
               IPushParams
             >(i, this.stateManager),
-            () => this.startRound(i + 1)
+            async () => {
+              await this.roundOverCallback();
+              await this.startRound(i + 1);
+            }
           )
       );
     return this;
@@ -227,6 +230,8 @@ export class Logic<
     }
   }
 
+  async roundOverCallback() {}
+
   async startRound(r: number) {
     const { round } = this.params;
     if (r < round) {
@@ -238,5 +243,6 @@ export class Logic<
         p => (p.status = RoundDecorator.PlayerStatus.result)
       );
     }
+    await this.stateManager.syncState();
   }
 }

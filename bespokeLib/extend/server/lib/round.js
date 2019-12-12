@@ -158,7 +158,19 @@ var Logic = /** @class */ (function (_super) {
         this.roundsLogic = Array(round)
             .fill(null)
             .map(function (_, i) {
-            return new _this.RoundLogic(groupIndex, i, roundsParams[i], new Round.StateManager(i, _this.stateManager), function () { return _this.startRound(i + 1); });
+            return new _this.RoundLogic(groupIndex, i, roundsParams[i], new Round.StateManager(i, _this.stateManager), function () { return __awaiter(_this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.roundOverCallback()];
+                        case 1:
+                            _a.sent();
+                            return [4 /*yield*/, this.startRound(i + 1)];
+                        case 2:
+                            _a.sent();
+                            return [2 /*return*/];
+                    }
+                });
+            }); });
         });
         return this;
     };
@@ -229,6 +241,11 @@ var Logic = /** @class */ (function (_super) {
             });
         });
     };
+    Logic.prototype.roundOverCallback = function () {
+        return __awaiter(this, void 0, void 0, function () { return __generator(this, function (_a) {
+            return [2 /*return*/];
+        }); });
+    };
     Logic.prototype.startRound = function (r) {
         return __awaiter(this, void 0, void 0, function () {
             var round, gameState, playerStates;
@@ -247,7 +264,10 @@ var Logic = /** @class */ (function (_super) {
                         playerStates = _a.sent();
                         playerStates.forEach(function (p) { return (p.status = share_1.RoundDecorator.PlayerStatus.result); });
                         _a.label = 4;
-                    case 4: return [2 /*return*/];
+                    case 4: return [4 /*yield*/, this.stateManager.syncState()];
+                    case 5:
+                        _a.sent();
+                        return [2 /*return*/];
                 }
             });
         });
