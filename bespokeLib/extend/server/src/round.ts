@@ -60,7 +60,7 @@ export namespace Round {
     IPushParams
   > {
     constructor(
-      protected groupIndex: string,
+      protected groupIndex: number,
       protected roundIndex: number,
       protected params: IRoundCreateParams,
       protected stateManager: StateManager<
@@ -83,12 +83,6 @@ export namespace Round {
       return {} as any;
     }
 
-    async teacherMoveReducer(
-      type: MoveType,
-      params: IMoveParams,
-      cb: IMoveCallback
-    ): Promise<void> {}
-
     async playerMoveReducer(
       index: number,
       type: MoveType,
@@ -102,17 +96,17 @@ export class Logic<
   IRoundCreateParams,
   IRoundGameState,
   IRoundPlayerState,
-  MoveType,
+  RoundMoveType,
   PushType,
-  IMoveParams,
+  IRoundMoveParams,
   IPushParams
 > extends Group.Logic<
   RoundDecorator.ICreateParams<IRoundCreateParams>,
   RoundDecorator.IGameState<IRoundGameState>,
   RoundDecorator.IPlayerState<IRoundPlayerState>,
-  RoundDecorator.MoveType<MoveType>,
+  RoundDecorator.TMoveType<RoundMoveType>,
   PushType,
-  RoundDecorator.IMoveParams<IMoveParams>,
+  RoundDecorator.IMoveParams<IRoundMoveParams>,
   IPushParams
 > {
   RoundLogic: new (
@@ -123,9 +117,9 @@ export class Logic<
       IRoundCreateParams,
       IRoundGameState,
       IRoundPlayerState,
-      MoveType,
+      RoundMoveType,
       PushType,
-      IMoveParams,
+      IRoundMoveParams,
       IPushParams
     >,
     overCallback: () => void
@@ -133,9 +127,9 @@ export class Logic<
     IRoundCreateParams,
     IRoundGameState,
     IRoundPlayerState,
-    MoveType,
+    RoundMoveType,
     PushType,
-    IMoveParams,
+    IRoundMoveParams,
     IPushParams
   >;
 
@@ -143,9 +137,9 @@ export class Logic<
     IRoundCreateParams,
     IRoundGameState,
     IRoundPlayerState,
-    MoveType,
+    RoundMoveType,
     PushType,
-    IMoveParams,
+    IRoundMoveParams,
     IPushParams
   >[];
 
@@ -167,9 +161,9 @@ export class Logic<
               IRoundCreateParams,
               IRoundGameState,
               IRoundPlayerState,
-              MoveType,
+              RoundMoveType,
               PushType,
-              IMoveParams,
+              IRoundMoveParams,
               IPushParams
             >(i, this.stateManager),
             () => this.startRound(i + 1)
@@ -204,14 +198,14 @@ export class Logic<
 
   async playerMoveReducer(
     index: number,
-    type: RoundDecorator.MoveType<MoveType>,
-    params: RoundDecorator.IMoveParams<IMoveParams>,
+    type: RoundDecorator.TMoveType<RoundMoveType>,
+    params: RoundDecorator.IMoveParams<IRoundMoveParams>,
     cb: IMoveCallback
   ): Promise<void> {
     const { groupSize } = this,
       playerState = await this.stateManager.getPlayerState(index),
       playerStates = await this.stateManager.getPlayerStates();
-    if (type === RoundDecorator.RoundMoveType.guideDone) {
+    if (type === RoundDecorator.MoveType.guideDone) {
       {
         playerState.status = RoundDecorator.PlayerStatus.round;
         if (

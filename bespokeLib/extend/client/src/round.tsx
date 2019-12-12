@@ -1,90 +1,113 @@
-import * as React from 'react'
-import { RoundDecorator } from '@extend/share'
-import { Group } from './group'
-import { Core } from '@bespoke/client'
-import { Button, InputNumber, Radio, Row, Spin, Tabs } from 'antd'
-import { Label, Lang, MaskLoading } from '@elf/component'
-import * as style from './style.scss'
+import * as React from "react";
+import { RoundDecorator } from "@extend/share";
+import { Group } from "./group";
+import { Core } from "@bespoke/client";
+import { Button, InputNumber, Radio, Row, Spin, Tabs } from "antd";
+import { Label, Lang, MaskLoading } from "@elf/component";
+import * as style from "./style.scss";
+import { FrameEmitter } from "@bespoke/share";
 
 export namespace Round {
   export interface ICreateProps<IRoundCreateParams>
-    extends Group.ICreateProps<RoundDecorator.ICreateParams<IRoundCreateParams>> {
+    extends Group.ICreateProps<
+      RoundDecorator.ICreateParams<IRoundCreateParams>
+    > {
     roundIndex?: number;
     roundParams: IRoundCreateParams;
     setRoundParams: Core.TSetCreateParams<IRoundCreateParams>;
   }
 
-  export interface IPlayProps<IRoundCreateParams,
+  export interface IPlayProps<
+    IRoundCreateParams,
     IRoundGameState,
     IRoundPlayerState,
-    MoveType,
+    RoundMoveType,
     PushType,
-    IMoveParams,
-    IPushParams>
-    extends Group.IPlayProps<RoundDecorator.ICreateParams<IRoundCreateParams>,
+    IRoundMoveParams,
+    IPushParams
+  >
+    extends Group.IPlayProps<
+      RoundDecorator.ICreateParams<IRoundCreateParams>,
       RoundDecorator.IGameState<IRoundGameState>,
       RoundDecorator.IPlayerState<IRoundPlayerState>,
-      RoundDecorator.MoveType<MoveType>,
+      RoundDecorator.TMoveType<RoundMoveType>,
       PushType,
-      IMoveParams,
-      IPushParams> {
+      RoundDecorator.IMoveParams<IRoundMoveParams>,
+      IPushParams
+    > {
     roundParams: IRoundCreateParams;
     roundGameState: IRoundGameState;
     roundPlayerState: IRoundPlayerState;
+    roundFrameEmitter: FrameEmitter<
+      RoundMoveType,
+      PushType,
+      IRoundMoveParams,
+      IPushParams
+    >;
   }
 
-  export class Create<IRoundCreateParams, S = {}> extends React.Component<ICreateProps<IRoundCreateParams>,
-    S> {
-  }
+  export class Create<IRoundCreateParams, S = {}> extends React.Component<
+    ICreateProps<IRoundCreateParams>,
+    S
+  > {}
 
-  export class Play<IRoundCreateParams,
+  export class Play<
+    IRoundCreateParams,
     IRoundGameState,
     IRoundPlayerState,
     MoveType,
     PushType,
     IMoveParams,
     IPushParams,
-    S = {}> extends React.Component<IPlayProps<IRoundCreateParams,
-    IRoundGameState,
-    IRoundPlayerState,
-    MoveType,
-    PushType,
-    IMoveParams,
-    IPushParams>> {
-  }
+    S = {}
+  > extends React.Component<
+    IPlayProps<
+      IRoundCreateParams,
+      IRoundGameState,
+      IRoundPlayerState,
+      MoveType,
+      PushType,
+      IMoveParams,
+      IPushParams
+    >
+  > {}
 }
 
 interface ICreateState {
   independentRound: boolean;
 }
 
-export class Create<IRoundCreateParams,
-  S extends ICreateState = ICreateState> extends Group.Create<RoundDecorator.ICreateParams<Core.TCreateParams<IRoundCreateParams>>,
-  S> {
+export class Create<
+  IRoundCreateParams,
+  S extends ICreateState = ICreateState
+> extends Group.Create<
+  RoundDecorator.ICreateParams<Core.TCreateParams<IRoundCreateParams>>,
+  S
+> {
   static readonly ROUND_RANGE = {
     min: 1,
     max: 12
-  }
+  };
   static readonly ROUND_TIME_RANGE = {
     min: 60,
     max: 120
-  }
+  };
 
   RoundCreate: React.ComponentType<Round.ICreateProps<IRoundCreateParams>> =
-    Round.Create
+    Round.Create;
 
   state: S = {
     independentRound: false
-  } as S
+  } as S;
 
   lang = Lang.extractLang({
-    round: ['轮数', 'Round'],
-    roundConfiguration: ['每轮参数', 'RoundConfiguration'],
-    configAll: ['统一设置'],
-    configIndependent: ['独立设置'],
-    allRound: ['所有轮', 'AllRound'],
+    round: ["轮数", "Round"],
+    roundConfiguration: ["每轮参数", "RoundConfiguration"],
+    configAll: ["统一设置"],
+    configIndependent: ["独立设置"],
+    allRound: ["所有轮", "AllRound"],
     roundIndex: [i => `第${i + 1}轮`, i => `Round ${i + 1}`]
-  })
+  });
 
   setParams<P>(
     setParams: Core.TSetCreateParams<RoundDecorator.ICreateParams<P>>,
@@ -92,38 +115,38 @@ export class Create<IRoundCreateParams,
   ): Core.TSetCreateParams<P> {
     return (action: React.SetStateAction<P>) =>
       setParams(prevParams => {
-        const i = roundIndex || 0
+        const i = roundIndex || 0;
         const roundsParams = prevParams.roundsParams.slice(),
-          prevRoundParams = roundsParams[i]
+          prevRoundParams = roundsParams[i];
         roundsParams[i] = {
           ...prevRoundParams,
-          ...(typeof action === 'function'
+          ...(typeof action === "function"
             ? (action as (prevState: P) => P)(prevRoundParams)
             : action)
-        }
+        };
         if (roundIndex === undefined) {
           for (let j = 0; j < roundsParams.length; j++) {
-            roundsParams[j] = { ...roundsParams[0] }
+            roundsParams[j] = { ...roundsParams[0] };
           }
         }
-        return { roundsParams }
-      })
+        return { roundsParams };
+      });
   }
 
   componentDidMount(): void {
     const {
       props: { groupParams, setGroupParams }
-    } = this
+    } = this;
     if (groupParams.roundsParams) {
-      return
+      return;
     }
     const initParams: RoundDecorator.ICreateParams<IRoundCreateParams> = {
       round: ~~((Create.ROUND_RANGE.max + Create.ROUND_RANGE.min) >> 1),
       roundsParams: Array(Create.ROUND_RANGE.max)
         .fill(null)
         .map(() => ({} as any))
-    }
-    setGroupParams(initParams)
+    };
+    setGroupParams(initParams);
   }
 
   render(): React.ReactNode {
@@ -132,21 +155,21 @@ export class Create<IRoundCreateParams,
         props,
         state: { independentRound }
       } = this,
-      { groupParams, setGroupParams } = props
+      { groupParams, setGroupParams } = props;
     if (!groupParams.roundsParams) {
-      return <Spin/>
+      return <Spin />;
     }
     return (
       <div>
         <Row>
-          <Label label={lang.round}/>
+          <Label label={lang.round} />
           <InputNumber
             {...Create.ROUND_RANGE}
             value={groupParams.round}
             onChange={value => setGroupParams({ round: +value })}
           />
           &nbsp;&nbsp;&nbsp;
-          <Label label={lang.roundConfiguration}/>
+          <Label label={lang.roundConfiguration} />
           <Radio.Group
             value={independentRound}
             onChange={({ target: { value } }) =>
@@ -157,7 +180,7 @@ export class Create<IRoundCreateParams,
             <Radio value={true}>{lang.configIndependent}</Radio>
           </Radio.Group>
         </Row>
-        <br/>
+        <br />
         <Tabs tabPosition="left">
           {independentRound ? (
             Array(groupParams.round)
@@ -191,66 +214,74 @@ export class Create<IRoundCreateParams,
           )}
         </Tabs>
       </div>
-    )
+    );
   }
 }
 
-export class Play<IRoundCreateParams,
+export class Play<
+  IRoundCreateParams,
   IRoundGameState,
   IRoundPlayerState,
-  MoveType,
+  RoundMoveType,
   PushType,
-  IMoveParams,
+  IRoundMoveParams,
   IPushParams,
-  S = {}> extends Group.Play<RoundDecorator.ICreateParams<IRoundCreateParams>,
+  S = {}
+> extends Group.Play<
+  RoundDecorator.ICreateParams<IRoundCreateParams>,
   RoundDecorator.IGameState<IRoundGameState>,
   RoundDecorator.IPlayerState<IRoundPlayerState>,
-  RoundDecorator.MoveType<MoveType>,
+  RoundDecorator.TMoveType<RoundMoveType>,
   PushType,
-  IMoveParams,
+  RoundDecorator.IMoveParams<IRoundMoveParams>,
   IPushParams,
-  S> {
-  RoundPlay: React.ComponentType<Round.IPlayProps<IRoundCreateParams,
-    IRoundGameState,
-    IRoundPlayerState,
-    MoveType,
-    PushType,
-    IMoveParams,
-    IPushParams>> = Round.Play
+  S
+> {
+  RoundPlay: React.ComponentType<
+    Round.IPlayProps<
+      IRoundCreateParams,
+      IRoundGameState,
+      IRoundPlayerState,
+      RoundMoveType,
+      PushType,
+      IRoundMoveParams,
+      IPushParams
+    >
+  > = Round.Play;
 
   lang = Lang.extractLang({
-    round1: ['第', 'Round'],
-    round2: ['轮', ''],
-    wait4OtherPlayers: ['等待其它玩家加入......'],
-    gameOver: ['所有轮次结束，等待老师关闭实验']
-  })
+    round1: ["第", "Round"],
+    round2: ["轮", ""],
+    wait4OtherPlayers: ["等待其它玩家加入......"],
+    gameOver: ["所有轮次结束，等待老师关闭实验"]
+  });
 
   render(): React.ReactNode {
     const { lang, props } = this,
-      { playerState, groupParams, groupGameState, groupFrameEmitter } = props
+      { playerState, groupParams, groupGameState, groupFrameEmitter } = props;
     if (playerState.status === RoundDecorator.PlayerStatus.guide) {
       return (
         <section className={style.groupGuide}>
           <Button
             type="primary"
             onClick={() =>
-              groupFrameEmitter.emit(RoundDecorator.RoundMoveType.guideDone)
+              groupFrameEmitter.emit(RoundDecorator.MoveType.guideDone)
             }
           >
             Start
           </Button>
         </section>
-      )
+      );
     }
     if (playerState.status === RoundDecorator.PlayerStatus.result) {
-      return <section className={style.groupResult}>{lang.gameOver}</section>
+      return <section className={style.groupResult}>{lang.gameOver}</section>;
     }
     const { round } = groupGameState,
       roundParams = groupParams.roundsParams[round],
       roundPlayerState = playerState.rounds[round],
-      roundGameState = groupGameState.rounds[round]
+      roundGameState = groupGameState.rounds[round];
     if (!roundPlayerState) {
-      return <MaskLoading label={lang.wait4OtherPlayers}/>
+      return <MaskLoading label={lang.wait4OtherPlayers} />;
     }
     return (
       <section className={style.groupPlay}>
@@ -264,10 +295,14 @@ export class Play<IRoundCreateParams,
           {...{
             roundParams,
             roundGameState,
-            roundPlayerState
+            roundPlayerState,
+            roundFrameEmitter: RoundDecorator.roundFrameEmitter(
+              groupFrameEmitter,
+              round
+            )
           }}
         />
       </section>
-    )
+    );
   }
 }

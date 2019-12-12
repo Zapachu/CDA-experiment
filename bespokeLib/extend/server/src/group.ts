@@ -126,17 +126,17 @@ export class Logic<
   IGroupCreateParams,
   IGroupGameState,
   IGroupPlayerState,
-  MoveType,
+  GroupMoveType,
   PushType,
-  IMoveParams,
+  IGroupMoveParams,
   IPushParams
 > extends BaseLogic<
   GroupDecorator.ICreateParams<IGroupCreateParams>,
   GroupDecorator.IGameState<IGroupGameState>,
   GroupDecorator.TPlayerState<IGroupPlayerState>,
-  GroupDecorator.MoveType<MoveType>,
+  GroupDecorator.TMoveType<GroupMoveType>,
   PushType,
-  GroupDecorator.IMoveParams<IMoveParams>,
+  GroupDecorator.IMoveParams<IGroupMoveParams>,
   IPushParams
 > {
   GroupLogic: new (
@@ -148,18 +148,18 @@ export class Logic<
       IGroupCreateParams,
       IGroupGameState,
       IGroupPlayerState,
-      MoveType,
+      GroupMoveType,
       PushType,
-      IMoveParams,
+      IGroupMoveParams,
       IPushParams
     >
   ) => Group.Logic<
     IGroupCreateParams,
     IGroupGameState,
     IGroupPlayerState,
-    MoveType,
+    GroupMoveType,
     PushType,
-    IMoveParams,
+    IGroupMoveParams,
     IPushParams
   >;
 
@@ -167,9 +167,9 @@ export class Logic<
     IGroupCreateParams,
     IGroupGameState,
     IGroupPlayerState,
-    MoveType,
+    GroupMoveType,
     PushType,
-    IMoveParams,
+    IGroupMoveParams,
     IPushParams
   >[];
 
@@ -193,9 +193,9 @@ export class Logic<
             IGroupCreateParams,
             IGroupGameState,
             IGroupPlayerState,
-            MoveType,
+            GroupMoveType,
             PushType,
-            IMoveParams,
+            IGroupMoveParams,
             IPushParams
           >(i, this.stateManager)
         ).init()
@@ -216,12 +216,12 @@ export class Logic<
 
   async teacherMoveReducer(
     actor: IActor,
-    type: GroupDecorator.MoveType<MoveType>,
-    params: GroupDecorator.IMoveParams<IMoveParams>,
+    type: GroupDecorator.TMoveType<GroupMoveType>,
+    params: GroupDecorator.IMoveParams<IGroupMoveParams>,
     cb: IMoveCallback
   ): Promise<void> {
     await this.groupsLogic[params.groupIndex].teacherMoveReducer(
-      type as MoveType,
+      type as GroupMoveType,
       params.params,
       cb
     );
@@ -229,14 +229,14 @@ export class Logic<
 
   async playerMoveReducer(
     actor: IActor,
-    type: GroupDecorator.MoveType<MoveType>,
-    params: GroupDecorator.IMoveParams<IMoveParams>,
+    type: GroupDecorator.TMoveType<GroupMoveType>,
+    params: GroupDecorator.IMoveParams<IGroupMoveParams>,
     cb: IMoveCallback
   ): Promise<void> {
     const { groupSize } = this.game.params;
     const gameState = await this.stateManager.getGameState(),
       playerState = await this.stateManager.getPlayerState(actor);
-    if (type === GroupDecorator.GroupMoveType.getGroup) {
+    if (type === GroupDecorator.MoveType.getGroup) {
       if (playerState.groupIndex !== undefined) {
         return;
       }

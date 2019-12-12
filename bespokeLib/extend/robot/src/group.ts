@@ -7,17 +7,17 @@ export namespace Group {
     IGroupCreateParams,
     IGroupGameState,
     IGroupPlayerState,
-    MoveType,
+    GroupMoveType,
     PushType,
-    IMoveParams,
+    IGroupMoveParams,
     IPushParams,
     IRobotMeta = any
   > {
     groupParams: IGroupCreateParams;
     groupFrameEmitter: FrameEmitter<
-      MoveType,
+      GroupMoveType,
       PushType,
-      IMoveParams,
+      IGroupMoveParams,
       IPushParams
     >;
 
@@ -26,9 +26,9 @@ export namespace Group {
         GroupDecorator.ICreateParams<IGroupCreateParams>,
         GroupDecorator.IGameState<IGroupGameState>,
         GroupDecorator.TPlayerState<IGroupPlayerState>,
-        GroupDecorator.MoveType<MoveType>,
+        GroupDecorator.TMoveType<GroupMoveType>,
         PushType,
-        GroupDecorator.IMoveParams<IMoveParams>,
+        GroupDecorator.IMoveParams<IGroupMoveParams>,
         IPushParams,
         IRobotMeta
       >
@@ -73,18 +73,18 @@ export class Robot<
   IGroupCreateParams,
   IGroupGameState,
   IGroupPlayerState,
-  MoveType,
+  GroupMoveType,
   PushType,
-  IMoveParams,
+  IGroupMoveParams,
   IPushParams,
   IRobotMeta = {}
 > extends BaseRobot<
   GroupDecorator.ICreateParams<IGroupCreateParams>,
   GroupDecorator.IGameState<IGroupGameState>,
   GroupDecorator.TPlayerState<IGroupPlayerState>,
-  GroupDecorator.MoveType<MoveType>,
+  GroupDecorator.TMoveType<GroupMoveType>,
   PushType,
-  GroupDecorator.IMoveParams<IMoveParams>,
+  GroupDecorator.IMoveParams<IGroupMoveParams>,
   IPushParams,
   IRobotMeta
 > {
@@ -93,9 +93,9 @@ export class Robot<
       IGroupCreateParams,
       IGroupGameState,
       IGroupPlayerState,
-      MoveType,
+      GroupMoveType,
       PushType,
-      IMoveParams,
+      IGroupMoveParams,
       IPushParams,
       IRobotMeta
     >
@@ -103,9 +103,9 @@ export class Robot<
     IGroupCreateParams,
     IGroupGameState,
     IGroupPlayerState,
-    MoveType,
+    GroupMoveType,
     PushType,
-    IMoveParams,
+    IGroupMoveParams,
     IPushParams,
     IRobotMeta
   >;
@@ -114,16 +114,16 @@ export class Robot<
     IGroupCreateParams,
     IGroupGameState,
     IGroupPlayerState,
-    MoveType,
+    GroupMoveType,
     PushType,
-    IMoveParams,
+    IGroupMoveParams,
     IPushParams,
     IRobotMeta
   >;
 
   async init(): Promise<this> {
     await super.init();
-    this.frameEmitter.emit(GroupDecorator.GroupMoveType.getGroup);
+    this.frameEmitter.emit(GroupDecorator.MoveType.getGroup);
     const interval = setInterval(async () => {
       if (this.playerState && this.playerState.groupIndex !== undefined) {
         clearInterval(interval);

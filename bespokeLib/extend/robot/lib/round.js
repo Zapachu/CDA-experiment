@@ -101,7 +101,7 @@ var Robot = /** @class */ (function (_super) {
                     case 0: return [4 /*yield*/, _super.prototype.init.call(this)];
                     case 1:
                         _a.sent();
-                        this.groupFrameEmitter.emit(share_1.RoundDecorator.RoundMoveType.guideDone);
+                        this.groupFrameEmitter.emit(share_1.RoundDecorator.MoveType.guideDone);
                         interval = setInterval(function () { return __awaiter(_this, void 0, void 0, function () {
                             return __generator(this, function (_a) {
                                 switch (_a.label) {

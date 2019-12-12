@@ -7,17 +7,17 @@ export namespace Round {
     IRoundCreateParams,
     IRoundGameState,
     IRoundPlayerState,
-    MoveType,
+    RoundMoveType,
     PushType,
-    IMoveParams,
+    IRoundMoveParams,
     IPushParams,
     IRobotMeta = any
   > {
     roundParams: IRoundCreateParams;
     roundFrameEmitter: FrameEmitter<
-      MoveType,
+      RoundMoveType,
       PushType,
-      IMoveParams,
+      IRoundMoveParams,
       IPushParams
     >;
 
@@ -26,9 +26,9 @@ export namespace Round {
         RoundDecorator.ICreateParams<IRoundCreateParams>,
         RoundDecorator.IGameState<IRoundGameState>,
         RoundDecorator.IPlayerState<IRoundPlayerState>,
-        RoundDecorator.MoveType<MoveType>,
+        RoundDecorator.TMoveType<RoundMoveType>,
         PushType,
-        IMoveParams,
+        RoundDecorator.IMoveParams<IRoundMoveParams>,
         IPushParams,
         IRobotMeta
       >,
@@ -57,18 +57,18 @@ export class Robot<
   IRoundCreateParams,
   IRoundGameState,
   IRoundPlayerState,
-  MoveType,
+  RoundMoveType,
   PushType,
-  IMoveParams,
+  IRoundMoveParams,
   IPushParams,
   IRobotMeta = {}
 > extends Group.Robot<
   RoundDecorator.ICreateParams<IRoundCreateParams>,
   RoundDecorator.IGameState<IRoundGameState>,
   RoundDecorator.IPlayerState<IRoundPlayerState>,
-  RoundDecorator.MoveType<MoveType>,
+  RoundDecorator.TMoveType<RoundMoveType>,
   PushType,
-  IMoveParams,
+  RoundDecorator.IMoveParams<IRoundMoveParams>,
   IPushParams,
   IRobotMeta
 > {
@@ -77,9 +77,9 @@ export class Robot<
       IRoundCreateParams,
       IRoundGameState,
       IRoundPlayerState,
-      MoveType,
+      RoundMoveType,
       PushType,
-      IMoveParams,
+      IRoundMoveParams,
       IPushParams,
       IRobotMeta
     >,
@@ -88,9 +88,9 @@ export class Robot<
     IRoundCreateParams,
     IRoundGameState,
     IRoundPlayerState,
-    MoveType,
+    RoundMoveType,
     PushType,
-    IMoveParams,
+    IRoundMoveParams,
     IPushParams,
     IRobotMeta
   >;
@@ -99,16 +99,16 @@ export class Robot<
     IRoundCreateParams,
     IRoundGameState,
     IRoundPlayerState,
-    MoveType,
+    RoundMoveType,
     PushType,
-    IMoveParams,
+    IRoundMoveParams,
     IPushParams,
     IRobotMeta
   >;
 
   async init(): Promise<this> {
     await super.init();
-    this.groupFrameEmitter.emit(RoundDecorator.RoundMoveType.guideDone);
+    this.groupFrameEmitter.emit(RoundDecorator.MoveType.guideDone);
     const interval = setInterval(async () => {
       if (this.playerState.status === RoundDecorator.PlayerStatus.guide) {
         return;

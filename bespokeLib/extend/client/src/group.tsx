@@ -19,26 +19,26 @@ export namespace Group {
     IGroupCreateParams,
     IGroupGameState,
     IGroupPlayerState,
-    MoveType,
+    GroupMoveType,
     PushType,
-    IMoveParams,
+    IGroupMoveParams,
     IPushParams
   >
     extends Core.IPlayProps<
       GroupDecorator.ICreateParams<IGroupCreateParams>,
       GroupDecorator.IGameState<IGroupGameState>,
       GroupDecorator.TPlayerState<IGroupPlayerState>,
-      GroupDecorator.MoveType<MoveType>,
+      GroupDecorator.TMoveType<GroupMoveType>,
       PushType,
-      GroupDecorator.IMoveParams<IMoveParams>,
+      GroupDecorator.IMoveParams<IGroupMoveParams>,
       IPushParams
     > {
     groupParams: IGroupCreateParams;
     groupGameState: IGroupGameState;
     groupFrameEmitter: FrameEmitter<
-      MoveType,
+      GroupMoveType,
       PushType,
-      IMoveParams,
+      IGroupMoveParams,
       IPushParams
     >;
   }
@@ -47,27 +47,27 @@ export namespace Group {
     IGroupCreateParams,
     IGroupGameState,
     IGroupPlayerState,
-    MoveType,
+    GroupMoveType,
     PushType,
-    IMoveParams,
+    IGroupMoveParams,
     IPushParams
   >
     extends Core.IPlay4OwnerProps<
       GroupDecorator.ICreateParams<IGroupCreateParams>,
       GroupDecorator.IGameState<IGroupGameState>,
       GroupDecorator.TPlayerState<IGroupPlayerState>,
-      GroupDecorator.MoveType<MoveType>,
+      GroupDecorator.TMoveType<GroupMoveType>,
       PushType,
-      IMoveParams,
+      GroupDecorator.IMoveParams<IGroupMoveParams>,
       IPushParams
     > {
     groupParams: IGroupCreateParams;
     groupGameState: IGroupGameState;
     groupPlayerStates: GroupDecorator.TPlayerState<IGroupPlayerState>[];
     groupFrameEmitter: FrameEmitter<
-      MoveType,
+      GroupMoveType,
       PushType,
-      IMoveParams,
+      IGroupMoveParams,
       IPushParams
     >;
   }
@@ -357,18 +357,18 @@ export class Play<
   IGroupCreateParams,
   IGroupGameState,
   IGroupPlayerState,
-  MoveType,
+  GroupMoveType,
   PushType,
-  IMoveParams,
+  IGroupMoveParams,
   IPushParams,
   S = {}
 > extends Core.Play<
   GroupDecorator.ICreateParams<IGroupCreateParams>,
   GroupDecorator.IGameState<IGroupGameState>,
   GroupDecorator.TPlayerState<IGroupPlayerState>,
-  GroupDecorator.MoveType<MoveType>,
+  GroupDecorator.TMoveType<GroupMoveType>,
   PushType,
-  GroupDecorator.IMoveParams<IMoveParams>,
+  GroupDecorator.IMoveParams<IGroupMoveParams>,
   IPushParams,
   S
 > {
@@ -377,9 +377,9 @@ export class Play<
       IGroupCreateParams,
       IGroupGameState,
       IGroupPlayerState,
-      MoveType,
+      GroupMoveType,
       PushType,
-      IMoveParams,
+      IGroupMoveParams,
       IPushParams
     >
   > = Group.Play;
@@ -388,7 +388,7 @@ export class Play<
     const {
       props: { frameEmitter }
     } = this;
-    frameEmitter.emit(GroupDecorator.GroupMoveType.getGroup);
+    frameEmitter.emit(GroupDecorator.MoveType.getGroup);
   }
 
   render(): React.ReactNode {
@@ -418,18 +418,18 @@ export class Play4Owner<
   IGroupCreateParams,
   IGroupGameState,
   IGroupPlayerState,
-  MoveType,
+  GroupMoveType,
   PushType,
-  IMoveParams,
+  IGroupMoveParams,
   IPushParams,
   S = {}
 > extends Core.Play4Owner<
   GroupDecorator.ICreateParams<IGroupCreateParams>,
   GroupDecorator.IGameState<IGroupGameState>,
   GroupDecorator.TPlayerState<IGroupPlayerState>,
-  GroupDecorator.MoveType<MoveType>,
+  GroupDecorator.TMoveType<GroupMoveType>,
   PushType,
-  IMoveParams,
+  GroupDecorator.IMoveParams<IGroupMoveParams>,
   IPushParams,
   S
 > {
@@ -438,9 +438,9 @@ export class Play4Owner<
       IGroupCreateParams,
       IGroupGameState,
       IGroupPlayerState,
-      MoveType,
+      GroupMoveType,
       PushType,
-      IMoveParams,
+      IGroupMoveParams,
       IPushParams
     >
   > = Group.Play4Owner;

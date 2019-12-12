@@ -1,7 +1,7 @@
 import { FrameEmitter, IUserWithId } from "@bespoke/share";
 
 export namespace GroupDecorator {
-  export enum GroupMoveType {
+  export enum MoveType {
     getGroup = "getGroup"
   }
 
@@ -11,7 +11,7 @@ export namespace GroupDecorator {
     showAll
   }
 
-  export type MoveType<MoveType> = MoveType | GroupMoveType;
+  export type TMoveType<GroupMoveType> = GroupMoveType | MoveType;
 
   export interface ICreateParams<IGroupCreateParams> {
     group: number;
@@ -20,9 +20,9 @@ export namespace GroupDecorator {
     groupsParams: IGroupCreateParams[];
   }
 
-  export interface IMoveParams<IMoveParams> {
+  export interface IMoveParams<IGroupMoveParams> {
     groupIndex: number;
-    params: IMoveParams;
+    params: IGroupMoveParams;
   }
 
   export interface IGameState<IGroupGameState> {
@@ -39,19 +39,19 @@ export namespace GroupDecorator {
   };
 
   export function groupFrameEmitter<
-    MoveType,
+    GroupMoveType,
     PushType,
-    IMoveParams,
+    IGroupMoveParams,
     IPushParams
   >(
     frameEmitter: FrameEmitter<
-      MoveType,
+      GroupDecorator.TMoveType<GroupMoveType>,
       PushType,
-      GroupDecorator.IMoveParams<IMoveParams>,
+      GroupDecorator.IMoveParams<IGroupMoveParams>,
       IPushParams
     >,
     groupIndex: number
-  ): FrameEmitter<MoveType, PushType, IMoveParams, IPushParams> {
+  ): FrameEmitter<GroupMoveType, PushType, IGroupMoveParams, IPushParams> {
     const f = Object.create(frameEmitter);
     f.emit = (moveType, params, cb) =>
       frameEmitter.emit(moveType, { groupIndex, params }, cb);
@@ -60,7 +60,7 @@ export namespace GroupDecorator {
 }
 
 export namespace RoundDecorator {
-  export enum RoundMoveType {
+  export enum MoveType {
     guideDone = "guideDone"
   }
 
@@ -70,16 +70,16 @@ export namespace RoundDecorator {
     result
   }
 
-  export type MoveType<MoveType> = MoveType | RoundMoveType;
+  export type TMoveType<RoundMoveType> = RoundMoveType | MoveType;
 
   export interface ICreateParams<IRoundCreateParams> {
     round: number;
     roundsParams: IRoundCreateParams[];
   }
 
-  export interface IMoveParams<IMoveParams> {
+  export interface IMoveParams<IRoundMoveParams> {
     roundIndex: number;
-    params: IMoveParams;
+    params: IRoundMoveParams;
   }
 
   export interface IGameState<IRoundGameState> {
@@ -90,5 +90,25 @@ export namespace RoundDecorator {
   export interface IPlayerState<IPlayerRoundState> {
     status: PlayerStatus;
     rounds: IPlayerRoundState[];
+  }
+
+  export function roundFrameEmitter<
+    RoundMoveType,
+    PushType,
+    IRoundMoveParams,
+    IPushParams
+    >(
+    frameEmitter: FrameEmitter<
+      RoundDecorator.TMoveType<RoundMoveType>,
+      PushType,
+      RoundDecorator.IMoveParams<IRoundMoveParams>,
+      IPushParams
+      >,
+    roundIndex: number
+  ): FrameEmitter<RoundMoveType, PushType, IRoundMoveParams, IPushParams> {
+    const f = Object.create(frameEmitter);
+    f.emit = (moveType, params, cb) =>
+      frameEmitter.emit(moveType, { roundIndex, params }, cb);
+    return f;
   }
 }
