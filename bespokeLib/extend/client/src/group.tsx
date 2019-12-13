@@ -124,7 +124,8 @@ export namespace Group {
       PushType,
       IMoveParams,
       IPushParams
-    >
+    >,
+    S
   > {}
 
   export class Play4Owner<

@@ -1,8 +1,8 @@
 import * as React from "react";
-import { RoundDecorator } from "@extend/share";
+import { GroupDecorator, RoundDecorator } from "@extend/share";
 import { Group } from "./group";
 import { Core } from "@bespoke/client";
-import { Button, InputNumber, Radio, Row, Spin, Tabs } from "antd";
+import { Button, InputNumber, Modal, Radio, Row, Spin, Tabs } from "antd";
 import { Label, Lang, MaskLoading } from "@elf/component";
 import * as style from "./style.scss";
 import { FrameEmitter } from "@bespoke/share";
@@ -46,31 +46,24 @@ export namespace Round {
     >;
   }
 
-  export class Create<IRoundCreateParams, S = {}> extends React.Component<
-    ICreateProps<IRoundCreateParams>,
-    S
-  > {}
-
-  export class Play<
+  export interface IHistoryProps<
     IRoundCreateParams,
     IRoundGameState,
     IRoundPlayerState,
-    MoveType,
+    RoundMoveType,
     PushType,
-    IMoveParams,
-    IPushParams,
-    S = {}
-  > extends React.Component<
-    IPlayProps<
-      IRoundCreateParams,
-      IRoundGameState,
-      IRoundPlayerState,
-      MoveType,
+    IRoundMoveParams,
+    IPushParams
+  >
+    extends Group.IPlayProps<
+      RoundDecorator.ICreateParams<IRoundCreateParams>,
+      RoundDecorator.IGameState<IRoundGameState>,
+      RoundDecorator.IPlayerState<IRoundPlayerState>,
+      RoundDecorator.TMoveType<RoundMoveType>,
       PushType,
-      IMoveParams,
+      RoundDecorator.IMoveParams<IRoundMoveParams>,
       IPushParams
-    >
-  > {}
+    > {}
 }
 
 interface ICreateState {
@@ -89,8 +82,7 @@ export class Create<
     max: 12
   };
 
-  RoundCreate: React.ComponentType<Round.ICreateProps<IRoundCreateParams>> =
-    Round.Create;
+  RoundCreate: React.ComponentType<Round.ICreateProps<IRoundCreateParams>>;
 
   state: S = {
     independentRound: false
@@ -214,6 +206,10 @@ export class Create<
   }
 }
 
+interface IPlayState {
+  showHistoryModal: boolean;
+}
+
 export class Play<
   IRoundCreateParams,
   IRoundGameState,
@@ -222,7 +218,7 @@ export class Play<
   PushType,
   IRoundMoveParams,
   IPushParams,
-  S = {}
+  S extends IPlayState = IPlayState
 > extends Group.Play<
   RoundDecorator.ICreateParams<IRoundCreateParams>,
   RoundDecorator.IGameState<IRoundGameState>,
@@ -243,18 +239,48 @@ export class Play<
       IRoundMoveParams,
       IPushParams
     >
-  > = Round.Play;
+  >;
+
+  RoundHistory: React.ComponentType<
+    Round.IHistoryProps<
+      IRoundCreateParams,
+      IRoundGameState,
+      IRoundPlayerState,
+      RoundMoveType,
+      PushType,
+      IRoundMoveParams,
+      IPushParams
+    >
+  >;
+
+  state = {
+    showHistoryModal: false
+  } as S;
 
   lang = Lang.extractLang({
     round1: ["第", "Round"],
     round2: ["轮", ""],
+    start: ["开始", "Start"],
     wait4OtherPlayers: ["等待其它玩家加入......"],
-    gameOver: ["所有轮次结束，等待老师关闭实验"]
+    gameOver: ["所有轮次结束，等待老师关闭实验"],
+    history: ["历史信息", "History"]
   });
 
   render(): React.ReactNode {
-    const { lang, props } = this,
-      { playerState, groupParams, groupGameState, groupFrameEmitter } = props;
+    const {
+        lang,
+        props,
+        state: { showHistoryModal }
+      } = this,
+      {
+        playerState,
+        groupParams,
+        groupGameState,
+        groupFrameEmitter,
+        game: {
+          params: { showHistory }
+        }
+      } = props;
     if (playerState.status === RoundDecorator.PlayerStatus.guide) {
       return (
         <section className={style.groupGuide}>
@@ -264,7 +290,7 @@ export class Play<
               groupFrameEmitter.emit(RoundDecorator.MoveType.guideDone)
             }
           >
-            Start
+            {lang.start}
           </Button>
         </section>
       );
@@ -299,6 +325,23 @@ export class Play<
             )
           }}
         />
+        {showHistory === GroupDecorator.ShowHistory.hide ||
+        round === 0 ? null : (
+          <div className={style.historyWrapper}>
+            <Button onClick={() => this.setState({ showHistoryModal: true })}>
+              {lang.history}
+            </Button>
+            <Modal
+              footer={null}
+              visible={showHistoryModal}
+              width={"64rem"}
+              onCancel={() => this.setState({ showHistoryModal: false })}
+            >
+              <br />
+              <this.RoundHistory {...props} />
+            </Modal>
+          </div>
+        )}
       </section>
     );
   }
