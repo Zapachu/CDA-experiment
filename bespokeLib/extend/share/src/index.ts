@@ -16,6 +16,7 @@ export namespace GroupDecorator {
   export interface ICreateParams<IGroupCreateParams> {
     group: number;
     groupSize: number;
+    independentGroup: boolean;
     showHistory: ShowHistory;
     groupsParams: IGroupCreateParams[];
   }
@@ -74,6 +75,7 @@ export namespace RoundDecorator {
 
   export interface ICreateParams<IRoundCreateParams> {
     round: number;
+    independentRound: boolean;
     roundsParams: IRoundCreateParams[];
   }
 
@@ -97,13 +99,13 @@ export namespace RoundDecorator {
     PushType,
     IRoundMoveParams,
     IPushParams
-    >(
+  >(
     frameEmitter: FrameEmitter<
       RoundDecorator.TMoveType<RoundMoveType>,
       PushType,
       RoundDecorator.IMoveParams<IRoundMoveParams>,
       IPushParams
-      >,
+    >,
     roundIndex: number
   ): FrameEmitter<RoundMoveType, PushType, IRoundMoveParams, IPushParams> {
     const f = Object.create(frameEmitter);

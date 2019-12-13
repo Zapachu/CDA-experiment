@@ -66,14 +66,7 @@ export namespace Round {
     > {}
 }
 
-interface ICreateState {
-  independentRound: boolean;
-}
-
-export class Create<
-  IRoundCreateParams,
-  S extends ICreateState = ICreateState
-> extends Group.Create<
+export class Create<IRoundCreateParams, S = {}> extends Group.Create<
   RoundDecorator.ICreateParams<Core.TCreateParams<IRoundCreateParams>>,
   S
 > {
@@ -83,10 +76,6 @@ export class Create<
   };
 
   RoundCreate: React.ComponentType<Round.ICreateProps<IRoundCreateParams>>;
-
-  state: S = {
-    independentRound: false
-  } as S;
 
   lang = Lang.extractLang({
     round: ["轮数", "Round"],
@@ -130,6 +119,7 @@ export class Create<
     }
     const initParams: RoundDecorator.ICreateParams<IRoundCreateParams> = {
       round: ~~((Create.ROUND_RANGE.max + Create.ROUND_RANGE.min) >> 1),
+      independentRound: false,
       roundsParams: Array(Create.ROUND_RANGE.max)
         .fill(null)
         .map(() => ({} as any))
@@ -138,11 +128,7 @@ export class Create<
   }
 
   render(): React.ReactNode {
-    const {
-        lang,
-        props,
-        state: { independentRound }
-      } = this,
+    const { lang, props } = this,
       { groupParams, setGroupParams } = props;
     if (!groupParams.roundsParams) {
       return <Spin />;
@@ -159,9 +145,9 @@ export class Create<
           &nbsp;&nbsp;&nbsp;
           <Label label={lang.roundConfiguration} />
           <Radio.Group
-            value={independentRound}
+            value={groupParams.independentRound}
             onChange={({ target: { value } }) =>
-              this.setState({ independentRound: value })
+              setGroupParams({ independentRound: value })
             }
           >
             <Radio value={false}>{lang.configAll}</Radio>
@@ -170,7 +156,7 @@ export class Create<
         </Row>
         <br />
         <Tabs tabPosition="left">
-          {independentRound ? (
+          {groupParams.independentRound ? (
             Array(groupParams.round)
               .fill(null)
               .map((_, i) => (

@@ -3,10 +3,15 @@ import { Component, Group, Round } from '@extend/client'
 import { IRoundCreateParams } from '../config'
 import { RoundDecorator } from '@extend/share'
 
-function RoundCreate({ params: { groupSize }, setRoundParams }: Round.Round.ICreateProps<IRoundCreateParams>) {
+function RoundCreate({
+  params: { groupSize },
+  roundParams,
+  setRoundParams
+}: Round.Round.ICreateProps<IRoundCreateParams>) {
   return (
     <Component.PrivateValueMatrix
       groupSize={groupSize}
+      preMatrix={roundParams.privatePriceMatrix}
       callback={privatePriceMatrix => setRoundParams({ privatePriceMatrix })}
     />
   )

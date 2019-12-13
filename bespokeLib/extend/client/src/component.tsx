@@ -1,5 +1,5 @@
 import * as React from "react";
-import { InputNumber, Table } from "antd";
+import { InputNumber, Spin, Table } from "antd";
 import { Label, Lang } from "@elf/component";
 import { DndProvider, DragSource, DropTarget } from "react-dnd";
 import HTML5Backend from "react-dnd-html5-backend";
@@ -10,24 +10,28 @@ type TNumberMatrix = number[][];
 
 export function PrivateValueMatrix({
   groupSize,
+  preMatrix,
   callback
 }: {
   groupSize: number;
+  preMatrix: TNumberMatrix;
   callback: (matrix: TNumberMatrix) => void;
 }) {
   const LIMIT = {
     maxGroupSize: 12,
     maxGoodAmount: 12,
-    minMin: 0,
-    maxMin: 50,
-    minStep: 0,
+    minMin: 50,
+    maxMin: 100,
+    minStep: -10,
     maxStep: 10,
     minOffset: 0,
-    maxOffset: 10
+    maxOffset: 10,
+    minPrice: 0,
+    maxPrice: 1e3
   };
   const lang = Lang.extractLang({
     goodAmount: ["物品数量(M)", "GoodAmount(M)"],
-    minPrivateValue: ["最低心理价值(v1)", "MinPrivateValue(v1)"],
+    minPrivateValue: ["基准心理价值(v1)", "BasePrivateValue(v1)"],
     step: ["心理价值步长", "PrivateValueStep"],
     offset: ["偏移范围", "OffsetRange"],
     generate: ["随机生成", "Generate"],
@@ -35,7 +39,7 @@ export function PrivateValueMatrix({
     good: ["物品", "Good"]
   });
   const [goodAmount, setGoodAmount] = React.useState(LIMIT.maxGoodAmount >> 1),
-    [min, setMin] = React.useState(LIMIT.maxMin),
+    [min, setMin] = React.useState(LIMIT.minMin),
     [step, setStep] = React.useState(LIMIT.maxStep),
     [offset, setOffset] = React.useState(LIMIT.maxOffset),
     geneMatrix = (): TNumberMatrix =>
@@ -49,14 +53,19 @@ export function PrivateValueMatrix({
                 min + step * i + Math.round((2 * Math.random() - 1) * offset)
             )
         ),
-    [matrix, _setMatrix] = React.useState(geneMatrix),
+    [matrix, _setMatrix] = React.useState(preMatrix),
     setMatrix = (matrix: TNumberMatrix) => {
       _setMatrix(matrix);
       callback(matrix.slice(0, groupSize).map(row => row.slice(0, goodAmount)));
     };
-  React.useEffect(() => setMatrix(geneMatrix()), []);
+  React.useEffect(() => {
+    if (preMatrix) {
+      return
+    }
+    setMatrix(geneMatrix())
+  }, []);
   const tableScroll = goodAmount > LIMIT.maxGoodAmount / 2;
-  return (
+  return matrix ? (
     <section>
       <Label label={lang.goodAmount} />
       <InputNumber
@@ -109,6 +118,8 @@ export function PrivateValueMatrix({
                 <InputNumber
                   size={"small"}
                   style={{ width: "3.5rem" }}
+                  min={LIMIT.minPrice}
+                  max={LIMIT.maxPrice}
                   value={row[c]}
                   onChange={val => {
                     const newMatrix = cloneDeep(matrix);
@@ -122,6 +133,8 @@ export function PrivateValueMatrix({
         dataSource={matrix.slice(0, groupSize)}
       />
     </section>
+  ) : (
+    <Spin />
   );
 }
 

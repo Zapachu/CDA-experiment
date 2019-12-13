@@ -178,14 +178,7 @@ export namespace Group {
   > {}
 }
 
-interface ICreateState {
-  independentGroup: boolean;
-}
-
-export class Create<
-  IGroupCreateParams,
-  S extends ICreateState = ICreateState
-> extends Core.Create<
+export class Create<IGroupCreateParams, S = {}> extends Core.Create<
   GroupDecorator.ICreateParams<Core.TCreateParams<IGroupCreateParams>>,
   S
 > {
@@ -200,10 +193,6 @@ export class Create<
 
   GroupCreate: React.ComponentType<Group.ICreateProps<IGroupCreateParams>> =
     Group.Create;
-
-  state: S = {
-    independentGroup: false
-  } as S;
 
   lang = Lang.extractLang({
     group: ["组数", "Group"],
@@ -253,6 +242,7 @@ export class Create<
         (Create.GROUP_SIZE_RANGE.max + Create.GROUP_SIZE_RANGE.min) >>
         1
       ),
+      independentGroup: false,
       showHistory: GroupDecorator.ShowHistory.hide,
       groupsParams: Array(Create.GROUP_RANGE.max)
         .fill(null)
@@ -262,11 +252,7 @@ export class Create<
   }
 
   render(): React.ReactNode {
-    const {
-        lang,
-        props,
-        state: { independentGroup }
-      } = this,
+    const { lang, props } = this,
       { params, setParams } = props;
     if (!params.groupsParams) {
       return <Spin />;
@@ -308,9 +294,9 @@ export class Create<
           &nbsp;&nbsp;&nbsp;
           <Label label={lang.groupConfiguration} />
           <Radio.Group
-            value={independentGroup}
+            value={params.independentGroup}
             onChange={({ target: { value } }) =>
-              this.setState({ independentGroup: value })
+              setParams({ independentGroup: value })
             }
           >
             <Radio value={false}>{lang.configAll}</Radio>
@@ -318,7 +304,7 @@ export class Create<
           </Radio.Group>
         </Row>
         <Tabs>
-          {independentGroup ? (
+          {params.independentGroup ? (
             Array(params.group)
               .fill(null)
               .map((_, i) => (
