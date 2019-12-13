@@ -18,7 +18,6 @@ import {
   RoundMoveType
 } from '../config'
 import { Lang, MaskLoading } from '@elf/component'
-import { FrameEmitter } from '@bespoke/share'
 import { DragTable } from './component/DragTable'
 
 function RoundPlay({
@@ -26,14 +25,16 @@ function RoundPlay({
   roundPlayerState,
   roundGameState,
   roundFrameEmitter,
-  playerIndex
-}: {
-  roundParams: IRoundCreateParams
-  roundPlayerState: IRoundPlayerState
-  roundGameState: IRoundGameState
-  roundFrameEmitter: FrameEmitter<RoundMoveType, PushType, IRoundMoveParams, IPushParams>
-  playerIndex: number
-}) {
+  playerState
+}: Round.Round.IPlayProps<
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
+  PushType,
+  IRoundMoveParams,
+  IPushParams
+>) {
   const lang = Lang.extractLang({
     yourSeq: ['您的优先序为'],
     dragPlease: ['，请拖拽下方物品列表进行偏好表达'],
@@ -51,7 +52,8 @@ function RoundPlay({
     preference: ['偏好'],
     preferNo: [n => `第${n}喜欢`]
   })
-  const { allocation } = roundGameState,
+  const playerIndex = playerState.index,
+    { allocation } = roundGameState,
     { status } = roundPlayerState,
     privatePrices = roundParams.privatePriceMatrix[playerIndex]
   const [sort, setSort] = React.useState(privatePrices.map((_, i) => i))
@@ -124,31 +126,6 @@ function RoundPlay({
   }
 }
 
-class RoundPlayWrapper extends Round.Round.Play<
-  IRoundCreateParams,
-  IRoundGameState,
-  IRoundPlayerState,
-  RoundMoveType,
-  PushType,
-  IRoundMoveParams,
-  IPushParams
-> {
-  render() {
-    const { roundParams, roundPlayerState, roundGameState, roundFrameEmitter, playerState } = this.props
-    return (
-      <RoundPlay
-        {...{
-          roundParams,
-          roundGameState,
-          roundPlayerState,
-          roundFrameEmitter,
-          playerIndex: playerState.index
-        }}
-      />
-    )
-  }
-}
-
 class GroupPlay extends Round.Play<
   IRoundCreateParams,
   IRoundGameState,
@@ -158,7 +135,7 @@ class GroupPlay extends Round.Play<
   IRoundMoveParams,
   IPushParams
 > {
-  RoundPlay = RoundPlayWrapper
+  RoundPlay = RoundPlay
 }
 
 export class Play extends Group.Play<
