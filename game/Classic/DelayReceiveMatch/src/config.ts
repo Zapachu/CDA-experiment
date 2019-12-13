@@ -24,9 +24,7 @@ export interface IRoundMoveParams {
 export interface IPushParams {}
 
 export interface IRoundCreateParams {
-  goodAmount: number
-  minPrivateValue: number
-  maxPrivateValue: number
+  privatePriceMatrix: number[][]
 }
 
 export interface IRoundGameState {
@@ -41,7 +39,6 @@ export enum PlayerRoundStatus {
 }
 
 export interface IRoundPlayerState {
-  privatePrices: number[]
   sort: number[]
   status: PlayerRoundStatus
 }

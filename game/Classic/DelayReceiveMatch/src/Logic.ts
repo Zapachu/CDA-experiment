@@ -36,13 +36,9 @@ class RoundLogic extends Round.Round.Logic<
   }
 
   async initPlayerState(index: number): Promise<IRoundPlayerState> {
-    const { minPrivateValue, maxPrivateValue, goodAmount } = this.params
     const playerState = await super.initPlayerState(index)
     playerState.status = PlayerRoundStatus.play
     playerState.sort = []
-    playerState.privatePrices = Array(goodAmount)
-      .fill(null)
-      .map(() => ~~(minPrivateValue + Math.random() * (maxPrivateValue - minPrivateValue)))
     return playerState
   }
 
@@ -97,10 +93,11 @@ class GroupLogic extends Round.Logic<
       )
     await Model.FreeStyleModel.create({
       game: this.gameId,
-      key: `${this.groupIndex}_${gameState.round}`,
+      key: `${this.groupIndex}_${round}`,
       data: playerStatesArr.map(({ user, index, rounds }) => {
-        const { allocation } = gameRoundState
-        const { privatePrices, sort } = rounds[gameState.round]
+        const { allocation } = gameRoundState,
+          { sort } = rounds[round],
+          privatePrices = this.params.roundsParams[round].privatePriceMatrix[index]
         return {
           user: user.stuNum,
           playerIndex: index + 1,

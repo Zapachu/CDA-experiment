@@ -28,7 +28,7 @@ class GroupPlay4Owner extends Group.Group.Play4Owner<
   render(): React.ReactNode {
     const {
       lang,
-      props: { groupPlayerStates, groupGameState }
+      props: { groupPlayerStates, groupGameState, groupParams }
     } = this
     const columns = [
       {
@@ -68,8 +68,9 @@ class GroupPlay4Owner extends Group.Group.Play4Owner<
               <Table
                 dataSource={groupPlayerStates
                   .map(({ user, index, rounds }) => {
-                    const { allocation } = gameRoundState
-                    const { privatePrices, sort } = rounds[i]
+                    const { allocation } = gameRoundState,
+                      { sort } = rounds[i],
+                      privatePrices = groupParams.roundsParams[i].privatePriceMatrix[index]
                     return {
                       userName: user.name,
                       stuNum: user.stuNum,

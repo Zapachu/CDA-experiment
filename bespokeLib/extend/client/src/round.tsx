@@ -293,6 +293,7 @@ export class Play<
         <this.RoundPlay
           {...props}
           {...{
+            key: round,
             roundParams,
             roundGameState,
             roundPlayerState,

@@ -52,12 +52,9 @@ function RoundPlay({
     preferNo: [n => `第${n}喜欢`]
   })
   const { allocation } = roundGameState,
-    { privatePrices, status } = roundPlayerState
-  const [sort, setSort] = React.useState(
-    Array(roundParams.goodAmount)
-      .fill(null)
-      .map((_, i) => i)
-  )
+    { status } = roundPlayerState,
+    privatePrices = roundParams.privatePriceMatrix[playerIndex]
+  const [sort, setSort] = React.useState(privatePrices.map((_, i) => i))
   switch (status) {
     case PlayerRoundStatus.play:
       return <Play />
