@@ -101,6 +101,7 @@ class GroupLogic extends Round.Logic<
         return {
           user: user.stuNum,
           playerIndex: index + 1,
+          privatePrices: privatePrices.join(' , '),
           sort: sort.map(i => i + 1).join('>'),
           good: allocation[index] + 1,
           goodPrice: privatePrices[allocation[index]]

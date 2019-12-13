@@ -41,23 +41,23 @@ class GroupPlay4Owner extends Group.Group.Play4Owner<
       },
       {
         title: '优先序',
-        dataIndex: 'playerIndex',
-        key: 'playerIndex'
+        dataIndex: 'playerIndex'
+      },
+      {
+        title: '心理价值',
+        dataIndex: 'privatePrices'
       },
       {
         title: '偏好表达',
-        dataIndex: 'sort',
-        key: 'sort'
+        dataIndex: 'sort'
       },
       {
         title: '分得物品编号',
-        dataIndex: 'good',
-        key: 'good'
+        dataIndex: 'good'
       },
       {
         title: '分得物品价格',
-        dataIndex: 'goodPrice',
-        key: 'goodPrice'
+        dataIndex: 'goodPrice'
       }
     ]
     return (
@@ -75,6 +75,7 @@ class GroupPlay4Owner extends Group.Group.Play4Owner<
                       userName: user.name,
                       stuNum: user.stuNum,
                       playerIndex: index + 1,
+                      privatePrices: privatePrices.join(' , '),
                       sort: sort.map(i => i + 1).join('>'),
                       good: allocation[index] === null ? null : allocation[index] + 1,
                       goodPrice: privatePrices[allocation[index]]

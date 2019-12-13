@@ -88,10 +88,6 @@ export class Create<
     min: 1,
     max: 12
   };
-  static readonly ROUND_TIME_RANGE = {
-    min: 60,
-    max: 120
-  };
 
   RoundCreate: React.ComponentType<Round.ICreateProps<IRoundCreateParams>> =
     Round.Create;
