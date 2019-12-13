@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Group } from '@extend/client'
+import { Group, Component } from '@extend/client'
 import { Button, Table, Tag } from 'antd'
 import * as style from './style.scss'
 import {
@@ -18,7 +18,6 @@ import {
 } from '../config'
 import { Lang, MaskLoading } from '@elf/component'
 import { FrameEmitter } from '@bespoke/share'
-import { DragTable } from '../../../DelayReceiveMatch/src/view/component/DragTable'
 
 function RoundPlay({
   playerRoundState,
@@ -179,7 +178,7 @@ function RoundPlay({
           </em>
           {lang.dragPlease}
         </label>{' '}
-        <DragTable
+        <Component.DragTable
           columns={[
             {
               title: lang.preference,

@@ -3,7 +3,6 @@ import { RoundDecorator } from '@extend/share'
 export const namespace = 'DelayReceiveMatch'
 
 export const CONFIG = {
-  tradeSeconds: 30,
   resultSeconds: 5
 }
 
@@ -28,7 +27,6 @@ export interface IRoundCreateParams {
 }
 
 export interface IRoundGameState {
-  timeLeft: number
   allocation: number[]
 }
 

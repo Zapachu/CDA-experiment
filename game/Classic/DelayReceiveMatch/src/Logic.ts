@@ -30,7 +30,6 @@ class RoundLogic extends Round.Round.Logic<
 > {
   initGameState(): IRoundGameState {
     const gameState = super.initGameState()
-    gameState.timeLeft = CONFIG.tradeSeconds
     gameState.allocation = []
     return gameState
   }

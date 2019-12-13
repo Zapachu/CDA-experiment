@@ -1,6 +1,8 @@
 import * as React from 'react'
-import { Group, Round } from '@extend/client'
-import { Button } from 'antd'
+import { Group, Round, Component } from '@extend/client'
+import { GroupDecorator } from '@extend/share'
+import { Button, Table } from 'antd'
+import { Lang, MaskLoading } from '@elf/component'
 import * as style from './style.scss'
 import {
   GroupMoveType,
@@ -17,8 +19,6 @@ import {
   PushType,
   RoundMoveType
 } from '../config'
-import { Lang, MaskLoading } from '@elf/component'
-import { DragTable } from './component/DragTable'
 
 function RoundPlay({
   roundParams,
@@ -90,7 +90,7 @@ function RoundPlay({
           <em style={{ padding: '.5rem', fontSize: '1.5rem' }}>{playerIndex + 1}</em>
           {lang.dragPlease}
         </label>
-        <DragTable
+        <Component.DragTable
           columns={[
             {
               title: lang.preference,
@@ -126,6 +126,73 @@ function RoundPlay({
   }
 }
 
+function RoundHistory({
+  game,
+  playerState,
+  groupParams,
+  groupGameState
+}: Round.Round.IHistoryProps<
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
+  PushType,
+  IRoundMoveParams,
+  IPushParams
+>) {
+  const { groupSize, showHistory } = game.params
+  const columns = [
+    {
+      title: '轮次',
+      dataIndex: 'round',
+      render: (r, { rowSpan }) => ({
+        children: r + 1,
+        props: { rowSpan }
+      })
+    },
+    {
+      title: '优先序',
+      dataIndex: 'playerIndex',
+      render: i => `${i + 1}${playerState.index === i ? '(你)' : ''}`
+    },
+    {
+      title: '心理价值',
+      dataIndex: 'privatePrices'
+    },
+    {
+      title: '偏好表达',
+      dataIndex: 'sort'
+    },
+    {
+      title: '分得物品编号',
+      dataIndex: 'good'
+    },
+    {
+      title: '分得物品价格',
+      dataIndex: 'goodPrice'
+    }
+  ]
+  const dataSource = []
+  groupGameState.rounds.forEach((roundGameState, r) =>
+    roundGameState.allocation.forEach((good, i) => {
+      const privatePrices = groupParams.roundsParams[r].privatePriceMatrix[i]
+      if (showHistory === GroupDecorator.ShowHistory.selfOnly && i !== playerState.index) {
+        return
+      }
+      dataSource.push({
+        rowSpan: i === 0 ? (showHistory === GroupDecorator.ShowHistory.selfOnly ? 1 : groupSize) : 0,
+        round: i === 0 ? r : null,
+        playerIndex: i,
+        privatePrices: privatePrices.join(' , '),
+        sort: playerState.index === i ? playerState.rounds[r].sort.join('>') : null,
+        good: good + 1,
+        goodPrice: privatePrices[good]
+      })
+    })
+  )
+  return <Table pagination={{ pageSize: groupSize * 2 }} size={'small'} columns={columns} dataSource={dataSource} />
+}
+
 class GroupPlay extends Round.Play<
   IRoundCreateParams,
   IRoundGameState,
@@ -136,6 +203,8 @@ class GroupPlay extends Round.Play<
   IPushParams
 > {
   RoundPlay = RoundPlay
+
+  RoundHistory = RoundHistory
 }
 
 export class Play extends Group.Play<
