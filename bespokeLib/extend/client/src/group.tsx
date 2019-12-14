@@ -243,7 +243,7 @@ export class Create<IGroupCreateParams, S = {}> extends Core.Create<
         1
       ),
       independentGroup: false,
-      showHistory: GroupDecorator.ShowHistory.hide,
+      showHistory: GroupDecorator.ShowHistory.selfOnly,
       groupsParams: Array(Create.GROUP_RANGE.max)
         .fill(null)
         .map(() => ({} as any))

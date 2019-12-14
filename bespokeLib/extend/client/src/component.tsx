@@ -11,11 +11,13 @@ type TNumberMatrix = number[][];
 export function PrivateValueMatrix({
   groupSize,
   preMatrix,
-  callback
+  callback,
+  goodAmount: pGoodAmount
 }: {
   groupSize: number;
   preMatrix: TNumberMatrix;
   callback: (matrix: TNumberMatrix) => void;
+  goodAmount?: number;
 }) {
   const LIMIT = {
     maxGroupSize: 12,
@@ -31,14 +33,17 @@ export function PrivateValueMatrix({
   };
   const lang = Lang.extractLang({
     goodAmount: ["物品数量(M)", "GoodAmount(M)"],
-    minPrivateValue: ["基准心理价值(v1)", "BasePrivateValue(v1)"],
-    step: ["心理价值步长", "PrivateValueStep"],
+    minPrivateValue: ["基准心理价值", "BasePrivateValue"],
+    step: ["步长", "Step"],
     offset: ["偏移范围", "OffsetRange"],
     generate: ["随机生成", "Generate"],
     player: ["玩家", "Player"],
     good: ["物品", "Good"]
   });
-  const [goodAmount, setGoodAmount] = React.useState(LIMIT.maxGoodAmount >> 1),
+  const [sGoodAmount, setSGoodAmount] = React.useState(
+      LIMIT.maxGoodAmount >> 1
+    ),
+    goodAmount = pGoodAmount || sGoodAmount,
     [min, setMin] = React.useState(LIMIT.minMin),
     [step, setStep] = React.useState(LIMIT.maxStep),
     [offset, setOffset] = React.useState(LIMIT.maxOffset),
@@ -60,34 +65,42 @@ export function PrivateValueMatrix({
     };
   React.useEffect(() => {
     if (preMatrix) {
-      return
+      return;
     }
-    setMatrix(geneMatrix())
+    setMatrix(geneMatrix());
   }, []);
+  const inputStyle: React.CSSProperties = { width: "4.5rem" };
   const tableScroll = goodAmount > LIMIT.maxGoodAmount / 2;
   return matrix ? (
-    <section>
-      <Label label={lang.goodAmount} />
-      <InputNumber
-        value={goodAmount}
-        onChange={v => setGoodAmount(v)}
-        max={LIMIT.maxGoodAmount}
-      />
-      &nbsp;&nbsp;&nbsp;
+    <section style={{ margin: "1rem 0" }}>
+      {sGoodAmount ? null : (
+        <>
+          <Label label={lang.goodAmount} />
+          <InputNumber
+            value={goodAmount}
+            onChange={v => setSGoodAmount(v)}
+            max={LIMIT.maxGoodAmount}
+            style={inputStyle}
+          />
+          <br />
+        </>
+      )}
       <Label label={lang.minPrivateValue} />
       <InputNumber
         value={min}
         onChange={v => setMin(v)}
         min={LIMIT.minMin}
         max={LIMIT.maxMin}
+        style={inputStyle}
       />
-      <br />
+      &nbsp;&nbsp;&nbsp;
       <Label label={lang.step} />
       <InputNumber
         value={step}
         onChange={v => setStep(v)}
         min={LIMIT.minStep}
         max={LIMIT.maxStep}
+        style={inputStyle}
       />
       &nbsp;&nbsp;&nbsp;
       <Label label={lang.offset} />
@@ -96,9 +109,15 @@ export function PrivateValueMatrix({
         onChange={v => setOffset(v)}
         min={LIMIT.minOffset}
         max={LIMIT.maxOffset}
+        style={inputStyle}
       />
-      &nbsp;&nbsp;&nbsp;
-      <a onClick={() => setMatrix(geneMatrix())}>{lang.generate}</a>
+      <br />
+      <a
+        style={{ display: "inline-block", margin: ".5rem" }}
+        onClick={() => setMatrix(geneMatrix())}
+      >
+        {lang.generate}
+      </a>
       <Table
         scroll={tableScroll ? { x: 100 } : {}}
         pagination={false}
