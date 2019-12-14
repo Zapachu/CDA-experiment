@@ -1,71 +1,95 @@
 import * as React from 'react'
 import { Group } from '@extend/client'
 import { Table, Tabs } from 'antd'
-import { ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, MoveType, PushType } from '../config'
+import {
+  GroupMoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupMoveParams,
+  IGroupPlayerState,
+  IPushParams,
+  PushType
+} from '../config'
 import { Lang } from '@elf/component'
 
 class GroupPlay4Owner extends Group.Group.Play4Owner<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupPlayerState,
+  GroupMoveType,
   PushType,
-  IMoveParams,
+  IGroupMoveParams,
   IPushParams
 > {
   lang = Lang.extractLang({
-    roundIndex: [i => `第${i + 1}轮`, i => `Round ${i + 1}`],
-    tradeNo: ['成交订单编号'],
-    buyerNo: ['买家编号'],
-    sellerNo: ['卖家编号'],
-    shout: ['报价']
+    roundIndex: [i => `第${i + 1}轮`, i => `Round ${i + 1}`]
   })
 
   render(): React.ReactNode {
     const {
       lang,
-      props: { groupGameState }
+      props: { groupGameState, groupPlayerStates, groupParams }
     } = this
+    const columns = [
+      {
+        title: '玩家',
+        dataIndex: 'userName'
+      },
+      {
+        title: '学号',
+        dataIndex: 'stuNum'
+      },
+      {
+        title: '编号',
+        dataIndex: 'playerIndex'
+      },
+      {
+        title: '角色',
+        dataIndex: 'role'
+      },
+      {
+        title: '心理价值',
+        dataIndex: 'privatePrice'
+      },
+      {
+        title: '报价',
+        dataIndex: 'price'
+      },
+      {
+        title: '交易成功',
+        dataIndex: 'success'
+      },
+      {
+        title: '交易对象编号',
+        dataIndex: 'pairIndex'
+      }
+    ]
     return (
       <Tabs tabPosition={'left'}>
-        {groupGameState.rounds.map((gameRoundState, i) => (
-          <Tabs.TabPane tab={lang.roundIndex(i)} key={i.toString()}>
+        {groupGameState.rounds.map((gameRoundState, r) => (
+          <Tabs.TabPane tab={lang.roundIndex(r)} key={r.toString()}>
             <Table
               pagination={false}
-              columns={[
-                {
-                  title: lang.tradeNo,
-                  dataIndex: 'tradeNo',
-                  key: 'tradeNo'
-                },
-                {
-                  title: lang.buyerNo,
-                  dataIndex: 'buyer',
-                  key: 'buyer'
-                },
-                {
-                  title: `${lang.buyerNo}${lang.shout}`,
-                  dataIndex: 'buyPrice',
-                  key: 'buyPrice'
-                },
-                {
-                  title: lang.sellerNo,
-                  dataIndex: 'seller',
-                  key: 'seller'
-                },
-                {
-                  title: `${lang.sellerNo}${lang.shout}`,
-                  dataIndex: 'sellPrice',
-                  key: 'sellPrice'
-                }
-              ]}
-              dataSource={gameRoundState.trades.map(({ buy, sell }, i) => ({
-                tradeNo: i + 1,
-                buyer: buy.player + 1,
-                buyPrice: buy.price,
-                seller: sell.player + 1,
-                sellPrice: sell.price
-              }))}
+              columns={columns}
+              dataSource={groupPlayerStates
+                .map(({ user, index, rounds }) => {
+                  const { trades } = gameRoundState,
+                    { price } = rounds[r],
+                    isBuyer = index < groupParams.roundsParams[r].buyerAmount,
+                    privatePrices = groupParams.roundsParams[r].privatePriceMatrix[index],
+                    trade = trades.find(({ buy, sell }) => (isBuyer ? buy : sell).player === index)
+                  return {
+                    userName: user.name,
+                    stuNum: user.stuNum,
+                    playerIndex: index + 1,
+                    role: isBuyer ? '买家' : '卖家',
+                    privatePrice: privatePrices[0],
+                    price: price || '',
+                    success: trade ? 'Yes' : 'No',
+                    pairIndex: trade ? (isBuyer ? trade.sell : trade.buy).player + 1 : ''
+                  }
+                })
+                .sort(({ playerIndex: p1 }, { playerIndex: p2 }) => p1 - p2)}
             />
           </Tabs.TabPane>
         ))}
@@ -75,12 +99,12 @@ class GroupPlay4Owner extends Group.Group.Play4Owner<
 }
 
 export class Play4Owner extends Group.Play4Owner<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupPlayerState,
+  GroupMoveType,
   PushType,
-  IMoveParams,
+  IGroupMoveParams,
   IPushParams
 > {
   GroupPlay4Owner = GroupPlay4Owner

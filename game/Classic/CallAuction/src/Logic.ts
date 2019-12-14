@@ -1,33 +1,34 @@
-import { Group } from '@extend/server'
-import { IActor, IMoveCallback, IUserWithId } from '@bespoke/share'
-import { GroupDecorator } from '@extend/share'
+import { Group, Round } from '@extend/server'
+import { IMoveCallback } from '@bespoke/share'
 import { Model } from '@bespoke/server'
 import {
-  ICreateParams,
-  IGameRoundState,
-  IGameState,
-  IMoveParams,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupMoveParams,
+  IGroupPlayerState,
   IOrder,
-  IPlayerRoundState,
-  IPlayerState,
   IPushParams,
-  MoveType,
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundMoveParams,
+  IRoundPlayerState,
   PlayerRoundStatus,
-  PlayerStatus,
   PushType,
-  Role
+  RoundMoveType
 } from './config'
 
-class GroupLogic extends Group.Group.Logic<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+class RoundLogic extends Round.Round.Logic<
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
   PushType,
-  IMoveParams,
+  IRoundMoveParams,
   IPushParams
 > {
-  static match(buyPrices: number[], sellPrices: number[]): Array<{ buy: number; sell: number }> {
+  alive: boolean = true
+
+  match(buyPrices: number[], sellPrices: number[]): Array<{ buy: number; sell: number }> {
     const result: Array<{ buy: number; sell: number }> = []
     let k = 0
     for (let i = 0; i < buyPrices.length; i++) {
@@ -45,160 +46,129 @@ class GroupLogic extends Group.Group.Logic<
     return result
   }
 
-  private static privatePrice([min, max]: [number, number]) {
-    return ~~(min + Math.random() * (max - min))
-  }
-
-  initGameState(): IGameState {
-    const gameState = super.initGameState()
-    gameState.rounds = []
-    return gameState
-  }
-
-  async initPlayerState(
-    user: IUserWithId,
-    groupIndex: number,
-    index: number
-  ): Promise<GroupDecorator.TPlayerState<IPlayerState>> {
-    const playerState = await super.initPlayerState(user, groupIndex, index)
-    playerState.status = PlayerStatus.guide
-    playerState.rounds = []
-    return playerState
-  }
-
-  async startRound(r: number) {
-    const { round } = this.params
-    if (r >= round) {
-      return
-    }
-    const gameState = await this.stateManager.getGameState(),
-      playerStates = await this.stateManager.getPlayerStates()
-    gameState.round = r
-    const gameRoundState: IGameRoundState = {
-      timeLeft: this.params.t,
-      trades: []
-    }
-    gameState.rounds[r] = gameRoundState
-    Object.values(playerStates).forEach(
-      p =>
-        (p.rounds[r] = {
-          status: PlayerRoundStatus.play,
-          price: 0
-        })
-    )
-    await this.stateManager.syncState()
+  async roundStart() {
+    const gameState = await this.stateManager.getGameState()
     const timer = global.setInterval(async () => {
-      if (gameState.round > r) {
+      if (!this.alive) {
         global.clearInterval(timer)
       }
-      if (gameRoundState.timeLeft <= 1) {
-        this.roundOver()
+      if (gameState.timeLeft <= 1) {
+        await this.roundOver()
         global.clearInterval(timer)
       }
-      gameRoundState.timeLeft--
+      gameState.timeLeft--
       await this.stateManager.syncState()
     }, 1e3)
   }
 
-  async getState(): Promise<{
-    gameState: IGameState
-    gameRoundState: IGameRoundState
-    playerStatesArr: GroupDecorator.TPlayerState<IPlayerState>[]
-    playerRoundStates: IPlayerRoundState[]
-  }> {
-    const gameState = await this.stateManager.getGameState(),
-      { round } = gameState,
-      gameRoundState = gameState.rounds[round],
-      playerStates = await this.stateManager.getPlayerStates(),
-      playerStatesArr = Object.values<GroupDecorator.TPlayerState<IPlayerState>>(playerStates).sort(
-        (p1, p2) => p1.index - p2.index
-      ),
-      playerRoundStates = playerStatesArr.map(({ rounds }) => rounds[round])
-    return {
-      gameState,
-      gameRoundState,
-      playerStatesArr,
-      playerRoundStates
-    }
+  initGameState(): IRoundGameState {
+    const gameState = super.initGameState()
+    gameState.timeLeft = this.params.t
+    gameState.trades = []
+    return gameState
+  }
+
+  async initPlayerState(index: number): Promise<IRoundPlayerState> {
+    const playerState = await super.initPlayerState(index)
+    playerState.status = PlayerRoundStatus.play
+    return playerState
   }
 
   async roundOver() {
-    const { gameState, playerStatesArr, gameRoundState, playerRoundStates } = await this.getState()
+    this.alive = false
+    const gameState = await this.stateManager.getGameState(),
+      playerStates = await this.stateManager.getPlayerStates()
     let buyOrders: IOrder[] = [],
       sellOrders: IOrder[] = []
-    playerStatesArr.map(({ role, index }) =>
-      (role === Role.buyer ? buyOrders : sellOrders).push({
+    playerStates.map(({ price }, index) =>
+      (index < this.params.buyerAmount ? buyOrders : sellOrders).push({
         player: index,
-        price: playerRoundStates[index].price
+        price
       })
     )
     buyOrders = buyOrders.sort((b1, b2) => b1.price - b2.price)
     sellOrders = sellOrders.sort((s1, s2) => s2.price - s1.price)
-    const trades = GroupLogic.match(
+    const trades = this.match(
       buyOrders.map(({ price }) => price),
       sellOrders.map(({ price }) => price)
     )
-    gameRoundState.trades = trades.map(({ buy, sell }) => ({
+    gameState.trades = trades.map(({ buy, sell }) => ({
       buy: buyOrders[buy],
       sell: sellOrders[sell]
     }))
-    playerRoundStates.forEach(p => (p.status = PlayerRoundStatus.result))
+    playerStates.forEach(p => (p.status = PlayerRoundStatus.result))
     await this.stateManager.syncState()
-    global.setTimeout(async () => {
-      gameState.round < this.params.round - 1
-        ? this.startRound(gameState.round + 1)
-        : playerStatesArr.forEach(p => (p.status = PlayerStatus.result))
-      await this.stateManager.syncState()
-    }, 5e3)
-    await Model.FreeStyleModel.create({
-      game: this.gameId,
-      key: `${this.groupIndex}_${gameState.round}`,
-      data: gameRoundState.trades
-    })
+    global.setTimeout(async () => await this.overCallback(), 5e3)
   }
 
-  async playerMoveReducer(index: number, type: MoveType, params: IMoveParams, cb: IMoveCallback): Promise<void> {
-    const { groupSize } = this
+  async playerMoveReducer(
+    index: number,
+    type: RoundMoveType,
+    params: IRoundMoveParams,
+    cb: IMoveCallback
+  ): Promise<void> {
     const playerState = await this.stateManager.getPlayerState(index),
-      { gameState, playerStatesArr, playerRoundStates } = await this.getState(),
-      { round } = gameState,
-      playerRoundState = playerState.rounds[round]
+      playerStates = await this.stateManager.getPlayerStates()
     switch (type) {
-      case MoveType.guideDone: {
-        playerState.status = PlayerStatus.round
-        playerState.role = playerState.index % 2 ? Role.buyer : Role.seller
-        playerState.privatePrices = Array(this.params.round)
-          .fill(null)
-          .map(() =>
-            GroupLogic.privatePrice(
-              playerState.role === Role.buyer ? this.params.buyPriceRange : this.params.sellPriceRange
-            )
-          )
-        if (playerStatesArr.length === groupSize && playerStatesArr.every(p => p.status === PlayerStatus.round)) {
-          this.startRound(0)
+      case RoundMoveType.shout:
+        playerState.status = PlayerRoundStatus.wait
+        playerState.price = params.price
+        if (playerStates.every(p => p.status === PlayerRoundStatus.wait)) {
+          await this.roundOver()
         }
         break
-      }
-      case MoveType.shout: {
-        const { price } = params
-        playerRoundState.price = price
-        playerRoundState.status = PlayerRoundStatus.wait
-        if (playerRoundStates.every(({ price }) => price)) {
-          this.roundOver()
-        }
-        break
-      }
     }
   }
 }
 
-export class Logic extends Group.Logic<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+class GroupLogic extends Round.Logic<
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
   PushType,
-  IMoveParams,
+  IRoundMoveParams,
+  IPushParams
+> {
+  RoundLogic = RoundLogic
+
+  async roundOverCallback(): Promise<any> {
+    const gameState = await this.stateManager.getGameState(),
+      { round } = gameState,
+      { buyerAmount, privatePriceMatrix } = this.params.roundsParams[round],
+      gameRoundState = gameState.rounds[round],
+      playerStates = await this.stateManager.getPlayerStates()
+    await Model.FreeStyleModel.create({
+      game: this.gameId,
+      key: `${this.groupIndex}_${round}`,
+      data: playerStates.map(({ user, index, rounds }) => {
+        const { trades } = gameRoundState,
+          { price } = rounds[round],
+          isBuyer = index < buyerAmount,
+          privatePrices = privatePriceMatrix[index],
+          trade = trades.find(({ buy, sell }) => (isBuyer ? buy : sell).player === index)
+        return {
+          userName: user.name,
+          stuNum: user.stuNum,
+          playerIndex: index + 1,
+          role: isBuyer ? '买家' : '卖家',
+          privatePrice: privatePrices[0],
+          price: price || '',
+          success: trade ? 'Yes' : 'No',
+          pairIndex: trade ? (isBuyer ? trade.sell : trade.buy).player + 1 : ''
+        }
+      })
+    })
+  }
+}
+
+export class Logic extends Group.Logic<
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupPlayerState,
+  RoundMoveType,
+  PushType,
+  IGroupMoveParams,
   IPushParams
 > {
   GroupLogic = GroupLogic

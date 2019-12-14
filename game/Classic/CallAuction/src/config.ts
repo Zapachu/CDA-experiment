@@ -1,27 +1,27 @@
+import { RoundDecorator } from '@extend/share'
+
 export const namespace = 'CallAuction'
 
 export enum FetchRoute {
   exportXls = '/exportXls/:gameId'
 }
 
-export enum MoveType {
-  guideDone,
+export enum RoundMoveType {
   shout
 }
 
 export enum PushType {}
 
-export interface IMoveParams {
+export interface IRoundMoveParams {
   price: number
 }
 
 export interface IPushParams {}
 
-export interface ICreateParams {
-  round: number
+export interface IRoundCreateParams {
   t: number
-  buyPriceRange: [number, number]
-  sellPriceRange: [number, number]
+  buyerAmount: number
+  privatePriceMatrix: number[][]
 }
 
 export interface IOrder {
@@ -34,19 +34,9 @@ export interface ITrade {
   sell: IOrder
 }
 
-export interface IGameRoundState {
+export interface IRoundGameState {
   timeLeft: number
   trades: Array<ITrade>
-}
-
-export enum Role {
-  buyer,
-  seller
-}
-
-export interface IGameState {
-  round: number
-  rounds: IGameRoundState[]
 }
 
 export enum PlayerRoundStatus {
@@ -55,20 +45,13 @@ export enum PlayerRoundStatus {
   result
 }
 
-export interface IPlayerRoundState {
+export interface IRoundPlayerState {
   price: number
   status: PlayerRoundStatus
 }
 
-export enum PlayerStatus {
-  guide,
-  round,
-  result
-}
-
-export interface IPlayerState {
-  role: Role
-  status: PlayerStatus
-  privatePrices: number[]
-  rounds: IPlayerRoundState[]
-}
+export type GroupMoveType = RoundDecorator.TMoveType<RoundMoveType>
+export type IGroupMoveParams = RoundDecorator.IMoveParams<IRoundMoveParams>
+export type IGroupCreateParams = RoundDecorator.ICreateParams<IRoundCreateParams>
+export type IGroupGameState = RoundDecorator.IGameState<IRoundGameState>
+export type IGroupPlayerState = RoundDecorator.IPlayerState<IRoundPlayerState>

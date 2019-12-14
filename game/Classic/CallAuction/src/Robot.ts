@@ -1,13 +1,21 @@
 import { Group } from '@extend/robot'
-import { ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, MoveType, PushType } from './config'
+import {
+  GroupMoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupMoveParams,
+  IGroupPlayerState,
+  IPushParams,
+  PushType
+} from './config'
 
 export class GroupRobot extends Group.Group.Robot<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupPlayerState,
+  GroupMoveType,
   PushType,
-  IMoveParams,
+  IGroupMoveParams,
   IPushParams
 > {
   async init(): Promise<this> {
@@ -17,12 +25,12 @@ export class GroupRobot extends Group.Group.Robot<
 }
 
 export class Robot extends Group.Robot<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupPlayerState,
+  GroupMoveType,
   PushType,
-  IMoveParams,
+  IGroupMoveParams,
   IPushParams
 > {
   GroupRobot = GroupRobot

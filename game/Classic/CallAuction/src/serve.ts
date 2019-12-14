@@ -26,8 +26,10 @@ const router = Router().get(FetchRoute.exportXls, async (req, res) => {
     const [g, r] = round.key.split('_')
     data.push([])
     data.push([`第${+g + 1}组`, `第${+r + 1}轮`])
-    data.push(['订单编号', '买家编号', '买家报价', '买家编号', '卖家报价'])
-    round.data.forEach(({ buy, sell }, i) => data.push([i + 1, buy.player + 1, buy.price, sell.player + 1, sell.price]))
+    data.push(['玩家', '学号', '编号', '角色', '心理价值', '报价', '交易成功', '交易对象编号'])
+    round.data.forEach(({ userName, stuNum, playerIndex, role, privatePrice, price, success, pairIndex }) =>
+      data.push([userName, stuNum, playerIndex, role, privatePrice, price, success, pairIndex])
+    )
   })
   const buffer = nodeXlsx.build([{ name, data }], option)
   res.setHeader('Content-Type', 'application/vnd.openxmlformats')
