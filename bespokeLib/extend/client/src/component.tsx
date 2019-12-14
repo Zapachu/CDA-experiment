@@ -63,8 +63,9 @@ export function PrivateValueMatrix({
       _setMatrix(matrix);
       callback(matrix.slice(0, groupSize).map(row => row.slice(0, goodAmount)));
     };
+  React.useEffect(() => setMatrix(matrix), [groupSize]);
   React.useEffect(() => {
-    if (preMatrix) {
+    if (preMatrix && preMatrix.length) {
       return;
     }
     setMatrix(geneMatrix());
@@ -79,6 +80,7 @@ export function PrivateValueMatrix({
           <InputNumber
             value={goodAmount}
             onChange={v => setSGoodAmount(v)}
+            min={1}
             max={LIMIT.maxGoodAmount}
             style={inputStyle}
           />
@@ -94,15 +96,19 @@ export function PrivateValueMatrix({
         style={inputStyle}
       />
       &nbsp;&nbsp;&nbsp;
-      <Label label={lang.step} />
-      <InputNumber
-        value={step}
-        onChange={v => setStep(v)}
-        min={LIMIT.minStep}
-        max={LIMIT.maxStep}
-        style={inputStyle}
-      />
-      &nbsp;&nbsp;&nbsp;
+      {goodAmount === 1 ? null : (
+        <>
+          <Label label={lang.step} />
+          <InputNumber
+            value={step}
+            onChange={v => setStep(v)}
+            min={LIMIT.minStep}
+            max={LIMIT.maxStep}
+            style={inputStyle}
+          />
+          &nbsp;&nbsp;&nbsp;
+        </>
+      )}
       <Label label={lang.offset} />
       <InputNumber
         value={offset}
@@ -125,14 +131,16 @@ export function PrivateValueMatrix({
         columns={[
           {
             render: (_, __, i) => (
-              <div style={{ width: "3.5rem" }}>{`${lang.player}${i + 1}`}</div>
+              <div style={{ width: "3.5rem" }}>{`${
+                lang.player
+              }${String.fromCharCode(65 + i)}`}</div>
             ),
             fixed: tableScroll ? "left" : null
           },
           ...Array(goodAmount)
             .fill(null)
             .map((_, c) => ({
-              title: `${lang.good}${c + 1}`,
+              title: `${lang.good}${String.fromCharCode(65 + c)}`,
               render: (_, row, r) => (
                 <InputNumber
                   size={"small"}

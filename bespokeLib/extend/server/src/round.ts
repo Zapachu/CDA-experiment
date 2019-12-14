@@ -75,6 +75,8 @@ export namespace Round {
       protected overCallback: () => Promise<void>
     ) {}
 
+    async roundStart() {}
+
     initGameState(): IRoundGameState {
       return {} as any;
     }
@@ -237,6 +239,7 @@ export class Logic<
     if (r < round) {
       const gameState = await this.stateManager.getGameState();
       gameState.round = r;
+      await this.roundsLogic[r].roundStart();
     } else {
       const playerStates = await this.stateManager.getPlayerStates();
       playerStates.forEach(

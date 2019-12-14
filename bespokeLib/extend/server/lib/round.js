@@ -127,6 +127,11 @@ var Round;
             this.stateManager = stateManager;
             this.overCallback = overCallback;
         }
+        Logic.prototype.roundStart = function () {
+            return __awaiter(this, void 0, void 0, function () { return __generator(this, function (_a) {
+                return [2 /*return*/];
+            }); });
+        };
         Logic.prototype.initGameState = function () {
             return {};
         };
@@ -253,19 +258,22 @@ var Logic = /** @class */ (function (_super) {
                 switch (_a.label) {
                     case 0:
                         round = this.params.round;
-                        if (!(r < round)) return [3 /*break*/, 2];
+                        if (!(r < round)) return [3 /*break*/, 3];
                         return [4 /*yield*/, this.stateManager.getGameState()];
                     case 1:
                         gameState = _a.sent();
                         gameState.round = r;
-                        return [3 /*break*/, 4];
-                    case 2: return [4 /*yield*/, this.stateManager.getPlayerStates()];
-                    case 3:
+                        return [4 /*yield*/, this.roundsLogic[r].roundStart()];
+                    case 2:
+                        _a.sent();
+                        return [3 /*break*/, 5];
+                    case 3: return [4 /*yield*/, this.stateManager.getPlayerStates()];
+                    case 4:
                         playerStates = _a.sent();
                         playerStates.forEach(function (p) { return (p.status = share_1.RoundDecorator.PlayerStatus.result); });
-                        _a.label = 4;
-                    case 4: return [4 /*yield*/, this.stateManager.syncState()];
-                    case 5:
+                        _a.label = 5;
+                    case 5: return [4 /*yield*/, this.stateManager.syncState()];
+                    case 6:
                         _a.sent();
                         return [2 /*return*/];
                 }
