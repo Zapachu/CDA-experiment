@@ -1,7 +1,6 @@
 import { Model } from '@bespoke/server'
 import { IMoveCallback } from '@bespoke/share'
 import { Group, Round } from '@extend/server'
-import { GroupDecorator } from '@extend/share'
 import { IPlayer, match } from './util/Match'
 import {
   IGroupCreateParams,
@@ -94,19 +93,17 @@ class GroupLogic extends Round.Logic<
     const gameState = await this.stateManager.getGameState(),
       { round } = gameState,
       gameRoundState = gameState.rounds[round],
-      playerStates = await this.stateManager.getPlayerStates(),
-      playerStatesArr = Object.values<GroupDecorator.TPlayerState<IGroupPlayerState>>(playerStates).sort(
-        (p1, p2) => p1.index - p2.index
-      )
+      playerStates = await this.stateManager.getPlayerStates()
     await Model.FreeStyleModel.create({
       game: this.gameId,
       key: `${this.groupIndex}_${round}`,
-      data: playerStatesArr.map(({ user, index, rounds }) => {
+      data: playerStates.map(({ user, index, rounds }) => {
         const { initAllocation, allocation } = gameRoundState,
           { sort } = rounds[round],
           privatePrices = this.params.roundsParams[round].privatePriceMatrix[index]
         return {
-          user: user.stuNum,
+          userName: user.name,
+          stuNum: user.stuNum,
           playerIndex: index + 1,
           privatePrices: privatePrices.join(' , '),
           initGood: initAllocation[index] === null ? '' : initAllocation[index] + 1,
