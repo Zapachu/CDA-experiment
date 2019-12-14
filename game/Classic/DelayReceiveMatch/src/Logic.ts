@@ -4,7 +4,6 @@ import { Group, Round } from '@extend/server'
 import { GroupDecorator } from '@extend/share'
 import { IPlayer, match } from './util/Match'
 import {
-  CONFIG,
   IGroupCreateParams,
   IGroupGameState,
   IGroupMoveParams,

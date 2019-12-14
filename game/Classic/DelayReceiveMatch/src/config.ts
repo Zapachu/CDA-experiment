@@ -2,10 +2,6 @@ import { RoundDecorator } from '@extend/share'
 
 export const namespace = 'DelayReceiveMatch'
 
-export const CONFIG = {
-  resultSeconds: 5
-}
-
 export enum FetchRoute {
   exportXls = '/exportXls/:gameId'
 }
