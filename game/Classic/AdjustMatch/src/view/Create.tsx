@@ -1,76 +1,44 @@
 import * as React from 'react'
-import { Group } from '@extend/client'
+import { Component, Group, Round } from '@extend/client'
 import { Label, Lang } from '@elf/component'
-import { Col, InputNumber, Row } from 'antd'
-import { ICreateParams } from '../config'
+import { InputNumber } from 'antd'
+import { IRoundCreateParams } from '../config'
+import { RoundDecorator } from '@extend/share'
 
-class GroupCreate extends Group.Group.Create<ICreateParams> {
-  lang = Lang.extractLang({
-    round: ['轮次(r)', 'Round(r)'],
-    oldPlayer: ['旧参与者(m)', 'OldPlayer(m)'],
-    minPrivateValue: ['最低心理价值(v1)', 'MinPrivateValue(v1)'],
-    maxPrivateValue: ['最高心理价值(v2)', 'MaxPrivateValue(v2)']
+function RoundCreate({
+  params: { groupSize },
+  roundParams,
+  setRoundParams
+}: Round.Round.ICreateProps<IRoundCreateParams>) {
+  const lang = Lang.extractLang({
+    oldPlayer: ['旧参与者(m)', 'OldPlayer(m)']
   })
-
-  componentDidMount(): void {
-    const {
-      props: {
-        params: { groupSize },
-        setGroupParams
-      }
-    } = this
-    setGroupParams({
-      round: 3,
-      oldPlayer: ~~(groupSize >> 1),
-      minPrivateValue: 25,
-      maxPrivateValue: 75
-    })
-  }
-
-  render() {
-    const {
-      props: {
-        params: { groupSize },
-        groupParams: { round, oldPlayer, minPrivateValue, maxPrivateValue },
-        setGroupParams
-      },
-      lang
-    } = this
-    return (
-      <Row>
-        <Col span={12} offset={6}>
-          <div>
-            <Label label={lang.round} />
-            <InputNumber value={round} onChange={v => setGroupParams({ round: +v })} min={0} max={6} />
-          </div>
-          <div>
-            <Label label={lang.oldPlayer} />
-            <InputNumber value={oldPlayer} onChange={v => setGroupParams({ oldPlayer: +v })} min={0} max={groupSize} />
-          </div>
-          <div>
-            <Label label={lang.minPrivateValue} />
-            <InputNumber
-              value={minPrivateValue}
-              onChange={v => setGroupParams({ minPrivateValue: +v })}
-              min={0}
-              max={50}
-            />
-          </div>
-          <div>
-            <Label label={lang.maxPrivateValue} />
-            <InputNumber
-              value={maxPrivateValue}
-              onChange={v => setGroupParams({ maxPrivateValue: +v })}
-              min={50}
-              max={100}
-            />
-          </div>
-        </Col>
-      </Row>
-    )
-  }
+  React.useEffect(() => setRoundParams({ oldPlayer: ~~(groupSize / 2) }), [])
+  return (
+    <section>
+      <>
+        <Label label={lang.oldPlayer} />
+        <InputNumber
+          value={roundParams.oldPlayer}
+          min={1}
+          max={groupSize}
+          onChange={oldPlayer => setRoundParams({ oldPlayer })}
+        />
+      </>
+      <Component.PrivateValueMatrix
+        groupSize={groupSize}
+        preMatrix={roundParams.privatePriceMatrix}
+        callback={privatePriceMatrix => setRoundParams({ privatePriceMatrix })}
+        goodAmount={groupSize}
+      />
+    </section>
+  )
 }
 
-export class Create extends Group.Create<ICreateParams> {
+class GroupCreate extends Round.Create<IRoundCreateParams> {
+  RoundCreate = RoundCreate
+}
+
+export class Create extends Group.Create<RoundDecorator.ICreateParams<IRoundCreateParams>> {
   GroupCreate = GroupCreate
 }

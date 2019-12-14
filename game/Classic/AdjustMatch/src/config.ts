@@ -1,7 +1,8 @@
+import { RoundDecorator } from '@extend/share'
+
 export const namespace = 'AdjustMatch'
 
 export const CONFIG = {
-  tradeSeconds: 30,
   resultSeconds: 5
 }
 
@@ -9,26 +10,23 @@ export enum FetchRoute {
   exportXls = '/exportXls/:gameId'
 }
 
-export enum MoveType {
-  guideDone,
+export enum RoundMoveType {
   overPrePlay,
   submit
 }
 
 export enum PushType {}
 
-export interface IMoveParams {
+export interface IRoundMoveParams {
   join: boolean
   sort: number[]
 }
 
 export interface IPushParams {}
 
-export interface ICreateParams {
-  round: number
+export interface IRoundCreateParams {
   oldPlayer: number
-  minPrivateValue: number
-  maxPrivateValue: number
+  privatePriceMatrix: number[][]
 }
 
 export enum GoodStatus {
@@ -37,17 +35,11 @@ export enum GoodStatus {
   left
 }
 
-export interface IGameRoundState {
-  timeLeft: number
+export interface IRoundGameState {
   initAllocation: number[]
   overPrePlay: boolean[]
   allocation: number[]
   goodStatus: GoodStatus[]
-}
-
-export interface IGameState {
-  round: number
-  rounds: IGameRoundState[]
 }
 
 export enum PlayerRoundStatus {
@@ -57,8 +49,7 @@ export enum PlayerRoundStatus {
   result
 }
 
-export interface IPlayerRoundState {
-  privatePrices: number[]
+export interface IRoundPlayerState {
   sort: number[]
   status: PlayerRoundStatus
 }
@@ -69,7 +60,8 @@ export enum PlayerStatus {
   result
 }
 
-export interface IPlayerState {
-  status: PlayerStatus
-  rounds: IPlayerRoundState[]
-}
+export type GroupMoveType = RoundDecorator.TMoveType<RoundMoveType>
+export type IGroupMoveParams = RoundDecorator.IMoveParams<IRoundMoveParams>
+export type IGroupCreateParams = RoundDecorator.ICreateParams<IRoundCreateParams>
+export type IGroupGameState = RoundDecorator.IGameState<IRoundGameState>
+export type IGroupPlayerState = RoundDecorator.IPlayerState<IRoundPlayerState>

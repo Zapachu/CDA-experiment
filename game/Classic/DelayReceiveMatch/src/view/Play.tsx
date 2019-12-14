@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Group, Round, Component } from '@extend/client'
+import { Component, Group, Round } from '@extend/client'
 import { GroupDecorator } from '@extend/share'
 import { Button, Table } from 'antd'
 import { Lang, MaskLoading } from '@elf/component'
@@ -126,7 +126,7 @@ function RoundPlay({
   }
 }
 
-function RoundHistory({
+export function RoundHistory({
   game,
   playerState,
   groupParams,
@@ -180,8 +180,8 @@ function RoundHistory({
         return
       }
       dataSource.push({
-        rowSpan: i === 0 ? (showHistory === GroupDecorator.ShowHistory.selfOnly ? 1 : groupSize) : 0,
-        round: i === 0 ? r : null,
+        rowSpan: showHistory === GroupDecorator.ShowHistory.selfOnly ? 1 : i === 0 ? groupSize : 0,
+        round: r,
         playerIndex: i,
         privatePrices: privatePrices.join(' , '),
         sort: playerState.index === i ? playerState.rounds[r].sort.join('>') : null,

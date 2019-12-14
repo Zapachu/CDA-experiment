@@ -1,35 +1,41 @@
 import * as React from 'react'
-import { Group, Component } from '@extend/client'
+import { Component, Group, Round } from '@extend/client'
 import { Button, Table, Tag } from 'antd'
 import * as style from './style.scss'
 import {
   GoodStatus,
-  ICreateParams,
-  IGameRoundState,
-  IGameState,
-  IMoveParams,
-  IPlayerRoundState,
-  IPlayerState,
+  GroupMoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupMoveParams,
+  IGroupPlayerState,
   IPushParams,
-  MoveType,
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundMoveParams,
+  IRoundPlayerState,
   PlayerRoundStatus,
-  PlayerStatus,
-  PushType
+  PushType,
+  RoundMoveType
 } from '../config'
 import { Lang, MaskLoading } from '@elf/component'
-import { FrameEmitter } from '@bespoke/share'
+import { RoundHistory } from '../../../DelayReceiveMatch/src/view/Play'
 
 function RoundPlay({
-  playerRoundState,
-  gameRoundState,
-  frameEmitter,
-  playerIndex
-}: {
-  playerRoundState: IPlayerRoundState
-  gameRoundState: IGameRoundState
-  frameEmitter: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
-  playerIndex: number
-}) {
+  roundParams,
+  roundPlayerState,
+  roundGameState,
+  roundFrameEmitter,
+  playerState
+}: Round.Round.IPlayProps<
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
+  PushType,
+  IRoundMoveParams,
+  IPushParams
+>) {
   const lang = Lang.extractLang({
     yourSeq: ['您的优先序为'],
     dragPlease: ['，请拖拽下方物品列表进行偏好表达'],
@@ -55,8 +61,10 @@ function RoundPlay({
     oldPlayer: ['旧租户'],
     newPlayer: ['新租户']
   })
-  const { goodStatus, initAllocation, allocation } = gameRoundState,
-    { privatePrices, status } = playerRoundState
+  const playerIndex = playerState.index,
+    { goodStatus, initAllocation, allocation } = roundGameState,
+    { status } = roundPlayerState,
+    privatePrices = roundParams.privatePriceMatrix[playerIndex]
   const colStyle: React.CSSProperties = {
     minWidth: '6rem',
     maxWidth: '12rem'
@@ -148,8 +156,13 @@ function RoundPlay({
             lang.wait4OldPlayers
           ) : (
             <>
-              <Button onClick={() => frameEmitter.emit(MoveType.overPrePlay, { join: false })}>{lang.leave}</Button>
-              <Button onClick={() => frameEmitter.emit(MoveType.overPrePlay, { join: true })} type={'primary'}>
+              <Button onClick={() => roundFrameEmitter.emit(RoundMoveType.overPrePlay, { join: false })}>
+                {lang.leave}
+              </Button>
+              <Button
+                onClick={() => roundFrameEmitter.emit(RoundMoveType.overPrePlay, { join: true })}
+                type={'primary'}
+              >
                 {lang.join}
               </Button>
             </>
@@ -226,7 +239,7 @@ function RoundPlay({
           setData={data => setSort(data.map(({ key }) => key))}
         />
         <div className={style.btnsWrapper}>
-          <Button type={'primary'} onClick={() => frameEmitter.emit(MoveType.submit, { sort })}>
+          <Button type={'primary'} onClick={() => roundFrameEmitter.emit(RoundMoveType.submit, { sort })}>
             {lang.submit}
           </Button>
         </div>
@@ -235,71 +248,27 @@ function RoundPlay({
   }
 }
 
-class GroupPlay extends Group.Group.Play<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+class GroupPlay extends Round.Play<
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
   PushType,
-  IMoveParams,
+  IRoundMoveParams,
   IPushParams
 > {
-  lang = Lang.extractLang({
-    round1: ['第', 'Round'],
-    round2: ['轮', ''],
-    wait4OtherPlayers: ['等待其它玩家加入......'],
-    gameOver: ['所有轮次结束，等待老师关闭实验']
-  })
+  RoundPlay = RoundPlay
 
-  render(): React.ReactNode {
-    const {
-      lang,
-      props: { playerState, groupGameState, groupFrameEmitter }
-    } = this
-    if (playerState.status === PlayerStatus.guide) {
-      return (
-        <section className={style.groupGuide}>
-          <Button type="primary" onClick={() => groupFrameEmitter.emit(MoveType.guideDone)}>
-            Start
-          </Button>
-        </section>
-      )
-    }
-    if (playerState.status === PlayerStatus.result) {
-      return <section className={style.groupResult}>{lang.gameOver}</section>
-    }
-    const playerRoundState = playerState.rounds[groupGameState.round],
-      gameRoundState = groupGameState.rounds[groupGameState.round]
-    if (!playerRoundState) {
-      return <MaskLoading label={lang.wait4OtherPlayers} />
-    }
-    return (
-      <section className={style.groupPlay}>
-        <h2 className={style.title}>
-          {lang.round1}
-          {groupGameState.round + 1}
-          {lang.round2}
-        </h2>
-        <RoundPlay
-          {...{
-            playerRoundState,
-            gameRoundState,
-            frameEmitter: groupFrameEmitter,
-            playerIndex: playerState.index
-          }}
-        />
-      </section>
-    )
-  }
+  RoundHistory = RoundHistory as any
 }
 
 export class Play extends Group.Play<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupPlayerState,
+  GroupMoveType,
   PushType,
-  IMoveParams,
+  IGroupMoveParams,
   IPushParams
 > {
   GroupPlay = GroupPlay

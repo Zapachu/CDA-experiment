@@ -1,16 +1,24 @@
 import * as React from 'react'
 import { Group } from '@extend/client'
 import { Table, Tabs } from 'antd'
-import { ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, MoveType, PushType } from '../config'
+import {
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupMoveParams,
+  IGroupPlayerState,
+  IPushParams,
+  PushType,
+  RoundMoveType
+} from '../config'
 import { Lang } from '@elf/component'
 
 class GroupPlay4Owner extends Group.Group.Play4Owner<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupPlayerState,
+  RoundMoveType,
   PushType,
-  IMoveParams,
+  IGroupMoveParams,
   IPushParams
 > {
   lang = Lang.extractLang({
@@ -20,7 +28,7 @@ class GroupPlay4Owner extends Group.Group.Play4Owner<
   render(): React.ReactNode {
     const {
       lang,
-      props: { groupPlayerStates, groupGameState }
+      props: { groupPlayerStates, groupGameState, groupParams }
     } = this
     const columns = [
       {
@@ -35,6 +43,10 @@ class GroupPlay4Owner extends Group.Group.Play4Owner<
         title: '优先序',
         dataIndex: 'playerIndex',
         key: 'playerIndex'
+      },
+      {
+        title: '心理价值',
+        dataIndex: 'privatePrices'
       },
       {
         title: '初始物品编号',
@@ -76,11 +88,13 @@ class GroupPlay4Owner extends Group.Group.Play4Owner<
                 dataSource={groupPlayerStates
                   .map(({ user, index, rounds }) => {
                     const { initAllocation, allocation } = gameRoundState
-                    const { privatePrices, sort } = rounds[i]
+                    const { sort } = rounds[i],
+                      privatePrices = groupParams.roundsParams[i].privatePriceMatrix[index]
                     return {
                       userName: user.name,
                       stuNum: user.stuNum,
                       playerIndex: index + 1,
+                      privatePrices: privatePrices.join(' , '),
                       initGood: initAllocation[index] === null ? null : initAllocation[index] + 1,
                       initGoodPrice: privatePrices[initAllocation[index]],
                       join: sort.length === 0 ? 'No' : 'Yes',
@@ -102,12 +116,12 @@ class GroupPlay4Owner extends Group.Group.Play4Owner<
 }
 
 export class Play4Owner extends Group.Play4Owner<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupPlayerState,
+  RoundMoveType,
   PushType,
-  IMoveParams,
+  IGroupMoveParams,
   IPushParams
 > {
   GroupPlay4Owner = GroupPlay4Owner
