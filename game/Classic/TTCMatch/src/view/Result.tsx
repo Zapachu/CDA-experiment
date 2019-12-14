@@ -1,15 +1,15 @@
 import * as React from 'react'
 import { Group } from '@extend/client'
 import * as style from './style.scss'
-import { ICreateParams, IGameState, IPlayerState } from '../config'
+import { IGroupGameState, IGroupPlayerState, IRoundCreateParams } from '../config'
 
-class GroupResult extends Group.Group.Result<ICreateParams, IGameState, IPlayerState> {
+class GroupResult extends Group.Group.Result<IRoundCreateParams, IGroupGameState, IGroupPlayerState> {
   render(): React.ReactNode {
     const { playerState, gameState } = this.props
     return <section className={style.groupResult}>Game Closed</section>
   }
 }
 
-export class Result extends Group.Result<ICreateParams, IGameState, IPlayerState> {
+export class Result extends Group.Result<IRoundCreateParams, IGroupGameState, IGroupPlayerState> {
   GroupResult = GroupResult
 }

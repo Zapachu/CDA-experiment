@@ -1,11 +1,19 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import { Core, Request } from '@bespoke/client'
-import { FetchRoute, ICreateParams, IGameState, IMoveParams, IPlayerState, MoveType, namespace } from '../config'
+import {
+  FetchRoute,
+  IGroupGameState,
+  IGroupPlayerState,
+  IRoundCreateParams,
+  IRoundMoveParams,
+  namespace,
+  RoundMoveType
+} from '../config'
 
 export function Result4Owner({
   game
-}: Core.IResult4OwnerProps<ICreateParams, IGameState, IPlayerState, MoveType, IMoveParams>) {
+}: Core.IResult4OwnerProps<IRoundCreateParams, IGroupGameState, IGroupPlayerState, RoundMoveType, IRoundMoveParams>) {
   return (
     <section className={style.groupResult4Owner}>
       <a

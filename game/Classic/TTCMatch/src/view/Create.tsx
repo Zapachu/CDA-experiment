@@ -1,59 +1,27 @@
 import * as React from 'react'
-import { Group } from '@extend/client'
-import { Label, Lang } from '@elf/component'
-import { Col, InputNumber, Row } from 'antd'
-import { ICreateParams } from '../config'
+import { Component, Group, Round } from '@extend/client'
+import { IRoundCreateParams } from '../config'
+import { RoundDecorator } from '@extend/share'
 
-class GroupCreate extends Group.Group.Create<ICreateParams> {
-  lang = Lang.extractLang({
-    round: ['轮次(r)', 'Round(r)'],
-    minPrivateValue: ['最低心理价值(v1)', 'MinPrivateValue(v1)'],
-    maxPrivateValue: ['最高心理价值(v2)', 'MaxPrivateValue(v2)']
-  })
-
-  componentDidMount(): void {
-    const {
-      props: {
-        params: { groupSize },
-        setGroupParams
-      }
-    } = this
-    setGroupParams({
-      round: 3,
-      minPrivateValue: 25,
-      maxPrivateValue: 75
-    })
-  }
-
-  render() {
-    const {
-      props: {
-        groupParams: { round, minPrivateValue, maxPrivateValue },
-        setGroupParams
-      },
-      lang
-    } = this
-    return (
-      <Row>
-        <Col span={12} offset={6}>
-          <div>
-            <Label label={lang.round} />
-            <InputNumber value={round} onChange={v => setGroupParams({ round: +v })} max={6} />
-          </div>
-          <div>
-            <Label label={lang.minPrivateValue} />
-            <InputNumber value={minPrivateValue} onChange={v => setGroupParams({ minPrivateValue: +v })} max={50} />
-          </div>
-          <div>
-            <Label label={lang.maxPrivateValue} />
-            <InputNumber value={maxPrivateValue} onChange={v => setGroupParams({ maxPrivateValue: +v })} min={50} />
-          </div>
-        </Col>
-      </Row>
-    )
-  }
+function RoundCreate({
+  params: { groupSize },
+  roundParams,
+  setRoundParams
+}: Round.Round.ICreateProps<IRoundCreateParams>) {
+  return (
+    <Component.PrivateValueMatrix
+      groupSize={groupSize}
+      goodAmount={groupSize}
+      preMatrix={roundParams.privatePriceMatrix}
+      callback={privatePriceMatrix => setRoundParams({ privatePriceMatrix })}
+    />
+  )
 }
 
-export class Create extends Group.Create<ICreateParams> {
+class GroupCreate extends Round.Create<IRoundCreateParams> {
+  RoundCreate = RoundCreate
+}
+
+export class Create extends Group.Create<RoundDecorator.ICreateParams<IRoundCreateParams>> {
   GroupCreate = GroupCreate
 }

@@ -1,131 +1,116 @@
-import { Group } from '@extend/server'
-import { IActor, IMoveCallback, IUserWithId } from '@bespoke/share'
-import { GroupDecorator } from '@extend/share'
-import {
-  CONFIG,
-  GoodStatus,
-  ICreateParams,
-  IGameRoundState,
-  IGameState,
-  IMoveParams,
-  IPlayerRoundState,
-  IPlayerState,
-  IPushParams,
-  MoveType,
-  PlayerRoundStatus,
-  PlayerStatus,
-  PushType
-} from './config'
 import { Model } from '@bespoke/server'
+import { IMoveCallback } from '@bespoke/share'
+import { Group, Round } from '@extend/server'
+import { GroupDecorator } from '@extend/share'
 import { IPlayer, match } from './util/Match'
+import {
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupMoveParams,
+  IGroupPlayerState,
+  IPushParams,
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundMoveParams,
+  IRoundPlayerState,
+  PlayerRoundStatus,
+  PushType,
+  RoundMoveType
+} from './config'
 import shuffle = require('lodash/shuffle')
 
-export class GroupLogic extends Group.Group.Logic<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+class RoundLogic extends Round.Round.Logic<
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
   PushType,
-  IMoveParams,
+  IRoundMoveParams,
   IPushParams
 > {
-  initGameState(): IGameState {
+  initGameState(): IRoundGameState {
+    const { privatePriceMatrix } = this.params,
+      groupSize = privatePriceMatrix.length
     const gameState = super.initGameState()
-    gameState.rounds = []
+    gameState.allocation = []
+    gameState.initAllocation = shuffle([
+      ...Array(groupSize)
+        .fill(null)
+        .map((_, i) => i)
+    ])
     return gameState
   }
 
-  async initPlayerState(
-    user: IUserWithId,
-    groupIndex: number,
-    index: number
-  ): Promise<GroupDecorator.TPlayerState<IPlayerState>> {
-    const playerState = await super.initPlayerState(user, groupIndex, index)
-    playerState.status = PlayerStatus.guide
-    playerState.rounds = []
+  async initPlayerState(index: number): Promise<IRoundPlayerState> {
+    const playerState = await super.initPlayerState(index)
+    playerState.status = PlayerRoundStatus.play
+    playerState.sort = []
     return playerState
   }
 
-  async startRound(r: number) {
-    const { round, minPrivateValue, maxPrivateValue } = this.params
-    if (r >= round) {
-      return
-    }
+  async roundOver() {
     const gameState = await this.stateManager.getGameState(),
       playerStates = await this.stateManager.getPlayerStates()
-    gameState.round = r
-    const goodStatus = shuffle([...Array(this.groupSize).fill(GoodStatus.active)])
-    gameState.rounds[r] = {
-      timeLeft: CONFIG.tradeSeconds,
-      goodStatus,
-      initAllocation: shuffle([...goodStatus.map((_, i) => i)]),
-      allocation: []
-    }
-    Object.values(playerStates).forEach(
-      p =>
-        (p.rounds[r] = {
-          status: PlayerRoundStatus.play,
-          sort: [],
-          privatePrices: Array(this.groupSize)
-            .fill(null)
-            .map(() => ~~(minPrivateValue + Math.random() * (maxPrivateValue - minPrivateValue)))
-        })
-    )
+    const players: IPlayer[] = playerStates.map(({ sort }) => ({ sort }))
+    gameState.initAllocation.forEach((good, i) => (players[i].good = good))
+    gameState.allocation = match(players)
+    playerStates.forEach(p => (p.status = PlayerRoundStatus.result))
     await this.stateManager.syncState()
+    global.setTimeout(async () => await this.overCallback(), 5e3)
   }
 
-  async getState(): Promise<{
-    gameState: IGameState
-    gameRoundState: IGameRoundState
-    playerStatesArr: GroupDecorator.TPlayerState<IPlayerState>[]
-    playerRoundStates: IPlayerRoundState[]
-  }> {
+  async playerMoveReducer(
+    index: number,
+    type: RoundMoveType,
+    params: IRoundMoveParams,
+    cb: IMoveCallback
+  ): Promise<void> {
+    const playerState = await this.stateManager.getPlayerState(index),
+      playerStates = await this.stateManager.getPlayerStates()
+    switch (type) {
+      case RoundMoveType.submit:
+        playerState.status = PlayerRoundStatus.wait
+        playerState.sort = params.sort
+        if (playerStates.every(p => p.status === PlayerRoundStatus.wait)) {
+          await this.roundOver()
+        }
+        break
+    }
+  }
+}
+
+class GroupLogic extends Round.Logic<
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
+  PushType,
+  IRoundMoveParams,
+  IPushParams
+> {
+  RoundLogic = RoundLogic
+
+  async roundOverCallback(): Promise<any> {
     const gameState = await this.stateManager.getGameState(),
       { round } = gameState,
       gameRoundState = gameState.rounds[round],
       playerStates = await this.stateManager.getPlayerStates(),
-      playerStatesArr = Object.values<GroupDecorator.TPlayerState<IPlayerState>>(playerStates).sort(
+      playerStatesArr = Object.values<GroupDecorator.TPlayerState<IGroupPlayerState>>(playerStates).sort(
         (p1, p2) => p1.index - p2.index
-      ),
-      playerRoundStates = playerStatesArr.map(({ rounds }) => rounds[round])
-    return {
-      gameState,
-      gameRoundState,
-      playerStatesArr,
-      playerRoundStates
-    }
-  }
-
-  match(players: IPlayer[]): number[] {
-    return match(players)
-  }
-
-  async roundOver() {
-    const { gameState, gameRoundState, playerRoundStates, playerStatesArr } = await this.getState()
-    const players: IPlayer[] = playerRoundStates.map(({ sort }) => ({ sort }))
-    gameRoundState.initAllocation.forEach((good, i) => (players[i].good = good))
-    gameRoundState.allocation = match(players)
-    playerRoundStates.forEach(p => (p.status = PlayerRoundStatus.result))
-    await this.stateManager.syncState()
-    global.setTimeout(async () => {
-      gameState.round < this.params.round - 1
-        ? this.startRound(gameState.round + 1)
-        : playerStatesArr.forEach(p => (p.status = PlayerStatus.result))
-      await this.stateManager.syncState()
-    }, 5e3)
-    await this.stateManager.syncState()
+      )
     await Model.FreeStyleModel.create({
       game: this.gameId,
-      key: `${this.groupIndex}_${gameState.round}`,
+      key: `${this.groupIndex}_${round}`,
       data: playerStatesArr.map(({ user, index, rounds }) => {
-        const { initAllocation, allocation } = gameRoundState
-        const { privatePrices, sort } = rounds[gameState.round]
+        const { initAllocation, allocation } = gameRoundState,
+          { sort } = rounds[round],
+          privatePrices = this.params.roundsParams[round].privatePriceMatrix[index]
         return {
           user: user.stuNum,
           playerIndex: index + 1,
+          privatePrices: privatePrices.join(' , '),
           initGood: initAllocation[index] === null ? '' : initAllocation[index] + 1,
           initGoodPrice: privatePrices[initAllocation[index]] || '',
-          join: sort.length === 0 ? 'No' : 'Yes',
           sort: sort.map(i => i + 1).join('>'),
           good: allocation[index] + 1,
           goodPrice: privatePrices[allocation[index]]
@@ -133,45 +118,15 @@ export class GroupLogic extends Group.Group.Logic<
       })
     })
   }
-
-  async playerMoveReducer(index: number, type: MoveType, params: IMoveParams, cb: IMoveCallback): Promise<void> {
-    const { groupSize } = this
-    const { gameState, playerStatesArr, playerRoundStates } = await this.getState(),
-      playerState = await this.stateManager.getPlayerState(index),
-      { round } = gameState,
-      gameRoundState = gameState.rounds[round],
-      playerRoundState = playerState.rounds[round]
-    switch (type) {
-      case MoveType.guideDone: {
-        playerState.status = PlayerStatus.round
-        if (playerStatesArr.length === groupSize && playerStatesArr.every(p => p.status === PlayerStatus.round)) {
-          this.startRound(0)
-        }
-        break
-      }
-      case MoveType.submit: {
-        playerRoundState.status = PlayerRoundStatus.wait
-        playerRoundState.sort = params.sort
-        if (params.sort.length === 0) {
-          const { goodStatus, initAllocation } = gameRoundState
-          goodStatus[initAllocation[playerState.index]] = GoodStatus.left
-        }
-        if (playerRoundStates.every(p => p.status === PlayerRoundStatus.wait)) {
-          this.roundOver()
-        }
-        break
-      }
-    }
-  }
 }
 
 export class Logic extends Group.Logic<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupPlayerState,
+  RoundMoveType,
   PushType,
-  IMoveParams,
+  IGroupMoveParams,
   IPushParams
 > {
   GroupLogic = GroupLogic
