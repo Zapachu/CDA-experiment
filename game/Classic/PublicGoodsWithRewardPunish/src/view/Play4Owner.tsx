@@ -1,90 +1,108 @@
 import * as React from 'react'
 import { Group } from '@extend/client'
 import { Table, Tabs } from 'antd'
-import { ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, MoveType, PushType } from '../config'
+import {
+  GroupMoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupMoveParams,
+  IGroupPlayerState,
+  IPushParams,
+  PushType
+} from '../config'
 import { Lang } from '@elf/component'
 
 class GroupPlay4Owner extends Group.Group.Play4Owner<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupPlayerState,
+  GroupMoveType,
   PushType,
-  IMoveParams,
+  IGroupMoveParams,
   IPushParams
 > {
   lang = Lang.extractLang({
-    roundIndex: [i => `第${i + 1}轮`, i => `Round ${i + 1}`],
-    playerNo: ['玩家编号'],
-    x: ['投入'],
-    d: ['奖惩成本'],
-    extra: ['奖/惩'],
-    result: ['最终收益']
+    roundIndex: [i => `第${i + 1}轮`, i => `Round ${i + 1}`]
   })
 
   render(): React.ReactNode {
     const {
       lang,
-      props: { groupGameState }
+      props: { groupGameState, groupPlayerStates }
     } = this
+    const columns = [
+      {
+        title: '玩家',
+        dataIndex: 'userName'
+      },
+      {
+        title: '学号',
+        dataIndex: 'stuNum'
+      },
+      {
+        title: '编号',
+        dataIndex: 'playerIndex'
+      },
+      {
+        title: '投入',
+        dataIndex: 'x'
+      },
+      {
+        title: '回报',
+        dataIndex: 'reward'
+      },
+      {
+        title: '奖惩成本',
+        dataIndex: 'd'
+      },
+      {
+        title: '奖/惩',
+        dataIndex: 'extra'
+      },
+      {
+        title: '最终收益',
+        dataIndex: 'result'
+      }
+    ]
     return (
       <Tabs tabPosition={'left'}>
-        {groupGameState.rounds.map((gameRoundState, i) =>
-          gameRoundState.reward ? (
+        {groupGameState.rounds.map(({ players, reward }, i) => {
+          return (
             <Tabs.TabPane tab={lang.roundIndex(i)} key={i.toString()}>
               <Table
                 pagination={false}
-                columns={[
-                  {
-                    title: lang.playerNo,
-                    dataIndex: 'index',
-                    key: 'index',
-                    render: i => <div>{i + 1}</div>
-                  },
-                  {
-                    title: lang.x,
-                    dataIndex: 'x',
-                    key: 'x'
-                  },
-                  {
-                    title: lang.d,
-                    dataIndex: 'd',
-                    key: 'd'
-                  },
-                  {
-                    title: lang.extra,
-                    dataIndex: 'extra',
-                    key: 'extra'
-                  },
-                  {
-                    title: lang.result,
-                    dataIndex: 'result',
-                    key: 'result'
-                  }
-                ]}
-                dataSource={gameRoundState.players.map(({ x, d, extra }, i) => ({
-                  index: i,
-                  x,
-                  d,
-                  extra,
-                  result: x + gameRoundState.reward - d + extra
-                }))}
+                columns={columns}
+                dataSource={groupPlayerStates
+                  .map(({ user, index }) => {
+                    const { x, extra, d } = players[index]
+                    return {
+                      userName: user.name,
+                      stuNum: user.stuNum,
+                      playerIndex: index + 1,
+                      x,
+                      d,
+                      extra,
+                      reward,
+                      result: reward ? x + reward - d + extra : ''
+                    }
+                  })
+                  .sort(({ playerIndex: p1 }, { playerIndex: p2 }) => p1 - p2)}
               />
             </Tabs.TabPane>
-          ) : null
-        )}
+          )
+        })}
       </Tabs>
     )
   }
 }
 
 export class Play4Owner extends Group.Play4Owner<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupPlayerState,
+  GroupMoveType,
   PushType,
-  IMoveParams,
+  IGroupMoveParams,
   IPushParams
 > {
   GroupPlay4Owner = GroupPlay4Owner

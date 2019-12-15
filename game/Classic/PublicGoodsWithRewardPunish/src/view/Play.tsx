@@ -1,37 +1,41 @@
 import * as React from 'react'
-import { Group } from '@extend/client'
+import { Group, Round } from '@extend/client'
 import { Button, InputNumber, Table } from 'antd'
 import * as style from './style.scss'
 import {
-  ICreateParams,
-  IGameRoundState,
-  IGameState,
-  IMoveParams,
-  IPlayerRoundState,
-  IPlayerState,
+  GroupMoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupMoveParams,
+  IGroupPlayerState,
   IPushParams,
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundMoveParams,
+  IRoundPlayerState,
   Mode,
-  MoveType,
   PlayerRoundStatus,
-  PlayerStatus,
-  PushType
+  PushType,
+  RoundMoveType
 } from '../config'
 import { Lang, MaskLoading } from '@elf/component'
-import { FrameEmitter } from '@bespoke/share'
+import { GroupDecorator } from '@extend/share'
 
 function RoundPlay({
-  playerRoundState,
-  gameRoundState,
-  groupParams,
-  frameEmitter,
-  playerIndex
-}: {
-  groupParams: ICreateParams
-  playerRoundState: IPlayerRoundState
-  gameRoundState: IGameRoundState
-  frameEmitter: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
-  playerIndex: number
-}) {
+  roundFrameEmitter,
+  roundParams: { M, P, mode, t, K },
+  roundGameState,
+  roundPlayerState,
+  playerState
+}: Round.Round.IPlayProps<
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
+  PushType,
+  IRoundMoveParams,
+  IPushParams
+>) {
   const lang = Lang.extractLang({
     timeLeft: ['剩余时间', 'Time Left'],
     yourNo: [],
@@ -50,8 +54,8 @@ function RoundPlay({
   })
   const [x, setX] = React.useState(null)
   const [d, setD] = React.useState(null)
-  const { timeLeft, reward } = gameRoundState
-  switch (playerRoundState.status) {
+  const { timeLeft, reward } = roundGameState
+  switch (roundPlayerState.status) {
     case PlayerRoundStatus.play:
       return (
         <section className={style.roundPlay}>
@@ -59,27 +63,15 @@ function RoundPlay({
             {lang.timeLeft}&nbsp;:&nbsp;<em>{timeLeft}</em>s
           </label>
           <p className={style.playTips}>{lang.tips}</p>
-          <InputNumber
-            placeholder={`0≤x≤${groupParams.M}`}
-            value={x}
-            onChange={v => setX(+v)}
-            min={0}
-            max={groupParams.M}
-          />
-          {groupParams.mode === Mode.normal ? null : (
+          <InputNumber placeholder={`0≤x≤${M}`} value={x} onChange={v => setX(+v)} min={0} max={M} />
+          {mode === Mode.normal ? null : (
             <>
-              <p className={style.playTips}>{groupParams.mode === Mode.reward ? lang.tips2reward : lang.tips2punish}</p>
-              <InputNumber
-                placeholder={`0≤d≤${groupParams.M - x}`}
-                value={d}
-                onChange={v => setD(+v)}
-                min={0}
-                max={groupParams.M - x}
-              />
+              <p className={style.playTips}>{mode === Mode.reward ? lang.tips2reward : lang.tips2punish}</p>
+              <InputNumber placeholder={`0≤d≤${M - x}`} value={d} onChange={v => setD(+v)} min={0} max={M - x} />
             </>
           )}
           <br />
-          <Button type="primary" onClick={() => frameEmitter.emit(MoveType.submit, { x, d })}>
+          <Button type="primary" onClick={() => roundFrameEmitter.emit(RoundMoveType.submit, { x, d })}>
             {lang.submit}
           </Button>
         </section>
@@ -99,7 +91,7 @@ function RoundPlay({
                 render: i => (
                   <div>
                     {i + 1}
-                    {i === playerIndex ? lang.you : null}
+                    {i === playerState.index ? lang.you : null}
                   </div>
                 )
               },
@@ -124,7 +116,7 @@ function RoundPlay({
                 key: 'result'
               }
             ]}
-            dataSource={gameRoundState.players.map(({ x, d, extra }, i) => ({
+            dataSource={roundGameState.players.map(({ x, d, extra }, i) => ({
               index: i,
               x,
               d,
@@ -138,75 +130,104 @@ function RoundPlay({
   }
 }
 
-class GroupPlay extends Group.Group.Play<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+function RoundHistory({
+  game,
+  playerState,
+  groupGameState
+}: Round.Round.IHistoryProps<
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
   PushType,
-  IMoveParams,
+  IRoundMoveParams,
+  IPushParams
+>) {
+  const { groupSize, showHistory } = game.params
+  const columns = [
+    {
+      title: '轮次',
+      dataIndex: 'round',
+      render: (r, { rowSpan }) => ({
+        children: r + 1,
+        props: { rowSpan }
+      })
+    },
+    {
+      title: '编号',
+      dataIndex: 'playerIndex',
+      render: i => `${i + 1}${playerState.index === i ? '(你)' : ''}`
+    },
+    {
+      title: '投入',
+      dataIndex: 'x'
+    },
+    {
+      title: '回报',
+      dataIndex: 'reward'
+    },
+    {
+      title: '奖惩成本',
+      dataIndex: 'd'
+    },
+    {
+      title: '奖/惩',
+      dataIndex: 'extra'
+    },
+    {
+      title: '最终收益',
+      dataIndex: 'result'
+    }
+  ]
+  const dataSource = []
+  groupGameState.rounds.forEach(({ players, reward }, r) => {
+    for (let index = 0; index < groupSize; index++) {
+      const { x, d, extra } = players[index]
+      if (showHistory === GroupDecorator.ShowHistory.selfOnly && index !== playerState.index) {
+        continue
+      }
+      dataSource.push({
+        rowSpan: showHistory === GroupDecorator.ShowHistory.selfOnly ? 1 : index === 0 ? groupSize : 0,
+        round: r,
+        playerIndex: index,
+        x,
+        d,
+        extra,
+        reward,
+        result: reward ? x + reward - d + extra : ''
+      })
+    }
+  })
+  return <Table pagination={{ pageSize: groupSize * 2 }} size={'small'} columns={columns} dataSource={dataSource} />
+}
+
+class GroupPlay extends Round.Play<
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
+  PushType,
+  IRoundMoveParams,
   IPushParams
 > {
-  lang = Lang.extractLang({
-    round1: ['第', 'Round'],
-    round2: ['轮', ''],
-    wait4OtherPlayers: ['等待其它玩家加入......'],
-    gameOver: ['所有轮次结束，等待老师关闭实验']
-  })
+  RoundPlay = RoundPlay
 
-  render(): React.ReactNode {
-    const {
-      lang,
-      props: { playerState, groupGameState, groupFrameEmitter, groupParams }
-    } = this
-    if (playerState.status === PlayerStatus.guide) {
-      return (
-        <section className={style.groupGuide}>
-          <p>
-            本实验共R轮。在本次实验中，您将会被随机的分配到某个组中，每组有N名成员。每名成员在实验开始时都有M实验币，您可以选择拿出一部分实验币出来作为公共资金投资。每组的公共资金总和将会翻K倍，然后平均返回给该组的N人。您的收益将等于您从您所在组的公共资金中获得的回报加上您未投入公共资金池的实验币。此外，可以选择花费一定的成本惩罚投资公共资金池最少的人，具体的惩罚机制为：花费惩罚成本的参与者在原来的基础上减少d，收到惩罚的参与者实验收益减少P*d，其中P为惩罚参数，大于0小于等于1。
-          </p>
-          <Button type="primary" onClick={() => groupFrameEmitter.emit(MoveType.guideDone)}>
-            Start
-          </Button>
-        </section>
-      )
-    }
-    if (playerState.status === PlayerStatus.result) {
-      return <section className={style.groupResult}>{lang.gameOver}</section>
-    }
-    const playerRoundState = playerState.rounds[groupGameState.round],
-      gameRoundState = groupGameState.rounds[groupGameState.round]
-    if (!playerRoundState) {
-      return <MaskLoading label={lang.wait4OtherPlayers} />
-    }
-    return (
-      <section className={style.groupPlay}>
-        <h2 className={style.title}>
-          {lang.round1}
-          {groupGameState.round + 1}
-          {lang.round2}
-        </h2>
-        <RoundPlay
-          {...{
-            groupParams,
-            playerRoundState,
-            gameRoundState,
-            frameEmitter: groupFrameEmitter,
-            playerIndex: playerState.index
-          }}
-        />
-      </section>
-    )
-  }
+  RoundHistory = RoundHistory
+
+  RoundGuide = () => (
+    <p>
+      本实验共R轮。在本次实验中，您将会被随机的分配到某个组中，每组有N名成员。每名成员在实验开始时都有M实验币，您可以选择拿出一部分实验币出来作为公共资金投资。每组的公共资金总和将会翻K倍，然后平均返回给该组的N人。您的收益将等于您从您所在组的公共资金中获得的回报加上您未投入公共资金池的实验币。此外，可以选择花费一定的成本惩罚投资公共资金池最少的人，具体的惩罚机制为：花费惩罚成本的参与者在原来的基础上减少d，收到惩罚的参与者实验收益减少P*d，其中P为惩罚参数，大于0小于等于1。
+    </p>
+  )
 }
 
 export class Play extends Group.Play<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupPlayerState,
+  GroupMoveType,
   PushType,
-  IMoveParams,
+  IGroupMoveParams,
   IPushParams
 > {
   GroupPlay = GroupPlay
