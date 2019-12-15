@@ -1,34 +1,39 @@
 import * as React from 'react'
-import { Group } from '@extend/client'
+import { Group, Round } from '@extend/client'
 import { Button, Table, Tag } from 'antd'
 import * as style from './style.scss'
+import { GroupDecorator } from '@extend/share'
+import { Lang } from '@elf/component'
 import {
   ExchangeStatus,
-  ICreateParams,
-  IGameRoundState,
-  IGameState,
-  IMoveParams,
-  IPlayerRoundState,
-  IPlayerState,
+  GroupMoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupMoveParams,
+  IGroupPlayerState,
   IPushParams,
-  MoveType,
-  PlayerStatus,
-  PushType
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundMoveParams,
+  IRoundPlayerState,
+  PushType,
+  RoundMoveType
 } from '../config'
-import { Lang, MaskLoading } from '@elf/component'
-import { FrameEmitter } from '@bespoke/share'
 
 function RoundPlay({
-  playerRoundState,
-  gameRoundState,
-  frameEmitter,
-  playerIndex
-}: {
-  playerRoundState: IPlayerRoundState
-  gameRoundState: IGameRoundState
-  frameEmitter: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
-  playerIndex: number
-}) {
+  roundParams,
+  roundGameState,
+  roundFrameEmitter,
+  playerState
+}: Round.Round.IPlayProps<
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
+  PushType,
+  IRoundMoveParams,
+  IPushParams
+>) {
   const lang = Lang.extractLang({
     goodNo: ['物品', 'Good'],
     privateValue: ['心理价值', 'Private Value'],
@@ -54,8 +59,9 @@ function RoundPlay({
     display: 'flex',
     alignItems: 'center'
   }
-  const { allocation, exchangeMatrix, timeLeft } = gameRoundState,
-    { privatePrices } = playerRoundState
+  const playerIndex = playerState.index,
+    { allocation, exchangeMatrix, timeLeft } = roundGameState,
+    privatePrices = roundParams.privatePriceMatrix[playerIndex]
   return (
     <>
       <div className={style.roundPlay}>
@@ -97,7 +103,7 @@ function RoundPlay({
                       return <span>{lang.waitRes}</span>
                     }
                     const btnProps: any = {
-                      onClick: () => frameEmitter.emit(MoveType.exchange, { good })
+                      onClick: () => roundFrameEmitter.emit(RoundMoveType.exchange, { good })
                     }
                     if (exchangeMatrix[good][playerIndex] === ExchangeStatus.waiting) {
                       return <Button {...btnProps}>{lang.resExchange}</Button>
@@ -140,71 +146,103 @@ function RoundPlay({
   )
 }
 
-class GroupPlay extends Group.Group.Play<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+export function RoundHistory({
+  game,
+  playerState,
+  groupParams,
+  groupGameState
+}: Round.Round.IHistoryProps<
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
   PushType,
-  IMoveParams,
+  IRoundMoveParams,
+  IPushParams
+>) {
+  const { groupSize, showHistory } = game.params
+  const columns = [
+    {
+      title: '轮次',
+      dataIndex: 'round',
+      render: (r, { rowSpan }) => ({
+        children: r + 1,
+        props: { rowSpan }
+      })
+    },
+    {
+      title: '编号',
+      dataIndex: 'playerIndex',
+      render: i => `${i + 1}${playerState.index === i ? '(你)' : ''}`
+    },
+    {
+      title: '心理价值',
+      dataIndex: 'privatePrices'
+    },
+    {
+      title: '初始物品编号',
+      dataIndex: 'initGood',
+      key: 'initGood'
+    },
+    {
+      title: '初始物品价格',
+      dataIndex: 'initGoodPrice',
+      key: 'initGoodPrice'
+    },
+    {
+      title: '最终物品编号',
+      dataIndex: 'good',
+      key: 'good'
+    },
+    {
+      title: '最终物品价格',
+      dataIndex: 'goodPrice',
+      key: 'goodPrice'
+    }
+  ]
+  const dataSource = []
+  groupGameState.rounds.forEach((roundGameState, r) =>
+    roundGameState.allocation.forEach((good, i) => {
+      const privatePrices = groupParams.roundsParams[r].privatePriceMatrix[i]
+      if (showHistory === GroupDecorator.ShowHistory.selfOnly && i !== playerState.index) {
+        return
+      }
+      dataSource.push({
+        rowSpan: showHistory === GroupDecorator.ShowHistory.selfOnly ? 1 : i === 0 ? groupSize : 0,
+        round: r,
+        playerIndex: i,
+        privatePrices: privatePrices.join(' , '),
+        initGood: i + 1,
+        initGoodPrice: privatePrices[i],
+        good: good + 1,
+        goodPrice: privatePrices[good]
+      })
+    })
+  )
+  return <Table pagination={{ pageSize: groupSize * 2 }} size={'small'} columns={columns} dataSource={dataSource} />
+}
+
+class GroupPlay extends Round.Play<
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
+  PushType,
+  IRoundMoveParams,
   IPushParams
 > {
-  lang = Lang.extractLang({
-    round1: ['第', 'Round'],
-    round2: ['轮', ''],
-    wait4OtherPlayers: ['等待其它玩家加入......'],
-    gameOver: ['所有轮次结束，等待老师关闭实验']
-  })
+  RoundPlay = RoundPlay
 
-  render(): React.ReactNode {
-    const {
-      lang,
-      props: { playerState, groupGameState, groupFrameEmitter }
-    } = this
-    if (playerState.status === PlayerStatus.guide) {
-      return (
-        <section className={style.groupGuide}>
-          <Button type="primary" onClick={() => groupFrameEmitter.emit(MoveType.guideDone)}>
-            Start
-          </Button>
-        </section>
-      )
-    }
-    if (playerState.status === PlayerStatus.result) {
-      return <section className={style.groupResult}>{lang.gameOver}</section>
-    }
-    const playerRoundState = playerState.rounds[groupGameState.round],
-      gameRoundState = groupGameState.rounds[groupGameState.round]
-    if (!playerRoundState) {
-      return <MaskLoading label={lang.wait4OtherPlayers} />
-    }
-    return (
-      <section className={style.groupPlay}>
-        <h2 className={style.title}>
-          {lang.round1}
-          {groupGameState.round + 1}
-          {lang.round2}
-        </h2>
-        <RoundPlay
-          {...{
-            playerRoundState,
-            gameRoundState,
-            frameEmitter: groupFrameEmitter,
-            playerIndex: playerState.index
-          }}
-        />
-      </section>
-    )
-  }
+  RoundHistory = RoundHistory
 }
 
 export class Play extends Group.Play<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupPlayerState,
+  GroupMoveType,
   PushType,
-  IMoveParams,
+  IGroupMoveParams,
   IPushParams
 > {
   GroupPlay = GroupPlay

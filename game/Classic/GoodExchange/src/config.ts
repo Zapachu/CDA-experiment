@@ -1,27 +1,27 @@
+import { RoundDecorator } from '@extend/share'
+
 export const namespace = 'GoodExchange'
 
 export enum FetchRoute {
   exportXls = '/exportXls/:gameId'
 }
 
-export enum MoveType {
-  guideDone,
+export enum RoundMoveType {
   exchange
 }
 
 export enum PushType {}
 
-export interface IMoveParams {
+export interface IRoundMoveParams {
   good: number
 }
 
 export interface IPushParams {}
 
-export interface ICreateParams {
-  round: number
+export interface IRoundCreateParams {
   t: number
-  minPrivateValue: number
-  maxPrivateValue: number
+  buyerAmount: number
+  privatePriceMatrix: number[][]
 }
 
 export enum ExchangeStatus {
@@ -30,20 +30,13 @@ export enum ExchangeStatus {
   exchanged
 }
 
-export interface IGameRoundState {
+export interface IRoundGameState {
   timeLeft: number
   exchangeMatrix: ExchangeStatus[][]
   allocation: number[]
 }
 
-export interface IGameState {
-  round: number
-  rounds: IGameRoundState[]
-}
-
-export interface IPlayerRoundState {
-  privatePrices: number[]
-}
+export interface IRoundPlayerState {}
 
 export enum PlayerStatus {
   guide,
@@ -51,7 +44,8 @@ export enum PlayerStatus {
   result
 }
 
-export interface IPlayerState {
-  status: PlayerStatus
-  rounds: IPlayerRoundState[]
-}
+export type GroupMoveType = RoundDecorator.TMoveType<RoundMoveType>
+export type IGroupMoveParams = RoundDecorator.IMoveParams<IRoundMoveParams>
+export type IGroupCreateParams = RoundDecorator.ICreateParams<IRoundCreateParams>
+export type IGroupGameState = RoundDecorator.IGameState<IRoundGameState>
+export type IGroupPlayerState = RoundDecorator.IPlayerState<IRoundPlayerState>

@@ -1,163 +1,85 @@
-import { Group } from '@extend/server'
-import { IActor, IMoveCallback, IUserWithId } from '@bespoke/share'
-import { GroupDecorator } from '@extend/share'
+import { Group, Round } from '@extend/server'
+import { IMoveCallback } from '@bespoke/share'
 import { Model } from '@bespoke/server'
 import {
   ExchangeStatus,
-  ICreateParams,
-  IGameRoundState,
-  IGameState,
-  IMoveParams,
-  IPlayerRoundState,
-  IPlayerState,
+  GroupMoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupMoveParams,
+  IGroupPlayerState,
   IPushParams,
-  MoveType,
-  PlayerStatus,
-  PushType
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundMoveParams,
+  IRoundPlayerState,
+  PushType,
+  RoundMoveType
 } from './config'
 
-class GroupLogic extends Group.Group.Logic<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+class RoundLogic extends Round.Round.Logic<
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
   PushType,
-  IMoveParams,
+  IRoundMoveParams,
   IPushParams
 > {
-  initGameState(): IGameState {
-    const gameState = super.initGameState()
-    gameState.rounds = []
-    return gameState
-  }
+  alive: boolean = true
 
-  async initPlayerState(
-    user: IUserWithId,
-    groupIndex: number,
-    index: number
-  ): Promise<GroupDecorator.TPlayerState<IPlayerState>> {
-    const playerState = await super.initPlayerState(user, groupIndex, index)
-    playerState.status = PlayerStatus.guide
-    playerState.rounds = []
-    return playerState
-  }
-
-  async startRound(r: number) {
-    const { round, minPrivateValue, maxPrivateValue } = this.params
-    if (r >= round) {
-      return
-    }
-    const gameState = await this.stateManager.getGameState(),
-      playerStates = await this.stateManager.getPlayerStates()
-    gameState.round = r
-    const gameRoundState = {
-      timeLeft: this.params.t,
-      exchangeMatrix: Array(this.groupSize)
-        .fill(null)
-        .map(() =>
-          Array(this.groupSize)
-            .fill(null)
-            .map(() => ExchangeStatus.null)
-        ),
-      allocation: Array(this.groupSize).fill(null)
-    }
-    gameState.rounds[r] = gameRoundState
-    Object.values(playerStates).forEach(
-      p =>
-        (p.rounds[r] = {
-          privatePrices: Array(this.groupSize)
-            .fill(null)
-            .map(() => ~~(minPrivateValue + Math.random() * (maxPrivateValue - minPrivateValue)))
-        })
-    )
-    await this.stateManager.syncState()
+  async roundStart() {
+    const gameState = await this.stateManager.getGameState()
     const timer = global.setInterval(async () => {
-      if (gameState.round > r) {
+      if (!this.alive) {
         global.clearInterval(timer)
       }
-      if (gameRoundState.timeLeft <= 1) {
-        this.roundOver()
+      if (gameState.timeLeft <= 1) {
+        await this.roundOver()
         global.clearInterval(timer)
       }
-      gameRoundState.timeLeft--
+      gameState.timeLeft--
       await this.stateManager.syncState()
     }, 1e3)
   }
 
-  async getState(): Promise<{
-    gameState: IGameState
-    gameRoundState: IGameRoundState
-    playerStatesArr: GroupDecorator.TPlayerState<IPlayerState>[]
-    playerRoundStates: IPlayerRoundState[]
-  }> {
-    const gameState = await this.stateManager.getGameState(),
-      { round } = gameState,
-      gameRoundState = gameState.rounds[round],
-      playerStates = await this.stateManager.getPlayerStates(),
-      playerStatesArr = Object.values<GroupDecorator.TPlayerState<IPlayerState>>(playerStates).sort(
-        (p1, p2) => p1.index - p2.index
-      ),
-      playerRoundStates = playerStatesArr.map(({ rounds }) => rounds[round])
-    return {
-      gameState,
-      gameRoundState,
-      playerStatesArr,
-      playerRoundStates
-    }
+  initGameState(): IRoundGameState {
+    const { privatePriceMatrix } = this.params
+    const gameState = super.initGameState()
+    gameState.timeLeft = this.params.t
+    gameState.allocation = privatePriceMatrix.map(() => null)
+    gameState.exchangeMatrix = privatePriceMatrix.map(row => row.map(() => ExchangeStatus.null))
+    return gameState
   }
 
   async roundOver() {
-    const { gameState, playerStatesArr, gameRoundState } = await this.getState(),
-      { allocation } = gameState.rounds[gameState.round]
+    this.alive = false
+    const { allocation } = await this.stateManager.getGameState()
     allocation.forEach((good, i) => (good === null ? (allocation[i] = i) : null))
-    gameState.round < this.params.round - 1
-      ? this.startRound(gameState.round + 1)
-      : playerStatesArr.forEach(p => (p.status = PlayerStatus.result))
     await this.stateManager.syncState()
-    await Model.FreeStyleModel.create({
-      game: this.gameId,
-      key: `${this.groupIndex}_${gameState.round}`,
-      data: playerStatesArr.map(({ user, index, rounds }) => {
-        const { allocation } = gameRoundState
-        const { privatePrices } = rounds[gameState.round]
-        return {
-          user: user.stuNum,
-          playerIndex: index + 1,
-          initGood: index + 1,
-          initGoodPrice: privatePrices[index],
-          good: allocation[index] + 1,
-          goodPrice: privatePrices[allocation[index]]
-        }
-      })
-    })
+    global.setTimeout(async () => await this.overCallback(), 5e3)
   }
 
-  async playerMoveReducer(index: number, type: MoveType, params: IMoveParams, cb: IMoveCallback): Promise<void> {
-    const { groupSize } = this
-    const { gameState, playerStatesArr, playerRoundStates } = await this.getState(),
-      playerState = await this.stateManager.getPlayerState(index),
-      { round } = gameState,
-      gameRoundState = gameState.rounds[round]
+  async playerMoveReducer(
+    index: number,
+    type: RoundMoveType,
+    params: IRoundMoveParams,
+    cb: IMoveCallback
+  ): Promise<void> {
+    const gameRoundState = await this.stateManager.getGameState()
     switch (type) {
-      case MoveType.guideDone: {
-        playerState.status = PlayerStatus.round
-        if (playerStatesArr.length === groupSize && playerStatesArr.every(p => p.status === PlayerStatus.round)) {
-          this.startRound(0)
-        }
-        break
-      }
-      case MoveType.exchange: {
+      case RoundMoveType.exchange: {
         const { exchangeMatrix, allocation } = gameRoundState,
           { good } = params
-        if (exchangeMatrix[good][playerState.index] === ExchangeStatus.waiting) {
+        if (exchangeMatrix[good][index] === ExchangeStatus.waiting) {
           exchangeMatrix[good].fill(ExchangeStatus.null)
-          exchangeMatrix[good][playerState.index] = ExchangeStatus.exchanged
-          exchangeMatrix[playerState.index].fill(ExchangeStatus.null)
-          exchangeMatrix[playerState.index][good] = ExchangeStatus.exchanged
-          allocation[good] = playerState.index
-          allocation[playerState.index] = good
+          exchangeMatrix[good][index] = ExchangeStatus.exchanged
+          exchangeMatrix[index].fill(ExchangeStatus.null)
+          exchangeMatrix[index][good] = ExchangeStatus.exchanged
+          allocation[good] = index
+          allocation[index] = good
         } else {
-          exchangeMatrix[playerState.index][good] = ExchangeStatus.waiting
+          exchangeMatrix[index][good] = ExchangeStatus.waiting
         }
         if (allocation.every(p => p !== null)) {
           this.roundOver()
@@ -168,13 +90,50 @@ class GroupLogic extends Group.Group.Logic<
   }
 }
 
-export class Logic extends Group.Logic<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+class GroupLogic extends Round.Logic<
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
   PushType,
-  IMoveParams,
+  IRoundMoveParams,
+  IPushParams
+> {
+  RoundLogic = RoundLogic
+
+  async roundOverCallback(): Promise<any> {
+    const gameState = await this.stateManager.getGameState(),
+      { round } = gameState,
+      { privatePriceMatrix } = this.params.roundsParams[round],
+      gameRoundState = gameState.rounds[round],
+      playerStates = await this.stateManager.getPlayerStates()
+    await Model.FreeStyleModel.create({
+      game: this.gameId,
+      key: `${this.groupIndex}_${gameState.round}`,
+      data: playerStates.map(({ user, index }) => {
+        const { allocation } = gameRoundState
+        const privatePrices = privatePriceMatrix[index]
+        return {
+          userName: user.name,
+          stuNum: user.stuNum,
+          playerIndex: index + 1,
+          initGood: index + 1,
+          initGoodPrice: privatePrices[index],
+          good: allocation[index] + 1,
+          goodPrice: privatePrices[allocation[index]]
+        }
+      })
+    })
+  }
+}
+
+export class Logic extends Group.Logic<
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupPlayerState,
+  GroupMoveType,
+  PushType,
+  IGroupMoveParams,
   IPushParams
 > {
   GroupLogic = GroupLogic

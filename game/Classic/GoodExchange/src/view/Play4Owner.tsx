@@ -1,16 +1,24 @@
 import * as React from 'react'
 import { Group } from '@extend/client'
 import { Table, Tabs } from 'antd'
-import { ICreateParams, IGameState, IMoveParams, IPlayerState, IPushParams, MoveType, PushType } from '../config'
+import {
+  GroupMoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupMoveParams,
+  IGroupPlayerState,
+  IPushParams,
+  PushType
+} from '../config'
 import { Lang } from '@elf/component'
 
 class GroupPlay4Owner extends Group.Group.Play4Owner<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupPlayerState,
+  GroupMoveType,
   PushType,
-  IMoveParams,
+  IGroupMoveParams,
   IPushParams
 > {
   lang = Lang.extractLang({
@@ -20,7 +28,7 @@ class GroupPlay4Owner extends Group.Group.Play4Owner<
   render(): React.ReactNode {
     const {
       lang,
-      props: { groupPlayerStates, groupGameState }
+      props: { groupPlayerStates, groupGameState, groupParams }
     } = this
     const columns = [
       {
@@ -30,6 +38,10 @@ class GroupPlay4Owner extends Group.Group.Play4Owner<
       {
         title: '学号',
         dataIndex: 'stuNum'
+      },
+      {
+        title: '编号',
+        dataIndex: 'playerIndex'
       },
       {
         title: '初始物品编号',
@@ -54,14 +66,14 @@ class GroupPlay4Owner extends Group.Group.Play4Owner<
     ]
     return (
       <Tabs tabPosition={'left'}>
-        {groupGameState.rounds.map((gameRoundState, i) => (
-          <Tabs.TabPane tab={lang.roundIndex(i)} key={i.toString()}>
+        {groupGameState.rounds.map((gameRoundState, round) => (
+          <Tabs.TabPane tab={lang.roundIndex(round)} key={round.toString()}>
             {gameRoundState.allocation.every(good => good !== null) ? (
               <Table
                 dataSource={groupPlayerStates
-                  .map(({ user, index, rounds }) => {
+                  .map(({ user, index }) => {
                     const { allocation } = gameRoundState
-                    const { privatePrices } = rounds[i]
+                    const privatePrices = groupParams.roundsParams[round].privatePriceMatrix[index]
                     return {
                       userName: user.name,
                       stuNum: user.stuNum,
@@ -85,12 +97,12 @@ class GroupPlay4Owner extends Group.Group.Play4Owner<
 }
 
 export class Play4Owner extends Group.Play4Owner<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupPlayerState,
+  GroupMoveType,
   PushType,
-  IMoveParams,
+  IGroupMoveParams,
   IPushParams
 > {
   GroupPlay4Owner = GroupPlay4Owner
