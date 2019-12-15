@@ -4,35 +4,28 @@ export enum FetchRoute {
   exportXls = '/exportXls/:gameId'
 }
 
-export enum MoveType {
-  guideDone,
+export enum RoundMoveType {
   submit
 }
 
 export enum PushType {}
 
-export interface IMoveParams {
+export interface IRoundMoveParams {
   x: number
 }
 
 export interface IPushParams {}
 
-export interface ICreateParams {
-  round: number
+export interface IRoundCreateParams {
   t: number
   M: number
   K: number
 }
 
-export interface IGameRoundState {
+export interface IRoundGameState {
   timeLeft: number
   reward?: number
   xArr: number[]
-}
-
-export interface IGameState {
-  round: number
-  rounds: IGameRoundState[]
 }
 
 export enum PlayerRoundStatus {
@@ -41,17 +34,14 @@ export enum PlayerRoundStatus {
   result
 }
 
-export interface IPlayerRoundState {
+export interface IRoundPlayerState {
   status: PlayerRoundStatus
 }
 
-export enum PlayerStatus {
-  guide,
-  round,
-  result
-}
+import { RoundDecorator } from '@extend/share'
 
-export interface IPlayerState {
-  status: PlayerStatus
-  rounds: IPlayerRoundState[]
-}
+export type GroupMoveType = RoundDecorator.TMoveType<RoundMoveType>
+export type IGroupMoveParams = RoundDecorator.IMoveParams<IRoundMoveParams>
+export type IGroupCreateParams = RoundDecorator.ICreateParams<IRoundCreateParams>
+export type IGroupGameState = RoundDecorator.IGameState<IRoundGameState>
+export type IGroupPlayerState = RoundDecorator.IPlayerState<IRoundPlayerState>

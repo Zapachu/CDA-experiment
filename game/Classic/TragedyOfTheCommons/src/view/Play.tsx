@@ -1,36 +1,40 @@
 import * as React from 'react'
-import { Group } from '@extend/client'
+import { Group, Round } from '@extend/client'
 import { Button, InputNumber, Table } from 'antd'
 import * as style from './style.scss'
 import {
-  ICreateParams,
-  IGameRoundState,
-  IGameState,
-  IMoveParams,
-  IPlayerRoundState,
-  IPlayerState,
+  GroupMoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupMoveParams,
+  IGroupPlayerState,
   IPushParams,
-  MoveType,
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundMoveParams,
+  IRoundPlayerState,
   PlayerRoundStatus,
-  PlayerStatus,
-  PushType
+  PushType,
+  RoundMoveType
 } from '../config'
 import { Lang, MaskLoading } from '@elf/component'
-import { FrameEmitter } from '@bespoke/share'
+import { GroupDecorator } from '@extend/share'
 
 function RoundPlay({
-  playerRoundState,
-  gameRoundState,
-  groupParams,
-  frameEmitter,
-  playerIndex
-}: {
-  groupParams: ICreateParams
-  playerRoundState: IPlayerRoundState
-  gameRoundState: IGameRoundState
-  frameEmitter: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
-  playerIndex: number
-}) {
+  roundFrameEmitter,
+  roundParams: { M },
+  roundGameState,
+  roundPlayerState,
+  playerState
+}: Round.Round.IPlayProps<
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
+  PushType,
+  IRoundMoveParams,
+  IPushParams
+>) {
   const lang = Lang.extractLang({
     timeLeft: ['剩余时间', 'Time Left'],
     yourNo: [],
@@ -44,8 +48,8 @@ function RoundPlay({
     toNextRound: ['等待进入下一轮...']
   })
   const [x, setX] = React.useState(null)
-  const { timeLeft, reward, xArr } = gameRoundState
-  switch (playerRoundState.status) {
+  const { timeLeft, reward, xArr } = roundGameState
+  switch (roundPlayerState.status) {
     case PlayerRoundStatus.play:
       return (
         <section className={style.roundPlay}>
@@ -53,15 +57,9 @@ function RoundPlay({
             {lang.timeLeft}&nbsp;:&nbsp;<em>{timeLeft}</em>s
           </label>
           <p className={style.playTips}>{lang.tips}</p>
-          <InputNumber
-            placeholder={`0≤x≤${groupParams.M}`}
-            value={x}
-            onChange={v => setX(+v)}
-            min={0}
-            max={groupParams.M}
-          />
+          <InputNumber placeholder={`0≤x≤${M}`} value={x} onChange={v => setX(+v)} min={0} max={M} />
           <br />
-          <Button type="primary" onClick={() => frameEmitter.emit(MoveType.submit, { x })}>
+          <Button type="primary" onClick={() => roundFrameEmitter.emit(RoundMoveType.submit, { x })}>
             {lang.submit}
           </Button>
         </section>
@@ -81,7 +79,7 @@ function RoundPlay({
                 render: i => (
                   <div>
                     {i + 1}
-                    {i === playerIndex ? lang.you : null}
+                    {i === playerState.index ? lang.you : null}
                   </div>
                 )
               },
@@ -96,7 +94,7 @@ function RoundPlay({
                 key: 'result'
               }
             ]}
-            dataSource={gameRoundState.xArr.map((x, i) => ({
+            dataSource={roundGameState.xArr.map((x, i) => ({
               index: i,
               x,
               result: x + reward
@@ -108,75 +106,88 @@ function RoundPlay({
   }
 }
 
-class GroupPlay extends Group.Group.Play<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+function RoundHistory({
+  game,
+  playerState,
+  groupGameState
+}: Round.Round.IHistoryProps<
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
   PushType,
-  IMoveParams,
+  IRoundMoveParams,
+  IPushParams
+>) {
+  const { groupSize, showHistory } = game.params
+  const columns = [
+    {
+      title: '轮次',
+      dataIndex: 'round',
+      render: (r, { rowSpan }) => ({
+        children: r + 1,
+        props: { rowSpan }
+      })
+    },
+    {
+      title: '编号',
+      dataIndex: 'playerIndex'
+    },
+    {
+      title: '捕获',
+      dataIndex: 'x'
+    },
+    {
+      title: '最终受益',
+      dataIndex: 'result'
+    }
+  ]
+  const dataSource = []
+  groupGameState.rounds.forEach(({ xArr, reward }, r) => {
+    for (let index = 0; index < groupSize; index++) {
+      const x = xArr[index]
+      if (showHistory === GroupDecorator.ShowHistory.selfOnly && index !== playerState.index) {
+        continue
+      }
+      dataSource.push({
+        rowSpan: showHistory === GroupDecorator.ShowHistory.selfOnly ? 1 : index === 0 ? groupSize : 0,
+        round: r,
+        playerIndex: index + 1,
+        x,
+        result: reward ? x + reward : ''
+      })
+    }
+  })
+  return <Table pagination={{ pageSize: groupSize * 2 }} size={'small'} columns={columns} dataSource={dataSource} />
+}
+
+class GroupPlay extends Round.Play<
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
+  PushType,
+  IRoundMoveParams,
   IPushParams
 > {
-  lang = Lang.extractLang({
-    round1: ['第', 'Round'],
-    round2: ['轮', ''],
-    wait4OtherPlayers: ['等待其它玩家加入......'],
-    gameOver: ['所有轮次结束，等待老师关闭实验']
-  })
+  RoundPlay = RoundPlay
 
-  render(): React.ReactNode {
-    const {
-      lang,
-      props: { playerState, groupGameState, groupFrameEmitter, groupParams }
-    } = this
-    if (playerState.status === PlayerStatus.guide) {
-      return (
-        <section className={style.groupGuide}>
-          <p>
-            本实验共R轮。在本次实验中，您将会被随机的分配到某个组中，每组有N名成员。每一轮每组成员共有一个鱼塘资源，每年可产鱼N*M单位，您可以选择现在就从公共鱼塘资源中捕鱼x单位（大于等于0小于等于M）。每轮结束时，鱼塘中剩余的鱼将在来年翻K倍，然后平均分给该组的N人。您的收益将等于您从您所在组的公共鱼塘中获得的回报加上您之前从公共鱼塘中捕捞的鱼产量.
-          </p>
-          <Button type="primary" onClick={() => groupFrameEmitter.emit(MoveType.guideDone)}>
-            Start
-          </Button>
-        </section>
-      )
-    }
-    if (playerState.status === PlayerStatus.result) {
-      return <section className={style.groupResult}>{lang.gameOver}</section>
-    }
-    const playerRoundState = playerState.rounds[groupGameState.round],
-      gameRoundState = groupGameState.rounds[groupGameState.round]
-    if (!playerRoundState) {
-      return <MaskLoading label={lang.wait4OtherPlayers} />
-    }
-    return (
-      <section className={style.groupPlay}>
-        <h2 className={style.title}>
-          {lang.round1}
-          {groupGameState.round + 1}
-          {lang.round2}
-        </h2>
-        <RoundPlay
-          {...{
-            groupParams,
-            playerRoundState,
-            gameRoundState,
-            frameEmitter: groupFrameEmitter,
-            playerIndex: playerState.index
-          }}
-        />
-      </section>
-    )
-  }
+  RoundHistory = RoundHistory
+
+  RoundGuide = () => (
+    <p>
+      本实验共R轮。在本次实验中，您将会被随机的分配到某个组中，每组有N名成员。每一轮每组成员共有一个鱼塘资源，每年可产鱼N*M单位，您可以选择现在就从公共鱼塘资源中捕鱼x单位（大于等于0小于等于M）。每轮结束时，鱼塘中剩余的鱼将在来年翻K倍，然后平均分给该组的N人。您的收益将等于您从您所在组的公共鱼塘中获得的回报加上您之前从公共鱼塘中捕捞的鱼产量.
+    </p>
+  )
 }
 
 export class Play extends Group.Play<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupPlayerState,
+  GroupMoveType,
   PushType,
-  IMoveParams,
+  IGroupMoveParams,
   IPushParams
 > {
   GroupPlay = GroupPlay
