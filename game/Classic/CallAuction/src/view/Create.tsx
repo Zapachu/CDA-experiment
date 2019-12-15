@@ -11,7 +11,7 @@ function RoundCreate({
   setRoundParams
 }: Round.Round.ICreateProps<IRoundCreateParams>) {
   const LIMIT = {
-    minT: 30,
+    minT: 60,
     maxT: 120
   }
   const lang = Lang.extractLang({
