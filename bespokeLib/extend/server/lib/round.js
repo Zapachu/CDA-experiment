@@ -120,7 +120,8 @@ var Round;
     }());
     Round.StateManager = StateManager;
     var Logic = /** @class */ (function () {
-        function Logic(groupIndex, roundIndex, params, stateManager, overCallback) {
+        function Logic(groupSize, groupIndex, roundIndex, params, stateManager, overCallback) {
+            this.groupSize = groupSize;
             this.groupIndex = groupIndex;
             this.roundIndex = roundIndex;
             this.params = params;
@@ -163,7 +164,7 @@ var Logic = /** @class */ (function (_super) {
         this.roundsLogic = Array(round)
             .fill(null)
             .map(function (_, i) {
-            return new _this.RoundLogic(groupIndex, i, roundsParams[i], new Round.StateManager(i, _this.stateManager), function () { return __awaiter(_this, void 0, void 0, function () {
+            return new _this.RoundLogic(_this.groupSize, groupIndex, i, roundsParams[i], new Round.StateManager(i, _this.stateManager), function () { return __awaiter(_this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0: return [4 /*yield*/, this.roundOverCallback()];

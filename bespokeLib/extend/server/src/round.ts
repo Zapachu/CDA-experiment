@@ -60,6 +60,7 @@ export namespace Round {
     IPushParams
   > {
     constructor(
+      protected groupSize: number,
       protected groupIndex: number,
       protected roundIndex: number,
       protected params: IRoundCreateParams,
@@ -112,6 +113,7 @@ export class Logic<
   IPushParams
 > {
   RoundLogic: new (
+    groupSize: number,
     groupIndex: number,
     roundIndex: number,
     params: IRoundCreateParams,
@@ -156,6 +158,7 @@ export class Logic<
       .map(
         (_, i) =>
           new this.RoundLogic(
+            this.groupSize,
             groupIndex,
             i,
             roundsParams[i],
