@@ -1,6 +1,6 @@
 import { resolve } from 'path'
 import nodeXlsx from 'node-xlsx'
-import { FetchRoute, IShout, namespace, Role } from './config'
+import { FetchRoute, namespace } from './config'
 import { BaseLogic, Model, Server } from '@bespoke/server'
 import { Router } from 'express'
 import { Logic } from './Logic'
@@ -23,18 +23,10 @@ const router = Router().get(FetchRoute.exportXls, async (req, res) => {
     const [g, r] = round.key.split('_')
     data.push([])
     data.push([`第${+g + 1}组`, `第${+r + 1}轮`])
-    data.push(['玩家编号', '角色', '报价', '成交', '成交对象'])
-    round.data
-      .filter(s => s)
-      .forEach((shout: IShout, i) =>
-        data.push([
-          i + 1,
-          shout.role === Role.buyer ? 'Buyer' : 'Seller',
-          shout.price,
-          !!shout.tradePair,
-          shout.tradePair ? shout.tradePair + 1 : ''
-        ])
-      )
+    data.push(['玩家', '学号', '编号', '角色', '心理价值', '报价', '交易成功', '交易对象编号', '利润'])
+    round.data.forEach(({ userName, stuNum, playerIndex, role, privatePrice, price, success, pairIndex, profit }) =>
+      data.push([userName, stuNum, playerIndex, role, privatePrice, price, success, pairIndex, profit])
+    )
   })
   const buffer = nodeXlsx.build([{ name, data }], option)
   res.setHeader('Content-Type', 'application/vnd.openxmlformats')

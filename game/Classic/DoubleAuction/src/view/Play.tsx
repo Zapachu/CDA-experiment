@@ -1,38 +1,40 @@
 import * as React from 'react'
-import { Group } from '@extend/client'
-import { Button, InputNumber } from 'antd'
+import { Group, Round } from '@extend/client'
+import { Button, InputNumber, Table } from 'antd'
+import { GroupDecorator } from '@extend/share'
+import { Lang, MaskLoading, Toast } from '@elf/component'
 import * as style from './style.scss'
 import {
-  ICreateParams,
-  IGameRoundState,
-  IGameState,
-  IMoveParams,
-  IPlayerRoundState,
-  IPlayerState,
+  GroupMoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupMoveParams,
+  IGroupPlayerState,
   IPushParams,
-  MoveType,
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundMoveParams,
+  IRoundPlayerState,
   PlayerRoundStatus,
-  PlayerStatus,
   PushType,
-  Role
+  RoundMoveType
 } from '../config'
-import { Lang, MaskLoading, Toast } from '@elf/component'
-import { FrameEmitter } from '@bespoke/share'
 
 function RoundPlay({
-  playerRoundState,
-  gameRoundState,
-  frameEmitter,
-  role,
-  playerIndex
-}: {
-  groupParams: ICreateParams
-  playerRoundState: IPlayerRoundState
-  gameRoundState: IGameRoundState
-  frameEmitter: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
-  playerIndex: number
-  role: Role
-}) {
+  roundParams: { buyerAmount, buyPriceMatrix, sellPriceMatrix },
+  roundPlayerState,
+  roundGameState,
+  roundFrameEmitter,
+  playerState
+}: Round.Round.IPlayProps<
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
+  PushType,
+  IRoundMoveParams,
+  IPushParams
+>) {
   const lang = Lang.extractLang({
     timeLeft: ['剩余时间', 'Time Left'],
     shout: ['报价'],
@@ -56,18 +58,16 @@ function RoundPlay({
     tradeInfo3: ['利润为']
   })
   const [price, setPrice] = React.useState(null)
-  const roleLabel = {
-    [Role.buyer]: lang.buyer,
-    [Role.seller]: lang.seller
-  }[role]
-  const { privatePrice, status } = playerRoundState
-  const { timeLeft } = gameRoundState
-  switch (status) {
+  const playerIndex = playerState.index,
+    isBuyer = playerIndex < buyerAmount,
+    [privatePrice] = [...buyPriceMatrix, ...sellPriceMatrix][playerIndex]
+  const { timeLeft } = roundGameState
+  switch (roundPlayerState.status) {
     case PlayerRoundStatus.play:
       return (
         <section className={style.roundPlay}>
           <p className={style.playTips}>
-            {lang.tips1}&nbsp;:&nbsp;{roleLabel}&nbsp;,&nbsp;{lang.tips2}
+            {lang.tips1}&nbsp;:&nbsp;{isBuyer ? lang.buyer : lang.seller}&nbsp;,&nbsp;{lang.tips2}
             &nbsp;:&nbsp;{privatePrice}
           </p>
           <label className={style.timeLeft}>
@@ -78,13 +78,13 @@ function RoundPlay({
           <Button
             type="primary"
             onClick={() => {
-              if (role === Role.buyer && price > privatePrice) {
+              if (isBuyer && price > privatePrice) {
                 return Toast.warn(lang.invalidBuyPrice)
               }
-              if (role === Role.seller && price < privatePrice) {
+              if (!isBuyer && price < privatePrice) {
                 return Toast.warn(lang.invalidSellPrice)
               }
-              frameEmitter.emit(MoveType.shout, { price: price })
+              roundFrameEmitter.emit(RoundMoveType.shout, { price })
             }}
           >
             {lang.shout}
@@ -94,7 +94,7 @@ function RoundPlay({
     case PlayerRoundStatus.wait:
       return <MaskLoading label={lang.waiting} />
     case PlayerRoundStatus.result:
-      const { shouts } = gameRoundState,
+      const { shouts } = roundGameState,
         myShout = shouts[playerIndex]
       const traded = myShout && myShout.tradePair !== null
       return (
@@ -107,7 +107,7 @@ function RoundPlay({
                 <em>{shouts[playerIndex].price}</em>&nbsp;,&nbsp;
                 {lang.tradeInfo2}
                 <em>{privatePrice}</em>&nbsp;,&nbsp;{lang.tradeInfo3}
-                <em>{playerRoundState.profit}</em>
+                <em>{roundPlayerState.profit}</em>
               </>
             ) : (
               lang.noTrade
@@ -118,78 +118,115 @@ function RoundPlay({
   }
 }
 
-class GroupPlay extends Group.Group.Play<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+function RoundHistory({
+  game,
+  playerState,
+  groupParams,
+  groupGameState
+}: Round.Round.IHistoryProps<
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
   PushType,
-  IMoveParams,
+  IRoundMoveParams,
+  IPushParams
+>) {
+  const { groupSize, showHistory } = game.params
+  const columns = [
+    {
+      title: '轮次',
+      dataIndex: 'round',
+      render: (r, { rowSpan }) => ({
+        children: r + 1,
+        props: { rowSpan }
+      })
+    },
+    {
+      title: '编号',
+      dataIndex: 'playerIndex'
+    },
+    {
+      title: '角色',
+      dataIndex: 'role'
+    },
+    {
+      title: '心理价值',
+      dataIndex: 'privatePrice'
+    },
+    {
+      title: '报价',
+      dataIndex: 'price'
+    },
+    {
+      title: '交易成功',
+      dataIndex: 'success'
+    },
+    {
+      title: '交易对象编号',
+      dataIndex: 'pairIndex'
+    },
+    {
+      title: '利润',
+      dataIndex: 'profit'
+    }
+  ]
+  const dataSource = []
+  groupGameState.rounds.forEach(({ trades }, r) => {
+    const { buyPriceMatrix, sellPriceMatrix, buyerAmount } = groupParams.roundsParams[r],
+      { price, profit } = playerState.rounds[r]
+    for (let index = 0; index < groupSize; index++) {
+      const [privatePrice] = [...buyPriceMatrix, ...sellPriceMatrix][index],
+        isBuyer = index < buyerAmount,
+        trade = trades.find(({ reqIndex, resIndex }) => [reqIndex, resIndex].includes(index))
+      if (showHistory === GroupDecorator.ShowHistory.selfOnly && index !== playerState.index) {
+        continue
+      }
+      dataSource.push({
+        rowSpan: showHistory === GroupDecorator.ShowHistory.selfOnly ? 1 : index === 0 ? groupSize : 0,
+        round: r,
+        playerIndex: index + 1,
+        role: isBuyer ? '买家' : '卖家',
+        privatePrice,
+        price: price || '',
+        success: trade ? 'Yes' : 'No',
+        pairIndex: trade ? (trade.reqIndex === index ? trade.resIndex : trade.reqIndex) + 1 : '',
+        profit: profit || ''
+      })
+    }
+  })
+  return <Table pagination={{ pageSize: groupSize * 2 }} size={'small'} columns={columns} dataSource={dataSource} />
+}
+
+class GroupPlay extends Round.Play<
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
+  PushType,
+  IRoundMoveParams,
   IPushParams
 > {
-  lang = Lang.extractLang({
-    round1: ['第', 'Round'],
-    round2: ['轮', ''],
-    wait4OtherPlayers: ['等待其它玩家加入......'],
-    gameOver: ['所有轮次结束，等待老师关闭实验']
-  })
+  RoundPlay = RoundPlay
 
-  render(): React.ReactNode {
-    const {
-      lang,
-      props: { playerState, groupGameState, groupFrameEmitter, groupParams }
-    } = this
-    if (playerState.status === PlayerStatus.guide) {
-      return (
-        <section className={style.groupGuide}>
-          <p>
-            本实验共进行R轮，每组N人。参与者会被随机分配到某一组中，担任卖家或者买家其中一种角色，实验中角色不变，双方人数对半，每轮进行1单位商品的交易；每轮实验中，每单位商品对于买家有一个货币价值，该价值是V1到V2之间的随机数，买家根据自身的货币价值进行出价（Bid
-            prices），买家的出价只有低于货币价值时才会获得收益；每单位商品对于卖家有一定的成本，该成本是C1到C2之间的随机数，卖家根据商品的成本进行要价（Ask
-            prices），卖家的要价只有高于商品成本时才能获得收益。卖家接受买家的出价或者买家同意卖家的要价时，交易达成。实验中可及时修改价格（降低要价、提高出价），最终收益计算：买家（Buyer）——每买进一单位商品，收益=货币价值-成交价格；卖家（Seller）——每卖出一单位商品，收益=成交价格-商品成本
-          </p>
-          <Button type="primary" onClick={() => groupFrameEmitter.emit(MoveType.guideDone)}>
-            Start
-          </Button>
-        </section>
-      )
-    }
-    if (playerState.status === PlayerStatus.result) {
-      return <section className={style.groupResult}>{lang.gameOver}</section>
-    }
-    const playerRoundState = playerState.rounds[groupGameState.round],
-      gameRoundState = groupGameState.rounds[groupGameState.round]
-    if (!playerRoundState) {
-      return <MaskLoading label={lang.wait4OtherPlayers} />
-    }
-    return (
-      <section className={style.groupPlay}>
-        <h2 className={style.title}>
-          {lang.round1}
-          {groupGameState.round + 1}
-          {lang.round2}
-        </h2>
-        <RoundPlay
-          {...{
-            groupParams,
-            playerRoundState,
-            gameRoundState,
-            frameEmitter: groupFrameEmitter,
-            playerIndex: playerState.index,
-            role: playerState.role
-          }}
-        />
-      </section>
-    )
-  }
+  RoundHistory = RoundHistory
+
+  RoundGuide = () => (
+    <p>
+      本实验共进行R轮，每组N人。参与者会被随机分配到某一组中，担任卖家或者买家其中一种角色，实验中角色不变，双方人数对半，每轮进行1单位商品的交易；每轮实验中，每单位商品对于买家有一个货币价值，该价值是V1到V2之间的随机数，买家根据自身的货币价值进行出价（Bid
+      prices），买家的出价只有低于货币价值时才会获得收益；每单位商品对于卖家有一定的成本，该成本是C1到C2之间的随机数，卖家根据商品的成本进行要价（Ask
+      prices），卖家的要价只有高于商品成本时才能获得收益。卖家接受买家的出价或者买家同意卖家的要价时，交易达成。实验中可及时修改价格（降低要价、提高出价），最终收益计算：买家（Buyer）——每买进一单位商品，收益=货币价值-成交价格；卖家（Seller）——每卖出一单位商品，收益=成交价格-商品成本
+    </p>
+  )
 }
 
 export class Play extends Group.Play<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupPlayerState,
+  GroupMoveType,
   PushType,
-  IMoveParams,
+  IGroupMoveParams,
   IPushParams
 > {
   GroupPlay = GroupPlay
