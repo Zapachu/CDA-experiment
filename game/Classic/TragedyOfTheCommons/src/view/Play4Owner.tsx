@@ -22,51 +22,62 @@ class GroupPlay4Owner extends Group.Group.Play4Owner<
   IPushParams
 > {
   lang = Lang.extractLang({
-    roundIndex: [i => `第${i + 1}轮`, i => `Round ${i + 1}`],
-    playerNo: ['玩家编号'],
-    x: ['捕获量'],
-    result: ['最终收益']
+    roundIndex: [i => `第${i + 1}轮`, i => `Round ${i + 1}`]
   })
 
   render(): React.ReactNode {
     const {
       lang,
-      props: { groupGameState }
+      props: { groupGameState, groupPlayerStates }
     } = this
+    const columns = [
+      {
+        title: '玩家',
+        dataIndex: 'userName'
+      },
+      {
+        title: '学号',
+        dataIndex: 'stuNum'
+      },
+      {
+        title: '编号',
+        dataIndex: 'playerIndex'
+      },
+      {
+        title: '捕获量',
+        dataIndex: 'x'
+      },
+      {
+        title: '回报',
+        dataIndex: 'reward'
+      },
+      {
+        title: '最终受益',
+        dataIndex: 'result'
+      }
+    ]
     return (
       <Tabs tabPosition={'left'}>
-        {groupGameState.rounds.map((gameRoundState, i) =>
-          gameRoundState.reward ? (
+        {groupGameState.rounds.map(({ xArr, reward }, i) => {
+          return (
             <Tabs.TabPane tab={lang.roundIndex(i)} key={i.toString()}>
               <Table
                 pagination={false}
-                columns={[
-                  {
-                    title: lang.playerNo,
-                    dataIndex: 'index',
-                    key: 'index',
-                    render: i => <div>{i + 1}</div>
-                  },
-                  {
-                    title: lang.x,
-                    dataIndex: 'x',
-                    key: 'x'
-                  },
-                  {
-                    title: lang.result,
-                    dataIndex: 'result',
-                    key: 'result'
+                columns={columns}
+                dataSource={groupPlayerStates.map(({ user, index }) => {
+                  return {
+                    userName: user.name,
+                    stuNum: user.stuNum,
+                    playerIndex: index + 1,
+                    x: xArr[index],
+                    reward,
+                    result: reward ? xArr[index] + reward : ''
                   }
-                ]}
-                dataSource={gameRoundState.xArr.map((x, i) => ({
-                  index: i,
-                  x,
-                  result: x + gameRoundState.reward
-                }))}
+                })}
               />
             </Tabs.TabPane>
-          ) : null
-        )}
+          )
+        })}
       </Tabs>
     )
   }

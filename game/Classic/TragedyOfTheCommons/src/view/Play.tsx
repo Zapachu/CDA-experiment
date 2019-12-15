@@ -131,7 +131,8 @@ function RoundHistory({
     },
     {
       title: '编号',
-      dataIndex: 'playerIndex'
+      dataIndex: 'playerIndex',
+      render: i => `${i + 1}${playerState.index === i ? '(你)' : ''}`
     },
     {
       title: '捕获',
@@ -152,7 +153,7 @@ function RoundHistory({
       dataSource.push({
         rowSpan: showHistory === GroupDecorator.ShowHistory.selfOnly ? 1 : index === 0 ? groupSize : 0,
         round: r,
-        playerIndex: index + 1,
+        playerIndex: index,
         x,
         result: reward ? x + reward : ''
       })

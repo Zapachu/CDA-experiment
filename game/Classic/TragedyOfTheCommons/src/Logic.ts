@@ -112,7 +112,8 @@ class GroupLogic extends Round.Logic<
       key: `${this.groupIndex}_${gameState.round}`,
       data: playerStates.map(({ user, index }) => {
         return {
-          user: user.stuNum,
+          userName: user.name,
+          stuNum: user.stuNum,
           playerIndex: index + 1,
           x: xArr[index],
           reward
