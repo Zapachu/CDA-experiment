@@ -21,7 +21,8 @@ export interface IPushParams {}
 export interface IRoundCreateParams {
   t: number
   buyerAmount: number
-  privatePriceMatrix: number[][]
+  buyPriceMatrix: number[][]
+  sellPriceMatrix: number[][]
 }
 
 export interface IOrder {

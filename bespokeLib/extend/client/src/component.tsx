@@ -10,13 +10,13 @@ type TNumberMatrix = number[][];
 
 export function PrivateValueMatrix({
   groupSize,
-  preMatrix,
-  callback,
-  goodAmount: pGoodAmount
+  goodAmount: pGoodAmount,
+  matrix,
+  setMatrix: pSetMatrix
 }: {
   groupSize: number;
-  preMatrix: TNumberMatrix;
-  callback: (matrix: TNumberMatrix) => void;
+  matrix: TNumberMatrix;
+  setMatrix: (matrix: TNumberMatrix) => void;
   goodAmount?: number;
 }) {
   const LIMIT = {
@@ -58,23 +58,25 @@ export function PrivateValueMatrix({
                 min + step * i + Math.round((2 * Math.random() - 1) * offset)
             )
         ),
-    [matrix, _setMatrix] = React.useState(preMatrix),
-    setMatrix = (matrix: TNumberMatrix) => {
-      _setMatrix(matrix);
-      callback(matrix.slice(0, groupSize).map(row => row.slice(0, goodAmount)));
-    };
-  React.useEffect(() => setMatrix(matrix), [groupSize]);
+    setMatrix = (matrix: TNumberMatrix) =>
+      pSetMatrix(
+        matrix.slice(0, groupSize).map(row => row.slice(0, goodAmount))
+      );
   React.useEffect(() => {
-    if (preMatrix && preMatrix.length) {
+    if (
+      matrix &&
+      matrix.length >= groupSize &&
+      matrix[0].length >= goodAmount
+    ) {
       return;
     }
     setMatrix(geneMatrix());
-  }, []);
+  }, [groupSize, goodAmount]);
   const inputStyle: React.CSSProperties = { width: "4.5rem" };
   const tableScroll = goodAmount > LIMIT.maxGoodAmount / 2;
   return matrix ? (
     <section style={{ margin: "1rem 0" }}>
-      {sGoodAmount ? null : (
+      {pGoodAmount ? null : (
         <>
           <Label label={lang.goodAmount} />
           <InputNumber

@@ -1,18 +1,19 @@
 @import "~@elf/component/lib/public";
 
 .groupGuide {
-  display: flex;
-  justify-content: center;
-  margin: 2rem;
-}
-
-.groupPlay {
   max-width: 48rem;
   margin: auto;
-  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
+  .guideWrapper{
+    margin: 3rem 0;
+  }
+}
+
+.groupPlay {
+  @extend .groupGuide;
+  position: relative;
 
   .title {
     margin: 2rem;

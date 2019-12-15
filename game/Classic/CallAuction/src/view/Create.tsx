@@ -7,7 +7,7 @@ import { RoundDecorator } from '@extend/share'
 
 function RoundCreate({
   params: { groupSize },
-  roundParams: { t, buyerAmount, privatePriceMatrix },
+  roundParams: { t, buyerAmount, buyPriceMatrix, sellPriceMatrix },
   setRoundParams
 }: Round.Round.ICreateProps<IRoundCreateParams>) {
   const LIMIT = {
@@ -21,12 +21,12 @@ function RoundCreate({
     sellPriceMatrix: ['卖家心理价值']
   })
   React.useEffect(() => {
-    if (privatePriceMatrix) {
+    if (buyPriceMatrix) {
       return
     }
-    setRoundParams({ privatePriceMatrix: [], buyerAmount: ~~(groupSize >> 1), t: LIMIT.minT })
+    setRoundParams({ buyPriceMatrix: [], sellPriceMatrix: [], buyerAmount: ~~(groupSize >> 1), t: LIMIT.minT })
   }, [])
-  return privatePriceMatrix ? (
+  return buyPriceMatrix ? (
     <section>
       <>
         <Label label={lang.tradeTime} />
@@ -47,10 +47,8 @@ function RoundCreate({
         <Component.PrivateValueMatrix
           groupSize={buyerAmount}
           goodAmount={1}
-          preMatrix={privatePriceMatrix.slice(0, buyerAmount)}
-          callback={matrix =>
-            setRoundParams({ privatePriceMatrix: [...matrix, ...privatePriceMatrix.slice(buyerAmount)] })
-          }
+          matrix={buyPriceMatrix}
+          setMatrix={buyPriceMatrix => setRoundParams({ buyPriceMatrix })}
         />
       </>
       <br />
@@ -59,10 +57,8 @@ function RoundCreate({
         <Component.PrivateValueMatrix
           groupSize={groupSize - buyerAmount}
           goodAmount={1}
-          preMatrix={privatePriceMatrix.slice(buyerAmount)}
-          callback={matrix =>
-            setRoundParams({ privatePriceMatrix: [...privatePriceMatrix.slice(0, buyerAmount), ...matrix] })
-          }
+          matrix={sellPriceMatrix}
+          setMatrix={sellPriceMatrix => setRoundParams({ sellPriceMatrix })}
         />
       </>
     </section>

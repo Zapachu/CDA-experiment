@@ -27,8 +27,8 @@ function RoundCreate({
       </>
       <Component.PrivateValueMatrix
         groupSize={groupSize}
-        preMatrix={roundParams.privatePriceMatrix}
-        callback={privatePriceMatrix => setRoundParams({ privatePriceMatrix })}
+        matrix={roundParams.privatePriceMatrix}
+        setMatrix={privatePriceMatrix => setRoundParams({ privatePriceMatrix })}
         goodAmount={groupSize}
       />
     </section>

@@ -135,7 +135,7 @@ class GroupLogic extends Round.Logic<
   async roundOverCallback(): Promise<any> {
     const gameState = await this.stateManager.getGameState(),
       { round } = gameState,
-      { buyerAmount, privatePriceMatrix } = this.params.roundsParams[round],
+      { buyerAmount, buyPriceMatrix, sellPriceMatrix } = this.params.roundsParams[round],
       gameRoundState = gameState.rounds[round],
       playerStates = await this.stateManager.getPlayerStates()
     await Model.FreeStyleModel.create({
@@ -145,14 +145,14 @@ class GroupLogic extends Round.Logic<
         const { trades } = gameRoundState,
           { price } = rounds[round],
           isBuyer = index < buyerAmount,
-          privatePrices = privatePriceMatrix[index],
+          [privatePrice] = [...buyPriceMatrix, ...sellPriceMatrix][index],
           trade = trades.find(({ buy, sell }) => (isBuyer ? buy : sell).player === index)
         return {
           userName: user.name,
           stuNum: user.stuNum,
           playerIndex: index + 1,
           role: isBuyer ? '买家' : '卖家',
-          privatePrice: privatePrices[0],
+          privatePrice,
           price: price || '',
           success: trade ? 'Yes' : 'No',
           pairIndex: trade ? (isBuyer ? trade.sell : trade.buy).player + 1 : ''

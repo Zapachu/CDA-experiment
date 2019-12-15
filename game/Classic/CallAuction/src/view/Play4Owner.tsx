@@ -75,15 +75,16 @@ class GroupPlay4Owner extends Group.Group.Play4Owner<
                 .map(({ user, index, rounds }) => {
                   const { trades } = gameRoundState,
                     { price } = rounds[r],
-                    isBuyer = index < groupParams.roundsParams[r].buyerAmount,
-                    privatePrices = groupParams.roundsParams[r].privatePriceMatrix[index],
+                    { buyerAmount, buyPriceMatrix, sellPriceMatrix } = groupParams.roundsParams[r],
+                    isBuyer = index < buyerAmount,
+                    [privatePrice] = [...buyPriceMatrix, ...sellPriceMatrix][index],
                     trade = trades.find(({ buy, sell }) => (isBuyer ? buy : sell).player === index)
                   return {
                     userName: user.name,
                     stuNum: user.stuNum,
                     playerIndex: index + 1,
                     role: isBuyer ? '买家' : '卖家',
-                    privatePrice: privatePrices[0],
+                    privatePrice,
                     price: price || '',
                     success: trade ? 'Yes' : 'No',
                     pairIndex: trade ? (isBuyer ? trade.sell : trade.buy).player + 1 : ''

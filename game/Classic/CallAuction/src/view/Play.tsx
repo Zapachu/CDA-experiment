@@ -20,7 +20,7 @@ import {
 import { Lang, MaskLoading, Toast } from '@elf/component'
 
 function RoundPlay({
-  roundParams,
+  roundParams: { buyerAmount, buyPriceMatrix, sellPriceMatrix },
   roundPlayerState,
   roundGameState,
   roundFrameEmitter,
@@ -58,8 +58,8 @@ function RoundPlay({
   })
   const [price, setPrice] = React.useState(null)
   const playerIndex = playerState.index,
-    isBuyer = playerIndex < roundParams.buyerAmount,
-    privatePrice = roundParams.privatePriceMatrix[playerIndex][0]
+    isBuyer = playerIndex < buyerAmount,
+    [privatePrice] = [...buyPriceMatrix, ...sellPriceMatrix][playerIndex]
   const { timeLeft } = roundGameState
   switch (roundPlayerState.status) {
     case PlayerRoundStatus.play:

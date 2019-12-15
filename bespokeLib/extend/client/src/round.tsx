@@ -196,6 +196,10 @@ interface IPlayState {
   showHistoryModal: boolean;
 }
 
+function Empty() {
+  return null;
+}
+
 export class Play<
   IRoundCreateParams,
   IRoundGameState,
@@ -215,6 +219,18 @@ export class Play<
   IPushParams,
   S
 > {
+  state = {
+    showHistoryModal: false
+  } as S;
+  lang = Lang.extractLang({
+    round1: ["第", "Round"],
+    round2: ["轮", ""],
+    start: ["开始", "Start"],
+    wait4OtherPlayers: ["等待其它玩家加入......"],
+    gameOver: ["所有轮次结束，等待老师关闭实验"],
+    history: ["历史信息", "History"]
+  });
+
   RoundPlay: React.ComponentType<
     Round.IPlayProps<
       IRoundCreateParams,
@@ -225,7 +241,7 @@ export class Play<
       IRoundMoveParams,
       IPushParams
     >
-  >;
+  > = Empty;
 
   RoundHistory: React.ComponentType<
     Round.IHistoryProps<
@@ -237,20 +253,9 @@ export class Play<
       IRoundMoveParams,
       IPushParams
     >
-  >;
+  > = Empty;
 
-  state = {
-    showHistoryModal: false
-  } as S;
-
-  lang = Lang.extractLang({
-    round1: ["第", "Round"],
-    round2: ["轮", ""],
-    start: ["开始", "Start"],
-    wait4OtherPlayers: ["等待其它玩家加入......"],
-    gameOver: ["所有轮次结束，等待老师关闭实验"],
-    history: ["历史信息", "History"]
-  });
+  RoundGuide: React.ComponentType = Empty;
 
   render(): React.ReactNode {
     const {
@@ -270,6 +275,9 @@ export class Play<
     if (playerState.status === RoundDecorator.PlayerStatus.guide) {
       return (
         <section className={style.groupGuide}>
+          <div className={style.guideWrapper}>
+            <this.RoundGuide />
+          </div>
           <Button
             type="primary"
             onClick={() =>
