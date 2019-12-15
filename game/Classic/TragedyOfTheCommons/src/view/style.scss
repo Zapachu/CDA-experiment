@@ -1,4 +1,4 @@
-@import "~@elf/component/lib/public";
+@import '~@elf/component/lib/public';
 
 .roundPlay {
   margin: auto;
@@ -11,7 +11,7 @@
 
     em {
       font-size: $fontSize-middle;
-      padding: .5rem;
+      padding: 0.5rem;
     }
   }
 
@@ -30,6 +30,13 @@
     text-align: center;
     font-size: 1.5rem;
   }
+}
+
+.groupResult {
+  display: flex;
+  justify-content: center;
+  margin: 2rem;
+  font-size: 1.5rem;
 }
 
 .groupResult4Owner {
