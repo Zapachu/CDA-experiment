@@ -2,24 +2,24 @@ import * as React from 'react'
 import { Group } from '@extend/client'
 import {
   Choice,
-  ICreateParams,
-  IGameState,
-  IMoveParams,
-  IPlayerState,
+  GroupMoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupMoveParams,
+  IGroupPlayerState,
   IPushParams,
-  MoveType,
   PushType
 } from '../config'
 import { Table, Tabs } from 'antd'
 import { Lang } from '@elf/component'
 
 class GroupPlay4Owner extends Group.Group.Play4Owner<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupPlayerState,
+  GroupMoveType,
   PushType,
-  IMoveParams,
+  IGroupMoveParams,
   IPushParams
 > {
   lang = Lang.extractLang({
@@ -111,12 +111,12 @@ class GroupPlay4Owner extends Group.Group.Play4Owner<
 }
 
 export class Play4Owner extends Group.Play4Owner<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupPlayerState,
+  GroupMoveType,
   PushType,
-  IMoveParams,
+  IGroupMoveParams,
   IPushParams
 > {
   GroupPlay4Owner = GroupPlay4Owner

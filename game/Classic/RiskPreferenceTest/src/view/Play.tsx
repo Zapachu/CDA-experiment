@@ -1,38 +1,40 @@
 import * as React from 'react'
-import { Group } from '@extend/client'
-import { Button, Radio } from 'antd'
+import { Group, Round } from '@extend/client'
+import { Button, Radio, Table } from 'antd'
 import * as style from './style.scss'
 import {
   awardLimit,
   Choice,
-  ICreateParams,
-  IGameRoundState,
-  IGameState,
-  IMoveParams,
-  IPlayerRoundState,
-  IPlayerState,
+  GroupMoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupMoveParams,
+  IGroupPlayerState,
   IPushParams,
-  MoveType,
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundMoveParams,
+  IRoundPlayerState,
   PlayerRoundStatus,
-  PlayerStatus,
-  PushType
+  PushType,
+  RoundMoveType
 } from '../config'
 import { Lang, MaskLoading } from '@elf/component'
-import { FrameEmitter } from '@bespoke/share'
 
 function RoundPlay({
-  playerRoundState,
-  gameRoundState,
-  groupParams: { awardA, awardB },
-  frameEmitter,
-  playerIndex
-}: {
-  groupParams: ICreateParams
-  playerRoundState: IPlayerRoundState
-  gameRoundState: IGameRoundState
-  frameEmitter: FrameEmitter<MoveType, PushType, IMoveParams, IPushParams>
-  playerIndex: number
-}) {
+  roundFrameEmitter,
+  roundParams: { awardA, awardB },
+  roundGameState,
+  roundPlayerState
+}: Round.Round.IPlayProps<
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
+  PushType,
+  IRoundMoveParams,
+  IPushParams
+>) {
   const lang = Lang.extractLang({
     timeLeft: ['剩余时间', 'Time Left'],
     yourNo: [],
@@ -49,8 +51,8 @@ function RoundPlay({
     roundOver4: [success => `${success ? '中奖了' : '未中奖'},收益为`]
   })
   const [preference, setPreference] = React.useState([])
-  const { timeLeft } = gameRoundState
-  switch (playerRoundState.status) {
+  const { timeLeft } = roundGameState
+  switch (roundPlayerState.status) {
     case PlayerRoundStatus.play:
       return (
         <section className={style.roundPlay}>
@@ -59,10 +61,10 @@ function RoundPlay({
           </label>
           <p className={style.playTips}>{lang.tips}</p>
           <br />
-          {Array(playerRoundState.T)
+          {Array(roundPlayerState.T)
             .fill(null)
             .map((_, i) => {
-              const p1 = (i / playerRoundState.T).toFixed(1),
+              const p1 = (i / roundPlayerState.T).toFixed(1),
                 p2 = (1 - +p1).toFixed(1)
               return (
                 <Radio.Group
@@ -95,7 +97,8 @@ function RoundPlay({
                 </Radio.Group>
               )
             })}
-          <Button type="primary" onClick={() => frameEmitter.emit(MoveType.submit, { preference })}>
+          <br />
+          <Button type="primary" onClick={() => roundFrameEmitter.emit(RoundMoveType.submit, { preference })}>
             {lang.submit}
           </Button>
         </section>
@@ -106,7 +109,7 @@ function RoundPlay({
       const {
         result: { caseIndex, award, success },
         preference
-      } = playerRoundState
+      } = roundPlayerState
       return (
         <section className={style.roundResult}>
           <p>
@@ -126,75 +129,115 @@ function RoundPlay({
   }
 }
 
-class GroupPlay extends Group.Group.Play<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+export function RoundHistory({
+  game,
+  playerState
+}: Round.Round.IHistoryProps<
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
   PushType,
-  IMoveParams,
+  IRoundMoveParams,
+  IPushParams
+>) {
+  const { groupSize } = game.params
+  const columns = [
+    {
+      title: '轮次',
+      dataIndex: 'round',
+      render: (r, { rowSpan }) => ({
+        children: r + 1,
+        props: { rowSpan }
+      })
+    },
+    {
+      title: '编号',
+      dataIndex: 'playerIndex',
+      key: 'playerIndex'
+    },
+    {
+      title: '题目数量',
+      dataIndex: 'T',
+      key: 'T'
+    },
+    {
+      title: '偏好选择',
+      dataIndex: 'preference',
+      key: 'preference'
+    },
+    {
+      title: '结果题号',
+      dataIndex: 'caseIndex',
+      key: 'caseIndex'
+    },
+    {
+      title: '是否选中',
+      dataIndex: 'success',
+      key: 'success'
+    },
+    {
+      title: '收益',
+      dataIndex: 'award',
+      key: 'award'
+    }
+  ]
+  const dataSource = []
+  playerState.rounds.forEach(
+    (
+      {
+        T,
+        preference,
+        result = {
+          caseIndex: undefined,
+          success: false,
+          award: 0
+        }
+      },
+      r
+    ) => {
+      const { caseIndex, success, award } = result
+      dataSource.push({
+        round: r,
+        playerIndex: playerState.index + 1,
+        T,
+        preference: (preference ? preference.map(c => (c === Choice.A ? 'A' : 'B')) : []).join('>'),
+        caseIndex: caseIndex === undefined ? '' : +caseIndex + 1,
+        success: success.toString(),
+        award
+      })
+    }
+  )
+  return <Table pagination={{ pageSize: groupSize * 2 }} size={'small'} columns={columns} dataSource={dataSource} />
+}
+
+class GroupPlay extends Round.Play<
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
+  PushType,
+  IRoundMoveParams,
   IPushParams
 > {
-  lang = Lang.extractLang({
-    round1: ['第', 'Round'],
-    round2: ['轮', ''],
-    wait4OtherPlayers: ['等待其它玩家加入......'],
-    gameOver: ['所有轮次结束，等待老师关闭实验']
-  })
+  RoundPlay = RoundPlay
 
-  render(): React.ReactNode {
-    const {
-      lang,
-      props: { playerState, groupGameState, groupFrameEmitter, groupParams }
-    } = this
-    if (playerState.status === PlayerStatus.guide) {
-      return (
-        <section className={style.groupGuide}>
-          <p>
-            本实验要求您在以下T个成对彩票中选择，即需要做T次选择。彩票A为：以P1的概率获得S1单位实验币，以1-P1的概率获得S2实验币；彩票B为：以P2的概率获得S3单位实验币，以1-P2的概率获得S4实验币。
-          </p>
-          <Button type="primary" onClick={() => groupFrameEmitter.emit(MoveType.guideDone)}>
-            Start
-          </Button>
-        </section>
-      )
-    }
-    if (playerState.status === PlayerStatus.result) {
-      return <section className={style.groupResult}>{lang.gameOver}</section>
-    }
-    const playerRoundState = playerState.rounds[groupGameState.round],
-      gameRoundState = groupGameState.rounds[groupGameState.round]
-    if (!playerRoundState) {
-      return <MaskLoading label={lang.wait4OtherPlayers} />
-    }
-    return (
-      <section className={style.groupPlay}>
-        <h2 className={style.title}>
-          {lang.round1}
-          {groupGameState.round + 1}
-          {lang.round2}
-        </h2>
-        <RoundPlay
-          {...{
-            groupParams,
-            playerRoundState,
-            gameRoundState,
-            frameEmitter: groupFrameEmitter,
-            playerIndex: playerState.index
-          }}
-        />
-      </section>
-    )
-  }
+  RoundHistory = RoundHistory
+
+  RoundGuide = () => (
+    <p>
+      本实验要求您在以下T个成对彩票中选择，即需要做T次选择。彩票A为：以P1的概率获得S1单位实验币，以1-P1的概率获得S2实验币；彩票B为：以P2的概率获得S3单位实验币，以1-P2的概率获得S4实验币。
+    </p>
+  )
 }
 
 export class Play extends Group.Play<
-  ICreateParams,
-  IGameState,
-  IPlayerState,
-  MoveType,
+  IGroupCreateParams,
+  IGroupGameState,
+  IGroupPlayerState,
+  GroupMoveType,
   PushType,
-  IMoveParams,
+  IGroupMoveParams,
   IPushParams
 > {
   GroupPlay = GroupPlay

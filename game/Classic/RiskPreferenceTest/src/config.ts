@@ -1,3 +1,5 @@
+import { RoundDecorator } from '@extend/share'
+
 export const namespace = 'RiskPreferenceTest'
 
 export enum FetchRoute {
@@ -6,8 +8,7 @@ export enum FetchRoute {
 
 export const TRange: [number, number] = [5, 10]
 
-export enum MoveType {
-  guideDone,
+export enum RoundMoveType {
   submit
 }
 
@@ -18,7 +19,7 @@ export enum Choice {
   B
 }
 
-export interface IMoveParams {
+export interface IRoundMoveParams {
   preference: Choice[]
 }
 
@@ -26,20 +27,14 @@ export interface IPushParams {}
 
 export const awardLimit = 100
 
-export interface ICreateParams {
-  round: number
+export interface IRoundCreateParams {
   t: number
   awardA: number
   awardB: number
 }
 
-export interface IGameRoundState {
+export interface IRoundGameState {
   timeLeft: number
-}
-
-export interface IGameState {
-  round: number
-  rounds: IGameRoundState[]
 }
 
 export enum PlayerRoundStatus {
@@ -48,7 +43,7 @@ export enum PlayerRoundStatus {
   result
 }
 
-export interface IPlayerRoundState {
+export interface IRoundPlayerState {
   status: PlayerRoundStatus
   T: number
   preference?: Choice[]
@@ -65,7 +60,8 @@ export enum PlayerStatus {
   result
 }
 
-export interface IPlayerState {
-  status: PlayerStatus
-  rounds: IPlayerRoundState[]
-}
+export type GroupMoveType = RoundDecorator.TMoveType<RoundMoveType>
+export type IGroupMoveParams = RoundDecorator.IMoveParams<IRoundMoveParams>
+export type IGroupCreateParams = RoundDecorator.ICreateParams<IRoundCreateParams>
+export type IGroupGameState = RoundDecorator.IGameState<IRoundGameState>
+export type IGroupPlayerState = RoundDecorator.IPlayerState<IRoundPlayerState>

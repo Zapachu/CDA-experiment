@@ -17,7 +17,7 @@ const router = Router().get(FetchRoute.exportXls, async (req, res) => {
   const name = 'RoundResult'
   const data = [],
     option = {}
-  data.push(['玩家', '优先序', '捕获', '回报', '最终收益'])
+  data.push(['玩家', '学号', '编号', '题目数量', '偏好选择', '结果题号', '是否选中', '受益'])
   const rounds = (await Model.FreeStyleModel.find({
     game: game.id
   }).sort({ key: 1 })) as Array<any>
@@ -25,7 +25,9 @@ const router = Router().get(FetchRoute.exportXls, async (req, res) => {
     const [g, r] = round.key.split('_')
     data.push([])
     data.push([`第${+g + 1}组`, `第${+r + 1}轮`])
-    round.data.forEach(({ user, playerIndex, x, reward }) => data.push([user, playerIndex, x, reward, x + reward]))
+    round.data.forEach(({ userName, stuNum, playerIndex, T, preference, caseIndex, success, award }) =>
+      data.push([userName, stuNum, playerIndex, T, preference, caseIndex, success, award])
+    )
   })
   const buffer = nodeXlsx.build([{ name, data }], option)
   res.setHeader('Content-Type', 'application/vnd.openxmlformats')
