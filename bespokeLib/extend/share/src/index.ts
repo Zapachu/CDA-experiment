@@ -71,27 +71,27 @@ export namespace RoundDecorator {
     result
   }
 
-  export type TMoveType<RoundMoveType> = RoundMoveType | MoveType;
+  export type TGroupMoveType<RoundMoveType> = RoundMoveType | MoveType;
 
-  export interface ICreateParams<IRoundCreateParams> {
+  export interface IGroupCreateParams<IRoundCreateParams> {
     round: number;
     independentRound: boolean;
     roundsParams: IRoundCreateParams[];
   }
 
-  export interface IMoveParams<IRoundMoveParams> {
+  export interface IGroupMoveParams<IRoundMoveParams> {
     roundIndex: number;
     params: IRoundMoveParams;
   }
 
-  export interface IGameState<IRoundGameState> {
+  export interface IGroupGameState<IRoundGameState> {
     round: number;
     rounds: IRoundGameState[];
   }
 
-  export interface IPlayerState<IPlayerRoundState> {
+  export interface IGroupPlayerState<IRoundPlayerState> {
     status: PlayerStatus;
-    rounds: IPlayerRoundState[];
+    rounds: IRoundPlayerState[];
   }
 
   export function roundFrameEmitter<
@@ -101,9 +101,9 @@ export namespace RoundDecorator {
     IPushParams
   >(
     frameEmitter: FrameEmitter<
-      RoundDecorator.TMoveType<RoundMoveType>,
+      RoundDecorator.TGroupMoveType<RoundMoveType>,
       PushType,
-      RoundDecorator.IMoveParams<IRoundMoveParams>,
+      RoundDecorator.IGroupMoveParams<IRoundMoveParams>,
       IPushParams
     >,
     roundIndex: number

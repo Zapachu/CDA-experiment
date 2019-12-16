@@ -10,7 +10,7 @@ import { FrameEmitter } from "@bespoke/share";
 export namespace Round {
   export interface ICreateProps<IRoundCreateParams>
     extends Group.ICreateProps<
-      RoundDecorator.ICreateParams<IRoundCreateParams>
+      RoundDecorator.IGroupCreateParams<IRoundCreateParams>
     > {
     roundIndex?: number;
     roundParams: IRoundCreateParams;
@@ -27,12 +27,12 @@ export namespace Round {
     IPushParams
   >
     extends Group.IPlayProps<
-      RoundDecorator.ICreateParams<IRoundCreateParams>,
-      RoundDecorator.IGameState<IRoundGameState>,
-      RoundDecorator.IPlayerState<IRoundPlayerState>,
-      RoundDecorator.TMoveType<RoundMoveType>,
+      RoundDecorator.IGroupCreateParams<IRoundCreateParams>,
+      RoundDecorator.IGroupGameState<IRoundGameState>,
+      RoundDecorator.IGroupPlayerState<IRoundPlayerState>,
+      RoundDecorator.TGroupMoveType<RoundMoveType>,
       PushType,
-      RoundDecorator.IMoveParams<IRoundMoveParams>,
+      RoundDecorator.IGroupMoveParams<IRoundMoveParams>,
       IPushParams
     > {
     roundParams: IRoundCreateParams;
@@ -56,18 +56,18 @@ export namespace Round {
     IPushParams
   >
     extends Group.IPlayProps<
-      RoundDecorator.ICreateParams<IRoundCreateParams>,
-      RoundDecorator.IGameState<IRoundGameState>,
-      RoundDecorator.IPlayerState<IRoundPlayerState>,
-      RoundDecorator.TMoveType<RoundMoveType>,
+      RoundDecorator.IGroupCreateParams<IRoundCreateParams>,
+      RoundDecorator.IGroupGameState<IRoundGameState>,
+      RoundDecorator.IGroupPlayerState<IRoundPlayerState>,
+      RoundDecorator.TGroupMoveType<RoundMoveType>,
       PushType,
-      RoundDecorator.IMoveParams<IRoundMoveParams>,
+      RoundDecorator.IGroupMoveParams<IRoundMoveParams>,
       IPushParams
     > {}
 }
 
 export class Create<IRoundCreateParams, S = {}> extends Group.Create<
-  RoundDecorator.ICreateParams<Core.TCreateParams<IRoundCreateParams>>,
+  RoundDecorator.IGroupCreateParams<Core.TCreateParams<IRoundCreateParams>>,
   S
 > {
   static readonly ROUND_RANGE = {
@@ -87,7 +87,7 @@ export class Create<IRoundCreateParams, S = {}> extends Group.Create<
   });
 
   setParams<P>(
-    setParams: Core.TSetCreateParams<RoundDecorator.ICreateParams<P>>,
+    setParams: Core.TSetCreateParams<RoundDecorator.IGroupCreateParams<P>>,
     roundIndex?: number
   ): Core.TSetCreateParams<P> {
     return (action: React.SetStateAction<P>) =>
@@ -117,7 +117,7 @@ export class Create<IRoundCreateParams, S = {}> extends Group.Create<
     if (groupParams.roundsParams) {
       return;
     }
-    const initParams: RoundDecorator.ICreateParams<IRoundCreateParams> = {
+    const initParams: RoundDecorator.IGroupCreateParams<IRoundCreateParams> = {
       round: ~~((Create.ROUND_RANGE.max + Create.ROUND_RANGE.min) >> 1),
       independentRound: false,
       roundsParams: Array(Create.ROUND_RANGE.max)
@@ -210,12 +210,12 @@ export class Play<
   IPushParams,
   S extends IPlayState = IPlayState
 > extends Group.Play<
-  RoundDecorator.ICreateParams<IRoundCreateParams>,
-  RoundDecorator.IGameState<IRoundGameState>,
-  RoundDecorator.IPlayerState<IRoundPlayerState>,
-  RoundDecorator.TMoveType<RoundMoveType>,
+  RoundDecorator.IGroupCreateParams<IRoundCreateParams>,
+  RoundDecorator.IGroupGameState<IRoundGameState>,
+  RoundDecorator.IGroupPlayerState<IRoundPlayerState>,
+  RoundDecorator.TGroupMoveType<RoundMoveType>,
   PushType,
-  RoundDecorator.IMoveParams<IRoundMoveParams>,
+  RoundDecorator.IGroupMoveParams<IRoundMoveParams>,
   IPushParams,
   S
 > {

@@ -39,6 +39,6 @@ class GroupCreate extends Round.Create<IRoundCreateParams> {
   RoundCreate = RoundCreate
 }
 
-export class Create extends Group.Create<RoundDecorator.ICreateParams<IRoundCreateParams>> {
+export class Create extends Group.Create<RoundDecorator.IGroupCreateParams<IRoundCreateParams>> {
   GroupCreate = GroupCreate
 }

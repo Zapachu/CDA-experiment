@@ -23,12 +23,12 @@ export namespace Round {
 
     constructor(
       private host: Group.Robot<
-        RoundDecorator.ICreateParams<IRoundCreateParams>,
-        RoundDecorator.IGameState<IRoundGameState>,
-        RoundDecorator.IPlayerState<IRoundPlayerState>,
-        RoundDecorator.TMoveType<RoundMoveType>,
+        RoundDecorator.IGroupCreateParams<IRoundCreateParams>,
+        RoundDecorator.IGroupGameState<IRoundGameState>,
+        RoundDecorator.IGroupPlayerState<IRoundPlayerState>,
+        RoundDecorator.TGroupMoveType<RoundMoveType>,
         PushType,
-        RoundDecorator.IMoveParams<IRoundMoveParams>,
+        RoundDecorator.IGroupMoveParams<IRoundMoveParams>,
         IPushParams,
         IRobotMeta
       >,
@@ -63,12 +63,12 @@ export class Robot<
   IPushParams,
   IRobotMeta = {}
 > extends Group.Robot<
-  RoundDecorator.ICreateParams<IRoundCreateParams>,
-  RoundDecorator.IGameState<IRoundGameState>,
-  RoundDecorator.IPlayerState<IRoundPlayerState>,
-  RoundDecorator.TMoveType<RoundMoveType>,
+  RoundDecorator.IGroupCreateParams<IRoundCreateParams>,
+  RoundDecorator.IGroupGameState<IRoundGameState>,
+  RoundDecorator.IGroupPlayerState<IRoundPlayerState>,
+  RoundDecorator.TGroupMoveType<RoundMoveType>,
   PushType,
-  RoundDecorator.IMoveParams<IRoundMoveParams>,
+  RoundDecorator.IGroupMoveParams<IRoundMoveParams>,
   IPushParams,
   IRobotMeta
 > {

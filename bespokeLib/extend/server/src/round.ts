@@ -15,12 +15,12 @@ export namespace Round {
     constructor(
       private roundIndex: number,
       private stateManager: Group.StateManager<
-        RoundDecorator.ICreateParams<IRoundCreateParams>,
-        RoundDecorator.IGameState<IRoundGameState>,
-        RoundDecorator.IPlayerState<IRoundPlayerState>,
+        RoundDecorator.IGroupCreateParams<IRoundCreateParams>,
+        RoundDecorator.IGroupGameState<IRoundGameState>,
+        RoundDecorator.IGroupPlayerState<IRoundPlayerState>,
         MoveType,
         PushType,
-        RoundDecorator.IMoveParams<IMoveParams>,
+        RoundDecorator.IGroupMoveParams<IMoveParams>,
         IPushParams
       >
     ) {}
@@ -104,12 +104,12 @@ export class Logic<
   IRoundMoveParams,
   IPushParams
 > extends Group.Logic<
-  RoundDecorator.ICreateParams<IRoundCreateParams>,
-  RoundDecorator.IGameState<IRoundGameState>,
-  RoundDecorator.IPlayerState<IRoundPlayerState>,
-  RoundDecorator.TMoveType<RoundMoveType>,
+  RoundDecorator.IGroupCreateParams<IRoundCreateParams>,
+  RoundDecorator.IGroupGameState<IRoundGameState>,
+  RoundDecorator.IGroupPlayerState<IRoundPlayerState>,
+  RoundDecorator.TGroupMoveType<RoundMoveType>,
   PushType,
-  RoundDecorator.IMoveParams<IRoundMoveParams>,
+  RoundDecorator.IGroupMoveParams<IRoundMoveParams>,
   IPushParams
 > {
   RoundLogic: new (
@@ -181,7 +181,7 @@ export class Logic<
     return this;
   }
 
-  initGameState(): RoundDecorator.IGameState<IRoundGameState> {
+  initGameState(): RoundDecorator.IGroupGameState<IRoundGameState> {
     const gameState = super.initGameState();
     gameState.rounds = Array(this.params.round)
       .fill(null)
@@ -194,7 +194,7 @@ export class Logic<
     groupIndex: number,
     index: number
   ): Promise<
-    GroupDecorator.TPlayerState<RoundDecorator.IPlayerState<IRoundPlayerState>>
+    GroupDecorator.TPlayerState<RoundDecorator.IGroupPlayerState<IRoundPlayerState>>
   > {
     const playerState = await super.initPlayerState(user, groupIndex, index);
     playerState.status = RoundDecorator.PlayerStatus.guide;
@@ -207,8 +207,8 @@ export class Logic<
 
   async playerMoveReducer(
     index: number,
-    type: RoundDecorator.TMoveType<RoundMoveType>,
-    params: RoundDecorator.IMoveParams<IRoundMoveParams>,
+    type: RoundDecorator.TGroupMoveType<RoundMoveType>,
+    params: RoundDecorator.IGroupMoveParams<IRoundMoveParams>,
     cb: IMoveCallback
   ): Promise<void> {
     const { groupSize } = this,

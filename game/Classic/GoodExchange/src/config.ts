@@ -44,8 +44,8 @@ export enum PlayerStatus {
   result
 }
 
-export type GroupMoveType = RoundDecorator.TMoveType<RoundMoveType>
-export type IGroupMoveParams = RoundDecorator.IMoveParams<IRoundMoveParams>
-export type IGroupCreateParams = RoundDecorator.ICreateParams<IRoundCreateParams>
-export type IGroupGameState = RoundDecorator.IGameState<IRoundGameState>
-export type IGroupPlayerState = RoundDecorator.IPlayerState<IRoundPlayerState>
+export type GroupMoveType = RoundDecorator.TGroupMoveType<RoundMoveType>
+export type IGroupMoveParams = RoundDecorator.IGroupMoveParams<IRoundMoveParams>
+export type IGroupCreateParams = RoundDecorator.IGroupCreateParams<IRoundCreateParams>
+export type IGroupGameState = RoundDecorator.IGroupGameState<IRoundGameState>
+export type IGroupPlayerState = RoundDecorator.IGroupPlayerState<IRoundPlayerState>
