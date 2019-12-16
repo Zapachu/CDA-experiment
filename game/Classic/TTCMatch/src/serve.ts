@@ -23,7 +23,7 @@ const router = Router().get(FetchRoute.exportXls, async (req, res) => {
   data.push([
     '玩家',
     '学号',
-    '优先序',
+    '编号',
     '心理价值',
     '初始物品编号',
     '初始物品价格',

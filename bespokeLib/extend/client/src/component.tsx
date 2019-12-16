@@ -27,7 +27,7 @@ export function PrivateValueMatrix({
     minStep: -10,
     maxStep: 10,
     minOffset: 0,
-    maxOffset: 10,
+    maxOffset: 50,
     minPrice: 0,
     maxPrice: 1e3
   };
@@ -133,9 +133,7 @@ export function PrivateValueMatrix({
         columns={[
           {
             render: (_, __, i) => (
-              <div style={{ width: "3.5rem" }}>{`${
-                lang.player
-              }${String.fromCharCode(65 + i)}`}</div>
+              <div style={{ width: "3.5rem" }}>{`${lang.player}${i + 1}`}</div>
             ),
             fixed: tableScroll ? "left" : null
           },

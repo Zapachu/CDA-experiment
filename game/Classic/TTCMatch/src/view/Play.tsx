@@ -36,8 +36,7 @@ function RoundPlay({
   IPushParams
 >) {
   const lang = Lang.extractLang({
-    yourSeq: ['您的优先序为'],
-    dragPlease: ['，请拖拽下方物品列表进行偏好表达'],
+    dragPlease: ['请拖拽下方物品列表进行偏好表达'],
     goodNo: ['物品', 'Good'],
     privateValue: ['心理价值', 'Private Value'],
     goodStatus: ['物品状态', 'Good Status'],
@@ -93,11 +92,7 @@ function RoundPlay({
     }
     return (
       <section className={style.roundPlay}>
-        <label style={{ marginBottom: '1rem' }}>
-          {lang.yourSeq}
-          <em style={{ padding: '.5rem', fontSize: '1.5rem' }}>{playerIndex + 1}</em>
-          {lang.dragPlease}
-        </label>
+        <label style={{ marginBottom: '1rem' }}>{lang.dragPlease}</label>
         <Component.DragTable
           columns={[
             {
@@ -155,7 +150,8 @@ export function RoundHistory({
   IRoundMoveParams,
   IPushParams
 >) {
-  const { groupSize, showHistory } = game.params
+  const { groupSize } = game.params
+  const showHistory = 2
   const columns = [
     {
       title: '轮次',
@@ -166,7 +162,7 @@ export function RoundHistory({
       })
     },
     {
-      title: '优先序',
+      title: '编号',
       dataIndex: 'playerIndex',
       render: i => `${i + 1}${playerState.index === i ? '(你)' : ''}`
     },
@@ -220,6 +216,14 @@ class GroupPlay extends Round.Play<
   RoundPlay = RoundPlay
 
   RoundHistory = RoundHistory
+
+  RoundGuide = () => (
+    <p>
+      本实验是一个关于物品交换的实验，运用顶层交易循环（简称TTC机制），让拥有与N个参与者（每人拥有一个物品）进行交换。实验分为G组，每组N人，共进行R轮，每位参与者将会随机分配到某组中。实验中，系统先随机生成参与者拥有的物品编号，每件物品对于每位参与者的心理价值不同（每件物品心理价值即真实偏好是严格的，即不会出现并列排序），该心理价值是系统在[V1,V2]间产生的随机数（每轮随机或相同可选）。实验开始时系统将随机分给每位参与者一个物品
+      。实验开始后，参与者需要依据系统随机分配的初始物品和该物品对应的心理价值，按相关提示输入你需要交换的物品列表，操作完成后，系统按TTC机制自动匹配。
+      交换成功参与者的收益=最终物品对应的心理价值 未交换成功参与者的收益=初始物品对应的心理价值
+    </p>
+  )
 }
 
 export class Play extends Group.Play<

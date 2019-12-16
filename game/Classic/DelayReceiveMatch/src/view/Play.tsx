@@ -184,8 +184,9 @@ export function RoundHistory({
         round: r,
         playerIndex: i,
         privatePrices: privatePrices.join(' , '),
-        sort: playerState.index === i ? playerState.rounds[r].sort.join('>') : null,
-        good: good + 1,
+        sort:
+          playerState.index === i ? playerState.rounds[r].sort.map(v => String.fromCharCode(65 + v)).join('>') : null,
+        good: String.fromCharCode(65 + good),
         goodPrice: privatePrices[good]
       })
     })
@@ -205,6 +206,14 @@ class GroupPlay extends Round.Play<
   RoundPlay = RoundPlay
 
   RoundHistory = RoundHistory
+
+  RoundGuide = () => (
+    <p>
+      本实验是一个关于稳定配置的实验，运用延迟接受算法（简称G-S机制），对N个物品与N个参与者进行配对，每位参与者至多匹配一件物品，
+      实验分为G组，每组N人，共进行R轮，每位参与者将会被随机的分配到某组中。实验中，系统先随机生成参与者和物品编号，参与者的编号代表不同的优先序（1-N号，数字越小越优先）。每件物品对于每位参与者的心理价值是系统在[V1,V2]之间产生的随机数（每轮随机或相同可选），参与者依据自己对于物品的心理价值表达对于物品进行偏好表达。参与者按相关提示操作后，系统自动匹配。
+      匹配成功参与者收益=匹配到物品对应的心理价值 未匹配成功参与者的收益=0
+    </p>
+  )
 }
 
 export class Play extends Group.Play<
