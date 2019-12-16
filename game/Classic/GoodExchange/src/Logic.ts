@@ -116,9 +116,9 @@ class GroupLogic extends Round.Logic<
           userName: user.name,
           stuNum: user.stuNum,
           playerIndex: index + 1,
-          initGood: index + 1,
+          initGood: String.fromCharCode(65 + index),
           initGoodPrice: privatePrices[index],
-          good: allocation[index] + 1,
+          good: String.fromCharCode(65 + allocation[index]),
           goodPrice: privatePrices[allocation[index]]
         }
       })

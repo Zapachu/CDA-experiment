@@ -69,7 +69,7 @@ function RoundPlay({
           <p>
             {lang.roundOver1}&nbsp;,&nbsp;
             {lang.roundOver4}
-            <em>{good + 1}</em> &nbsp;,&nbsp;
+            <em>{String.fromCharCode(65 + good)}</em> &nbsp;,&nbsp;
             {lang.roundOver3}
             <em>{privatePrices[good]}</em>
           </p>
@@ -164,11 +164,11 @@ export function RoundHistory({
       dataIndex: 'sort'
     },
     {
-      title: '分得物品编号',
+      title: '最终物品',
       dataIndex: 'good'
     },
     {
-      title: '分得物品价格',
+      title: '最终物品价格',
       dataIndex: 'goodPrice'
     }
   ]

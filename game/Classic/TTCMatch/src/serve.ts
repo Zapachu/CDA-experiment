@@ -25,11 +25,11 @@ const router = Router().get(FetchRoute.exportXls, async (req, res) => {
     '学号',
     '编号',
     '心理价值',
-    '初始物品编号',
+    '初始物品',
     '初始物品价格',
     '偏好表达',
-    '分得物品编号',
-    '分得物品价格'
+    '最终物品',
+    '最终物品价格'
   ])
   const rounds = (await Model.FreeStyleModel.find({
     game: game.id

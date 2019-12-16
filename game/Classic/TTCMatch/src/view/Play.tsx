@@ -71,12 +71,12 @@ function RoundPlay({
             {initGood === null ? null : (
               <>
                 {lang.roundOver2}
-                <em>{initGood + 1}</em>&nbsp;,&nbsp;{lang.roundOver3}
+                <em>{String.fromCharCode(65 + initGood)}</em>&nbsp;,&nbsp;{lang.roundOver3}
                 <em>{privatePrices[initGood]}</em>&nbsp;,&nbsp;
               </>
             )}
             {lang.roundOver4}
-            <em>{good + 1}</em> &nbsp;,&nbsp;
+            <em>{String.fromCharCode(65 + good)}</em> &nbsp;,&nbsp;
             {lang.roundOver3}
             <em>{privatePrices[good]}</em>
           </p>
@@ -175,11 +175,11 @@ export function RoundHistory({
       dataIndex: 'sort'
     },
     {
-      title: '分得物品编号',
+      title: '最终物品',
       dataIndex: 'good'
     },
     {
-      title: '分得物品价格',
+      title: '最终物品价格',
       dataIndex: 'goodPrice'
     }
   ]
@@ -195,8 +195,9 @@ export function RoundHistory({
         round: r,
         playerIndex: i,
         privatePrices: privatePrices.join(' , '),
-        sort: playerState.index === i ? playerState.rounds[r].sort.join('>') : null,
-        good: good + 1,
+        sort:
+          playerState.index === i ? playerState.rounds[r].sort.map(v => String.fromCharCode(65 + v)).join('>') : null,
+        good: String.fromCharCode(65 + good),
         goodPrice: privatePrices[good]
       })
     })

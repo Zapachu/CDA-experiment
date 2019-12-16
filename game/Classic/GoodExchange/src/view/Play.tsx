@@ -46,7 +46,7 @@ function RoundPlay({
     waitRes: ['等待响应...', 'Waiting for response...'],
     exchanging: ['交换中...', 'Exchanging...'],
     timeLeft: ['剩余时间', 'Time Left'],
-    resultInfo1: ['您已完成本轮交换，您的初始物品编号为'],
+    resultInfo1: ['您已完成本轮交换，您的初始物品为'],
     resultInfo2: ['其价格为'],
     resultInfo3: ['最终所得物品编号为'],
     resultInfo4: ['其价格为'],
@@ -130,11 +130,11 @@ function RoundPlay({
           <>
             <p className={style.resultInfo}>
               {lang.resultInfo1}
-              <em>{playerIndex + 1}</em>&nbsp;,&nbsp;
+              <em>{String.fromCharCode(65 + playerIndex)}</em>&nbsp;,&nbsp;
               {lang.resultInfo2}
               <em>{privatePrices[playerIndex]}</em>&nbsp;,&nbsp;
               {lang.resultInfo3}
-              <em>{allocation[playerIndex] + 1}</em>&nbsp;,&nbsp;
+              <em>{String.fromCharCode(65 + allocation[playerIndex])}</em>&nbsp;,&nbsp;
               {lang.resultInfo4}
               <em>{privatePrices[allocation[playerIndex]]}</em>
             </p>
@@ -180,7 +180,7 @@ export function RoundHistory({
       dataIndex: 'privatePrices'
     },
     {
-      title: '初始物品编号',
+      title: '初始物品',
       dataIndex: 'initGood',
       key: 'initGood'
     },
@@ -212,9 +212,9 @@ export function RoundHistory({
         round: r,
         playerIndex: i,
         privatePrices: privatePrices.join(' , '),
-        initGood: i + 1,
+        initGood: String.fromCharCode(65 + i),
         initGoodPrice: privatePrices[i],
-        good: good + 1,
+        good: good === null ? null : String.fromCharCode(65 + good),
         goodPrice: privatePrices[good]
       })
     })

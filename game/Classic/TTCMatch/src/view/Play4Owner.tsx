@@ -44,7 +44,7 @@ class GroupPlay4Owner extends Group.Group.Play4Owner<
         dataIndex: 'privatePrices'
       },
       {
-        title: '初始物品编号',
+        title: '初始物品',
         dataIndex: 'initGood',
         key: 'initGood'
       },
@@ -59,12 +59,12 @@ class GroupPlay4Owner extends Group.Group.Play4Owner<
         key: 'sort'
       },
       {
-        title: '分得物品编号',
+        title: '最终物品',
         dataIndex: 'good',
         key: 'good'
       },
       {
-        title: '分得物品价格',
+        title: '最终物品价格',
         dataIndex: 'goodPrice',
         key: 'goodPrice'
       }
@@ -85,10 +85,10 @@ class GroupPlay4Owner extends Group.Group.Play4Owner<
                       stuNum: user.stuNum,
                       playerIndex: index + 1,
                       privatePrices: privatePrices.join(' , '),
-                      initGood: initAllocation[index] === null ? null : initAllocation[index] + 1,
+                      initGood: initAllocation[index] === null ? null : String.fromCharCode(65 + initAllocation[index]),
                       initGoodPrice: privatePrices[initAllocation[index]],
-                      sort: sort.map(i => i + 1).join('>'),
-                      good: allocation[index] + 1,
+                      sort: sort.map(i => String.fromCharCode(65 + i)).join('>'),
+                      good: String.fromCharCode(65 + allocation[index]),
                       goodPrice: privatePrices[allocation[index]]
                     }
                   })

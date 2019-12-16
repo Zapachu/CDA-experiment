@@ -19,7 +19,7 @@ import {
   RoundMoveType
 } from '../config'
 import { Lang, MaskLoading } from '@elf/component'
-import { RoundHistory } from '../../../DelayReceiveMatch/src/view/Play'
+import { GroupDecorator } from '@extend/share'
 
 function RoundPlay({
   roundParams,
@@ -248,6 +248,81 @@ function RoundPlay({
   }
 }
 
+export function RoundHistory({
+  game,
+  playerState,
+  groupParams,
+  groupGameState
+}: Round.Round.IHistoryProps<
+  IRoundCreateParams,
+  IRoundGameState,
+  IRoundPlayerState,
+  RoundMoveType,
+  PushType,
+  IRoundMoveParams,
+  IPushParams
+>) {
+  const { groupSize } = game.params
+  const showHistory = 2
+  const columns = [
+    {
+      title: '轮次',
+      dataIndex: 'round',
+      render: (r, { rowSpan }) => ({
+        children: r + 1,
+        props: { rowSpan }
+      })
+    },
+    {
+      title: '优先序',
+      dataIndex: 'playerIndex',
+      render: i => `${i + 1}${playerState.index === i ? '(你)' : ''}`
+    },
+    {
+      title: '心理价值',
+      dataIndex: 'privatePrices'
+    },
+    {
+      title: '角色',
+      dataIndex: 'role',
+      key: 'role'
+    },
+    {
+      title: '偏好表达',
+      dataIndex: 'sort'
+    },
+    {
+      title: '最终物品',
+      dataIndex: 'good'
+    },
+    {
+      title: '最终物品价格',
+      dataIndex: 'goodPrice'
+    }
+  ]
+  const dataSource = []
+  groupGameState.rounds.forEach(({ initAllocation, allocation }, r) =>
+    allocation.forEach((good, i) => {
+      const privatePrices = groupParams.roundsParams[r].privatePriceMatrix[i]
+      if (showHistory === GroupDecorator.ShowHistory.selfOnly && i !== playerState.index) {
+        return
+      }
+      const roundPlayerState = playerState.rounds[r]
+      dataSource.push({
+        rowSpan: showHistory === GroupDecorator.ShowHistory.selfOnly ? 1 : i === 0 ? groupSize : 0,
+        round: r,
+        playerIndex: i,
+        privatePrices: privatePrices.join(' , '),
+        role: initAllocation[i] === null ? '新租户' : '旧租户',
+        sort: playerState.index === i ? roundPlayerState.sort.map(v => String.fromCharCode(65 + v)).join('>') : null,
+        good: String.fromCharCode(65 + good),
+        goodPrice: privatePrices[good]
+      })
+    })
+  )
+  return <Table pagination={{ pageSize: groupSize * 2 }} size={'small'} columns={columns} dataSource={dataSource} />
+}
+
 class GroupPlay extends Round.Play<
   IRoundCreateParams,
   IRoundGameState,
@@ -259,7 +334,7 @@ class GroupPlay extends Round.Play<
 > {
   RoundPlay = RoundPlay
 
-  RoundHistory = RoundHistory as any
+  RoundHistory = RoundHistory
 
   RoundGuide = () => (
     <p>

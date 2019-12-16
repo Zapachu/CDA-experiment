@@ -126,11 +126,11 @@ export class GroupLogic extends Round.Logic<
           stuNum: user.stuNum,
           playerIndex: index + 1,
           privatePrices: privatePrices.join(' , '),
-          initGood: initAllocation[index] === null ? '' : initAllocation[index] + 1,
+          initGood: initAllocation[index] === null ? '' : String.fromCharCode(65 + initAllocation[index]),
           initGoodPrice: privatePrices[initAllocation[index]] || '',
           join: sort.length === 0 ? 'No' : 'Yes',
-          sort: sort.map(i => i + 1).join('>'),
-          good: allocation[index] + 1,
+          sort: sort.map(i => String.fromCharCode(65 + i)).join('>'),
+          good: String.fromCharCode(65 + initAllocation[index]),
           goodPrice: privatePrices[allocation[index]]
         }
       })
