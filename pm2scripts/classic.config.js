@@ -40,7 +40,7 @@ const apps = [
 module.exports = {
     apps: apps.map(app => ({
         ...app,
-        watch: true,
+        autorestart: true,
         max_memory_restart: '1G',
         log_date_format: "YYYY-MM-DD HH:mm Z",
         env: {
