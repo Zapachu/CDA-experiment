@@ -27,8 +27,8 @@ export namespace Round {
     ) {}
 
     async getPlayerState(index: number): Promise<IRoundPlayerState> {
-      const { rounds } = await this.stateManager.getPlayerState(index);
-      return rounds[this.roundIndex];
+      const playerStates = await this.getPlayerStates()
+      return playerStates[index];
     }
 
     async getGameState(): Promise<IRoundGameState> {
@@ -243,7 +243,7 @@ export class Logic<
       }
     } else {
       await this.roundsLogic[params.roundIndex].playerMoveReducer(
-        index,
+        playerState.rounds[params.roundIndex].index,
         type,
         params.params,
         cb

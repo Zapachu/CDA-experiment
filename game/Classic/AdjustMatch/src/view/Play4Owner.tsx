@@ -40,9 +40,12 @@ class GroupPlay4Owner extends Group.Group.Play4Owner<
         dataIndex: 'stuNum'
       },
       {
+        title: '编号',
+        dataIndex: 'indexInGroup'
+      },
+      {
         title: '优先序',
-        dataIndex: 'playerIndex',
-        key: 'playerIndex'
+        dataIndex: 'indexInRound'
       },
       {
         title: '心理价值',
@@ -81,33 +84,35 @@ class GroupPlay4Owner extends Group.Group.Play4Owner<
     ]
     return (
       <Tabs tabPosition={'left'}>
-        {groupGameState.rounds.map((gameRoundState, i) => (
-          <Tabs.TabPane tab={lang.roundIndex(i)} key={i.toString()}>
-            {gameRoundState.allocation.length ? (
-              <Table
-                dataSource={groupPlayerStates
-                  .map(({ user, index, rounds }) => {
-                    const { initAllocation, allocation } = gameRoundState
-                    const { sort } = rounds[i],
-                      privatePrices = groupParams.roundsParams[i].privatePriceMatrix[index]
-                    return {
-                      userName: user.name,
-                      stuNum: user.stuNum,
-                      playerIndex: index + 1,
-                      privatePrices: privatePrices.join(' , '),
-                      initGood: initAllocation[index] === null ? null : String.fromCharCode(65 + initAllocation[index]),
-                      initGoodPrice: privatePrices[initAllocation[index]],
-                      join: sort.length === 0 ? 'No' : 'Yes',
-                      sort: sort.map(i => String.fromCharCode(65 + i)).join('>'),
-                      good: String.fromCharCode(65 + allocation[index]),
-                      goodPrice: privatePrices[allocation[index]]
-                    }
-                  })
-                  .sort(({ playerIndex: p1 }, { playerIndex: p2 }) => p1 - p2)}
-                columns={columns}
-                pagination={false}
-              />
-            ) : null}
+        {groupGameState.rounds.map((gameRoundState, r) => (
+          <Tabs.TabPane tab={lang.roundIndex(r)} key={r.toString()}>
+            <Table
+              dataSource={groupPlayerStates
+                .map(({ user, index: indexInGroup, rounds }) => {
+                  const { initAllocation, allocation } = gameRoundState
+                  const { sort, index: indexInRound } = rounds[r],
+                    privatePrices = groupParams.roundsParams[r].privatePriceMatrix[indexInGroup]
+                  return {
+                    userName: user.name,
+                    stuNum: user.stuNum,
+                    indexInGroup: indexInGroup + 1,
+                    indexInRound: indexInRound + 1,
+                    privatePrices: privatePrices.join(' , '),
+                    initGood:
+                      initAllocation[indexInRound] === null
+                        ? null
+                        : String.fromCharCode(65 + initAllocation[indexInRound]),
+                    initGoodPrice: privatePrices[initAllocation[indexInRound]],
+                    join: sort.length === 0 ? 'No' : 'Yes',
+                    sort: sort.map(i => String.fromCharCode(65 + i)).join('>'),
+                    good: allocation[indexInRound] === null ? null : String.fromCharCode(65 + allocation[indexInRound]),
+                    goodPrice: privatePrices[allocation[indexInRound]]
+                  }
+                })
+                .sort(({ indexInGroup: p1 }, { indexInGroup: p2 }) => p1 - p2)}
+              columns={columns}
+              pagination={false}
+            />
           </Tabs.TabPane>
         ))}
       </Tabs>

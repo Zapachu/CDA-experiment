@@ -23,6 +23,7 @@ const router = Router().get(FetchRoute.exportXls, async (req, res) => {
   data.push([
     '玩家',
     '学号',
+    '编号',
     '优先序',
     '心理价值',
     '初始物品',
@@ -40,8 +41,32 @@ const router = Router().get(FetchRoute.exportXls, async (req, res) => {
     data.push([])
     data.push([`第${+g + 1}组`, `第${+r + 1}轮`])
     round.data.forEach(
-      ({ userName, stuNum, playerIndex, privatePrices, initGood, initGoodPrice, join, sort, good, goodPrice }) =>
-        data.push([userName, stuNum, playerIndex, privatePrices, initGood, initGoodPrice, join, sort, good, goodPrice])
+      ({
+        userName,
+        stuNum,
+        indexInGroup,
+        indexInRound,
+        privatePrices,
+        initGood,
+        initGoodPrice,
+        join,
+        sort,
+        good,
+        goodPrice
+      }) =>
+        data.push([
+          userName,
+          stuNum,
+          indexInGroup,
+          indexInRound,
+          privatePrices,
+          initGood,
+          initGoodPrice,
+          join,
+          sort,
+          good,
+          goodPrice
+        ])
     )
   })
   const buffer = nodeXlsx.build([{ name, data }], option)

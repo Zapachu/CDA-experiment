@@ -61,10 +61,10 @@ function RoundPlay({
     oldPlayer: ['旧租户'],
     newPlayer: ['新租户']
   })
-  const playerIndex = playerState.index,
+  const indexInGroup = playerState.index,
     { goodStatus, initAllocation, allocation } = roundGameState,
-    { status } = roundPlayerState,
-    privatePrices = roundParams.privatePriceMatrix[playerIndex]
+    { status, index: indexInRound } = roundPlayerState,
+    privatePrices = roundParams.privatePriceMatrix[indexInGroup]
   const colStyle: React.CSSProperties = {
     minWidth: '6rem',
     maxWidth: '12rem'
@@ -77,8 +77,8 @@ function RoundPlay({
     case PlayerRoundStatus.wait:
       return <MaskLoading label={lang.wait4Others} />
     case PlayerRoundStatus.result:
-      const good = allocation[playerIndex],
-        initGood = initAllocation[playerIndex]
+      const good = allocation[indexInRound],
+        initGood = initAllocation[indexInRound]
       return (
         <div className={style.roundResult}>
           <p>
@@ -106,7 +106,7 @@ function RoundPlay({
         <label style={{ marginBottom: '1rem' }}>
           {lang.yourRole}
           <em style={{ padding: '.5rem', fontSize: '1.5rem' }}>
-            {initAllocation[playerIndex] === null ? lang.newPlayer : lang.oldPlayer}
+            {initAllocation[indexInRound] === null ? lang.newPlayer : lang.oldPlayer}
           </em>
         </label>
         <Table
@@ -148,11 +148,11 @@ function RoundPlay({
             key: i,
             price: privatePrices[i],
             goodStatus: goodStatus[i],
-            isYou: i === initAllocation[playerIndex]
+            isYou: i === initAllocation[indexInRound]
           }))}
         />
         <div className={style.btnsWrapper}>
-          {initAllocation[playerIndex] === null ? (
+          {initAllocation[indexInRound] === null ? (
             lang.wait4OldPlayers
           ) : (
             <>
@@ -187,7 +187,7 @@ function RoundPlay({
               fontSize: '1.5rem'
             }}
           >
-            {playerIndex + 1 - allocation.filter((s, i) => s !== null && i < playerIndex).length}
+            {indexInRound + 1 - allocation.filter((s, i) => s !== null && i < indexInRound).length}
           </em>
           {lang.dragPlease}
         </label>{' '}
@@ -233,7 +233,7 @@ function RoundPlay({
             key: i,
             price: privatePrices[i],
             goodStatus: goodStatus[i],
-            isYou: i === initAllocation[playerIndex],
+            isYou: i === initAllocation[indexInRound],
             preferNo: j
           }))}
           setData={data => setSort(data.map(({ key }) => key))}
@@ -274,9 +274,14 @@ export function RoundHistory({
       })
     },
     {
-      title: '优先序',
-      dataIndex: 'playerIndex',
+      title: '编号',
+      dataIndex: 'indexInGroup',
       render: i => `${i + 1}${playerState.index === i ? '(你)' : ''}`
+    },
+    {
+      title: '优先序',
+      dataIndex: 'indexInRound',
+      render: i => i + 1
     },
     {
       title: '心理价值',
@@ -301,20 +306,25 @@ export function RoundHistory({
     }
   ]
   const dataSource = []
-  groupGameState.rounds.forEach(({ initAllocation, allocation }, r) =>
-    allocation.forEach((good, i) => {
-      const privatePrices = groupParams.roundsParams[r].privatePriceMatrix[i]
-      if (showHistory === GroupDecorator.ShowHistory.selfOnly && i !== playerState.index) {
+  groupGameState.rounds.forEach(({ indices, initAllocation, allocation }, r) =>
+    indices.forEach((indexInRound, indexInGroup) => {
+      const good = allocation[indexInRound]
+      const privatePrices = groupParams.roundsParams[r].privatePriceMatrix[indexInGroup]
+      if (showHistory === GroupDecorator.ShowHistory.selfOnly && indexInGroup !== playerState.index) {
         return
       }
       const roundPlayerState = playerState.rounds[r]
       dataSource.push({
-        rowSpan: showHistory === GroupDecorator.ShowHistory.selfOnly ? 1 : i === 0 ? groupSize : 0,
+        rowSpan: showHistory === GroupDecorator.ShowHistory.selfOnly ? 1 : indexInGroup === 0 ? groupSize : 0,
         round: r,
-        playerIndex: i,
+        indexInGroup,
+        indexInRound,
         privatePrices: privatePrices.join(' , '),
-        role: initAllocation[i] === null ? '新租户' : '旧租户',
-        sort: playerState.index === i ? roundPlayerState.sort.map(v => String.fromCharCode(65 + v)).join('>') : null,
+        role: initAllocation[indexInGroup] === null ? '新租户' : '旧租户',
+        sort:
+          playerState.index === indexInRound
+            ? roundPlayerState.sort.map(v => String.fromCharCode(65 + v)).join('>')
+            : null,
         good: String.fromCharCode(65 + good),
         goodPrice: privatePrices[good]
       })

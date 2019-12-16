@@ -17,8 +17,8 @@ import {
 } from './config'
 import { Model } from '@bespoke/server'
 import { IPlayer, match } from './util/Match'
-import shuffle = require('lodash/shuffle')
 import { RoundDecorator } from '@extend/share'
+import shuffle = require('lodash/shuffle')
 
 class RoundLogic extends Round.Round.Logic<
   IRoundCreateParams,
@@ -118,21 +118,22 @@ export class GroupLogic extends Round.Logic<
     await Model.FreeStyleModel.create({
       game: this.gameId,
       key: `${this.groupIndex}_${round}`,
-      data: playerStates.map(({ user, index, rounds }) => {
+      data: playerStates.map(({ user, index: indexInGroup, rounds }) => {
         const { initAllocation, allocation } = gameRoundState,
-          { sort } = rounds[round],
-          privatePrices = this.params.roundsParams[round].privatePriceMatrix[index]
+          { sort, index: indexInRound } = rounds[round],
+          privatePrices = this.params.roundsParams[round].privatePriceMatrix[indexInGroup]
         return {
           userName: user.name,
           stuNum: user.stuNum,
-          playerIndex: index + 1,
+          indexInGroup: indexInGroup + 1,
+          indexInRound: indexInRound + 1,
           privatePrices: privatePrices.join(' , '),
-          initGood: initAllocation[index] === null ? '' : String.fromCharCode(65 + initAllocation[index]),
-          initGoodPrice: privatePrices[initAllocation[index]] || '',
+          initGood: initAllocation[indexInRound] === null ? '' : String.fromCharCode(65 + initAllocation[indexInRound]),
+          initGoodPrice: privatePrices[initAllocation[indexInRound]] || '',
           join: sort.length === 0 ? 'No' : 'Yes',
           sort: sort.map(i => String.fromCharCode(65 + i)).join('>'),
-          good: String.fromCharCode(65 + initAllocation[index]),
-          goodPrice: privatePrices[allocation[index]]
+          good: String.fromCharCode(65 + allocation[indexInRound]),
+          goodPrice: privatePrices[allocation[indexInRound]]
         }
       })
     })

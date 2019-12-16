@@ -61,13 +61,13 @@ var Round;
         }
         StateManager.prototype.getPlayerState = function (index) {
             return __awaiter(this, void 0, void 0, function () {
-                var rounds;
+                var playerStates;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.stateManager.getPlayerState(index)];
+                        case 0: return [4 /*yield*/, this.getPlayerStates()];
                         case 1:
-                            rounds = (_a.sent()).rounds;
-                            return [2 /*return*/, rounds[this.roundIndex]];
+                            playerStates = _a.sent();
+                            return [2 /*return*/, playerStates[index]];
                     }
                 });
             });
@@ -253,7 +253,7 @@ var Logic = /** @class */ (function (_super) {
                             }
                         }
                         return [3 /*break*/, 5];
-                    case 3: return [4 /*yield*/, this.roundsLogic[params.roundIndex].playerMoveReducer(index, type, params.params, cb)];
+                    case 3: return [4 /*yield*/, this.roundsLogic[params.roundIndex].playerMoveReducer(playerState.rounds[params.roundIndex].index, type, params.params, cb)];
                     case 4:
                         _a.sent();
                         _a.label = 5;
