@@ -20,10 +20,6 @@ const apps = [
         name: "GoodExchange"
     },
     {
-        script: "../game/Classic/PublicGoods/build/serve.js",
-        name: "PublicGoods"
-    },
-    {
         script: "../game/Classic/PublicGoodsWithRewardPunish/build/serve.js",
         name: "PublicGoodsWithRewardPunish"
     },
