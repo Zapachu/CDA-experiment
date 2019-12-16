@@ -52,10 +52,10 @@ function RoundPlay({
     preference: ['偏好'],
     preferNo: [n => `第${n}喜欢`]
   })
-  const playerIndex = playerState.index,
+  const indexInGroup = playerState.index,
     { allocation } = roundGameState,
-    { status } = roundPlayerState,
-    privatePrices = roundParams.privatePriceMatrix[playerIndex]
+    { status, index: indexInRound } = roundPlayerState,
+    privatePrices = roundParams.privatePriceMatrix[indexInGroup]
   const [sort, setSort] = React.useState(privatePrices.map((_, i) => i))
   switch (status) {
     case PlayerRoundStatus.play:
@@ -63,7 +63,7 @@ function RoundPlay({
     case PlayerRoundStatus.wait:
       return <MaskLoading label={lang.wait4Others} />
     case PlayerRoundStatus.result:
-      const good = allocation[playerIndex]
+      const good = allocation[indexInRound]
       return (
         <div className={style.roundResult}>
           <p>
@@ -87,7 +87,7 @@ function RoundPlay({
       <section className={style.roundPlay}>
         <label style={{ marginBottom: '1rem' }}>
           {lang.yourSeq}
-          <em style={{ padding: '.5rem', fontSize: '1.5rem' }}>{playerIndex + 1}</em>
+          <em style={{ padding: '.5rem', fontSize: '1.5rem' }}>{indexInRound + 1}</em>
           {lang.dragPlease}
         </label>
         <Component.DragTable
@@ -111,7 +111,7 @@ function RoundPlay({
           data={sort.map((i, j) => ({
             key: i,
             price: privatePrices[i],
-            isYou: i === playerIndex,
+            isYou: i === indexInRound,
             preferNo: j
           }))}
           setData={data => setSort(data.map(({ key }) => key))}
@@ -151,9 +151,14 @@ export function RoundHistory({
       })
     },
     {
-      title: '优先序',
-      dataIndex: 'playerIndex',
+      title: '编号',
+      dataIndex: 'indexInGroup',
       render: i => `${i + 1}${playerState.index === i ? '(你)' : ''}`
+    },
+    {
+      title: '优先序',
+      dataIndex: 'indexInRound',
+      render: i => i + 1
     },
     {
       title: '心理价值',
@@ -173,19 +178,23 @@ export function RoundHistory({
     }
   ]
   const dataSource = []
-  groupGameState.rounds.forEach((roundGameState, r) =>
-    roundGameState.allocation.forEach((good, i) => {
-      const privatePrices = groupParams.roundsParams[r].privatePriceMatrix[i]
-      if (showHistory === GroupDecorator.ShowHistory.selfOnly && i !== playerState.index) {
+  groupGameState.rounds.forEach(({ indices, allocation }, r) =>
+    indices.forEach((indexInRound, indexInGroup) => {
+      const good = allocation[indexInRound]
+      const privatePrices = groupParams.roundsParams[r].privatePriceMatrix[indexInGroup]
+      if (showHistory === GroupDecorator.ShowHistory.selfOnly && indexInGroup !== playerState.index) {
         return
       }
       dataSource.push({
-        rowSpan: showHistory === GroupDecorator.ShowHistory.selfOnly ? 1 : i === 0 ? groupSize : 0,
+        rowSpan: showHistory === GroupDecorator.ShowHistory.selfOnly ? 1 : indexInGroup === 0 ? groupSize : 0,
         round: r,
-        playerIndex: i,
+        indexInGroup,
+        indexInRound,
         privatePrices: privatePrices.join(' , '),
         sort:
-          playerState.index === i ? playerState.rounds[r].sort.map(v => String.fromCharCode(65 + v)).join('>') : null,
+          playerState.index === indexInGroup
+            ? playerState.rounds[r].sort.map(v => String.fromCharCode(65 + v)).join('>')
+            : null,
         good: String.fromCharCode(65 + good),
         goodPrice: privatePrices[good]
       })

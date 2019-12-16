@@ -40,8 +40,12 @@ class GroupPlay4Owner extends Group.Group.Play4Owner<
         dataIndex: 'stuNum'
       },
       {
+        title: '编号',
+        dataIndex: 'indexInGroup'
+      },
+      {
         title: '优先序',
-        dataIndex: 'playerIndex'
+        dataIndex: 'indexInRound'
       },
       {
         title: '心理价值',
@@ -67,21 +71,23 @@ class GroupPlay4Owner extends Group.Group.Play4Owner<
             {gameRoundState.allocation.length ? (
               <Table
                 dataSource={groupPlayerStates
-                  .map(({ user, index, rounds }) => {
+                  .map(({ user, index: indexInGroup, rounds }) => {
                     const { allocation } = gameRoundState,
-                      { sort } = rounds[i],
-                      privatePrices = groupParams.roundsParams[i].privatePriceMatrix[index]
+                      { sort, index: indexInRound } = rounds[i],
+                      privatePrices = groupParams.roundsParams[i].privatePriceMatrix[indexInGroup]
                     return {
                       userName: user.name,
                       stuNum: user.stuNum,
-                      playerIndex: index + 1,
+                      indexInGroup: indexInGroup + 1,
+                      indexInRound: indexInRound + 1,
                       privatePrices: privatePrices.join(' , '),
                       sort: sort.map(i => String.fromCharCode(65 + i)).join('>'),
-                      good: allocation[index] === null ? null : String.fromCharCode(65 + allocation[index]),
-                      goodPrice: privatePrices[allocation[index]]
+                      good:
+                        allocation[indexInRound] === null ? null : String.fromCharCode(65 + allocation[indexInRound]),
+                      goodPrice: privatePrices[allocation[indexInRound]]
                     }
                   })
-                  .sort(({ playerIndex: p1 }, { playerIndex: p2 }) => p1 - p2)}
+                  .sort(({ indexInGroup: p1 }, { indexInGroup: p2 }) => p1 - p2)}
                 columns={columns}
                 pagination={false}
               />

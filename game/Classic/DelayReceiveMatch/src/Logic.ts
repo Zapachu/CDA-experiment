@@ -1,7 +1,7 @@
 import { Model } from '@bespoke/server'
 import { IMoveCallback } from '@bespoke/share'
 import { Group, Round } from '@extend/server'
-import { GroupDecorator } from '@extend/share'
+import { RoundDecorator } from '@extend/share'
 import { IPlayer, match } from './util/Match'
 import {
   IGroupCreateParams,
@@ -17,7 +17,6 @@ import {
   PushType,
   RoundMoveType
 } from './config'
-import { RoundDecorator } from '@extend/share'
 
 class RoundLogic extends Round.Round.Logic<
   IRoundCreateParams,
@@ -84,23 +83,23 @@ class GroupLogic extends Round.Logic<
   async roundOverCallback(): Promise<any> {
     const gameState = await this.stateManager.getGameState(),
       { round } = gameState,
-      gameRoundState = gameState.rounds[round],
+      { allocation } = gameState.rounds[round],
       playerStates = await this.stateManager.getPlayerStates()
     await Model.FreeStyleModel.create({
       game: this.gameId,
       key: `${this.groupIndex}_${round}`,
-      data: playerStates.map(({ user, index, rounds }) => {
-        const { allocation } = gameRoundState,
-          { sort } = rounds[round],
-          privatePrices = this.params.roundsParams[round].privatePriceMatrix[index]
+      data: playerStates.map(({ user, index: indexInGroup, rounds }) => {
+        const { sort, index: indexInRound } = rounds[round],
+          privatePrices = this.params.roundsParams[round].privatePriceMatrix[indexInGroup]
         return {
           userName: user.name,
           stuNum: user.stuNum,
-          playerIndex: index + 1,
+          indexInGroup: indexInGroup + 1,
+          indexInRound: indexInRound + 1,
           privatePrices: privatePrices.join(' , '),
           sort: sort.map(i => String.fromCharCode(65 + i)).join('>'),
-          good: String.fromCharCode(65 + allocation[index]),
-          goodPrice: privatePrices[allocation[index]]
+          good: String.fromCharCode(65 + allocation[indexInRound]),
+          goodPrice: privatePrices[allocation[indexInRound]]
         }
       })
     })
