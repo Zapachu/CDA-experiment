@@ -30,6 +30,7 @@ class RoundLogic extends Round.Round.Logic<
   alive: boolean = true
 
   async roundStart() {
+    return
     const gameState = await this.stateManager.getGameState()
     const timer = global.setInterval(async () => {
       if (!this.alive) {
@@ -110,17 +111,19 @@ class GroupLogic extends Round.Logic<
     await Model.FreeStyleModel.create({
       game: this.gameId,
       key: `${this.groupIndex}_${gameState.round}`,
-      data: playerStates.map(({ user, index }) => {
+      data: playerStates.map(({ user, index: indexInGroup, rounds }) => {
+        const { index: indexInRound } = rounds[round]
         const { allocation } = gameRoundState
-        const privatePrices = privatePriceMatrix[index]
+        const privatePrices = privatePriceMatrix[indexInGroup]
         return {
           userName: user.name,
           stuNum: user.stuNum,
-          playerIndex: index + 1,
-          initGood: String.fromCharCode(65 + index),
-          initGoodPrice: privatePrices[index],
-          good: String.fromCharCode(65 + allocation[index]),
-          goodPrice: privatePrices[allocation[index]]
+          indexInGroup: indexInGroup + 1,
+          privatePrices: privatePrices.join(' , '),
+          initGood: String.fromCharCode(65 + indexInRound),
+          initGoodPrice: privatePrices[indexInRound],
+          good: String.fromCharCode(65 + allocation[indexInRound]),
+          goodPrice: privatePrices[allocation[indexInRound]]
         }
       })
     })

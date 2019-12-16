@@ -150,8 +150,7 @@ export function RoundHistory({
   IRoundMoveParams,
   IPushParams
 >) {
-  const { groupSize } = game.params
-  const showHistory = 2
+  const { groupSize, showHistory } = game.params
   const columns = [
     {
       title: '轮次',

@@ -24,7 +24,7 @@ function RoundPlay({
   roundParams,
   roundGameState,
   roundFrameEmitter,
-  playerState
+  roundPlayerState
 }: Round.Round.IPlayProps<
   IRoundCreateParams,
   IRoundGameState,
@@ -59,7 +59,7 @@ function RoundPlay({
     display: 'flex',
     alignItems: 'center'
   }
-  const playerIndex = playerState.index,
+  const playerIndex = roundPlayerState.index,
     { allocation, exchangeMatrix, timeLeft } = roundGameState,
     privatePrices = roundParams.privatePriceMatrix[playerIndex]
   return (

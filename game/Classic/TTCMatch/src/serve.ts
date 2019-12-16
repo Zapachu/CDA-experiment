@@ -20,17 +20,7 @@ const router = Router().get(FetchRoute.exportXls, async (req, res) => {
   const name = 'RoundResult'
   const data = [],
     option = {}
-  data.push([
-    '玩家',
-    '学号',
-    '编号',
-    '心理价值',
-    '初始物品',
-    '初始物品价格',
-    '偏好表达',
-    '最终物品',
-    '最终物品价格'
-  ])
+  data.push(['玩家', '学号', '编号', '心理价值', '初始物品', '初始物品价格', '偏好表达', '最终物品', '最终物品价格'])
   const rounds = (await Model.FreeStyleModel.find({
     game: game.id
   }).sort({ key: 1 })) as Array<any>

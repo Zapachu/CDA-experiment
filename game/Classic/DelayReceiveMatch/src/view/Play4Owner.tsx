@@ -68,30 +68,27 @@ class GroupPlay4Owner extends Group.Group.Play4Owner<
       <Tabs tabPosition={'left'}>
         {groupGameState.rounds.map((gameRoundState, i) => (
           <Tabs.TabPane tab={lang.roundIndex(i)} key={i.toString()}>
-            {gameRoundState.allocation.length ? (
-              <Table
-                dataSource={groupPlayerStates
-                  .map(({ user, index: indexInGroup, rounds }) => {
-                    const { allocation } = gameRoundState,
-                      { sort, index: indexInRound } = rounds[i],
-                      privatePrices = groupParams.roundsParams[i].privatePriceMatrix[indexInGroup]
-                    return {
-                      userName: user.name,
-                      stuNum: user.stuNum,
-                      indexInGroup: indexInGroup + 1,
-                      indexInRound: indexInRound + 1,
-                      privatePrices: privatePrices.join(' , '),
-                      sort: sort.map(i => String.fromCharCode(65 + i)).join('>'),
-                      good:
-                        allocation[indexInRound] === null ? null : String.fromCharCode(65 + allocation[indexInRound]),
-                      goodPrice: privatePrices[allocation[indexInRound]]
-                    }
-                  })
-                  .sort(({ indexInGroup: p1 }, { indexInGroup: p2 }) => p1 - p2)}
-                columns={columns}
-                pagination={false}
-              />
-            ) : null}
+            <Table
+              dataSource={groupPlayerStates
+                .map(({ user, index: indexInGroup, rounds }) => {
+                  const { allocation } = gameRoundState,
+                    { sort, index: indexInRound } = rounds[i],
+                    privatePrices = groupParams.roundsParams[i].privatePriceMatrix[indexInGroup]
+                  return {
+                    userName: user.name,
+                    stuNum: user.stuNum,
+                    indexInGroup: indexInGroup + 1,
+                    indexInRound: indexInRound + 1,
+                    privatePrices: privatePrices.join(' , '),
+                    sort: sort.map(i => String.fromCharCode(65 + i)).join('>'),
+                    good: allocation[indexInRound] === null ? null : String.fromCharCode(65 + allocation[indexInRound]),
+                    goodPrice: privatePrices[allocation[indexInRound]]
+                  }
+                })
+                .sort(({ indexInGroup: p1 }, { indexInGroup: p2 }) => p1 - p2)}
+              columns={columns}
+              pagination={false}
+            />
           </Tabs.TabPane>
         ))}
       </Tabs>

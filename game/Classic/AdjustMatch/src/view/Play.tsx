@@ -86,12 +86,12 @@ function RoundPlay({
             {initGood === null ? null : (
               <>
                 {lang.roundOver2}
-                <em>{initGood + 1}</em>&nbsp;,&nbsp;{lang.roundOver3}
+                <em>{String.fromCharCode(65 + initGood)}</em>&nbsp;,&nbsp;{lang.roundOver3}
                 <em>{privatePrices[initGood]}</em>&nbsp;,&nbsp;
               </>
             )}
             {lang.roundOver4}
-            <em>{good + 1}</em> &nbsp;,&nbsp;
+            <em>{String.fromCharCode(65 + good)}</em> &nbsp;,&nbsp;
             {lang.roundOver3}
             <em>{privatePrices[good]}</em>
           </p>
@@ -262,8 +262,7 @@ export function RoundHistory({
   IRoundMoveParams,
   IPushParams
 >) {
-  const { groupSize } = game.params
-  const showHistory = 2
+  const { groupSize, showHistory } = game.params
   const columns = [
     {
       title: '轮次',
