@@ -1,6 +1,7 @@
 import { Group, Round } from '@extend/server'
 import { IMoveCallback } from '@bespoke/share'
 import { Model } from '@bespoke/server'
+import { RoundDecorator } from '@extend/share'
 import {
   IGroupCreateParams,
   IGroupGameState,
@@ -61,14 +62,14 @@ class RoundLogic extends Round.Round.Logic<
     }, 1e3)
   }
 
-  initGameState(): IRoundGameState {
+  initGameState(): RoundDecorator.TRoundGameState<IRoundGameState> {
     const gameState = super.initGameState()
     gameState.timeLeft = this.params.t
     gameState.trades = []
     return gameState
   }
 
-  async initPlayerState(index: number): Promise<IRoundPlayerState> {
+  async initPlayerState(index: number): Promise<RoundDecorator.TRoundPlayerState<IRoundPlayerState>> {
     const playerState = await super.initPlayerState(index)
     playerState.status = PlayerRoundStatus.play
     return playerState

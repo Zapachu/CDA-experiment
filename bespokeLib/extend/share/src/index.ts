@@ -84,14 +84,22 @@ export namespace RoundDecorator {
     params: IRoundMoveParams;
   }
 
+  export type TRoundGameState<IRoundGameState> = IRoundGameState & {
+    indices: number[];
+  };
+
   export interface IGroupGameState<IRoundGameState> {
     round: number;
-    rounds: IRoundGameState[];
+    rounds: TRoundGameState<IRoundGameState>[];
   }
+
+  export type TRoundPlayerState<IRoundPlayerState> = IRoundPlayerState & {
+    index: number;
+  };
 
   export interface IGroupPlayerState<IRoundPlayerState> {
     status: PlayerStatus;
-    rounds: IRoundPlayerState[];
+    rounds: TRoundPlayerState<IRoundPlayerState>[];
   }
 
   export function roundFrameEmitter<

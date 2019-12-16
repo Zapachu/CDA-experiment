@@ -1,6 +1,7 @@
 import { Group, Round } from '@extend/server'
 import { IMoveCallback } from '@bespoke/share'
 import { Model } from '@bespoke/server'
+import { RoundDecorator } from '@extend/share'
 import {
   awardLimit,
   Choice,
@@ -50,7 +51,7 @@ class RoundLogic extends Round.Round.Logic<
     }, 1e3)
   }
 
-  async initPlayerState(index: number): Promise<IRoundPlayerState> {
+  async initPlayerState(index: number): Promise<RoundDecorator.TRoundPlayerState<IRoundPlayerState>> {
     const playerState = await super.initPlayerState(index)
     playerState.status = PlayerRoundStatus.play
     playerState.T = randomNumber(TRange)
@@ -58,7 +59,7 @@ class RoundLogic extends Round.Round.Logic<
     return playerState
   }
 
-  initGameState(): IRoundGameState {
+  initGameState(): RoundDecorator.TRoundGameState<IRoundGameState> {
     const gameState = super.initGameState()
     gameState.timeLeft = this.params.t
     return gameState

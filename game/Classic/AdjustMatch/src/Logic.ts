@@ -18,6 +18,7 @@ import {
 import { Model } from '@bespoke/server'
 import { IPlayer, match } from './util/Match'
 import shuffle = require('lodash/shuffle')
+import { RoundDecorator } from '@extend/share'
 
 class RoundLogic extends Round.Round.Logic<
   IRoundCreateParams,
@@ -28,7 +29,7 @@ class RoundLogic extends Round.Round.Logic<
   IRoundMoveParams,
   IPushParams
 > {
-  initGameState(): IRoundGameState {
+  initGameState(): RoundDecorator.TRoundGameState<IRoundGameState> {
     const { oldPlayer, privatePriceMatrix } = this.params,
       groupSize = privatePriceMatrix.length
     const gameState = super.initGameState()
@@ -41,7 +42,7 @@ class RoundLogic extends Round.Round.Logic<
     return gameState
   }
 
-  async initPlayerState(index: number): Promise<IRoundPlayerState> {
+  async initPlayerState(index: number): Promise<RoundDecorator.TRoundPlayerState<IRoundPlayerState>> {
     const playerState = await super.initPlayerState(index)
     playerState.status = PlayerRoundStatus.prePlay
     playerState.sort = []

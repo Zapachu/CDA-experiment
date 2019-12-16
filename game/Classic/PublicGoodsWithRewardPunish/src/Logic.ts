@@ -17,6 +17,7 @@ import {
   PushType,
   RoundMoveType
 } from './config'
+import { RoundDecorator } from '@extend/share'
 
 class RoundLogic extends Round.Round.Logic<
   IRoundCreateParams,
@@ -44,13 +45,13 @@ class RoundLogic extends Round.Round.Logic<
     }, 1e3)
   }
 
-  async initPlayerState(index: number): Promise<IRoundPlayerState> {
+  async initPlayerState(index: number): Promise<RoundDecorator.TRoundPlayerState<IRoundPlayerState>> {
     const playerState = await super.initPlayerState(index)
     playerState.status = PlayerRoundStatus.play
     return playerState
   }
 
-  initGameState(): IRoundGameState {
+  initGameState(): RoundDecorator.TRoundGameState<IRoundGameState> {
     const gameState = super.initGameState()
     gameState.timeLeft = this.params.t
     gameState.players = Array(this.groupSize)

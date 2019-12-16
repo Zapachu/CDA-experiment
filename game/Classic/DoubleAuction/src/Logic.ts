@@ -17,6 +17,7 @@ import {
   Role,
   RoundMoveType
 } from './config'
+import { RoundDecorator } from '@extend/share'
 
 class RoundLogic extends Round.Round.Logic<
   IRoundCreateParams,
@@ -44,7 +45,7 @@ class RoundLogic extends Round.Round.Logic<
     }, 1e3)
   }
 
-  initGameState(): IRoundGameState {
+  initGameState(): RoundDecorator.TRoundGameState<IRoundGameState> {
     const { buyPriceMatrix, sellPriceMatrix } = this.params
     const gameState = super.initGameState()
     gameState.timeLeft = this.params.t
@@ -53,7 +54,7 @@ class RoundLogic extends Round.Round.Logic<
     return gameState
   }
 
-  async initPlayerState(index: number): Promise<IRoundPlayerState> {
+  async initPlayerState(index: number): Promise<RoundDecorator.TRoundPlayerState<IRoundPlayerState>> {
     const playerState = await super.initPlayerState(index)
     playerState.status = PlayerRoundStatus.play
     return playerState

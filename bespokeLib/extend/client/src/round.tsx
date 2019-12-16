@@ -36,8 +36,8 @@ export namespace Round {
       IPushParams
     > {
     roundParams: IRoundCreateParams;
-    roundGameState: IRoundGameState;
-    roundPlayerState: IRoundPlayerState;
+    roundGameState: RoundDecorator.TRoundGameState<IRoundGameState>;
+    roundPlayerState: RoundDecorator.TRoundPlayerState<IRoundPlayerState>;
     roundFrameEmitter: FrameEmitter<
       RoundMoveType,
       PushType,

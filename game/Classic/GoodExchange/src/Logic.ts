@@ -16,6 +16,7 @@ import {
   PushType,
   RoundMoveType
 } from './config'
+import { RoundDecorator } from '@extend/share'
 
 class RoundLogic extends Round.Round.Logic<
   IRoundCreateParams,
@@ -43,7 +44,7 @@ class RoundLogic extends Round.Round.Logic<
     }, 1e3)
   }
 
-  initGameState(): IRoundGameState {
+  initGameState(): RoundDecorator.TRoundGameState<IRoundGameState> {
     const { privatePriceMatrix } = this.params
     const gameState = super.initGameState()
     gameState.timeLeft = this.params.t

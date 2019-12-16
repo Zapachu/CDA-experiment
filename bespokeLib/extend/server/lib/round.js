@@ -51,6 +51,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var share_1 = require("@extend/share");
 var group_1 = require("./group");
+var shuffle = require("lodash/shuffle");
 var Round;
 (function (Round) {
     var StateManager = /** @class */ (function () {
@@ -95,9 +96,9 @@ var Round;
                             _b = (_a = Object).values;
                             return [4 /*yield*/, this.stateManager.getPlayerStates()];
                         case 1:
-                            _b.apply(_a, [_c.sent()]).forEach(function (playerState) {
-                                return (playerStates[playerState.index] =
-                                    playerState.rounds[_this.roundIndex]);
+                            _b.apply(_a, [_c.sent()]).forEach(function (groupPlayerState) {
+                                var roundPlayerState = groupPlayerState.rounds[_this.roundIndex];
+                                playerStates[roundPlayerState.index] = roundPlayerState;
                             });
                             return [2 /*return*/, playerStates];
                     }
@@ -134,12 +135,16 @@ var Round;
             }); });
         };
         Logic.prototype.initGameState = function () {
-            return {};
+            return {
+                indices: shuffle(Array(this.groupSize)
+                    .fill(null)
+                    .map(function (_, i) { return i; }))
+            };
         };
         Logic.prototype.initPlayerState = function (index) {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    return [2 /*return*/, {}];
+                    return [2 /*return*/, { index: index }];
                 });
             });
         };
@@ -197,28 +202,31 @@ var Logic = /** @class */ (function (_super) {
     };
     Logic.prototype.initPlayerState = function (user, groupIndex, index) {
         return __awaiter(this, void 0, void 0, function () {
-            var playerState, i, _a, _b;
+            var gameState, playerState, r, _a, _b;
             return __generator(this, function (_c) {
                 switch (_c.label) {
-                    case 0: return [4 /*yield*/, _super.prototype.initPlayerState.call(this, user, groupIndex, index)];
+                    case 0: return [4 /*yield*/, this.stateManager.getGameState()];
                     case 1:
+                        gameState = _c.sent();
+                        return [4 /*yield*/, _super.prototype.initPlayerState.call(this, user, groupIndex, index)];
+                    case 2:
                         playerState = _c.sent();
                         playerState.status = share_1.RoundDecorator.PlayerStatus.guide;
                         playerState.rounds = [];
-                        i = 0;
-                        _c.label = 2;
-                    case 2:
-                        if (!(i < this.params.round)) return [3 /*break*/, 5];
-                        _a = playerState.rounds;
-                        _b = i;
-                        return [4 /*yield*/, this.roundsLogic[i].initPlayerState(index)];
+                        r = 0;
+                        _c.label = 3;
                     case 3:
-                        _a[_b] = _c.sent();
-                        _c.label = 4;
+                        if (!(r < this.params.round)) return [3 /*break*/, 6];
+                        _a = playerState.rounds;
+                        _b = r;
+                        return [4 /*yield*/, this.roundsLogic[r].initPlayerState(gameState.rounds[r].indices[index])];
                     case 4:
-                        i++;
-                        return [3 /*break*/, 2];
-                    case 5: return [2 /*return*/, playerState];
+                        _a[_b] = _c.sent();
+                        _c.label = 5;
+                    case 5:
+                        r++;
+                        return [3 /*break*/, 3];
+                    case 6: return [2 /*return*/, playerState];
                 }
             });
         });

@@ -1,6 +1,7 @@
 import { IMoveCallback, IUserWithId } from "@bespoke/server";
 import { GroupDecorator, RoundDecorator } from "@extend/share";
 import { Group } from "./group";
+import shuffle = require("lodash/shuffle");
 
 export namespace Round {
   export class StateManager<
@@ -38,9 +39,10 @@ export namespace Round {
     async getPlayerStates(): Promise<IRoundPlayerState[]> {
       const playerStates: IRoundPlayerState[] = [];
       Object.values(await this.stateManager.getPlayerStates()).forEach(
-        playerState =>
-          (playerStates[playerState.index] =
-            playerState.rounds[this.roundIndex])
+        groupPlayerState => {
+          const roundPlayerState = groupPlayerState.rounds[this.roundIndex];
+          playerStates[roundPlayerState.index] = roundPlayerState;
+        }
       );
       return playerStates;
     }
@@ -78,12 +80,20 @@ export namespace Round {
 
     async roundStart() {}
 
-    initGameState(): IRoundGameState {
-      return {} as any;
+    initGameState(): RoundDecorator.TRoundGameState<IRoundGameState> {
+      return {
+        indices: shuffle(
+          Array(this.groupSize)
+            .fill(null)
+            .map((_, i) => i)
+        )
+      } as any;
     }
 
-    async initPlayerState(index: number): Promise<IRoundPlayerState> {
-      return {} as any;
+    async initPlayerState(
+      index: number
+    ): Promise<RoundDecorator.TRoundPlayerState<IRoundPlayerState>> {
+      return { index } as any;
     }
 
     async playerMoveReducer(
@@ -194,13 +204,18 @@ export class Logic<
     groupIndex: number,
     index: number
   ): Promise<
-    GroupDecorator.TPlayerState<RoundDecorator.IGroupPlayerState<IRoundPlayerState>>
+    GroupDecorator.TPlayerState<
+      RoundDecorator.IGroupPlayerState<IRoundPlayerState>
+    >
   > {
-    const playerState = await super.initPlayerState(user, groupIndex, index);
+    const gameState = await this.stateManager.getGameState(),
+      playerState = await super.initPlayerState(user, groupIndex, index);
     playerState.status = RoundDecorator.PlayerStatus.guide;
     playerState.rounds = [];
-    for (let i = 0; i < this.params.round; i++) {
-      playerState.rounds[i] = await this.roundsLogic[i].initPlayerState(index);
+    for (let r = 0; r < this.params.round; r++) {
+      playerState.rounds[r] = await this.roundsLogic[r].initPlayerState(
+        gameState.rounds[r].indices[index]
+      );
     }
     return playerState;
   }

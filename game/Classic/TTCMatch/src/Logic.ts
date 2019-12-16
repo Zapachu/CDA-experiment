@@ -16,6 +16,7 @@ import {
   PushType,
   RoundMoveType
 } from './config'
+import { RoundDecorator } from '@extend/share'
 import shuffle = require('lodash/shuffle')
 
 class RoundLogic extends Round.Round.Logic<
@@ -27,7 +28,7 @@ class RoundLogic extends Round.Round.Logic<
   IRoundMoveParams,
   IPushParams
 > {
-  initGameState(): IRoundGameState {
+  initGameState(): RoundDecorator.TRoundGameState<IRoundGameState> {
     const { privatePriceMatrix } = this.params,
       groupSize = privatePriceMatrix.length
     const gameState = super.initGameState()
@@ -40,7 +41,7 @@ class RoundLogic extends Round.Round.Logic<
     return gameState
   }
 
-  async initPlayerState(index: number): Promise<IRoundPlayerState> {
+  async initPlayerState(index: number): Promise<RoundDecorator.TRoundPlayerState<IRoundPlayerState>> {
     const playerState = await super.initPlayerState(index)
     playerState.status = PlayerRoundStatus.play
     playerState.sort = []
