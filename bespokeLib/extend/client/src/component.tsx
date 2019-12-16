@@ -5,6 +5,7 @@ import { DndProvider, DragSource, DropTarget } from "react-dnd";
 import HTML5Backend from "react-dnd-html5-backend";
 import TouchBackend from "react-dnd-touch-backend";
 import cloneDeep = require("lodash/cloneDeep");
+import shuffle = require("lodash/shuffle");
 
 type TNumberMatrix = number[][];
 
@@ -22,20 +23,20 @@ export function PrivateValueMatrix({
   const LIMIT = {
     maxGroupSize: 12,
     maxGoodAmount: 12,
-    minMin: 50,
-    maxMin: 100,
-    minStep: -10,
+    minBase: 50,
+    maxBase: 150,
+    minStep: 0,
     maxStep: 10,
-    minOffset: 0,
-    maxOffset: 50,
+    minRange: 0,
+    maxRange: 50,
     minPrice: 0,
     maxPrice: 1e3
   };
   const lang = Lang.extractLang({
     goodAmount: ["物品数量(M)", "GoodAmount(M)"],
     minPrivateValue: ["基准心理价值", "BasePrivateValue"],
-    step: ["步长", "Step"],
-    offset: ["偏移范围", "OffsetRange"],
+    range: ["随机范围", "RandomRange"],
+    step: ["步长", "MinStep"],
     generate: ["随机生成", "Generate"],
     player: ["玩家", "Player"],
     good: ["物品", "Good"]
@@ -44,20 +45,31 @@ export function PrivateValueMatrix({
       LIMIT.maxGoodAmount >> 1
     ),
     goodAmount = pGoodAmount || sGoodAmount,
-    [min, setMin] = React.useState(LIMIT.minMin),
-    [step, setStep] = React.useState(LIMIT.maxStep),
-    [offset, setOffset] = React.useState(LIMIT.maxOffset),
+    [base, setBase] = React.useState(~~((LIMIT.minBase + LIMIT.maxBase) >> 1)),
+    [step, setStep] = React.useState(~~((LIMIT.minStep + LIMIT.maxStep) >> 1)),
+    [range, setRange] = React.useState(
+      ~~((LIMIT.minRange + LIMIT.maxRange) >> 1)
+    ),
     geneMatrix = (): TNumberMatrix =>
       Array(LIMIT.maxGroupSize)
         .fill(null)
-        .map(() =>
-          Array(LIMIT.maxGoodAmount)
+        .map(() => {
+          const arr = [];
+          for (
+            let n = base - range + ~~(Math.random() * 2);
+            n <= base + range;
+            n += ~~(Math.random() * 2) + step
+          ) {
+            arr.push(n);
+          }
+          return shuffle(arr).slice(0, LIMIT.maxGoodAmount);
+          return Array(LIMIT.maxGoodAmount)
             .fill(null)
             .map(
               (_, i) =>
-                min + step * i + Math.round((2 * Math.random() - 1) * offset)
-            )
-        ),
+                base + step * i + Math.round((2 * Math.random() - 1) * range)
+            );
+        }),
     setMatrix = (matrix: TNumberMatrix) =>
       pSetMatrix(
         matrix.slice(0, groupSize).map(row => row.slice(0, goodAmount))
@@ -91,10 +103,19 @@ export function PrivateValueMatrix({
       )}
       <Label label={lang.minPrivateValue} />
       <InputNumber
-        value={min}
-        onChange={v => setMin(v)}
-        min={LIMIT.minMin}
-        max={LIMIT.maxMin}
+        value={base}
+        onChange={v => setBase(v)}
+        min={LIMIT.minBase}
+        max={LIMIT.maxBase}
+        style={inputStyle}
+      />
+      &nbsp;&nbsp;&nbsp;
+      <Label label={lang.range} />
+      <InputNumber
+        value={range}
+        onChange={v => setRange(v)}
+        min={LIMIT.minRange}
+        max={LIMIT.maxRange}
         style={inputStyle}
       />
       &nbsp;&nbsp;&nbsp;
@@ -108,17 +129,8 @@ export function PrivateValueMatrix({
             max={LIMIT.maxStep}
             style={inputStyle}
           />
-          &nbsp;&nbsp;&nbsp;
         </>
       )}
-      <Label label={lang.offset} />
-      <InputNumber
-        value={offset}
-        onChange={v => setOffset(v)}
-        min={LIMIT.minOffset}
-        max={LIMIT.maxOffset}
-        style={inputStyle}
-      />
       <br />
       <a
         style={{ display: "inline-block", margin: ".5rem" }}
