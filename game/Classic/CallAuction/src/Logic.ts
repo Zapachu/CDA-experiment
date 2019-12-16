@@ -97,8 +97,7 @@ class RoundLogic extends Round.Round.Logic<
       sell: sellOrders[sell]
     }))
     playerStates.forEach(p => (p.status = PlayerRoundStatus.result))
-    await this.stateManager.syncState()
-    global.setTimeout(async () => await this.overCallback(), 5e3)
+    await this.overCallback()
   }
 
   async playerMoveReducer(

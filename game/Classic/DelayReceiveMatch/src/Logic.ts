@@ -46,8 +46,7 @@ class RoundLogic extends Round.Round.Logic<
     const players: IPlayer[] = playerStates.map(({ sort }) => ({ sort }))
     gameState.allocation = match(players)
     playerStates.forEach(p => (p.status = PlayerRoundStatus.result))
-    await this.stateManager.syncState()
-    global.setTimeout(async () => await this.overCallback(), 5e3)
+    await this.overCallback()
   }
 
   async playerMoveReducer(

@@ -165,14 +165,21 @@ var Logic = /** @class */ (function (_super) {
             .fill(null)
             .map(function (_, i) {
             return new _this.RoundLogic(_this.groupSize, groupIndex, i, roundsParams[i], new Round.StateManager(i, _this.stateManager), function () { return __awaiter(_this, void 0, void 0, function () {
+                var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0: return [4 /*yield*/, this.roundOverCallback()];
                         case 1:
                             _a.sent();
-                            return [4 /*yield*/, this.startRound(i + 1)];
+                            return [4 /*yield*/, this.stateManager.syncState()];
                         case 2:
                             _a.sent();
+                            global.setTimeout(function () { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0: return [4 /*yield*/, this.startRound(i + 1)];
+                                    case 1: return [2 /*return*/, _a.sent()];
+                                }
+                            }); }); }, 10e3);
                             return [2 /*return*/];
                     }
                 });

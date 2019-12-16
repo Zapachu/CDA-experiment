@@ -56,8 +56,7 @@ class RoundLogic extends Round.Round.Logic<
     this.alive = false
     const { allocation } = await this.stateManager.getGameState()
     allocation.forEach((good, i) => (good === null ? (allocation[i] = i) : null))
-    await this.stateManager.syncState()
-    global.setTimeout(async () => await this.overCallback(), 5e3)
+    await this.overCallback()
   }
 
   async playerMoveReducer(

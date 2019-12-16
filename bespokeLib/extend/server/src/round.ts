@@ -173,7 +173,8 @@ export class Logic<
             >(i, this.stateManager),
             async () => {
               await this.roundOverCallback();
-              await this.startRound(i + 1);
+              await this.stateManager.syncState();
+              global.setTimeout(async () => await this.startRound(i + 1), 10e3);
             }
           )
       );
