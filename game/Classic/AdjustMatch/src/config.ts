@@ -37,13 +37,14 @@ export enum GoodStatus {
 
 export interface IRoundGameState {
   initAllocation: number[]
-  overPrePlay: boolean[]
+  join: boolean[]
   allocation: number[]
   goodStatus: GoodStatus[]
 }
 
 export enum PlayerRoundStatus {
   prePlay,
+  wait4Play,
   play,
   wait,
   result

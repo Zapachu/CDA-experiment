@@ -89,7 +89,7 @@ class GroupPlay4Owner extends Group.Group.Play4Owner<
             <Table
               dataSource={groupPlayerStates
                 .map(({ user, index: indexInGroup, rounds }) => {
-                  const { initAllocation, allocation } = gameRoundState
+                  const { initAllocation, join, allocation } = gameRoundState
                   const { sort, index: indexInRound } = rounds[r],
                     privatePrices = groupParams.roundsParams[r].privatePriceMatrix[indexInGroup]
                   return {
@@ -103,7 +103,7 @@ class GroupPlay4Owner extends Group.Group.Play4Owner<
                         ? null
                         : String.fromCharCode(65 + initAllocation[indexInRound]),
                     initGoodPrice: privatePrices[initAllocation[indexInRound]],
-                    join: sort.length === 0 ? 'No' : 'Yes',
+                    join: join[indexInRound] ? 'Yes' : 'No',
                     sort: sort.map(i => String.fromCharCode(65 + i)).join('>'),
                     good: allocation[indexInRound] === null ? null : String.fromCharCode(65 + allocation[indexInRound]),
                     goodPrice: privatePrices[allocation[indexInRound]]

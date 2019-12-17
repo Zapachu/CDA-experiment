@@ -71,7 +71,8 @@ function RoundPlay({
   }
   switch (status) {
     case PlayerRoundStatus.prePlay:
-      return <PrePlay />
+    case PlayerRoundStatus.wait4Play:
+      return <PrePlay status={status} />
     case PlayerRoundStatus.play:
       return <Play />
     case PlayerRoundStatus.wait:
@@ -100,7 +101,7 @@ function RoundPlay({
       )
   }
 
-  function PrePlay() {
+  function PrePlay({ status }: { status: PlayerRoundStatus }) {
     return (
       <section className={style.roundPlay}>
         <label style={{ marginBottom: '1rem' }}>
@@ -131,9 +132,7 @@ function RoundPlay({
               key: 'goodStatus',
               render: (goodStatus, { isYou }) => (
                 <div style={colStyle}>
-                  {goodStatus === GoodStatus.left ? (
-                    <Tag color="gray">{lang.leftMarket}</Tag>
-                  ) : goodStatus === GoodStatus.old ? (
+                  {goodStatus === GoodStatus.old ? (
                     isYou ? (
                       <Tag color="green">{lang.beingOwnedByYou}</Tag>
                     ) : (
@@ -152,7 +151,7 @@ function RoundPlay({
           }))}
         />
         <div className={style.btnsWrapper}>
-          {initAllocation[indexInRound] === null ? (
+          {status === PlayerRoundStatus.wait4Play ? (
             lang.wait4OldPlayers
           ) : (
             <>
@@ -305,7 +304,7 @@ export function RoundHistory({
     }
   ]
   const dataSource = []
-  groupGameState.rounds.forEach(({ indices, initAllocation, allocation }, r) =>
+  groupGameState.rounds.slice(0, groupGameState.round).forEach(({ indices, initAllocation, allocation }, r) =>
     indices.forEach((indexInRound, indexInGroup) => {
       const good = allocation[indexInRound]
       const privatePrices = groupParams.roundsParams[r].privatePriceMatrix[indexInGroup]

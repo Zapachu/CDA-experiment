@@ -37,14 +37,15 @@ class RoundLogic extends Round.Round.Logic<
       initAllocation = shuffle(goodStatus.map((s, i) => (s === GoodStatus.new ? null : i)))
     gameState.goodStatus = goodStatus
     gameState.initAllocation = initAllocation
-    gameState.overPrePlay = initAllocation.map(a => a === null)
+    gameState.join = initAllocation.map(a => a === null)
     gameState.allocation = []
     return gameState
   }
 
   async initPlayerState(index: number): Promise<RoundDecorator.TRoundPlayerState<IRoundPlayerState>> {
     const playerState = await super.initPlayerState(index)
-    playerState.status = PlayerRoundStatus.prePlay
+    const { initAllocation } = await this.stateManager.getGameState()
+    playerState.status = initAllocation[index] === null ? PlayerRoundStatus.wait4Play : PlayerRoundStatus.prePlay
     playerState.sort = []
     return playerState
   }
@@ -70,22 +71,24 @@ class RoundLogic extends Round.Round.Logic<
       playerStates = await this.stateManager.getPlayerStates()
     switch (type) {
       case RoundMoveType.overPrePlay:
-        const { goodStatus, initAllocation, allocation, overPrePlay } = gameState
-        overPrePlay[index] = true
+        const { goodStatus, initAllocation, join, allocation } = gameState
+        join[index] = params.join
         if (params.join) {
-          playerState.status = PlayerRoundStatus.play
+          playerState.status = PlayerRoundStatus.wait4Play
         } else {
           const initGood = initAllocation[index]
           goodStatus[initGood] = GoodStatus.left
           allocation[index] = initGood
           playerState.status = PlayerRoundStatus.result
         }
-        if (overPrePlay.every(o => o)) {
-          for (let s of playerStates) {
-            if (s.status === PlayerRoundStatus.prePlay) {
-              s.status = PlayerRoundStatus.play
-            }
-          }
+        if (
+          playerStates.every(
+            ({ status }) => status === PlayerRoundStatus.wait4Play || status === PlayerRoundStatus.result
+          )
+        ) {
+          playerStates.forEach(s =>
+            s.status === PlayerRoundStatus.wait4Play ? (s.status = PlayerRoundStatus.play) : null
+          )
         }
         break
       case RoundMoveType.submit:
@@ -119,7 +122,7 @@ export class GroupLogic extends Round.Logic<
       game: this.gameId,
       key: `${this.groupIndex}_${round}`,
       data: playerStates.map(({ user, index: indexInGroup, rounds }) => {
-        const { initAllocation, allocation } = gameRoundState,
+        const { initAllocation, join, allocation } = gameRoundState,
           { sort, index: indexInRound } = rounds[round],
           privatePrices = this.params.roundsParams[round].privatePriceMatrix[indexInGroup]
         return {
@@ -130,7 +133,7 @@ export class GroupLogic extends Round.Logic<
           privatePrices: privatePrices.join(' , '),
           initGood: initAllocation[indexInRound] === null ? '' : String.fromCharCode(65 + initAllocation[indexInRound]),
           initGoodPrice: privatePrices[initAllocation[indexInRound]] || '',
-          join: sort.length === 0 ? 'No' : 'Yes',
+          join: join[indexInRound] ? 'No' : 'Yes',
           sort: sort.map(i => String.fromCharCode(65 + i)).join('>'),
           good: String.fromCharCode(65 + allocation[indexInRound]),
           goodPrice: privatePrices[allocation[indexInRound]]
