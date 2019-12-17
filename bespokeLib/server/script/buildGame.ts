@@ -1,11 +1,11 @@
-import {resolve} from 'path';
-import * as webpack from 'webpack';
-import * as QiniuPlugin from 'qiniu-webpack-plugin';
-import * as ManifestPlugin from 'webpack-manifest-plugin';
-import {CleanWebpackPlugin} from 'clean-webpack-plugin';
-import {config} from '@bespoke/share';
-import {elfSetting} from '@elf/setting';
-import {NetWork} from '@elf/util';
+import { resolve } from 'path'
+import * as webpack from 'webpack'
+import * as QiniuPlugin from 'qiniu-webpack-plugin'
+import * as ManifestPlugin from 'webpack-manifest-plugin'
+import { CleanWebpackPlugin } from 'clean-webpack-plugin'
+import { config } from '@bespoke/share'
+import { elfSetting } from '@elf/setting'
+import { NetWork } from '@elf/util'
 
 interface IPaths {
   entry?: string
@@ -32,16 +32,15 @@ interface IBuildOption {
   qiNiu?: typeof elfSetting.qiNiu
 }
 
-export function geneClientBuilder(
-    {
-      namespace,
-      basePath,
-      paths = defaultPaths,
-      qiNiu = elfSetting.qiNiu
-    }: IBuildOption): webpack.Configuration {
-  const {entry, output} = resolvePaths(basePath, paths)
+export function geneClientBuilder({
+  namespace,
+  basePath,
+  paths = defaultPaths,
+  qiNiu = elfSetting.qiNiu
+}: IBuildOption): webpack.Configuration {
+  const { entry, output } = resolvePaths(basePath, paths)
   const buildMode = process.env.BUILD_MODE || 'dev',
-      HMR = process.env.HMR === 'true'
+    HMR = process.env.HMR === 'true'
   return {
     devtool: buildMode === 'dev' ? 'cheap-module-eval-source-map' : false,
     devServer: {
@@ -56,12 +55,15 @@ export function geneClientBuilder(
     },
     mode: buildMode === 'dev' ? 'development' : 'production',
     watch: buildMode === 'dev',
-    watchOptions: {poll: true},
-    entry: {[namespace]: entry},
+    watchOptions: { poll: true },
+    entry: { [namespace]: entry },
     output: {
       path: output,
       filename: `[name].js`,
-      publicPath: buildMode === 'publish' ? `${qiNiu.download.jsDomain}/${qiNiu.upload.path}/` : `/${config.rootName}/${namespace}/static/`
+      publicPath:
+        buildMode === 'publish'
+          ? `${qiNiu.download.jsDomain}/${qiNiu.upload.path}/`
+          : `/${config.rootName}/${namespace}/static/`
     },
     resolve: {
       extensions: ['.ts', '.tsx', '.js', '.jsx', '.json']
@@ -87,11 +89,7 @@ export function geneClientBuilder(
         },
         {
           test: /\.less$/,
-          use: [
-            'style-loader',
-            'css-loader',
-            {loader: 'less-loader', options: {javascriptEnabled: true}}
-          ]
+          use: ['style-loader', 'css-loader', { loader: 'less-loader', options: { javascriptEnabled: true } }]
         },
         {
           test: /\.(scss|sass)$/,
@@ -124,29 +122,31 @@ export function geneClientBuilder(
       ]
     },
     externals: {
-      'react': 'React',
+      react: 'React',
       'react-dom': 'ReactDOM',
       '@elf/component': 'ElfComponent',
-      'antd': 'antd'
+      antd: 'antd'
     },
     plugins: [
       new ManifestPlugin({
         fileName: `${namespace}.json`,
         filter: descriptor => descriptor.isInitial,
         generate: (seed, files) =>
-            files.reduce((manifest, {name, path, chunk}) => {
-              return {
-                ...manifest,
-                [name]: path + (chunk ? `?${chunk.hash}` : '')
-              }
-            }, seed)
+          files.reduce((manifest, { name, path, chunk }) => {
+            return {
+              ...manifest,
+              [name]: path + (chunk ? `?${chunk.hash}` : '')
+            }
+          }, seed)
       })
-    ].concat(buildMode === 'publish' ? [
-      new QiniuPlugin(qiNiu.upload)
-    ] : buildMode === 'dist' ? [
-      new CleanWebpackPlugin()
-    ] : HMR ? [
-      new webpack.HotModuleReplacementPlugin()
-    ] : [])
+    ].concat(
+      buildMode === 'publish'
+        ? [new QiniuPlugin(qiNiu.upload)]
+        : buildMode === 'dist'
+        ? [new CleanWebpackPlugin()]
+        : HMR
+        ? [new webpack.HotModuleReplacementPlugin()]
+        : []
+    )
   } as any
 }

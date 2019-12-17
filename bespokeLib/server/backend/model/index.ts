@@ -1,6 +1,6 @@
-import {Document, Model, model} from 'mongoose'
-import {getModels} from '@elf/protocol'
-import {IUser} from '@bespoke/share'
+import { Document, Model, model } from 'mongoose'
+import { getModels } from '@elf/protocol'
+import { IUser } from '@bespoke/share'
 
 const models = getModels(model)
 
