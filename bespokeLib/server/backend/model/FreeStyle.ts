@@ -6,7 +6,7 @@ const {Types:{ObjectId, String}} = Schema
 export interface FreeStyleDoc extends IFreeStyle,Document{}
 
 const FreeStyleSchema = new Schema({
-    game: ObjectId,
+    game: {type: ObjectId, index: true},
     key: String,
     data: {},
     createAt: {type: Date, default: Date.now},
