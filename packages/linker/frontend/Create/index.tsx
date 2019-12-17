@@ -8,6 +8,104 @@ import {RouteComponentProps} from 'react-router';
 import {Button, Input, List, message, Modal} from 'antd';
 import * as dateFormat from 'dateformat';
 
+import { Icon, Layout, Menu } from 'antd'
+
+const { Header, Sider } = Layout
+
+function LinkerFrame() {
+    const lang = Lang.extractLang({
+        ancademy: ['微课研', 'Ancademy'],
+        home: ['主页', 'Home'],
+        class: ['课堂', 'Class'],
+        convene: ['招募', 'Convene'],
+        survey: ['问卷', 'Survey'],
+        experiment: ['实验', 'Experiment']
+    })
+    const menu = {
+        home: {
+            label: lang.home,
+            icon: 'home',
+            href: '/'
+        },
+        class: {
+            label: lang.class,
+            icon: 'book',
+            href: '/'
+        },
+        convene: {
+            label: lang.convene,
+            icon: 'flag',
+            href: '/'
+        },
+        survey: {
+            label: lang.survey,
+            icon: 'file-text',
+            href: '/'
+        },
+        experiment: {
+            label: lang.experiment,
+            icon: 'experiment',
+            href: '/'
+        }
+    }
+    const [collapsed, setCollapsed] = React.useState(false)
+    const sideWidth = collapsed ? 80 : 200
+    return (
+      <Layout style={{ paddingLeft: sideWidth }}>
+          <Sider
+            trigger={null}
+            theme={'light'}
+            style={{
+                position: 'fixed',
+                top: 0,
+                width: sideWidth,
+                height: '100vh',
+                left: 0,
+                borderRight: '1px solid #e8e8e8'
+            }}
+            collapsible
+            collapsed={collapsed}
+          >
+              <a href={'https://www.ancademy.org/'} className={style.logo}>
+                  <img src={'http://org.modao.cc/uploads4/images/4154/41544426/v2_q0ybhh.svg'} alt={lang.ancademy} />
+                  <h1 className={style.title}>{lang.ancademy}</h1>
+              </a>
+              <Menu mode="inline" defaultSelectedKeys={[menu.experiment.label]}>
+                  {Object.values(menu).map(({ label, icon, href }) => (
+                    <Menu.Item key={label}>
+                        <a href={href}>
+                            <Icon type={icon} theme={'filled'} />
+                            <span>{label}</span>
+                        </a>
+                    </Menu.Item>
+                  ))}
+              </Menu>
+          </Sider>
+          <Layout>
+              <Header
+                style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: sideWidth,
+                    background: '#fff',
+                    zIndex: 100,
+                    padding: 0,
+                    right: 0,
+                    borderBottom: '1px solid #e8e8e8'
+                }}
+              >
+                  <Icon
+                    style={{ margin: '1rem 2rem', fontSize: '1.5rem' }}
+                    className="trigger"
+                    type={collapsed ? 'menu-unfold' : 'menu-fold'}
+                    onClick={() => setCollapsed(!collapsed)}
+                  />
+              </Header>
+          </Layout>
+      </Layout>
+    )
+}
+
 interface ICreateState {
     loading: boolean
     title: string
@@ -129,6 +227,7 @@ export class Create extends React.Component<TPageProps & RouteComponentProps<{ n
                         <Button type='primary' onClick={() => this.handleSubmit()}>{lang.submit}</Button>
                     </div> : null
             }
+            <LinkerFrame/>
         </section>;
     }
 }
