@@ -131,6 +131,7 @@ function RoundPlay({
 
 export function RoundHistory({
   game,
+  groupGameState,
   playerState
 }: Round.Round.IHistoryProps<
   IRoundCreateParams,
@@ -183,7 +184,7 @@ export function RoundHistory({
     }
   ]
   const dataSource = []
-  playerState.rounds.forEach(
+  playerState.rounds.slice(0, groupGameState.round).forEach(
     (
       {
         T,

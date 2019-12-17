@@ -180,7 +180,7 @@ function RoundHistory({
     }
   ]
   const dataSource = []
-  groupGameState.rounds.forEach(({ players, reward }, r) => {
+  groupGameState.rounds.slice(0, groupGameState.round).forEach(({ players, reward }, r) => {
     for (let index = 0; index < groupSize; index++) {
       const { x, d, extra } = players[index]
       if (showHistory === GroupDecorator.ShowHistory.selfOnly && index !== playerState.index) {

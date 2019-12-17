@@ -144,7 +144,7 @@ function RoundHistory({
     }
   ]
   const dataSource = []
-  groupGameState.rounds.forEach(({ xArr, reward }, r) => {
+  groupGameState.rounds.slice(0, groupGameState.round).forEach(({ xArr, reward }, r) => {
     for (let index = 0; index < groupSize; index++) {
       const x = xArr[index]
       if (showHistory === GroupDecorator.ShowHistory.selfOnly && index !== playerState.index) {

@@ -183,7 +183,7 @@ export function RoundHistory({
     }
   ]
   const dataSource = []
-  groupGameState.rounds.forEach((roundGameState, r) =>
+  groupGameState.rounds.slice(0, groupGameState.round).forEach((roundGameState, r) =>
     roundGameState.allocation.forEach((good, i) => {
       const privatePrices = groupParams.roundsParams[r].privatePriceMatrix[i]
       if (showHistory === GroupDecorator.ShowHistory.selfOnly && i !== playerState.index) {

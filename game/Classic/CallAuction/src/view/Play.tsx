@@ -167,7 +167,7 @@ export function RoundHistory({
     }
   ]
   const dataSource = []
-  groupGameState.rounds.forEach(({ trades }, r) => {
+  groupGameState.rounds.slice(0, groupGameState.round).forEach(({ trades }, r) => {
     const { buyPriceMatrix, sellPriceMatrix, buyerAmount } = groupParams.roundsParams[r],
       { price } = playerState.rounds[r]
     for (let index = 0; index < groupSize; index++) {

@@ -178,7 +178,7 @@ export function RoundHistory({
     }
   ]
   const dataSource = []
-  groupGameState.rounds.forEach(({ indices, allocation }, r) =>
+  groupGameState.rounds.slice(0, groupGameState.round).forEach(({ indices, allocation }, r) =>
     indices.forEach((indexInRound, indexInGroup) => {
       const good = allocation[indexInRound]
       const privatePrices = groupParams.roundsParams[r].privatePriceMatrix[indexInGroup]
