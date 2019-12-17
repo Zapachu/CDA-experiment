@@ -8,7 +8,7 @@ export interface MoveLogDoc extends IMoveLog<any, any, any, any>, Document {
 
 const MoveLogSchema = new Schema({
     seq: Number,
-    gameId: String,
+    gameId: {type:String, index:true},
     token: String,
     type: String,
     params: {},
