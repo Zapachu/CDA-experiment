@@ -983,7 +983,6 @@ export class Hall3D extends React.Component<{}, State> {
 
   render() {
     const {detailActive, isInitView, user, count, waiting} = this.state;
-    console.log(user);
     return <div>
       <section className={style.titleBar}>
         <div className={style.logo}/>
@@ -1021,6 +1020,7 @@ export class Hall3D extends React.Component<{}, State> {
           </div>)
         }
       </section>
+      <p className={style.copyright}>Copyright @ 鄂ICP备18029770号-1</p>
     </div>;
   }
 }
