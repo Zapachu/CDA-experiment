@@ -1,9 +1,41 @@
 {
   "name": "linker",
   "version": "1.1.1",
-  "author": "GuoKan",
-  "repository": " ",
-  "license": "ISC",
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "browser": true,
+      "node": true
+    },
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "sourceType": "module"
+    },
+    "plugins": [
+      "@typescript-eslint",
+      "prettier"
+    ],
+    "extends": [
+      "prettier/@typescript-eslint",
+      "plugin:prettier/recommended"
+    ],
+    "rules": {
+      "prettier/prettier": "error"
+    }
+  },
+  "eslintIgnore": [
+    "build",
+    "dist"
+  ],
+  "prettier": {
+    "printWidth": 120,
+    "semi": false,
+    "singleQuote": true
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
+  },
   "scripts": {
     "client:tsc-w": "tsc -p frontend -w",
     "client:build": "webpack --env.TS_NODE_PROJECT=\"frontend/tsconfig.json\" --config ./script/webpack.config.ts",
@@ -11,16 +43,26 @@
     "server:tsc-w": "tsc -p backend -w",
     "server:dist": "tsc -p backend",
     "server:dev": "ts-node backend/server.ts",
-    "both:dist": "npm run server:dist & npm run client:dist"
+    "both:dist": "npm run server:dist & npm run client:dist",
+    "test": "jest",
+    "lint": "eslint . --ext .ts,.tsx --fix"
   },
   "devDependencies": {
-    "@elf/component": "^1.1.1",
     "@elf/client": "^1.1.1",
-    "@elf/share": "^1.1.1",
-    "@elf/util": "^1.1.1",
+    "@elf/component": "^1.1.1",
     "@elf/protocol": "^1.1.1",
     "@elf/setting": "^1.1.1",
+    "@elf/share": "^1.1.1",
+    "@elf/util": "^1.1.1",
+    "@typescript-eslint/eslint-plugin": "^2.7.0",
+    "@typescript-eslint/parser": "^2.7.0",
+    "eslint": "^6.7.2",
+    "eslint-config-prettier": "^6.6.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "jest": "^24.9.0",
     "linker-share": "^1.1.1",
+    "prettier": "^1.19.1",
+    "ts-jest": "^24.2.0",
     "ts-node": "^8.0.3",
     "typescript": "^3.3.3333",
     "webpack": "^4.29.6"
