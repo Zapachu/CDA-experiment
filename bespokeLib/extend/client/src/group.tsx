@@ -1,9 +1,10 @@
 import * as React from "react";
 import { Core } from "@bespoke/client";
 import { GroupDecorator } from "@extend/share";
-import { InputNumber, Radio, Row, Spin, Tabs } from "antd";
+import { Card, InputNumber, Radio, Spin, Tabs } from "antd";
 import { Label, Lang, MaskLoading } from "@elf/component";
 import { FrameEmitter } from "@bespoke/share";
+import { GroupLimit, GroupSizeLimit } from "./config";
 
 export namespace Group {
   export interface ICreateProps<IGroupCreateParams>
@@ -182,15 +183,6 @@ export class Create<IGroupCreateParams, S = {}> extends Core.Create<
   GroupDecorator.ICreateParams<Core.TCreateParams<IGroupCreateParams>>,
   S
 > {
-  static readonly GROUP_RANGE = {
-    min: 1,
-    max: 12
-  };
-  static readonly GROUP_SIZE_RANGE = {
-    min: 1,
-    max: 12
-  };
-
   GroupCreate: React.ComponentType<Group.ICreateProps<IGroupCreateParams>> =
     Group.Create;
 
@@ -237,14 +229,11 @@ export class Create<IGroupCreateParams, S = {}> extends Core.Create<
       props: { setParams }
     } = this;
     const initParams: GroupDecorator.ICreateParams<IGroupCreateParams> = {
-      group: ~~((Create.GROUP_RANGE.max + Create.GROUP_RANGE.min) >> 1),
-      groupSize: ~~(
-        (Create.GROUP_SIZE_RANGE.max + Create.GROUP_SIZE_RANGE.min) >>
-        1
-      ),
+      group: ~~((GroupLimit.max + GroupLimit.min) >> 1),
+      groupSize: ~~(GroupSizeLimit.max/3),
       independentGroup: false,
       showHistory: GroupDecorator.ShowHistory.selfOnly,
-      groupsParams: Array(Create.GROUP_RANGE.max)
+      groupsParams: Array(GroupLimit.max)
         .fill(null)
         .map(() => ({} as any))
     };
@@ -259,7 +248,7 @@ export class Create<IGroupCreateParams, S = {}> extends Core.Create<
     }
     return (
       <div>
-        <Row>
+        <Card bordered={false}>
           <Label label={lang.history} />
           <Radio.Group
             value={params.showHistory}
@@ -275,19 +264,18 @@ export class Create<IGroupCreateParams, S = {}> extends Core.Create<
               {lang.showAll}
             </Radio>
           </Radio.Group>
-        </Row>
-        <br />
-        <Row>
+        </Card>
+        <Card bordered={false}>
           <Label label={lang.group} />
           <InputNumber
-            {...Create.GROUP_RANGE}
+            {...GroupLimit}
             value={params.group}
             onChange={value => setParams({ group: +value })}
           />
           &nbsp;&nbsp;&nbsp;
           <Label label={lang.groupSize} />
           <InputNumber
-            {...Create.GROUP_SIZE_RANGE}
+            {...GroupSizeLimit}
             value={params.groupSize}
             onChange={value => setParams({ groupSize: +value })}
           />
@@ -302,7 +290,7 @@ export class Create<IGroupCreateParams, S = {}> extends Core.Create<
             <Radio value={false}>{lang.configAll}</Radio>
             <Radio value={true}>{lang.configIndependent}</Radio>
           </Radio.Group>
-        </Row>
+        </Card>
         <Tabs>
           {params.independentGroup ? (
             Array(params.group)

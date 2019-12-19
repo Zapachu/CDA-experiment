@@ -2,7 +2,7 @@ import * as React from "react";
 import { GroupDecorator, RoundDecorator } from "@extend/share";
 import { Group } from "./group";
 import { Core } from "@bespoke/client";
-import { Button, InputNumber, Modal, Radio, Row, Spin, Tabs } from "antd";
+import { Button, Card, InputNumber, Modal, Radio, Spin, Tabs } from "antd";
 import { Label, Lang, MaskLoading } from "@elf/component";
 import * as style from "./style.scss";
 import { FrameEmitter } from "@bespoke/share";
@@ -135,7 +135,7 @@ export class Create<IRoundCreateParams, S = {}> extends Group.Create<
     }
     return (
       <div>
-        <Row>
+        <Card bordered={false}>
           <Label label={lang.round} />
           <InputNumber
             {...Create.ROUND_RANGE}
@@ -153,8 +153,7 @@ export class Create<IRoundCreateParams, S = {}> extends Group.Create<
             <Radio value={false}>{lang.configAll}</Radio>
             <Radio value={true}>{lang.configIndependent}</Radio>
           </Radio.Group>
-        </Row>
-        <br />
+        </Card>
         <Tabs tabPosition="left">
           {groupParams.independentRound ? (
             Array(groupParams.round)

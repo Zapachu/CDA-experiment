@@ -1,6 +1,7 @@
 import * as React from "react";
 import { InputNumber, Spin, Table } from "antd";
 import { Label, Lang } from "@elf/component";
+import {GroupSizeLimit} from './config'
 import { DndProvider, DragSource, DropTarget } from "react-dnd";
 import HTML5Backend from "react-dnd-html5-backend";
 import TouchBackend from "react-dnd-touch-backend";
@@ -21,7 +22,6 @@ export function PrivateValueMatrix({
   goodAmount?: number;
 }) {
   const LIMIT = {
-    maxGroupSize: 12,
     maxGoodAmount: 12,
     minBase: 50,
     maxBase: 150,
@@ -51,7 +51,7 @@ export function PrivateValueMatrix({
       ~~((LIMIT.minRange + LIMIT.maxRange) >> 1)
     ),
     geneMatrix = (): TNumberMatrix =>
-      Array(LIMIT.maxGroupSize)
+      Array(GroupSizeLimit.max)
         .fill(null)
         .map(() => {
           const arr = [];
@@ -63,12 +63,6 @@ export function PrivateValueMatrix({
             arr.push(n);
           }
           return shuffle(arr).slice(0, LIMIT.maxGoodAmount);
-          return Array(LIMIT.maxGoodAmount)
-            .fill(null)
-            .map(
-              (_, i) =>
-                base + step * i + Math.round((2 * Math.random() - 1) * range)
-            );
         }),
     setMatrix = (matrix: TNumberMatrix) =>
       pSetMatrix(
@@ -131,13 +125,15 @@ export function PrivateValueMatrix({
           />
         </>
       )}
-      <br />
+      &nbsp;&nbsp;&nbsp;
       <a
         style={{ display: "inline-block", margin: ".5rem" }}
         onClick={() => setMatrix(geneMatrix())}
       >
         {lang.generate}
       </a>
+      <br/>
+      <br/>
       <Table
         scroll={tableScroll ? { x: 100 } : {}}
         pagination={false}
