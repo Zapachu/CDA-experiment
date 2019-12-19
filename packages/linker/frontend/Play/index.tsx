@@ -1,10 +1,9 @@
 import * as React from 'react'
 import { Actor, config, IActor, IGameState, IGameWithId, IUserWithId, SocketEvent, TSocket } from 'linker-share'
 import { Api, toV5, TPageProps } from '../util'
-import { Lang } from '@elf/component'
+import { Lang, MaskLoading } from '@elf/component'
 import { connect } from 'socket.io-client'
 import * as queryString from 'query-string'
-import { Loading } from '../component'
 import * as style from './style.scss'
 import { Button, Dropdown, Menu } from 'antd'
 
@@ -50,24 +49,24 @@ export class Play extends React.Component<TPageProps, IPlayState> {
     )
   }
 
-  private registerStateReducer(socketClient: TSocket) {
-    socketClient.on(SocketEvent.syncGameState, (gameState: IGameState) => {
-      this.setState({ gameState: gameState })
-    })
-  }
-
   render(): React.ReactNode {
     const {
       props: { user },
       state: { game, actor, gameState }
     } = this
     if (!gameState) {
-      return <Loading />
+      return <MaskLoading />
     }
     if (actor.type === Actor.owner) {
       return <Play4Owner {...{ gameState, game, user }} />
     }
     return <iframe className={style.playIframe} src={`${gameState.playUrl}?${Lang.key}=${Lang.activeLanguage}`} />
+  }
+
+  private registerStateReducer(socketClient: TSocket) {
+    socketClient.on(SocketEvent.syncGameState, (gameState: IGameState) => {
+      this.setState({ gameState: gameState })
+    })
   }
 }
 

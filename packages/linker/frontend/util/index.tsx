@@ -3,7 +3,6 @@ import { RouteComponentProps } from 'react-router-dom'
 import { IGameTemplate } from '@elf/client'
 
 export { Api } from './Api'
-export { loadScript } from './fileLoader'
 
 export type TPageProps = Partial<
   {

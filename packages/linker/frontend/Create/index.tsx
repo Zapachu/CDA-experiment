@@ -1,14 +1,11 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import { Api, GameTemplate, loadScript, TPageProps } from '../util'
-import { Lang } from '@elf/component'
+import { Api, GameTemplate, TPageProps } from '../util'
+import { Lang, loadScript, MaskLoading } from '@elf/component'
 import { IGameConfig, ResponseCode } from '@elf/share'
-import { Loading } from '../component'
 import { RouteComponentProps } from 'react-router'
-import { Button, Input, List, message, Modal } from 'antd'
+import { Button, Icon, Input, Layout, List, Menu, message, Modal } from 'antd'
 import * as dateFormat from 'dateformat'
-
-import { Icon, Layout, Menu } from 'antd'
 
 const { Header, Sider } = Layout
 
@@ -185,7 +182,7 @@ export class Create extends React.Component<TPageProps & RouteComponentProps<{ n
       state: { loading, params, title, desc, submitable }
     } = this
     if (loading) {
-      return <Loading />
+      return <MaskLoading />
     }
     const { Create } = GameTemplate.getTemplate()
     return (
@@ -292,6 +289,6 @@ function HistoryGame({
           </div>
         </List.Item>
       )}
-    ></List>
+    />
   )
 }

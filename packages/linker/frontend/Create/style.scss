@@ -1,30 +1,33 @@
-@import "public";
-.create{
+.create {
   max-width: 48rem;
   margin: auto;
-  .titleWrapper{
+
+  .titleWrapper {
     padding: 7rem 4rem 3rem;
   }
-  .historyGameBtnWrapper{
+
+  .historyGameBtnWrapper {
     margin: 1rem;
     text-align: right;
   }
 }
 
-.logo{
+.logo {
   display: inline-block;
   padding-left: 1.5rem;
   height: 4rem;
   overflow: hidden;
-  img{
+
+  img {
     width: 3rem;
     margin-top: 1.3rem;
   }
-  h1{
+
+  h1 {
     margin: 1.1em 1rem;
     float: right;
-    font-size: $fontSize-large;
+    font-size: 1.4rem;
     font-weight: bold;
-    color:$color-blue;
+    color: #1f90e6;
   }
 }

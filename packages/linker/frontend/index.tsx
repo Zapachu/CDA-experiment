@@ -6,11 +6,7 @@ import { render } from 'react-dom'
 import { BrowserRouter, Route as ReactRoute, RouteComponentProps, RouteProps, Switch } from 'react-router-dom'
 import { config } from 'linker-share'
 import { Play } from './Play'
-import { Info } from './Info'
-import { Dashboard } from './Dashboard'
 import { Create } from './Create'
-
-require('./initial.scss')
 
 export function registerOnElf(namespace: string, template: IGameTemplate) {
   GameTemplate.setTemplate({
@@ -38,9 +34,7 @@ function renderRoot(pageProps: TPageProps, rootContainer: HTMLElement) {
     <BrowserRouter basename={config.rootName}>
       <Switch>
         <Route path={'/create/:namespace'} component={Create} />
-        <Route path={'/info/:gameId'} component={Info} />
         <Route path={'/play/:gameId'} component={Play} />
-        <Route component={Dashboard} />
       </Switch>
     </BrowserRouter>,
     rootContainer
