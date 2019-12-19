@@ -1,4 +1,4 @@
-export const namespace = 'EgretDoubleAuction'
+export { namespace } from '../bespoke.json'
 
 export const Config = {
   ROUND: 3,

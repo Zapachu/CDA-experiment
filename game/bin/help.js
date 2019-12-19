@@ -53,7 +53,10 @@ var TaskHelper;
     var logPath = path_1.resolve(__dirname, './help.log');
     function getLogs() {
         try {
-            return fs_extra_1.readFileSync(logPath).toString().split('\n').map(function (row) { return JSON.parse(row); });
+            return fs_extra_1.readFileSync(logPath)
+                .toString()
+                .split('\n')
+                .map(function (row) { return JSON.parse(row); });
         }
         catch (e) {
             return [];
@@ -85,22 +88,25 @@ var TaskHelper;
     TaskHelper.distServer = distServer;
     function distClient(project) {
         execTask({
-            env: { BUILD_MODE: Task.dist },
-            command: "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + project + "/script/webpack.config.ts"
+            env: { PROJECT: project, BUILD_MODE: Task.dist },
+            command: "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./bin/webpack.client.ts"
         });
     }
     TaskHelper.distClient = distClient;
     function publishClient(project) {
         execTask({
-            env: { BUILD_MODE: Task.publish },
-            command: "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + project + "/script/webpack.config.ts"
+            env: { PROJECT: project, BUILD_MODE: Task.publish },
+            command: "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./bin/webpack.client.ts"
         });
     }
     TaskHelper.publishClient = publishClient;
     function pkg(project) {
         var rootDir = path_1.resolve(__dirname, '../../'), pkgDir = path_1.resolve(__dirname, "../" + project + "/pkg/" + project.split('/').pop()), targetDirs = ['bespokeLib', 'elfLib', 'lerna.json', 'game/package.json'];
         shelljs_1.cd(rootDir);
-        shelljs_1.exec('git ls-files', { silent: true }).toString().split('\n').forEach(function (file) {
+        shelljs_1.exec('git ls-files', { silent: true })
+            .toString()
+            .split('\n')
+            .forEach(function (file) {
             if (['.ts', '.tsx', '.scss', '.md'].some(function (a) { return file.endsWith(a); })) {
                 return;
             }
@@ -122,7 +128,7 @@ var TaskHelper;
         fs_extra_1.writeFileSync(path_1.resolve(pkgDir, "README.txt"), 'npm i\nnpm start');
         zip(pkgDir, {
             saveTo: pkgDir + ".zip"
-        }, function (err) { return err ? console.log(err) : fs_extra_1.removeSync(pkgDir); });
+        }, function (err) { return (err ? console.log(err) : fs_extra_1.removeSync(pkgDir)); });
     }
     TaskHelper.pkg = pkg;
 })(TaskHelper || (TaskHelper = {}));
@@ -157,6 +163,7 @@ function getProjects(parentProject, projectSet) {
     });
     return Array.from(projectSet, function (p) { return p.slice(2); });
 }
+;
 (function () {
     return __awaiter(this, void 0, void 0, function () {
         var projects, project, taskLog, side, _a, mode, HMR, task, _b, HMR, _c, withProxy, withLinker, mode;
@@ -171,9 +178,14 @@ function getProjects(parentProject, projectSet) {
                                 message: "Project(" + projects.length + "):",
                                 source: function (_, input) {
                                     if (input === void 0) { input = ''; }
-                                    return Promise.resolve(input == ' ' ?
-                                        Object.values(SpecialProject) :
-                                        projects.filter(function (p) { return input.toLowerCase().split(' ').every(function (s) { return p.toLowerCase().includes(s); }); }));
+                                    return Promise.resolve(input == ' '
+                                        ? Object.values(SpecialProject)
+                                        : projects.filter(function (p) {
+                                            return input
+                                                .toLowerCase()
+                                                .split(' ')
+                                                .every(function (s) { return p.toLowerCase().includes(s); });
+                                        }));
                                 }
                             }
                         ])];
@@ -252,18 +264,19 @@ function getProjects(parentProject, projectSet) {
                     if (HMR) {
                         TaskHelper.execTask({
                             env: {
+                                PROJECT: project,
                                 BUILD_MODE: mode,
                                 HMR: HMR.toString()
                             },
-                            command: "webpack-dev-server --hot --progress --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + project + "/script/webpack.config.ts"
+                            command: "webpack-dev-server --hot --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./bin/webpack.client.ts"
                         });
                         return [3 /*break*/, 19];
                     }
                     _d.label = 8;
                 case 8:
                     TaskHelper.execTask({
-                        env: { BUILD_MODE: mode },
-                        command: "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./" + project + "/script/webpack.config.ts"
+                        env: { PROJECT: project, BUILD_MODE: mode },
+                        command: "webpack --env.TS_NODE_PROJECT=\"tsconfig.json\" --config ./bin/webpack.client.ts"
                     });
                     return [3 /*break*/, 19];
                 case 9: return [4 /*yield*/, inquirer_1.prompt([

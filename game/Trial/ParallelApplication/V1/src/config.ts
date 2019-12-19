@@ -1,4 +1,4 @@
-export const namespace = 'ParallelApplication'
+export { namespace } from '../bespoke.json'
 
 export enum MoveType {
   join = 'join',

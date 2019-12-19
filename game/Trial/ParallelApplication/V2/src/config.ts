@@ -1,4 +1,4 @@
-export const namespace = 'ParallelApplicationV2'
+export { namespace } from '../bespoke.json'
 
 export enum SceneName {
   boot = 'boot',

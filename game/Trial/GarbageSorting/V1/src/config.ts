@@ -1,4 +1,4 @@
-export const namespace = 'GarbageSorting'
+export { namespace } from '../bespoke.json'
 
 export enum MoveType {
   prepare = 'prepare',

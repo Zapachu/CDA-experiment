@@ -1,6 +1,6 @@
 import provinces from './provinces'
 
-export const namespace = 'ShanghaiNYV4'
+export { namespace } from '../bespoke.json'
 
 export enum Stage {
   Seat,

@@ -1,4 +1,4 @@
-export const namespace = 'qualtrics'
+export { namespace } from '../bespoke.json'
 
 export enum MoveType {
   getIndex = 'getIndex'

@@ -12,6 +12,7 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "downlevelIteration": true,
+    "resolveJsonModule": true,
     "jsx": "react"
   },
   "include": [

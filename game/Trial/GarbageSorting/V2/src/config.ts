@@ -1,4 +1,4 @@
-export const namespace = 'GarbageSortingV2'
+export { namespace } from '../bespoke.json'
 
 export enum GarbageType {
   harmful,

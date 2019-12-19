@@ -56,15 +56,15 @@ namespace TaskHelper {
 
   export function distClient(project: string) {
     execTask({
-      env: { BUILD_MODE: Task.dist },
-      command: `webpack --env.TS_NODE_PROJECT="tsconfig.json" --config ./${project}/script/webpack.config.ts`
+      env: { PROJECT: project, BUILD_MODE: Task.dist },
+      command: `webpack --env.TS_NODE_PROJECT="tsconfig.json" --config ./bin/webpack.client.ts`
     })
   }
 
   export function publishClient(project: string) {
     execTask({
-      env: { BUILD_MODE: Task.publish },
-      command: `webpack --env.TS_NODE_PROJECT="tsconfig.json" --config ./${project}/script/webpack.config.ts`
+      env: { PROJECT: project, BUILD_MODE: Task.publish },
+      command: `webpack --env.TS_NODE_PROJECT="tsconfig.json" --config ./bin/webpack.client.ts`
     })
   }
 
@@ -217,17 +217,18 @@ function getProjects(parentProject = '.', projectSet = new Set<string>()): Array
         if (HMR) {
           TaskHelper.execTask({
             env: {
+              PROJECT: project,
               BUILD_MODE: mode,
               HMR: HMR.toString()
             },
-            command: `webpack-dev-server --hot --progress --env.TS_NODE_PROJECT="tsconfig.json" --config ./${project}/script/webpack.config.ts`
+            command: `webpack-dev-server --hot --env.TS_NODE_PROJECT="tsconfig.json" --config ./bin/webpack.client.ts`
           })
           break
         }
       }
       TaskHelper.execTask({
-        env: { BUILD_MODE: mode },
-        command: `webpack --env.TS_NODE_PROJECT="tsconfig.json" --config ./${project}/script/webpack.config.ts`
+        env: { PROJECT: project, BUILD_MODE: mode },
+        command: `webpack --env.TS_NODE_PROJECT="tsconfig.json" --config ./bin/webpack.client.ts`
       })
       break
     }
