@@ -132,7 +132,7 @@ function RoundPlay({
               key: 'goodStatus',
               render: (goodStatus, { isYou }) => (
                 <div style={colStyle}>
-                  {goodStatus === GoodStatus.old ? (
+                  {goodStatus === GoodStatus.old || goodStatus === GoodStatus.left ? (
                     isYou ? (
                       <Tag color="green">{lang.beingOwnedByYou}</Tag>
                     ) : (
