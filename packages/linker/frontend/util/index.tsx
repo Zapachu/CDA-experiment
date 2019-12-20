@@ -1,14 +1,11 @@
 import { config, IUserWithId } from 'linker-share'
-import { RouteComponentProps } from 'react-router-dom'
 import { IGameTemplate } from '@elf/client'
 
 export { Api } from './Api'
 
-export type TPageProps = Partial<
-  {
-    user: IUserWithId
-  } & RouteComponentProps<{ gameId?: string }>
->
+export type TPageProps = {
+  user: IUserWithId
+}
 
 export namespace GameTemplate {
   let gameTemplate: IGameTemplate

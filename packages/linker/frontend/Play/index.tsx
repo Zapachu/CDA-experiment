@@ -6,6 +6,7 @@ import { connect } from 'socket.io-client'
 import * as queryString from 'query-string'
 import * as style from './style.scss'
 import { Button, Dropdown, Menu } from 'antd'
+import { RouteComponentProps } from 'react-router'
 
 declare interface IPlayState {
   game?: IGameWithId
@@ -14,7 +15,7 @@ declare interface IPlayState {
   gameState?: IGameState
 }
 
-export class Play extends React.Component<TPageProps, IPlayState> {
+export class Play extends React.Component<TPageProps & RouteComponentProps<{ gameId: string }>, IPlayState> {
   state: IPlayState = {}
 
   async componentDidMount() {
