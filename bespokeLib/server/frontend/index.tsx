@@ -56,7 +56,6 @@ export function registerOnBespoke(gameTemplate: IGameTemplate) {
   Api.getUser().then(({ user }) => {
     const rootContainer = document.body.appendChild(document.createElement('div')),
       props = { gameTemplate: template, user }
-    renderRoot(props, rootContainer)
-    Lang.switchListeners.push(() => renderRoot(props, rootContainer))
+    Lang.listenLang(() => renderRoot(props, rootContainer))
   })
 }
