@@ -56,5 +56,6 @@ export function Login({history}: RouteComponentProps) {
                 <a href="http://www.ilab-x.com/find/password">忘记密码</a>
             </div>
         </div>
+        <p className={style.copyright}>Copyright @ 鄂ICP备18029770号-1</p>
     </section>;
 }
