@@ -19,7 +19,7 @@ import GameResult from './components/GameResult'
 //                 label: '进入实验下一部分',
 //                 onClick: () => game.params.nextPhaseKey ?
 //                     frameEmitter.emit(MoveType.sendBackPlayer) :
-//                     location.href = '/bespoke/join'
+//                     location.href = window.open('https://www.ancademy.org/subject/fastjoin', '_blank')
 //             }}/>
 //         </div>
 //     </section>

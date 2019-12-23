@@ -38,7 +38,7 @@ const PhaseOver: React.SFC<{
         <Button
           {...{
             label: '进入实验下一部分',
-            onClick: () => (location.href = '/bespoke/join')
+            onClick: () => window.open('https://www.ancademy.org/subject/fastjoin', '_blank')
           }}
         />
       </div>

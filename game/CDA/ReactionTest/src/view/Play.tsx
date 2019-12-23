@@ -19,7 +19,7 @@ const PhaseOver: React.SFC<{
           {...{
             label: '进入实验下一部分',
             onClick: () =>
-              game.params.nextPhaseKey ? frameEmitter.emit(MoveType.sendBackPlayer) : (location.href = '/bespoke/join')
+              game.params.nextPhaseKey ? frameEmitter.emit(MoveType.sendBackPlayer) : window.open('https://www.ancademy.org/subject/fastjoin', '_blank')
           }}
         />
       </div>
