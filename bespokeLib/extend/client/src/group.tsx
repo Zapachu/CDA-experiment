@@ -228,7 +228,7 @@ export class Create<IGroupCreateParams, S = {}> extends Core.Create<
     const {
       props: { params, setParams }
     } = this;
-    if (params) {
+    if (params.groupsParams) {
       return;
     }
     const initParams: GroupDecorator.ICreateParams<IGroupCreateParams> = {

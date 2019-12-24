@@ -1,2 +1,2 @@
-import { Schema } from 'mongoose';
+import { Schema } from "mongoose";
 export declare const ElfGame: Schema<any>;

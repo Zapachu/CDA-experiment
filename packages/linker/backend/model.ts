@@ -1,8 +1,6 @@
-import { Document, Model, model, Schema } from 'mongoose'
+import { Document, Model, model } from 'mongoose'
 import { getModels } from '@elf/protocol'
-import { IGame, IGameState, IPlayer, IUser } from 'linker-share'
-
-const { String } = Schema.Types
+import { IGame, IPlayer, IUser } from 'linker-share'
 
 const models = getModels(model)
 
@@ -14,20 +12,3 @@ export const PlayerModel: Model<PlayerDoc> = models.ElfPlayer
 
 export type UserDoc = IUser & Document
 export const UserModel: Model<UserDoc> = models.User
-
-export type GameStateDoc = {
-  gameId: string
-  data: IGameState
-} & Document
-export const GameStateModel: Model<GameStateDoc> = model(
-  'LinkerGameState',
-  new Schema(
-    {
-      gameId: String,
-      data: Object,
-      createAt: { type: Date, default: Date.now },
-      updateAt: { type: Date, default: Date.now }
-    },
-    { minimize: false }
-  )
-)

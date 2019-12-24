@@ -1,4 +1,5 @@
 import { GameModel, PlayerModel, UserModel } from '../model'
+import { Token } from '@elf/util'
 
 export class PlayerService {
   static async savePlayer(gameId: string, userId: string): Promise<string> {
@@ -8,7 +9,8 @@ export class PlayerService {
         { orgCode, orgName } = (await UserModel.findById(owner)) as any
       await UserModel.findByIdAndUpdate(userId, { orgCode, orgName })
     }
-    const player = await new PlayerModel({ gameId, userId }).save()
+    const token = Token.geneToken(`${gameId}_${userId}`)
+    const player = await new PlayerModel({ gameId, userId, token }).save()
     return player.id
   }
 

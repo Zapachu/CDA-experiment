@@ -23,13 +23,10 @@ export interface ILinkerActor extends IActor {
   playerId: string
 }
 
-export interface IPlayerState {
-  actor: ILinkerActor
-}
-
 export interface IBaseGame {
   title: string
   desc: string
+  playUrl?: string
   owner?: string
   orgCode?: string
   createAt?: string
@@ -53,17 +50,3 @@ export interface IPlayer {
   userId: string
   reward: string
 }
-
-export interface IGameState {
-  gameId: string
-  playUrl?: string
-  playerState: {
-    [playerToken: string]: IPlayerState
-  }
-}
-
-export type TApiPlayers = Array<{
-  playerId: string
-  userId: string
-  name: string
-}>

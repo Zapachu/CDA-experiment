@@ -1,16 +1,17 @@
-.playIframe{
+.playIframe {
   position: absolute;
   border: none;
   width: 100%;
-  height: calc(100% - 32px);
-  top: 32px;
+  height: 100%;
 }
-.ownerPlayIframe{
+
+.ownerPlayIframe {
   border: none;
   width: calc(100%);
   height: calc(100% - 11rem);
 }
-.consoleBtnWrapper{
+
+.consoleBtnWrapper {
   text-align: center;
   padding-top: 10vh;
 }

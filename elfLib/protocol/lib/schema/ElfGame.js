@@ -8,5 +8,6 @@ exports.ElfGame = new mongoose_1.Schema({
     desc: String,
     namespace: String,
     params: Object,
+    playUrl: String,
     createAt: { type: Date, "default": Date.now }
 }, { minimize: false });

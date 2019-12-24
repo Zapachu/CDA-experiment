@@ -1,15 +1,10 @@
 import { config, IActor } from 'linker-share'
 import * as path from 'path'
-import { RedisKey } from '../util'
 import { NextFunction, Request, Response } from 'express'
 import { Token } from '@elf/util'
-import { redisClient } from '@elf/protocol'
 import { AcademusRole, Actor, historyGamesListSize, IGameThumb, ResponseCode } from '@elf/share'
 import { GameService, PlayerService } from '../service'
 import { GameModel } from '../model'
-
-const SECONDS_PER_DAY = 86400
-const DEFAULT_PAGE_SIZE = 11
 
 export class UserCtrl {
   static async renderApp(req: Request, res: Response) {
@@ -110,19 +105,6 @@ export class GameCtrl {
     })
   }
 
-  static async getGameList(req, res: Response) {
-    const {
-      user: { _id },
-      query: { page = 0, pageSize = DEFAULT_PAGE_SIZE }
-    } = req
-    const { count, gameList } = await GameService.getGameList(_id, +page, +pageSize)
-    res.json({
-      code: ResponseCode.success,
-      count,
-      gameList
-    })
-  }
-
   static async getBaseGame(req: Request, res: Response) {
     const { gameId } = req.params
     const { params, ...game } = await GameService.getGame(gameId)
@@ -139,52 +121,6 @@ export class GameCtrl {
       code: ResponseCode.success,
       game
     })
-  }
-
-  static async shareGame(req, res) {
-    const { gameId } = req.params
-    let shareCode = await redisClient.get(RedisKey.share_GameCode(gameId))
-    const { title } = await GameService.getGame(gameId)
-    if (shareCode) {
-      return res.json({
-        code: ResponseCode.success,
-        title,
-        shareCode
-      })
-    }
-    shareCode = Math.random()
-      .toString()
-      .substr(2, 6)
-    try {
-      await redisClient.setex(RedisKey.share_GameCode(gameId), SECONDS_PER_DAY, shareCode)
-      await redisClient.setex(RedisKey.share_CodeGame(shareCode), SECONDS_PER_DAY, gameId)
-      res.json({
-        code: ResponseCode.success,
-        title,
-        shareCode
-      })
-    } catch (e) {
-      res.js({
-        code: ResponseCode.serverError
-      })
-    }
-  }
-
-  static async joinWithShareCode(req, res) {
-    const {
-      body: { code }
-    } = req
-    const gameId = await redisClient.get(RedisKey.share_CodeGame(code))
-    res.json(
-      gameId
-        ? {
-            code: ResponseCode.success,
-            gameId
-          }
-        : {
-            code: ResponseCode.notFound
-          }
-    )
   }
 
   static async joinGame(req, res) {

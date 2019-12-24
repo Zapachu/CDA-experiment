@@ -6,6 +6,7 @@ import { Lang, MaskLoading } from '@elf/component'
 import { Button, Card, message } from 'antd'
 import { ResponseCode } from '@elf/share'
 import { RouteComponentProps } from 'react-router'
+import * as ReactMarkdown from 'react-markdown'
 
 declare interface IInfoState {
   loading: boolean
@@ -57,7 +58,9 @@ export class Info extends React.Component<TPageProps & RouteComponentProps<{ gam
     }
     return (
       <section className={style.info}>
-        <Card title={game.title}>{game.desc}</Card>
+        <Card title={game.title}>
+          <ReactMarkdown source={game.desc} />
+        </Card>
         <div className={style.buttonWrapper}>
           <Button
             type={'primary'}

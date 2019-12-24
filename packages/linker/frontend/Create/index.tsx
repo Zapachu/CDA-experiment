@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import { Api, GameTemplate, TPageProps } from '../util'
+import { Api, Frame, GameTemplate, TPageProps } from '../util'
 import { Lang, loadScript } from '@elf/component'
 import { IGameConfig, ResponseCode } from '@elf/share'
 import { RouteComponentProps } from 'react-router'
@@ -8,9 +8,10 @@ import { Button, Card, Form, Input, List, message, Modal, PageHeader, Skeleton }
 import * as dateFormat from 'dateformat'
 
 export function Create({
+  user,
   history,
   match: {
-    params: { namespace, gameId }
+    params: { namespace }
   }
 }: TPageProps & RouteComponentProps<{ namespace: string; gameId: string }>) {
   const lang = Lang.extractLang({
@@ -73,7 +74,7 @@ export function Create({
   }
   const { Create } = GameTemplate.getTemplate()
   return (
-    <>
+    <Frame user={user}>
       <PageHeader
         title={null}
         breadcrumb={{
@@ -150,7 +151,7 @@ export function Create({
           {lang.submit}
         </Button>
       </div>
-    </>
+    </Frame>
   )
 }
 

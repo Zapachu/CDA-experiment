@@ -39,10 +39,6 @@ export const Api = new (class extends BaseRequest {
     return await this.get('/game/historyThumb/:namespace', { namespace })
   }
 
-  async joinGameWithCode(code: string): Promise<IHttpRes & { gameId?: string }> {
-    return await this.post('/game/joinWithShareCode', null, null, { code })
-  }
-
   async getJsUrl(namespace: string): Promise<IHttpRes & { jsUrl: string }> {
     return await this.get('/game/jsUrl/:namespace', { namespace })
   }
@@ -63,10 +59,6 @@ export const Api = new (class extends BaseRequest {
       namespace,
       params
     })
-  }
-
-  async shareGame(gameId: string): Promise<IHttpRes & { shareCode: string; title: string }> {
-    return await this.get('/game/share/:gameId', { gameId })
   }
 
   async getActor(gameId: string, token: string = ''): Promise<IHttpRes & { actor: ILinkerActor }> {

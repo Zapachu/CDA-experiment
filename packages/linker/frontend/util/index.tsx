@@ -1,6 +1,7 @@
 import { config, IUserWithId } from 'linker-share'
 import { IGameTemplate } from '@elf/client'
 
+export { Frame } from './Frame'
 export { Api } from './Api'
 
 export type TPageProps = {
@@ -22,7 +23,9 @@ export namespace GameTemplate {
 export enum V5Route {
   item,
   push,
-  share
+  share,
+  member,
+  transaction
 }
 
 export function toV5(route: V5Route, orgCode?: string, gameId?: string) {
@@ -36,6 +39,13 @@ export function toV5(route: V5Route, orgCode?: string, gameId?: string) {
       break
     case V5Route.push:
       routePath = `/org/${orgCode}/task/game/push/${gameId}`
+      break
+    case V5Route.member:
+      routePath = `/org/${orgCode}/task/game/item/${gameId}/members`
+      break
+    case V5Route.transaction:
+      routePath = `/org/${orgCode}/task/game/trans/${gameId}`
+      break
   }
   window.open(`${config.academus.route.prefix}${routePath}`, '_blank')
 }

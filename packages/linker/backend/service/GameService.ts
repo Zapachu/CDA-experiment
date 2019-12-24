@@ -1,40 +1,29 @@
-import { IBaseGame, IGame, IGameWithId } from 'linker-share'
+import { IGame, IGameWithId } from 'linker-share'
 import { GameModel } from '../model'
-import { Log } from '@elf/util'
 import { elfSetting } from '@elf/setting'
 import { getAdminService } from '../rpc'
-import { Linker, redisClient } from '@elf/protocol'
+import { Log } from '@elf/util'
+import { Linker, RedisCall, redisClient } from '@elf/protocol'
 import HeartBeat = Linker.HeartBeat
 
 export class GameService {
-  static async getGameList(
-    owner: string,
-    page: number,
-    pageSize: number
-  ): Promise<{ gameList: Array<IGameWithId>; count: number }> {
-    const count = await GameModel.countDocuments({ owner })
-    const _gameList = await GameModel.find({ owner })
-        .sort('-createAt')
-        .skip(page * pageSize)
-        .limit(pageSize),
-      gameList = _gameList.map(({ id, title, desc, namespace, params }) => ({
-        id,
-        title,
-        desc,
-        namespace,
-        params
-      }))
-    return { count, gameList }
-  }
-
-  static async saveGame(game: IBaseGame | IGame): Promise<string> {
+  static async saveGame(game: IGame): Promise<string> {
     const { id } = await new GameModel(game).save()
+    const { playUrl } = await RedisCall.call<Linker.Create.IReq, Linker.Create.IRes>(
+      Linker.Create.name(game.namespace),
+      {
+        owner: game.owner,
+        elfGameId: id,
+        params: game.params
+      }
+    )
+    await GameModel.findByIdAndUpdate(id, { playUrl })
     return id
   }
 
-  static async getGame(gameId: string): Promise<IGameWithId> {
-    const { id, title, desc, owner, namespace, params, createAt } = await GameModel.findById(gameId)
-    return { id, title, desc, owner, namespace, params, createAt }
+  static async getGame(id: string): Promise<IGameWithId> {
+    const game = await GameModel.findById(id).lean()
+    return { ...game, id }
   }
 
   static async getHeartBeats(userId?: string): Promise<Array<HeartBeat.IHeartBeat>> {

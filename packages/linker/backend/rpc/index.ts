@@ -1,8 +1,8 @@
 import { elfSetting } from '@elf/setting'
 import { Server, ServerCredentials } from 'grpc'
 import { setElfService } from './service/ElfAdmin'
-import { RedisCall, Linker } from '@elf/protocol'
-import { StateManager } from '../service'
+import { Linker, RedisCall } from '@elf/protocol'
+import { PlayerModel } from '../model'
 
 export { getAdminService } from './service/ElfAdmin'
 
@@ -16,8 +16,7 @@ export function serve() {
 RedisCall.handle<Linker.Result.IReq, Linker.Result.IRes>(
   Linker.Result.name,
   async ({ elfGameId, playerToken, result }) => {
-    const stageManger = await StateManager.getManager(elfGameId)
-    await stageManger.setPlayerResult(playerToken, result)
+    await PlayerModel.findOneAndUpdate({ gameId: elfGameId, token: playerToken }, { result })
     return null
   }
 )

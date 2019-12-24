@@ -1,12 +1,13 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import { Api, GameTemplate, TPageProps } from '../util'
+import { Api, Frame, GameTemplate, TPageProps } from '../util'
 import { Lang, loadScript } from '@elf/component'
 import { RouteComponentProps } from 'react-router'
 import { Button, Card, Form, Input, PageHeader, Skeleton } from 'antd'
 import { IGameWithId } from 'linker-share'
 
 export function View({
+  user,
   history,
   match: {
     params: { gameId }
@@ -38,7 +39,7 @@ export function View({
   }
   const { Create } = GameTemplate.getTemplate()
   return (
-    <>
+    <Frame user={user}>
       <PageHeader
         title={null}
         breadcrumb={{
@@ -77,6 +78,6 @@ export function View({
         <span style={{ flexGrow: 1 }} />
         <Button onClick={() => history.goBack()}>{lang.goBack}</Button>
       </div>
-    </>
+    </Frame>
   )
 }
