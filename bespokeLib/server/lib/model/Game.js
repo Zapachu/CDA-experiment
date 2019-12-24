@@ -6,7 +6,7 @@ var GameSchema = new mongoose_1.Schema({
     elfGameId: String,
     title: String,
     namespace: String,
-    params: { type: Object, default: ({}) },
+    params: { type: Object, default: {} },
     owner: { type: ObjectId, ref: 'User' },
     createAt: { type: Date, default: Date.now }
 }, { minimize: false });
@@ -16,5 +16,5 @@ var SimulatePlayer = new mongoose_1.Schema({
     token: String,
     name: String
 });
-exports.SimulatePlayerModel = mongoose_1.model('BespokeSimulatePlayer', SimulatePlayer);
+exports.SimulatePlayerModel = (mongoose_1.model('BespokeSimulatePlayer', SimulatePlayer));
 //endregion

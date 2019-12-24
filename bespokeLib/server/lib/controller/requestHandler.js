@@ -56,7 +56,9 @@ var UserCtrl = /** @class */ (function () {
             return __generator(this, function (_a) {
                 chunk = fs.readFileSync(path.resolve(__dirname, "../../static/index.html")).toString();
                 res.set('content-type', 'text/html');
-                res.end(chunk.replace('</head>', "<script type=\"text/javascript\">\nObject.assign(window, {\n    NAMESPACE:'" + util_2.Setting.namespace + "',\n    WITH_LINKER:" + setting_1.elfSetting.bespokeWithLinker + ",\n    PRODUCT_ENV:" + setting_1.elfSetting.inProductEnv + "\n})\n</script></head>").replace(/static/g, util_2.Setting.namespace + "/static") +
+                res.end(chunk
+                    .replace('</head>', "<script type=\"text/javascript\">\nObject.assign(window, {\n    NAMESPACE:'" + util_2.Setting.namespace + "',\n    WITH_LINKER:" + setting_1.elfSetting.bespokeWithLinker + ",\n    PRODUCT_ENV:" + setting_1.elfSetting.inProductEnv + "\n})\n</script></head>")
+                    .replace(/static/g, util_2.Setting.namespace + "/static") +
                     ("<script type=\"text/javascript\" src=\"" + util_2.Setting.getClientPath() + "\"></script>"));
                 return [2 /*return*/];
             });
@@ -132,12 +134,14 @@ var UserCtrl = /** @class */ (function () {
                                 });
                             }
                             req.logIn(user, function (err) {
-                                res.json(err ? {
-                                    code: share_1.ResponseCode.notFound
-                                } : {
-                                    code: share_1.ResponseCode.success,
-                                    returnToUrl: returnToUrl
-                                });
+                                res.json(err
+                                    ? {
+                                        code: share_1.ResponseCode.notFound
+                                    }
+                                    : {
+                                        code: share_1.ResponseCode.success,
+                                        returnToUrl: returnToUrl
+                                    });
                             });
                         })(req, res, next);
                         return [2 /*return*/];
@@ -220,12 +224,14 @@ var GameCtrl = /** @class */ (function () {
                         return [4 /*yield*/, service_1.GameDAO.newGame(owner, game)];
                     case 1:
                         gameId = _a.sent();
-                        res.json(gameId ? {
-                            code: share_1.ResponseCode.success,
-                            gameId: gameId
-                        } : {
-                            code: share_1.ResponseCode.serverError
-                        });
+                        res.json(gameId
+                            ? {
+                                code: share_1.ResponseCode.success,
+                                gameId: gameId
+                            }
+                            : {
+                                code: share_1.ResponseCode.serverError
+                            });
                         return [2 /*return*/];
                 }
             });
@@ -251,7 +257,9 @@ var GameCtrl = /** @class */ (function () {
                                     shareCode: shareCode
                                 })];
                         }
-                        shareCode = Math.random().toString().substr(2, 6);
+                        shareCode = Math.random()
+                            .toString()
+                            .substr(2, 6);
                         _a.label = 3;
                     case 3:
                         _a.trys.push([3, 6, , 7]);
@@ -288,12 +296,14 @@ var GameCtrl = /** @class */ (function () {
                         return [4 /*yield*/, protocol_1.redisClient.get(util_2.RedisKey.share_CodeGame(code))];
                     case 1:
                         gameId = _a.sent();
-                        res.json(gameId ? {
-                            code: share_1.ResponseCode.success,
-                            gameId: gameId
-                        } : {
-                            code: share_1.ResponseCode.notFound
-                        });
+                        res.json(gameId
+                            ? {
+                                code: share_1.ResponseCode.success,
+                                gameId: gameId
+                            }
+                            : {
+                                code: share_1.ResponseCode.notFound
+                            });
                         return [2 /*return*/];
                 }
             });
@@ -308,10 +318,13 @@ var GameCtrl = /** @class */ (function () {
                         gameId = req.params.gameId;
                         return [4 /*yield*/, model_1.SimulatePlayerModel.find({ gameId: gameId })];
                     case 1:
-                        simulatePlayers = (_a.sent())
-                            .map(function (_a) {
+                        simulatePlayers = (_a.sent()).map(function (_a) {
                             var gameId = _a.gameId, token = _a.token, name = _a.name;
-                            return ({ gameId: gameId, token: token, name: name });
+                            return ({
+                                gameId: gameId,
+                                token: token,
+                                name: name
+                            });
                         });
                         res.json({
                             code: share_1.ResponseCode.success,

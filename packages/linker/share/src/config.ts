@@ -7,8 +7,7 @@ export const config = {
       prefix: '',
       login: '/login',
       profileMobile: '/profile/mobile',
-      join: '/subject/fastJoin',
-      home: (orgCode, gameId) => `/org/${orgCode}/task/game/item/${gameId}`
+      join: '/subject/fastJoin'
     }
   }
 }

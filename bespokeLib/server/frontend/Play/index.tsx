@@ -12,7 +12,6 @@ import {
   TPlayerState,
   TSocket
 } from '@bespoke/share'
-import * as style from './style.scss'
 import { Lang, MaskLoading } from '@elf/component'
 import { Api, TPageProps } from '../util'
 import { connect } from 'socket.io-client'
@@ -20,6 +19,7 @@ import { applyChange, Diff } from 'deep-diff'
 import * as queryString from 'query-string'
 import { GameControl } from './console/GameControl'
 import { GameResult } from './console/GameResult'
+import { Card, Layout } from 'antd'
 import cloneDeep = require('lodash/cloneDeep')
 
 declare interface IPlayState {
@@ -35,6 +35,9 @@ declare interface IPlayState {
 export class Play extends React.Component<TPageProps, IPlayState> {
   token = queryString.parse(location.search).token as string
   lang = Lang.extractLang({
+    control: ['实验操作', 'Status Control'],
+    playerState: ['玩家状态', 'Player State'],
+    gameResult: ['实验结果', 'Game Result'],
     Mask_GamePaused: ['实验已暂停', 'Experiment Paused']
   })
 
@@ -74,6 +77,82 @@ export class Play extends React.Component<TPageProps, IPlayState> {
   componentWillUnmount(): void {
     if (this.state.socketClient) {
       this.state.socketClient.close()
+    }
+  }
+
+  applyPlayerState(playerState: TPlayerState<{}>, token?: string) {
+    const {
+      state: { playerStates }
+    } = this
+    token
+      ? this.setState({
+          playerStates: {
+            ...playerStates,
+            [token]: playerState
+          }
+        })
+      : this.setState({ playerState })
+  }
+
+  render(): React.ReactNode {
+    const {
+      lang,
+      props: { history, gameTemplate },
+      state: { game, actor, gameState, playerState, playerStates, frameEmitter }
+    } = this
+    if (!gameTemplate || !gameState) {
+      return <MaskLoading />
+    }
+    const { Play4Owner, Result4Owner, Play, Result } = gameTemplate
+    if (!PRODUCT_ENV) {
+      console.log(gameState, playerState || playerStates)
+    }
+    const CardStyle: React.CSSProperties = {
+      margin: '1rem'
+    }
+    if (actor.type === Actor.owner) {
+      return (
+        <Layout>
+          <Card title={lang.control} style={CardStyle}>
+            <GameControl
+              {...{
+                game,
+                gameState,
+                playerStates,
+                frameEmitter,
+                historyPush: path => history.push(path)
+              }}
+            />
+          </Card>
+          {gameState.status === GameStatus.over ? (
+            <Card title={lang.gameResult} style={CardStyle}>
+              <GameResult {...{ game, Result4Owner }} />
+            </Card>
+          ) : (
+            <Card title={lang.playerState} style={CardStyle}>
+              <Play4Owner
+                {...{
+                  game,
+                  frameEmitter,
+                  gameState,
+                  playerStates
+                }}
+              />
+            </Card>
+          )}
+        </Layout>
+      )
+    }
+    if (!playerState) {
+      return <MaskLoading />
+    }
+    switch (gameState.status) {
+      case GameStatus.paused:
+        return <MaskLoading label={lang.Mask_GamePaused} />
+      case GameStatus.started:
+        return <Play {...{ game, gameState, playerState, frameEmitter }} />
+      case GameStatus.over:
+        return <Result {...{ game, gameState, playerState }} />
     }
   }
 
@@ -120,72 +199,5 @@ export class Play extends React.Component<TPageProps, IPlayState> {
           })
         : this.setState({ playerState })
     })
-  }
-
-  applyPlayerState(playerState: TPlayerState<{}>, token?: string) {
-    const {
-      state: { playerStates }
-    } = this
-    token
-      ? this.setState({
-          playerStates: {
-            ...playerStates,
-            [token]: playerState
-          }
-        })
-      : this.setState({ playerState })
-  }
-
-  render(): React.ReactNode {
-    const {
-      lang,
-      props: { history, gameTemplate },
-      state: { game, actor, gameState, playerState, playerStates, frameEmitter }
-    } = this
-    if (!gameTemplate || !gameState) {
-      return <MaskLoading />
-    }
-    const { Play4Owner, Result4Owner, Play, Result } = gameTemplate
-    if (!PRODUCT_ENV) {
-      console.log(gameState, playerState || playerStates)
-    }
-    if (actor.type === Actor.owner) {
-      return (
-        <section className={style.play4owner}>
-          <GameControl
-            {...{
-              game,
-              gameState,
-              playerStates,
-              frameEmitter,
-              historyPush: path => history.push(path)
-            }}
-          />
-          {gameState.status === GameStatus.over ? (
-            <GameResult {...{ game, Result4Owner }} />
-          ) : (
-            <Play4Owner
-              {...{
-                game,
-                frameEmitter,
-                gameState,
-                playerStates
-              }}
-            />
-          )}
-        </section>
-      )
-    }
-    if (!playerState) {
-      return <MaskLoading />
-    }
-    switch (gameState.status) {
-      case GameStatus.paused:
-        return <MaskLoading label={lang.Mask_GamePaused} />
-      case GameStatus.started:
-        return <Play {...{ game, gameState, playerState, frameEmitter }} />
-      case GameStatus.over:
-        return <Result {...{ game, gameState, playerState }} />
-    }
   }
 }

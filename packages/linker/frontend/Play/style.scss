@@ -5,6 +5,11 @@
   height: calc(100% - 32px);
   top: 32px;
 }
+.ownerPlayIframe{
+  border: none;
+  width: calc(100%);
+  height: calc(100% - 11rem);
+}
 .consoleBtnWrapper{
   text-align: center;
   padding-top: 10vh;

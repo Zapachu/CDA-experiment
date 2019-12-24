@@ -33,8 +33,8 @@ export class GameService {
   }
 
   static async getGame(gameId: string): Promise<IGameWithId> {
-    const { id, title, desc, owner, namespace, params } = await GameModel.findById(gameId)
-    return { id, title, desc, namespace, params, owner }
+    const { id, title, desc, owner, namespace, params, createAt } = await GameModel.findById(gameId)
+    return { id, title, desc, owner, namespace, params, createAt }
   }
 
   static async getHeartBeats(userId?: string): Promise<Array<HeartBeat.IHeartBeat>> {

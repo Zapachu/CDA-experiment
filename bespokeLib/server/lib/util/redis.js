@@ -1,7 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RedisKey = {
-    verifyCodeSendTimes: function (nationCode, phoneNumber) { return "verifyCodeSendTimes:" + nationCode + ":" + phoneNumber; },
+    verifyCodeSendTimes: function (nationCode, phoneNumber) {
+        return "verifyCodeSendTimes:" + nationCode + ":" + phoneNumber;
+    },
     verifyCode: function (nationCode, phoneNumber) { return "verifyCode:" + nationCode + ":" + phoneNumber; },
     share_GameCode: function (gameId) { return "shareCode:" + gameId; },
     share_CodeGame: function (code) { return "shareCodeMapping:" + code; },

@@ -1,18 +1,18 @@
 import * as React from 'react'
 import * as style from './style.scss'
 import { Api, GameTemplate, TPageProps } from '../util'
-import { Lang, loadScript, MaskLoading } from '@elf/component'
+import { Lang, loadScript } from '@elf/component'
 import { IGameConfig, ResponseCode } from '@elf/share'
 import { RouteComponentProps } from 'react-router'
-import { Breadcrumb, Button, Card, Form, Input, List, message, Modal } from 'antd'
+import { Button, Card, Form, Input, List, message, Modal, PageHeader, Skeleton } from 'antd'
 import * as dateFormat from 'dateformat'
 
 export function Create({
   history,
   match: {
-    params: { namespace }
+    params: { namespace, gameId }
   }
-}: TPageProps & RouteComponentProps<{ namespace: string }>) {
+}: TPageProps & RouteComponentProps<{ namespace: string; gameId: string }>) {
   const lang = Lang.extractLang({
     title: ['实验标题', 'Game Title'],
     desc: ['实验描述', 'Description'],
@@ -69,16 +69,27 @@ export function Create({
   }
 
   if (loading) {
-    return <MaskLoading />
+    return <Skeleton />
   }
   const { Create } = GameTemplate.getTemplate()
   return (
     <>
+      <PageHeader
+        title={null}
+        breadcrumb={{
+          routes: [
+            {
+              path: '#',
+              breadcrumbName: lang.game
+            },
+            {
+              path: '#',
+              breadcrumbName: lang.createGame
+            }
+          ]
+        }}
+      />
       <div className={style.content}>
-        <Breadcrumb style={{ margin: '1rem' }}>
-          <Breadcrumb.Item>{lang.game}</Breadcrumb.Item>
-          <Breadcrumb.Item>{lang.createGame}</Breadcrumb.Item>
-        </Breadcrumb>
         <Card title={lang.baseInfo} style={CardStyle}>
           <Form.Item required={true} label={lang.title} labelCol={{ md: 2 }} wrapperCol={{ md: 10 }}>
             <Input value={title} maxLength={20} onChange={({ target: { value: title } }) => setTitle(title)} />

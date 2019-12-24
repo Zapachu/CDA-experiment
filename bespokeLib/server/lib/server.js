@@ -137,7 +137,7 @@ var Server = /** @class */ (function () {
         });
     };
     Server.initMongo = function () {
-        mongoose_1.connect(setting_1.elfSetting.mongoUri, __assign(__assign({}, setting_1.elfSetting.mongoUser ? { user: setting_1.elfSetting.mongoUser, pass: setting_1.elfSetting.mongoPass } : {}), { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true }), function (err) { return err ? util_2.Log.e(err) : null; });
+        mongoose_1.connect(setting_1.elfSetting.mongoUri, __assign(__assign({}, (setting_1.elfSetting.mongoUser ? { user: setting_1.elfSetting.mongoUser, pass: setting_1.elfSetting.mongoPass } : {})), { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true }), function (err) { return (err ? util_2.Log.e(err) : null); });
     };
     Server.initSessionMiddleware = function () {
         var RedisStore = connectRedis(expressSession);
@@ -203,7 +203,8 @@ var Server = /** @class */ (function () {
         }));
     };
     Server.bindServerListener = function (server, cb) {
-        server.on('error', function (error) {
+        server
+            .on('error', function (error) {
             if (error.syscall !== 'listen') {
                 util_2.Log.e(error);
             }

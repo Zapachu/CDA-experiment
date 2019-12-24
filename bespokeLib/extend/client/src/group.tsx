@@ -226,11 +226,14 @@ export class Create<IGroupCreateParams, S = {}> extends Core.Create<
 
   componentDidMount(): void {
     const {
-      props: { setParams }
+      props: { params, setParams }
     } = this;
+    if (params) {
+      return;
+    }
     const initParams: GroupDecorator.ICreateParams<IGroupCreateParams> = {
       group: ~~((GroupLimit.max + GroupLimit.min) >> 1),
-      groupSize: ~~(GroupSizeLimit.max/3),
+      groupSize: ~~(GroupSizeLimit.max / 3),
       independentGroup: false,
       showHistory: GroupDecorator.ShowHistory.selfOnly,
       groupsParams: Array(GroupLimit.max)

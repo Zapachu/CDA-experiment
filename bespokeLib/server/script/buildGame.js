@@ -54,7 +54,9 @@ function geneClientBuilder(_a) {
         output: {
             path: output,
             filename: "[name].js",
-            publicPath: buildMode === 'publish' ? qiNiu.download.jsDomain + "/" + qiNiu.upload.path + "/" : "/" + share_1.config.rootName + "/" + namespace + "/static/"
+            publicPath: buildMode === 'publish'
+                ? qiNiu.download.jsDomain + "/" + qiNiu.upload.path + "/"
+                : "/" + share_1.config.rootName + "/" + namespace + "/static/"
         },
         resolve: {
             extensions: ['.ts', '.tsx', '.js', '.jsx', '.json']
@@ -80,11 +82,7 @@ function geneClientBuilder(_a) {
                 },
                 {
                     test: /\.less$/,
-                    use: [
-                        'style-loader',
-                        'css-loader',
-                        { loader: 'less-loader', options: { javascriptEnabled: true } }
-                    ]
+                    use: ['style-loader', 'css-loader', { loader: 'less-loader', options: { javascriptEnabled: true } }]
                 },
                 {
                     test: /\.(scss|sass)$/,
@@ -117,10 +115,10 @@ function geneClientBuilder(_a) {
             ]
         },
         externals: {
-            'react': 'React',
+            react: 'React',
             'react-dom': 'ReactDOM',
             '@elf/component': 'ElfComponent',
-            'antd': 'antd'
+            antd: 'antd'
         },
         plugins: [
             new ManifestPlugin({
@@ -134,13 +132,13 @@ function geneClientBuilder(_a) {
                     }, seed);
                 }
             })
-        ].concat(buildMode === 'publish' ? [
-            new QiniuPlugin(qiNiu.upload)
-        ] : buildMode === 'dist' ? [
-            new clean_webpack_plugin_1.CleanWebpackPlugin()
-        ] : HMR ? [
-            new webpack.HotModuleReplacementPlugin()
-        ] : [])
+        ].concat(buildMode === 'publish'
+            ? [new QiniuPlugin(qiNiu.upload)]
+            : buildMode === 'dist'
+                ? [new clean_webpack_plugin_1.CleanWebpackPlugin()]
+                : HMR
+                    ? [new webpack.HotModuleReplacementPlugin()]
+                    : [])
     };
 }
 exports.geneClientBuilder = geneClientBuilder;

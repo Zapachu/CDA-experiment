@@ -102,10 +102,12 @@ var GameDAO = /** @class */ (function () {
     };
     //region persist state
     GameDAO.saveGameState = function (gameId, gameState) {
-        setting_1.elfSetting.inProductEnv && protocol_1.redisClient.set(util_2.RedisKey.gameState(gameId), JSON.stringify(gameState)).catch(function (reason) { return util_1.Log.e(reason); });
+        setting_1.elfSetting.inProductEnv &&
+            protocol_1.redisClient.set(util_2.RedisKey.gameState(gameId), JSON.stringify(gameState)).catch(function (reason) { return util_1.Log.e(reason); });
     };
     GameDAO.savePlayerState = function (gameId, token, playerState) {
-        setting_1.elfSetting.inProductEnv && protocol_1.redisClient.set(util_2.RedisKey.playerState(gameId, token), JSON.stringify(playerState)).catch(function (reason) { return util_1.Log.e(reason); });
+        setting_1.elfSetting.inProductEnv &&
+            protocol_1.redisClient.set(util_2.RedisKey.playerState(gameId, token), JSON.stringify(playerState)).catch(function (reason) { return util_1.Log.e(reason); });
     };
     GameDAO.queryGameState = function (gameId) {
         return __awaiter(this, void 0, void 0, function () {

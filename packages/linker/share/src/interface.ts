@@ -32,6 +32,7 @@ export interface IBaseGame {
   desc: string
   owner?: string
   orgCode?: string
+  createAt?: string
 }
 
 export interface IBaseGameWithId extends IBaseGame {

@@ -76,11 +76,15 @@ var UserService = /** @class */ (function () {
                                     msg: "You've got one verify code in the last " + share_1.config.vcodeLifetime + " seconds"
                                 }];
                         }
-                        verifyCode = Math.random().toString().substr(2, 6);
+                        verifyCode = Math.random()
+                            .toString()
+                            .substr(2, 6);
                         util_2.Log.d(verifyCode);
                         _a = !setting_1.elfSetting.inProductEnv;
                         if (_a) return [3 /*break*/, 4];
-                        return [4 /*yield*/, util_1.QCloudSMS.singleSenderWithParam(nationCode, mobile, setting_1.elfSetting.qCloudSMS.templateId.verifyCode, [verifyCode])];
+                        return [4 /*yield*/, util_1.QCloudSMS.singleSenderWithParam(nationCode, mobile, setting_1.elfSetting.qCloudSMS.templateId.verifyCode, [
+                                verifyCode
+                            ])];
                     case 3:
                         _a = (_b.sent());
                         _b.label = 4;

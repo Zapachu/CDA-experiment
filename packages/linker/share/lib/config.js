@@ -9,8 +9,7 @@ exports.config = {
             prefix: '',
             login: '/login',
             profileMobile: '/profile/mobile',
-            join: '/subject/fastJoin',
-            home: function (orgCode, gameId) { return "/org/" + orgCode + "/task/game/item/" + gameId; }
+            join: '/subject/fastJoin'
         }
     }
 };

@@ -49,12 +49,14 @@ function gameId2PlayUrl(gameId, keyOrToken) {
 }
 exports.gameId2PlayUrl = gameId2PlayUrl;
 function getOrigin() {
-    return setting_1.elfSetting.bespokeWithProxy ? setting_1.elfSetting.proxyOrigin :
-        "http://" + Setting.ip + ":" + (setting_1.elfSetting.bespokeHmr ? share_1.config.devPort.client : Setting.port);
+    return setting_1.elfSetting.bespokeWithProxy
+        ? setting_1.elfSetting.proxyOrigin
+        : "http://" + Setting.ip + ":" + (setting_1.elfSetting.bespokeHmr ? share_1.config.devPort.client : Setting.port);
 }
 exports.getOrigin = getOrigin;
 function heartBeat(key, getValue, seconds) {
     if (seconds === void 0) { seconds = config_1.CONFIG.heartBeatSeconds; }
+    ;
     (function foo() {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {

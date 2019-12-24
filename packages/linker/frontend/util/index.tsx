@@ -19,6 +19,23 @@ export namespace GameTemplate {
   }
 }
 
-export function toV5(route: string) {
-  window.open(`${config.academus.route.prefix}${route}`, '_blank')
+export enum V5Route {
+  item,
+  push,
+  share
+}
+
+export function toV5(route: V5Route, orgCode?: string, gameId?: string) {
+  let routePath = ''
+  switch (route) {
+    case V5Route.item:
+      routePath = `/org/${orgCode}/task/game/item/${gameId}`
+      break
+    case V5Route.share:
+      routePath = `/org/${orgCode}/task/game/item/${gameId}`
+      break
+    case V5Route.push:
+      routePath = `/org/${orgCode}/task/game/push/${gameId}`
+  }
+  window.open(`${config.academus.route.prefix}${routePath}`, '_blank')
 }

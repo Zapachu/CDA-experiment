@@ -106,11 +106,15 @@ var EventIO = /** @class */ (function () {
                         return [4 /*yield*/, GameDAO_1.GameDAO.getGame(gameId)];
                     case 1:
                         game = _f.sent();
-                        actor = util_1.Token.checkToken(token) ?
-                            game.owner === userId ? { type: share_1.Actor.clientRobot, token: token } : { type: share_1.Actor.player, token: token } :
-                            game.owner === userId ? { type: share_1.Actor.owner, token: util_1.Token.geneToken(userId) } :
-                                setting_1.elfSetting.bespokeWithLinker ? linkerActor :
-                                    { type: share_1.Actor.player, token: util_1.Token.geneToken(userId || sessionID) };
+                        actor = util_1.Token.checkToken(token)
+                            ? game.owner === userId
+                                ? { type: share_1.Actor.clientRobot, token: token }
+                                : { type: share_1.Actor.player, token: token }
+                            : game.owner === userId
+                                ? { type: share_1.Actor.owner, token: util_1.Token.geneToken(userId) }
+                                : setting_1.elfSetting.bespokeWithLinker
+                                    ? linkerActor
+                                    : { type: share_1.Actor.player, token: util_1.Token.geneToken(userId || sessionID) };
                         user = null;
                         if (!userId) return [3 /*break*/, 3];
                         return [4 /*yield*/, model_1.UserModel.findById(userId)];

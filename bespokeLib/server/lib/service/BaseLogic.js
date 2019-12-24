@@ -100,11 +100,9 @@ var BaseLogic = /** @class */ (function () {
         });
     };
     BaseLogic.prototype.onGameOver = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                return [2 /*return*/];
-            });
-        });
+        return __awaiter(this, void 0, void 0, function () { return __generator(this, function (_a) {
+            return [2 /*return*/];
+        }); });
     };
     BaseLogic.prototype.moveReducer = function (actor, type, params, cb) {
         return __awaiter(this, void 0, void 0, function () {
@@ -179,14 +177,16 @@ var BaseLogic = /** @class */ (function () {
     BaseLogic.prototype.push = function (actors, type, params) {
         var _this = this;
         var _actors = Array.isArray(actors) ? actors : [actors];
-        setTimeout(function () { return _actors.forEach(function (actor) {
-            try {
-                EventIO_1.EventIO.emitEvent(_this.connections.get(actor.token).id, share_1.SocketEvent.push, type, params);
-            }
-            catch (e) {
-                util_1.Log.e(e);
-            }
-        }); }, 0);
+        setTimeout(function () {
+            return _actors.forEach(function (actor) {
+                try {
+                    EventIO_1.EventIO.emitEvent(_this.connections.get(actor.token).id, share_1.SocketEvent.push, type, params);
+                }
+                catch (e) {
+                    util_1.Log.e(e);
+                }
+            });
+        }, 0);
     };
     BaseLogic.prototype.broadcast = function (type, params) {
         var _this = this;

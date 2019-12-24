@@ -11,6 +11,20 @@ export const Api = new (class extends BaseRequest {
     return await this.get('/user')
   }
 
+  async getBaseGame(
+    gameId: string
+  ): Promise<
+    IHttpRes & {
+      game: IGameWithId
+    }
+  > {
+    return await this.get('/game/baseInfo/:gameId', { gameId })
+  }
+
+  async joinGame(gameId: string): Promise<IHttpRes> {
+    return await this.post('/game/join/:gameId', { gameId })
+  }
+
   async getGame(
     gameId: string
   ): Promise<

@@ -76,7 +76,10 @@ var EventDispatcher = /** @class */ (function () {
                         if (!clientConn.actor) {
                             return [2 /*return*/];
                         }
-                        util_1.Log.i.apply(util_1.Log, __spread([clientConn.actor.token, event], args.filter(function (arg) { return ![null, undefined].includes(arg); }).map(function (arg) {
+                        util_1.Log.i.apply(util_1.Log, __spread([clientConn.actor.token,
+                            event], args
+                            .filter(function (arg) { return ![null, undefined].includes(arg); })
+                            .map(function (arg) {
                             switch (typeof arg) {
                                 case 'function':
                                     return 'CallbackFunction';

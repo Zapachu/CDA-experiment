@@ -1,12 +1,15 @@
 import * as React from 'react'
 import { Actor, config, IActor, IGameState, IGameWithId, IUserWithId, SocketEvent, TSocket } from 'linker-share'
-import { Api, toV5, TPageProps } from '../util'
+import { Api, toV5, TPageProps, V5Route } from '../util'
 import { Lang, MaskLoading } from '@elf/component'
 import { connect } from 'socket.io-client'
 import * as queryString from 'query-string'
 import * as style from './style.scss'
-import { Button, Dropdown, Menu } from 'antd'
+import { Button, Col, Icon, PageHeader, Row, Tabs, Tooltip, Typography } from 'antd'
 import { RouteComponentProps } from 'react-router'
+import dateFormat = require('dateformat')
+
+const { TabPane } = Tabs
 
 declare interface IPlayState {
   game?: IGameWithId
@@ -52,14 +55,14 @@ export class Play extends React.Component<TPageProps & RouteComponentProps<{ gam
 
   render(): React.ReactNode {
     const {
-      props: { user },
+      props: { user, ...routeProps },
       state: { game, actor, gameState }
     } = this
     if (!gameState) {
       return <MaskLoading />
     }
     if (actor.type === Actor.owner) {
-      return <Play4Owner {...{ gameState, game, user }} />
+      return <Play4Owner {...{ gameState, game, user, ...routeProps }} />
     }
     return <iframe className={style.playIframe} src={`${gameState.playUrl}?${Lang.key}=${Lang.activeLanguage}`} />
   }
@@ -71,46 +74,85 @@ export class Play extends React.Component<TPageProps & RouteComponentProps<{ gam
   }
 }
 
-class Play4Owner extends React.Component<{
-  user: IUserWithId
-  game: IGameWithId
-  gameState: IGameState
-}> {
+enum HeadTab {
+  console = 'console',
+  member = 'member',
+  transaction = 'transaction'
+}
+
+class Play4Owner extends React.Component<
+  RouteComponentProps<{ gameId: string }> & {
+    user: IUserWithId
+    game: IGameWithId
+    gameState: IGameState
+  }
+> {
   lang = Lang.extractLang({
+    game: ['实验', 'Game'],
     gameInfo: ['实验信息', 'Game Info'],
     console: ['控制台', 'Console'],
     playerStatus: ['玩家状态', 'Player Status'],
     point: ['得分', 'Point'],
     uniKey: ['唯一标识', 'UniKey'],
     detail: ['详情', 'Detail'],
-    reward: ['奖励', 'Reward']
+    reward: ['奖励', 'Reward'],
+    view: ['查看', 'View'],
+    push: ['推送', 'Push'],
+    share: ['分享', 'Share'],
+    member: ['成员', 'Member'],
+    transaction: ['流水', 'Transaction'],
+    createAt: ['创建时间', 'Create At']
   })
 
   render(): React.ReactNode {
     const {
-      props: { user, game, gameState },
+      props: { user, game, gameState, history },
       lang
     } = this
     return (
-      <section>
-        <div style={{ position: 'absolute', right: 8, top: 48, zIndex: 1000 }}>
-          <Dropdown
-            trigger={['click']}
-            overlay={
-              <Menu>
-                <Menu.Item>
-                  <Button onClick={() => toV5(config.academus.route.home(user.orgCode, game.id))}>
-                    {lang.gameInfo}
-                  </Button>
-                </Menu.Item>
-              </Menu>
-            }
-          >
-            <Button type="primary" shape="circle" icon="bars" />
-          </Dropdown>
-        </div>
-        {gameState.playUrl.includes('ancademy') ? (
-          <iframe className={style.playIframe} src={`${gameState.playUrl}?${Lang.key}=${Lang.activeLanguage}`} />
+      <>
+        <PageHeader
+          breadcrumb={{
+            routes: [
+              {
+                path: '#',
+                breadcrumbName: lang.game
+              },
+              {
+                path: '#',
+                breadcrumbName: lang.console
+              }
+            ]
+          }}
+          title={<Typography.Title level={4}>{game.title}</Typography.Title>}
+          subTitle={
+            <Tooltip title={game.desc}>
+              <Icon type="info-circle" />
+            </Tooltip>
+          }
+          extra={[
+            <Button onClick={() => history.push(`/view/${game.id}`)}>{lang.view}</Button>,
+            <Button onClick={() => toV5(V5Route.push, user.orgCode, game.id)}>{lang.push}</Button>,
+            <Button onClick={() => toV5(V5Route.share, user.orgCode, game.id)} type="primary">
+              {lang.share}
+            </Button>
+          ]}
+        >
+          <Row>
+            <Col span={12} />
+            <Col span={12} style={{ textAlign: 'right' }}>{`${lang.createAt}: ${dateFormat(
+              game.createAt,
+              'yyyy-mm-dd'
+            )}`}</Col>
+          </Row>
+          <Tabs style={{ marginBottom: '-2rem' }} activeKey={HeadTab.console} onChange={tab => console.log(tab)}>
+            <TabPane tab={lang.console} key={HeadTab.console} />
+            <TabPane tab={lang.member} key={HeadTab.member} />
+            <TabPane tab={lang.transaction} key={HeadTab.transaction} />
+          </Tabs>
+        </PageHeader>
+        {gameState.playUrl.includes('bespoke') ? (
+          <iframe className={style.ownerPlayIframe} src={`${gameState.playUrl}?${Lang.key}=${Lang.activeLanguage}`} />
         ) : (
           <div className={style.consoleBtnWrapper}>
             <Button type="primary" onClick={() => window.open(gameState.playUrl)}>
@@ -118,7 +160,7 @@ class Play4Owner extends React.Component<{
             </Button>
           </div>
         )}
-      </section>
+      </>
     )
   }
 }
