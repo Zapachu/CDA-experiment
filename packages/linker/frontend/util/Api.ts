@@ -1,4 +1,4 @@
-import { config, IGameWithId, ILinkerActor, IUserWithId } from 'linker-share'
+import { config, IActor, IGameWithId, IUserWithId } from 'linker-share'
 import { BaseRequest, IHttpRes } from '@elf/component'
 import { IGameThumb } from '@elf/share'
 
@@ -61,7 +61,7 @@ export const Api = new (class extends BaseRequest {
     })
   }
 
-  async getActor(gameId: string, token: string = ''): Promise<IHttpRes & { actor: ILinkerActor }> {
+  async getActor(gameId: string, token: string = ''): Promise<IHttpRes & { actor: IActor }> {
     return await this.get('/game/actor/:gameId', { gameId }, { token })
   }
 })()

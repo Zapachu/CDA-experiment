@@ -1,7 +1,4 @@
-import { Socket } from 'socket.io-client'
-import { AcademusRole, Actor, IActor } from '@elf/share'
-
-export type TSocket = typeof Socket
+import { AcademusRole } from '@elf/share'
 
 export interface IUser {
   orgCode: string
@@ -13,14 +10,6 @@ export interface IUser {
 
 export interface IUserWithId extends IUser {
   id: string
-}
-
-export interface ILinkerActor extends IActor {
-  token: string
-  type: Actor
-  userId: string
-  userName: string
-  playerId: string
 }
 
 export interface IBaseGame {
@@ -48,5 +37,10 @@ export interface IGameWithId extends IGame {
 export interface IPlayer {
   gameId: string
   userId: string
+  token: string
   reward: string
+}
+
+export interface IPlayerWithId extends IPlayer {
+  id: string
 }

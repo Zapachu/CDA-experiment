@@ -4,7 +4,8 @@ import { Api, Frame, GameTemplate, TPageProps } from '../util'
 import { Lang, loadScript } from '@elf/component'
 import { IGameConfig, ResponseCode } from '@elf/share'
 import { RouteComponentProps } from 'react-router'
-import { Button, Card, Form, Input, List, message, Modal, PageHeader, Skeleton } from 'antd'
+import * as ReactMarkdown from 'react-markdown'
+import { Button, Card, Form, Icon, Input, List, message, Modal, PageHeader, Skeleton, Tooltip } from 'antd'
 import * as dateFormat from 'dateformat'
 
 export function Create({
@@ -16,7 +17,7 @@ export function Create({
 }: TPageProps & RouteComponentProps<{ namespace: string; gameId: string }>) {
   const lang = Lang.extractLang({
     title: ['实验标题', 'Game Title'],
-    desc: ['实验描述', 'Description'],
+    desc: ['描述', 'Description'],
     invalidBaseInfo: ['请检查实验标题与描述信息', 'Check game title and description please'],
     start: ['开始', 'Start'],
     end: ['结束', 'End'],
@@ -31,13 +32,15 @@ export function Create({
     detailCfg: ['详细配置', 'Detail Configuration'],
     reset: ['恢复默认', 'Reset'],
     lastStep: ['上一步', 'Last Step'],
-    game: ['实验', 'Game']
+    game: ['实验', 'Game'],
+    preview: ['预览', 'Preview']
   })
   const CardStyle: React.CSSProperties = { margin: '1.5rem' }
   const [loading, setLoading] = React.useState(true),
     [submitable, setSubmitable] = React.useState(true),
     [title, setTitle] = React.useState(''),
     [desc, setDesc] = React.useState(''),
+    [previewDesc, setPreviewDesc] = React.useState(false),
     [params, setParams] = React.useState({})
   React.useEffect(() => {
     Api.getJsUrl(namespace).then(({ code, jsUrl }) => {
@@ -93,15 +96,39 @@ export function Create({
       <div className={style.content}>
         <Card title={lang.baseInfo} style={CardStyle}>
           <Form.Item required={true} label={lang.title} labelCol={{ md: 2 }} wrapperCol={{ md: 10 }}>
-            <Input value={title} maxLength={20} onChange={({ target: { value: title } }) => setTitle(title)} />
-          </Form.Item>
-          <Form.Item required={true} label={lang.desc} labelCol={{ md: 2 }} wrapperCol={{ md: 10 }}>
-            <Input.TextArea
-              value={desc}
-              maxLength={500}
-              autosize={{ minRows: 4, maxRows: 8 }}
-              onChange={({ target: { value: desc } }) => setDesc(desc)}
+            <Input
+              autoFocus
+              value={title}
+              maxLength={20}
+              onChange={({ target: { value: title } }) => setTitle(title)}
             />
+          </Form.Item>
+          <Form.Item
+            required={true}
+            label={
+              <span>
+                {lang.desc}&nbsp;
+                <Tooltip title={lang.preview}>
+                  <Icon type={previewDesc ? 'eye' : 'eye-invisible'} onClick={() => setPreviewDesc(!previewDesc)} />
+                </Tooltip>
+              </span>
+            }
+            labelCol={{ md: 2 }}
+            wrapperCol={{ md: 10 }}
+          >
+            {previewDesc ? (
+              <div className={style.descPreviewWrapper} onClick={() => setPreviewDesc(false)}>
+                <ReactMarkdown source={desc} />
+              </div>
+            ) : (
+              <Input.TextArea
+                onBlur={() => setPreviewDesc(true)}
+                value={desc}
+                maxLength={500}
+                autosize={{ minRows: 4, maxRows: 8 }}
+                onChange={({ target: { value: desc } }) => setDesc(desc)}
+              />
+            )}
           </Form.Item>
         </Card>
         <Card title={lang.detailCfg} style={CardStyle}>

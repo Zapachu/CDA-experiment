@@ -22,7 +22,6 @@ export function Play({ user, ...routeProps }: TPageProps & RouteComponentProps<{
       } = routeProps,
       { token = '' } = queryString.parse(search)
     Promise.all([Api.getGame(gameId), Api.getActor(gameId, token as string)]).then(([{ game }, { actor }]) => {
-      console.log(game, actor)
       if (!actor) {
         this.props.history.push('/join')
         return

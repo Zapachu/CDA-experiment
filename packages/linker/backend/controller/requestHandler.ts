@@ -43,8 +43,7 @@ export class UserCtrl {
     if (owner === userId) {
       return next()
     }
-    const player = await PlayerService.findPlayerId(gameId, userId)
-    console.log(player)
+    const player = await PlayerService.findPlayer(gameId, userId)
     if (player) {
       return next()
     }
@@ -130,8 +129,8 @@ export class GameCtrl {
       } = req,
       userId = _id.toString()
     try {
-      const playerId = await PlayerService.findPlayerId(gameId, userId)
-      if (!playerId) {
+      const player = await PlayerService.findPlayer(gameId, userId)
+      if (!player) {
         await PlayerService.savePlayer(gameId, userId)
       }
     } catch (e) {
@@ -151,17 +150,15 @@ export class GameCtrl {
       } = req,
       userId = user._id.toString()
     const game = await GameService.getGame(gameId),
-      playerId = await PlayerService.findPlayerId(gameId, userId)
-    const token = Token.geneToken(userId === game.owner ? userId : playerId),
-      type = userId === game.owner ? Actor.owner : Actor.player
-    req.session.actor = {
-      token,
-      type
-    } as IActor
+      player = await PlayerService.findPlayer(gameId, userId)
+    const token = userId === game.owner ? Token.geneToken(userId) : player.token,
+      type = userId === game.owner ? Actor.owner : Actor.player,
+      actor: IActor = { token, type }
+    req.session.actor = actor
     res.json({
       code: ResponseCode.success,
       game,
-      actor: { token, type, playerId }
+      actor
     })
   }
 
@@ -170,7 +167,6 @@ export class GameCtrl {
       user,
       params: { namespace }
     } = req
-    console.log(namespace)
     try {
       const historyGameThumbs: Array<IGameThumb> = (
         await GameModel.find({

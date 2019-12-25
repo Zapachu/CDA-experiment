@@ -5,6 +5,7 @@ var _a = mongoose_1.Schema.Types, ObjectId = _a.ObjectId, Number = _a.Number;
 exports.ElfPlayer = new mongoose_1.Schema({
     userId: { type: ObjectId, ref: 'User' },
     gameId: { type: ObjectId, ref: 'ElfGame' },
+    token: String,
     reward: { type: Number, "default": 0 },
     result: {
         type: Object, "default": {

@@ -1,4 +1,5 @@
 import { GameModel, PlayerModel, UserModel } from '../model'
+import { IPlayerWithId } from 'linker-share'
 import { Token } from '@elf/util'
 
 export class PlayerService {
@@ -14,8 +15,11 @@ export class PlayerService {
     return player.id
   }
 
-  static async findPlayerId(gameId: string, userId: string): Promise<string> {
-    const player = await PlayerModel.findOne({ gameId, userId })
-    return player ? player.id : null
+  static async findPlayer(gameId: string, userId: string): Promise<IPlayerWithId> {
+    const player = await PlayerModel.findOne({ gameId, userId }).lean()
+    if (!player) {
+      return null
+    }
+    return { ...player, id: player._id }
   }
 }
