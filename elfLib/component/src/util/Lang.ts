@@ -6,7 +6,7 @@ export namespace Lang {
     en = "en"
   }
 
-  export const key = "lang",
+  export const key = "elf_lang",
     languages = [Language.zh, Language.en],
     defaultLanguageIndex = 0,
     switchListeners: Array<() => void> = [];

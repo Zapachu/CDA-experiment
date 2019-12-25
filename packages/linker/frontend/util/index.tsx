@@ -44,7 +44,7 @@ export function toV5(route: V5Route, orgCode?: string, gameId?: string) {
       routePath = `/org/${orgCode}/task/game/item/${gameId}/members`
       break
     case V5Route.transaction:
-      routePath = `/org/${orgCode}/task/game/trans/${gameId}`
+      routePath = `/org/${orgCode}/trans/game/${gameId}`
       break
   }
   window.open(`${config.academus.route.prefix}${routePath}`, '_blank')
