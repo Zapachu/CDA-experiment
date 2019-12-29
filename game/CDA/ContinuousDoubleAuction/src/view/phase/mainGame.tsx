@@ -1,6 +1,7 @@
 import * as React from 'react'
 import * as style from './style.scss'
-import { Button, ButtonProps, Label, Lang, MaskLoading, RangeInput, Toast, Input, Switch } from '@elf/component'
+import { Button, ButtonProps, Label, Lang, MaskLoading, RangeInput, Switch, Toast } from '@elf/component'
+import { InputNumber } from 'antd'
 import { BasePhase } from './BasePhase'
 import { CreateParams, GameState } from '../../interface'
 
@@ -105,20 +106,18 @@ class Create extends BasePhase.Create<ICreateState> {
           ))}
           <li className={style.robotStartTimeGenerator}>
             <Label label={lang.robotStartTime} />
-            <Input
-              type="number"
+            <InputNumber
               min={0}
               max={10}
               value={minStartTime}
-              onChange={({ target: { value } }) => this.setState({ minStartTime: value as any })}
+              onChange={value => this.setState({ minStartTime: value as any })}
             />
             ~
-            <Input
-              type="number"
+            <InputNumber
               min={0}
               max={10}
               value={maxStartTime}
-              onChange={({ target: { value } }) => this.setState({ maxStartTime: value as any })}
+              onChange={value => this.setState({ maxStartTime: value as any })}
             />
             <a
               className={style.btnGenerate}

@@ -12,7 +12,6 @@ $height-tr: 2.4rem;
 }
 
 @mixin createTable {
-  width: 100%;
   tr {
     padding: 0 2rem;
     height: 3rem;
@@ -94,9 +93,6 @@ $height-tr: 2.4rem;
     }
     .positions {
       @include createTable;
-      width: 90vw;
-      position: relative;
-      left: -20vw;
 
       tr td:last-child span{
         font-size: .8rem;
