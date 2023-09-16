@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<e:Skin class="eui.TextInputSkin" width="360" height="72" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" >
-	<w:Config id="16b4e986d6e" ></w:Config>
-	<e:Rect fillColor="0xffffff" anchorOffsetY="0" left="0" right="0" height="2" bottom="0"/>
-	<e:EditableText text="" left="0" right="0" top="0" bottom="0" verticalAlign="middle" textAlign="center" size="48" fontFamily="SimHei"/>
-</e:Skin>

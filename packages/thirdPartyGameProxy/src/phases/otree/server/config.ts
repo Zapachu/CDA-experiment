@@ -1,7 +1,0 @@
-export const virtualJsRoute = '/static/phase/otreeRegister.js'
-export const getOTreeListRoute = '/phases/list'
-export const reportScreenRoute = '/report/screen'
-export const jqueryRoute = '/static/otree/js/jquery-3.2.1'
-export const initRoute = '/init'
-export const previewScreenXlsxRoute = '/previewScreenXlsx'
-export const downloadScreenXlsxRoute = '/downloadScreenXlsx'

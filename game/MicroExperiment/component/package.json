@@ -1,9 +1,0 @@
-{
-  "name": "@micro-experiment/component",
-  "version": "1.1.1",
-  "main": "lib/index",
-  "types": "lib/index",
-  "dependencies": {
-    "@micro-experiment/share": "^1.1.1"
-  }
-}
